@@ -20,7 +20,9 @@ jobs:
       - name: Evaluate full API and selected operations
         shell: bash
         run: |
-          set -uo pipefail
+          set -euo pipefail
+          evaluation_status=0
+          export CARGO_TARGET_DIR="$RUNNER_TEMP/evaluation-target"
           mkdir -p evaluation
           curl -fsSL https://raw.githubusercontent.com/mistralai/platform-docs-public/ff846cf93d91df6fe04d0a5e540ecbe1e0ecc691/openapi.yaml -o evaluation/openapi.yaml
           curl -fsSL https://crates.io/api/v1/crates/mistralai -o evaluation/crate-name.json || true
@@ -49,18 +51,19 @@ jobs:
           prune_models = true
           EOF
             fi
-            openapi-to-rust generate --config "evaluation/$scope/config.toml" > "evaluation/$scope/generate.log" 2>&1 || continue
+            openapi-to-rust generate --config "evaluation/$scope/config.toml" > "evaluation/$scope/generate.log" 2>&1 || { evaluation_status=1; continue; }
             printf '[package]\nname = "evaluate-%s"\nversion = "0.0.0"\nedition = "2024"\n' "$scope" > "evaluation/$scope/Cargo.toml"
             cat "evaluation/$scope/src/generated/REQUIRED_DEPS.toml" >> "evaluation/$scope/Cargo.toml"
             printf 'pub mod generated;\n' > "evaluation/$scope/src/lib.rs"
-            cargo +1.94.0 check --manifest-path "evaluation/$scope/Cargo.toml" > "evaluation/$scope/check.log" 2>&1
-            cargo +1.94.0 clippy --manifest-path "evaluation/$scope/Cargo.toml" -- -D warnings > "evaluation/$scope/clippy.log" 2>&1
+            cargo +1.94.0 check --manifest-path "evaluation/$scope/Cargo.toml" > "evaluation/$scope/check.log" 2>&1 || evaluation_status=1
+            cargo +1.94.0 clippy --manifest-path "evaluation/$scope/Cargo.toml" -- -D warnings > "evaluation/$scope/clippy.log" 2>&1 || evaluation_status=1
           done
+          exit "$evaluation_status"
       - name: Commit evaluation evidence to development branch
         if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add evaluation ':!evaluation/**/target' 
+          git add evaluation 
           git diff --cached --quiet || git commit -m "chore: record generator evaluation results"
           git push origin HEAD:feat/generated-sdk
