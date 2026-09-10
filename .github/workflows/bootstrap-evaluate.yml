@@ -1,0 +1,66 @@
+name: Bootstrap generator evaluation
+on:
+  push:
+    branches: [feat/generated-sdk]
+    paths: [.github/workflows/bootstrap-evaluate.yml]
+permissions:
+  contents: write
+jobs:
+  evaluate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup toolchain install 1.94.0 --profile minimal --component rustfmt,clippy
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cargo
+          key: bootstrap-openapi-to-rust-0.16.0-1.94.0
+      - run: cargo +1.94.0 install --locked openapi-to-rust --version 0.16.0
+      - name: Evaluate full API and selected operations
+        shell: bash
+        run: |
+          set -uo pipefail
+          mkdir -p evaluation
+          curl -fsSL https://raw.githubusercontent.com/mistralai/platform-docs-public/ff846cf93d91df6fe04d0a5e540ecbe1e0ecc691/openapi.yaml -o evaluation/openapi.yaml
+          curl -fsSL https://crates.io/api/v1/crates/mistralai -o evaluation/crate-name.json || true
+          for scope in full selected; do
+            mkdir -p "evaluation/$scope/src"
+            cat > "evaluation/$scope/config.toml" <<'EOF'
+          [generator]
+          spec_path = "../openapi.yaml"
+          output_dir = "src/generated"
+          module_name = "mistralai"
+          [features]
+          enable_async_client = true
+          [http_client]
+          base_url = "https://api.mistral.ai"
+          timeout_seconds = 120
+          [http_client.retry]
+          max_retries = 0
+          [http_client.auth]
+          type = "Bearer"
+          header_name = "Authorization"
+          EOF
+            if [ "$scope" = selected ]; then
+              cat >> "evaluation/$scope/config.toml" <<'EOF'
+          [client]
+          operations = ["POST /v1/chat/completions", "GET /v1/models", "GET /v1/models/{model_id}"]
+          prune_models = true
+          EOF
+            fi
+            openapi-to-rust generate --config "evaluation/$scope/config.toml" > "evaluation/$scope/generate.log" 2>&1 || continue
+            printf '[package]\nname = "evaluate-%s"\nversion = "0.0.0"\nedition = "2024"\n' "$scope" > "evaluation/$scope/Cargo.toml"
+            cat "evaluation/$scope/src/generated/REQUIRED_DEPS.toml" >> "evaluation/$scope/Cargo.toml"
+            printf 'pub mod generated;\n' > "evaluation/$scope/src/lib.rs"
+            cargo +1.94.0 check --manifest-path "evaluation/$scope/Cargo.toml" > "evaluation/$scope/check.log" 2>&1
+            cargo +1.94.0 clippy --manifest-path "evaluation/$scope/Cargo.toml" -- -D warnings > "evaluation/$scope/clippy.log" 2>&1
+          done
+      - name: Commit evaluation evidence to development branch
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add evaluation ':!evaluation/**/target' 
+          git diff --cached --quiet || git commit -m "chore: record generator evaluation results"
+          git push origin HEAD:feat/generated-sdk
