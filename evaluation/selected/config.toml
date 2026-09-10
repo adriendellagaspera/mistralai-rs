@@ -1,0 +1,17 @@
+[generator]
+spec_path = "../openapi.yaml"
+output_dir = "src/generated"
+module_name = "mistralai"
+[features]
+enable_async_client = true
+[http_client]
+base_url = "https://api.mistral.ai"
+timeout_seconds = 120
+[http_client.retry]
+max_retries = 0
+[http_client.auth]
+type = "Bearer"
+header_name = "Authorization"
+[client]
+operations = ["POST /v1/chat/completions", "GET /v1/models", "GET /v1/models/{model_id}"]
+prune_models = true

@@ -1,0 +1,30 @@
+    Updating crates.io index
+     Locking 193 packages to latest Rust 1.94.0 compatible versions
+    Checking bytes v1.12.1
+   Compiling serde_core v1.0.229
+    Checking futures-util v0.3.34
+   Compiling serde v1.0.229
+    Checking url v2.5.8
+    Checking tokio v1.53.1
+    Checking http v1.5.0
+    Checking http-body v1.1.0
+    Checking http-body-util v0.1.5
+    Checking futures-executor v0.3.34
+    Checking futures v0.3.34
+    Checking serde_json v1.0.151
+    Checking uuid v1.26.1
+    Checking serde_urlencoded v0.7.1
+    Checking chrono v0.4.45
+    Checking hyper v1.11.1
+    Checking tower v0.5.3
+    Checking tokio-rustls v0.26.5
+    Checking tokio-util v0.7.19
+    Checking tower-http v0.6.11
+    Checking hyper-util v0.1.20
+    Checking hyper-rustls v0.27.9
+    Checking reqwest v0.13.5
+    Checking reqwest-middleware v0.5.2
+    Checking reqwest-retry v0.9.1
+    Checking reqwest-tracing v0.7.1
+    Checking evaluate-selected v0.0.0 (/home/runner/work/mistralai-rs/mistralai-rs/evaluation/selected)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 7.59s
