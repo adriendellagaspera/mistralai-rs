@@ -1,10 +1,13 @@
+use futures_util::{Stream, StreamExt};
 use serde::Serialize;
 
 use super::SdkError;
 use crate::generated::client::HttpClient;
-use crate::generated::types::{ChatCompletionRequest, ChatCompletionResponse};
+use crate::generated::types::{ChatCompletionRequest, ChatCompletionResponse, CompletionChunk};
+use crate::streaming;
 
 pub type ChatResponse = ChatCompletionResponse;
+pub type ChatStreamChunk = CompletionChunk;
 
 /// A chat message with a role and textual content.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -29,7 +32,7 @@ impl Message {
     }
 }
 
-/// Ergonomic request for a non-streaming chat completion.
+/// Ergonomic request shared by non-streaming and streaming chat completions.
 #[derive(Debug, Clone)]
 pub struct ChatRequest {
     model: String,
@@ -51,11 +54,11 @@ impl ChatRequest {
         self
     }
 
-    fn into_raw(self) -> Result<ChatCompletionRequest, SdkError> {
+    fn into_raw(self, stream: bool) -> Result<ChatCompletionRequest, SdkError> {
         let mut value = serde_json::json!({
             "model": self.model,
             "messages": self.messages,
-            "stream": false,
+            "stream": stream,
         });
         if let Some(max_tokens) = self.max_tokens {
             value["max_tokens"] = serde_json::json!(max_tokens);
@@ -78,9 +81,24 @@ impl<'a> Chat<'a> {
     /// Create a chat completion.
     pub async fn complete(&self, request: ChatRequest) -> Result<ChatResponse, SdkError> {
         self.raw
-            .chat_completion_v1_chat_completions_post(request.into_raw()?)
+            .chat_completion_v1_chat_completions_post(request.into_raw(false)?)
             .await
             .map_err(SdkError::api)
+    }
+
+    /// Stream completion chunks without exposing the raw SSE byte stream.
+    pub async fn stream(
+        &self,
+        request: ChatRequest,
+    ) -> Result<impl Stream<Item = Result<ChatStreamChunk, SdkError>>, SdkError> {
+        let bytes = self
+            .raw
+            .chat_completion_v1_chat_completions_post_stream(request.into_raw(true)?)
+            .await
+            .map_err(SdkError::api)?;
+        Ok(streaming::json_events::<_, _, CompletionChunk>(bytes).map(|event| {
+            event.map(|event| event.data).map_err(SdkError::api)
+        }))
     }
 }
 
@@ -95,7 +113,7 @@ mod tests {
             [Message::system("Be concise."), Message::user("Bonjour")],
         )
         .max_tokens(64)
-        .into_raw()
+        .into_raw(false)
         .unwrap();
 
         let value = serde_json::to_value(raw).unwrap();
@@ -104,5 +122,14 @@ mod tests {
         assert_eq!(value["messages"][1]["content"], "Bonjour");
         assert_eq!(value["max_tokens"], 64);
         assert_eq!(value["stream"], false);
+    }
+
+    #[test]
+    fn streaming_request_sets_stream_contract() {
+        let raw = ChatRequest::new("mistral-small-latest", [Message::user("Bonjour")])
+            .into_raw(true)
+            .unwrap();
+        let value = serde_json::to_value(raw).unwrap();
+        assert_eq!(value["stream"], true);
     }
 }
