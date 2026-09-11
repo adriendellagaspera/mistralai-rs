@@ -6,10 +6,13 @@ use std::path::{Path, PathBuf};
 use syn::{ImplItem, Item, ItemImpl, Type};
 
 const INDEX_SIZE: usize = 200;
-const MAX_RUST_LINES: usize = 1_200;
+const TARGET_RUST_LINES: usize = 1_200;
+const MAX_ATOMIC_RUST_LINES: usize = 5_000;
 
 fn main() {
-    let generated = env::args().nth(1).expect("usage: mistralai-codegen-layout <generated-dir>");
+    let generated = env::args()
+        .nth(1)
+        .expect("usage: mistralai-codegen-layout <generated-dir>");
     let generated = PathBuf::from(generated);
     split_file(&generated.join("types.rs"), "types", false);
     split_file(&generated.join("client.rs"), "client", true);
@@ -49,7 +52,7 @@ fn split_file(path: &Path, directory: &str, split_http_client: bool) {
             attrs: Vec::new(),
             items: vec![item],
         };
-        write_rust(&output_dir.join(&filename), prettyplease::unparse(&file));
+        write_atomic_rust(&output_dir.join(&filename), prettyplease::unparse(&file));
         files.push(filename);
     }
 
@@ -60,7 +63,7 @@ fn split_file(path: &Path, directory: &str, split_http_client: bool) {
             .iter()
             .map(|file| format!("include!(\"{file}\");\n"))
             .collect::<String>();
-        write_rust(&output_dir.join(&filename), body);
+        write_layout_rust(&output_dir.join(&filename), body);
         index_files.push(filename);
     }
 
@@ -74,17 +77,33 @@ fn split_file(path: &Path, directory: &str, split_http_client: bool) {
             .expect("build include item");
         facade.items.push(include);
     }
-    write_rust(path, prettyplease::unparse(&facade));
+    write_layout_rust(path, prettyplease::unparse(&facade));
 }
 
-fn write_rust(path: &Path, source: String) {
+fn write_layout_rust(path: &Path, source: String) {
     let lines = source.lines().count();
     assert!(
-        lines <= MAX_RUST_LINES,
-        "generated layout file {} has {lines} lines; maximum is {MAX_RUST_LINES}",
+        lines <= TARGET_RUST_LINES,
+        "generated layout file {} has {lines} lines; maximum is {TARGET_RUST_LINES}",
         path.display()
     );
     fs::write(path, source).expect("write generated layout file");
+}
+
+fn write_atomic_rust(path: &Path, source: String) {
+    let lines = source.lines().count();
+    if lines > TARGET_RUST_LINES {
+        eprintln!(
+            "warning: generated atomic Rust item {} has {lines} lines; target is {TARGET_RUST_LINES}",
+            path.display()
+        );
+    }
+    assert!(
+        lines <= MAX_ATOMIC_RUST_LINES,
+        "generated atomic Rust item {} has {lines} lines; hard maximum is {MAX_ATOMIC_RUST_LINES}",
+        path.display()
+    );
+    fs::write(path, source).expect("write generated atomic item");
 }
 
 fn split_http_client_impl(item: Item) -> Vec<Item> {
@@ -108,7 +127,11 @@ fn split_http_client_impl(item: Item) -> Vec<Item> {
 
 fn is_http_client(ty: &Type) -> bool {
     match ty {
-        Type::Path(path) => path.path.segments.last().is_some_and(|segment| segment.ident == "HttpClient"),
+        Type::Path(path) => path
+            .path
+            .segments
+            .last()
+            .is_some_and(|segment| segment.ident == "HttpClient"),
         _ => false,
     }
 }
@@ -134,7 +157,11 @@ fn item_name(item: &Item, index: usize) -> String {
 
 fn impl_name(item: &ItemImpl) -> String {
     let target = match item.self_ty.as_ref() {
-        Type::Path(path) => path.path.segments.last().map(|segment| segment.ident.to_string()),
+        Type::Path(path) => path
+            .path
+            .segments
+            .last()
+            .map(|segment| segment.ident.to_string()),
         _ => None,
     }
     .unwrap_or_else(|| "type".to_string());
@@ -196,5 +223,10 @@ mod tests {
     fn names_are_deterministic_and_bounded() {
         assert_eq!(snake_case("ChatCompletionRequest"), "chat_completion_request");
         assert!(snake_case(&"A".repeat(200)).len() <= 96);
+    }
+
+    #[test]
+    fn atomic_items_may_exceed_layout_target_but_have_a_hard_cap() {
+        assert!(TARGET_RUST_LINES < MAX_ATOMIC_RUST_LINES);
     }
 }
