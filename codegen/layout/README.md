@@ -1,0 +1,1 @@
+Generated layout tooling for splitting monolithic Rust output into deterministic include files while preserving public module paths.
