@@ -18,7 +18,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let chunk = event?.data;
         println!("{chunk:?}");
         if let Some(usage) = chunk.usage {
-            println!("prompt={}, completion={}", usage.prompt_tokens, usage.completion_tokens);
+            println!(
+                "prompt={}, completion={}",
+                usage.prompt_tokens, usage.completion_tokens
+            );
         }
     }
     Ok(())

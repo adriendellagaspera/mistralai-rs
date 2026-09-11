@@ -230,6 +230,7 @@ pub struct HttpClient {
     api_key: Option<String>,
     http_client: ClientWithMiddleware,
     custom_headers: BTreeMap<String, String>,
+    upload_filename: String,
     max_response_body_bytes: usize,
 }
 async fn __read_bounded_response_body(
@@ -276,6 +277,7 @@ impl HttpClient {
             api_key: None,
             http_client,
             custom_headers: BTreeMap::new(),
+            upload_filename: "upload".to_string(),
             max_response_body_bytes: 8388608usize,
         }
     }
@@ -285,6 +287,10 @@ impl HttpClient {
         self
     }
     /// Set the API key for authentication
+    pub fn with_upload_filename(mut self, filename: impl Into<String>) -> Self {
+        self.upload_filename = filename.into();
+        self
+    }
     pub fn with_api_key(mut self, api_key: impl Into<String>) -> Self {
         self.api_key = Some(api_key.into());
         self
@@ -325,9 +331,898 @@ fn __pct_encode_path_segment(s: &str) -> String {
     }
     out
 }
+///Allowed values for the `operator` query parameter.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
+pub enum GetChatCompletionFieldOptionsV1ObservabilityChatCompletionFieldsFieldNameOptionsGetOperator
+{
+    #[serde(rename = "lt")]
+    Lt,
+    #[serde(rename = "lte")]
+    Lte,
+    #[serde(rename = "gt")]
+    Gt,
+    #[serde(rename = "gte")]
+    Gte,
+    #[serde(rename = "startswith")]
+    Startswith,
+    #[serde(rename = "istartswith")]
+    Istartswith,
+    #[serde(rename = "endswith")]
+    Endswith,
+    #[serde(rename = "iendswith")]
+    Iendswith,
+    #[serde(rename = "contains")]
+    Contains,
+    #[serde(rename = "icontains")]
+    Icontains,
+    #[serde(rename = "matches")]
+    Matches,
+    #[serde(rename = "notcontains")]
+    Notcontains,
+    #[serde(rename = "inotcontains")]
+    Inotcontains,
+    #[serde(rename = "eq")]
+    Eq,
+    #[serde(rename = "neq")]
+    Neq,
+    #[serde(rename = "isnull")]
+    Isnull,
+    #[serde(rename = "includes")]
+    Includes,
+    #[serde(rename = "excludes")]
+    Excludes,
+    #[serde(rename = "len_eq")]
+    LenEq,
+}
+impl GetChatCompletionFieldOptionsV1ObservabilityChatCompletionFieldsFieldNameOptionsGetOperator {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::Lt => "lt",
+            Self::Lte => "lte",
+            Self::Gt => "gt",
+            Self::Gte => "gte",
+            Self::Startswith => "startswith",
+            Self::Istartswith => "istartswith",
+            Self::Endswith => "endswith",
+            Self::Iendswith => "iendswith",
+            Self::Contains => "contains",
+            Self::Icontains => "icontains",
+            Self::Matches => "matches",
+            Self::Notcontains => "notcontains",
+            Self::Inotcontains => "inotcontains",
+            Self::Eq => "eq",
+            Self::Neq => "neq",
+            Self::Isnull => "isnull",
+            Self::Includes => "includes",
+            Self::Excludes => "excludes",
+            Self::LenEq => "len_eq",
+        }
+    }
+}
+impl std::fmt::Display
+    for GetChatCompletionFieldOptionsV1ObservabilityChatCompletionFieldsFieldNameOptionsGetOperator
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+impl AsRef<str>
+    for GetChatCompletionFieldOptionsV1ObservabilityChatCompletionFieldsFieldNameOptionsGetOperator
+{
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+///Allowed values for the `scope` query parameter.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
+pub enum GetStreamEventsV1WorkflowsEventsStreamGetScope {
+    #[serde(rename = "activity")]
+    Activity,
+    #[serde(rename = "workflow")]
+    Workflow,
+    #[serde(rename = "*")]
+    Value,
+}
+impl GetStreamEventsV1WorkflowsEventsStreamGetScope {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::Activity => "activity",
+            Self::Workflow => "workflow",
+            Self::Value => "*",
+        }
+    }
+}
+impl std::fmt::Display for GetStreamEventsV1WorkflowsEventsStreamGetScope {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+impl AsRef<str> for GetStreamEventsV1WorkflowsEventsStreamGetScope {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+///Allowed values for the `order_by` query parameter.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Deserialize, serde::Serialize)]
+pub enum JobsApiRoutesBatchGetBatchJobsOrderBy {
+    #[serde(rename = "created")]
+    Created,
+    #[serde(rename = "-created")]
+    Created2,
+}
+impl JobsApiRoutesBatchGetBatchJobsOrderBy {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::Created => "created",
+            Self::Created2 => "-created",
+        }
+    }
+}
+impl std::fmt::Display for JobsApiRoutesBatchGetBatchJobsOrderBy {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+impl AsRef<str> for JobsApiRoutesBatchGetBatchJobsOrderBy {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+///Typed error responses for `agents_api_v1_agents_create`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum AgentsApiV1AgentsCreateApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `agents_api_v1_agents_create_or_update_alias`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum AgentsApiV1AgentsCreateOrUpdateAliasApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `agents_api_v1_agents_delete`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum AgentsApiV1AgentsDeleteApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `agents_api_v1_agents_delete_alias`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum AgentsApiV1AgentsDeleteAliasApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `agents_api_v1_agents_get`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum AgentsApiV1AgentsGetApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `agents_api_v1_agents_get_version`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum AgentsApiV1AgentsGetVersionApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `agents_api_v1_agents_list`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum AgentsApiV1AgentsListApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `agents_api_v1_agents_list_pages`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum AgentsApiV1AgentsListPagesApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `agents_api_v1_agents_list_version_aliases`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum AgentsApiV1AgentsListVersionAliasesApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `agents_api_v1_agents_list_versions`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum AgentsApiV1AgentsListVersionsApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `agents_api_v1_agents_update`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum AgentsApiV1AgentsUpdateApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `agents_api_v1_agents_update_version`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum AgentsApiV1AgentsUpdateVersionApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `agents_api_v1_conversations_append`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum AgentsApiV1ConversationsAppendApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `agents_api_v1_conversations_append_stream`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum AgentsApiV1ConversationsAppendStreamApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `agents_api_v1_conversations_delete`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum AgentsApiV1ConversationsDeleteApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `agents_api_v1_conversations_get`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum AgentsApiV1ConversationsGetApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `agents_api_v1_conversations_history`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum AgentsApiV1ConversationsHistoryApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `agents_api_v1_conversations_list`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum AgentsApiV1ConversationsListApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `agents_api_v1_conversations_messages`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum AgentsApiV1ConversationsMessagesApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `agents_api_v1_conversations_restart`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum AgentsApiV1ConversationsRestartApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `agents_api_v1_conversations_restart_stream`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum AgentsApiV1ConversationsRestartStreamApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `agents_api_v1_conversations_start`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum AgentsApiV1ConversationsStartApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `agents_api_v1_conversations_start_stream`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum AgentsApiV1ConversationsStartStreamApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `agents_completion_v1_agents_completions_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum AgentsCompletionV1AgentsCompletionsPostApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `archive_workflow_v1_workflows__workflow_identifier__archive_put`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum ArchiveWorkflowV1WorkflowsWorkflowIdentifierArchivePutApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `batch_cancel_workflow_executions_v1_workflows_executions_cancel_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum BatchCancelWorkflowExecutionsV1WorkflowsExecutionsCancelPostApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `batch_terminate_workflow_executions_v1_workflows_executions_terminate_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum BatchTerminateWorkflowExecutionsV1WorkflowsExecutionsTerminatePostApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `cancel_workflow_execution_v1_workflows_executions__execution_id__cancel_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum CancelWorkflowExecutionV1WorkflowsExecutionsExecutionIdCancelPostApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `chat_classifications_v1_chat_classifications_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum ChatClassificationsV1ChatClassificationsPostApiError {
+    Status422(HTTPValidationError),
+}
 ///Typed error responses for `chat_completion_v1_chat_completions_post`. One variant per declared non-2xx response.
 #[derive(Debug, Clone)]
 pub enum ChatCompletionV1ChatCompletionsPostApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `chat_completion_v1_chat_completions_post_stream`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum ChatCompletionV1ChatCompletionsPostStreamApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `chat_moderations_v1_chat_moderations_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum ChatModerationsV1ChatModerationsPostApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `classifications_v1_classifications_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum ClassificationsV1ClassificationsPostApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `connector_call_tool_v1`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum ConnectorCallToolV1ApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `connector_create_or_update_organization_credentials_v1`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum ConnectorCreateOrUpdateOrganizationCredentialsV1ApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `connector_create_or_update_user_credentials_v1`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum ConnectorCreateOrUpdateUserCredentialsV1ApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `connector_create_or_update_workspace_credentials_v1`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum ConnectorCreateOrUpdateWorkspaceCredentialsV1ApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `connector_create_v1`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum ConnectorCreateV1ApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `connector_delete_organization_credentials_v1`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum ConnectorDeleteOrganizationCredentialsV1ApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `connector_delete_user_credentials_v1`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum ConnectorDeleteUserCredentialsV1ApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `connector_delete_v1`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum ConnectorDeleteV1ApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `connector_delete_workspace_credentials_v1`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum ConnectorDeleteWorkspaceCredentialsV1ApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `connector_get_auth_url_v1`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum ConnectorGetAuthUrlV1ApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `connector_get_v1`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum ConnectorGetV1ApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `connector_list_organization_credentials_v1`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum ConnectorListOrganizationCredentialsV1ApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `connector_list_tools_v1`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum ConnectorListToolsV1ApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `connector_list_user_credentials_v1`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum ConnectorListUserCredentialsV1ApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `connector_list_v1`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum ConnectorListV1ApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `connector_list_workspace_credentials_v1`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum ConnectorListWorkspaceCredentialsV1ApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `connector_update_v1`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum ConnectorUpdateV1ApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `create_campaign_v1_observability_campaigns_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum CreateCampaignV1ObservabilityCampaignsPostApiError {
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `create_dataset_record_v1_observability_datasets__dataset_id__records_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum CreateDatasetRecordV1ObservabilityDatasetsDatasetIdRecordsPostApiError {
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `create_dataset_v1_observability_datasets_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum CreateDatasetV1ObservabilityDatasetsPostApiError {
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `create_judge_v1_observability_judges_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum CreateJudgeV1ObservabilityJudgesPostApiError {
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `create_voice_v1_audio_voices_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum CreateVoiceV1AudioVoicesPostApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `delete_campaign_v1_observability_campaigns__campaign_id__delete`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum DeleteCampaignV1ObservabilityCampaignsCampaignIdDeleteApiError {
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `delete_dataset_record_v1_observability_dataset_records__dataset_record_id__delete`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum DeleteDatasetRecordV1ObservabilityDatasetRecordsDatasetRecordIdDeleteApiError {
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `delete_dataset_records_v1_observability_dataset_records_bulk_delete_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum DeleteDatasetRecordsV1ObservabilityDatasetRecordsBulkDeletePostApiError {
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `delete_dataset_v1_observability_datasets__dataset_id__delete`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum DeleteDatasetV1ObservabilityDatasetsDatasetIdDeleteApiError {
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `delete_judge_v1_observability_judges__judge_id__delete`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum DeleteJudgeV1ObservabilityJudgesJudgeIdDeleteApiError {
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `delete_model_v1_models__model_id__delete`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum DeleteModelV1ModelsModelIdDeleteApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `delete_voice_v1_audio_voices__voice_id__delete`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum DeleteVoiceV1AudioVoicesVoiceIdDeleteApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `embeddings_v1_embeddings_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum EmbeddingsV1EmbeddingsPostApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `execute_workflow_registration_v1_workflows_registrations__workflow_registration_id__execute_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum ExecuteWorkflowRegistrationV1WorkflowsRegistrationsWorkflowRegistrationIdExecutePostApiError
+{
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `execute_workflow_v1_workflows__workflow_identifier__execute_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum ExecuteWorkflowV1WorkflowsWorkflowIdentifierExecutePostApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `export_dataset_to_jsonl_v1_observability_datasets__dataset_id__exports_to_jsonl_get`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum ExportDatasetToJsonlV1ObservabilityDatasetsDatasetIdExportsToJsonlGetApiError {
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `fim_completion_v1_fim_completions_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum FimCompletionV1FimCompletionsPostApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `fim_completion_v1_fim_completions_post_stream`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum FimCompletionV1FimCompletionsPostStreamApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `get_campaign_by_id_v1_observability_campaigns__campaign_id__get`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum GetCampaignByIdV1ObservabilityCampaignsCampaignIdGetApiError {
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `get_campaign_selected_events_v1_observability_campaigns__campaign_id__selected_events_get`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum GetCampaignSelectedEventsV1ObservabilityCampaignsCampaignIdSelectedEventsGetApiError {
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `get_campaign_status_by_id_v1_observability_campaigns__campaign_id__status_get`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum GetCampaignStatusByIdV1ObservabilityCampaignsCampaignIdStatusGetApiError {
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `get_campaigns_v1_observability_campaigns_get`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum GetCampaignsV1ObservabilityCampaignsGetApiError {
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `get_chat_completion_event_ids_v1_observability_chat_completion_events_search_ids_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum GetChatCompletionEventIdsV1ObservabilityChatCompletionEventsSearchIdsPostApiError {
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `get_chat_completion_event_v1_observability_chat_completion_events__event_id__get`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum GetChatCompletionEventV1ObservabilityChatCompletionEventsEventIdGetApiError {
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `get_chat_completion_events_v1_observability_chat_completion_events_search_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum GetChatCompletionEventsV1ObservabilityChatCompletionEventsSearchPostApiError {
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `get_chat_completion_field_options_counts_v1_observability_chat_completion_fields__field_name__options_counts_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum GetChatCompletionFieldOptionsCountsV1ObservabilityChatCompletionFieldsFieldNameOptionsCountsPostApiError
+{
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `get_chat_completion_field_options_v1_observability_chat_completion_fields__field_name__options_get`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum GetChatCompletionFieldOptionsV1ObservabilityChatCompletionFieldsFieldNameOptionsGetApiError
+{
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `get_chat_completion_fields_v1_observability_chat_completion_fields_get`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum GetChatCompletionFieldsV1ObservabilityChatCompletionFieldsGetApiError {
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `get_dataset_by_id_v1_observability_datasets__dataset_id__get`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum GetDatasetByIdV1ObservabilityDatasetsDatasetIdGetApiError {
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `get_dataset_import_task_v1_observability_datasets__dataset_id__tasks__task_id__get`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum GetDatasetImportTaskV1ObservabilityDatasetsDatasetIdTasksTaskIdGetApiError {
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `get_dataset_import_tasks_v1_observability_datasets__dataset_id__tasks_get`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum GetDatasetImportTasksV1ObservabilityDatasetsDatasetIdTasksGetApiError {
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `get_dataset_record_v1_observability_dataset_records__dataset_record_id__get`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum GetDatasetRecordV1ObservabilityDatasetRecordsDatasetRecordIdGetApiError {
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `get_dataset_records_v1_observability_datasets__dataset_id__records_get`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum GetDatasetRecordsV1ObservabilityDatasetsDatasetIdRecordsGetApiError {
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `get_datasets_v1_observability_datasets_get`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum GetDatasetsV1ObservabilityDatasetsGetApiError {
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `get_deployment_v1_workflows_deployments__name__get`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum GetDeploymentV1WorkflowsDeploymentsNameGetApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `get_judge_by_id_v1_observability_judges__judge_id__get`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum GetJudgeByIdV1ObservabilityJudgesJudgeIdGetApiError {
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `get_judges_v1_observability_judges_get`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum GetJudgesV1ObservabilityJudgesGetApiError {
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `get_run_history_v1_workflows_runs__run_id__history_get`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum GetRunHistoryV1WorkflowsRunsRunIdHistoryGetApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `get_run_v1_workflows_runs__run_id__get`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum GetRunV1WorkflowsRunsRunIdGetApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `get_similar_chat_completion_events_v1_observability_chat_completion_events__event_id__similar_events_get`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum GetSimilarChatCompletionEventsV1ObservabilityChatCompletionEventsEventIdSimilarEventsGetApiError
+{
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `get_stream_events_v1_workflows_events_stream_get`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum GetStreamEventsV1WorkflowsEventsStreamGetApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `get_voice_sample_audio_v1_audio_voices__voice_id__sample_get`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum GetVoiceSampleAudioV1AudioVoicesVoiceIdSampleGetApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `get_voice_sample_audio_v1_audio_voices__voice_id__sample_get_wav`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum GetVoiceSampleAudioV1AudioVoicesVoiceIdSampleGetWavApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `get_voice_v1_audio_voices__voice_id__get`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum GetVoiceV1AudioVoicesVoiceIdGetApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `get_workflow_events_v1_workflows_events_list_get`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum GetWorkflowEventsV1WorkflowsEventsListGetApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `get_workflow_execution_history_v1_workflows_executions__execution_id__history_get`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum GetWorkflowExecutionHistoryV1WorkflowsExecutionsExecutionIdHistoryGetApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `get_workflow_execution_trace_events`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum GetWorkflowExecutionTraceEventsApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `get_workflow_execution_trace_otel`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum GetWorkflowExecutionTraceOtelApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `get_workflow_execution_trace_summary`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum GetWorkflowExecutionTraceSummaryApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `get_workflow_execution_v1_workflows_executions__execution_id__get`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum GetWorkflowExecutionV1WorkflowsExecutionsExecutionIdGetApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `get_workflow_metrics_v1_workflows__workflow_name__metrics_get`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum GetWorkflowMetricsV1WorkflowsWorkflowNameMetricsGetApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `get_workflow_registration_v1_workflows_registrations__workflow_registration_id__get`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum GetWorkflowRegistrationV1WorkflowsRegistrationsWorkflowRegistrationIdGetApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `get_workflow_registrations_v1_workflows_registrations_get`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum GetWorkflowRegistrationsV1WorkflowsRegistrationsGetApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `get_workflow_v1_workflows__workflow_identifier__get`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum GetWorkflowV1WorkflowsWorkflowIdentifierGetApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `judge_chat_completion_event_v1_observability_chat_completion_events__event_id__live_judging_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum JudgeChatCompletionEventV1ObservabilityChatCompletionEventsEventIdLiveJudgingPostApiError {
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `judge_conversation_v1_observability_judges__judge_id__live_judging_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum JudgeConversationV1ObservabilityJudgesJudgeIdLiveJudgingPostApiError {
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `judge_dataset_record_v1_observability_dataset_records__dataset_record_id__live_judging_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum JudgeDatasetRecordV1ObservabilityDatasetRecordsDatasetRecordIdLiveJudgingPostApiError {
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `libraries_create_v1`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum LibrariesCreateV1ApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `libraries_delete_v1`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum LibrariesDeleteV1ApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `libraries_documents_delete_v1`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum LibrariesDocumentsDeleteV1ApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `libraries_documents_get_extracted_text_signed_url_v1`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum LibrariesDocumentsGetExtractedTextSignedUrlV1ApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `libraries_documents_get_signed_url_v1`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum LibrariesDocumentsGetSignedUrlV1ApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `libraries_documents_get_status_v1`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum LibrariesDocumentsGetStatusV1ApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `libraries_documents_get_text_content_v1`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum LibrariesDocumentsGetTextContentV1ApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `libraries_documents_get_v1`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum LibrariesDocumentsGetV1ApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `libraries_documents_list_v1`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum LibrariesDocumentsListV1ApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `libraries_documents_reprocess_v1`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum LibrariesDocumentsReprocessV1ApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `libraries_documents_update_v1`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum LibrariesDocumentsUpdateV1ApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `libraries_documents_upload_v1`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum LibrariesDocumentsUploadV1ApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `libraries_get_v1`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum LibrariesGetV1ApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `libraries_share_create_v1`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum LibrariesShareCreateV1ApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `libraries_share_delete_v1`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum LibrariesShareDeleteV1ApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `libraries_share_list_v1`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum LibrariesShareListV1ApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `libraries_update_v1`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum LibrariesUpdateV1ApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `list_deployments_v1_workflows_deployments_get`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum ListDeploymentsV1WorkflowsDeploymentsGetApiError {
     Status422(HTTPValidationError),
 }
 ///Typed error responses for `list_models_v1_models_get`. One variant per declared non-2xx response.
@@ -335,12 +1230,3055 @@ pub enum ChatCompletionV1ChatCompletionsPostApiError {
 pub enum ListModelsV1ModelsGetApiError {
     Status422(HTTPValidationError),
 }
+///Typed error responses for `list_runs_v1_workflows_runs_get`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum ListRunsV1WorkflowsRunsGetApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `list_voices_v1_audio_voices_get`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum ListVoicesV1AudioVoicesGetApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `moderations_v1_moderations_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum ModerationsV1ModerationsPostApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `ocr_v1_ocr_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum OcrV1OcrPostApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `post_dataset_records_from_campaign_v1_observability_datasets__dataset_id__imports_from_campaign_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum PostDatasetRecordsFromCampaignV1ObservabilityDatasetsDatasetIdImportsFromCampaignPostApiError
+{
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `post_dataset_records_from_dataset_v1_observability_datasets__dataset_id__imports_from_dataset_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum PostDatasetRecordsFromDatasetV1ObservabilityDatasetsDatasetIdImportsFromDatasetPostApiError
+{
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `post_dataset_records_from_explorer_v1_observability_datasets__dataset_id__imports_from_explorer_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum PostDatasetRecordsFromExplorerV1ObservabilityDatasetsDatasetIdImportsFromExplorerPostApiError
+{
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `post_dataset_records_from_file_v1_observability_datasets__dataset_id__imports_from_file_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum PostDatasetRecordsFromFileV1ObservabilityDatasetsDatasetIdImportsFromFilePostApiError {
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `post_dataset_records_from_playground_v1_observability_datasets__dataset_id__imports_from_playground_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum PostDatasetRecordsFromPlaygroundV1ObservabilityDatasetsDatasetIdImportsFromPlaygroundPostApiError
+{
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `query_workflow_execution_v1_workflows_executions__execution_id__queries_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum QueryWorkflowExecutionV1WorkflowsExecutionsExecutionIdQueriesPostApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `reset_workflow_v1_workflows_executions__execution_id__reset_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum ResetWorkflowV1WorkflowsExecutionsExecutionIdResetPostApiError {
+    Status422(HTTPValidationError),
+}
 ///Typed error responses for `retrieve_model_v1_models__model_id__get`. One variant per declared non-2xx response.
 #[derive(Debug, Clone)]
 pub enum RetrieveModelV1ModelsModelIdGetApiError {
     Status422(HTTPValidationError),
 }
+///Typed error responses for `schedule_workflow_v1_workflows_schedules_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum ScheduleWorkflowV1WorkflowsSchedulesPostApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `signal_workflow_execution_v1_workflows_executions__execution_id__signals_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum SignalWorkflowExecutionV1WorkflowsExecutionsExecutionIdSignalsPostApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `speech_v1_audio_speech_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum SpeechV1AudioSpeechPostApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `speech_v1_audio_speech_post_stream`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum SpeechV1AudioSpeechPostStreamApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `stream_v1_workflows_executions__execution_id__stream_get`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum StreamV1WorkflowsExecutionsExecutionIdStreamGetApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `terminate_workflow_execution_v1_workflows_executions__execution_id__terminate_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum TerminateWorkflowExecutionV1WorkflowsExecutionsExecutionIdTerminatePostApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `unarchive_workflow_v1_workflows__workflow_identifier__unarchive_put`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum UnarchiveWorkflowV1WorkflowsWorkflowIdentifierUnarchivePutApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `unschedule_workflow_v1_workflows_schedules__schedule_id__delete`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum UnscheduleWorkflowV1WorkflowsSchedulesScheduleIdDeleteApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `update_dataset_record_payload_v1_observability_dataset_records__dataset_record_id__payload_put`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum UpdateDatasetRecordPayloadV1ObservabilityDatasetRecordsDatasetRecordIdPayloadPutApiError {
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `update_dataset_record_properties_v1_observability_dataset_records__dataset_record_id__properties_put`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum UpdateDatasetRecordPropertiesV1ObservabilityDatasetRecordsDatasetRecordIdPropertiesPutApiError
+{
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `update_dataset_v1_observability_datasets__dataset_id__patch`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum UpdateDatasetV1ObservabilityDatasetsDatasetIdPatchApiError {
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `update_judge_v1_observability_judges__judge_id__put`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum UpdateJudgeV1ObservabilityJudgesJudgeIdPutApiError {
+    Status400(ObservabilityError),
+    Status404(ObservabilityError),
+    Status408(ObservabilityError),
+    Status409(ObservabilityError),
+    Status422(ObservabilityError),
+}
+///Typed error responses for `update_voice_v1_audio_voices__voice_id__patch`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum UpdateVoiceV1AudioVoicesVoiceIdPatchApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `update_workflow_execution_v1_workflows_executions__execution_id__updates_post`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum UpdateWorkflowExecutionV1WorkflowsExecutionsExecutionIdUpdatesPostApiError {
+    Status422(HTTPValidationError),
+}
+///Typed error responses for `update_workflow_v1_workflows__workflow_identifier__put`. One variant per declared non-2xx response.
+#[derive(Debug, Clone)]
+pub enum UpdateWorkflowV1WorkflowsWorkflowIdentifierPutApiError {
+    Status422(HTTPValidationError),
+}
 impl HttpClient {
+    /// Create a agent that can be used within a conversation.
+    ///
+    /// Create a new agent giving it instructions, tools, description. The agent is then available to be used as a regular assistant in a conversation or as part of an agent pool from which it can be used.
+    ///
+    /// `POST /v1/agents`
+    pub async fn agents_api_v1_agents_create(
+        &self,
+        request: AgentCreationRequest,
+    ) -> Result<Agent, ApiOpError<AgentsApiV1AgentsCreateApiError>> {
+        let request_url = format!("{}{}", self.base_url, "/v1/agents");
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<AgentsApiV1AgentsCreateApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(AgentsApiV1AgentsCreateApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Create or update an agent version alias.
+    ///
+    /// Create a new alias or update an existing alias to point to a specific version. Aliases are unique per agent and can be reassigned to different versions.
+    ///
+    /// `PUT /v1/agents/{agent_id}/aliases`
+    pub async fn agents_api_v1_agents_create_or_update_alias(
+        &self,
+        agent_id: impl AsRef<str>,
+        alias: impl AsRef<str>,
+        version: i64,
+    ) -> Result<AgentAliasResponse, ApiOpError<AgentsApiV1AgentsCreateOrUpdateAliasApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/agents/{}/aliases",
+                __pct_encode_path_segment(agent_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.put(request_url);
+        req = req.header(reqwest::header::CONTENT_LENGTH, "0");
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            query_params.push(("alias".to_string(), alias.as_ref().to_string()));
+            query_params.push(("version".to_string(), version.to_string()));
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<AgentsApiV1AgentsCreateOrUpdateAliasApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(AgentsApiV1AgentsCreateOrUpdateAliasApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Delete an agent entity.
+    ///
+    /// `DELETE /v1/agents/{agent_id}`
+    pub async fn agents_api_v1_agents_delete(
+        &self,
+        agent_id: impl AsRef<str>,
+    ) -> Result<(), ApiOpError<AgentsApiV1AgentsDeleteApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/agents/{}",
+                __pct_encode_path_segment(agent_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.delete(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            req = req.header(name, value);
+        }
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 204u16 {
+            let _ = body_text;
+            let _ = raw_body;
+            let _ = headers;
+            Ok(())
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "204",
+                )),
+            }))
+        } else {
+            let typed: Option<AgentsApiV1AgentsDeleteApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(AgentsApiV1AgentsDeleteApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Delete an agent version alias.
+    ///
+    /// Delete an existing alias for an agent.
+    ///
+    /// `DELETE /v1/agents/{agent_id}/aliases`
+    pub async fn agents_api_v1_agents_delete_alias(
+        &self,
+        agent_id: impl AsRef<str>,
+        alias: impl AsRef<str>,
+    ) -> Result<(), ApiOpError<AgentsApiV1AgentsDeleteAliasApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/agents/{}/aliases",
+                __pct_encode_path_segment(agent_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.delete(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            query_params.push(("alias".to_string(), alias.as_ref().to_string()));
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            req = req.header(name, value);
+        }
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 204u16 {
+            let _ = body_text;
+            let _ = raw_body;
+            let _ = headers;
+            Ok(())
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "204",
+                )),
+            }))
+        } else {
+            let typed: Option<AgentsApiV1AgentsDeleteAliasApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(AgentsApiV1AgentsDeleteAliasApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Retrieve an agent entity.
+    ///
+    /// Given an agent, retrieve an agent entity with its attributes. The agent_version parameter can be an integer version number or a string alias.
+    ///
+    /// `GET /v1/agents/{agent_id}`
+    pub async fn agents_api_v1_agents_get(
+        &self,
+        agent_id: impl AsRef<str>,
+        agent_version: Option<impl AsRef<str>>,
+    ) -> Result<Agent, ApiOpError<AgentsApiV1AgentsGetApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/agents/{}",
+                __pct_encode_path_segment(agent_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = agent_version {
+                query_params.push(("agent_version".to_string(), v.as_ref().to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<AgentsApiV1AgentsGetApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(AgentsApiV1AgentsGetApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Retrieve a specific version of an agent.
+    ///
+    /// Get a specific agent version by version number.
+    ///
+    /// `GET /v1/agents/{agent_id}/versions/{version}`
+    pub async fn agents_api_v1_agents_get_version(
+        &self,
+        agent_id: impl AsRef<str>,
+        version: impl AsRef<str>,
+    ) -> Result<Agent, ApiOpError<AgentsApiV1AgentsGetVersionApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/agents/{}/versions/{}",
+                __pct_encode_path_segment(agent_id.as_ref()),
+                __pct_encode_path_segment(version.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<AgentsApiV1AgentsGetVersionApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(AgentsApiV1AgentsGetVersionApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// List agent entities.
+    ///
+    /// Retrieve a list of agent entities sorted by creation time. Deprecated: some features such as agent sharing are not supported by this endpoint. Use the cursor-paginated `GET /v1/agents/pages` instead.
+    ///
+    /// `GET /v1/agents`
+    pub async fn agents_api_v1_agents_list(
+        &self,
+        page: Option<i64>,
+        page_size: Option<i64>,
+        deployment_chat: Option<impl AsRef<str>>,
+        sources: Option<impl AsRef<str>>,
+        name: Option<impl AsRef<str>>,
+        search: Option<impl AsRef<str>>,
+        id: Option<impl AsRef<str>>,
+        metadata: Option<impl AsRef<str>>,
+    ) -> Result<AgentsApiV1AgentsListResponse, ApiOpError<AgentsApiV1AgentsListApiError>> {
+        let request_url = format!("{}{}", self.base_url, "/v1/agents");
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = page {
+                query_params.push(("page".to_string(), v.to_string()));
+            }
+            if let Some(v) = page_size {
+                query_params.push(("page_size".to_string(), v.to_string()));
+            }
+            if let Some(v) = deployment_chat {
+                query_params.push(("deployment_chat".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = sources {
+                query_params.push(("sources".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = name {
+                query_params.push(("name".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = search {
+                query_params.push(("search".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = id {
+                query_params.push(("id".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = metadata {
+                query_params.push(("metadata".to_string(), v.as_ref().to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<AgentsApiV1AgentsListApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(AgentsApiV1AgentsListApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// List agent entities, cursor-paginated.
+    ///
+    /// Retrieve a page of agent entities. Unlike the deprecated `GET /v1/agents`, this endpoint paginates by opaque cursor and honors per-agent sharing, returning only agents the caller is authorized to see.
+    ///
+    /// `GET /v1/agents/pages`
+    pub async fn agents_api_v1_agents_list_pages(
+        &self,
+        page_size: Option<i64>,
+        deployment_chat: Option<impl AsRef<str>>,
+        sources: Option<impl AsRef<str>>,
+        name: Option<impl AsRef<str>>,
+        search: Option<impl AsRef<str>>,
+        id: Option<impl AsRef<str>>,
+        metadata: Option<impl AsRef<str>>,
+        page_token: Option<impl AsRef<str>>,
+    ) -> Result<AgentListPage, ApiOpError<AgentsApiV1AgentsListPagesApiError>> {
+        let request_url = format!("{}{}", self.base_url, "/v1/agents/pages");
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = page_size {
+                query_params.push(("page_size".to_string(), v.to_string()));
+            }
+            if let Some(v) = deployment_chat {
+                query_params.push(("deployment_chat".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = sources {
+                query_params.push(("sources".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = name {
+                query_params.push(("name".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = search {
+                query_params.push(("search".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = id {
+                query_params.push(("id".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = metadata {
+                query_params.push(("metadata".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = page_token {
+                query_params.push(("page_token".to_string(), v.as_ref().to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<AgentsApiV1AgentsListPagesApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(AgentsApiV1AgentsListPagesApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// List all aliases for an agent.
+    ///
+    /// Retrieve all version aliases for a specific agent.
+    ///
+    /// `GET /v1/agents/{agent_id}/aliases`
+    pub async fn agents_api_v1_agents_list_version_aliases(
+        &self,
+        agent_id: impl AsRef<str>,
+    ) -> Result<
+        AgentsApiV1AgentsListVersionAliasesResponse,
+        ApiOpError<AgentsApiV1AgentsListVersionAliasesApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/agents/{}/aliases",
+                __pct_encode_path_segment(agent_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<AgentsApiV1AgentsListVersionAliasesApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(AgentsApiV1AgentsListVersionAliasesApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// List all versions of an agent.
+    ///
+    /// Retrieve all versions for a specific agent with full agent context. Supports pagination.
+    ///
+    /// `GET /v1/agents/{agent_id}/versions`
+    pub async fn agents_api_v1_agents_list_versions(
+        &self,
+        agent_id: impl AsRef<str>,
+        page: Option<i64>,
+        page_size: Option<i64>,
+    ) -> Result<
+        AgentsApiV1AgentsListVersionsResponse,
+        ApiOpError<AgentsApiV1AgentsListVersionsApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/agents/{}/versions",
+                __pct_encode_path_segment(agent_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = page {
+                query_params.push(("page".to_string(), v.to_string()));
+            }
+            if let Some(v) = page_size {
+                query_params.push(("page_size".to_string(), v.to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<AgentsApiV1AgentsListVersionsApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(AgentsApiV1AgentsListVersionsApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Update an agent entity.
+    ///
+    /// Update an agent attributes and create a new version.
+    ///
+    /// `PATCH /v1/agents/{agent_id}`
+    pub async fn agents_api_v1_agents_update(
+        &self,
+        agent_id: impl AsRef<str>,
+        request: AgentUpdateRequest,
+    ) -> Result<Agent, ApiOpError<AgentsApiV1AgentsUpdateApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/agents/{}",
+                __pct_encode_path_segment(agent_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.patch(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<AgentsApiV1AgentsUpdateApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(AgentsApiV1AgentsUpdateApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Update an agent version.
+    ///
+    /// Switch the version of an agent.
+    ///
+    /// `PATCH /v1/agents/{agent_id}/version`
+    pub async fn agents_api_v1_agents_update_version(
+        &self,
+        agent_id: impl AsRef<str>,
+        version: i64,
+    ) -> Result<Agent, ApiOpError<AgentsApiV1AgentsUpdateVersionApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/agents/{}/version",
+                __pct_encode_path_segment(agent_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.patch(request_url);
+        req = req.header(reqwest::header::CONTENT_LENGTH, "0");
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            query_params.push(("version".to_string(), version.to_string()));
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<AgentsApiV1AgentsUpdateVersionApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(AgentsApiV1AgentsUpdateVersionApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Append new entries to an existing conversation.
+    ///
+    /// Run completion on the history of the conversation and the user entries. Return the new created entries.
+    ///
+    /// `POST /v1/conversations/{conversation_id}`
+    pub async fn agents_api_v1_conversations_append(
+        &self,
+        conversation_id: impl AsRef<str>,
+        request: ConversationAppendRequest,
+    ) -> Result<ConversationResponse, ApiOpError<AgentsApiV1ConversationsAppendApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/conversations/{}",
+                __pct_encode_path_segment(conversation_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<AgentsApiV1ConversationsAppendApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(AgentsApiV1ConversationsAppendApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Append new entries to an existing conversation.
+    ///
+    /// Run completion on the history of the conversation and the user entries. Return the new created entries.
+    ///
+    /// `POST /v1/conversations/{conversation_id}`
+    pub async fn agents_api_v1_conversations_append_stream(
+        &self,
+        conversation_id: impl AsRef<str>,
+        request: ConversationAppendStreamRequest,
+    ) -> Result<
+        impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>>,
+        ApiOpError<AgentsApiV1ConversationsAppendStreamApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/conversations/{}",
+                __pct_encode_path_segment(conversation_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "text/event-stream");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        if false || status_code == 200u16 {
+            Ok(response.bytes_stream())
+        } else {
+            if status.is_success() {
+                return Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers,
+                    body: String::new(),
+                    raw_body: Vec::new(),
+                    typed: None,
+                    parse_error: Some(format!(
+                        "unexpected successful status {}; generated return type selects `{}`; live response body was not buffered",
+                        status_code, "200",
+                    )),
+                }));
+            }
+            let body_bytes =
+                __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+            let raw_body = body_bytes;
+            let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+            let typed: Option<AgentsApiV1ConversationsAppendStreamApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(AgentsApiV1ConversationsAppendStreamApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Delete a conversation.
+    ///
+    /// Delete a conversation given a conversation_id.
+    ///
+    /// `DELETE /v1/conversations/{conversation_id}`
+    pub async fn agents_api_v1_conversations_delete(
+        &self,
+        conversation_id: impl AsRef<str>,
+    ) -> Result<(), ApiOpError<AgentsApiV1ConversationsDeleteApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/conversations/{}",
+                __pct_encode_path_segment(conversation_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.delete(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            req = req.header(name, value);
+        }
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 204u16 {
+            let _ = body_text;
+            let _ = raw_body;
+            let _ = headers;
+            Ok(())
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "204",
+                )),
+            }))
+        } else {
+            let typed: Option<AgentsApiV1ConversationsDeleteApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(AgentsApiV1ConversationsDeleteApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Retrieve a conversation information.
+    ///
+    /// Given a conversation_id retrieve a conversation entity with its attributes.
+    ///
+    /// `GET /v1/conversations/{conversation_id}`
+    pub async fn agents_api_v1_conversations_get(
+        &self,
+        conversation_id: impl AsRef<str>,
+    ) -> Result<AgentsApiV1ConversationsGetResponse, ApiOpError<AgentsApiV1ConversationsGetApiError>>
+    {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/conversations/{}",
+                __pct_encode_path_segment(conversation_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<AgentsApiV1ConversationsGetApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(AgentsApiV1ConversationsGetApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Retrieve all entries in a conversation.
+    ///
+    /// Given a conversation_id retrieve all the entries belonging to that conversation. The entries are sorted in the order they were appended, those can be messages, connectors or function_call.
+    ///
+    /// `GET /v1/conversations/{conversation_id}/history`
+    pub async fn agents_api_v1_conversations_history(
+        &self,
+        conversation_id: impl AsRef<str>,
+    ) -> Result<ConversationHistory, ApiOpError<AgentsApiV1ConversationsHistoryApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/conversations/{}/history",
+                __pct_encode_path_segment(conversation_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<AgentsApiV1ConversationsHistoryApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(AgentsApiV1ConversationsHistoryApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// List all created conversations.
+    ///
+    /// Retrieve a list of conversation entities sorted by creation time.
+    ///
+    /// `GET /v1/conversations`
+    pub async fn agents_api_v1_conversations_list(
+        &self,
+        page: Option<i64>,
+        page_size: Option<i64>,
+        metadata: Option<impl AsRef<str>>,
+    ) -> Result<
+        AgentsApiV1ConversationsListResponse,
+        ApiOpError<AgentsApiV1ConversationsListApiError>,
+    > {
+        let request_url = format!("{}{}", self.base_url, "/v1/conversations");
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = page {
+                query_params.push(("page".to_string(), v.to_string()));
+            }
+            if let Some(v) = page_size {
+                query_params.push(("page_size".to_string(), v.to_string()));
+            }
+            if let Some(v) = metadata {
+                query_params.push(("metadata".to_string(), v.as_ref().to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<AgentsApiV1ConversationsListApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(AgentsApiV1ConversationsListApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Retrieve all messages in a conversation.
+    ///
+    /// Given a conversation_id retrieve all the messages belonging to that conversation. This is similar to retrieving all entries except we filter the messages only.
+    ///
+    /// `GET /v1/conversations/{conversation_id}/messages`
+    pub async fn agents_api_v1_conversations_messages(
+        &self,
+        conversation_id: impl AsRef<str>,
+    ) -> Result<ConversationMessages, ApiOpError<AgentsApiV1ConversationsMessagesApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/conversations/{}/messages",
+                __pct_encode_path_segment(conversation_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<AgentsApiV1ConversationsMessagesApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(AgentsApiV1ConversationsMessagesApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Restart a conversation starting from a given entry.
+    ///
+    /// Given a conversation_id and an id, recreate a conversation from this point and run completion. A new conversation is returned with the new entries returned.
+    ///
+    /// `POST /v1/conversations/{conversation_id}/restart`
+    pub async fn agents_api_v1_conversations_restart(
+        &self,
+        conversation_id: impl AsRef<str>,
+        request: ConversationRestartRequest,
+    ) -> Result<ConversationResponse, ApiOpError<AgentsApiV1ConversationsRestartApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/conversations/{}/restart",
+                __pct_encode_path_segment(conversation_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<AgentsApiV1ConversationsRestartApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(AgentsApiV1ConversationsRestartApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Restart a conversation starting from a given entry.
+    ///
+    /// Given a conversation_id and an id, recreate a conversation from this point and run completion. A new conversation is returned with the new entries returned.
+    ///
+    /// `POST /v1/conversations/{conversation_id}/restart`
+    pub async fn agents_api_v1_conversations_restart_stream(
+        &self,
+        conversation_id: impl AsRef<str>,
+        request: ConversationRestartStreamRequest,
+    ) -> Result<
+        impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>>,
+        ApiOpError<AgentsApiV1ConversationsRestartStreamApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/conversations/{}/restart",
+                __pct_encode_path_segment(conversation_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "text/event-stream");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        if false || status_code == 200u16 {
+            Ok(response.bytes_stream())
+        } else {
+            if status.is_success() {
+                return Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers,
+                    body: String::new(),
+                    raw_body: Vec::new(),
+                    typed: None,
+                    parse_error: Some(format!(
+                        "unexpected successful status {}; generated return type selects `{}`; live response body was not buffered",
+                        status_code, "200",
+                    )),
+                }));
+            }
+            let body_bytes =
+                __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+            let raw_body = body_bytes;
+            let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+            let typed: Option<AgentsApiV1ConversationsRestartStreamApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(AgentsApiV1ConversationsRestartStreamApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Create a conversation and append entries to it.
+    ///
+    /// Create a new conversation, using a base model or an agent and append entries. Completion and tool executions are run and the response is appended to the conversation.Use the returned conversation_id to continue the conversation.
+    ///
+    /// `POST /v1/conversations`
+    pub async fn agents_api_v1_conversations_start(
+        &self,
+        request: ConversationRequest,
+    ) -> Result<ConversationResponse, ApiOpError<AgentsApiV1ConversationsStartApiError>> {
+        let request_url = format!("{}{}", self.base_url, "/v1/conversations");
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<AgentsApiV1ConversationsStartApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(AgentsApiV1ConversationsStartApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Create a conversation and append entries to it.
+    ///
+    /// Create a new conversation, using a base model or an agent and append entries. Completion and tool executions are run and the response is appended to the conversation.Use the returned conversation_id to continue the conversation.
+    ///
+    /// `POST /v1/conversations`
+    pub async fn agents_api_v1_conversations_start_stream(
+        &self,
+        request: ConversationStreamRequest,
+    ) -> Result<
+        impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>>,
+        ApiOpError<AgentsApiV1ConversationsStartStreamApiError>,
+    > {
+        let request_url = format!("{}{}", self.base_url, "/v1/conversations");
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "text/event-stream");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        if false || status_code == 200u16 {
+            Ok(response.bytes_stream())
+        } else {
+            if status.is_success() {
+                return Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers,
+                    body: String::new(),
+                    raw_body: Vec::new(),
+                    typed: None,
+                    parse_error: Some(format!(
+                        "unexpected successful status {}; generated return type selects `{}`; live response body was not buffered",
+                        status_code, "200",
+                    )),
+                }));
+            }
+            let body_bytes =
+                __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+            let raw_body = body_bytes;
+            let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+            let typed: Option<AgentsApiV1ConversationsStartStreamApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(AgentsApiV1ConversationsStartStreamApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Agents Completion
+    ///
+    /// `POST /v1/agents/completions`
+    pub async fn agents_completion_v1_agents_completions_post(
+        &self,
+        request: AgentsCompletionRequest,
+    ) -> Result<ChatCompletionResponse, ApiOpError<AgentsCompletionV1AgentsCompletionsPostApiError>>
+    {
+        let request_url = format!("{}{}", self.base_url, "/v1/agents/completions");
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<AgentsCompletionV1AgentsCompletionsPostApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(AgentsCompletionV1AgentsCompletionsPostApiError::Status422(
+                            v,
+                        ));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Archive Workflow
+    ///
+    /// `PUT /v1/workflows/{workflow_identifier}/archive`
+    pub async fn archive_workflow_v1_workflows_workflow_identifier_archive_put(
+        &self,
+        workflow_identifier: impl AsRef<str>,
+    ) -> Result<
+        WorkflowArchiveResponse,
+        ApiOpError<ArchiveWorkflowV1WorkflowsWorkflowIdentifierArchivePutApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/workflows/{}/archive",
+                __pct_encode_path_segment(workflow_identifier.as_ref())
+            )
+        );
+        let mut req = self.http_client.put(request_url);
+        req = req.header(reqwest::header::CONTENT_LENGTH, "0");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<ArchiveWorkflowV1WorkflowsWorkflowIdentifierArchivePutApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                ArchiveWorkflowV1WorkflowsWorkflowIdentifierArchivePutApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Create Transcription
+    ///
+    /// `POST /v1/audio/transcriptions`
+    pub async fn audio_api_v1_transcriptions_post(
+        &self,
+        request: AudioTranscriptionRequest,
+    ) -> Result<TranscriptionResponse, ApiOpError<serde_json::Value>> {
+        let request_url = format!("{}{}", self.base_url, "/v1/audio/transcriptions");
+        let mut req = self.http_client.post(request_url);
+        let mut form = reqwest::multipart::Form::new();
+        if let Some(value) = &request.context_bias {
+            for item in value {
+                form = form.text("context_bias", item.to_string());
+            }
+        }
+        if let Some(value) = &request.diarize {
+            form = form.text("diarize", value.to_string());
+        }
+        if let Some(Some(value)) = &request.file {
+            form = form.part(
+                "file",
+                reqwest::multipart::Part::bytes(value.to_vec())
+                    .file_name(self.upload_filename.clone()),
+            );
+        }
+        if let Some(Some(value)) = &request.file_id {
+            form = form.text("file_id", value.to_string());
+        }
+        if let Some(Some(value)) = &request.file_url {
+            form = form.text("file_url", value.to_string());
+        }
+        if let Some(Some(value)) = &request.language {
+            form = form.text("language", value.to_string());
+        }
+        let value = &request.model;
+        form = form.text("model", value.to_string());
+        if let Some(value) = &request.stream {
+            form = form.text("stream", value.to_string());
+        }
+        if let Some(Some(value)) = &request.temperature {
+            form = form.text("temperature", value.to_string());
+        }
+        if let Some(value) = &request.timestamp_granularities {
+            for item in value {
+                form = form.text("timestamp_granularities", item.to_string());
+            }
+        }
+        req = req.multipart(form);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<serde_json::Value>;
+            let parse_error: Option<String>;
+            match status_code {
+                _ => match serde_json::from_str::<serde_json::Value>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(v);
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Create Streaming Transcription (SSE)
+    ///
+    /// `POST /v1/audio/transcriptions`
+    pub async fn audio_api_v1_transcriptions_post_stream(
+        &self,
+        request: AudioTranscriptionRequestStream,
+    ) -> Result<
+        impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>>,
+        ApiOpError<serde_json::Value>,
+    > {
+        let request_url = format!("{}{}", self.base_url, "/v1/audio/transcriptions");
+        let mut req = self.http_client.post(request_url);
+        let mut form = reqwest::multipart::Form::new();
+        if let Some(value) = &request.context_bias {
+            for item in value {
+                form = form.text("context_bias", item.to_string());
+            }
+        }
+        if let Some(value) = &request.diarize {
+            form = form.text("diarize", value.to_string());
+        }
+        if let Some(Some(value)) = &request.file {
+            form = form.part(
+                "file",
+                reqwest::multipart::Part::bytes(value.to_vec())
+                    .file_name(self.upload_filename.clone()),
+            );
+        }
+        if let Some(Some(value)) = &request.file_id {
+            form = form.text("file_id", value.to_string());
+        }
+        if let Some(Some(value)) = &request.file_url {
+            form = form.text("file_url", value.to_string());
+        }
+        if let Some(Some(value)) = &request.language {
+            form = form.text("language", value.to_string());
+        }
+        let value = &request.model;
+        form = form.text("model", value.to_string());
+        if let Some(value) = &request.stream {
+            form = form.text("stream", value.to_string());
+        }
+        if let Some(Some(value)) = &request.temperature {
+            form = form.text("temperature", value.to_string());
+        }
+        if let Some(value) = &request.timestamp_granularities {
+            for item in value {
+                form = form.text("timestamp_granularities", item.to_string());
+            }
+        }
+        req = req.multipart(form);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "text/event-stream");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        if false || status_code == 200u16 {
+            Ok(response.bytes_stream())
+        } else {
+            if status.is_success() {
+                return Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers,
+                    body: String::new(),
+                    raw_body: Vec::new(),
+                    typed: None,
+                    parse_error: Some(format!(
+                        "unexpected successful status {}; generated return type selects `{}`; live response body was not buffered",
+                        status_code, "200",
+                    )),
+                }));
+            }
+            let body_bytes =
+                __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+            let raw_body = body_bytes;
+            let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+            let typed: Option<serde_json::Value>;
+            let parse_error: Option<String>;
+            match status_code {
+                _ => match serde_json::from_str::<serde_json::Value>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(v);
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Batch Cancel Workflow Executions
+    ///
+    /// `POST /v1/workflows/executions/cancel`
+    pub async fn batch_cancel_workflow_executions_v1_workflows_executions_cancel_post(
+        &self,
+        request: BatchExecutionBody,
+    ) -> Result<
+        BatchExecutionResponse,
+        ApiOpError<BatchCancelWorkflowExecutionsV1WorkflowsExecutionsCancelPostApiError>,
+    > {
+        let request_url = format!("{}{}", self.base_url, "/v1/workflows/executions/cancel");
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<
+                BatchCancelWorkflowExecutionsV1WorkflowsExecutionsCancelPostApiError,
+            >;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                BatchCancelWorkflowExecutionsV1WorkflowsExecutionsCancelPostApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Batch Terminate Workflow Executions
+    ///
+    /// `POST /v1/workflows/executions/terminate`
+    pub async fn batch_terminate_workflow_executions_v1_workflows_executions_terminate_post(
+        &self,
+        request: BatchExecutionBody,
+    ) -> Result<
+        BatchExecutionResponse,
+        ApiOpError<BatchTerminateWorkflowExecutionsV1WorkflowsExecutionsTerminatePostApiError>,
+    > {
+        let request_url = format!("{}{}", self.base_url, "/v1/workflows/executions/terminate");
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<
+                BatchTerminateWorkflowExecutionsV1WorkflowsExecutionsTerminatePostApiError,
+            >;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                BatchTerminateWorkflowExecutionsV1WorkflowsExecutionsTerminatePostApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Cancel Workflow Execution
+    ///
+    /// `POST /v1/workflows/executions/{execution_id}/cancel`
+    pub async fn cancel_workflow_execution_v1_workflows_executions_execution_id_cancel_post(
+        &self,
+        execution_id: impl AsRef<str>,
+    ) -> Result<
+        (),
+        ApiOpError<CancelWorkflowExecutionV1WorkflowsExecutionsExecutionIdCancelPostApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/workflows/executions/{}/cancel",
+                __pct_encode_path_segment(execution_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.post(request_url);
+        req = req.header(reqwest::header::CONTENT_LENGTH, "0");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            req = req.header(name, value);
+        }
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 204u16 {
+            let _ = body_text;
+            let _ = raw_body;
+            let _ = headers;
+            Ok(())
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "204",
+                )),
+            }))
+        } else {
+            let typed: Option<
+                CancelWorkflowExecutionV1WorkflowsExecutionsExecutionIdCancelPostApiError,
+            >;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                CancelWorkflowExecutionV1WorkflowsExecutionsExecutionIdCancelPostApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Chat Classifications
+    ///
+    /// `POST /v1/chat/classifications`
+    pub async fn chat_classifications_v1_chat_classifications_post(
+        &self,
+        request: ChatClassificationRequest,
+    ) -> Result<
+        ClassificationResponse,
+        ApiOpError<ChatClassificationsV1ChatClassificationsPostApiError>,
+    > {
+        let request_url = format!("{}{}", self.base_url, "/v1/chat/classifications");
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<ChatClassificationsV1ChatClassificationsPostApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                            ChatClassificationsV1ChatClassificationsPostApiError::Status422(v),
+                        );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
     /// Chat Completion
     ///
     /// `POST /v1/chat/completions`
@@ -402,6 +4340,12640 @@ impl HttpClient {
                 422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
                     Ok(v) => {
                         typed = Some(ChatCompletionV1ChatCompletionsPostApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Chat Completion
+    ///
+    /// `POST /v1/chat/completions`
+    pub async fn chat_completion_v1_chat_completions_post_stream(
+        &self,
+        request: ChatCompletionRequest,
+    ) -> Result<
+        impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>>,
+        ApiOpError<ChatCompletionV1ChatCompletionsPostStreamApiError>,
+    > {
+        let request_url = format!("{}{}", self.base_url, "/v1/chat/completions");
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "text/event-stream");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        if false || status_code == 200u16 {
+            Ok(response.bytes_stream())
+        } else {
+            if status.is_success() {
+                return Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers,
+                    body: String::new(),
+                    raw_body: Vec::new(),
+                    typed: None,
+                    parse_error: Some(format!(
+                        "unexpected successful status {}; generated return type selects `{}`; live response body was not buffered",
+                        status_code, "200",
+                    )),
+                }));
+            }
+            let body_bytes =
+                __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+            let raw_body = body_bytes;
+            let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+            let typed: Option<ChatCompletionV1ChatCompletionsPostStreamApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed =
+                            Some(ChatCompletionV1ChatCompletionsPostStreamApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Chat Moderations
+    ///
+    /// `POST /v1/chat/moderations`
+    pub async fn chat_moderations_v1_chat_moderations_post(
+        &self,
+        request: ChatModerationRequest,
+    ) -> Result<ModerationResponse, ApiOpError<ChatModerationsV1ChatModerationsPostApiError>> {
+        let request_url = format!("{}{}", self.base_url, "/v1/chat/moderations");
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<ChatModerationsV1ChatModerationsPostApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(ChatModerationsV1ChatModerationsPostApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Classifications
+    ///
+    /// `POST /v1/classifications`
+    pub async fn classifications_v1_classifications_post(
+        &self,
+        request: ClassificationRequest,
+    ) -> Result<ClassificationResponse, ApiOpError<ClassificationsV1ClassificationsPostApiError>>
+    {
+        let request_url = format!("{}{}", self.base_url, "/v1/classifications");
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<ClassificationsV1ClassificationsPostApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(ClassificationsV1ClassificationsPostApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Call Connector Tool
+    ///
+    /// Call a tool on an MCP connector.
+    ///
+    /// `POST /v1/connectors/{connector_id_or_name}/tools/{tool_name}/call`
+    pub async fn connector_call_tool_v1(
+        &self,
+        tool_name: impl AsRef<str>,
+        connector_id_or_name: impl AsRef<str>,
+        credentials_name: Option<impl AsRef<str>>,
+        request: MCPToolCallRequest,
+    ) -> Result<MCPToolCallResponse, ApiOpError<ConnectorCallToolV1ApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/connectors/{}/tools/{}/call",
+                __pct_encode_path_segment(connector_id_or_name.as_ref()),
+                __pct_encode_path_segment(tool_name.as_ref())
+            )
+        );
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = credentials_name {
+                query_params.push(("credentials_name".to_string(), v.as_ref().to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<ConnectorCallToolV1ApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(ConnectorCallToolV1ApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Create or update organization credentials for a connector.
+    ///
+    /// Create or update credentials at the organization level for a given connector.
+    ///
+    /// `POST /v1/connectors/{connector_id_or_name}/organization/credentials`
+    pub async fn connector_create_or_update_organization_credentials_v1(
+        &self,
+        connector_id_or_name: impl AsRef<str>,
+        request: CredentialsCreateOrUpdate,
+    ) -> Result<MessageResponse, ApiOpError<ConnectorCreateOrUpdateOrganizationCredentialsV1ApiError>>
+    {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/connectors/{}/organization/credentials",
+                __pct_encode_path_segment(connector_id_or_name.as_ref())
+            )
+        );
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<ConnectorCreateOrUpdateOrganizationCredentialsV1ApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                            ConnectorCreateOrUpdateOrganizationCredentialsV1ApiError::Status422(v),
+                        );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Create or update user credentials for a connector.
+    ///
+    /// Create or update credentials at the user level for a given connector.
+    ///
+    /// `POST /v1/connectors/{connector_id_or_name}/user/credentials`
+    pub async fn connector_create_or_update_user_credentials_v1(
+        &self,
+        connector_id_or_name: impl AsRef<str>,
+        request: CredentialsCreateOrUpdate,
+    ) -> Result<MessageResponse, ApiOpError<ConnectorCreateOrUpdateUserCredentialsV1ApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/connectors/{}/user/credentials",
+                __pct_encode_path_segment(connector_id_or_name.as_ref())
+            )
+        );
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<ConnectorCreateOrUpdateUserCredentialsV1ApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(ConnectorCreateOrUpdateUserCredentialsV1ApiError::Status422(
+                            v,
+                        ));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Create or update workspace credentials for a connector.
+    ///
+    /// Create or update credentials at the workspace level for a given connector.
+    ///
+    /// `POST /v1/connectors/{connector_id_or_name}/workspace/credentials`
+    pub async fn connector_create_or_update_workspace_credentials_v1(
+        &self,
+        connector_id_or_name: impl AsRef<str>,
+        request: CredentialsCreateOrUpdate,
+    ) -> Result<MessageResponse, ApiOpError<ConnectorCreateOrUpdateWorkspaceCredentialsV1ApiError>>
+    {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/connectors/{}/workspace/credentials",
+                __pct_encode_path_segment(connector_id_or_name.as_ref())
+            )
+        );
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<ConnectorCreateOrUpdateWorkspaceCredentialsV1ApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                            ConnectorCreateOrUpdateWorkspaceCredentialsV1ApiError::Status422(v),
+                        );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Create a new connector.
+    ///
+    /// Create a new MCP connector. You can customize its visibility, url and auth type.
+    ///
+    /// `POST /v1/connectors`
+    pub async fn connector_create_v1(
+        &self,
+        request: ConnectorMCPCreate,
+    ) -> Result<Connector, ApiOpError<ConnectorCreateV1ApiError>> {
+        let request_url = format!("{}{}", self.base_url, "/v1/connectors");
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 201u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "201",
+                )),
+            }))
+        } else {
+            let typed: Option<ConnectorCreateV1ApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(ConnectorCreateV1ApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Delete organization credentials for a connector.
+    ///
+    /// Delete credentials at the organization level for a given connector.
+    ///
+    /// `DELETE /v1/connectors/{connector_id_or_name}/organization/credentials/{credentials_name}`
+    pub async fn connector_delete_organization_credentials_v1(
+        &self,
+        credentials_name: impl AsRef<str>,
+        connector_id_or_name: impl AsRef<str>,
+    ) -> Result<MessageResponse, ApiOpError<ConnectorDeleteOrganizationCredentialsV1ApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/connectors/{}/organization/credentials/{}",
+                __pct_encode_path_segment(connector_id_or_name.as_ref()),
+                __pct_encode_path_segment(credentials_name.as_ref())
+            )
+        );
+        let mut req = self.http_client.delete(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<ConnectorDeleteOrganizationCredentialsV1ApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(ConnectorDeleteOrganizationCredentialsV1ApiError::Status422(
+                            v,
+                        ));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Delete user credentials for a connector.
+    ///
+    /// Delete credentials at the user level for a given connector.
+    ///
+    /// `DELETE /v1/connectors/{connector_id_or_name}/user/credentials/{credentials_name}`
+    pub async fn connector_delete_user_credentials_v1(
+        &self,
+        credentials_name: impl AsRef<str>,
+        connector_id_or_name: impl AsRef<str>,
+    ) -> Result<MessageResponse, ApiOpError<ConnectorDeleteUserCredentialsV1ApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/connectors/{}/user/credentials/{}",
+                __pct_encode_path_segment(connector_id_or_name.as_ref()),
+                __pct_encode_path_segment(credentials_name.as_ref())
+            )
+        );
+        let mut req = self.http_client.delete(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<ConnectorDeleteUserCredentialsV1ApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(ConnectorDeleteUserCredentialsV1ApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Delete a connector.
+    ///
+    /// Delete a connector by its ID.
+    ///
+    /// `DELETE /v1/connectors/{connector_id}`
+    pub async fn connector_delete_v1(
+        &self,
+        connector_id: impl AsRef<str>,
+    ) -> Result<MessageResponse, ApiOpError<ConnectorDeleteV1ApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/connectors/{}",
+                __pct_encode_path_segment(connector_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.delete(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<ConnectorDeleteV1ApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(ConnectorDeleteV1ApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Delete workspace credentials for a connector.
+    ///
+    /// Delete credentials at the workspace level for a given connector.
+    ///
+    /// `DELETE /v1/connectors/{connector_id_or_name}/workspace/credentials/{credentials_name}`
+    pub async fn connector_delete_workspace_credentials_v1(
+        &self,
+        credentials_name: impl AsRef<str>,
+        connector_id_or_name: impl AsRef<str>,
+    ) -> Result<MessageResponse, ApiOpError<ConnectorDeleteWorkspaceCredentialsV1ApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/connectors/{}/workspace/credentials/{}",
+                __pct_encode_path_segment(connector_id_or_name.as_ref()),
+                __pct_encode_path_segment(credentials_name.as_ref())
+            )
+        );
+        let mut req = self.http_client.delete(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<ConnectorDeleteWorkspaceCredentialsV1ApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(ConnectorDeleteWorkspaceCredentialsV1ApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get the auth URL for a connector.
+    ///
+    /// Get the OAuth2 authorization URL for a connector to initiate user authentication.
+    ///
+    /// `GET /v1/connectors/{connector_id_or_name}/auth_url`
+    pub async fn connector_get_auth_url_v1(
+        &self,
+        connector_id_or_name: impl AsRef<str>,
+        app_return_url: Option<impl AsRef<str>>,
+        credentials_name: Option<impl AsRef<str>>,
+    ) -> Result<AuthUrlResponse, ApiOpError<ConnectorGetAuthUrlV1ApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/connectors/{}/auth_url",
+                __pct_encode_path_segment(connector_id_or_name.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = app_return_url {
+                query_params.push(("app_return_url".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = credentials_name {
+                query_params.push(("credentials_name".to_string(), v.as_ref().to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<ConnectorGetAuthUrlV1ApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(ConnectorGetAuthUrlV1ApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get authentication methods for a connector.
+    ///
+    /// Get the authentication schema for a connector. Returns the list of supported authentication methods and their required headers.
+    ///
+    /// `GET /v1/connectors/{connector_id_or_name}/authentication_methods`
+    pub async fn connector_get_authentication_methods_v1(
+        &self,
+        connector_id_or_name: impl AsRef<str>,
+    ) -> Result<ConnectorGetAuthenticationMethodsV1Response, ApiOpError<serde_json::Value>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/connectors/{}/authentication_methods",
+                __pct_encode_path_segment(connector_id_or_name.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<serde_json::Value>;
+            let parse_error: Option<String>;
+            match status_code {
+                _ => match serde_json::from_str::<serde_json::Value>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(v);
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get a connector.
+    ///
+    /// Get a connector by its ID or name.
+    ///
+    /// `GET /v1/connectors/{connector_id_or_name}`
+    pub async fn connector_get_v1(
+        &self,
+        connector_id_or_name: impl AsRef<str>,
+        fetch_customer_data: Option<bool>,
+        fetch_connection_secrets: Option<bool>,
+    ) -> Result<Connector, ApiOpError<ConnectorGetV1ApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/connectors/{}",
+                __pct_encode_path_segment(connector_id_or_name.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = fetch_customer_data {
+                query_params.push(("fetch_customer_data".to_string(), v.to_string()));
+            }
+            if let Some(v) = fetch_connection_secrets {
+                query_params.push(("fetch_connection_secrets".to_string(), v.to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<ConnectorGetV1ApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(ConnectorGetV1ApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// List organization credentials for a connector.
+    ///
+    /// List all credentials configured at the organization level for a given connector.
+    ///
+    /// `GET /v1/connectors/{connector_id_or_name}/organization/credentials`
+    pub async fn connector_list_organization_credentials_v1(
+        &self,
+        connector_id_or_name: impl AsRef<str>,
+        auth_type: Option<impl AsRef<str>>,
+        fetch_default: Option<bool>,
+    ) -> Result<CredentialsResponse, ApiOpError<ConnectorListOrganizationCredentialsV1ApiError>>
+    {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/connectors/{}/organization/credentials",
+                __pct_encode_path_segment(connector_id_or_name.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = auth_type {
+                query_params.push(("auth_type".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = fetch_default {
+                query_params.push(("fetch_default".to_string(), v.to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<ConnectorListOrganizationCredentialsV1ApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(ConnectorListOrganizationCredentialsV1ApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// List tools for a connector.
+    ///
+    /// List all tools available for an MCP connector.
+    ///
+    /// `GET /v1/connectors/{connector_id_or_name}/tools`
+    pub async fn connector_list_tools_v1(
+        &self,
+        connector_id_or_name: impl AsRef<str>,
+        page: Option<i64>,
+        page_size: Option<i64>,
+        refresh: Option<bool>,
+        pretty: Option<bool>,
+        credentials_name: Option<impl AsRef<str>>,
+    ) -> Result<ConnectorListToolsV1Response, ApiOpError<ConnectorListToolsV1ApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/connectors/{}/tools",
+                __pct_encode_path_segment(connector_id_or_name.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = page {
+                query_params.push(("page".to_string(), v.to_string()));
+            }
+            if let Some(v) = page_size {
+                query_params.push(("page_size".to_string(), v.to_string()));
+            }
+            if let Some(v) = refresh {
+                query_params.push(("refresh".to_string(), v.to_string()));
+            }
+            if let Some(v) = pretty {
+                query_params.push(("pretty".to_string(), v.to_string()));
+            }
+            if let Some(v) = credentials_name {
+                query_params.push(("credentials_name".to_string(), v.as_ref().to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<ConnectorListToolsV1ApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(ConnectorListToolsV1ApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// List user credentials for a connector.
+    ///
+    /// List all credentials configured at the user level for a given connector.
+    ///
+    /// `GET /v1/connectors/{connector_id_or_name}/user/credentials`
+    pub async fn connector_list_user_credentials_v1(
+        &self,
+        connector_id_or_name: impl AsRef<str>,
+        auth_type: Option<impl AsRef<str>>,
+        fetch_default: Option<bool>,
+    ) -> Result<CredentialsResponse, ApiOpError<ConnectorListUserCredentialsV1ApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/connectors/{}/user/credentials",
+                __pct_encode_path_segment(connector_id_or_name.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = auth_type {
+                query_params.push(("auth_type".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = fetch_default {
+                query_params.push(("fetch_default".to_string(), v.to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<ConnectorListUserCredentialsV1ApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(ConnectorListUserCredentialsV1ApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// List all connectors.
+    ///
+    /// List all your custom connectors with keyset pagination and filters.
+    ///
+    /// `GET /v1/connectors`
+    pub async fn connector_list_v1(
+        &self,
+        query_filters: Option<ConnectorsQueryFilters>,
+        cursor: Option<impl AsRef<str>>,
+        page_size: Option<i64>,
+    ) -> Result<PaginatedConnectors, ApiOpError<ConnectorListV1ApiError>> {
+        let request_url = format!("{}{}", self.base_url, "/v1/connectors");
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = cursor {
+                query_params.push(("cursor".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = page_size {
+                query_params.push(("page_size".to_string(), v.to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(v) = query_filters {
+            let __empty = match serde_json::to_value(&v).map_err(HttpError::serialization_error)? {
+                serde_json::Value::Object(map) => map.is_empty(),
+                _ => false,
+            };
+            if __empty {
+                req = req.query(&[(format!("{}[]", "query_filters"), String::new())]);
+            } else {
+                req = req.query(&v);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<ConnectorListV1ApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(ConnectorListV1ApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// List workspace credentials for a connector.
+    ///
+    /// List all credentials configured at the workspace level for a given connector.
+    ///
+    /// `GET /v1/connectors/{connector_id_or_name}/workspace/credentials`
+    pub async fn connector_list_workspace_credentials_v1(
+        &self,
+        connector_id_or_name: impl AsRef<str>,
+        auth_type: Option<impl AsRef<str>>,
+        fetch_default: Option<bool>,
+    ) -> Result<CredentialsResponse, ApiOpError<ConnectorListWorkspaceCredentialsV1ApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/connectors/{}/workspace/credentials",
+                __pct_encode_path_segment(connector_id_or_name.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = auth_type {
+                query_params.push(("auth_type".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = fetch_default {
+                query_params.push(("fetch_default".to_string(), v.to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<ConnectorListWorkspaceCredentialsV1ApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(ConnectorListWorkspaceCredentialsV1ApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Update a connector.
+    ///
+    /// Update a connector by its ID.
+    ///
+    /// `PATCH /v1/connectors/{connector_id}`
+    pub async fn connector_update_v1(
+        &self,
+        connector_id: impl AsRef<str>,
+        request: ConnectorMCPUpdate,
+    ) -> Result<Connector, ApiOpError<ConnectorUpdateV1ApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/connectors/{}",
+                __pct_encode_path_segment(connector_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.patch(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<ConnectorUpdateV1ApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(ConnectorUpdateV1ApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Create and start a new campaign
+    ///
+    /// `POST /v1/observability/campaigns`
+    pub async fn create_campaign_v1_observability_campaigns_post(
+        &self,
+        request: PostCampaignInSchema,
+    ) -> Result<CampaignPreview, ApiOpError<CreateCampaignV1ObservabilityCampaignsPostApiError>>
+    {
+        let request_url = format!("{}{}", self.base_url, "/v1/observability/campaigns");
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 201u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "201",
+                )),
+            }))
+        } else {
+            let typed: Option<CreateCampaignV1ObservabilityCampaignsPostApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed =
+                            Some(CreateCampaignV1ObservabilityCampaignsPostApiError::Status400(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed =
+                            Some(CreateCampaignV1ObservabilityCampaignsPostApiError::Status404(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed =
+                            Some(CreateCampaignV1ObservabilityCampaignsPostApiError::Status408(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed =
+                            Some(CreateCampaignV1ObservabilityCampaignsPostApiError::Status409(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed =
+                            Some(CreateCampaignV1ObservabilityCampaignsPostApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Add a conversation to the dataset
+    ///
+    /// `POST /v1/observability/datasets/{dataset_id}/records`
+    pub async fn create_dataset_record_v1_observability_datasets_dataset_id_records_post(
+        &self,
+        dataset_id: impl AsRef<str>,
+        request: PostDatasetRecordInSchema,
+    ) -> Result<
+        DatasetRecord,
+        ApiOpError<CreateDatasetRecordV1ObservabilityDatasetsDatasetIdRecordsPostApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/observability/datasets/{}/records",
+                __pct_encode_path_segment(dataset_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 201u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "201",
+                )),
+            }))
+        } else {
+            let typed: Option<
+                CreateDatasetRecordV1ObservabilityDatasetsDatasetIdRecordsPostApiError,
+            >;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                CreateDatasetRecordV1ObservabilityDatasetsDatasetIdRecordsPostApiError::Status400(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                CreateDatasetRecordV1ObservabilityDatasetsDatasetIdRecordsPostApiError::Status404(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                CreateDatasetRecordV1ObservabilityDatasetsDatasetIdRecordsPostApiError::Status408(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                CreateDatasetRecordV1ObservabilityDatasetsDatasetIdRecordsPostApiError::Status409(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                CreateDatasetRecordV1ObservabilityDatasetsDatasetIdRecordsPostApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Create a new empty dataset
+    ///
+    /// `POST /v1/observability/datasets`
+    pub async fn create_dataset_v1_observability_datasets_post(
+        &self,
+        request: PostDatasetInSchema,
+    ) -> Result<Dataset, ApiOpError<CreateDatasetV1ObservabilityDatasetsPostApiError>> {
+        let request_url = format!("{}{}", self.base_url, "/v1/observability/datasets");
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 201u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "201",
+                )),
+            }))
+        } else {
+            let typed: Option<CreateDatasetV1ObservabilityDatasetsPostApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(CreateDatasetV1ObservabilityDatasetsPostApiError::Status400(
+                            v,
+                        ));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(CreateDatasetV1ObservabilityDatasetsPostApiError::Status404(
+                            v,
+                        ));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(CreateDatasetV1ObservabilityDatasetsPostApiError::Status408(
+                            v,
+                        ));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(CreateDatasetV1ObservabilityDatasetsPostApiError::Status409(
+                            v,
+                        ));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(CreateDatasetV1ObservabilityDatasetsPostApiError::Status422(
+                            v,
+                        ));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Create a new judge
+    ///
+    /// `POST /v1/observability/judges`
+    pub async fn create_judge_v1_observability_judges_post(
+        &self,
+        request: PostJudgeInSchema,
+    ) -> Result<JudgePreview, ApiOpError<CreateJudgeV1ObservabilityJudgesPostApiError>> {
+        let request_url = format!("{}{}", self.base_url, "/v1/observability/judges");
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 201u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "201",
+                )),
+            }))
+        } else {
+            let typed: Option<CreateJudgeV1ObservabilityJudgesPostApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(CreateJudgeV1ObservabilityJudgesPostApiError::Status400(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(CreateJudgeV1ObservabilityJudgesPostApiError::Status404(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(CreateJudgeV1ObservabilityJudgesPostApiError::Status408(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(CreateJudgeV1ObservabilityJudgesPostApiError::Status409(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(CreateJudgeV1ObservabilityJudgesPostApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Create a new voice
+    ///
+    /// Create a new voice with a base64-encoded audio sample
+    ///
+    /// `POST /v1/audio/voices`
+    pub async fn create_voice_v1_audio_voices_post(
+        &self,
+        request: VoiceCreateRequest,
+    ) -> Result<VoiceResponse, ApiOpError<CreateVoiceV1AudioVoicesPostApiError>> {
+        let request_url = format!("{}{}", self.base_url, "/v1/audio/voices");
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<CreateVoiceV1AudioVoicesPostApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(CreateVoiceV1AudioVoicesPostApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Delete a campaign
+    ///
+    /// `DELETE /v1/observability/campaigns/{campaign_id}`
+    pub async fn delete_campaign_v1_observability_campaigns_campaign_id_delete(
+        &self,
+        campaign_id: impl AsRef<str>,
+    ) -> Result<(), ApiOpError<DeleteCampaignV1ObservabilityCampaignsCampaignIdDeleteApiError>>
+    {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/observability/campaigns/{}",
+                __pct_encode_path_segment(campaign_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.delete(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            req = req.header(name, value);
+        }
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 204u16 {
+            let _ = body_text;
+            let _ = raw_body;
+            let _ = headers;
+            Ok(())
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "204",
+                )),
+            }))
+        } else {
+            let typed: Option<DeleteCampaignV1ObservabilityCampaignsCampaignIdDeleteApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                DeleteCampaignV1ObservabilityCampaignsCampaignIdDeleteApiError::Status400(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                DeleteCampaignV1ObservabilityCampaignsCampaignIdDeleteApiError::Status404(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                DeleteCampaignV1ObservabilityCampaignsCampaignIdDeleteApiError::Status408(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                DeleteCampaignV1ObservabilityCampaignsCampaignIdDeleteApiError::Status409(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                DeleteCampaignV1ObservabilityCampaignsCampaignIdDeleteApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Delete a record from a dataset
+    ///
+    /// `DELETE /v1/observability/dataset-records/{dataset_record_id}`
+    pub async fn delete_dataset_record_v1_observability_dataset_records_dataset_record_id_delete(
+        &self,
+        dataset_record_id: impl AsRef<str>,
+    ) -> Result<
+        (),
+        ApiOpError<DeleteDatasetRecordV1ObservabilityDatasetRecordsDatasetRecordIdDeleteApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/observability/dataset-records/{}",
+                __pct_encode_path_segment(dataset_record_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.delete(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            req = req.header(name, value);
+        }
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 204u16 {
+            let _ = body_text;
+            let _ = raw_body;
+            let _ = headers;
+            Ok(())
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "204",
+                )),
+            }))
+        } else {
+            let typed: Option<
+                DeleteDatasetRecordV1ObservabilityDatasetRecordsDatasetRecordIdDeleteApiError,
+            >;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                DeleteDatasetRecordV1ObservabilityDatasetRecordsDatasetRecordIdDeleteApiError::Status400(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                DeleteDatasetRecordV1ObservabilityDatasetRecordsDatasetRecordIdDeleteApiError::Status404(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                DeleteDatasetRecordV1ObservabilityDatasetRecordsDatasetRecordIdDeleteApiError::Status408(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                DeleteDatasetRecordV1ObservabilityDatasetRecordsDatasetRecordIdDeleteApiError::Status409(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                DeleteDatasetRecordV1ObservabilityDatasetRecordsDatasetRecordIdDeleteApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Delete multiple records from datasets
+    ///
+    /// `POST /v1/observability/dataset-records/bulk-delete`
+    pub async fn delete_dataset_records_v1_observability_dataset_records_bulk_delete_post(
+        &self,
+        request: DeleteDatasetRecordsInSchema,
+    ) -> Result<
+        (),
+        ApiOpError<DeleteDatasetRecordsV1ObservabilityDatasetRecordsBulkDeletePostApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url, "/v1/observability/dataset-records/bulk-delete"
+        );
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            req = req.header(name, value);
+        }
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 204u16 {
+            let _ = body_text;
+            let _ = raw_body;
+            let _ = headers;
+            Ok(())
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "204",
+                )),
+            }))
+        } else {
+            let typed: Option<
+                DeleteDatasetRecordsV1ObservabilityDatasetRecordsBulkDeletePostApiError,
+            >;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                DeleteDatasetRecordsV1ObservabilityDatasetRecordsBulkDeletePostApiError::Status400(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                DeleteDatasetRecordsV1ObservabilityDatasetRecordsBulkDeletePostApiError::Status404(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                DeleteDatasetRecordsV1ObservabilityDatasetRecordsBulkDeletePostApiError::Status408(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                DeleteDatasetRecordsV1ObservabilityDatasetRecordsBulkDeletePostApiError::Status409(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                DeleteDatasetRecordsV1ObservabilityDatasetRecordsBulkDeletePostApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Delete a dataset
+    ///
+    /// `DELETE /v1/observability/datasets/{dataset_id}`
+    pub async fn delete_dataset_v1_observability_datasets_dataset_id_delete(
+        &self,
+        dataset_id: impl AsRef<str>,
+    ) -> Result<(), ApiOpError<DeleteDatasetV1ObservabilityDatasetsDatasetIdDeleteApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/observability/datasets/{}",
+                __pct_encode_path_segment(dataset_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.delete(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            req = req.header(name, value);
+        }
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 204u16 {
+            let _ = body_text;
+            let _ = raw_body;
+            let _ = headers;
+            Ok(())
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "204",
+                )),
+            }))
+        } else {
+            let typed: Option<DeleteDatasetV1ObservabilityDatasetsDatasetIdDeleteApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                            DeleteDatasetV1ObservabilityDatasetsDatasetIdDeleteApiError::Status400(
+                                v,
+                            ),
+                        );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                            DeleteDatasetV1ObservabilityDatasetsDatasetIdDeleteApiError::Status404(
+                                v,
+                            ),
+                        );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                            DeleteDatasetV1ObservabilityDatasetsDatasetIdDeleteApiError::Status408(
+                                v,
+                            ),
+                        );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                            DeleteDatasetV1ObservabilityDatasetsDatasetIdDeleteApiError::Status409(
+                                v,
+                            ),
+                        );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                            DeleteDatasetV1ObservabilityDatasetsDatasetIdDeleteApiError::Status422(
+                                v,
+                            ),
+                        );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Delete a judge
+    ///
+    /// `DELETE /v1/observability/judges/{judge_id}`
+    pub async fn delete_judge_v1_observability_judges_judge_id_delete(
+        &self,
+        judge_id: impl AsRef<str>,
+    ) -> Result<(), ApiOpError<DeleteJudgeV1ObservabilityJudgesJudgeIdDeleteApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/observability/judges/{}",
+                __pct_encode_path_segment(judge_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.delete(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            req = req.header(name, value);
+        }
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 204u16 {
+            let _ = body_text;
+            let _ = raw_body;
+            let _ = headers;
+            Ok(())
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "204",
+                )),
+            }))
+        } else {
+            let typed: Option<DeleteJudgeV1ObservabilityJudgesJudgeIdDeleteApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                            DeleteJudgeV1ObservabilityJudgesJudgeIdDeleteApiError::Status400(v),
+                        );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                            DeleteJudgeV1ObservabilityJudgesJudgeIdDeleteApiError::Status404(v),
+                        );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                            DeleteJudgeV1ObservabilityJudgesJudgeIdDeleteApiError::Status408(v),
+                        );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                            DeleteJudgeV1ObservabilityJudgesJudgeIdDeleteApiError::Status409(v),
+                        );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                            DeleteJudgeV1ObservabilityJudgesJudgeIdDeleteApiError::Status422(v),
+                        );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Delete Model
+    ///
+    /// Delete a fine-tuned model.
+    ///
+    /// `DELETE /v1/models/{model_id}`
+    pub async fn delete_model_v1_models_model_id_delete(
+        &self,
+        model_id: impl AsRef<str>,
+    ) -> Result<DeleteModelOut, ApiOpError<DeleteModelV1ModelsModelIdDeleteApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/models/{}",
+                __pct_encode_path_segment(model_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.delete(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<DeleteModelV1ModelsModelIdDeleteApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(DeleteModelV1ModelsModelIdDeleteApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Delete a custom voice
+    ///
+    /// Delete a custom voice
+    ///
+    /// `DELETE /v1/audio/voices/{voice_id}`
+    pub async fn delete_voice_v1_audio_voices_voice_id_delete(
+        &self,
+        voice_id: impl AsRef<str>,
+    ) -> Result<VoiceResponse, ApiOpError<DeleteVoiceV1AudioVoicesVoiceIdDeleteApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/audio/voices/{}",
+                __pct_encode_path_segment(voice_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.delete(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<DeleteVoiceV1AudioVoicesVoiceIdDeleteApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(DeleteVoiceV1AudioVoicesVoiceIdDeleteApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Embeddings
+    ///
+    /// Embeddings
+    ///
+    /// `POST /v1/embeddings`
+    pub async fn embeddings_v1_embeddings_post(
+        &self,
+        request: EmbeddingRequest,
+    ) -> Result<EmbeddingResponse, ApiOpError<EmbeddingsV1EmbeddingsPostApiError>> {
+        let request_url = format!("{}{}", self.base_url, "/v1/embeddings");
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<EmbeddingsV1EmbeddingsPostApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(EmbeddingsV1EmbeddingsPostApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Execute Workflow Registration
+    ///
+    /// `POST /v1/workflows/registrations/{workflow_registration_id}/execute`
+    pub async fn execute_workflow_registration_v1_workflows_registrations_workflow_registration_id_execute_post(
+        &self,
+        workflow_registration_id: impl AsRef<str>,
+        request: WorkflowExecutionRequest,
+    ) -> Result<
+        ExecuteWorkflowRegistrationV1WorkflowsRegistrationsWorkflowRegistrationIdExecutePostResponse,
+        ApiOpError<
+            ExecuteWorkflowRegistrationV1WorkflowsRegistrationsWorkflowRegistrationIdExecutePostApiError,
+        >,
+    >{
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/workflows/registrations/{}/execute",
+                __pct_encode_path_segment(workflow_registration_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<
+                ExecuteWorkflowRegistrationV1WorkflowsRegistrationsWorkflowRegistrationIdExecutePostApiError,
+            >;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                ExecuteWorkflowRegistrationV1WorkflowsRegistrationsWorkflowRegistrationIdExecutePostApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Execute Workflow
+    ///
+    /// `POST /v1/workflows/{workflow_identifier}/execute`
+    pub async fn execute_workflow_v1_workflows_workflow_identifier_execute_post(
+        &self,
+        workflow_identifier: impl AsRef<str>,
+        request: WorkflowExecutionRequest,
+    ) -> Result<
+        ExecuteWorkflowV1WorkflowsWorkflowIdentifierExecutePostResponse,
+        ApiOpError<ExecuteWorkflowV1WorkflowsWorkflowIdentifierExecutePostApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/workflows/{}/execute",
+                __pct_encode_path_segment(workflow_identifier.as_ref())
+            )
+        );
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<ExecuteWorkflowV1WorkflowsWorkflowIdentifierExecutePostApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                ExecuteWorkflowV1WorkflowsWorkflowIdentifierExecutePostApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Export to the Files API and retrieve presigned URL to download the resulting JSONL file
+    ///
+    /// `GET /v1/observability/datasets/{dataset_id}/exports/to-jsonl`
+    pub async fn export_dataset_to_jsonl_v1_observability_datasets_dataset_id_exports_to_jsonl_get(
+        &self,
+        dataset_id: impl AsRef<str>,
+    ) -> Result<
+        DatasetExport,
+        ApiOpError<ExportDatasetToJsonlV1ObservabilityDatasetsDatasetIdExportsToJsonlGetApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/observability/datasets/{}/exports/to-jsonl",
+                __pct_encode_path_segment(dataset_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<
+                ExportDatasetToJsonlV1ObservabilityDatasetsDatasetIdExportsToJsonlGetApiError,
+            >;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                ExportDatasetToJsonlV1ObservabilityDatasetsDatasetIdExportsToJsonlGetApiError::Status400(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                ExportDatasetToJsonlV1ObservabilityDatasetsDatasetIdExportsToJsonlGetApiError::Status404(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                ExportDatasetToJsonlV1ObservabilityDatasetsDatasetIdExportsToJsonlGetApiError::Status408(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                ExportDatasetToJsonlV1ObservabilityDatasetsDatasetIdExportsToJsonlGetApiError::Status409(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                ExportDatasetToJsonlV1ObservabilityDatasetsDatasetIdExportsToJsonlGetApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Delete File
+    ///
+    /// Delete a file.
+    ///
+    /// `DELETE /v1/files/{file_id}`
+    pub async fn files_api_routes_delete_file(
+        &self,
+        file_id: impl AsRef<str>,
+    ) -> Result<DeleteFileOut, ApiOpError<serde_json::Value>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!("/v1/files/{}", __pct_encode_path_segment(file_id.as_ref()))
+        );
+        let mut req = self.http_client.delete(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<serde_json::Value>;
+            let parse_error: Option<String>;
+            match status_code {
+                _ => match serde_json::from_str::<serde_json::Value>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(v);
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Download File
+    ///
+    /// Download a file
+    ///
+    /// `GET /v1/files/{file_id}/content`
+    pub async fn files_api_routes_download_file(
+        &self,
+        file_id: impl AsRef<str>,
+    ) -> Result<bytes::Bytes, ApiOpError<serde_json::Value>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/files/{}/content",
+                __pct_encode_path_segment(file_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/octet-stream");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        if false || status_code == 200u16 {
+            Ok(bytes::Bytes::from(body_bytes))
+        } else {
+            let raw_body = body_bytes;
+            let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+            if status.is_success() {
+                return Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!(
+                        "unexpected successful status {}; generated return type selects `{}`",
+                        status_code, "200",
+                    )),
+                }));
+            }
+            let typed: Option<serde_json::Value>;
+            let parse_error: Option<String>;
+            match status_code {
+                _ => match serde_json::from_str::<serde_json::Value>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(v);
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get Signed Url
+    ///
+    /// `GET /v1/files/{file_id}/url`
+    pub async fn files_api_routes_get_signed_url(
+        &self,
+        file_id: impl AsRef<str>,
+        expiry: Option<i64>,
+    ) -> Result<FileSignedURL, ApiOpError<serde_json::Value>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/files/{}/url",
+                __pct_encode_path_segment(file_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = expiry {
+                query_params.push(("expiry".to_string(), v.to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<serde_json::Value>;
+            let parse_error: Option<String>;
+            match status_code {
+                _ => match serde_json::from_str::<serde_json::Value>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(v);
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// List Files
+    ///
+    /// Returns a list of files that belong to the user's organization.
+    ///
+    /// `GET /v1/files`
+    pub async fn files_api_routes_list_files(
+        &self,
+        page: Option<i64>,
+        page_size: Option<i64>,
+        include_total: Option<bool>,
+        sample_type: Option<impl AsRef<str>>,
+        source: Option<impl AsRef<str>>,
+        search: Option<impl AsRef<str>>,
+        purpose: Option<impl AsRef<str>>,
+        mimetypes: Option<impl AsRef<str>>,
+    ) -> Result<ListFilesOut, ApiOpError<serde_json::Value>> {
+        let request_url = format!("{}{}", self.base_url, "/v1/files");
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = page {
+                query_params.push(("page".to_string(), v.to_string()));
+            }
+            if let Some(v) = page_size {
+                query_params.push(("page_size".to_string(), v.to_string()));
+            }
+            if let Some(v) = include_total {
+                query_params.push(("include_total".to_string(), v.to_string()));
+            }
+            if let Some(v) = sample_type {
+                query_params.push(("sample_type".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = source {
+                query_params.push(("source".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = search {
+                query_params.push(("search".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = purpose {
+                query_params.push(("purpose".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = mimetypes {
+                query_params.push(("mimetypes".to_string(), v.as_ref().to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<serde_json::Value>;
+            let parse_error: Option<String>;
+            match status_code {
+                _ => match serde_json::from_str::<serde_json::Value>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(v);
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Retrieve File
+    ///
+    /// Returns information about a specific file.
+    ///
+    /// `GET /v1/files/{file_id}`
+    pub async fn files_api_routes_retrieve_file(
+        &self,
+        file_id: impl AsRef<str>,
+    ) -> Result<RetrieveFileOut, ApiOpError<serde_json::Value>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!("/v1/files/{}", __pct_encode_path_segment(file_id.as_ref()))
+        );
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<serde_json::Value>;
+            let parse_error: Option<String>;
+            match status_code {
+                _ => match serde_json::from_str::<serde_json::Value>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(v);
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Upload File
+    ///
+    /// Upload a file that can be used across various endpoints.
+    ///
+    /// The size of individual files can be a maximum of 512 MB. The Fine-tuning API only supports .jsonl files.
+    ///
+    /// Please contact us if you need to increase these storage limits.
+    ///
+    /// `POST /v1/files`
+    pub async fn files_api_routes_upload_file(
+        &self,
+        request: FilesApiRoutesUploadFileRequest,
+    ) -> Result<UploadFileOut, ApiOpError<serde_json::Value>> {
+        let request_url = format!("{}{}", self.base_url, "/v1/files");
+        let mut req = self.http_client.post(request_url);
+        let mut form = reqwest::multipart::Form::new();
+        if let Some(Some(value)) = &request.expiry {
+            form = form.text("expiry", value.to_string());
+        }
+        let value = &request.file;
+        form = form.part(
+            "file",
+            reqwest::multipart::Part::bytes(value.to_vec()).file_name(self.upload_filename.clone()),
+        );
+        if let Some(value) = &request.purpose {
+            form = form.text("purpose", value.to_string());
+        }
+        if let Some(value) = &request.visibility {
+            form = form.text("visibility", value.to_string());
+        }
+        req = req.multipart(form);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<serde_json::Value>;
+            let parse_error: Option<String>;
+            match status_code {
+                _ => match serde_json::from_str::<serde_json::Value>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(v);
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Fim Completion
+    ///
+    /// FIM completion.
+    ///
+    /// `POST /v1/fim/completions`
+    pub async fn fim_completion_v1_fim_completions_post(
+        &self,
+        request: FIMCompletionRequest,
+    ) -> Result<FIMCompletionResponse, ApiOpError<FimCompletionV1FimCompletionsPostApiError>> {
+        let request_url = format!("{}{}", self.base_url, "/v1/fim/completions");
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<FimCompletionV1FimCompletionsPostApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(FimCompletionV1FimCompletionsPostApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Fim Completion
+    ///
+    /// FIM completion.
+    ///
+    /// `POST /v1/fim/completions`
+    pub async fn fim_completion_v1_fim_completions_post_stream(
+        &self,
+        request: FIMCompletionRequest,
+    ) -> Result<
+        impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>>,
+        ApiOpError<FimCompletionV1FimCompletionsPostStreamApiError>,
+    > {
+        let request_url = format!("{}{}", self.base_url, "/v1/fim/completions");
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "text/event-stream");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        if false || status_code == 200u16 {
+            Ok(response.bytes_stream())
+        } else {
+            if status.is_success() {
+                return Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers,
+                    body: String::new(),
+                    raw_body: Vec::new(),
+                    typed: None,
+                    parse_error: Some(format!(
+                        "unexpected successful status {}; generated return type selects `{}`; live response body was not buffered",
+                        status_code, "200",
+                    )),
+                }));
+            }
+            let body_bytes =
+                __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+            let raw_body = body_bytes;
+            let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+            let typed: Option<FimCompletionV1FimCompletionsPostStreamApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(FimCompletionV1FimCompletionsPostStreamApiError::Status422(
+                            v,
+                        ));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get campaign by id
+    ///
+    /// `GET /v1/observability/campaigns/{campaign_id}`
+    pub async fn get_campaign_by_id_v1_observability_campaigns_campaign_id_get(
+        &self,
+        campaign_id: impl AsRef<str>,
+    ) -> Result<
+        CampaignPreview,
+        ApiOpError<GetCampaignByIdV1ObservabilityCampaignsCampaignIdGetApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/observability/campaigns/{}",
+                __pct_encode_path_segment(campaign_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<GetCampaignByIdV1ObservabilityCampaignsCampaignIdGetApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                            GetCampaignByIdV1ObservabilityCampaignsCampaignIdGetApiError::Status400(
+                                v,
+                            ),
+                        );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                            GetCampaignByIdV1ObservabilityCampaignsCampaignIdGetApiError::Status404(
+                                v,
+                            ),
+                        );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                            GetCampaignByIdV1ObservabilityCampaignsCampaignIdGetApiError::Status408(
+                                v,
+                            ),
+                        );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                            GetCampaignByIdV1ObservabilityCampaignsCampaignIdGetApiError::Status409(
+                                v,
+                            ),
+                        );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                            GetCampaignByIdV1ObservabilityCampaignsCampaignIdGetApiError::Status422(
+                                v,
+                            ),
+                        );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get event ids that were selected by the given campaign
+    ///
+    /// `GET /v1/observability/campaigns/{campaign_id}/selected-events`
+    pub async fn get_campaign_selected_events_v1_observability_campaigns_campaign_id_selected_events_get(
+        &self,
+        campaign_id: impl AsRef<str>,
+        page_size: Option<i64>,
+        page: Option<i64>,
+    ) -> Result<
+        CampaignSelectedEvents,
+        ApiOpError<
+            GetCampaignSelectedEventsV1ObservabilityCampaignsCampaignIdSelectedEventsGetApiError,
+        >,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/observability/campaigns/{}/selected-events",
+                __pct_encode_path_segment(campaign_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = page_size {
+                query_params.push(("page_size".to_string(), v.to_string()));
+            }
+            if let Some(v) = page {
+                query_params.push(("page".to_string(), v.to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<
+                GetCampaignSelectedEventsV1ObservabilityCampaignsCampaignIdSelectedEventsGetApiError,
+            >;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetCampaignSelectedEventsV1ObservabilityCampaignsCampaignIdSelectedEventsGetApiError::Status400(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetCampaignSelectedEventsV1ObservabilityCampaignsCampaignIdSelectedEventsGetApiError::Status404(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetCampaignSelectedEventsV1ObservabilityCampaignsCampaignIdSelectedEventsGetApiError::Status408(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetCampaignSelectedEventsV1ObservabilityCampaignsCampaignIdSelectedEventsGetApiError::Status409(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetCampaignSelectedEventsV1ObservabilityCampaignsCampaignIdSelectedEventsGetApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get campaign status by campaign id
+    ///
+    /// `GET /v1/observability/campaigns/{campaign_id}/status`
+    pub async fn get_campaign_status_by_id_v1_observability_campaigns_campaign_id_status_get(
+        &self,
+        campaign_id: impl AsRef<str>,
+    ) -> Result<
+        CampaignStatus,
+        ApiOpError<GetCampaignStatusByIdV1ObservabilityCampaignsCampaignIdStatusGetApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/observability/campaigns/{}/status",
+                __pct_encode_path_segment(campaign_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<
+                GetCampaignStatusByIdV1ObservabilityCampaignsCampaignIdStatusGetApiError,
+            >;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetCampaignStatusByIdV1ObservabilityCampaignsCampaignIdStatusGetApiError::Status400(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetCampaignStatusByIdV1ObservabilityCampaignsCampaignIdStatusGetApiError::Status404(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetCampaignStatusByIdV1ObservabilityCampaignsCampaignIdStatusGetApiError::Status408(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetCampaignStatusByIdV1ObservabilityCampaignsCampaignIdStatusGetApiError::Status409(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetCampaignStatusByIdV1ObservabilityCampaignsCampaignIdStatusGetApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get all campaigns
+    ///
+    /// `GET /v1/observability/campaigns`
+    pub async fn get_campaigns_v1_observability_campaigns_get(
+        &self,
+        page_size: Option<i64>,
+        page: Option<i64>,
+        q: Option<impl AsRef<str>>,
+    ) -> Result<CampaignPreviews, ApiOpError<GetCampaignsV1ObservabilityCampaignsGetApiError>> {
+        let request_url = format!("{}{}", self.base_url, "/v1/observability/campaigns");
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = page_size {
+                query_params.push(("page_size".to_string(), v.to_string()));
+            }
+            if let Some(v) = page {
+                query_params.push(("page".to_string(), v.to_string()));
+            }
+            if let Some(v) = q {
+                query_params.push(("q".to_string(), v.as_ref().to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<GetCampaignsV1ObservabilityCampaignsGetApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(GetCampaignsV1ObservabilityCampaignsGetApiError::Status400(
+                            v,
+                        ));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(GetCampaignsV1ObservabilityCampaignsGetApiError::Status404(
+                            v,
+                        ));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(GetCampaignsV1ObservabilityCampaignsGetApiError::Status408(
+                            v,
+                        ));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(GetCampaignsV1ObservabilityCampaignsGetApiError::Status409(
+                            v,
+                        ));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(GetCampaignsV1ObservabilityCampaignsGetApiError::Status422(
+                            v,
+                        ));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Alternative to /search that returns only the IDs and that can return many IDs at once
+    ///
+    /// `POST /v1/observability/chat-completion-events/search-ids`
+    pub async fn get_chat_completion_event_ids_v1_observability_chat_completion_events_search_ids_post(
+        &self,
+        request: GetChatCompletionEventIdsInSchema,
+    ) -> Result<
+        ChatCompletionEventIds,
+        ApiOpError<
+            GetChatCompletionEventIdsV1ObservabilityChatCompletionEventsSearchIdsPostApiError,
+        >,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url, "/v1/observability/chat-completion-events/search-ids"
+        );
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<
+                GetChatCompletionEventIdsV1ObservabilityChatCompletionEventsSearchIdsPostApiError,
+            >;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetChatCompletionEventIdsV1ObservabilityChatCompletionEventsSearchIdsPostApiError::Status400(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetChatCompletionEventIdsV1ObservabilityChatCompletionEventsSearchIdsPostApiError::Status404(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetChatCompletionEventIdsV1ObservabilityChatCompletionEventsSearchIdsPostApiError::Status408(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetChatCompletionEventIdsV1ObservabilityChatCompletionEventsSearchIdsPostApiError::Status409(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetChatCompletionEventIdsV1ObservabilityChatCompletionEventsSearchIdsPostApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get Chat Completion Event
+    ///
+    /// `GET /v1/observability/chat-completion-events/{event_id}`
+    pub async fn get_chat_completion_event_v1_observability_chat_completion_events_event_id_get(
+        &self,
+        event_id: impl AsRef<str>,
+    ) -> Result<
+        ChatCompletionEvent,
+        ApiOpError<GetChatCompletionEventV1ObservabilityChatCompletionEventsEventIdGetApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/observability/chat-completion-events/{}",
+                __pct_encode_path_segment(event_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<
+                GetChatCompletionEventV1ObservabilityChatCompletionEventsEventIdGetApiError,
+            >;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetChatCompletionEventV1ObservabilityChatCompletionEventsEventIdGetApiError::Status400(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetChatCompletionEventV1ObservabilityChatCompletionEventsEventIdGetApiError::Status404(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetChatCompletionEventV1ObservabilityChatCompletionEventsEventIdGetApiError::Status408(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetChatCompletionEventV1ObservabilityChatCompletionEventsEventIdGetApiError::Status409(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetChatCompletionEventV1ObservabilityChatCompletionEventsEventIdGetApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get Chat Completion Events
+    ///
+    /// `POST /v1/observability/chat-completion-events/search`
+    pub async fn get_chat_completion_events_v1_observability_chat_completion_events_search_post(
+        &self,
+        page_size: Option<i64>,
+        cursor: Option<impl AsRef<str>>,
+        request: GetChatCompletionEventsInSchema,
+    ) -> Result<
+        ChatCompletionEvents,
+        ApiOpError<GetChatCompletionEventsV1ObservabilityChatCompletionEventsSearchPostApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url, "/v1/observability/chat-completion-events/search"
+        );
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = page_size {
+                query_params.push(("page_size".to_string(), v.to_string()));
+            }
+            if let Some(v) = cursor {
+                query_params.push(("cursor".to_string(), v.as_ref().to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<
+                GetChatCompletionEventsV1ObservabilityChatCompletionEventsSearchPostApiError,
+            >;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetChatCompletionEventsV1ObservabilityChatCompletionEventsSearchPostApiError::Status400(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetChatCompletionEventsV1ObservabilityChatCompletionEventsSearchPostApiError::Status404(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetChatCompletionEventsV1ObservabilityChatCompletionEventsSearchPostApiError::Status408(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetChatCompletionEventsV1ObservabilityChatCompletionEventsSearchPostApiError::Status409(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetChatCompletionEventsV1ObservabilityChatCompletionEventsSearchPostApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get Chat Completion Field Options Counts
+    ///
+    /// `POST /v1/observability/chat-completion-fields/{field_name}/options-counts`
+    pub async fn get_chat_completion_field_options_counts_v1_observability_chat_completion_fields_field_name_options_counts_post(
+        &self,
+        field_name: impl AsRef<str>,
+        request: FieldOptionCountsInSchema,
+    ) -> Result<
+        FieldOptionCounts,
+        ApiOpError<
+            GetChatCompletionFieldOptionsCountsV1ObservabilityChatCompletionFieldsFieldNameOptionsCountsPostApiError,
+        >,
+    >{
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/observability/chat-completion-fields/{}/options-counts",
+                __pct_encode_path_segment(field_name.as_ref())
+            )
+        );
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<
+                GetChatCompletionFieldOptionsCountsV1ObservabilityChatCompletionFieldsFieldNameOptionsCountsPostApiError,
+            >;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetChatCompletionFieldOptionsCountsV1ObservabilityChatCompletionFieldsFieldNameOptionsCountsPostApiError::Status400(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetChatCompletionFieldOptionsCountsV1ObservabilityChatCompletionFieldsFieldNameOptionsCountsPostApiError::Status404(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetChatCompletionFieldOptionsCountsV1ObservabilityChatCompletionFieldsFieldNameOptionsCountsPostApiError::Status408(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetChatCompletionFieldOptionsCountsV1ObservabilityChatCompletionFieldsFieldNameOptionsCountsPostApiError::Status409(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetChatCompletionFieldOptionsCountsV1ObservabilityChatCompletionFieldsFieldNameOptionsCountsPostApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get Chat Completion Field Options
+    ///
+    /// `GET /v1/observability/chat-completion-fields/{field_name}/options`
+    pub async fn get_chat_completion_field_options_v1_observability_chat_completion_fields_field_name_options_get(
+        &self,
+        field_name: impl AsRef<str>,
+        operator: GetChatCompletionFieldOptionsV1ObservabilityChatCompletionFieldsFieldNameOptionsGetOperator,
+    ) -> Result<
+        ChatCompletionFieldOptions,
+        ApiOpError<
+            GetChatCompletionFieldOptionsV1ObservabilityChatCompletionFieldsFieldNameOptionsGetApiError,
+        >,
+    >{
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/observability/chat-completion-fields/{}/options",
+                __pct_encode_path_segment(field_name.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            query_params.push(("operator".to_string(), operator.to_string()));
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<
+                GetChatCompletionFieldOptionsV1ObservabilityChatCompletionFieldsFieldNameOptionsGetApiError,
+            >;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetChatCompletionFieldOptionsV1ObservabilityChatCompletionFieldsFieldNameOptionsGetApiError::Status400(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetChatCompletionFieldOptionsV1ObservabilityChatCompletionFieldsFieldNameOptionsGetApiError::Status404(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetChatCompletionFieldOptionsV1ObservabilityChatCompletionFieldsFieldNameOptionsGetApiError::Status408(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetChatCompletionFieldOptionsV1ObservabilityChatCompletionFieldsFieldNameOptionsGetApiError::Status409(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetChatCompletionFieldOptionsV1ObservabilityChatCompletionFieldsFieldNameOptionsGetApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get Chat Completion Fields
+    ///
+    /// `GET /v1/observability/chat-completion-fields`
+    pub async fn get_chat_completion_fields_v1_observability_chat_completion_fields_get(
+        &self,
+    ) -> Result<
+        ChatCompletionFields,
+        ApiOpError<GetChatCompletionFieldsV1ObservabilityChatCompletionFieldsGetApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url, "/v1/observability/chat-completion-fields"
+        );
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<
+                GetChatCompletionFieldsV1ObservabilityChatCompletionFieldsGetApiError,
+            >;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetChatCompletionFieldsV1ObservabilityChatCompletionFieldsGetApiError::Status400(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetChatCompletionFieldsV1ObservabilityChatCompletionFieldsGetApiError::Status404(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetChatCompletionFieldsV1ObservabilityChatCompletionFieldsGetApiError::Status408(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetChatCompletionFieldsV1ObservabilityChatCompletionFieldsGetApiError::Status409(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetChatCompletionFieldsV1ObservabilityChatCompletionFieldsGetApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get dataset by id
+    ///
+    /// `GET /v1/observability/datasets/{dataset_id}`
+    pub async fn get_dataset_by_id_v1_observability_datasets_dataset_id_get(
+        &self,
+        dataset_id: impl AsRef<str>,
+    ) -> Result<DatasetPreview, ApiOpError<GetDatasetByIdV1ObservabilityDatasetsDatasetIdGetApiError>>
+    {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/observability/datasets/{}",
+                __pct_encode_path_segment(dataset_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<GetDatasetByIdV1ObservabilityDatasetsDatasetIdGetApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                            GetDatasetByIdV1ObservabilityDatasetsDatasetIdGetApiError::Status400(v),
+                        );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                            GetDatasetByIdV1ObservabilityDatasetsDatasetIdGetApiError::Status404(v),
+                        );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                            GetDatasetByIdV1ObservabilityDatasetsDatasetIdGetApiError::Status408(v),
+                        );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                            GetDatasetByIdV1ObservabilityDatasetsDatasetIdGetApiError::Status409(v),
+                        );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                            GetDatasetByIdV1ObservabilityDatasetsDatasetIdGetApiError::Status422(v),
+                        );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get status of a dataset import task
+    ///
+    /// `GET /v1/observability/datasets/{dataset_id}/tasks/{task_id}`
+    pub async fn get_dataset_import_task_v1_observability_datasets_dataset_id_tasks_task_id_get(
+        &self,
+        dataset_id: impl AsRef<str>,
+        task_id: impl AsRef<str>,
+    ) -> Result<
+        DatasetImportTask,
+        ApiOpError<GetDatasetImportTaskV1ObservabilityDatasetsDatasetIdTasksTaskIdGetApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/observability/datasets/{}/tasks/{}",
+                __pct_encode_path_segment(dataset_id.as_ref()),
+                __pct_encode_path_segment(task_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<
+                GetDatasetImportTaskV1ObservabilityDatasetsDatasetIdTasksTaskIdGetApiError,
+            >;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetDatasetImportTaskV1ObservabilityDatasetsDatasetIdTasksTaskIdGetApiError::Status400(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetDatasetImportTaskV1ObservabilityDatasetsDatasetIdTasksTaskIdGetApiError::Status404(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetDatasetImportTaskV1ObservabilityDatasetsDatasetIdTasksTaskIdGetApiError::Status408(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetDatasetImportTaskV1ObservabilityDatasetsDatasetIdTasksTaskIdGetApiError::Status409(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetDatasetImportTaskV1ObservabilityDatasetsDatasetIdTasksTaskIdGetApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// List import tasks for the given dataset
+    ///
+    /// `GET /v1/observability/datasets/{dataset_id}/tasks`
+    pub async fn get_dataset_import_tasks_v1_observability_datasets_dataset_id_tasks_get(
+        &self,
+        dataset_id: impl AsRef<str>,
+        page_size: Option<i64>,
+        page: Option<i64>,
+    ) -> Result<
+        DatasetImportTasks,
+        ApiOpError<GetDatasetImportTasksV1ObservabilityDatasetsDatasetIdTasksGetApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/observability/datasets/{}/tasks",
+                __pct_encode_path_segment(dataset_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = page_size {
+                query_params.push(("page_size".to_string(), v.to_string()));
+            }
+            if let Some(v) = page {
+                query_params.push(("page".to_string(), v.to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<
+                GetDatasetImportTasksV1ObservabilityDatasetsDatasetIdTasksGetApiError,
+            >;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetDatasetImportTasksV1ObservabilityDatasetsDatasetIdTasksGetApiError::Status400(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetDatasetImportTasksV1ObservabilityDatasetsDatasetIdTasksGetApiError::Status404(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetDatasetImportTasksV1ObservabilityDatasetsDatasetIdTasksGetApiError::Status408(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetDatasetImportTasksV1ObservabilityDatasetsDatasetIdTasksGetApiError::Status409(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetDatasetImportTasksV1ObservabilityDatasetsDatasetIdTasksGetApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get the content of a given conversation from a dataset
+    ///
+    /// `GET /v1/observability/dataset-records/{dataset_record_id}`
+    pub async fn get_dataset_record_v1_observability_dataset_records_dataset_record_id_get(
+        &self,
+        dataset_record_id: impl AsRef<str>,
+    ) -> Result<
+        DatasetRecord,
+        ApiOpError<GetDatasetRecordV1ObservabilityDatasetRecordsDatasetRecordIdGetApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/observability/dataset-records/{}",
+                __pct_encode_path_segment(dataset_record_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<
+                GetDatasetRecordV1ObservabilityDatasetRecordsDatasetRecordIdGetApiError,
+            >;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetDatasetRecordV1ObservabilityDatasetRecordsDatasetRecordIdGetApiError::Status400(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetDatasetRecordV1ObservabilityDatasetRecordsDatasetRecordIdGetApiError::Status404(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetDatasetRecordV1ObservabilityDatasetRecordsDatasetRecordIdGetApiError::Status408(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetDatasetRecordV1ObservabilityDatasetRecordsDatasetRecordIdGetApiError::Status409(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetDatasetRecordV1ObservabilityDatasetRecordsDatasetRecordIdGetApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// List existing records in the dataset
+    ///
+    /// `GET /v1/observability/datasets/{dataset_id}/records`
+    pub async fn get_dataset_records_v1_observability_datasets_dataset_id_records_get(
+        &self,
+        dataset_id: impl AsRef<str>,
+        page_size: Option<i64>,
+        page: Option<i64>,
+    ) -> Result<
+        DatasetRecords,
+        ApiOpError<GetDatasetRecordsV1ObservabilityDatasetsDatasetIdRecordsGetApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/observability/datasets/{}/records",
+                __pct_encode_path_segment(dataset_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = page_size {
+                query_params.push(("page_size".to_string(), v.to_string()));
+            }
+            if let Some(v) = page {
+                query_params.push(("page".to_string(), v.to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<GetDatasetRecordsV1ObservabilityDatasetsDatasetIdRecordsGetApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetDatasetRecordsV1ObservabilityDatasetsDatasetIdRecordsGetApiError::Status400(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetDatasetRecordsV1ObservabilityDatasetsDatasetIdRecordsGetApiError::Status404(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetDatasetRecordsV1ObservabilityDatasetsDatasetIdRecordsGetApiError::Status408(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetDatasetRecordsV1ObservabilityDatasetsDatasetIdRecordsGetApiError::Status409(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetDatasetRecordsV1ObservabilityDatasetsDatasetIdRecordsGetApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// List existing datasets
+    ///
+    /// `GET /v1/observability/datasets`
+    pub async fn get_datasets_v1_observability_datasets_get(
+        &self,
+        page_size: Option<i64>,
+        page: Option<i64>,
+        q: Option<impl AsRef<str>>,
+    ) -> Result<DatasetPreviews, ApiOpError<GetDatasetsV1ObservabilityDatasetsGetApiError>> {
+        let request_url = format!("{}{}", self.base_url, "/v1/observability/datasets");
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = page_size {
+                query_params.push(("page_size".to_string(), v.to_string()));
+            }
+            if let Some(v) = page {
+                query_params.push(("page".to_string(), v.to_string()));
+            }
+            if let Some(v) = q {
+                query_params.push(("q".to_string(), v.as_ref().to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<GetDatasetsV1ObservabilityDatasetsGetApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(GetDatasetsV1ObservabilityDatasetsGetApiError::Status400(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(GetDatasetsV1ObservabilityDatasetsGetApiError::Status404(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(GetDatasetsV1ObservabilityDatasetsGetApiError::Status408(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(GetDatasetsV1ObservabilityDatasetsGetApiError::Status409(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(GetDatasetsV1ObservabilityDatasetsGetApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get Deployment
+    ///
+    /// `GET /v1/workflows/deployments/{name}`
+    pub async fn get_deployment_v1_workflows_deployments_name_get(
+        &self,
+        name: impl AsRef<str>,
+    ) -> Result<
+        DeploymentDetailResponse,
+        ApiOpError<GetDeploymentV1WorkflowsDeploymentsNameGetApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/workflows/deployments/{}",
+                __pct_encode_path_segment(name.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<GetDeploymentV1WorkflowsDeploymentsNameGetApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed =
+                            Some(GetDeploymentV1WorkflowsDeploymentsNameGetApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get judge by id
+    ///
+    /// `GET /v1/observability/judges/{judge_id}`
+    pub async fn get_judge_by_id_v1_observability_judges_judge_id_get(
+        &self,
+        judge_id: impl AsRef<str>,
+    ) -> Result<JudgePreview, ApiOpError<GetJudgeByIdV1ObservabilityJudgesJudgeIdGetApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/observability/judges/{}",
+                __pct_encode_path_segment(judge_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<GetJudgeByIdV1ObservabilityJudgesJudgeIdGetApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed =
+                            Some(GetJudgeByIdV1ObservabilityJudgesJudgeIdGetApiError::Status400(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed =
+                            Some(GetJudgeByIdV1ObservabilityJudgesJudgeIdGetApiError::Status404(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed =
+                            Some(GetJudgeByIdV1ObservabilityJudgesJudgeIdGetApiError::Status408(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed =
+                            Some(GetJudgeByIdV1ObservabilityJudgesJudgeIdGetApiError::Status409(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed =
+                            Some(GetJudgeByIdV1ObservabilityJudgesJudgeIdGetApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get judges with optional filtering and search
+    ///
+    /// `GET /v1/observability/judges`
+    pub async fn get_judges_v1_observability_judges_get(
+        &self,
+        type_filter: Option<impl AsRef<str>>,
+        model_filter: Option<impl AsRef<str>>,
+        page_size: Option<i64>,
+        page: Option<i64>,
+        q: Option<impl AsRef<str>>,
+    ) -> Result<JudgePreviews, ApiOpError<GetJudgesV1ObservabilityJudgesGetApiError>> {
+        let request_url = format!("{}{}", self.base_url, "/v1/observability/judges");
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = type_filter {
+                query_params.push(("type_filter".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = model_filter {
+                query_params.push(("model_filter".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = page_size {
+                query_params.push(("page_size".to_string(), v.to_string()));
+            }
+            if let Some(v) = page {
+                query_params.push(("page".to_string(), v.to_string()));
+            }
+            if let Some(v) = q {
+                query_params.push(("q".to_string(), v.as_ref().to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<GetJudgesV1ObservabilityJudgesGetApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(GetJudgesV1ObservabilityJudgesGetApiError::Status400(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(GetJudgesV1ObservabilityJudgesGetApiError::Status404(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(GetJudgesV1ObservabilityJudgesGetApiError::Status408(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(GetJudgesV1ObservabilityJudgesGetApiError::Status409(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(GetJudgesV1ObservabilityJudgesGetApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get Run History
+    ///
+    /// `GET /v1/workflows/runs/{run_id}/history`
+    pub async fn get_run_history_v1_workflows_runs_run_id_history_get(
+        &self,
+        run_id: impl AsRef<str>,
+        decode_payloads: Option<bool>,
+    ) -> Result<
+        GetRunHistoryV1WorkflowsRunsRunIdHistoryGetResponse,
+        ApiOpError<GetRunHistoryV1WorkflowsRunsRunIdHistoryGetApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/workflows/runs/{}/history",
+                __pct_encode_path_segment(run_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = decode_payloads {
+                query_params.push(("decode_payloads".to_string(), v.to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<GetRunHistoryV1WorkflowsRunsRunIdHistoryGetApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed =
+                            Some(GetRunHistoryV1WorkflowsRunsRunIdHistoryGetApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get Run
+    ///
+    /// `GET /v1/workflows/runs/{run_id}`
+    pub async fn get_run_v1_workflows_runs_run_id_get(
+        &self,
+        run_id: impl AsRef<str>,
+    ) -> Result<WorkflowExecutionResponse, ApiOpError<GetRunV1WorkflowsRunsRunIdGetApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/workflows/runs/{}",
+                __pct_encode_path_segment(run_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<GetRunV1WorkflowsRunsRunIdGetApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(GetRunV1WorkflowsRunsRunIdGetApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get Schedules
+    ///
+    /// `GET /v1/workflows/schedules`
+    pub async fn get_schedules_v1_workflows_schedules_get(
+        &self,
+    ) -> Result<WorkflowScheduleListResponse, ApiOpError<serde_json::Value>> {
+        let request_url = format!("{}{}", self.base_url, "/v1/workflows/schedules");
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<serde_json::Value>;
+            let parse_error: Option<String>;
+            match status_code {
+                _ => match serde_json::from_str::<serde_json::Value>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(v);
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get Similar Chat Completion Events
+    ///
+    /// `GET /v1/observability/chat-completion-events/{event_id}/similar-events`
+    pub async fn get_similar_chat_completion_events_v1_observability_chat_completion_events_event_id_similar_events_get(
+        &self,
+        event_id: impl AsRef<str>,
+    ) -> Result<
+        ChatCompletionEvents,
+        ApiOpError<
+            GetSimilarChatCompletionEventsV1ObservabilityChatCompletionEventsEventIdSimilarEventsGetApiError,
+        >,
+    >{
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/observability/chat-completion-events/{}/similar-events",
+                __pct_encode_path_segment(event_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<
+                GetSimilarChatCompletionEventsV1ObservabilityChatCompletionEventsEventIdSimilarEventsGetApiError,
+            >;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetSimilarChatCompletionEventsV1ObservabilityChatCompletionEventsEventIdSimilarEventsGetApiError::Status400(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetSimilarChatCompletionEventsV1ObservabilityChatCompletionEventsEventIdSimilarEventsGetApiError::Status404(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetSimilarChatCompletionEventsV1ObservabilityChatCompletionEventsEventIdSimilarEventsGetApiError::Status408(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetSimilarChatCompletionEventsV1ObservabilityChatCompletionEventsEventIdSimilarEventsGetApiError::Status409(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetSimilarChatCompletionEventsV1ObservabilityChatCompletionEventsEventIdSimilarEventsGetApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get Stream Events
+    ///
+    /// `GET /v1/workflows/events/stream`
+    pub async fn get_stream_events_v1_workflows_events_stream_get(
+        &self,
+        scope: Option<GetStreamEventsV1WorkflowsEventsStreamGetScope>,
+        activity_name: Option<impl AsRef<str>>,
+        activity_id: Option<impl AsRef<str>>,
+        workflow_name: Option<impl AsRef<str>>,
+        workflow_exec_id: Option<impl AsRef<str>>,
+        root_workflow_exec_id: Option<impl AsRef<str>>,
+        parent_workflow_exec_id: Option<impl AsRef<str>>,
+        stream: Option<impl AsRef<str>>,
+        start_seq: Option<i64>,
+        metadata_filters: Option<impl AsRef<str>>,
+        workflow_event_types: Option<impl AsRef<str>>,
+        last_event_id: Option<impl AsRef<str>>,
+    ) -> Result<
+        impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>>,
+        ApiOpError<GetStreamEventsV1WorkflowsEventsStreamGetApiError>,
+    > {
+        let request_url = format!("{}{}", self.base_url, "/v1/workflows/events/stream");
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = scope {
+                query_params.push(("scope".to_string(), v.to_string()));
+            }
+            if let Some(v) = activity_name {
+                query_params.push(("activity_name".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = activity_id {
+                query_params.push(("activity_id".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = workflow_name {
+                query_params.push(("workflow_name".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = workflow_exec_id {
+                query_params.push(("workflow_exec_id".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = root_workflow_exec_id {
+                query_params.push(("root_workflow_exec_id".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = parent_workflow_exec_id {
+                query_params.push((
+                    "parent_workflow_exec_id".to_string(),
+                    v.as_ref().to_string(),
+                ));
+            }
+            if let Some(v) = stream {
+                query_params.push(("stream".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = start_seq {
+                query_params.push(("start_seq".to_string(), v.to_string()));
+            }
+            if let Some(v) = metadata_filters {
+                query_params.push(("metadata_filters".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = workflow_event_types {
+                query_params.push(("workflow_event_types".to_string(), v.as_ref().to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(v) = last_event_id {
+            req = req.header("last-event-id", v.as_ref());
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "text/event-stream");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        if false || status_code == 200u16 {
+            Ok(response.bytes_stream())
+        } else {
+            if status.is_success() {
+                return Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers,
+                    body: String::new(),
+                    raw_body: Vec::new(),
+                    typed: None,
+                    parse_error: Some(format!(
+                        "unexpected successful status {}; generated return type selects `{}`; live response body was not buffered",
+                        status_code, "200",
+                    )),
+                }));
+            }
+            let body_bytes =
+                __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+            let raw_body = body_bytes;
+            let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+            let typed: Option<GetStreamEventsV1WorkflowsEventsStreamGetApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed =
+                            Some(GetStreamEventsV1WorkflowsEventsStreamGetApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get voice sample audio
+    ///
+    /// Get the audio sample for a voice
+    ///
+    /// `GET /v1/audio/voices/{voice_id}/sample`
+    pub async fn get_voice_sample_audio_v1_audio_voices_voice_id_sample_get(
+        &self,
+        voice_id: impl AsRef<str>,
+    ) -> Result<
+        GetVoiceSampleAudioV1AudioVoicesVoiceIdSampleGetResponse,
+        ApiOpError<GetVoiceSampleAudioV1AudioVoicesVoiceIdSampleGetApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/audio/voices/{}/sample",
+                __pct_encode_path_segment(voice_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<GetVoiceSampleAudioV1AudioVoicesVoiceIdSampleGetApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                            GetVoiceSampleAudioV1AudioVoicesVoiceIdSampleGetApiError::Status422(v),
+                        );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get voice sample audio
+    ///
+    /// Get the audio sample for a voice
+    ///
+    /// `GET /v1/audio/voices/{voice_id}/sample`
+    pub async fn get_voice_sample_audio_v1_audio_voices_voice_id_sample_get_wav(
+        &self,
+        voice_id: impl AsRef<str>,
+    ) -> Result<bytes::Bytes, ApiOpError<GetVoiceSampleAudioV1AudioVoicesVoiceIdSampleGetWavApiError>>
+    {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/audio/voices/{}/sample",
+                __pct_encode_path_segment(voice_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "audio/wav");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        if false || status_code == 200u16 {
+            Ok(bytes::Bytes::from(body_bytes))
+        } else {
+            let raw_body = body_bytes;
+            let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+            if status.is_success() {
+                return Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!(
+                        "unexpected successful status {}; generated return type selects `{}`",
+                        status_code, "200",
+                    )),
+                }));
+            }
+            let typed: Option<GetVoiceSampleAudioV1AudioVoicesVoiceIdSampleGetWavApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                            GetVoiceSampleAudioV1AudioVoicesVoiceIdSampleGetWavApiError::Status422(
+                                v,
+                            ),
+                        );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get voice details
+    ///
+    /// Get voice details (excluding sample)
+    ///
+    /// `GET /v1/audio/voices/{voice_id}`
+    pub async fn get_voice_v1_audio_voices_voice_id_get(
+        &self,
+        voice_id: impl AsRef<str>,
+    ) -> Result<VoiceResponse, ApiOpError<GetVoiceV1AudioVoicesVoiceIdGetApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/audio/voices/{}",
+                __pct_encode_path_segment(voice_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<GetVoiceV1AudioVoicesVoiceIdGetApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(GetVoiceV1AudioVoicesVoiceIdGetApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get Worker Info
+    ///
+    /// `GET /v1/workflows/workers/whoami`
+    pub async fn get_worker_info_v1_workflows_workers_whoami_get(
+        &self,
+    ) -> Result<WorkerInfo, ApiOpError<serde_json::Value>> {
+        let request_url = format!("{}{}", self.base_url, "/v1/workflows/workers/whoami");
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<serde_json::Value>;
+            let parse_error: Option<String>;
+            match status_code {
+                _ => match serde_json::from_str::<serde_json::Value>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(v);
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get Workflow Events
+    ///
+    /// `GET /v1/workflows/events/list`
+    pub async fn get_workflow_events_v1_workflows_events_list_get(
+        &self,
+        root_workflow_exec_id: Option<impl AsRef<str>>,
+        workflow_exec_id: Option<impl AsRef<str>>,
+        workflow_run_id: Option<impl AsRef<str>>,
+        limit: Option<i64>,
+        cursor: Option<impl AsRef<str>>,
+    ) -> Result<
+        ListWorkflowEventResponse,
+        ApiOpError<GetWorkflowEventsV1WorkflowsEventsListGetApiError>,
+    > {
+        let request_url = format!("{}{}", self.base_url, "/v1/workflows/events/list");
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = root_workflow_exec_id {
+                query_params.push(("root_workflow_exec_id".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = workflow_exec_id {
+                query_params.push(("workflow_exec_id".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = workflow_run_id {
+                query_params.push(("workflow_run_id".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = limit {
+                query_params.push(("limit".to_string(), v.to_string()));
+            }
+            if let Some(v) = cursor {
+                query_params.push(("cursor".to_string(), v.as_ref().to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<GetWorkflowEventsV1WorkflowsEventsListGetApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed =
+                            Some(GetWorkflowEventsV1WorkflowsEventsListGetApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get Workflow Execution History
+    ///
+    /// `GET /v1/workflows/executions/{execution_id}/history`
+    pub async fn get_workflow_execution_history_v1_workflows_executions_execution_id_history_get(
+        &self,
+        execution_id: impl AsRef<str>,
+        decode_payloads: Option<bool>,
+    ) -> Result<
+        GetWorkflowExecutionHistoryV1WorkflowsExecutionsExecutionIdHistoryGetResponse,
+        ApiOpError<GetWorkflowExecutionHistoryV1WorkflowsExecutionsExecutionIdHistoryGetApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/workflows/executions/{}/history",
+                __pct_encode_path_segment(execution_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = decode_payloads {
+                query_params.push(("decode_payloads".to_string(), v.to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<
+                GetWorkflowExecutionHistoryV1WorkflowsExecutionsExecutionIdHistoryGetApiError,
+            >;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetWorkflowExecutionHistoryV1WorkflowsExecutionsExecutionIdHistoryGetApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get Workflow Execution Trace Events
+    ///
+    /// `GET /v1/workflows/executions/{execution_id}/trace/events`
+    pub async fn get_workflow_execution_trace_events(
+        &self,
+        execution_id: impl AsRef<str>,
+        merge_same_id_events: Option<bool>,
+        include_internal_events: Option<bool>,
+    ) -> Result<
+        WorkflowExecutionTraceEventsResponse,
+        ApiOpError<GetWorkflowExecutionTraceEventsApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/workflows/executions/{}/trace/events",
+                __pct_encode_path_segment(execution_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = merge_same_id_events {
+                query_params.push(("merge_same_id_events".to_string(), v.to_string()));
+            }
+            if let Some(v) = include_internal_events {
+                query_params.push(("include_internal_events".to_string(), v.to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<GetWorkflowExecutionTraceEventsApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(GetWorkflowExecutionTraceEventsApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get Workflow Execution Trace Otel
+    ///
+    /// `GET /v1/workflows/executions/{execution_id}/trace/otel`
+    pub async fn get_workflow_execution_trace_otel(
+        &self,
+        execution_id: impl AsRef<str>,
+    ) -> Result<WorkflowExecutionTraceOTelResponse, ApiOpError<GetWorkflowExecutionTraceOtelApiError>>
+    {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/workflows/executions/{}/trace/otel",
+                __pct_encode_path_segment(execution_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<GetWorkflowExecutionTraceOtelApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(GetWorkflowExecutionTraceOtelApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get Workflow Execution Trace Summary
+    ///
+    /// `GET /v1/workflows/executions/{execution_id}/trace/summary`
+    pub async fn get_workflow_execution_trace_summary(
+        &self,
+        execution_id: impl AsRef<str>,
+    ) -> Result<
+        WorkflowExecutionTraceSummaryResponse,
+        ApiOpError<GetWorkflowExecutionTraceSummaryApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/workflows/executions/{}/trace/summary",
+                __pct_encode_path_segment(execution_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<GetWorkflowExecutionTraceSummaryApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(GetWorkflowExecutionTraceSummaryApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get Workflow Execution
+    ///
+    /// `GET /v1/workflows/executions/{execution_id}`
+    pub async fn get_workflow_execution_v1_workflows_executions_execution_id_get(
+        &self,
+        execution_id: impl AsRef<str>,
+    ) -> Result<
+        WorkflowExecutionResponse,
+        ApiOpError<GetWorkflowExecutionV1WorkflowsExecutionsExecutionIdGetApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/workflows/executions/{}",
+                __pct_encode_path_segment(execution_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<GetWorkflowExecutionV1WorkflowsExecutionsExecutionIdGetApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetWorkflowExecutionV1WorkflowsExecutionsExecutionIdGetApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get Workflow Metrics
+    ///
+    /// Get comprehensive metrics for a specific workflow.
+    ///
+    /// Args:
+    ///     workflow_name: The name of the workflow type to get metrics for
+    ///     start_time: Optional start time filter (ISO 8601 format)
+    ///     end_time: Optional end time filter (ISO 8601 format)
+    ///
+    /// Returns:
+    ///     WorkflowMetrics: Dictionary containing metrics:
+    ///         - execution_count: Total number of executions
+    ///         - success_count: Number of successful executions
+    ///         - error_count: Number of failed/terminated executions
+    ///         - average_latency_ms: Average execution duration in milliseconds
+    ///         - retry_rate: Proportion of workflows with retries
+    ///         - latency_over_time: Time-series data of execution durations
+    ///
+    /// Example:
+    ///     GET /v1/workflows/MyWorkflow/metrics
+    ///     GET /v1/workflows/MyWorkflow/metrics?start_time=2025-01-01T00:00:00Z
+    ///     GET /v1/workflows/MyWorkflow/metrics?start_time=2025-01-01T00:00:00Z&end_time=2025-12-31T23:59:59Z
+    ///
+    /// `GET /v1/workflows/{workflow_name}/metrics`
+    pub async fn get_workflow_metrics_v1_workflows_workflow_name_metrics_get(
+        &self,
+        workflow_name: impl AsRef<str>,
+        start_time: Option<impl AsRef<str>>,
+        end_time: Option<impl AsRef<str>>,
+    ) -> Result<
+        WorkflowMetrics,
+        ApiOpError<GetWorkflowMetricsV1WorkflowsWorkflowNameMetricsGetApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/workflows/{}/metrics",
+                __pct_encode_path_segment(workflow_name.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = start_time {
+                query_params.push(("start_time".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = end_time {
+                query_params.push(("end_time".to_string(), v.as_ref().to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<GetWorkflowMetricsV1WorkflowsWorkflowNameMetricsGetApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                            GetWorkflowMetricsV1WorkflowsWorkflowNameMetricsGetApiError::Status422(
+                                v,
+                            ),
+                        );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get Workflow Registration
+    ///
+    /// `GET /v1/workflows/registrations/{workflow_registration_id}`
+    pub async fn get_workflow_registration_v1_workflows_registrations_workflow_registration_id_get(
+        &self,
+        workflow_registration_id: impl AsRef<str>,
+        with_workflow: Option<bool>,
+        include_shared: Option<bool>,
+    ) -> Result<
+        WorkflowRegistrationGetResponse,
+        ApiOpError<
+            GetWorkflowRegistrationV1WorkflowsRegistrationsWorkflowRegistrationIdGetApiError,
+        >,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/workflows/registrations/{}",
+                __pct_encode_path_segment(workflow_registration_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = with_workflow {
+                query_params.push(("with_workflow".to_string(), v.to_string()));
+            }
+            if let Some(v) = include_shared {
+                query_params.push(("include_shared".to_string(), v.to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<
+                GetWorkflowRegistrationV1WorkflowsRegistrationsWorkflowRegistrationIdGetApiError,
+            >;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                GetWorkflowRegistrationV1WorkflowsRegistrationsWorkflowRegistrationIdGetApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get Workflow Registrations
+    ///
+    /// `GET /v1/workflows/registrations`
+    pub async fn get_workflow_registrations_v1_workflows_registrations_get(
+        &self,
+        workflow_id: Option<impl AsRef<str>>,
+        task_queue: Option<impl AsRef<str>>,
+        active_only: Option<bool>,
+        include_shared: Option<bool>,
+        workflow_search: Option<impl AsRef<str>>,
+        archived: Option<impl AsRef<str>>,
+        with_workflow: Option<bool>,
+        available_in_chat_assistant: Option<impl AsRef<str>>,
+        limit: Option<i64>,
+        cursor: Option<impl AsRef<str>>,
+    ) -> Result<
+        WorkflowRegistrationListResponse,
+        ApiOpError<GetWorkflowRegistrationsV1WorkflowsRegistrationsGetApiError>,
+    > {
+        let request_url = format!("{}{}", self.base_url, "/v1/workflows/registrations");
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = workflow_id {
+                query_params.push(("workflow_id".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = task_queue {
+                query_params.push(("task_queue".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = active_only {
+                query_params.push(("active_only".to_string(), v.to_string()));
+            }
+            if let Some(v) = include_shared {
+                query_params.push(("include_shared".to_string(), v.to_string()));
+            }
+            if let Some(v) = workflow_search {
+                query_params.push(("workflow_search".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = archived {
+                query_params.push(("archived".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = with_workflow {
+                query_params.push(("with_workflow".to_string(), v.to_string()));
+            }
+            if let Some(v) = available_in_chat_assistant {
+                query_params.push((
+                    "available_in_chat_assistant".to_string(),
+                    v.as_ref().to_string(),
+                ));
+            }
+            if let Some(v) = limit {
+                query_params.push(("limit".to_string(), v.to_string()));
+            }
+            if let Some(v) = cursor {
+                query_params.push(("cursor".to_string(), v.as_ref().to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<GetWorkflowRegistrationsV1WorkflowsRegistrationsGetApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                            GetWorkflowRegistrationsV1WorkflowsRegistrationsGetApiError::Status422(
+                                v,
+                            ),
+                        );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get Workflow
+    ///
+    /// `GET /v1/workflows/{workflow_identifier}`
+    pub async fn get_workflow_v1_workflows_workflow_identifier_get(
+        &self,
+        workflow_identifier: impl AsRef<str>,
+    ) -> Result<WorkflowGetResponse, ApiOpError<GetWorkflowV1WorkflowsWorkflowIdentifierGetApiError>>
+    {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/workflows/{}",
+                __pct_encode_path_segment(workflow_identifier.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<GetWorkflowV1WorkflowsWorkflowIdentifierGetApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed =
+                            Some(GetWorkflowV1WorkflowsWorkflowIdentifierGetApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Cancel Batch Job
+    ///
+    /// Request the cancellation of a batch job.
+    ///
+    /// `POST /v1/batch/jobs/{job_id}/cancel`
+    pub async fn jobs_api_routes_batch_cancel_batch_job(
+        &self,
+        job_id: impl AsRef<str>,
+    ) -> Result<BatchJobOut, ApiOpError<serde_json::Value>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/batch/jobs/{}/cancel",
+                __pct_encode_path_segment(job_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.post(request_url);
+        req = req.header(reqwest::header::CONTENT_LENGTH, "0");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<serde_json::Value>;
+            let parse_error: Option<String>;
+            match status_code {
+                _ => match serde_json::from_str::<serde_json::Value>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(v);
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Create Batch Job
+    ///
+    /// Create a new batch job, it will be queued for processing.
+    ///
+    /// `POST /v1/batch/jobs`
+    pub async fn jobs_api_routes_batch_create_batch_job(
+        &self,
+        request: BatchJobIn,
+    ) -> Result<BatchJobOut, ApiOpError<serde_json::Value>> {
+        let request_url = format!("{}{}", self.base_url, "/v1/batch/jobs");
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<serde_json::Value>;
+            let parse_error: Option<String>;
+            match status_code {
+                _ => match serde_json::from_str::<serde_json::Value>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(v);
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get Batch Job
+    ///
+    /// Get a batch job details by its UUID.
+    ///
+    /// Args:
+    ///     inline: If True, return results inline in the response.
+    ///
+    /// `GET /v1/batch/jobs/{job_id}`
+    pub async fn jobs_api_routes_batch_get_batch_job(
+        &self,
+        job_id: impl AsRef<str>,
+        inline: Option<impl AsRef<str>>,
+    ) -> Result<BatchJobOut, ApiOpError<serde_json::Value>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/batch/jobs/{}",
+                __pct_encode_path_segment(job_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = inline {
+                query_params.push(("inline".to_string(), v.as_ref().to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<serde_json::Value>;
+            let parse_error: Option<String>;
+            match status_code {
+                _ => match serde_json::from_str::<serde_json::Value>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(v);
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get Batch Jobs
+    ///
+    /// Get a list of batch jobs for your organization and user.
+    ///
+    /// `GET /v1/batch/jobs`
+    pub async fn jobs_api_routes_batch_get_batch_jobs(
+        &self,
+        page: Option<i64>,
+        page_size: Option<i64>,
+        model: Option<impl AsRef<str>>,
+        agent_id: Option<impl AsRef<str>>,
+        metadata: Option<impl AsRef<str>>,
+        created_after: Option<impl AsRef<str>>,
+        created_by_me: Option<bool>,
+        status: Option<impl AsRef<str>>,
+        order_by: Option<JobsApiRoutesBatchGetBatchJobsOrderBy>,
+    ) -> Result<BatchJobsOut, ApiOpError<serde_json::Value>> {
+        let request_url = format!("{}{}", self.base_url, "/v1/batch/jobs");
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = page {
+                query_params.push(("page".to_string(), v.to_string()));
+            }
+            if let Some(v) = page_size {
+                query_params.push(("page_size".to_string(), v.to_string()));
+            }
+            if let Some(v) = model {
+                query_params.push(("model".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = agent_id {
+                query_params.push(("agent_id".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = metadata {
+                query_params.push(("metadata".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = created_after {
+                query_params.push(("created_after".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = created_by_me {
+                query_params.push(("created_by_me".to_string(), v.to_string()));
+            }
+            if let Some(v) = status {
+                query_params.push(("status".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = order_by {
+                query_params.push(("order_by".to_string(), v.to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<serde_json::Value>;
+            let parse_error: Option<String>;
+            match status_code {
+                _ => match serde_json::from_str::<serde_json::Value>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(v);
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Archive Fine Tuned Model
+    ///
+    /// Archive a fine-tuned model.
+    ///
+    /// `POST /v1/fine_tuning/models/{model_id}/archive`
+    pub async fn jobs_api_routes_fine_tuning_archive_fine_tuned_model(
+        &self,
+        model_id: impl AsRef<str>,
+    ) -> Result<ArchiveFTModelOut, ApiOpError<serde_json::Value>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/fine_tuning/models/{}/archive",
+                __pct_encode_path_segment(model_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.post(request_url);
+        req = req.header(reqwest::header::CONTENT_LENGTH, "0");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<serde_json::Value>;
+            let parse_error: Option<String>;
+            match status_code {
+                _ => match serde_json::from_str::<serde_json::Value>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(v);
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Cancel Fine Tuning Job
+    ///
+    /// Request the cancellation of a fine tuning job.
+    ///
+    /// `POST /v1/fine_tuning/jobs/{job_id}/cancel`
+    pub async fn jobs_api_routes_fine_tuning_cancel_fine_tuning_job(
+        &self,
+        job_id: impl AsRef<str>,
+    ) -> Result<JobsApiRoutesFineTuningCancelFineTuningJobResponse, ApiOpError<serde_json::Value>>
+    {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/fine_tuning/jobs/{}/cancel",
+                __pct_encode_path_segment(job_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.post(request_url);
+        req = req.header(reqwest::header::CONTENT_LENGTH, "0");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<serde_json::Value>;
+            let parse_error: Option<String>;
+            match status_code {
+                _ => match serde_json::from_str::<serde_json::Value>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(v);
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Create Fine Tuning Job
+    ///
+    /// Create a new fine-tuning job, it will be queued for processing.
+    ///
+    /// `POST /v1/fine_tuning/jobs`
+    pub async fn jobs_api_routes_fine_tuning_create_fine_tuning_job(
+        &self,
+        dry_run: Option<impl AsRef<str>>,
+        request: JobIn,
+    ) -> Result<JobsApiRoutesFineTuningCreateFineTuningJobResponse, ApiOpError<serde_json::Value>>
+    {
+        let request_url = format!("{}{}", self.base_url, "/v1/fine_tuning/jobs");
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = dry_run {
+                query_params.push(("dry_run".to_string(), v.as_ref().to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<serde_json::Value>;
+            let parse_error: Option<String>;
+            match status_code {
+                _ => match serde_json::from_str::<serde_json::Value>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(v);
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get Fine Tuning Job
+    ///
+    /// Get a fine-tuned job details by its UUID.
+    ///
+    /// `GET /v1/fine_tuning/jobs/{job_id}`
+    pub async fn jobs_api_routes_fine_tuning_get_fine_tuning_job(
+        &self,
+        job_id: impl AsRef<str>,
+    ) -> Result<JobsApiRoutesFineTuningGetFineTuningJobResponse, ApiOpError<serde_json::Value>>
+    {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/fine_tuning/jobs/{}",
+                __pct_encode_path_segment(job_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<serde_json::Value>;
+            let parse_error: Option<String>;
+            match status_code {
+                _ => match serde_json::from_str::<serde_json::Value>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(v);
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Get Fine Tuning Jobs
+    ///
+    /// Get a list of fine-tuning jobs for your organization and user.
+    ///
+    /// `GET /v1/fine_tuning/jobs`
+    pub async fn jobs_api_routes_fine_tuning_get_fine_tuning_jobs(
+        &self,
+        page: Option<i64>,
+        page_size: Option<i64>,
+        model: Option<impl AsRef<str>>,
+        created_after: Option<impl AsRef<str>>,
+        created_before: Option<impl AsRef<str>>,
+        created_by_me: Option<bool>,
+        status: Option<impl AsRef<str>>,
+        wandb_project: Option<impl AsRef<str>>,
+        wandb_name: Option<impl AsRef<str>>,
+        suffix: Option<impl AsRef<str>>,
+    ) -> Result<JobsOut, ApiOpError<serde_json::Value>> {
+        let request_url = format!("{}{}", self.base_url, "/v1/fine_tuning/jobs");
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = page {
+                query_params.push(("page".to_string(), v.to_string()));
+            }
+            if let Some(v) = page_size {
+                query_params.push(("page_size".to_string(), v.to_string()));
+            }
+            if let Some(v) = model {
+                query_params.push(("model".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = created_after {
+                query_params.push(("created_after".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = created_before {
+                query_params.push(("created_before".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = created_by_me {
+                query_params.push(("created_by_me".to_string(), v.to_string()));
+            }
+            if let Some(v) = status {
+                query_params.push(("status".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = wandb_project {
+                query_params.push(("wandb_project".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = wandb_name {
+                query_params.push(("wandb_name".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = suffix {
+                query_params.push(("suffix".to_string(), v.as_ref().to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<serde_json::Value>;
+            let parse_error: Option<String>;
+            match status_code {
+                _ => match serde_json::from_str::<serde_json::Value>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(v);
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Start Fine Tuning Job
+    ///
+    /// Request the start of a validated fine tuning job.
+    ///
+    /// `POST /v1/fine_tuning/jobs/{job_id}/start`
+    pub async fn jobs_api_routes_fine_tuning_start_fine_tuning_job(
+        &self,
+        job_id: impl AsRef<str>,
+    ) -> Result<JobsApiRoutesFineTuningStartFineTuningJobResponse, ApiOpError<serde_json::Value>>
+    {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/fine_tuning/jobs/{}/start",
+                __pct_encode_path_segment(job_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.post(request_url);
+        req = req.header(reqwest::header::CONTENT_LENGTH, "0");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<serde_json::Value>;
+            let parse_error: Option<String>;
+            match status_code {
+                _ => match serde_json::from_str::<serde_json::Value>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(v);
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Unarchive Fine Tuned Model
+    ///
+    /// Un-archive a fine-tuned model.
+    ///
+    /// `DELETE /v1/fine_tuning/models/{model_id}/archive`
+    pub async fn jobs_api_routes_fine_tuning_unarchive_fine_tuned_model(
+        &self,
+        model_id: impl AsRef<str>,
+    ) -> Result<UnarchiveFTModelOut, ApiOpError<serde_json::Value>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/fine_tuning/models/{}/archive",
+                __pct_encode_path_segment(model_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.delete(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<serde_json::Value>;
+            let parse_error: Option<String>;
+            match status_code {
+                _ => match serde_json::from_str::<serde_json::Value>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(v);
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Update Fine Tuned Model
+    ///
+    /// Update a model name or description.
+    ///
+    /// `PATCH /v1/fine_tuning/models/{model_id}`
+    pub async fn jobs_api_routes_fine_tuning_update_fine_tuned_model(
+        &self,
+        model_id: impl AsRef<str>,
+        request: UpdateFTModelIn,
+    ) -> Result<JobsApiRoutesFineTuningUpdateFineTunedModelResponse, ApiOpError<serde_json::Value>>
+    {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/fine_tuning/models/{}",
+                __pct_encode_path_segment(model_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.patch(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<serde_json::Value>;
+            let parse_error: Option<String>;
+            match status_code {
+                _ => match serde_json::from_str::<serde_json::Value>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(v);
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Run Judge on an event based on the given options
+    ///
+    /// `POST /v1/observability/chat-completion-events/{event_id}/live-judging`
+    pub async fn judge_chat_completion_event_v1_observability_chat_completion_events_event_id_live_judging_post(
+        &self,
+        event_id: impl AsRef<str>,
+        request: PostChatCompletionEventJudgingInSchema,
+    ) -> Result<
+        JudgeOutput,
+        ApiOpError<
+            JudgeChatCompletionEventV1ObservabilityChatCompletionEventsEventIdLiveJudgingPostApiError,
+        >,
+    >{
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/observability/chat-completion-events/{}/live-judging",
+                __pct_encode_path_segment(event_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<
+                JudgeChatCompletionEventV1ObservabilityChatCompletionEventsEventIdLiveJudgingPostApiError,
+            >;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                JudgeChatCompletionEventV1ObservabilityChatCompletionEventsEventIdLiveJudgingPostApiError::Status400(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                JudgeChatCompletionEventV1ObservabilityChatCompletionEventsEventIdLiveJudgingPostApiError::Status404(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                JudgeChatCompletionEventV1ObservabilityChatCompletionEventsEventIdLiveJudgingPostApiError::Status408(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                JudgeChatCompletionEventV1ObservabilityChatCompletionEventsEventIdLiveJudgingPostApiError::Status409(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                JudgeChatCompletionEventV1ObservabilityChatCompletionEventsEventIdLiveJudgingPostApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Run a saved judge on a conversation
+    ///
+    /// `POST /v1/observability/judges/{judge_id}/live-judging`
+    pub async fn judge_conversation_v1_observability_judges_judge_id_live_judging_post(
+        &self,
+        judge_id: impl AsRef<str>,
+        request: JudgeConversationRequest,
+    ) -> Result<
+        JudgeOutput,
+        ApiOpError<JudgeConversationV1ObservabilityJudgesJudgeIdLiveJudgingPostApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/observability/judges/{}/live-judging",
+                __pct_encode_path_segment(judge_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<
+                JudgeConversationV1ObservabilityJudgesJudgeIdLiveJudgingPostApiError,
+            >;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                JudgeConversationV1ObservabilityJudgesJudgeIdLiveJudgingPostApiError::Status400(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                JudgeConversationV1ObservabilityJudgesJudgeIdLiveJudgingPostApiError::Status404(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                JudgeConversationV1ObservabilityJudgesJudgeIdLiveJudgingPostApiError::Status408(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                JudgeConversationV1ObservabilityJudgesJudgeIdLiveJudgingPostApiError::Status409(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                JudgeConversationV1ObservabilityJudgesJudgeIdLiveJudgingPostApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Run Judge on a dataset record based on the given options
+    ///
+    /// `POST /v1/observability/dataset-records/{dataset_record_id}/live-judging`
+    pub async fn judge_dataset_record_v1_observability_dataset_records_dataset_record_id_live_judging_post(
+        &self,
+        dataset_record_id: impl AsRef<str>,
+        request: PostDatasetRecordJudgingInSchema,
+    ) -> Result<
+        JudgeOutput,
+        ApiOpError<
+            JudgeDatasetRecordV1ObservabilityDatasetRecordsDatasetRecordIdLiveJudgingPostApiError,
+        >,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/observability/dataset-records/{}/live-judging",
+                __pct_encode_path_segment(dataset_record_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<
+                JudgeDatasetRecordV1ObservabilityDatasetRecordsDatasetRecordIdLiveJudgingPostApiError,
+            >;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                JudgeDatasetRecordV1ObservabilityDatasetRecordsDatasetRecordIdLiveJudgingPostApiError::Status400(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                JudgeDatasetRecordV1ObservabilityDatasetRecordsDatasetRecordIdLiveJudgingPostApiError::Status404(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                JudgeDatasetRecordV1ObservabilityDatasetRecordsDatasetRecordIdLiveJudgingPostApiError::Status408(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                JudgeDatasetRecordV1ObservabilityDatasetRecordsDatasetRecordIdLiveJudgingPostApiError::Status409(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                JudgeDatasetRecordV1ObservabilityDatasetRecordsDatasetRecordIdLiveJudgingPostApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Create a new Library.
+    ///
+    /// Create a new Library, you will be marked as the owner and only you will have the possibility to share it with others. When first created this will only be accessible by you.
+    ///
+    /// `POST /v1/libraries`
+    pub async fn libraries_create_v1(
+        &self,
+        request: LibraryIn,
+    ) -> Result<LibraryOut, ApiOpError<LibrariesCreateV1ApiError>> {
+        let request_url = format!("{}{}", self.base_url, "/v1/libraries");
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 201u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "201",
+                )),
+            }))
+        } else {
+            let typed: Option<LibrariesCreateV1ApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(LibrariesCreateV1ApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Delete a library and all of it's document.
+    ///
+    /// Given a library id, deletes it together with all documents that have been uploaded to that library.
+    ///
+    /// `DELETE /v1/libraries/{library_id}`
+    pub async fn libraries_delete_v1(
+        &self,
+        library_id: impl AsRef<str>,
+    ) -> Result<LibraryOut, ApiOpError<LibrariesDeleteV1ApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/libraries/{}",
+                __pct_encode_path_segment(library_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.delete(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<LibrariesDeleteV1ApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(LibrariesDeleteV1ApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Delete a document.
+    ///
+    /// Given a library and a document in that library, delete that document. The document will be deleted from the library and the search index.
+    ///
+    /// `DELETE /v1/libraries/{library_id}/documents/{document_id}`
+    pub async fn libraries_documents_delete_v1(
+        &self,
+        library_id: impl AsRef<str>,
+        document_id: impl AsRef<str>,
+    ) -> Result<(), ApiOpError<LibrariesDocumentsDeleteV1ApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/libraries/{}/documents/{}",
+                __pct_encode_path_segment(library_id.as_ref()),
+                __pct_encode_path_segment(document_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.delete(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            req = req.header(name, value);
+        }
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 204u16 {
+            let _ = body_text;
+            let _ = raw_body;
+            let _ = headers;
+            Ok(())
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "204",
+                )),
+            }))
+        } else {
+            let typed: Option<LibrariesDocumentsDeleteV1ApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(LibrariesDocumentsDeleteV1ApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Retrieve the signed URL of text extracted from a given document.
+    ///
+    /// Given a library and a document in that library, retrieve the signed URL of text extracted. For documents that are sent to the OCR this returns the result of the OCR queries.
+    ///
+    /// `GET /v1/libraries/{library_id}/documents/{document_id}/extracted-text-signed-url`
+    pub async fn libraries_documents_get_extracted_text_signed_url_v1(
+        &self,
+        library_id: impl AsRef<str>,
+        document_id: impl AsRef<str>,
+    ) -> Result<
+        LibrariesDocumentsGetExtractedTextSignedUrlV1Response,
+        ApiOpError<LibrariesDocumentsGetExtractedTextSignedUrlV1ApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/libraries/{}/documents/{}/extracted-text-signed-url",
+                __pct_encode_path_segment(library_id.as_ref()),
+                __pct_encode_path_segment(document_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<LibrariesDocumentsGetExtractedTextSignedUrlV1ApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                            LibrariesDocumentsGetExtractedTextSignedUrlV1ApiError::Status422(v),
+                        );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Retrieve the signed URL of a specific document.
+    ///
+    /// Given a library and a document in that library, retrieve the signed URL of a specific document.The url will expire after 30 minutes and can be accessed by anyone with the link.
+    ///
+    /// `GET /v1/libraries/{library_id}/documents/{document_id}/signed-url`
+    pub async fn libraries_documents_get_signed_url_v1(
+        &self,
+        library_id: impl AsRef<str>,
+        document_id: impl AsRef<str>,
+    ) -> Result<
+        LibrariesDocumentsGetSignedUrlV1Response,
+        ApiOpError<LibrariesDocumentsGetSignedUrlV1ApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/libraries/{}/documents/{}/signed-url",
+                __pct_encode_path_segment(library_id.as_ref()),
+                __pct_encode_path_segment(document_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<LibrariesDocumentsGetSignedUrlV1ApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(LibrariesDocumentsGetSignedUrlV1ApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Retrieve the processing status of a specific document.
+    ///
+    /// Given a library and a document in that library, retrieve the processing status of that document.
+    ///
+    /// `GET /v1/libraries/{library_id}/documents/{document_id}/status`
+    pub async fn libraries_documents_get_status_v1(
+        &self,
+        library_id: impl AsRef<str>,
+        document_id: impl AsRef<str>,
+    ) -> Result<ProcessingStatusOut, ApiOpError<LibrariesDocumentsGetStatusV1ApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/libraries/{}/documents/{}/status",
+                __pct_encode_path_segment(library_id.as_ref()),
+                __pct_encode_path_segment(document_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<LibrariesDocumentsGetStatusV1ApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(LibrariesDocumentsGetStatusV1ApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Retrieve the text content of a specific document.
+    ///
+    /// Given a library and a document in that library, you can retrieve the text content of that document if it exists. For documents like pdf, docx and pptx the text content results from our processing using Mistral OCR.
+    ///
+    /// `GET /v1/libraries/{library_id}/documents/{document_id}/text_content`
+    pub async fn libraries_documents_get_text_content_v1(
+        &self,
+        library_id: impl AsRef<str>,
+        document_id: impl AsRef<str>,
+    ) -> Result<DocumentTextContent, ApiOpError<LibrariesDocumentsGetTextContentV1ApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/libraries/{}/documents/{}/text_content",
+                __pct_encode_path_segment(library_id.as_ref()),
+                __pct_encode_path_segment(document_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<LibrariesDocumentsGetTextContentV1ApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(LibrariesDocumentsGetTextContentV1ApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Retrieve the metadata of a specific document.
+    ///
+    /// Given a library and a document in this library, you can retrieve the metadata of that document.
+    ///
+    /// `GET /v1/libraries/{library_id}/documents/{document_id}`
+    pub async fn libraries_documents_get_v1(
+        &self,
+        library_id: impl AsRef<str>,
+        document_id: impl AsRef<str>,
+    ) -> Result<DocumentOut, ApiOpError<LibrariesDocumentsGetV1ApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/libraries/{}/documents/{}",
+                __pct_encode_path_segment(library_id.as_ref()),
+                __pct_encode_path_segment(document_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<LibrariesDocumentsGetV1ApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(LibrariesDocumentsGetV1ApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// List documents in a given library.
+    ///
+    /// Given a library, lists the document that have been uploaded to that library.
+    ///
+    /// `GET /v1/libraries/{library_id}/documents`
+    pub async fn libraries_documents_list_v1(
+        &self,
+        library_id: impl AsRef<str>,
+        search: Option<impl AsRef<str>>,
+        page_size: Option<i64>,
+        page: Option<i64>,
+        filters_attributes: Option<impl AsRef<str>>,
+        sort_by: Option<impl AsRef<str>>,
+        sort_order: Option<impl AsRef<str>>,
+    ) -> Result<ListDocumentOut, ApiOpError<LibrariesDocumentsListV1ApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/libraries/{}/documents",
+                __pct_encode_path_segment(library_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = search {
+                query_params.push(("search".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = page_size {
+                query_params.push(("page_size".to_string(), v.to_string()));
+            }
+            if let Some(v) = page {
+                query_params.push(("page".to_string(), v.to_string()));
+            }
+            if let Some(v) = filters_attributes {
+                query_params.push(("filters_attributes".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = sort_by {
+                query_params.push(("sort_by".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = sort_order {
+                query_params.push(("sort_order".to_string(), v.as_ref().to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<LibrariesDocumentsListV1ApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(LibrariesDocumentsListV1ApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Reprocess a document.
+    ///
+    /// Given a library and a document in that library, reprocess that document, it will be billed again.
+    ///
+    /// `POST /v1/libraries/{library_id}/documents/{document_id}/reprocess`
+    pub async fn libraries_documents_reprocess_v1(
+        &self,
+        library_id: impl AsRef<str>,
+        document_id: impl AsRef<str>,
+    ) -> Result<(), ApiOpError<LibrariesDocumentsReprocessV1ApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/libraries/{}/documents/{}/reprocess",
+                __pct_encode_path_segment(library_id.as_ref()),
+                __pct_encode_path_segment(document_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.post(request_url);
+        req = req.header(reqwest::header::CONTENT_LENGTH, "0");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            req = req.header(name, value);
+        }
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 204u16 {
+            let _ = body_text;
+            let _ = raw_body;
+            let _ = headers;
+            Ok(())
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "204",
+                )),
+            }))
+        } else {
+            let typed: Option<LibrariesDocumentsReprocessV1ApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(LibrariesDocumentsReprocessV1ApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Update the metadata of a specific document.
+    ///
+    /// Given a library and a document in that library, update the name of that document.
+    ///
+    /// `PUT /v1/libraries/{library_id}/documents/{document_id}`
+    pub async fn libraries_documents_update_v1(
+        &self,
+        library_id: impl AsRef<str>,
+        document_id: impl AsRef<str>,
+        request: DocumentUpdateIn,
+    ) -> Result<DocumentOut, ApiOpError<LibrariesDocumentsUpdateV1ApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/libraries/{}/documents/{}",
+                __pct_encode_path_segment(library_id.as_ref()),
+                __pct_encode_path_segment(document_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.put(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<LibrariesDocumentsUpdateV1ApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(LibrariesDocumentsUpdateV1ApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Upload a new document.
+    ///
+    /// Given a library, upload a new document to that library. It is queued for processing, it status will change it has been processed. The processing has to be completed in order be discoverable for the library search
+    ///
+    /// `POST /v1/libraries/{library_id}/documents`
+    pub async fn libraries_documents_upload_v1(
+        &self,
+        library_id: impl AsRef<str>,
+        request: LibrariesDocumentsUploadV1Request,
+    ) -> Result<DocumentOut, ApiOpError<LibrariesDocumentsUploadV1ApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/libraries/{}/documents",
+                __pct_encode_path_segment(library_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.post(request_url);
+        let mut form = reqwest::multipart::Form::new();
+        let value = &request.file;
+        form = form.part(
+            "file",
+            reqwest::multipart::Part::bytes(value.to_vec()).file_name(self.upload_filename.clone()),
+        );
+        req = req.multipart(form);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 || status_code == 201u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200, 201",
+                )),
+            }))
+        } else {
+            let typed: Option<LibrariesDocumentsUploadV1ApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(LibrariesDocumentsUploadV1ApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Detailed information about a specific Library.
+    ///
+    /// Given a library id, details information about that Library.
+    ///
+    /// `GET /v1/libraries/{library_id}`
+    pub async fn libraries_get_v1(
+        &self,
+        library_id: impl AsRef<str>,
+    ) -> Result<LibraryOut, ApiOpError<LibrariesGetV1ApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/libraries/{}",
+                __pct_encode_path_segment(library_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<LibrariesGetV1ApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(LibrariesGetV1ApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// List all libraries you have access to.
+    ///
+    /// List all libraries that you have created or have been shared with you.
+    ///
+    /// `GET /v1/libraries`
+    pub async fn libraries_list_v1(&self) -> Result<ListLibraryOut, ApiOpError<serde_json::Value>> {
+        let request_url = format!("{}{}", self.base_url, "/v1/libraries");
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<serde_json::Value>;
+            let parse_error: Option<String>;
+            match status_code {
+                _ => match serde_json::from_str::<serde_json::Value>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(v);
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Create or update an access level.
+    ///
+    /// Given a library id, you can create or update the access level of an entity. You have to be owner of the library to share a library. An owner cannot change their own role. A library cannot be shared outside of the organization.
+    ///
+    /// `PUT /v1/libraries/{library_id}/share`
+    pub async fn libraries_share_create_v1(
+        &self,
+        library_id: impl AsRef<str>,
+        request: SharingIn,
+    ) -> Result<SharingOut, ApiOpError<LibrariesShareCreateV1ApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/libraries/{}/share",
+                __pct_encode_path_segment(library_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.put(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<LibrariesShareCreateV1ApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(LibrariesShareCreateV1ApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Delete an access level.
+    ///
+    /// Given a library id, you can delete the access level of an entity. An owner cannot delete it's own access. You have to be the owner of the library to delete an acces other than yours.
+    ///
+    /// `DELETE /v1/libraries/{library_id}/share`
+    pub async fn libraries_share_delete_v1(
+        &self,
+        library_id: impl AsRef<str>,
+        request: SharingDelete,
+    ) -> Result<SharingOut, ApiOpError<LibrariesShareDeleteV1ApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/libraries/{}/share",
+                __pct_encode_path_segment(library_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.delete(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<LibrariesShareDeleteV1ApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(LibrariesShareDeleteV1ApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// List all of the access to this library.
+    ///
+    /// Given a library, list all of the Entity that have access and to what level.
+    ///
+    /// `GET /v1/libraries/{library_id}/share`
+    pub async fn libraries_share_list_v1(
+        &self,
+        library_id: impl AsRef<str>,
+    ) -> Result<ListSharingOut, ApiOpError<LibrariesShareListV1ApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/libraries/{}/share",
+                __pct_encode_path_segment(library_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<LibrariesShareListV1ApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(LibrariesShareListV1ApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Update a library.
+    ///
+    /// Given a library id, you can update the name and description.
+    ///
+    /// `PUT /v1/libraries/{library_id}`
+    pub async fn libraries_update_v1(
+        &self,
+        library_id: impl AsRef<str>,
+        request: LibraryInUpdate,
+    ) -> Result<LibraryOut, ApiOpError<LibrariesUpdateV1ApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/libraries/{}",
+                __pct_encode_path_segment(library_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.put(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<LibrariesUpdateV1ApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(LibrariesUpdateV1ApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// List Deployments
+    ///
+    /// `GET /v1/workflows/deployments`
+    pub async fn list_deployments_v1_workflows_deployments_get(
+        &self,
+        active_only: Option<bool>,
+        workflow_name: Option<impl AsRef<str>>,
+    ) -> Result<DeploymentListResponse, ApiOpError<ListDeploymentsV1WorkflowsDeploymentsGetApiError>>
+    {
+        let request_url = format!("{}{}", self.base_url, "/v1/workflows/deployments");
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = active_only {
+                query_params.push(("active_only".to_string(), v.to_string()));
+            }
+            if let Some(v) = workflow_name {
+                query_params.push(("workflow_name".to_string(), v.as_ref().to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<ListDeploymentsV1WorkflowsDeploymentsGetApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(ListDeploymentsV1WorkflowsDeploymentsGetApiError::Status422(
+                            v,
+                        ));
                         parse_error = None;
                     }
                     Err(e) => {
@@ -518,6 +17090,1337 @@ impl HttpClient {
             }))
         }
     }
+    /// List Runs
+    ///
+    /// `GET /v1/workflows/runs`
+    pub async fn list_runs_v1_workflows_runs_get(
+        &self,
+        workflow_identifier: Option<impl AsRef<str>>,
+        search: Option<impl AsRef<str>>,
+        status: Option<impl AsRef<str>>,
+        page_size: Option<i64>,
+        next_page_token: Option<impl AsRef<str>>,
+    ) -> Result<WorkflowExecutionListResponse, ApiOpError<ListRunsV1WorkflowsRunsGetApiError>> {
+        let request_url = format!("{}{}", self.base_url, "/v1/workflows/runs");
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = workflow_identifier {
+                query_params.push(("workflow_identifier".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = search {
+                query_params.push(("search".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = status {
+                query_params.push(("status".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = page_size {
+                query_params.push(("page_size".to_string(), v.to_string()));
+            }
+            if let Some(v) = next_page_token {
+                query_params.push(("next_page_token".to_string(), v.as_ref().to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<ListRunsV1WorkflowsRunsGetApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(ListRunsV1WorkflowsRunsGetApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// List all voices
+    ///
+    /// List all voices (excluding sample data)
+    ///
+    /// `GET /v1/audio/voices`
+    pub async fn list_voices_v1_audio_voices_get(
+        &self,
+        limit: Option<i64>,
+        offset: Option<i64>,
+    ) -> Result<VoiceListResponse, ApiOpError<ListVoicesV1AudioVoicesGetApiError>> {
+        let request_url = format!("{}{}", self.base_url, "/v1/audio/voices");
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = limit {
+                query_params.push(("limit".to_string(), v.to_string()));
+            }
+            if let Some(v) = offset {
+                query_params.push(("offset".to_string(), v.to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<ListVoicesV1AudioVoicesGetApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(ListVoicesV1AudioVoicesGetApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Moderations
+    ///
+    /// `POST /v1/moderations`
+    pub async fn moderations_v1_moderations_post(
+        &self,
+        request: ClassificationRequest,
+    ) -> Result<ModerationResponse, ApiOpError<ModerationsV1ModerationsPostApiError>> {
+        let request_url = format!("{}{}", self.base_url, "/v1/moderations");
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<ModerationsV1ModerationsPostApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(ModerationsV1ModerationsPostApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// OCR
+    ///
+    /// `POST /v1/ocr`
+    pub async fn ocr_v1_ocr_post(
+        &self,
+        request: OCRRequest,
+    ) -> Result<OCRResponse, ApiOpError<OcrV1OcrPostApiError>> {
+        let request_url = format!("{}{}", self.base_url, "/v1/ocr");
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<OcrV1OcrPostApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(OcrV1OcrPostApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Populate the dataset with a campaign
+    ///
+    /// `POST /v1/observability/datasets/{dataset_id}/imports/from-campaign`
+    pub async fn post_dataset_records_from_campaign_v1_observability_datasets_dataset_id_imports_from_campaign_post(
+        &self,
+        dataset_id: impl AsRef<str>,
+        request: PostDatasetImportFromCampaignInSchema,
+    ) -> Result<
+        DatasetImportTask,
+        ApiOpError<
+            PostDatasetRecordsFromCampaignV1ObservabilityDatasetsDatasetIdImportsFromCampaignPostApiError,
+        >,
+    >{
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/observability/datasets/{}/imports/from-campaign",
+                __pct_encode_path_segment(dataset_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 202u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "202",
+                )),
+            }))
+        } else {
+            let typed: Option<
+                PostDatasetRecordsFromCampaignV1ObservabilityDatasetsDatasetIdImportsFromCampaignPostApiError,
+            >;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                PostDatasetRecordsFromCampaignV1ObservabilityDatasetsDatasetIdImportsFromCampaignPostApiError::Status400(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                PostDatasetRecordsFromCampaignV1ObservabilityDatasetsDatasetIdImportsFromCampaignPostApiError::Status404(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                PostDatasetRecordsFromCampaignV1ObservabilityDatasetsDatasetIdImportsFromCampaignPostApiError::Status408(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                PostDatasetRecordsFromCampaignV1ObservabilityDatasetsDatasetIdImportsFromCampaignPostApiError::Status409(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                PostDatasetRecordsFromCampaignV1ObservabilityDatasetsDatasetIdImportsFromCampaignPostApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Populate the dataset with samples from another dataset
+    ///
+    /// `POST /v1/observability/datasets/{dataset_id}/imports/from-dataset`
+    pub async fn post_dataset_records_from_dataset_v1_observability_datasets_dataset_id_imports_from_dataset_post(
+        &self,
+        dataset_id: impl AsRef<str>,
+        request: PostDatasetImportFromDatasetInSchema,
+    ) -> Result<
+        DatasetImportTask,
+        ApiOpError<
+            PostDatasetRecordsFromDatasetV1ObservabilityDatasetsDatasetIdImportsFromDatasetPostApiError,
+        >,
+    >{
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/observability/datasets/{}/imports/from-dataset",
+                __pct_encode_path_segment(dataset_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 202u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "202",
+                )),
+            }))
+        } else {
+            let typed: Option<
+                PostDatasetRecordsFromDatasetV1ObservabilityDatasetsDatasetIdImportsFromDatasetPostApiError,
+            >;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                PostDatasetRecordsFromDatasetV1ObservabilityDatasetsDatasetIdImportsFromDatasetPostApiError::Status400(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                PostDatasetRecordsFromDatasetV1ObservabilityDatasetsDatasetIdImportsFromDatasetPostApiError::Status404(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                PostDatasetRecordsFromDatasetV1ObservabilityDatasetsDatasetIdImportsFromDatasetPostApiError::Status408(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                PostDatasetRecordsFromDatasetV1ObservabilityDatasetsDatasetIdImportsFromDatasetPostApiError::Status409(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                PostDatasetRecordsFromDatasetV1ObservabilityDatasetsDatasetIdImportsFromDatasetPostApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Populate the dataset with samples from the explorer
+    ///
+    /// `POST /v1/observability/datasets/{dataset_id}/imports/from-explorer`
+    pub async fn post_dataset_records_from_explorer_v1_observability_datasets_dataset_id_imports_from_explorer_post(
+        &self,
+        dataset_id: impl AsRef<str>,
+        request: PostDatasetImportFromExplorerInSchema,
+    ) -> Result<
+        DatasetImportTask,
+        ApiOpError<
+            PostDatasetRecordsFromExplorerV1ObservabilityDatasetsDatasetIdImportsFromExplorerPostApiError,
+        >,
+    >{
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/observability/datasets/{}/imports/from-explorer",
+                __pct_encode_path_segment(dataset_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 202u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "202",
+                )),
+            }))
+        } else {
+            let typed: Option<
+                PostDatasetRecordsFromExplorerV1ObservabilityDatasetsDatasetIdImportsFromExplorerPostApiError,
+            >;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                PostDatasetRecordsFromExplorerV1ObservabilityDatasetsDatasetIdImportsFromExplorerPostApiError::Status400(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                PostDatasetRecordsFromExplorerV1ObservabilityDatasetsDatasetIdImportsFromExplorerPostApiError::Status404(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                PostDatasetRecordsFromExplorerV1ObservabilityDatasetsDatasetIdImportsFromExplorerPostApiError::Status408(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                PostDatasetRecordsFromExplorerV1ObservabilityDatasetsDatasetIdImportsFromExplorerPostApiError::Status409(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                PostDatasetRecordsFromExplorerV1ObservabilityDatasetsDatasetIdImportsFromExplorerPostApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Populate the dataset with samples from an uploaded file
+    ///
+    /// `POST /v1/observability/datasets/{dataset_id}/imports/from-file`
+    pub async fn post_dataset_records_from_file_v1_observability_datasets_dataset_id_imports_from_file_post(
+        &self,
+        dataset_id: impl AsRef<str>,
+        request: PostDatasetImportFromFileInSchema,
+    ) -> Result<
+        DatasetImportTask,
+        ApiOpError<
+            PostDatasetRecordsFromFileV1ObservabilityDatasetsDatasetIdImportsFromFilePostApiError,
+        >,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/observability/datasets/{}/imports/from-file",
+                __pct_encode_path_segment(dataset_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 202u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "202",
+                )),
+            }))
+        } else {
+            let typed: Option<
+                PostDatasetRecordsFromFileV1ObservabilityDatasetsDatasetIdImportsFromFilePostApiError,
+            >;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                PostDatasetRecordsFromFileV1ObservabilityDatasetsDatasetIdImportsFromFilePostApiError::Status400(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                PostDatasetRecordsFromFileV1ObservabilityDatasetsDatasetIdImportsFromFilePostApiError::Status404(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                PostDatasetRecordsFromFileV1ObservabilityDatasetsDatasetIdImportsFromFilePostApiError::Status408(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                PostDatasetRecordsFromFileV1ObservabilityDatasetsDatasetIdImportsFromFilePostApiError::Status409(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                PostDatasetRecordsFromFileV1ObservabilityDatasetsDatasetIdImportsFromFilePostApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Populate the dataset with samples from the playground
+    ///
+    /// `POST /v1/observability/datasets/{dataset_id}/imports/from-playground`
+    pub async fn post_dataset_records_from_playground_v1_observability_datasets_dataset_id_imports_from_playground_post(
+        &self,
+        dataset_id: impl AsRef<str>,
+        request: PostDatasetImportFromPlaygroundInSchema,
+    ) -> Result<
+        DatasetImportTask,
+        ApiOpError<
+            PostDatasetRecordsFromPlaygroundV1ObservabilityDatasetsDatasetIdImportsFromPlaygroundPostApiError,
+        >,
+    >{
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/observability/datasets/{}/imports/from-playground",
+                __pct_encode_path_segment(dataset_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 202u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "202",
+                )),
+            }))
+        } else {
+            let typed: Option<
+                PostDatasetRecordsFromPlaygroundV1ObservabilityDatasetsDatasetIdImportsFromPlaygroundPostApiError,
+            >;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                PostDatasetRecordsFromPlaygroundV1ObservabilityDatasetsDatasetIdImportsFromPlaygroundPostApiError::Status400(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                PostDatasetRecordsFromPlaygroundV1ObservabilityDatasetsDatasetIdImportsFromPlaygroundPostApiError::Status404(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                PostDatasetRecordsFromPlaygroundV1ObservabilityDatasetsDatasetIdImportsFromPlaygroundPostApiError::Status408(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                PostDatasetRecordsFromPlaygroundV1ObservabilityDatasetsDatasetIdImportsFromPlaygroundPostApiError::Status409(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                PostDatasetRecordsFromPlaygroundV1ObservabilityDatasetsDatasetIdImportsFromPlaygroundPostApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Query Workflow Execution
+    ///
+    /// `POST /v1/workflows/executions/{execution_id}/queries`
+    pub async fn query_workflow_execution_v1_workflows_executions_execution_id_queries_post(
+        &self,
+        execution_id: impl AsRef<str>,
+        request: QueryInvocationBody,
+    ) -> Result<
+        QueryWorkflowResponse,
+        ApiOpError<QueryWorkflowExecutionV1WorkflowsExecutionsExecutionIdQueriesPostApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/workflows/executions/{}/queries",
+                __pct_encode_path_segment(execution_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<
+                QueryWorkflowExecutionV1WorkflowsExecutionsExecutionIdQueriesPostApiError,
+            >;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                QueryWorkflowExecutionV1WorkflowsExecutionsExecutionIdQueriesPostApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Reset Workflow
+    ///
+    /// `POST /v1/workflows/executions/{execution_id}/reset`
+    pub async fn reset_workflow_v1_workflows_executions_execution_id_reset_post(
+        &self,
+        execution_id: impl AsRef<str>,
+        request: ResetInvocationBody,
+    ) -> Result<(), ApiOpError<ResetWorkflowV1WorkflowsExecutionsExecutionIdResetPostApiError>>
+    {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/workflows/executions/{}/reset",
+                __pct_encode_path_segment(execution_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            req = req.header(name, value);
+        }
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 204u16 {
+            let _ = body_text;
+            let _ = raw_body;
+            let _ = headers;
+            Ok(())
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "204",
+                )),
+            }))
+        } else {
+            let typed: Option<ResetWorkflowV1WorkflowsExecutionsExecutionIdResetPostApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                ResetWorkflowV1WorkflowsExecutionsExecutionIdResetPostApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
     /// Retrieve Model
     ///
     /// Retrieve information about a model.
@@ -587,6 +18490,1569 @@ impl HttpClient {
                 422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
                     Ok(v) => {
                         typed = Some(RetrieveModelV1ModelsModelIdGetApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Schedule Workflow
+    ///
+    /// `POST /v1/workflows/schedules`
+    pub async fn schedule_workflow_v1_workflows_schedules_post(
+        &self,
+        request: WorkflowScheduleRequest,
+    ) -> Result<
+        WorkflowScheduleResponse,
+        ApiOpError<ScheduleWorkflowV1WorkflowsSchedulesPostApiError>,
+    > {
+        let request_url = format!("{}{}", self.base_url, "/v1/workflows/schedules");
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 201u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "201",
+                )),
+            }))
+        } else {
+            let typed: Option<ScheduleWorkflowV1WorkflowsSchedulesPostApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(ScheduleWorkflowV1WorkflowsSchedulesPostApiError::Status422(
+                            v,
+                        ));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Signal Workflow Execution
+    ///
+    /// `POST /v1/workflows/executions/{execution_id}/signals`
+    pub async fn signal_workflow_execution_v1_workflows_executions_execution_id_signals_post(
+        &self,
+        execution_id: impl AsRef<str>,
+        request: SignalInvocationBody,
+    ) -> Result<
+        SignalWorkflowResponse,
+        ApiOpError<SignalWorkflowExecutionV1WorkflowsExecutionsExecutionIdSignalsPostApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/workflows/executions/{}/signals",
+                __pct_encode_path_segment(execution_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 202u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "202",
+                )),
+            }))
+        } else {
+            let typed: Option<
+                SignalWorkflowExecutionV1WorkflowsExecutionsExecutionIdSignalsPostApiError,
+            >;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                SignalWorkflowExecutionV1WorkflowsExecutionsExecutionIdSignalsPostApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Speech
+    ///
+    /// Generate speech from text using a saved voice or a reference audio clip.
+    ///
+    /// `POST /v1/audio/speech`
+    pub async fn speech_v1_audio_speech_post(
+        &self,
+        request: SpeechRequest,
+    ) -> Result<SpeechResponse, ApiOpError<SpeechV1AudioSpeechPostApiError>> {
+        let request_url = format!("{}{}", self.base_url, "/v1/audio/speech");
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<SpeechV1AudioSpeechPostApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(SpeechV1AudioSpeechPostApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Speech
+    ///
+    /// Generate speech from text using a saved voice or a reference audio clip.
+    ///
+    /// `POST /v1/audio/speech`
+    pub async fn speech_v1_audio_speech_post_stream(
+        &self,
+        request: SpeechRequest,
+    ) -> Result<
+        impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>>,
+        ApiOpError<SpeechV1AudioSpeechPostStreamApiError>,
+    > {
+        let request_url = format!("{}{}", self.base_url, "/v1/audio/speech");
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "text/event-stream");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        if false || status_code == 200u16 {
+            Ok(response.bytes_stream())
+        } else {
+            if status.is_success() {
+                return Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers,
+                    body: String::new(),
+                    raw_body: Vec::new(),
+                    typed: None,
+                    parse_error: Some(format!(
+                        "unexpected successful status {}; generated return type selects `{}`; live response body was not buffered",
+                        status_code, "200",
+                    )),
+                }));
+            }
+            let body_bytes =
+                __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+            let raw_body = body_bytes;
+            let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+            let typed: Option<SpeechV1AudioSpeechPostStreamApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(SpeechV1AudioSpeechPostStreamApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Stream
+    ///
+    /// `GET /v1/workflows/executions/{execution_id}/stream`
+    pub async fn stream_v1_workflows_executions_execution_id_stream_get(
+        &self,
+        execution_id: impl AsRef<str>,
+        event_source: Option<impl AsRef<str>>,
+        last_event_id: Option<impl AsRef<str>>,
+    ) -> Result<
+        impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>>,
+        ApiOpError<StreamV1WorkflowsExecutionsExecutionIdStreamGetApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/workflows/executions/{}/stream",
+                __pct_encode_path_segment(execution_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.get(request_url);
+        {
+            let mut query_params: Vec<(String, String)> = Vec::new();
+            if let Some(v) = event_source {
+                query_params.push(("event_source".to_string(), v.as_ref().to_string()));
+            }
+            if let Some(v) = last_event_id {
+                query_params.push(("last_event_id".to_string(), v.as_ref().to_string()));
+            }
+            if !query_params.is_empty() {
+                req = req.query(&query_params);
+            }
+        }
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "text/event-stream");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        if false || status_code == 200u16 {
+            Ok(response.bytes_stream())
+        } else {
+            if status.is_success() {
+                return Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers,
+                    body: String::new(),
+                    raw_body: Vec::new(),
+                    typed: None,
+                    parse_error: Some(format!(
+                        "unexpected successful status {}; generated return type selects `{}`; live response body was not buffered",
+                        status_code, "200",
+                    )),
+                }));
+            }
+            let body_bytes =
+                __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+            let raw_body = body_bytes;
+            let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+            let typed: Option<StreamV1WorkflowsExecutionsExecutionIdStreamGetApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                            StreamV1WorkflowsExecutionsExecutionIdStreamGetApiError::Status422(v),
+                        );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Terminate Workflow Execution
+    ///
+    /// `POST /v1/workflows/executions/{execution_id}/terminate`
+    pub async fn terminate_workflow_execution_v1_workflows_executions_execution_id_terminate_post(
+        &self,
+        execution_id: impl AsRef<str>,
+    ) -> Result<
+        (),
+        ApiOpError<TerminateWorkflowExecutionV1WorkflowsExecutionsExecutionIdTerminatePostApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/workflows/executions/{}/terminate",
+                __pct_encode_path_segment(execution_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.post(request_url);
+        req = req.header(reqwest::header::CONTENT_LENGTH, "0");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            req = req.header(name, value);
+        }
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 204u16 {
+            let _ = body_text;
+            let _ = raw_body;
+            let _ = headers;
+            Ok(())
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "204",
+                )),
+            }))
+        } else {
+            let typed: Option<
+                TerminateWorkflowExecutionV1WorkflowsExecutionsExecutionIdTerminatePostApiError,
+            >;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                TerminateWorkflowExecutionV1WorkflowsExecutionsExecutionIdTerminatePostApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Unarchive Workflow
+    ///
+    /// `PUT /v1/workflows/{workflow_identifier}/unarchive`
+    pub async fn unarchive_workflow_v1_workflows_workflow_identifier_unarchive_put(
+        &self,
+        workflow_identifier: impl AsRef<str>,
+    ) -> Result<
+        WorkflowUnarchiveResponse,
+        ApiOpError<UnarchiveWorkflowV1WorkflowsWorkflowIdentifierUnarchivePutApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/workflows/{}/unarchive",
+                __pct_encode_path_segment(workflow_identifier.as_ref())
+            )
+        );
+        let mut req = self.http_client.put(request_url);
+        req = req.header(reqwest::header::CONTENT_LENGTH, "0");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<UnarchiveWorkflowV1WorkflowsWorkflowIdentifierUnarchivePutApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                UnarchiveWorkflowV1WorkflowsWorkflowIdentifierUnarchivePutApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Unschedule Workflow
+    ///
+    /// `DELETE /v1/workflows/schedules/{schedule_id}`
+    pub async fn unschedule_workflow_v1_workflows_schedules_schedule_id_delete(
+        &self,
+        schedule_id: impl AsRef<str>,
+    ) -> Result<(), ApiOpError<UnscheduleWorkflowV1WorkflowsSchedulesScheduleIdDeleteApiError>>
+    {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/workflows/schedules/{}",
+                __pct_encode_path_segment(schedule_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.delete(request_url);
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            req = req.header(name, value);
+        }
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 204u16 {
+            let _ = body_text;
+            let _ = raw_body;
+            let _ = headers;
+            Ok(())
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "204",
+                )),
+            }))
+        } else {
+            let typed: Option<UnscheduleWorkflowV1WorkflowsSchedulesScheduleIdDeleteApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                UnscheduleWorkflowV1WorkflowsSchedulesScheduleIdDeleteApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Update a dataset record conversation payload
+    ///
+    /// `PUT /v1/observability/dataset-records/{dataset_record_id}/payload`
+    pub async fn update_dataset_record_payload_v1_observability_dataset_records_dataset_record_id_payload_put(
+        &self,
+        dataset_record_id: impl AsRef<str>,
+        request: PutDatasetRecordPayloadInSchema,
+    ) -> Result<
+        (),
+        ApiOpError<
+            UpdateDatasetRecordPayloadV1ObservabilityDatasetRecordsDatasetRecordIdPayloadPutApiError,
+        >,
+    >{
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/observability/dataset-records/{}/payload",
+                __pct_encode_path_segment(dataset_record_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.put(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            req = req.header(name, value);
+        }
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 204u16 {
+            let _ = body_text;
+            let _ = raw_body;
+            let _ = headers;
+            Ok(())
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "204",
+                )),
+            }))
+        } else {
+            let typed: Option<
+                UpdateDatasetRecordPayloadV1ObservabilityDatasetRecordsDatasetRecordIdPayloadPutApiError,
+            >;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                UpdateDatasetRecordPayloadV1ObservabilityDatasetRecordsDatasetRecordIdPayloadPutApiError::Status400(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                UpdateDatasetRecordPayloadV1ObservabilityDatasetRecordsDatasetRecordIdPayloadPutApiError::Status404(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                UpdateDatasetRecordPayloadV1ObservabilityDatasetRecordsDatasetRecordIdPayloadPutApiError::Status408(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                UpdateDatasetRecordPayloadV1ObservabilityDatasetRecordsDatasetRecordIdPayloadPutApiError::Status409(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                UpdateDatasetRecordPayloadV1ObservabilityDatasetRecordsDatasetRecordIdPayloadPutApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Update conversation properties
+    ///
+    /// `PUT /v1/observability/dataset-records/{dataset_record_id}/properties`
+    pub async fn update_dataset_record_properties_v1_observability_dataset_records_dataset_record_id_properties_put(
+        &self,
+        dataset_record_id: impl AsRef<str>,
+        request: PutDatasetRecordPropertiesInSchema,
+    ) -> Result<
+        (),
+        ApiOpError<
+            UpdateDatasetRecordPropertiesV1ObservabilityDatasetRecordsDatasetRecordIdPropertiesPutApiError,
+        >,
+    >{
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/observability/dataset-records/{}/properties",
+                __pct_encode_path_segment(dataset_record_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.put(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            req = req.header(name, value);
+        }
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 204u16 {
+            let _ = body_text;
+            let _ = raw_body;
+            let _ = headers;
+            Ok(())
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "204",
+                )),
+            }))
+        } else {
+            let typed: Option<
+                UpdateDatasetRecordPropertiesV1ObservabilityDatasetRecordsDatasetRecordIdPropertiesPutApiError,
+            >;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                UpdateDatasetRecordPropertiesV1ObservabilityDatasetRecordsDatasetRecordIdPropertiesPutApiError::Status400(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                UpdateDatasetRecordPropertiesV1ObservabilityDatasetRecordsDatasetRecordIdPropertiesPutApiError::Status404(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                UpdateDatasetRecordPropertiesV1ObservabilityDatasetRecordsDatasetRecordIdPropertiesPutApiError::Status408(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                UpdateDatasetRecordPropertiesV1ObservabilityDatasetRecordsDatasetRecordIdPropertiesPutApiError::Status409(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                UpdateDatasetRecordPropertiesV1ObservabilityDatasetRecordsDatasetRecordIdPropertiesPutApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Patch dataset
+    ///
+    /// `PATCH /v1/observability/datasets/{dataset_id}`
+    pub async fn update_dataset_v1_observability_datasets_dataset_id_patch(
+        &self,
+        dataset_id: impl AsRef<str>,
+        request: PatchDatasetInSchema,
+    ) -> Result<
+        DatasetPreview,
+        ApiOpError<UpdateDatasetV1ObservabilityDatasetsDatasetIdPatchApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/observability/datasets/{}",
+                __pct_encode_path_segment(dataset_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.patch(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<UpdateDatasetV1ObservabilityDatasetsDatasetIdPatchApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                            UpdateDatasetV1ObservabilityDatasetsDatasetIdPatchApiError::Status400(
+                                v,
+                            ),
+                        );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                            UpdateDatasetV1ObservabilityDatasetsDatasetIdPatchApiError::Status404(
+                                v,
+                            ),
+                        );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                            UpdateDatasetV1ObservabilityDatasetsDatasetIdPatchApiError::Status408(
+                                v,
+                            ),
+                        );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                            UpdateDatasetV1ObservabilityDatasetsDatasetIdPatchApiError::Status409(
+                                v,
+                            ),
+                        );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                            UpdateDatasetV1ObservabilityDatasetsDatasetIdPatchApiError::Status422(
+                                v,
+                            ),
+                        );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Update a judge
+    ///
+    /// `PUT /v1/observability/judges/{judge_id}`
+    pub async fn update_judge_v1_observability_judges_judge_id_put(
+        &self,
+        judge_id: impl AsRef<str>,
+        request: PutJudgeInSchema,
+    ) -> Result<(), ApiOpError<UpdateJudgeV1ObservabilityJudgesJudgeIdPutApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/observability/judges/{}",
+                __pct_encode_path_segment(judge_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.put(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            req = req.header(name, value);
+        }
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 204u16 {
+            let _ = body_text;
+            let _ = raw_body;
+            let _ = headers;
+            Ok(())
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "204",
+                )),
+            }))
+        } else {
+            let typed: Option<UpdateJudgeV1ObservabilityJudgesJudgeIdPutApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                400u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed =
+                            Some(UpdateJudgeV1ObservabilityJudgesJudgeIdPutApiError::Status400(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                404u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed =
+                            Some(UpdateJudgeV1ObservabilityJudgesJudgeIdPutApiError::Status404(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                408u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed =
+                            Some(UpdateJudgeV1ObservabilityJudgesJudgeIdPutApiError::Status408(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                409u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed =
+                            Some(UpdateJudgeV1ObservabilityJudgesJudgeIdPutApiError::Status409(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                422u16 => match serde_json::from_str::<ObservabilityError>(&body_text) {
+                    Ok(v) => {
+                        typed =
+                            Some(UpdateJudgeV1ObservabilityJudgesJudgeIdPutApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Update voice metadata
+    ///
+    /// Update voice metadata (name, gender, languages, age, tags).
+    ///
+    /// `PATCH /v1/audio/voices/{voice_id}`
+    pub async fn update_voice_v1_audio_voices_voice_id_patch(
+        &self,
+        voice_id: impl AsRef<str>,
+        request: VoiceUpdateRequest,
+    ) -> Result<VoiceResponse, ApiOpError<UpdateVoiceV1AudioVoicesVoiceIdPatchApiError>> {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/audio/voices/{}",
+                __pct_encode_path_segment(voice_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.patch(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<UpdateVoiceV1AudioVoicesVoiceIdPatchApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(UpdateVoiceV1AudioVoicesVoiceIdPatchApiError::Status422(v));
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Update Workflow Execution
+    ///
+    /// `POST /v1/workflows/executions/{execution_id}/updates`
+    pub async fn update_workflow_execution_v1_workflows_executions_execution_id_updates_post(
+        &self,
+        execution_id: impl AsRef<str>,
+        request: UpdateInvocationBody,
+    ) -> Result<
+        UpdateWorkflowResponse,
+        ApiOpError<UpdateWorkflowExecutionV1WorkflowsExecutionsExecutionIdUpdatesPostApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/workflows/executions/{}/updates",
+                __pct_encode_path_segment(execution_id.as_ref())
+            )
+        );
+        let mut req = self.http_client.post(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<
+                UpdateWorkflowExecutionV1WorkflowsExecutionsExecutionIdUpdatesPostApiError,
+            >;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                                UpdateWorkflowExecutionV1WorkflowsExecutionsExecutionIdUpdatesPostApiError::Status422(
+                                    v,
+                                ),
+                            );
+                        parse_error = None;
+                    }
+                    Err(e) => {
+                        typed = None;
+                        parse_error = Some(e.to_string());
+                    }
+                },
+                _ => {
+                    typed = None;
+                    parse_error = None;
+                }
+            }
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed,
+                parse_error,
+            }))
+        }
+    }
+    /// Update Workflow
+    ///
+    /// `PUT /v1/workflows/{workflow_identifier}`
+    pub async fn update_workflow_v1_workflows_workflow_identifier_put(
+        &self,
+        workflow_identifier: impl AsRef<str>,
+        request: WorkflowUpdateRequest,
+    ) -> Result<
+        WorkflowUpdateResponse,
+        ApiOpError<UpdateWorkflowV1WorkflowsWorkflowIdentifierPutApiError>,
+    > {
+        let request_url = format!(
+            "{}{}",
+            self.base_url,
+            format!(
+                "/v1/workflows/{}",
+                __pct_encode_path_segment(workflow_identifier.as_ref())
+            )
+        );
+        let mut req = self.http_client.put(request_url);
+        req = req
+            .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
+            .header("content-type", "application/json");
+        if let Some(api_key) = &self.api_key {
+            req = req.bearer_auth(api_key);
+        }
+        for (name, value) in &self.custom_headers {
+            if !name.eq_ignore_ascii_case("accept") {
+                req = req.header(name, value);
+            }
+        }
+        req = req.header(reqwest::header::ACCEPT, "application/json");
+        let response = req.send().await?;
+        let status = response.status();
+        let status_code = status.as_u16();
+        let headers = response.headers().clone();
+        let body_bytes =
+            __read_bounded_response_body(response, self.max_response_body_bytes).await?;
+        let raw_body = body_bytes;
+        let body_text = String::from_utf8_lossy(&raw_body).into_owned();
+        if false || status_code == 200u16 {
+            match serde_json::from_str(&body_text) {
+                Ok(body) => Ok(body),
+                Err(e) => Err(ApiOpError::Api(ApiError {
+                    status: status_code,
+                    headers: headers,
+                    body: body_text,
+                    raw_body,
+                    typed: None,
+                    parse_error: Some(format!("failed to deserialize 2xx response body: {}", e)),
+                })),
+            }
+        } else if status.is_success() {
+            Err(ApiOpError::Api(ApiError {
+                status: status_code,
+                headers,
+                body: body_text,
+                raw_body,
+                typed: None,
+                parse_error: Some(format!(
+                    "unexpected successful status {}; generated return type selects `{}`",
+                    status_code, "200",
+                )),
+            }))
+        } else {
+            let typed: Option<UpdateWorkflowV1WorkflowsWorkflowIdentifierPutApiError>;
+            let parse_error: Option<String>;
+            match status_code {
+                422u16 => match serde_json::from_str::<HTTPValidationError>(&body_text) {
+                    Ok(v) => {
+                        typed = Some(
+                            UpdateWorkflowV1WorkflowsWorkflowIdentifierPutApiError::Status422(v),
+                        );
                         parse_error = None;
                     }
                     Err(e) => {
