@@ -57,9 +57,9 @@ cargo run --example chat
 ```
 
 `MISTRAL_MODEL` optionally changes the example's model. The client defaults to
-`https://api.mistral.ai`, with a 120-second timeout and no automatic retries of
-billable requests. `with_base_url(...)` allows another compatible endpoint or a
-local test server. Do not send credentials to an endpoint you do not trust.
+`https://api.mistral.ai` and does not automatically retry billable requests.
+`with_base_url(...)` allows another compatible endpoint or a local test server.
+Do not send credentials to an endpoint you do not trust.
 
 ## API scope
 
