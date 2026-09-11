@@ -40,7 +40,7 @@ def generator(lock):
     if lock["generator"] != "openapi-to-rust":
         raise ValueError("Unsupported generator")
     version = lock["generator_version"]
-    patch = ROOT / "codegen/patches/client.patch"
+    patch = ROOT / "codegen/patches/generator.patch"
     digest = hashlib.sha256(patch.read_bytes()).hexdigest()
     if digest != lock["generator_patch_sha256"]:
         raise ValueError("Generator patch SHA-256 mismatch")

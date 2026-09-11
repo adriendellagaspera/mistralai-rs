@@ -1,6 +1,6 @@
 # Development
 
-Install Rustup, Python 3.11+ and Just. Run commands from the repository root.
+Install Git, Rustup, Python 3.11+ with `venv`, and Just. Run commands from the repository root.
 Linux and macOS are the intended codegen environments; consumers need only Rust.
 
 ```sh
@@ -10,10 +10,16 @@ bash scripts/validate.sh
 ```
 
 Without Just, use `python3 scripts/codegen.py generate` and
-`python3 scripts/codegen.py check`. No Python packages or xtask are required.
-The Rust toolchain, rustfmt and generator are pinned. The generator installs
-into `.tools/` with its published dependency lockfile (`cargo install --locked
---version =0.16.0`). `Cargo.lock` pins this SDK's validation dependencies.
+`python3 scripts/codegen.py check`. No xtask is needed. The tool installs
+`ruamel.yaml` at the version in `codegen.lock` into an isolated environment in
+`.tools/`; no global Python package installation is needed.
+
+The Rust toolchain, rustfmt, generator source commit, generator patch SHA-256,
+and YAML parser version are pinned. Codegen fetches the immutable generator
+commit, checks/applies `codegen/patches/generator.patch`, and builds it with its
+committed dependency lockfile (`cargo install --locked --path ...`). The install
+cache includes both source commit and patch hash. `Cargo.lock` pins this SDK's
+validation dependencies. Tools can be installed online once and reused offline.
 
 ## Updating the source specification
 
@@ -39,29 +45,33 @@ changes to `codegen.lock`, never an automatic side effect of a spec update.
 
 ## Extending the API
 
-1. Add an exact operation selector (`METHOD /path` or upstream operation ID) to
-   `codegen/openapi-to-rust.toml`. Keep `prune_models = true` to retain the full
-   transitive model closure of selected operations.
-2. Regenerate, inspect `REQUIRED_DEPS.toml`, compile and review the new Rust API.
-3. Add offline serialization and HTTP behavior tests for the new operation,
-   including its unions, optional values and errors where relevant.
-4. Update the documented scope and run the complete validation script.
+There is no operation allowlist: all upstream operations and schemas are
+included (`prune_models = false`). New upstream operations are picked up on
+regeneration. `src/generated/coverage.json` records method, path, operation ID,
+Rust method, tags, and success media for each operation. Coverage validation
+rejects missing methods and runtime stubs before replacing committed output.
 
-Do not edit `src/generated/`. Prefer a generator configuration correction. If
-the generator needs a fix, report/fix it upstream and pin a released version.
-Any future spec preprocessing must preserve `spec/openapi.yaml` unchanged,
-live in the codegen tooling, and have explicit regression fixtures. Broad
-handwritten schemas or post-generation string replacements are not the design.
+Review new generated dependencies, request encodings, response media and tests.
+Add offline HTTP/serialization fixtures for new behavior. Stream variants for
+mixed JSON/SSE endpoints and the WAV voice-sample variant are explicit aliases
+in `codegen/preprocess.py`; the generator removes fragments from request URLs.
+The new methods are generated from the same upstream schemas.
 
-The initial generation contains one tested preprocessing correction documented
-in `codegen/EVALUATION.md`: an undefined `data` required field is removed from
-the chat response schema. No benchmark or `agent-ir` dependency belongs in this
-generic SDK.
+Do not edit `src/generated/`. Prefer generator configuration, then a narrowly
+scoped source patch or explicit preprocessing. Source patches must apply with
+`git apply --check` to the pinned commit and have their SHA-256 updated in
+`codegen.lock`. They change the generator, not its output. Rustfmt remains the
+only post-generation Rust transform. Submit/removal-track fixes upstream when
+possible; a future released generator should replace these local patches.
+
+See `codegen/EVALUATION.md` for the three upstream schema contradictions and
+multipart/streaming generator fixes. Preserve the original spec exactly.
+No benchmark or `agent-ir` dependency belongs in this generic SDK.
 
 ## Tests and live requests
 
 Normal tests use fixtures and local HTTP servers, and require no API key or
-external API connection. The chat example is compiled in CI but never run.
+external API connection. Both chat examples are compiled in CI but never run.
 To make a live request explicitly, set `MISTRAL_API_KEY` and run
 `cargo run --example chat`. Do not commit credentials or live response dumps.
 

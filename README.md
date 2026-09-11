@@ -63,15 +63,57 @@ Do not send credentials to an endpoint you do not trust.
 
 ## API scope
 
-Initial scope: non-streaming chat completions, list models, retrieve a model,
-and all reachable request/response types, including tool calls, structured
-outputs and token usage. Operation names follow upstream `operationId`s.
+All **173 operations** and **481 component schemas** from the pinned official
+specification are included, including deprecated and beta endpoints. Four
+additional generated methods select alternative response media, for **177
+methods** in total. Names follow upstream `operationId`s.
 
-Streaming is not supported by the initial client: keep `stream` false or omit
-it. The official spec describes streaming in prose, but the JSON completion
-method does not decode SSE. Other API families are outside this initial scope.
-See [the generator evaluation](codegen/EVALUATION.md) and
-[CONTRIBUTING.md](CONTRIBUTING.md) for extending the selection.
+| API families | Coverage |
+| --- | --- |
+| Chat, FIM, models, embeddings, classifiers, OCR | Generated typed requests/responses |
+| Agents, conversations, connectors | Includes beta endpoints and conversation SSE |
+| Files, batch, fine-tuning, libraries/documents/accesses | Includes multipart uploads and binary downloads |
+| Audio transcription, speech, voices | Multipart arrays/files, transcription/speech SSE, WAV sample download |
+| Observability: datasets, records, judges, campaigns, completion events | All operations declared upstream |
+| Workflows: executions, runs, schedules, deployments, events, metrics, workers | All operations, including SSE feeds |
+
+The exact machine-readable inventory is
+[`src/generated/coverage.json`](src/generated/coverage.json). Generation fails
+if an operation is missing or a generated method contains a configuration stub.
+This measures **OpenAPI coverage**, not live-service verification: offline tests
+exercise representative wire behavior and edge cases, and beta/deprecated APIs
+retain upstream stability and availability constraints. No live tests run in CI.
+Undocumented service features and media absent from the spec are not inferred.
+
+### Streaming and uploads
+
+Use the generated methods ending in `_stream` for chat, FIM and speech; native
+conversation/transcription/workflow streaming methods retain their upstream
+names. These return incremental byte streams. `streaming::json_events` decodes
+JSON data into generated types, while `streaming::events` preserves SSE metadata.
+For chat/FIM, deserialize the data as `CompletionChunk`, **not** `CompletionEvent`
+(which describes the envelope). `Event::envelope` handles envelope schemas such
+as `ConversationEvents`, `TranscriptionStreamEvents`, and `SpeechStreamEvents`.
+
+```rust,ignore
+let bytes = client.chat_completion_v1_chat_completions_post_stream(request).await?;
+let events = mistralai::streaming::json_events::<_, _, mistralai::CompletionChunk>(bytes);
+```
+
+See [`examples/chat_stream.rs`](examples/chat_stream.rs) for a complete example
+(`cargo run --example chat_stream`). JSON and SSE methods set a declared Boolean
+`stream` field to match their response contract. SSE parsing is incremental,
+handles `[DONE]`, and limits each buffered event to 1 MiB. It never reconnects
+or replays billable requests automatically. Transport, JSON and size errors are
+returned to the caller. Dropping the stream cancels consumption.
+
+Multipart file fields accept `bytes::Bytes`. Use
+`client.with_upload_filename("input.jsonl")` to set the filename sent with uploads
+(the default is `upload`). This setting applies to file parts on that client;
+clone it for concurrent uploads with different filenames. Audio arrays are sent
+as repeated form fields, and absent/null optional parts are omitted.
+Use `get_voice_sample_audio_v1_audio_voices_voice_id_sample_get_wav` for WAV bytes;
+the original method retains the spec's JSON response variant.
 
 This is a pre-1.0 SDK. Upstream schema fixes and generator upgrades can change
 the generated public Rust API; automatic update PRs require human review and
@@ -79,9 +121,11 @@ are never merged or published automatically.
 
 ## Reproduce the SDK
 
-Prerequisites: Rustup, Python 3.11+, and [Just](https://github.com/casey/just).
+Prerequisites: Git, Rustup, Python 3.11+ with `venv`, and [Just](https://github.com/casey/just).
 Rust/rustfmt is pinned by `rust-toolchain.toml`. The first codegen run installs
-the exact generator version with `cargo install --locked` into `.tools/`.
+the generator at an immutable source commit, verifies/applies a small source
+patch, and compiles with `cargo install --locked` into `.tools/`. An isolated
+Python environment installs pinned `ruamel.yaml` for YAML 1.2 preprocessing.
 
 ```sh
 just generate
@@ -104,12 +148,12 @@ ignoring untracked files. No timestamps enter the generated output.
 
 | Location | Purpose |
 | --- | --- |
-| `codegen.lock` | Upstream repository/path/commit/hash, generator version, Rust version |
+| `codegen.lock` | Upstream repository/path/commit/hash, generator version/source commit/patch hash, YAML parser and Rust versions |
 | `spec/` | Unmodified official spec and upstream licensing |
-| `codegen/` | Generator configuration, one fail-closed preprocessing fix, and evaluation |
+| `codegen/` | Generator configuration, explicit preprocessing repairs, source patch and evaluation |
 | `scripts/` | Acquisition, isolated generation, validation and update tooling |
-| `src/generated/` | Committed generated Rust and `REQUIRED_DEPS.toml` |
-| `src/lib.rs`, `tests/`, `examples/` | Handwritten exports, offline tests and opt-in example |
+| `src/generated/` | Committed generated Rust, dependency manifest and operation inventory |
+| `src/lib.rs`, `src/streaming.rs`, `tests/`, `examples/` | Handwritten exports/SSE decoder, offline tests and opt-in examples |
 
 The source of truth is
 [`mistralai/platform-docs-public/openapi.yaml`](https://github.com/mistralai/platform-docs-public/blob/main/openapi.yaml).

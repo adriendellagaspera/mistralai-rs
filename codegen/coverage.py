@@ -4,7 +4,6 @@ import json
 from pathlib import Path
 import re
 import sys
-from ruamel.yaml import YAML
 
 METHODS = {"get", "post", "put", "patch", "delete", "head", "options", "trace"}
 
@@ -14,10 +13,7 @@ def operations(spec):
             for method, op in item.items() if method in METHODS]
 
 
-def main(source, prepared, directory):
-    original = YAML(typ="safe", pure=True).load(Path(source).read_text())
-    spec = json.loads(Path(prepared).read_text())
-    client = (Path(directory) / "client.rs").read_text()
+def inventory(original, spec, client):
     methods = re.findall(r"pub async fn (\w+)\s*\(", client)
     if len(methods) != len(operations(spec)):
         raise ValueError(f"Expected {len(operations(spec))} generated methods, found {len(methods)}")
@@ -37,10 +33,19 @@ def main(source, prepared, directory):
                           "tags": op.get("tags", []),
                           "success_media": sorted({media for status, response in op.get("responses", {}).items()
                               if str(status).startswith("2") for media in response.get("content", {})})})
-    (Path(directory) / "coverage.json").write_text(json.dumps({
+    return {
         "upstream_operations": len(upstream), "generated_methods": len(methods),
         "operations": sorted(inventory, key=lambda op: op["operation_id"])
-    }, indent=2, sort_keys=True) + "\n")
+    }
+
+
+def main(source, prepared, directory):
+    from ruamel.yaml import YAML
+    original = YAML(typ="safe", pure=True).load(Path(source).read_text())
+    spec = json.loads(Path(prepared).read_text())
+    client = (Path(directory) / "client.rs").read_text()
+    report = inventory(original, spec, client)
+    (Path(directory) / "coverage.json").write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
 
 
 if __name__ == "__main__":

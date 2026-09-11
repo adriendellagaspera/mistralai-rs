@@ -1,4 +1,5 @@
 name: Evaluate complete API
+# Exercise all transports and the final generator source patch.
 on:
   push:
     branches: [feat/full-api-coverage]
