@@ -8,7 +8,6 @@ enable_async_client = true
 
 [http_client]
 base_url = "https://api.mistral.ai"
-timeout_seconds = 120
 
 [http_client.retry]
 # Avoid transparently retrying billable POST requests.
