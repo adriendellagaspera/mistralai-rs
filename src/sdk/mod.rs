@@ -9,7 +9,7 @@ pub use ocr::{Ocr, OcrRequest, OcrResponse};
 use crate::generated::client::HttpClient;
 
 /// Idiomatic entry point mirroring the resource-oriented Mistral SDKs.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct Mistral {
     raw: HttpClient,
 }
