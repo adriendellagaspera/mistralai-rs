@@ -2,7 +2,7 @@ mod chat;
 mod error;
 mod ocr;
 
-pub use chat::{Chat, ChatRequest, ChatResponse, Message};
+pub use chat::{Chat, ChatRequest, ChatResponse, ChatStreamChunk, Message};
 pub use error::SdkError;
 pub use ocr::{Ocr, OcrRequest, OcrResponse};
 
