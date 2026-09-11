@@ -10,5 +10,5 @@
   "generator_repository": "gpu-cli/openapi-to-rust",
   "generator_commit": "2af34b86ca9f38c35787f13ec5841989efcf4b99",
   "generator_patch_sha256": "a3da185d0bc0ba3c3a999d1ce5e84ce95ffb02a3a38327d8278d1e3b9035f63a",
-  "pyyaml_version": "6.0.3"
+  "ruamel_yaml_version": "0.18.6"
 }

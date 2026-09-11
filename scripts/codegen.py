@@ -65,17 +65,17 @@ def generator(lock):
 
 
 def tooling_python(lock):
-    environment = ROOT / ".tools" / f"python-pyyaml-{lock['pyyaml_version']}"
+    environment = ROOT / ".tools" / f"python-ruamel-yaml-{lock['ruamel_yaml_version']}"
     python = environment / "bin/python"
     if not python.exists():
         run(sys.executable, "-m", "venv", environment)
     try:
         version = subprocess.check_output(
-            [str(python), "-c", "import yaml; print(yaml.__version__)"], text=True).strip()
+            [str(python), "-c", "import ruamel.yaml; print(ruamel.yaml.__version__)"], text=True).strip()
     except subprocess.CalledProcessError:
         version = None
-    if version != lock["pyyaml_version"]:
-        run(python, "-m", "pip", "install", f"PyYAML=={lock['pyyaml_version']}")
+    if version != lock["ruamel_yaml_version"]:
+        run(python, "-m", "pip", "install", f"ruamel.yaml=={lock['ruamel_yaml_version']}")
     return python
 
 

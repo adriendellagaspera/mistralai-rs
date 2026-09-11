@@ -27,6 +27,7 @@ uuid = { version = "1", features = ["serde"] }
 bytes = { version = "1", features = ["serde"] }
 futures-util = "0.3"
 async-stream = "0.3"
+url = { version = "2", features = ["serde"] }
 
 [dev-dependencies]
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }

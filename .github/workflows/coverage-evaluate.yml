@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: rustup show
-      - uses: actions/cache@v4
+      - uses: actions/cache/restore@v4
         with:
           path: |
             ~/.cargo/registry
@@ -22,6 +22,16 @@ jobs:
           key: full-sdk-v1-${{ hashFiles('codegen.lock') }}
       - name: Generate all operations
         run: python scripts/codegen.py generate
+      - name: Cache installed tooling even if generation fails
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            .tools
+            target
+          key: full-sdk-v1-${{ hashFiles('codegen.lock') }}
       - name: Resolve added transport dependencies and format
         run: |
           cargo generate-lockfile

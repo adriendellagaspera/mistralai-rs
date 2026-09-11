@@ -39,9 +39,9 @@ def preprocess(source: bytes) -> bytes:
 
 def main(source: str, destination: str) -> None:
     import json
-    import yaml
+    from ruamel.yaml import YAML
 
-    spec = yaml.safe_load(preprocess(Path(source).read_bytes()))
+    spec = YAML(typ="safe", pure=True).load(preprocess(Path(source).read_bytes()))
     transform(spec)
     # JSON is valid YAML and avoids emitter/version-dependent YAML formatting.
     Path(destination).write_text(json.dumps(spec, sort_keys=True, indent=2) + "\n")

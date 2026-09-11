@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 import re
 import sys
-import yaml
+from ruamel.yaml import YAML
 
 METHODS = {"get", "post", "put", "patch", "delete", "head", "options", "trace"}
 
@@ -15,7 +15,7 @@ def operations(spec):
 
 
 def main(source, prepared, directory):
-    original = yaml.safe_load(Path(source).read_text())
+    original = YAML(typ="safe", pure=True).load(Path(source).read_text())
     spec = json.loads(Path(prepared).read_text())
     client = (Path(directory) / "client.rs").read_text()
     methods = re.findall(r"pub async fn (\w+)\s*\(", client)
