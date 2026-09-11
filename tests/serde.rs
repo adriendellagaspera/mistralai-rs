@@ -9,7 +9,8 @@ fn chat_response_exposes_integer_token_usage() {
         "choices": [{"index": 0, "finish_reason": "stop",
                      "message": {"role": "assistant", "content": "Bonjour"}}],
         "usage": {"prompt_tokens": 13, "completion_tokens": 7, "total_tokens": 20}
-    })).unwrap();
+    }))
+    .unwrap();
     assert_eq!(response.usage.prompt_tokens, 13);
     assert_eq!(response.usage.completion_tokens, 7);
     assert_eq!(response.usage.total_tokens, 20);
@@ -39,7 +40,15 @@ fn request_preserves_roles_tools_and_json_schema() {
     });
     let request: ChatCompletionRequest = serde_json::from_value(value.clone()).unwrap();
     let output = serde_json::to_value(request).unwrap();
-    for key in ["model", "messages", "tools", "tool_choice", "stream", "max_tokens", "response_format"] {
+    for key in [
+        "model",
+        "messages",
+        "tools",
+        "tool_choice",
+        "stream",
+        "max_tokens",
+        "response_format",
+    ] {
         assert_eq!(output[key], value[key], "field {key} changed on the wire");
     }
 }

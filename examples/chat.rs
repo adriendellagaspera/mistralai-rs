@@ -10,7 +10,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "stream": false,
         "max_tokens": 64
     }))?;
-    let response = client.chat_completion_v1_chat_completions_post(request).await?;
+    let response = client
+        .chat_completion_v1_chat_completions_post(request)
+        .await?;
     println!("{:?}", response.choices);
     println!("prompt_tokens: {}", response.usage.prompt_tokens);
     println!("completion_tokens: {}", response.usage.completion_tokens);
