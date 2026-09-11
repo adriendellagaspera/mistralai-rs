@@ -1,6 +1,7 @@
 {
   "upstream_repository": "mistralai/platform-docs-public",
   "upstream_spec_path": "openapi.yaml",
+  "published_spec_url": "https://docs.mistral.ai/openapi.yaml",
   "upstream_commit": "ff846cf93d91df6fe04d0a5e540ecbe1e0ecc691",
   "spec_sha256": "60f5e92dcc4cae89a1c1eec614c409a1ce9da37f1e856d2868ff6734474f5859",
   "generator": "openapi-to-rust",
