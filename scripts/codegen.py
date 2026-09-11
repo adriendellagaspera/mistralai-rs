@@ -1,4 +1,4 @@
-"""Pinned, isolated code generation. Python 3.11+; no Python dependencies."""
+"""Pinned, isolated code generation. Python 3.11+ with venv and Git."""
 
 import argparse
 import difflib
@@ -40,15 +40,43 @@ def generator(lock):
     if lock["generator"] != "openapi-to-rust":
         raise ValueError("Unsupported generator")
     version = lock["generator_version"]
-    install = ROOT / ".tools" / f"openapi-to-rust-{version}"
+    patch = ROOT / "codegen/patches/client.patch"
+    digest = hashlib.sha256(patch.read_bytes()).hexdigest()
+    if digest != lock["generator_patch_sha256"]:
+        raise ValueError("Generator patch SHA-256 mismatch")
+    install = ROOT / ".tools" / f"openapi-to-rust-{lock['generator_commit']}-{digest}"
     executable = install / "bin" / "openapi-to-rust"
     if not executable.exists():
-        run("cargo", f"+{lock['rust_toolchain']}", "install", "--locked",
-            "--version", f"={version}", "--root", install, "openapi-to-rust")
+        with tempfile.TemporaryDirectory(prefix="generator-") as temporary:
+            source = Path(temporary)
+            run("git", "init", source)
+            run("git", "fetch", "--depth=1",
+                f"https://github.com/{lock['generator_repository']}.git",
+                lock["generator_commit"], cwd=source)
+            run("git", "checkout", "--detach", "FETCH_HEAD", cwd=source)
+            run("git", "apply", "--check", patch, cwd=source)
+            run("git", "apply", patch, cwd=source)
+            run("cargo", f"+{lock['rust_toolchain']}", "install", "--locked",
+                "--path", source, "--root", install)
     output = subprocess.check_output([str(executable), "--version"], text=True).strip()
     if output != f"openapi-to-rust {version}":
         raise ValueError(f"Unexpected generator: {output}")
     return executable
+
+
+def tooling_python(lock):
+    environment = ROOT / ".tools" / f"python-pyyaml-{lock['pyyaml_version']}"
+    python = environment / "bin/python"
+    if not python.exists():
+        run(sys.executable, "-m", "venv", environment)
+    try:
+        version = subprocess.check_output(
+            [str(python), "-c", "import yaml; print(yaml.__version__)"], text=True).strip()
+    except subprocess.CalledProcessError:
+        version = None
+    if version != lock["pyyaml_version"]:
+        run(python, "-m", "pip", "install", f"PyYAML=={lock['pyyaml_version']}")
+    return python
 
 
 def main():
@@ -61,17 +89,21 @@ def main():
         raise ValueError("rust-toolchain.toml and codegen.lock disagree")
     verify_spec((ROOT / "spec/openapi.yaml").read_bytes(), lock)
     executable = generator(lock)
+    python = tooling_python(lock)
     # Preserve relative paths from the checked-in config; never modify its options.
     with tempfile.TemporaryDirectory(prefix=".codegen-", dir=ROOT) as temp:
         work = Path(temp)
         shutil.copytree(ROOT / "spec", work / "spec")
         shutil.copytree(ROOT / "codegen", work / "codegen")
-        preprocess.main(work / "spec/openapi.yaml", work / "spec/openapi.codegen.yaml")
+        run(python, work / "codegen/preprocess.py",
+            work / "spec/openapi.yaml", work / "spec/openapi.codegen.yaml")
         config = work / lock["generator_config"]
         run(executable, "generate", "--config", config)
         # The generator's own check runs in a second process, before rustfmt.
         run(executable, "generate", "--config", config, "--check")
         generated = work / "src/generated"
+        run(python, ROOT / "codegen/coverage.py", work / "spec/openapi.yaml",
+            work / "spec/openapi.codegen.yaml", generated)
         for path in sorted(generated.rglob("*.rs")):
             run("rustup", "run", lock["rust_toolchain"], "rustfmt",
                 "--edition", "2024", "--config", "skip_children=true", path)

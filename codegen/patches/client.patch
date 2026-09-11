@@ -1,0 +1,102 @@
+--- a/src/client_generator.rs
++++ b/src/client_generator.rs
+@@ -172,6 +172,7 @@
+ #[derive(Clone, Copy)]
+ enum MultipartClientFieldKind {
+     RawBytes,
++    RepeatedText,
+     Base64,
+     Base64UrlUnpadded,
+     Text,
+@@ -257,6 +258,7 @@
+                 api_key: Option<String>,
+                 http_client: ClientWithMiddleware,
+                 custom_headers: BTreeMap<String, String>,
++                upload_filename: String,
+                 max_response_body_bytes: usize,
+             }
+ 
+@@ -426,6 +428,7 @@
+                         api_key: None,
+                         http_client,
+                         custom_headers: BTreeMap::new(),
++                        upload_filename: "upload".to_string(),
+                         max_response_body_bytes: #max_response_body_bytes,
+                     }
+                 }
+@@ -451,6 +454,7 @@
+                         api_key: None,
+                         http_client,
+                         custom_headers: BTreeMap::new(),
++                        upload_filename: "upload".to_string(),
+                         max_response_body_bytes: #max_response_body_bytes,
+                     }
+                 }
+@@ -470,6 +474,11 @@
+             }
+ 
+             /// Set the API key for authentication
++            pub fn with_upload_filename(mut self, filename: impl Into<String>) -> Self {
++                self.upload_filename = filename.into();
++                self
++            }
++
+             pub fn with_api_key(mut self, api_key: impl Into<String>) -> Self {
+                 self.api_key = Some(api_key.into());
+                 self
+@@ -1263,7 +1272,7 @@
+                 let mut chosen = base.clone();
+                 let mut suffix = 2;
+                 while !used.insert(chosen.clone()) {
+-                    chosen = format!("{base}_{suffix}");
++                    chosen = format!("{base}{suffix}");
+                     suffix += 1;
+                 }
+                 chosen
+@@ -2535,6 +2544,12 @@
+         analysis: &'a SchemaAnalysis,
+         visited: &mut std::collections::HashSet<String>,
+     ) -> Option<&'a serde_json::Value> {
++        if let Some(variants) = schema.get("anyOf").and_then(serde_json::Value::as_array) {
++            let non_null: Vec<_> = variants.iter().filter(|v| v.get("type").and_then(serde_json::Value::as_str) != Some("null")).collect();
++            if non_null.len() == 1 {
++                return Self::resolve_multipart_wire_schema(non_null[0], analysis, visited);
++            }
++        }
+         let Some(reference) = schema.get("$ref").and_then(serde_json::Value::as_str) else {
+             return Some(schema);
+         };
+@@ -2572,6 +2587,12 @@
+                     Some(MultipartClientFieldKind::Base64)
+                 } else {
+                     Some(MultipartClientFieldKind::Text)
++                }
++            }
++            crate::analysis::SchemaType::Array { item_type } => {
++                match Self::multipart_client_field_kind(item_type, analysis, visited) {
++                    Some(MultipartClientFieldKind::Text) => Some(MultipartClientFieldKind::RepeatedText),
++                    _ => None,
+                 }
+             }
+             crate::analysis::SchemaType::StringEnum { .. }
+@@ -2695,7 +2716,7 @@
+                 MultipartClientFieldKind::RawBytes => quote! {
+                     form = form.part(
+                         #wire_name,
+-                        reqwest::multipart::Part::bytes(value.to_vec()),
++                        reqwest::multipart::Part::bytes(value.to_vec()).file_name(self.upload_filename.clone()),
+                     );
+                 },
+                 MultipartClientFieldKind::Base64 => quote! {
+@@ -2711,6 +2732,11 @@
+                         #wire_name,
+                         base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(value),
+                     );
++                },
++                MultipartClientFieldKind::RepeatedText => quote! {
++                    for item in value {
++                        form = form.text(#wire_name, item.to_string());
++                    }
+                 },
+                 MultipartClientFieldKind::Text => quote! {
+                     form = form.text(#wire_name, value.to_string());
