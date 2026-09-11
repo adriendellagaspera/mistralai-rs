@@ -1,0 +1,68 @@
+name: Update Mistral OpenAPI SDK
+on:
+  schedule:
+    - cron: '23 3 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+  pull-requests: write
+concurrency:
+  group: update-mistral-openapi
+  cancel-in-progress: false
+jobs:
+  update:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Acquire latest official spec at immutable commit
+        id: upstream
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 scripts/update_spec.py
+          if git diff --quiet -- spec codegen.lock; then
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+          else
+            echo 'changed=true' >> "$GITHUB_OUTPUT"
+          fi
+      - name: Install pinned Rust toolchain
+        if: steps.upstream.outputs.changed == 'true'
+        run: rustup show
+      - uses: actions/cache@v4
+        if: steps.upstream.outputs.changed == 'true'
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            .tools
+            target
+          key: sdk-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'codegen.lock') }}
+      - name: Regenerate and validate before opening a PR
+        if: steps.upstream.outputs.changed == 'true'
+        run: |
+          python3 scripts/codegen.py generate
+          bash scripts/validate.sh
+      - name: Inspect and summarize changed files
+        if: steps.upstream.outputs.changed == 'true'
+        run: |
+          python3 scripts/update_report.py
+          cat update-report.md >> "$GITHUB_STEP_SUMMARY"
+      # GITHUB_TOKEN PRs may not trigger CI: all checks above are mandatory here.
+      - name: Create or update the single SDK update PR
+        if: steps.upstream.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ github.token }}
+          branch: automation/update-mistral-openapi
+          base: main
+          title: 'chore: update Mistral OpenAPI SDK'
+          commit-message: 'chore: update Mistral OpenAPI SDK'
+          body-path: update-report.md
+          delete-branch: true
+          add-paths: |
+            codegen.lock
+            spec/
+            src/generated/
