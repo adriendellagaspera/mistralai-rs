@@ -79,6 +79,15 @@ def tooling_python(lock):
     return python
 
 
+def apply_layout(generated, lock):
+    manifest = ROOT / "codegen/layout/Cargo.toml"
+    lockfile = ROOT / "codegen/layout/Cargo.lock"
+    if not lockfile.exists():
+        raise ValueError("Missing codegen/layout/Cargo.lock; generate and commit the layout tool lockfile")
+    run("cargo", f"+{lock['rust_toolchain']}", "run", "--locked", "--quiet",
+        "--manifest-path", manifest, "--", generated)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=["generate", "check"])
@@ -99,11 +108,14 @@ def main():
             work / "spec/openapi.yaml", work / "spec/openapi.codegen.yaml")
         config = work / lock["generator_config"]
         run(executable, "generate", "--config", config)
-        # The generator's own check runs in a second process, before rustfmt.
+        # The generator's own check validates pristine generator output first.
         run(executable, "generate", "--config", config, "--check")
         generated = work / "src/generated"
+        # Coverage must inspect the generator's complete monolithic output before
+        # the physical layout step rewrites it into include files.
         run(python, ROOT / "codegen/coverage.py", work / "spec/openapi.yaml",
             work / "spec/openapi.codegen.yaml", generated)
+        apply_layout(generated, lock)
         for path in sorted(generated.rglob("*.rs")):
             run("rustup", "run", lock["rust_toolchain"], "rustfmt",
                 "--edition", "2024", "--config", "skip_children=true", path)
@@ -112,7 +124,7 @@ def main():
             if target.exists():
                 shutil.rmtree(target)
             shutil.copytree(generated, target)
-            print("Generated SDK from verified, pinned spec.")
+            print("Generated SDK from verified, pinned spec with deterministic split layout.")
         else:
             old, new = snapshot(target), snapshot(generated)
             changed = differences(old, new)
@@ -123,7 +135,7 @@ def main():
                     fromfile=f"committed/{name}", tofile=f"regenerated/{name}")))
             if changed:
                 raise SystemExit("Generated SDK is stale: " + ", ".join(changed))
-            print("Generated SDK matches byte-for-byte (including file set).")
+            print("Generated SDK matches byte-for-byte (including split file set).")
 
 
 if __name__ == "__main__":
