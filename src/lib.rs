@@ -26,7 +26,9 @@ pub mod raw {
 pub mod sdk;
 pub mod streaming;
 
-pub use sdk::{ChatRequest, Message, Mistral, OcrRequest, OcrResponse, SdkError};
+pub use sdk::{
+    ChatRequest, ChatStreamChunk, Message, Mistral, OcrRequest, OcrResponse, SdkError,
+};
 
 // Compatibility exports while the facade spike is evaluated. New code should
 // prefer `Mistral` and use `raw` only as an explicit escape hatch.
