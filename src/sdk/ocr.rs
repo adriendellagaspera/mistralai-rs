@@ -53,7 +53,7 @@ impl OcrRequest {
 }
 
 /// OCR resource, matching the taxonomy of Mistral's official SDKs.
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 pub struct Ocr<'a> {
     raw: &'a HttpClient,
 }
