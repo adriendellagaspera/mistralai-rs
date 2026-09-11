@@ -38,10 +38,7 @@ pub struct ChatRequest {
 }
 
 impl ChatRequest {
-    pub fn new(
-        model: impl Into<String>,
-        messages: impl IntoIterator<Item = Message>,
-    ) -> Self {
+    pub fn new(model: impl Into<String>, messages: impl IntoIterator<Item = Message>) -> Self {
         Self {
             model: model.into(),
             messages: messages.into_iter().collect(),
