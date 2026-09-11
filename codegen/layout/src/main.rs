@@ -6,6 +6,7 @@ use std::path::{Path, PathBuf};
 use syn::{ImplItem, Item, ItemImpl, Type};
 
 const INDEX_SIZE: usize = 200;
+const MAX_RUST_LINES: usize = 1_200;
 
 fn main() {
     let generated = env::args().nth(1).expect("usage: mistralai-codegen-layout <generated-dir>");
@@ -48,7 +49,7 @@ fn split_file(path: &Path, directory: &str, split_http_client: bool) {
             attrs: Vec::new(),
             items: vec![item],
         };
-        fs::write(output_dir.join(&filename), prettyplease::unparse(&file)).expect("write split item");
+        write_rust(&output_dir.join(&filename), prettyplease::unparse(&file));
         files.push(filename);
     }
 
@@ -59,7 +60,7 @@ fn split_file(path: &Path, directory: &str, split_http_client: bool) {
             .iter()
             .map(|file| format!("include!(\"{file}\");\n"))
             .collect::<String>();
-        fs::write(output_dir.join(&filename), body).expect("write generated index");
+        write_rust(&output_dir.join(&filename), body);
         index_files.push(filename);
     }
 
@@ -73,7 +74,17 @@ fn split_file(path: &Path, directory: &str, split_http_client: bool) {
             .expect("build include item");
         facade.items.push(include);
     }
-    fs::write(path, prettyplease::unparse(&facade)).expect("write generated facade");
+    write_rust(path, prettyplease::unparse(&facade));
+}
+
+fn write_rust(path: &Path, source: String) {
+    let lines = source.lines().count();
+    assert!(
+        lines <= MAX_RUST_LINES,
+        "generated layout file {} has {lines} lines; maximum is {MAX_RUST_LINES}",
+        path.display()
+    );
+    fs::write(path, source).expect("write generated layout file");
 }
 
 fn split_http_client_impl(item: Item) -> Vec<Item> {
@@ -154,4 +165,36 @@ fn snake_case(value: &str) -> String {
         }
     }
     out.trim_matches('_').chars().take(96).collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn splits_http_client_methods_into_independent_impls() {
+        let item: Item = syn::parse_str(
+            "impl HttpClient { pub fn alpha(&self) {} pub async fn beta(&self) {} }",
+        )
+        .unwrap();
+        let parts = split_http_client_impl(item);
+        assert_eq!(parts.len(), 2);
+        assert_eq!(item_name(&parts[0], 0), "impl_http_client_alpha");
+        assert_eq!(item_name(&parts[1], 1), "impl_http_client_beta");
+    }
+
+    #[test]
+    fn does_not_split_trait_impls() {
+        let item: Item = syn::parse_str(
+            "impl Default for HttpClient { fn default() -> Self { todo!() } }",
+        )
+        .unwrap();
+        assert_eq!(split_http_client_impl(item).len(), 1);
+    }
+
+    #[test]
+    fn names_are_deterministic_and_bounded() {
+        assert_eq!(snake_case("ChatCompletionRequest"), "chat_completion_request");
+        assert!(snake_case(&"A".repeat(200)).len() <= 96);
+    }
 }
