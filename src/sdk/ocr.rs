@@ -79,12 +79,10 @@ mod tests {
 
     #[test]
     fn document_url_request_maps_to_generated_ocr_contract() {
-        let raw = OcrRequest::document_url(
-            "mistral-ocr-latest",
-            "https://example.com/document.pdf",
-        )
-        .into_raw()
-        .unwrap();
+        let raw =
+            OcrRequest::document_url("mistral-ocr-latest", "https://example.com/document.pdf")
+                .into_raw()
+                .unwrap();
 
         let value = serde_json::to_value(raw).unwrap();
         assert_eq!(value["model"], "mistral-ocr-latest");
