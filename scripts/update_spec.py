@@ -1,4 +1,4 @@
-"""Fetch upstream at an immutable commit; no write when spec bytes are unchanged."""
+"""Fetch upstream at an immutable commit and verify the published spec mirror."""
 
 import hashlib
 import json
@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def fetch(url, *, api=False):
     headers = {"User-Agent": "mistralai-rs-codegen", "Accept": "application/vnd.github+json"}
-    # Never forward the GitHub token to raw.githubusercontent.com.
+    # Never forward the GitHub token outside api.github.com.
     if api and os.environ.get("GH_TOKEN"):
         headers["Authorization"] = "Bearer " + os.environ["GH_TOKEN"]
     request = urllib.request.Request(url, headers=headers)
@@ -21,8 +21,22 @@ def fetch(url, *, api=False):
         return response.read()
 
 
+def sha256(data):
+    return hashlib.sha256(data).hexdigest()
+
+
+def verify_published_spec(upstream_spec, published_spec, published_url):
+    upstream_digest = sha256(upstream_spec)
+    published_digest = sha256(published_spec)
+    if upstream_digest != published_digest:
+        raise ValueError(
+            "Published OpenAPI specification diverges from the official GitHub source: "
+            f"{published_url} has SHA-256 {published_digest}, upstream has {upstream_digest}"
+        )
+
+
 def updated_lock(old, commit, spec):
-    digest = hashlib.sha256(spec).hexdigest()
+    digest = sha256(spec)
     if digest == old["spec_sha256"]:
         return None
     return {**old, "upstream_commit": commit, "spec_sha256": digest}
@@ -41,17 +55,20 @@ def main():
     lock_path = ROOT / "codegen.lock"
     old = json.loads(lock_path.read_text())
     repo, path = old["upstream_repository"], old["upstream_spec_path"]
+    published_url = old["published_spec_url"]
     commits = json.loads(fetch(
         f"https://api.github.com/repos/{repo}/commits?path={path}&per_page=1", api=True))
     commit = commits[0]["sha"]
     if not re.fullmatch(r"[0-9a-f]{40}", commit):
         raise ValueError("Invalid upstream commit")
     spec = fetch(f"https://raw.githubusercontent.com/{repo}/{commit}/{path}")
+    published_spec = fetch(published_url)
+    verify_published_spec(spec, published_spec, published_url)
     new = updated_lock(old, commit, spec)
     report = ROOT / "update-report.md"
     report.unlink(missing_ok=True)
     if new is None:
-        print("Upstream spec is unchanged; no files updated.")
+        print("Upstream spec is unchanged and matches the published specification; no files updated.")
         return
     if not spec.startswith(b"openapi: 3.1."):
         raise ValueError("Upstream changed OpenAPI dialect; review generator compatibility")
@@ -72,11 +89,12 @@ def main():
         f"- New commit: `{commit}`\n"
         f"- Previous spec SHA-256: `{old['spec_sha256']}`\n"
         f"- New spec SHA-256: `{new['spec_sha256']}`\n"
+        f"- Published spec: `{published_url}` (verified identical)\n"
         f"- Generator: `{old['generator']} {old['generator_version']}`\n"
         f"- Rust/rustfmt: `{old['rust_toolchain']}`\n"
         f"- [Upstream changes](https://github.com/{repo}/compare/{old['upstream_commit']}...{commit})\n\n"
         "Review the spec and generated API diff for breaking changes before merging.\n")
-    print(f"Updated spec to {commit} ({new['spec_sha256']}).")
+    print(f"Updated spec to {commit} ({new['spec_sha256']}); published specification matches.")
 
 
 if __name__ == "__main__":
