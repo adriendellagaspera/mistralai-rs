@@ -1,7 +1,7 @@
-//! Unofficial Mistral AI SDK, generated from the official OpenAPI specification.
+//! Unofficial Mistral AI SDK generated from the official OpenAPI specification.
 //!
-//! The public API is generated. See `codegen.lock` for provenance and the
-//! repository README for supported operations and regeneration instructions.
+//! The primary API is resource-oriented and intentionally hides mechanical
+//! OpenAPI naming. The complete generated API remains available through `raw`.
 
 // openapi-to-rust 0.16.0 emits these mechanical style patterns.
 // Keep exceptions scoped to generated code; no compiler/correctness lint is
@@ -17,7 +17,20 @@
 )]
 pub mod generated;
 
-pub use generated::client::HttpClient as Client;
-pub use generated::types::*;
+/// Complete generated OpenAPI bindings and transport client.
+pub mod raw {
+    pub use crate::generated::client::{ClientError, HttpClient as Client};
+    pub use crate::generated::types;
+}
 
+pub mod sdk;
 pub mod streaming;
+
+pub use sdk::{ChatRequest, Message, Mistral, OcrRequest, OcrResponse, SdkError};
+
+// Compatibility exports while the facade spike is evaluated. New code should
+// prefer `Mistral` and use `raw` only as an explicit escape hatch.
+#[doc(hidden)]
+pub use generated::client::HttpClient as Client;
+#[doc(hidden)]
+pub use generated::types::*;
