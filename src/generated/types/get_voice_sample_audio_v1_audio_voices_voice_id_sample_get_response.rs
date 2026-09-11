@@ -1,0 +1,1 @@
+pub type GetVoiceSampleAudioV1AudioVoicesVoiceIdSampleGetResponse = String;

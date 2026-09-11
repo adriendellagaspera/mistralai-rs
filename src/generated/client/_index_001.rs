@@ -1,0 +1,250 @@
+include!("impl_http_client_agents_api_v1_agents_create_or_update_alias.rs");
+include!("impl_http_client_agents_api_v1_agents_delete.rs");
+include!("impl_http_client_agents_api_v1_agents_delete_alias.rs");
+include!("impl_http_client_agents_api_v1_agents_get.rs");
+include!("impl_http_client_agents_api_v1_agents_get_version.rs");
+include!("impl_http_client_agents_api_v1_agents_list.rs");
+include!("impl_http_client_agents_api_v1_agents_list_pages.rs");
+include!("impl_http_client_agents_api_v1_agents_list_version_aliases.rs");
+include!("impl_http_client_agents_api_v1_agents_list_versions.rs");
+include!("impl_http_client_agents_api_v1_agents_update.rs");
+include!("impl_http_client_agents_api_v1_agents_update_version.rs");
+include!("impl_http_client_agents_api_v1_conversations_append.rs");
+include!("impl_http_client_agents_api_v1_conversations_append_stream.rs");
+include!("impl_http_client_agents_api_v1_conversations_delete.rs");
+include!("impl_http_client_agents_api_v1_conversations_get.rs");
+include!("impl_http_client_agents_api_v1_conversations_history.rs");
+include!("impl_http_client_agents_api_v1_conversations_list.rs");
+include!("impl_http_client_agents_api_v1_conversations_messages.rs");
+include!("impl_http_client_agents_api_v1_conversations_restart.rs");
+include!("impl_http_client_agents_api_v1_conversations_restart_stream.rs");
+include!("impl_http_client_agents_api_v1_conversations_start.rs");
+include!("impl_http_client_agents_api_v1_conversations_start_stream.rs");
+include!("impl_http_client_agents_completion_v1_agents_completions_post.rs");
+include!("impl_http_client_archive_workflow_v1_workflows_workflow_identifier_archive_put.rs");
+include!("impl_http_client_audio_api_v1_transcriptions_post.rs");
+include!("impl_http_client_audio_api_v1_transcriptions_post_stream.rs");
+include!(
+    "impl_http_client_batch_cancel_workflow_executions_v1_workflows_executions_cancel_post.rs"
+);
+include!(
+    "impl_http_client_batch_terminate_workflow_executions_v1_workflows_executions_terminate_post.rs"
+);
+include!(
+    "impl_http_client_cancel_workflow_execution_v1_workflows_executions_execution_id_cancel_post.rs"
+);
+include!("impl_http_client_chat_classifications_v1_chat_classifications_post.rs");
+include!("impl_http_client_chat_completion_v1_chat_completions_post.rs");
+include!("impl_http_client_chat_completion_v1_chat_completions_post_stream.rs");
+include!("impl_http_client_chat_moderations_v1_chat_moderations_post.rs");
+include!("impl_http_client_classifications_v1_classifications_post.rs");
+include!("impl_http_client_connector_call_tool_v1.rs");
+include!("impl_http_client_connector_create_or_update_organization_credentials_v1.rs");
+include!("impl_http_client_connector_create_or_update_user_credentials_v1.rs");
+include!("impl_http_client_connector_create_or_update_workspace_credentials_v1.rs");
+include!("impl_http_client_connector_create_v1.rs");
+include!("impl_http_client_connector_delete_organization_credentials_v1.rs");
+include!("impl_http_client_connector_delete_user_credentials_v1.rs");
+include!("impl_http_client_connector_delete_v1.rs");
+include!("impl_http_client_connector_delete_workspace_credentials_v1.rs");
+include!("impl_http_client_connector_get_auth_url_v1.rs");
+include!("impl_http_client_connector_get_authentication_methods_v1.rs");
+include!("impl_http_client_connector_get_v1.rs");
+include!("impl_http_client_connector_list_organization_credentials_v1.rs");
+include!("impl_http_client_connector_list_tools_v1.rs");
+include!("impl_http_client_connector_list_user_credentials_v1.rs");
+include!("impl_http_client_connector_list_v1.rs");
+include!("impl_http_client_connector_list_workspace_credentials_v1.rs");
+include!("impl_http_client_connector_update_v1.rs");
+include!("impl_http_client_create_campaign_v1_observability_campaigns_post.rs");
+include!(
+    "impl_http_client_create_dataset_record_v1_observability_datasets_dataset_id_records_post.rs"
+);
+include!("impl_http_client_create_dataset_v1_observability_datasets_post.rs");
+include!("impl_http_client_create_judge_v1_observability_judges_post.rs");
+include!("impl_http_client_create_voice_v1_audio_voices_post.rs");
+include!("impl_http_client_delete_campaign_v1_observability_campaigns_campaign_id_delete.rs");
+include!(
+    "impl_http_client_delete_dataset_record_v1_observability_dataset_records_dataset_record_id_delete.rs"
+);
+include!(
+    "impl_http_client_delete_dataset_records_v1_observability_dataset_records_bulk_delete_post.rs"
+);
+include!("impl_http_client_delete_dataset_v1_observability_datasets_dataset_id_delete.rs");
+include!("impl_http_client_delete_judge_v1_observability_judges_judge_id_delete.rs");
+include!("impl_http_client_delete_model_v1_models_model_id_delete.rs");
+include!("impl_http_client_delete_voice_v1_audio_voices_voice_id_delete.rs");
+include!("impl_http_client_embeddings_v1_embeddings_post.rs");
+include!(
+    "impl_http_client_execute_workflow_registration_v1_workflows_registrations_workflow_registration_.rs"
+);
+include!("impl_http_client_execute_workflow_v1_workflows_workflow_identifier_execute_post.rs");
+include!(
+    "impl_http_client_export_dataset_to_jsonl_v1_observability_datasets_dataset_id_exports_to_jsonl_g.rs"
+);
+include!("impl_http_client_files_api_routes_delete_file.rs");
+include!("impl_http_client_files_api_routes_download_file.rs");
+include!("impl_http_client_files_api_routes_get_signed_url.rs");
+include!("impl_http_client_files_api_routes_list_files.rs");
+include!("impl_http_client_files_api_routes_retrieve_file.rs");
+include!("impl_http_client_files_api_routes_upload_file.rs");
+include!("impl_http_client_fim_completion_v1_fim_completions_post.rs");
+include!("impl_http_client_fim_completion_v1_fim_completions_post_stream.rs");
+include!("impl_http_client_get_campaign_by_id_v1_observability_campaigns_campaign_id_get.rs");
+include!(
+    "impl_http_client_get_campaign_selected_events_v1_observability_campaigns_campaign_id_selected_ev.rs"
+);
+include!(
+    "impl_http_client_get_campaign_status_by_id_v1_observability_campaigns_campaign_id_status_get.rs"
+);
+include!("impl_http_client_get_campaigns_v1_observability_campaigns_get.rs");
+include!(
+    "impl_http_client_get_chat_completion_event_ids_v1_observability_chat_completion_events_search_id.rs"
+);
+include!(
+    "impl_http_client_get_chat_completion_event_v1_observability_chat_completion_events_event_id_get.rs"
+);
+include!(
+    "impl_http_client_get_chat_completion_events_v1_observability_chat_completion_events_search_post.rs"
+);
+include!(
+    "impl_http_client_get_chat_completion_field_options_counts_v1_observability_chat_completion_field.rs"
+);
+include!(
+    "impl_http_client_get_chat_completion_field_options_v1_observability_chat_completion_fields_field.rs"
+);
+include!(
+    "impl_http_client_get_chat_completion_fields_v1_observability_chat_completion_fields_get.rs"
+);
+include!("impl_http_client_get_dataset_by_id_v1_observability_datasets_dataset_id_get.rs");
+include!(
+    "impl_http_client_get_dataset_import_task_v1_observability_datasets_dataset_id_tasks_task_id_get.rs"
+);
+include!(
+    "impl_http_client_get_dataset_import_tasks_v1_observability_datasets_dataset_id_tasks_get.rs"
+);
+include!(
+    "impl_http_client_get_dataset_record_v1_observability_dataset_records_dataset_record_id_get.rs"
+);
+include!(
+    "impl_http_client_get_dataset_records_v1_observability_datasets_dataset_id_records_get.rs"
+);
+include!("impl_http_client_get_datasets_v1_observability_datasets_get.rs");
+include!("impl_http_client_get_deployment_v1_workflows_deployments_name_get.rs");
+include!("impl_http_client_get_judge_by_id_v1_observability_judges_judge_id_get.rs");
+include!("impl_http_client_get_judges_v1_observability_judges_get.rs");
+include!("impl_http_client_get_run_history_v1_workflows_runs_run_id_history_get.rs");
+include!("impl_http_client_get_run_v1_workflows_runs_run_id_get.rs");
+include!("impl_http_client_get_schedules_v1_workflows_schedules_get.rs");
+include!(
+    "impl_http_client_get_similar_chat_completion_events_v1_observability_chat_completion_events_even.rs"
+);
+include!("impl_http_client_get_stream_events_v1_workflows_events_stream_get.rs");
+include!("impl_http_client_get_voice_sample_audio_v1_audio_voices_voice_id_sample_get.rs");
+include!("impl_http_client_get_voice_sample_audio_v1_audio_voices_voice_id_sample_get_wav.rs");
+include!("impl_http_client_get_voice_v1_audio_voices_voice_id_get.rs");
+include!("impl_http_client_get_worker_info_v1_workflows_workers_whoami_get.rs");
+include!("impl_http_client_get_workflow_events_v1_workflows_events_list_get.rs");
+include!(
+    "impl_http_client_get_workflow_execution_history_v1_workflows_executions_execution_id_history_get.rs"
+);
+include!("impl_http_client_get_workflow_execution_trace_events.rs");
+include!("impl_http_client_get_workflow_execution_trace_otel.rs");
+include!("impl_http_client_get_workflow_execution_trace_summary.rs");
+include!("impl_http_client_get_workflow_execution_v1_workflows_executions_execution_id_get.rs");
+include!("impl_http_client_get_workflow_metrics_v1_workflows_workflow_name_metrics_get.rs");
+include!(
+    "impl_http_client_get_workflow_registration_v1_workflows_registrations_workflow_registration_id_g.rs"
+);
+include!("impl_http_client_get_workflow_registrations_v1_workflows_registrations_get.rs");
+include!("impl_http_client_get_workflow_v1_workflows_workflow_identifier_get.rs");
+include!("impl_http_client_jobs_api_routes_batch_cancel_batch_job.rs");
+include!("impl_http_client_jobs_api_routes_batch_create_batch_job.rs");
+include!("impl_http_client_jobs_api_routes_batch_get_batch_job.rs");
+include!("impl_http_client_jobs_api_routes_batch_get_batch_jobs.rs");
+include!("impl_http_client_jobs_api_routes_fine_tuning_archive_fine_tuned_model.rs");
+include!("impl_http_client_jobs_api_routes_fine_tuning_cancel_fine_tuning_job.rs");
+include!("impl_http_client_jobs_api_routes_fine_tuning_create_fine_tuning_job.rs");
+include!("impl_http_client_jobs_api_routes_fine_tuning_get_fine_tuning_job.rs");
+include!("impl_http_client_jobs_api_routes_fine_tuning_get_fine_tuning_jobs.rs");
+include!("impl_http_client_jobs_api_routes_fine_tuning_start_fine_tuning_job.rs");
+include!("impl_http_client_jobs_api_routes_fine_tuning_unarchive_fine_tuned_model.rs");
+include!("impl_http_client_jobs_api_routes_fine_tuning_update_fine_tuned_model.rs");
+include!(
+    "impl_http_client_judge_chat_completion_event_v1_observability_chat_completion_events_event_id_li.rs"
+);
+include!(
+    "impl_http_client_judge_conversation_v1_observability_judges_judge_id_live_judging_post.rs"
+);
+include!(
+    "impl_http_client_judge_dataset_record_v1_observability_dataset_records_dataset_record_id_live_ju.rs"
+);
+include!("impl_http_client_libraries_create_v1.rs");
+include!("impl_http_client_libraries_delete_v1.rs");
+include!("impl_http_client_libraries_documents_delete_v1.rs");
+include!("impl_http_client_libraries_documents_get_extracted_text_signed_url_v1.rs");
+include!("impl_http_client_libraries_documents_get_signed_url_v1.rs");
+include!("impl_http_client_libraries_documents_get_status_v1.rs");
+include!("impl_http_client_libraries_documents_get_text_content_v1.rs");
+include!("impl_http_client_libraries_documents_get_v1.rs");
+include!("impl_http_client_libraries_documents_list_v1.rs");
+include!("impl_http_client_libraries_documents_reprocess_v1.rs");
+include!("impl_http_client_libraries_documents_update_v1.rs");
+include!("impl_http_client_libraries_documents_upload_v1.rs");
+include!("impl_http_client_libraries_get_v1.rs");
+include!("impl_http_client_libraries_list_v1.rs");
+include!("impl_http_client_libraries_share_create_v1.rs");
+include!("impl_http_client_libraries_share_delete_v1.rs");
+include!("impl_http_client_libraries_share_list_v1.rs");
+include!("impl_http_client_libraries_update_v1.rs");
+include!("impl_http_client_list_deployments_v1_workflows_deployments_get.rs");
+include!("impl_http_client_list_models_v1_models_get.rs");
+include!("impl_http_client_list_runs_v1_workflows_runs_get.rs");
+include!("impl_http_client_list_voices_v1_audio_voices_get.rs");
+include!("impl_http_client_moderations_v1_moderations_post.rs");
+include!("impl_http_client_ocr_v1_ocr_post.rs");
+include!(
+    "impl_http_client_post_dataset_records_from_campaign_v1_observability_datasets_dataset_id_imports.rs"
+);
+include!(
+    "impl_http_client_post_dataset_records_from_dataset_v1_observability_datasets_dataset_id_imports_.rs"
+);
+include!(
+    "impl_http_client_post_dataset_records_from_explorer_v1_observability_datasets_dataset_id_imports.rs"
+);
+include!(
+    "impl_http_client_post_dataset_records_from_file_v1_observability_datasets_dataset_id_imports_fro.rs"
+);
+include!(
+    "impl_http_client_post_dataset_records_from_playground_v1_observability_datasets_dataset_id_impor.rs"
+);
+include!(
+    "impl_http_client_query_workflow_execution_v1_workflows_executions_execution_id_queries_post.rs"
+);
+include!("impl_http_client_reset_workflow_v1_workflows_executions_execution_id_reset_post.rs");
+include!("impl_http_client_retrieve_model_v1_models_model_id_get.rs");
+include!("impl_http_client_schedule_workflow_v1_workflows_schedules_post.rs");
+include!(
+    "impl_http_client_signal_workflow_execution_v1_workflows_executions_execution_id_signals_post.rs"
+);
+include!("impl_http_client_speech_v1_audio_speech_post.rs");
+include!("impl_http_client_speech_v1_audio_speech_post_stream.rs");
+include!("impl_http_client_stream_v1_workflows_executions_execution_id_stream_get.rs");
+include!(
+    "impl_http_client_terminate_workflow_execution_v1_workflows_executions_execution_id_terminate_pos.rs"
+);
+include!("impl_http_client_unarchive_workflow_v1_workflows_workflow_identifier_unarchive_put.rs");
+include!("impl_http_client_unschedule_workflow_v1_workflows_schedules_schedule_id_delete.rs");
+include!(
+    "impl_http_client_update_dataset_record_payload_v1_observability_dataset_records_dataset_record_i.rs"
+);
+include!(
+    "impl_http_client_update_dataset_record_properties_v1_observability_dataset_records_dataset_recor.rs"
+);
+include!("impl_http_client_update_dataset_v1_observability_datasets_dataset_id_patch.rs");
+include!("impl_http_client_update_judge_v1_observability_judges_judge_id_put.rs");
+include!("impl_http_client_update_voice_v1_audio_voices_voice_id_patch.rs");
+include!(
+    "impl_http_client_update_workflow_execution_v1_workflows_executions_execution_id_updates_post.rs"
+);
+include!("impl_http_client_update_workflow_v1_workflows_workflow_identifier_put.rs");

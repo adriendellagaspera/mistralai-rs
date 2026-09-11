@@ -1,0 +1,1 @@
+pub type LibrariesDocumentsGetExtractedTextSignedUrlV1Response = String;

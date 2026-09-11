@@ -1,0 +1,260 @@
+include!("use_0000.rs");
+include!("use_0001.rs");
+include!("openapi_to_rust_problem.rs");
+include!("http_error.rs");
+include!("impl_http_error_serialization_error.rs");
+include!("api_error.rs");
+include!("a_p_i_e_r_r_o_r_b_o_d_y_d_i_s_p_l_a_y_l_i_m_i_t.rs");
+include!("a_p_i_e_r_r_o_r_b_o_d_y_t_r_u_n_c_a_t_i_o_n_m_a_r_k_e_r.rs");
+include!("display_api_error_body.rs");
+include!("impl_api_error_is_client_error.rs");
+include!("impl_api_error_fmt.rs");
+include!("impl_api_error.rs");
+include!("api_op_error.rs");
+include!("impl_api_op_error_api.rs");
+include!("impl_api_op_error_from.rs");
+include!("impl_api_op_error_from_2.rs");
+include!("http_result.rs");
+include!("retry_config.rs");
+include!("impl_retry_config_default.rs");
+include!("use_0019.rs");
+include!("use_0020.rs");
+include!("d_e_f_a_u_l_t_m_a_x_r_e_s_p_o_n_s_e_b_o_d_y_b_y_t_e_s.rs");
+include!("http_client.rs");
+include!("read_bounded_response_body.rs");
+include!("impl_http_client_new.rs");
+include!("impl_http_client_with_config.rs");
+include!("impl_http_client_with_base_url.rs");
+include!("impl_http_client_with_upload_filename.rs");
+include!("impl_http_client_with_api_key.rs");
+include!("impl_http_client_with_max_response_body_bytes.rs");
+include!("impl_http_client_with_header.rs");
+include!("impl_http_client_with_headers.rs");
+include!("impl_http_client_default.rs");
+include!("pct_encode_path_segment.rs");
+include!(
+    "get_chat_completion_field_options_v1_observability_chat_completion_fields_field_name_options_get.rs"
+);
+include!(
+    "impl_get_chat_completion_field_options_v1_observability_chat_completion_fields_field_name_option.rs"
+);
+include!(
+    "impl_get_chat_completion_field_options_v1_observability_chat_completion_fields_field_name_option_2.rs"
+);
+include!(
+    "impl_get_chat_completion_field_options_v1_observability_chat_completion_fields_field_name_option_3.rs"
+);
+include!("get_stream_events_v1_workflows_events_stream_get_scope.rs");
+include!("impl_get_stream_events_v1_workflows_events_stream_get_scope_as_str.rs");
+include!("impl_get_stream_events_v1_workflows_events_stream_get_scope_fmt.rs");
+include!("impl_get_stream_events_v1_workflows_events_stream_get_scope_as_ref.rs");
+include!("jobs_api_routes_batch_get_batch_jobs_order_by.rs");
+include!("impl_jobs_api_routes_batch_get_batch_jobs_order_by_as_str.rs");
+include!("impl_jobs_api_routes_batch_get_batch_jobs_order_by_fmt.rs");
+include!("impl_jobs_api_routes_batch_get_batch_jobs_order_by_as_ref.rs");
+include!("agents_api_v1_agents_create_api_error.rs");
+include!("agents_api_v1_agents_create_or_update_alias_api_error.rs");
+include!("agents_api_v1_agents_delete_api_error.rs");
+include!("agents_api_v1_agents_delete_alias_api_error.rs");
+include!("agents_api_v1_agents_get_api_error.rs");
+include!("agents_api_v1_agents_get_version_api_error.rs");
+include!("agents_api_v1_agents_list_api_error.rs");
+include!("agents_api_v1_agents_list_pages_api_error.rs");
+include!("agents_api_v1_agents_list_version_aliases_api_error.rs");
+include!("agents_api_v1_agents_list_versions_api_error.rs");
+include!("agents_api_v1_agents_update_api_error.rs");
+include!("agents_api_v1_agents_update_version_api_error.rs");
+include!("agents_api_v1_conversations_append_api_error.rs");
+include!("agents_api_v1_conversations_append_stream_api_error.rs");
+include!("agents_api_v1_conversations_delete_api_error.rs");
+include!("agents_api_v1_conversations_get_api_error.rs");
+include!("agents_api_v1_conversations_history_api_error.rs");
+include!("agents_api_v1_conversations_list_api_error.rs");
+include!("agents_api_v1_conversations_messages_api_error.rs");
+include!("agents_api_v1_conversations_restart_api_error.rs");
+include!("agents_api_v1_conversations_restart_stream_api_error.rs");
+include!("agents_api_v1_conversations_start_api_error.rs");
+include!("agents_api_v1_conversations_start_stream_api_error.rs");
+include!("agents_completion_v1_agents_completions_post_api_error.rs");
+include!("archive_workflow_v1_workflows_workflow_identifier_archive_put_api_error.rs");
+include!("batch_cancel_workflow_executions_v1_workflows_executions_cancel_post_api_error.rs");
+include!("batch_terminate_workflow_executions_v1_workflows_executions_terminate_post_api_error.rs");
+include!("cancel_workflow_execution_v1_workflows_executions_execution_id_cancel_post_api_error.rs");
+include!("chat_classifications_v1_chat_classifications_post_api_error.rs");
+include!("chat_completion_v1_chat_completions_post_api_error.rs");
+include!("chat_completion_v1_chat_completions_post_stream_api_error.rs");
+include!("chat_moderations_v1_chat_moderations_post_api_error.rs");
+include!("classifications_v1_classifications_post_api_error.rs");
+include!("connector_call_tool_v1_api_error.rs");
+include!("connector_create_or_update_organization_credentials_v1_api_error.rs");
+include!("connector_create_or_update_user_credentials_v1_api_error.rs");
+include!("connector_create_or_update_workspace_credentials_v1_api_error.rs");
+include!("connector_create_v1_api_error.rs");
+include!("connector_delete_organization_credentials_v1_api_error.rs");
+include!("connector_delete_user_credentials_v1_api_error.rs");
+include!("connector_delete_v1_api_error.rs");
+include!("connector_delete_workspace_credentials_v1_api_error.rs");
+include!("connector_get_auth_url_v1_api_error.rs");
+include!("connector_get_v1_api_error.rs");
+include!("connector_list_organization_credentials_v1_api_error.rs");
+include!("connector_list_tools_v1_api_error.rs");
+include!("connector_list_user_credentials_v1_api_error.rs");
+include!("connector_list_v1_api_error.rs");
+include!("connector_list_workspace_credentials_v1_api_error.rs");
+include!("connector_update_v1_api_error.rs");
+include!("create_campaign_v1_observability_campaigns_post_api_error.rs");
+include!("create_dataset_record_v1_observability_datasets_dataset_id_records_post_api_error.rs");
+include!("create_dataset_v1_observability_datasets_post_api_error.rs");
+include!("create_judge_v1_observability_judges_post_api_error.rs");
+include!("create_voice_v1_audio_voices_post_api_error.rs");
+include!("delete_campaign_v1_observability_campaigns_campaign_id_delete_api_error.rs");
+include!(
+    "delete_dataset_record_v1_observability_dataset_records_dataset_record_id_delete_api_error.rs"
+);
+include!("delete_dataset_records_v1_observability_dataset_records_bulk_delete_post_api_error.rs");
+include!("delete_dataset_v1_observability_datasets_dataset_id_delete_api_error.rs");
+include!("delete_judge_v1_observability_judges_judge_id_delete_api_error.rs");
+include!("delete_model_v1_models_model_id_delete_api_error.rs");
+include!("delete_voice_v1_audio_voices_voice_id_delete_api_error.rs");
+include!("embeddings_v1_embeddings_post_api_error.rs");
+include!(
+    "execute_workflow_registration_v1_workflows_registrations_workflow_registration_id_execute_post_a.rs"
+);
+include!("execute_workflow_v1_workflows_workflow_identifier_execute_post_api_error.rs");
+include!(
+    "export_dataset_to_jsonl_v1_observability_datasets_dataset_id_exports_to_jsonl_get_api_error.rs"
+);
+include!("fim_completion_v1_fim_completions_post_api_error.rs");
+include!("fim_completion_v1_fim_completions_post_stream_api_error.rs");
+include!("get_campaign_by_id_v1_observability_campaigns_campaign_id_get_api_error.rs");
+include!(
+    "get_campaign_selected_events_v1_observability_campaigns_campaign_id_selected_events_get_api_erro.rs"
+);
+include!(
+    "get_campaign_status_by_id_v1_observability_campaigns_campaign_id_status_get_api_error.rs"
+);
+include!("get_campaigns_v1_observability_campaigns_get_api_error.rs");
+include!(
+    "get_chat_completion_event_ids_v1_observability_chat_completion_events_search_ids_post_api_error.rs"
+);
+include!(
+    "get_chat_completion_event_v1_observability_chat_completion_events_event_id_get_api_error.rs"
+);
+include!(
+    "get_chat_completion_events_v1_observability_chat_completion_events_search_post_api_error.rs"
+);
+include!(
+    "get_chat_completion_field_options_counts_v1_observability_chat_completion_fields_field_name_opti.rs"
+);
+include!(
+    "get_chat_completion_field_options_v1_observability_chat_completion_fields_field_name_options_get_2.rs"
+);
+include!("get_chat_completion_fields_v1_observability_chat_completion_fields_get_api_error.rs");
+include!("get_dataset_by_id_v1_observability_datasets_dataset_id_get_api_error.rs");
+include!(
+    "get_dataset_import_task_v1_observability_datasets_dataset_id_tasks_task_id_get_api_error.rs"
+);
+include!("get_dataset_import_tasks_v1_observability_datasets_dataset_id_tasks_get_api_error.rs");
+include!("get_dataset_record_v1_observability_dataset_records_dataset_record_id_get_api_error.rs");
+include!("get_dataset_records_v1_observability_datasets_dataset_id_records_get_api_error.rs");
+include!("get_datasets_v1_observability_datasets_get_api_error.rs");
+include!("get_deployment_v1_workflows_deployments_name_get_api_error.rs");
+include!("get_judge_by_id_v1_observability_judges_judge_id_get_api_error.rs");
+include!("get_judges_v1_observability_judges_get_api_error.rs");
+include!("get_run_history_v1_workflows_runs_run_id_history_get_api_error.rs");
+include!("get_run_v1_workflows_runs_run_id_get_api_error.rs");
+include!(
+    "get_similar_chat_completion_events_v1_observability_chat_completion_events_event_id_similar_even.rs"
+);
+include!("get_stream_events_v1_workflows_events_stream_get_api_error.rs");
+include!("get_voice_sample_audio_v1_audio_voices_voice_id_sample_get_api_error.rs");
+include!("get_voice_sample_audio_v1_audio_voices_voice_id_sample_get_wav_api_error.rs");
+include!("get_voice_v1_audio_voices_voice_id_get_api_error.rs");
+include!("get_workflow_events_v1_workflows_events_list_get_api_error.rs");
+include!(
+    "get_workflow_execution_history_v1_workflows_executions_execution_id_history_get_api_error.rs"
+);
+include!("get_workflow_execution_trace_events_api_error.rs");
+include!("get_workflow_execution_trace_otel_api_error.rs");
+include!("get_workflow_execution_trace_summary_api_error.rs");
+include!("get_workflow_execution_v1_workflows_executions_execution_id_get_api_error.rs");
+include!("get_workflow_metrics_v1_workflows_workflow_name_metrics_get_api_error.rs");
+include!(
+    "get_workflow_registration_v1_workflows_registrations_workflow_registration_id_get_api_error.rs"
+);
+include!("get_workflow_registrations_v1_workflows_registrations_get_api_error.rs");
+include!("get_workflow_v1_workflows_workflow_identifier_get_api_error.rs");
+include!(
+    "judge_chat_completion_event_v1_observability_chat_completion_events_event_id_live_judging_post_a.rs"
+);
+include!("judge_conversation_v1_observability_judges_judge_id_live_judging_post_api_error.rs");
+include!(
+    "judge_dataset_record_v1_observability_dataset_records_dataset_record_id_live_judging_post_api_er.rs"
+);
+include!("libraries_create_v1_api_error.rs");
+include!("libraries_delete_v1_api_error.rs");
+include!("libraries_documents_delete_v1_api_error.rs");
+include!("libraries_documents_get_extracted_text_signed_url_v1_api_error.rs");
+include!("libraries_documents_get_signed_url_v1_api_error.rs");
+include!("libraries_documents_get_status_v1_api_error.rs");
+include!("libraries_documents_get_text_content_v1_api_error.rs");
+include!("libraries_documents_get_v1_api_error.rs");
+include!("libraries_documents_list_v1_api_error.rs");
+include!("libraries_documents_reprocess_v1_api_error.rs");
+include!("libraries_documents_update_v1_api_error.rs");
+include!("libraries_documents_upload_v1_api_error.rs");
+include!("libraries_get_v1_api_error.rs");
+include!("libraries_share_create_v1_api_error.rs");
+include!("libraries_share_delete_v1_api_error.rs");
+include!("libraries_share_list_v1_api_error.rs");
+include!("libraries_update_v1_api_error.rs");
+include!("list_deployments_v1_workflows_deployments_get_api_error.rs");
+include!("list_models_v1_models_get_api_error.rs");
+include!("list_runs_v1_workflows_runs_get_api_error.rs");
+include!("list_voices_v1_audio_voices_get_api_error.rs");
+include!("moderations_v1_moderations_post_api_error.rs");
+include!("ocr_v1_ocr_post_api_error.rs");
+include!(
+    "post_dataset_records_from_campaign_v1_observability_datasets_dataset_id_imports_from_campaign_po.rs"
+);
+include!(
+    "post_dataset_records_from_dataset_v1_observability_datasets_dataset_id_imports_from_dataset_post.rs"
+);
+include!(
+    "post_dataset_records_from_explorer_v1_observability_datasets_dataset_id_imports_from_explorer_po.rs"
+);
+include!(
+    "post_dataset_records_from_file_v1_observability_datasets_dataset_id_imports_from_file_post_api_e.rs"
+);
+include!(
+    "post_dataset_records_from_playground_v1_observability_datasets_dataset_id_imports_from_playgroun.rs"
+);
+include!("query_workflow_execution_v1_workflows_executions_execution_id_queries_post_api_error.rs");
+include!("reset_workflow_v1_workflows_executions_execution_id_reset_post_api_error.rs");
+include!("retrieve_model_v1_models_model_id_get_api_error.rs");
+include!("schedule_workflow_v1_workflows_schedules_post_api_error.rs");
+include!(
+    "signal_workflow_execution_v1_workflows_executions_execution_id_signals_post_api_error.rs"
+);
+include!("speech_v1_audio_speech_post_api_error.rs");
+include!("speech_v1_audio_speech_post_stream_api_error.rs");
+include!("stream_v1_workflows_executions_execution_id_stream_get_api_error.rs");
+include!(
+    "terminate_workflow_execution_v1_workflows_executions_execution_id_terminate_post_api_error.rs"
+);
+include!("unarchive_workflow_v1_workflows_workflow_identifier_unarchive_put_api_error.rs");
+include!("unschedule_workflow_v1_workflows_schedules_schedule_id_delete_api_error.rs");
+include!(
+    "update_dataset_record_payload_v1_observability_dataset_records_dataset_record_id_payload_put_api.rs"
+);
+include!(
+    "update_dataset_record_properties_v1_observability_dataset_records_dataset_record_id_properties_p.rs"
+);
+include!("update_dataset_v1_observability_datasets_dataset_id_patch_api_error.rs");
+include!("update_judge_v1_observability_judges_judge_id_put_api_error.rs");
+include!("update_voice_v1_audio_voices_voice_id_patch_api_error.rs");
+include!(
+    "update_workflow_execution_v1_workflows_executions_execution_id_updates_post_api_error.rs"
+);
+include!("update_workflow_v1_workflows_workflow_identifier_put_api_error.rs");
+include!("impl_http_client_agents_api_v1_agents_create.rs");

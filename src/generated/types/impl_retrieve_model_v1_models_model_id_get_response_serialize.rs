@@ -1,0 +1,78 @@
+impl serde::Serialize for RetrieveModelV1ModelsModelIdGetResponse {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        match self {
+            Self::BaseModelCard(payload) => {
+                let mut value = serde_json::to_value(payload).map_err(serde::ser::Error::custom)?;
+                let object = value.as_object_mut().ok_or_else(|| {
+                    serde::ser::Error::custom(concat!(
+                        "discriminated union variant `",
+                        stringify!(BaseModelCard),
+                        "` did not serialize as an object",
+                    ))
+                })?;
+                match object.get("type") {
+                    Some(serde_json::Value::String(tag)) if matches!(tag.as_str(), "base") => {}
+                    Some(serde_json::Value::String(tag)) => {
+                        return Err(serde::ser::Error::custom(format!(
+                            "discriminator `{}` value `{tag}` is not valid for variant `{}`",
+                            "type",
+                            stringify!(BaseModelCard),
+                        )));
+                    }
+                    Some(_) => {
+                        return Err(serde::ser::Error::custom(concat!(
+                            "discriminator `",
+                            "type",
+                            "` did not serialize as a string",
+                        )));
+                    }
+                    None => {
+                        object.insert(
+                            "type".to_string(),
+                            serde_json::Value::String("base".to_string()),
+                        );
+                    }
+                }
+                value.serialize(serializer)
+            }
+            Self::FTModelCard(payload) => {
+                let mut value = serde_json::to_value(payload).map_err(serde::ser::Error::custom)?;
+                let object = value.as_object_mut().ok_or_else(|| {
+                    serde::ser::Error::custom(concat!(
+                        "discriminated union variant `",
+                        stringify!(FTModelCard),
+                        "` did not serialize as an object",
+                    ))
+                })?;
+                match object.get("type") {
+                    Some(serde_json::Value::String(tag))
+                        if matches!(tag.as_str(), "fine-tuned") => {}
+                    Some(serde_json::Value::String(tag)) => {
+                        return Err(serde::ser::Error::custom(format!(
+                            "discriminator `{}` value `{tag}` is not valid for variant `{}`",
+                            "type",
+                            stringify!(FTModelCard),
+                        )));
+                    }
+                    Some(_) => {
+                        return Err(serde::ser::Error::custom(concat!(
+                            "discriminator `",
+                            "type",
+                            "` did not serialize as a string",
+                        )));
+                    }
+                    None => {
+                        object.insert(
+                            "type".to_string(),
+                            serde_json::Value::String("fine-tuned".to_string()),
+                        );
+                    }
+                }
+                value.serialize(serializer)
+            }
+        }
+    }
+}

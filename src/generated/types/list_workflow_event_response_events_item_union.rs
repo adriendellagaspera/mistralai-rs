@@ -1,0 +1,20 @@
+#[derive(Debug, Clone)]
+pub enum ListWorkflowEventResponseEventsItemUnion {
+    WorkflowExecutionStartedResponse(WorkflowExecutionStartedResponse),
+    WorkflowExecutionCompletedResponse(WorkflowExecutionCompletedResponse),
+    WorkflowExecutionFailedResponse(WorkflowExecutionFailedResponse),
+    WorkflowExecutionCanceledResponse(WorkflowExecutionCanceledResponse),
+    WorkflowExecutionContinuedAsNewResponse(WorkflowExecutionContinuedAsNewResponse),
+    WorkflowTaskTimedOutResponse(WorkflowTaskTimedOutResponse),
+    WorkflowTaskFailedResponse(WorkflowTaskFailedResponse),
+    CustomTaskStartedResponse(CustomTaskStartedResponse),
+    CustomTaskInProgressResponse(CustomTaskInProgressResponse),
+    CustomTaskCompletedResponse(CustomTaskCompletedResponse),
+    CustomTaskFailedResponse(CustomTaskFailedResponse),
+    CustomTaskTimedOutResponse(CustomTaskTimedOutResponse),
+    CustomTaskCanceledResponse(CustomTaskCanceledResponse),
+    ActivityTaskStartedResponse(ActivityTaskStartedResponse),
+    ActivityTaskCompletedResponse(ActivityTaskCompletedResponse),
+    ActivityTaskRetryingResponse(ActivityTaskRetryingResponse),
+    ActivityTaskFailedResponse(ActivityTaskFailedResponse),
+}

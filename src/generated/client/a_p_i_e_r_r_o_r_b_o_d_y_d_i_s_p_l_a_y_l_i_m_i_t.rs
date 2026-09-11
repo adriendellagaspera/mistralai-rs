@@ -1,0 +1,1 @@
+const API_ERROR_BODY_DISPLAY_LIMIT: usize = 500;

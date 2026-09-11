@@ -1,0 +1,51 @@
+impl ObservabilityErrorCode {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::UnknownError => "UNKNOWN_ERROR",
+            Self::ValidationError => "VALIDATION_ERROR",
+            Self::AuthForbidden => "AUTH_FORBIDDEN",
+            Self::AuthForbiddenNotWorkspaceAdmin => "AUTH_FORBIDDEN_NOT_WORKSPACE_ADMIN",
+            Self::AuthForbiddenWorkspaceNotFound => "AUTH_FORBIDDEN_WORKSPACE_NOT_FOUND",
+            Self::AuthForbiddenRoleNotFound => "AUTH_FORBIDDEN_ROLE_NOT_FOUND",
+            Self::AuthForbiddenOrgNotWhitelisted => "AUTH_FORBIDDEN_ORG_NOT_WHITELISTED",
+            Self::AuthUnauthorized => "AUTH_UNAUTHORIZED",
+            Self::FeatureNotSupported => "FEATURE_NOT_SUPPORTED",
+            Self::FieldsBadRequest => "FIELDS_BAD_REQUEST",
+            Self::FieldsNotFound => "FIELDS_NOT_FOUND",
+            Self::SearchNotFound => "SEARCH_NOT_FOUND",
+            Self::SearchBadRequest => "SEARCH_BAD_REQUEST",
+            Self::SearchServiceUnavailable => "SEARCH_SERVICE_UNAVAILABLE",
+            Self::DatabaseError => "DATABASE_ERROR",
+            Self::DatabaseTimeout => "DATABASE_TIMEOUT",
+            Self::DatabaseUnavailable => "DATABASE_UNAVAILABLE",
+            Self::DatabaseQueryError => "DATABASE_QUERY_ERROR",
+            Self::SearchFilterToSqlConversionError => "SEARCH_FILTER_TO_SQL_CONVERSION_ERROR",
+            Self::JudgeConversationFormatError => "JUDGE_CONVERSATION_FORMAT_ERROR",
+            Self::JudgeMistralApiError => "JUDGE_MISTRAL_API_ERROR",
+            Self::JudgeMistralApiTimeout => "JUDGE_MISTRAL_API_TIMEOUT",
+            Self::JudgeNameAlreadyExists => "JUDGE_NAME_ALREADY_EXISTS",
+            Self::JudgeNotFound => "JUDGE_NOT_FOUND",
+            Self::JudgeAlreadyHasNewVersion => "JUDGE_ALREADY_HAS_NEW_VERSION",
+            Self::JudgeUsedInCampaignCannotBeUpdated => "JUDGE_USED_IN_CAMPAIGN_CANNOT_BE_UPDATED",
+            Self::JudgeDidNotChange => "JUDGE_DID_NOT_CHANGE",
+            Self::CampaignNotFound => "CAMPAIGN_NOT_FOUND",
+            Self::CampaignNoMatchingEvents => "CAMPAIGN_NO_MATCHING_EVENTS",
+            Self::DatasetNotFound => "DATASET_NOT_FOUND",
+            Self::DatasetTaskNotFound => "DATASET_TASK_NOT_FOUND",
+            Self::DatasetRecordNotFound => "DATASET_RECORD_NOT_FOUND",
+            Self::DatasetRecordFormatError => "DATASET_RECORD_FORMAT_ERROR",
+            Self::AgentNotFound => "AGENT_NOT_FOUND",
+            Self::AgentMistralApiError => "AGENT_MISTRAL_API_ERROR",
+            Self::EvaluationNotFound => "EVALUATION_NOT_FOUND",
+            Self::EvaluationCurrentlyRunning => "EVALUATION_CURRENTLY_RUNNING",
+            Self::EvaluationRecordNotFound => "EVALUATION_RECORD_NOT_FOUND",
+            Self::EvaluationRunNotFound => "EVALUATION_RUN_NOT_FOUND",
+            Self::EvaluationRunTransitionIsInvalid => "EVALUATION_RUN_TRANSITION_IS_INVALID",
+            Self::EvaluationRunTransitionIsRunningAlready => {
+                "EVALUATION_RUN_TRANSITION_IS_RUNNING_ALREADY"
+            }
+            Self::EvaluationRunTransitionError => "EVALUATION_RUN_TRANSITION_ERROR",
+            Self::TemplateSyntaxError => "TEMPLATE_SYNTAX_ERROR",
+        }
+    }
+}

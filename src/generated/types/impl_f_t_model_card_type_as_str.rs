@@ -1,0 +1,7 @@
+impl FTModelCardType {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::FineTuned => "fine-tuned",
+        }
+    }
+}
