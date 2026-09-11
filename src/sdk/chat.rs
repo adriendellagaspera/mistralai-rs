@@ -65,7 +65,7 @@ impl ChatRequest {
 }
 
 /// Chat resource, matching the taxonomy of Mistral's official SDKs.
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 pub struct Chat<'a> {
     raw: &'a HttpClient,
 }
