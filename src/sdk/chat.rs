@@ -96,9 +96,8 @@ impl<'a> Chat<'a> {
             .chat_completion_v1_chat_completions_post_stream(request.into_raw(true)?)
             .await
             .map_err(SdkError::api)?;
-        Ok(streaming::json_events::<_, _, CompletionChunk>(bytes).map(|event| {
-            event.map(|event| event.data).map_err(SdkError::api)
-        }))
+        Ok(streaming::json_events::<_, _, CompletionChunk>(bytes)
+            .map(|event| event.map(|event| event.data).map_err(SdkError::api)))
     }
 }
 
