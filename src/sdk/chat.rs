@@ -126,7 +126,14 @@ pub struct ChatResponse {
 impl ChatResponse {
     /// Text from the first choice, when that choice contains plain text.
     pub fn text(&self) -> Option<&str> {
-        let content = self.raw.choices.first()?.message.content.as_ref()?.as_ref()?;
+        let content = self
+            .raw
+            .choices
+            .first()?
+            .message
+            .content
+            .as_ref()?
+            .as_ref()?;
         match content {
             AssistantMessageContent::String(text) => Some(text),
             AssistantMessageContent::ContentChunkArray(_) => None,
@@ -208,9 +215,7 @@ impl<'a> Chat<'a> {
     pub async fn stream(&self, request: ChatRequest) -> Result<ChatStream, SdkError> {
         let bytes = self
             .raw
-            .chat_completion_v1_chat_completions_post_stream(
-                request.into_raw_with_stream(true),
-            )
+            .chat_completion_v1_chat_completions_post_stream(request.into_raw_with_stream(true))
             .await
             .map_err(SdkError::from)?;
         let events = streaming::json_events::<_, _, CompletionChunk>(bytes).map(|event| {

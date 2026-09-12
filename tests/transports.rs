@@ -222,7 +222,7 @@ fn repaired_workflow_list_and_sharing_delete_match_wire_fields() {
         serde_json::from_value::<mistralai::raw::types::WorkflowListResponse>(
             json!({"next_cursor":null}),
         )
-            .is_err()
+        .is_err()
     );
     let sharing: mistralai::raw::types::SharingDelete = serde_json::from_value(json!({
         "share_with_uuid":"00000000-0000-0000-0000-000000000001", "share_with_type":"User"}))

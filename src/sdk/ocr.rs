@@ -178,7 +178,10 @@ mod tests {
     #[test]
     fn all_ocr_input_kinds_have_typed_constructors() {
         let image = OcrRequest::image_url("ocr", "https://example.com/image.png").into_raw();
-        assert!(matches!(image.document, OCRRequestDocument::ImageURLChunk(_)));
+        assert!(matches!(
+            image.document,
+            OCRRequestDocument::ImageURLChunk(_)
+        ));
 
         let file = OcrRequest::file_id("ocr", uuid::Uuid::nil()).into_raw();
         assert!(matches!(file.document, OCRRequestDocument::FileChunk(_)));
