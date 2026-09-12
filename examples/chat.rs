@@ -10,8 +10,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     .max_tokens(64);
 
     let response = mistral.chat().complete(request).await?;
-    println!("{:?}", response.choices);
-    println!("prompt_tokens: {}", response.usage.prompt_tokens);
-    println!("completion_tokens: {}", response.usage.completion_tokens);
+    println!("{}", response.text().unwrap_or_default());
+    println!("prompt_tokens: {}", response.raw().usage.prompt_tokens);
+    println!(
+        "completion_tokens: {}",
+        response.raw().usage.completion_tokens
+    );
     Ok(())
 }

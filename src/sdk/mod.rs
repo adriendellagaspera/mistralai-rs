@@ -1,10 +1,10 @@
-mod chat;
-mod error;
-mod ocr;
+pub mod chat;
+pub mod error;
+pub mod ocr;
 
-pub use chat::{Chat, ChatRequest, ChatResponse, ChatStreamChunk, Message};
-pub use error::SdkError;
-pub use ocr::{Ocr, OcrRequest, OcrResponse};
+pub use chat::{Chat, ChatRequest, ChatResponse, ChatStream, ChatStreamChunk, Message};
+pub use error::{ApiError, SdkError, TransportError, TransportErrorKind};
+pub use ocr::{Ocr, OcrPage, OcrRequest, OcrResponse};
 
 use crate::generated::client::HttpClient;
 

@@ -15,13 +15,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     futures_util::pin_mut!(stream);
     while let Some(chunk) = stream.next().await {
         let chunk = chunk?;
-        println!("{chunk:?}");
-        if let Some(usage) = chunk.usage {
+        if let Some(text) = chunk.text() {
+            print!("{text}");
+        }
+        if let Some(usage) = &chunk.raw().usage {
             println!(
                 "prompt={}, completion={}",
                 usage.prompt_tokens, usage.completion_tokens
             );
         }
     }
+    println!();
     Ok(())
 }

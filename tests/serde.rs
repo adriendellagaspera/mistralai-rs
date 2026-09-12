@@ -1,4 +1,4 @@
-use mistralai::{ChatCompletionRequest, ChatCompletionResponse};
+use mistralai::raw::types::{ChatCompletionRequest, ChatCompletionResponse};
 use serde_json::json;
 
 #[test]

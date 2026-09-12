@@ -3,7 +3,7 @@ use std::net::TcpListener;
 use std::thread::{self, JoinHandle};
 use std::time::Duration;
 
-use mistralai::{ChatCompletionRequest, Client};
+use mistralai::raw::{Client, types::ChatCompletionRequest};
 use serde_json::{Value, json};
 
 fn server(status: &str, body: Value) -> (String, JoinHandle<(String, Value)>) {
