@@ -46,11 +46,13 @@ multipart requests and owned streaming return types); `codegen.lock` pins and
 verifies their hashes. Generated output remains reproducible and is checked
 byte-for-byte by CI.
 
-A handwritten semantic facade now covers Chat and OCR. It is the primary public
-API for those resources and translates directly to generated request/response
-types without JSON round-trips. The complete mechanical transport remains
-available explicitly through `raw`. This is intentionally an architectural
-spike, not a claim that all 173 operations already have an idiomatic facade.
+A generated semantic facade now covers Chat and OCR. It is the primary public API
+for those resources and translates directly to generated request/response types
+without JSON round-trips. Its public taxonomy is declared in a versioned semantic
+manifest; request setters and operation contracts are derived from the generated
+raw Rust. The complete mechanical transport remains available explicitly through
+`raw`. This is intentionally an architectural spike, not a claim that all 173
+operations already have an idiomatic facade.
 
 One preprocessing correction removes `data` from
 `ChatCompletionResponse.required`: upstream lists it as required without

@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "resources": {
+    "chat": {
+      "resource_type": "Chat",
+      "request_type": "ChatCompletionRequest",
+      "request_wrapper": "ChatRequest",
+      "response_type": "ChatCompletionResponse",
+      "response_wrapper": "ChatResponse",
+      "complete_operation": "chat_completion_v1_chat_completions_post",
+      "stream_operation": "chat_completion_v1_chat_completions_post_stream",
+      "stream_item_type": "CompletionChunk",
+      "stream_item_wrapper": "ChatStreamChunk",
+      "stream_type": "ChatStream",
+      "reserved_request_fields": ["messages", "model", "stream"]
+    },
+    "ocr": {
+      "resource_type": "Ocr",
+      "request_type": "OCRRequest",
+      "request_wrapper": "OcrRequest",
+      "response_type": "OCRResponse",
+      "response_wrapper": "OcrResponse",
+      "operation": "ocr_v1_ocr_post",
+      "reserved_request_fields": ["document"]
+    }
+  }
+}

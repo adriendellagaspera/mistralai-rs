@@ -152,11 +152,11 @@ No Mistral API key is needed. Generation reads the vendored spec and verifies
 its SHA-256; it never fetches a newer spec implicitly. After initial tool and
 dependency installation, regeneration can run offline.
 
-`just check-generated` generates into a fresh temporary directory, runs the
-generator's own `--check` in a second process, applies pinned rustfmt, and
-compares the complete file set and bytes with the committed SDK. It leaves the
-checkout unchanged, detects added/deleted files, and does not rely on `git diff`
-ignoring untracked files. No timestamps enter the generated output.
+`just check-generated` generates into a fresh temporary directory, runs the raw
+generator's own `--check` in a second process, generates the semantic facade,
+applies pinned rustfmt, and compares both layers byte-for-byte with the committed
+SDK. It leaves the checkout unchanged, detects added/deleted raw files, and does
+not rely on `git diff` ignoring untracked files. No timestamps enter the output.
 
 ## Source and automation
 
@@ -164,10 +164,10 @@ ignoring untracked files. No timestamps enter the generated output.
 | --- | --- |
 | `codegen.lock` | Upstream repository/path/commit/hash, generator version/source commit/patch hash, YAML parser and Rust versions |
 | `spec/` | Unmodified official spec and upstream licensing |
-| `codegen/` | Generator configuration, explicit preprocessing repairs, source patch and evaluation |
+| `codegen/` | Raw generator configuration, semantic manifest, facade generator, preprocessing repairs and evaluation |
 | `scripts/` | Acquisition, isolated generation, validation and update tooling |
 | `src/generated/` | Committed generated Rust, dependency manifest and operation inventory |
-| `src/sdk/` | Handwritten, resource-oriented public facade and stable error types |
+| `src/sdk/` | Committed generated resource facade plus its generic stable error runtime |
 | `src/lib.rs`, `src/streaming.rs`, `tests/`, `examples/` | Public exports/SSE decoder, offline tests and opt-in examples |
 
 The source of truth is

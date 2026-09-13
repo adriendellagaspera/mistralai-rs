@@ -14,6 +14,10 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "codegen"))
 import preprocess
+import sdk_facade
+
+
+FACADE_FILES = ("mod.rs", "chat.rs", "ocr.rs", "coverage.json")
 
 
 def run(*args, cwd=ROOT):
@@ -107,12 +111,24 @@ def main():
         for path in sorted(generated.rglob("*.rs")):
             run("rustup", "run", lock["rust_toolchain"], "rustfmt",
                 "--edition", "2024", "--config", "skip_children=true", path)
+        facade = work / "src/sdk"
+        sdk_facade.generate(
+            generated,
+            facade,
+            work / "codegen/sdk-semantics.json",
+        )
+        for path in sorted(facade.rglob("*.rs")):
+            run("rustup", "run", lock["rust_toolchain"], "rustfmt",
+                "--edition", "2024", path)
         target = ROOT / "src/generated"
+        facade_target = ROOT / "src/sdk"
         if args.command == "generate":
             if target.exists():
                 shutil.rmtree(target)
             shutil.copytree(generated, target)
-            print("Generated SDK from verified, pinned spec.")
+            for name in FACADE_FILES:
+                shutil.copy2(facade / name, facade_target / name)
+            print("Generated raw bindings and semantic SDK facade from verified, pinned spec.")
         else:
             old, new = snapshot(target), snapshot(generated)
             changed = differences(old, new)
@@ -123,7 +139,11 @@ def main():
                     fromfile=f"committed/{name}", tofile=f"regenerated/{name}")))
             if changed:
                 raise SystemExit("Generated SDK is stale: " + ", ".join(changed))
-            print("Generated SDK matches byte-for-byte (including file set).")
+            facade_changed = [name for name in FACADE_FILES
+                              if (facade_target / name).read_bytes() != (facade / name).read_bytes()]
+            if facade_changed:
+                raise SystemExit("Generated facade is stale: " + ", ".join(facade_changed))
+            print("Generated raw bindings and facade match byte-for-byte (including file set).")
 
 
 if __name__ == "__main__":

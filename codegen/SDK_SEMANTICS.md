@@ -15,18 +15,28 @@ ownership, builders, enums and error handling.
 | --- | --- |
 | paths, verbs, payloads and response schemas | official Mistral OpenAPI |
 | resource and method taxonomy | official Mistral Python/TypeScript SDKs |
-| ownership, borrowing, builders and Rust naming | this crate |
+| ownership, borrowing, builders and Rust naming | `codegen/sdk-semantics.json` and the facade generator |
 | uncommon or newly-added operations | `mistralai::raw` generated bindings |
 
 The generated OpenAPI layer remains complete and reproducible. The idiomatic SDK
-is a projection over it, not a second HTTP implementation.
+is generated as a projection over it, not implemented as a second HTTP client.
+`codegen/sdk_facade.py` reads the actual raw Rust structs and client methods,
+then applies the versioned semantic manifest. The committed `src/sdk/mod.rs`,
+`chat.rs`, and `ocr.rs` files are generated artifacts and carry an explicit
+`@generated` marker. Only the generic error runtime is handwritten.
 
 ## Drift policy
 
-Facade request types serialize into the generated request models in tests. If an
-upstream schema changes incompatibly, those tests fail instead of silently
-changing the public Rust API. New operations remain immediately reachable through
-`raw` even before an idiomatic resource method is added.
+Every codegen run regenerates the raw bindings first and the facade second.
+Optional request fields are discovered from the raw Rust structs and receive
+fluent setters automatically. The generator validates configured operation
+signatures and raw types. A new required field or an incompatible signature
+therefore fails closed with a semantic-review diagnostic instead of silently
+changing the public Rust API. `codegen.py check` compares both layers
+byte-for-byte. The nightly uses the same pipeline.
+
+New operations remain immediately reachable through `raw` even before a new
+resource mapping is deliberately added to the semantic manifest.
 
 The Chat + OCR spike deliberately keeps the projection small. It exists to measure
 how much semantic glue is required before generalizing the pattern to all Mistral
