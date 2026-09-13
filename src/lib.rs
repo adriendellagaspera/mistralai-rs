@@ -15,7 +15,7 @@
     clippy::collapsible_if,
     clippy::empty_docs
 )]
-pub mod generated;
+mod generated;
 
 /// Complete generated OpenAPI bindings and transport client.
 pub mod raw {
@@ -23,7 +23,7 @@ pub mod raw {
     pub use crate::generated::types;
 }
 
-pub mod sdk;
+mod sdk;
 pub mod streaming;
 
 pub use sdk::{
