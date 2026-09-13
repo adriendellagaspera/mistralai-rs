@@ -13,6 +13,7 @@ use crate::streaming;
 
 /// A chat message with textual content.
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum Message {
     System(String),
     User(String),
