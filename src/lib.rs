@@ -19,8 +19,8 @@ mod generated;
 
 /// Complete generated OpenAPI bindings and transport client.
 pub mod raw {
-    pub use crate::generated::client::HttpClient as Client;
-    pub use crate::generated::types;
+    pub use crate::generated::{client, types};
+    pub use client::HttpClient as Client;
 }
 
 mod sdk;
