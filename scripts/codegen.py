@@ -119,7 +119,7 @@ def main():
         )
         for path in sorted(facade.rglob("*.rs")):
             run("rustup", "run", lock["rust_toolchain"], "rustfmt",
-                "--edition", "2024", path)
+                "--edition", "2024", "--config", "skip_children=true", path)
         target = ROOT / "src/generated"
         facade_target = ROOT / "src/sdk"
         if args.command == "generate":
