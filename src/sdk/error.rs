@@ -2,6 +2,7 @@ use crate::generated::client::{ApiOpError, HttpError};
 
 /// Stable classification of failures that happen before a response is available.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum TransportErrorKind {
     Network,
     Middleware,
@@ -174,6 +175,7 @@ impl std::error::Error for ApiError {}
 
 /// Errors surfaced by the idiomatic SDK facade.
 #[derive(Debug, thiserror::Error)]
+#[non_exhaustive]
 pub enum SdkError {
     #[error(transparent)]
     Transport(#[from] TransportError),
