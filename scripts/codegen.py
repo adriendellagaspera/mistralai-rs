@@ -139,8 +139,19 @@ def main():
                     fromfile=f"committed/{name}", tofile=f"regenerated/{name}")))
             if changed:
                 raise SystemExit("Generated SDK is stale: " + ", ".join(changed))
-            facade_changed = [name for name in FACADE_FILES
-                              if (facade_target / name).read_bytes() != (facade / name).read_bytes()]
+            facade_changed = []
+            for name in FACADE_FILES:
+                committed = (facade_target / name).read_bytes()
+                regenerated = (facade / name).read_bytes()
+                if committed == regenerated:
+                    continue
+                facade_changed.append(name)
+                print("".join(difflib.unified_diff(
+                    committed.decode().splitlines(keepends=True),
+                    regenerated.decode().splitlines(keepends=True),
+                    fromfile=f"committed/sdk/{name}",
+                    tofile=f"regenerated/sdk/{name}",
+                )))
             if facade_changed:
                 raise SystemExit("Generated facade is stale: " + ", ".join(facade_changed))
             print("Generated raw bindings and facade match byte-for-byte (including file set).")
