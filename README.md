@@ -167,7 +167,8 @@ ignoring untracked files. No timestamps enter the generated output.
 | `codegen/` | Generator configuration, explicit preprocessing repairs, source patch and evaluation |
 | `scripts/` | Acquisition, isolated generation, validation and update tooling |
 | `src/generated/` | Committed generated Rust, dependency manifest and operation inventory |
-| `src/lib.rs`, `src/streaming.rs`, `tests/`, `examples/` | Handwritten exports/SSE decoder, offline tests and opt-in examples |
+| `src/sdk/` | Handwritten, resource-oriented public facade and stable error types |
+| `src/lib.rs`, `src/streaming.rs`, `tests/`, `examples/` | Public exports/SSE decoder, offline tests and opt-in examples |
 
 The source of truth is
 [`mistralai/platform-docs-public/openapi.yaml`](https://github.com/mistralai/platform-docs-public/blob/main/openapi.yaml).
