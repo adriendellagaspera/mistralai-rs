@@ -9,6 +9,6 @@
   "rust_toolchain": "1.94.0",
   "generator_repository": "gpu-cli/openapi-to-rust",
   "generator_commit": "2af34b86ca9f38c35787f13ec5841989efcf4b99",
-  "generator_patch_sha256": "79ac91df99c5cbb25ee9c20a9e4cf67336833bcac63040aa6d0983148bd4c2eb",
+  "generator_patch_sha256": "b339cb45e65facd093346a3430a75846a75f5bf3b25ccab49b299263f0447243",
   "ruamel_yaml_version": "0.18.6"
 }
