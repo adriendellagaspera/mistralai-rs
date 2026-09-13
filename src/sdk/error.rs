@@ -181,23 +181,30 @@ pub enum SdkError {
     Transport(#[from] TransportError),
 
     #[error(transparent)]
-    Api(#[from] ApiError),
+    Api(Box<ApiError>),
 
     #[error(transparent)]
     Stream(#[from] crate::streaming::Error),
+}
+
+impl From<ApiError> for SdkError {
+    fn from(error: ApiError) -> Self {
+        Self::Api(Box::new(error))
+    }
 }
 
 impl<E: std::fmt::Debug> From<ApiOpError<E>> for SdkError {
     fn from(error: ApiOpError<E>) -> Self {
         match error {
             ApiOpError::Transport(error) => Self::Transport(error.into()),
-            ApiOpError::Api(error) => Self::Api(ApiError {
+            ApiOpError::Api(error) => ApiError {
                 status: error.status,
                 headers: error.headers,
                 body: error.body,
                 raw_body: error.raw_body,
                 parse_error: error.parse_error,
-            }),
+            }
+            .into(),
         }
     }
 }
