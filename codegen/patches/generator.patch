@@ -154,6 +154,14 @@
                  },
                  MultipartClientFieldKind::Text => quote! {
                      form = form.text(#wire_name, value.to_string());
+@@ -3047,6 +3106,6 @@
+             ClientSuccessBody::Binary => quote! { bytes::Bytes },
+             ClientSuccessBody::EventStream => {
+-                quote! { impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>> }
++                quote! { impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>> + use<> }
+             }
+             ClientSuccessBody::Empty => quote! { () },
+         }
 --- a/src/generator.rs
 +++ b/src/generator.rs
 @@ -2274,7 +2274,8 @@
