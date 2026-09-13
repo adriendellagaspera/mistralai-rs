@@ -18,23 +18,33 @@ pub enum Message {
 }
 
 impl Message {
-    pub fn system(content: impl Into<String>) -> Self { Self::System(content.into()) }
-    pub fn user(content: impl Into<String>) -> Self { Self::User(content.into()) }
-    pub fn assistant(content: impl Into<String>) -> Self { Self::Assistant(content.into()) }
+    pub fn system(content: impl Into<String>) -> Self {
+        Self::System(content.into())
+    }
+    pub fn user(content: impl Into<String>) -> Self {
+        Self::User(content.into())
+    }
+    pub fn assistant(content: impl Into<String>) -> Self {
+        Self::Assistant(content.into())
+    }
 }
 
 impl From<Message> for ChatCompletionRequestMessagesItemUnion {
     fn from(message: Message) -> Self {
         match message {
             Message::System(content) => Self::SystemMessage(SystemMessage {
-                content: SystemMessageContent::String(content), role: None,
+                content: SystemMessageContent::String(content),
+                role: None,
             }),
             Message::User(content) => Self::UserMessage(UserMessage {
-                content: Some(UserMessageContent::String(content)), role: None,
+                content: Some(UserMessageContent::String(content)),
+                role: None,
             }),
             Message::Assistant(content) => Self::AssistantMessage(AssistantMessage {
                 content: Some(Some(AssistantMessageContent::String(content))),
-                prefix: None, role: None, tool_calls: None,
+                prefix: None,
+                role: None,
+                tool_calls: None,
             }),
         }
     }
@@ -42,16 +52,23 @@ impl From<Message> for ChatCompletionRequestMessagesItemUnion {
 
 /// A generated ergonomic wrapper over [`ChatCompletionRequest`].
 #[derive(Debug, Clone)]
-pub struct ChatRequest { raw: ChatCompletionRequest }
+pub struct ChatRequest {
+    raw: ChatCompletionRequest,
+}
 
 impl ChatRequest {
     pub fn new(model: impl Into<String>, messages: impl IntoIterator<Item = Message>) -> Self {
-        Self { raw: ChatCompletionRequest::new(
-            messages.into_iter().map(Into::into).collect(), model.into(),
-        ) }
+        Self {
+            raw: ChatCompletionRequest::new(
+                messages.into_iter().map(Into::into).collect(),
+                model.into(),
+            ),
+        }
     }
 
-    pub fn from_raw(raw: ChatCompletionRequest) -> Self { Self { raw } }
+    pub fn from_raw(raw: ChatCompletionRequest) -> Self {
+        Self { raw }
+    }
 
     #[must_use]
     pub fn frequency_penalty(mut self, frequency_penalty: f64) -> Self {
@@ -162,7 +179,10 @@ impl ChatRequest {
     }
 
     #[must_use]
-    pub fn reasoning_effort(mut self, reasoning_effort: ChatCompletionRequestReasoningEffort) -> Self {
+    pub fn reasoning_effort(
+        mut self,
+        reasoning_effort: ChatCompletionRequestReasoningEffort,
+    ) -> Self {
         self.raw.reasoning_effort = Some(reasoning_effort);
         self
     }
@@ -221,8 +241,12 @@ impl ChatRequest {
         self
     }
 
-    pub fn as_raw(&self) -> &ChatCompletionRequest { &self.raw }
-    pub fn into_raw(self) -> ChatCompletionRequest { self.raw }
+    pub fn as_raw(&self) -> &ChatCompletionRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ChatCompletionRequest {
+        self.raw
+    }
 
     fn into_raw_with_stream(mut self, stream: bool) -> ChatCompletionRequest {
         self.raw.stream = Some(stream);
@@ -232,27 +256,44 @@ impl ChatRequest {
 
 /// A stable facade over the generated chat completion response.
 #[derive(Debug, Clone)]
-pub struct ChatResponse { raw: ChatCompletionResponse }
+pub struct ChatResponse {
+    raw: ChatCompletionResponse,
+}
 
 impl ChatResponse {
     pub fn text(&self) -> Option<&str> {
-        let content = self.raw.choices.first()?.message.content.as_ref()?.as_ref()?;
+        let content = self
+            .raw
+            .choices
+            .first()?
+            .message
+            .content
+            .as_ref()?
+            .as_ref()?;
         match content {
             AssistantMessageContent::String(text) => Some(text),
             AssistantMessageContent::ContentChunkArray(_) => None,
         }
     }
-    pub fn raw(&self) -> &ChatCompletionResponse { &self.raw }
-    pub fn into_raw(self) -> ChatCompletionResponse { self.raw }
+    pub fn raw(&self) -> &ChatCompletionResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ChatCompletionResponse {
+        self.raw
+    }
 }
 
 impl From<ChatCompletionResponse> for ChatResponse {
-    fn from(raw: ChatCompletionResponse) -> Self { Self { raw } }
+    fn from(raw: ChatCompletionResponse) -> Self {
+        Self { raw }
+    }
 }
 
 /// A stable facade over one generated streaming chunk.
 #[derive(Debug, Clone)]
-pub struct ChatStreamChunk { raw: CompletionChunk }
+pub struct ChatStreamChunk {
+    raw: CompletionChunk,
+}
 
 impl ChatStreamChunk {
     pub fn text(&self) -> Option<&str> {
@@ -262,37 +303,47 @@ impl ChatStreamChunk {
             DeltaMessageContent::ContentChunkArrayInline(_) => None,
         }
     }
-    pub fn raw(&self) -> &CompletionChunk { &self.raw }
-    pub fn into_raw(self) -> CompletionChunk { self.raw }
+    pub fn raw(&self) -> &CompletionChunk {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CompletionChunk {
+        self.raw
+    }
 }
 
 impl From<CompletionChunk> for ChatStreamChunk {
-    fn from(raw: CompletionChunk) -> Self { Self { raw } }
+    fn from(raw: CompletionChunk) -> Self {
+        Self { raw }
+    }
 }
 
-pub type ChatStream = Pin<Box<dyn Stream<
-    Item = Result<ChatStreamChunk, SdkError>,
-> + Send + 'static>>;
+pub type ChatStream =
+    Pin<Box<dyn Stream<Item = Result<ChatStreamChunk, SdkError>> + Send + 'static>>;
 
 #[derive(Clone, Copy)]
-pub struct Chat<'a> { raw: &'a HttpClient }
+pub struct Chat<'a> {
+    raw: &'a HttpClient,
+}
 
 impl<'a> Chat<'a> {
-    pub(crate) fn new(raw: &'a HttpClient) -> Self { Self { raw } }
-
-    pub async fn complete(&self, request: ChatRequest)
-        -> Result<ChatResponse, SdkError>
-    {
-        self.raw.chat_completion_v1_chat_completions_post(request.into_raw_with_stream(false))
-            .await.map(Into::into).map_err(Into::into)
+    pub(crate) fn new(raw: &'a HttpClient) -> Self {
+        Self { raw }
     }
 
-    pub async fn stream(&self, request: ChatRequest)
-        -> Result<ChatStream, SdkError>
-    {
-        let bytes = self.raw.chat_completion_v1_chat_completions_post_stream(
-            request.into_raw_with_stream(true),
-        ).await.map_err(SdkError::from)?;
+    pub async fn complete(&self, request: ChatRequest) -> Result<ChatResponse, SdkError> {
+        self.raw
+            .chat_completion_v1_chat_completions_post(request.into_raw_with_stream(false))
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn stream(&self, request: ChatRequest) -> Result<ChatStream, SdkError> {
+        let bytes = self
+            .raw
+            .chat_completion_v1_chat_completions_post_stream(request.into_raw_with_stream(true))
+            .await
+            .map_err(SdkError::from)?;
         let events = streaming::json_events::<_, _, CompletionChunk>(bytes)
             .map(|event| event.map(|event| event.data.into()).map_err(Into::into));
         Ok(Box::pin(events))

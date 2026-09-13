@@ -103,9 +103,17 @@ def request_setters(fields: dict[str, str], reserved: set[str]) -> str:
         inner, nullable = optional
         argument, value = _argument(name, inner)
         wrapped = f"Some(Some({value}))" if nullable else f"Some({value})"
+        signature = f"    pub fn {name}(mut self, {argument}) -> Self {{"
+        if len(signature) > 100:
+            signature = (
+                f"    pub fn {name}(\n"
+                f"        mut self,\n"
+                f"        {argument},\n"
+                "    ) -> Self {"
+            )
         methods.append(f"""
     #[must_use]
-    pub fn {name}(mut self, {argument}) -> Self {{
+{signature}
         self.raw.{raw_name} = {wrapped};
         self
     }}
@@ -142,23 +150,33 @@ pub enum Message {{
 }}
 
 impl Message {{
-    pub fn system(content: impl Into<String>) -> Self {{ Self::System(content.into()) }}
-    pub fn user(content: impl Into<String>) -> Self {{ Self::User(content.into()) }}
-    pub fn assistant(content: impl Into<String>) -> Self {{ Self::Assistant(content.into()) }}
+    pub fn system(content: impl Into<String>) -> Self {{
+        Self::System(content.into())
+    }}
+    pub fn user(content: impl Into<String>) -> Self {{
+        Self::User(content.into())
+    }}
+    pub fn assistant(content: impl Into<String>) -> Self {{
+        Self::Assistant(content.into())
+    }}
 }}
 
 impl From<Message> for ChatCompletionRequestMessagesItemUnion {{
     fn from(message: Message) -> Self {{
         match message {{
             Message::System(content) => Self::SystemMessage(SystemMessage {{
-                content: SystemMessageContent::String(content), role: None,
+                content: SystemMessageContent::String(content),
+                role: None,
             }}),
             Message::User(content) => Self::UserMessage(UserMessage {{
-                content: Some(UserMessageContent::String(content)), role: None,
+                content: Some(UserMessageContent::String(content)),
+                role: None,
             }}),
             Message::Assistant(content) => Self::AssistantMessage(AssistantMessage {{
                 content: Some(Some(AssistantMessageContent::String(content))),
-                prefix: None, role: None, tool_calls: None,
+                prefix: None,
+                role: None,
+                tool_calls: None,
             }}),
         }}
     }}
@@ -166,19 +184,30 @@ impl From<Message> for ChatCompletionRequestMessagesItemUnion {{
 
 /// A generated ergonomic wrapper over [`{config["request_type"]}`].
 #[derive(Debug, Clone)]
-pub struct {config["request_wrapper"]} {{ raw: {config["request_type"]} }}
+pub struct {config["request_wrapper"]} {{
+    raw: {config["request_type"]},
+}}
 
 impl {config["request_wrapper"]} {{
     pub fn new(model: impl Into<String>, messages: impl IntoIterator<Item = Message>) -> Self {{
-        Self {{ raw: {config["request_type"]}::new(
-            messages.into_iter().map(Into::into).collect(), model.into(),
-        ) }}
+        Self {{
+            raw: {config["request_type"]}::new(
+                messages.into_iter().map(Into::into).collect(),
+                model.into(),
+            ),
+        }}
     }}
 
-    pub fn from_raw(raw: {config["request_type"]}) -> Self {{ Self {{ raw }} }}
+    pub fn from_raw(raw: {config["request_type"]}) -> Self {{
+        Self {{ raw }}
+    }}
 {setters}
-    pub fn as_raw(&self) -> &{config["request_type"]} {{ &self.raw }}
-    pub fn into_raw(self) -> {config["request_type"]} {{ self.raw }}
+    pub fn as_raw(&self) -> &{config["request_type"]} {{
+        &self.raw
+    }}
+    pub fn into_raw(self) -> {config["request_type"]} {{
+        self.raw
+    }}
 
     fn into_raw_with_stream(mut self, stream: bool) -> {config["request_type"]} {{
         self.raw.stream = Some(stream);
@@ -188,27 +217,44 @@ impl {config["request_wrapper"]} {{
 
 /// A stable facade over the generated chat completion response.
 #[derive(Debug, Clone)]
-pub struct {config["response_wrapper"]} {{ raw: {config["response_type"]} }}
+pub struct {config["response_wrapper"]} {{
+    raw: {config["response_type"]},
+}}
 
 impl {config["response_wrapper"]} {{
     pub fn text(&self) -> Option<&str> {{
-        let content = self.raw.choices.first()?.message.content.as_ref()?.as_ref()?;
+        let content = self
+            .raw
+            .choices
+            .first()?
+            .message
+            .content
+            .as_ref()?
+            .as_ref()?;
         match content {{
             AssistantMessageContent::String(text) => Some(text),
             AssistantMessageContent::ContentChunkArray(_) => None,
         }}
     }}
-    pub fn raw(&self) -> &{config["response_type"]} {{ &self.raw }}
-    pub fn into_raw(self) -> {config["response_type"]} {{ self.raw }}
+    pub fn raw(&self) -> &{config["response_type"]} {{
+        &self.raw
+    }}
+    pub fn into_raw(self) -> {config["response_type"]} {{
+        self.raw
+    }}
 }}
 
 impl From<{config["response_type"]}> for {config["response_wrapper"]} {{
-    fn from(raw: {config["response_type"]}) -> Self {{ Self {{ raw }} }}
+    fn from(raw: {config["response_type"]}) -> Self {{
+        Self {{ raw }}
+    }}
 }}
 
 /// A stable facade over one generated streaming chunk.
 #[derive(Debug, Clone)]
-pub struct {config["stream_item_wrapper"]} {{ raw: {config["stream_item_type"]} }}
+pub struct {config["stream_item_wrapper"]} {{
+    raw: {config["stream_item_type"]},
+}}
 
 impl {config["stream_item_wrapper"]} {{
     pub fn text(&self) -> Option<&str> {{
@@ -218,37 +264,47 @@ impl {config["stream_item_wrapper"]} {{
             DeltaMessageContent::ContentChunkArrayInline(_) => None,
         }}
     }}
-    pub fn raw(&self) -> &{config["stream_item_type"]} {{ &self.raw }}
-    pub fn into_raw(self) -> {config["stream_item_type"]} {{ self.raw }}
+    pub fn raw(&self) -> &{config["stream_item_type"]} {{
+        &self.raw
+    }}
+    pub fn into_raw(self) -> {config["stream_item_type"]} {{
+        self.raw
+    }}
 }}
 
 impl From<{config["stream_item_type"]}> for {config["stream_item_wrapper"]} {{
-    fn from(raw: {config["stream_item_type"]}) -> Self {{ Self {{ raw }} }}
+    fn from(raw: {config["stream_item_type"]}) -> Self {{
+        Self {{ raw }}
+    }}
 }}
 
-pub type {config["stream_type"]} = Pin<Box<dyn Stream<
-    Item = Result<{config["stream_item_wrapper"]}, SdkError>,
-> + Send + 'static>>;
+pub type {config["stream_type"]} =
+    Pin<Box<dyn Stream<Item = Result<{config["stream_item_wrapper"]}, SdkError>> + Send + 'static>>;
 
 #[derive(Clone, Copy)]
-pub struct {config["resource_type"]}<'a> {{ raw: &'a HttpClient }}
+pub struct {config["resource_type"]}<'a> {{
+    raw: &'a HttpClient,
+}}
 
 impl<'a> {config["resource_type"]}<'a> {{
-    pub(crate) fn new(raw: &'a HttpClient) -> Self {{ Self {{ raw }} }}
-
-    pub async fn complete(&self, request: {config["request_wrapper"]})
-        -> Result<{config["response_wrapper"]}, SdkError>
-    {{
-        self.raw.{config["complete_operation"]}(request.into_raw_with_stream(false))
-            .await.map(Into::into).map_err(Into::into)
+    pub(crate) fn new(raw: &'a HttpClient) -> Self {{
+        Self {{ raw }}
     }}
 
-    pub async fn stream(&self, request: {config["request_wrapper"]})
-        -> Result<{config["stream_type"]}, SdkError>
-    {{
-        let bytes = self.raw.{config["stream_operation"]}(
-            request.into_raw_with_stream(true),
-        ).await.map_err(SdkError::from)?;
+    pub async fn complete(&self, request: {config["request_wrapper"]}) -> Result<{config["response_wrapper"]}, SdkError> {{
+        self.raw
+            .{config["complete_operation"]}(request.into_raw_with_stream(false))
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }}
+
+    pub async fn stream(&self, request: {config["request_wrapper"]}) -> Result<{config["stream_type"]}, SdkError> {{
+        let bytes = self
+            .raw
+            .{config["stream_operation"]}(request.into_raw_with_stream(true))
+            .await
+            .map_err(SdkError::from)?;
         let events = streaming::json_events::<_, _, {config["stream_item_type"]}>(bytes)
             .map(|event| event.map(|event| event.data.into()).map_err(Into::into));
         Ok(Box::pin(events))
@@ -264,70 +320,118 @@ use crate::generated::client::HttpClient;
 use crate::generated::types::*;
 
 #[derive(Debug)]
-pub struct {config["response_wrapper"]} {{ raw: {config["response_type"]} }}
+pub struct {config["response_wrapper"]} {{
+    raw: {config["response_type"]},
+}}
 
 impl {config["response_wrapper"]} {{
-    pub fn model(&self) -> &str {{ &self.raw.model }}
+    pub fn model(&self) -> &str {{
+        &self.raw.model
+    }}
     pub fn pages(&self) -> impl ExactSizeIterator<Item = OcrPage<'_>> {{
         self.raw.pages.iter().map(OcrPage::new)
     }}
-    pub fn raw(&self) -> &{config["response_type"]} {{ &self.raw }}
-    pub fn into_raw(self) -> {config["response_type"]} {{ self.raw }}
+    pub fn raw(&self) -> &{config["response_type"]} {{
+        &self.raw
+    }}
+    pub fn into_raw(self) -> {config["response_type"]} {{
+        self.raw
+    }}
 }}
 
 impl From<{config["response_type"]}> for {config["response_wrapper"]} {{
-    fn from(raw: {config["response_type"]}) -> Self {{ Self {{ raw }} }}
+    fn from(raw: {config["response_type"]}) -> Self {{
+        Self {{ raw }}
+    }}
 }}
 
 #[derive(Debug, Clone, Copy)]
-pub struct OcrPage<'a> {{ raw: &'a OCRPageObject }}
+pub struct OcrPage<'a> {{
+    raw: &'a OCRPageObject,
+}}
 
 impl<'a> OcrPage<'a> {{
-    fn new(raw: &'a OCRPageObject) -> Self {{ Self {{ raw }} }}
-    pub fn index(&self) -> i64 {{ self.raw.index }}
-    pub fn markdown(&self) -> &str {{ &self.raw.markdown }}
-    pub fn raw(&self) -> &OCRPageObject {{ self.raw }}
+    fn new(raw: &'a OCRPageObject) -> Self {{
+        Self {{ raw }}
+    }}
+    pub fn index(&self) -> i64 {{
+        self.raw.index
+    }}
+    pub fn markdown(&self) -> &str {{
+        &self.raw.markdown
+    }}
+    pub fn raw(&self) -> &OCRPageObject {{
+        self.raw
+    }}
 }}
 
 /// A generated ergonomic wrapper over [`{config["request_type"]}`].
 #[derive(Debug, Clone)]
-pub struct {config["request_wrapper"]} {{ raw: {config["request_type"]} }}
+pub struct {config["request_wrapper"]} {{
+    raw: {config["request_type"]},
+}}
 
 impl {config["request_wrapper"]} {{
     pub fn document_url(model: impl Into<String>, url: impl Into<String>) -> Self {{
-        Self::new(model, OCRRequestDocument::DocumentURLChunk(DocumentURLChunk {{
-            document_name: None, document_url: url.into(), r#type: None,
-        }}))
+        Self::new(
+            model,
+            OCRRequestDocument::DocumentURLChunk(DocumentURLChunk {{
+                document_name: None,
+                document_url: url.into(),
+                r#type: None,
+            }}),
+        )
     }}
     pub fn image_url(model: impl Into<String>, url: impl Into<String>) -> Self {{
-        Self::new(model, OCRRequestDocument::ImageURLChunk(ImageURLChunk {{
-            image_url: ImageURLChunkImageUrl::String(url.into()), r#type: None,
-        }}))
+        Self::new(
+            model,
+            OCRRequestDocument::ImageURLChunk(ImageURLChunk {{
+                image_url: ImageURLChunkImageUrl::String(url.into()),
+                r#type: None,
+            }}),
+        )
     }}
     pub fn file_id(model: impl Into<String>, file_id: uuid::Uuid) -> Self {{
-        Self::new(model, OCRRequestDocument::FileChunk(FileChunk {{
-            file_id, r#type: None,
-        }}))
+        Self::new(
+            model,
+            OCRRequestDocument::FileChunk(FileChunk {{
+                file_id,
+                r#type: None,
+            }}),
+        )
     }}
     fn new(model: impl Into<String>, document: OCRRequestDocument) -> Self {{
-        Self {{ raw: {config["request_type"]}::new(document, Some(model.into())) }}
+        Self {{
+            raw: {config["request_type"]}::new(document, Some(model.into())),
+        }}
     }}
-    pub fn from_raw(raw: {config["request_type"]}) -> Self {{ Self {{ raw }} }}
+    pub fn from_raw(raw: {config["request_type"]}) -> Self {{
+        Self {{ raw }}
+    }}
 {setters}
-    pub fn as_raw(&self) -> &{config["request_type"]} {{ &self.raw }}
-    pub fn into_raw(self) -> {config["request_type"]} {{ self.raw }}
+    pub fn as_raw(&self) -> &{config["request_type"]} {{
+        &self.raw
+    }}
+    pub fn into_raw(self) -> {config["request_type"]} {{
+        self.raw
+    }}
 }}
 
 #[derive(Clone, Copy)]
-pub struct {config["resource_type"]}<'a> {{ raw: &'a HttpClient }}
+pub struct {config["resource_type"]}<'a> {{
+    raw: &'a HttpClient,
+}}
 
 impl<'a> {config["resource_type"]}<'a> {{
-    pub(crate) fn new(raw: &'a HttpClient) -> Self {{ Self {{ raw }} }}
-    pub async fn process(&self, request: {config["request_wrapper"]})
-        -> Result<{config["response_wrapper"]}, SdkError>
-    {{
-        self.raw.{config["operation"]}(request.into_raw())
-            .await.map(Into::into).map_err(Into::into)
+    pub(crate) fn new(raw: &'a HttpClient) -> Self {{
+        Self {{ raw }}
+    }}
+    pub async fn process(&self, request: {config["request_wrapper"]}) -> Result<{config["response_wrapper"]}, SdkError> {{
+        self.raw
+            .{config["operation"]}(request.into_raw())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }}
 }}
 '''
@@ -345,20 +449,30 @@ pub use ocr::{{{ocr["resource_type"]}, OcrPage, {ocr["request_wrapper"]}, {ocr["
 use crate::generated::client::HttpClient;
 
 #[derive(Clone)]
-pub struct Mistral {{ raw: HttpClient }}
+pub struct Mistral {{
+    raw: HttpClient,
+}}
 
 impl Mistral {{
     pub fn new(api_key: impl Into<String>) -> Self {{
-        Self {{ raw: HttpClient::new().with_api_key(api_key) }}
+        Self {{
+            raw: HttpClient::new().with_api_key(api_key),
+        }}
     }}
     #[must_use]
     pub fn with_base_url(mut self, base_url: impl Into<String>) -> Self {{
         self.raw = self.raw.with_base_url(base_url);
         self
     }}
-    pub fn chat(&self) -> {chat["resource_type"]}<'_> {{ {chat["resource_type"]}::new(&self.raw) }}
-    pub fn ocr(&self) -> {ocr["resource_type"]}<'_> {{ {ocr["resource_type"]}::new(&self.raw) }}
-    pub fn raw(&self) -> &HttpClient {{ &self.raw }}
+    pub fn chat(&self) -> {chat["resource_type"]}<'_> {{
+        {chat["resource_type"]}::new(&self.raw)
+    }}
+    pub fn ocr(&self) -> {ocr["resource_type"]}<'_> {{
+        {ocr["resource_type"]}::new(&self.raw)
+    }}
+    pub fn raw(&self) -> &HttpClient {{
+        &self.raw
+    }}
 }}
 '''
 

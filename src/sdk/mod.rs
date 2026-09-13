@@ -10,18 +10,28 @@ pub use ocr::{Ocr, OcrPage, OcrRequest, OcrResponse};
 use crate::generated::client::HttpClient;
 
 #[derive(Clone)]
-pub struct Mistral { raw: HttpClient }
+pub struct Mistral {
+    raw: HttpClient,
+}
 
 impl Mistral {
     pub fn new(api_key: impl Into<String>) -> Self {
-        Self { raw: HttpClient::new().with_api_key(api_key) }
+        Self {
+            raw: HttpClient::new().with_api_key(api_key),
+        }
     }
     #[must_use]
     pub fn with_base_url(mut self, base_url: impl Into<String>) -> Self {
         self.raw = self.raw.with_base_url(base_url);
         self
     }
-    pub fn chat(&self) -> Chat<'_> { Chat::new(&self.raw) }
-    pub fn ocr(&self) -> Ocr<'_> { Ocr::new(&self.raw) }
-    pub fn raw(&self) -> &HttpClient { &self.raw }
+    pub fn chat(&self) -> Chat<'_> {
+        Chat::new(&self.raw)
+    }
+    pub fn ocr(&self) -> Ocr<'_> {
+        Ocr::new(&self.raw)
+    }
+    pub fn raw(&self) -> &HttpClient {
+        &self.raw
+    }
 }

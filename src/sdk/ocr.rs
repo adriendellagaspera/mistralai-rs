@@ -4,55 +4,94 @@ use crate::generated::client::HttpClient;
 use crate::generated::types::*;
 
 #[derive(Debug)]
-pub struct OcrResponse { raw: OCRResponse }
+pub struct OcrResponse {
+    raw: OCRResponse,
+}
 
 impl OcrResponse {
-    pub fn model(&self) -> &str { &self.raw.model }
+    pub fn model(&self) -> &str {
+        &self.raw.model
+    }
     pub fn pages(&self) -> impl ExactSizeIterator<Item = OcrPage<'_>> {
         self.raw.pages.iter().map(OcrPage::new)
     }
-    pub fn raw(&self) -> &OCRResponse { &self.raw }
-    pub fn into_raw(self) -> OCRResponse { self.raw }
+    pub fn raw(&self) -> &OCRResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> OCRResponse {
+        self.raw
+    }
 }
 
 impl From<OCRResponse> for OcrResponse {
-    fn from(raw: OCRResponse) -> Self { Self { raw } }
+    fn from(raw: OCRResponse) -> Self {
+        Self { raw }
+    }
 }
 
 #[derive(Debug, Clone, Copy)]
-pub struct OcrPage<'a> { raw: &'a OCRPageObject }
+pub struct OcrPage<'a> {
+    raw: &'a OCRPageObject,
+}
 
 impl<'a> OcrPage<'a> {
-    fn new(raw: &'a OCRPageObject) -> Self { Self { raw } }
-    pub fn index(&self) -> i64 { self.raw.index }
-    pub fn markdown(&self) -> &str { &self.raw.markdown }
-    pub fn raw(&self) -> &OCRPageObject { self.raw }
+    fn new(raw: &'a OCRPageObject) -> Self {
+        Self { raw }
+    }
+    pub fn index(&self) -> i64 {
+        self.raw.index
+    }
+    pub fn markdown(&self) -> &str {
+        &self.raw.markdown
+    }
+    pub fn raw(&self) -> &OCRPageObject {
+        self.raw
+    }
 }
 
 /// A generated ergonomic wrapper over [`OCRRequest`].
 #[derive(Debug, Clone)]
-pub struct OcrRequest { raw: OCRRequest }
+pub struct OcrRequest {
+    raw: OCRRequest,
+}
 
 impl OcrRequest {
     pub fn document_url(model: impl Into<String>, url: impl Into<String>) -> Self {
-        Self::new(model, OCRRequestDocument::DocumentURLChunk(DocumentURLChunk {
-            document_name: None, document_url: url.into(), r#type: None,
-        }))
+        Self::new(
+            model,
+            OCRRequestDocument::DocumentURLChunk(DocumentURLChunk {
+                document_name: None,
+                document_url: url.into(),
+                r#type: None,
+            }),
+        )
     }
     pub fn image_url(model: impl Into<String>, url: impl Into<String>) -> Self {
-        Self::new(model, OCRRequestDocument::ImageURLChunk(ImageURLChunk {
-            image_url: ImageURLChunkImageUrl::String(url.into()), r#type: None,
-        }))
+        Self::new(
+            model,
+            OCRRequestDocument::ImageURLChunk(ImageURLChunk {
+                image_url: ImageURLChunkImageUrl::String(url.into()),
+                r#type: None,
+            }),
+        )
     }
     pub fn file_id(model: impl Into<String>, file_id: uuid::Uuid) -> Self {
-        Self::new(model, OCRRequestDocument::FileChunk(FileChunk {
-            file_id, r#type: None,
-        }))
+        Self::new(
+            model,
+            OCRRequestDocument::FileChunk(FileChunk {
+                file_id,
+                r#type: None,
+            }),
+        )
     }
     fn new(model: impl Into<String>, document: OCRRequestDocument) -> Self {
-        Self { raw: OCRRequest::new(document, Some(model.into())) }
+        Self {
+            raw: OCRRequest::new(document, Some(model.into())),
+        }
     }
-    pub fn from_raw(raw: OCRRequest) -> Self { Self { raw } }
+    pub fn from_raw(raw: OCRRequest) -> Self {
+        Self { raw }
+    }
 
     #[must_use]
     pub fn bbox_annotation_format(mut self, bbox_annotation_format: ResponseFormat) -> Self {
@@ -67,7 +106,10 @@ impl OcrRequest {
     }
 
     #[must_use]
-    pub fn confidence_scores_granularity(mut self, confidence_scores_granularity: OCRRequestConfidenceScoresGranularity) -> Self {
+    pub fn confidence_scores_granularity(
+        mut self,
+        confidence_scores_granularity: OCRRequestConfidenceScoresGranularity,
+    ) -> Self {
         self.raw.confidence_scores_granularity = Some(Some(confidence_scores_granularity));
         self
     }
@@ -79,7 +121,10 @@ impl OcrRequest {
     }
 
     #[must_use]
-    pub fn document_annotation_format(mut self, document_annotation_format: ResponseFormat) -> Self {
+    pub fn document_annotation_format(
+        mut self,
+        document_annotation_format: ResponseFormat,
+    ) -> Self {
         self.raw.document_annotation_format = Some(Some(document_annotation_format));
         self
     }
@@ -91,7 +136,10 @@ impl OcrRequest {
     }
 
     #[must_use]
-    pub fn document_annotation_prompt(mut self, document_annotation_prompt: impl Into<String>) -> Self {
+    pub fn document_annotation_prompt(
+        mut self,
+        document_annotation_prompt: impl Into<String>,
+    ) -> Self {
         self.raw.document_annotation_prompt = Some(Some(document_annotation_prompt.into()));
         self
     }
@@ -192,19 +240,28 @@ impl OcrRequest {
         self
     }
 
-    pub fn as_raw(&self) -> &OCRRequest { &self.raw }
-    pub fn into_raw(self) -> OCRRequest { self.raw }
+    pub fn as_raw(&self) -> &OCRRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> OCRRequest {
+        self.raw
+    }
 }
 
 #[derive(Clone, Copy)]
-pub struct Ocr<'a> { raw: &'a HttpClient }
+pub struct Ocr<'a> {
+    raw: &'a HttpClient,
+}
 
 impl<'a> Ocr<'a> {
-    pub(crate) fn new(raw: &'a HttpClient) -> Self { Self { raw } }
-    pub async fn process(&self, request: OcrRequest)
-        -> Result<OcrResponse, SdkError>
-    {
-        self.raw.ocr_v1_ocr_post(request.into_raw())
-            .await.map(Into::into).map_err(Into::into)
+    pub(crate) fn new(raw: &'a HttpClient) -> Self {
+        Self { raw }
+    }
+    pub async fn process(&self, request: OcrRequest) -> Result<OcrResponse, SdkError> {
+        self.raw
+            .ocr_v1_ocr_post(request.into_raw())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 }
