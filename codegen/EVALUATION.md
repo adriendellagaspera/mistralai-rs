@@ -6,7 +6,7 @@ Source: `mistralai/platform-docs-public/openapi.yaml` at
 Generator: released `openapi-to-rust 0.16.0`, installed with `--locked`.
 Compiler and Clippy: Rust 1.94.0 on Ubuntu 24.04.
 
-## Actual trial
+## Historical generator trial
 
 Both scopes were generated directly from the unmodified official spec and
 compiled against each generated `REQUIRED_DEPS.toml`.
@@ -39,14 +39,26 @@ compiler or correctness warning is suppressed by this project. Remove the
 exceptions once a pinned upstream generator release emits clean code. The
 generator itself also emits its own documented local allow attributes.
 
-No generated output is patched and no handwritten API facade is used. One
-preprocessing correction removes `data` from `ChatCompletionResponse.required`:
-upstream lists it as required without defining the property, and normal Mistral
-chat responses do not contain it. `codegen/preprocess.py` matches the complete
-known schema fragment exactly and fails closed if upstream changes it. The
-vendored source remains byte-identical to upstream. Rustfmt is the sole
-post-generation transform. The SDK exposes the spec's required `UsageInfo`
-counters directly as `i64`.
+The current full-coverage branch retains the unmodified official specification
+as its wire-contract source, then applies versioned, deterministic generator
+patches before generation. These patches fix generator behavior (including
+multipart requests and owned streaming return types); `codegen.lock` pins and
+verifies their hashes. Generated output remains reproducible and is checked
+byte-for-byte by CI.
+
+A handwritten semantic facade now covers Chat and OCR. It is the primary public
+API for those resources and translates directly to generated request/response
+types without JSON round-trips. The complete mechanical transport remains
+available explicitly through `raw`. This is intentionally an architectural
+spike, not a claim that all 173 operations already have an idiomatic facade.
+
+One preprocessing correction removes `data` from
+`ChatCompletionResponse.required`: upstream lists it as required without
+defining the property, and normal Mistral chat responses do not contain it.
+`codegen/preprocess.py` matches the complete known schema fragment exactly and
+fails closed if upstream changes it. The vendored source remains byte-identical
+to upstream. The SDK exposes the spec's required `UsageInfo` counters directly
+as `i64`.
 
 ## Existing clients considered
 
