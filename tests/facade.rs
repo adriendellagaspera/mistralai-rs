@@ -22,12 +22,10 @@ fn generated_chat_request_maps_to_the_raw_wire_contract() {
 
 #[test]
 fn generated_ocr_request_covers_every_document_input_kind() {
-    let document = OcrRequest::document_url(
-        "mistral-ocr-latest",
-        "https://example.com/document.pdf",
-    )
-    .include_blocks(true)
-    .into_raw();
+    let document =
+        OcrRequest::document_url("mistral-ocr-latest", "https://example.com/document.pdf")
+            .include_blocks(true)
+            .into_raw();
     let value = serde_json::to_value(document).unwrap();
     assert_eq!(value["document"]["type"], "document_url");
     assert_eq!(value["include_blocks"], true);
