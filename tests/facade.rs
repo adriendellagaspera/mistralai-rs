@@ -1,4 +1,12 @@
-use mistralai::{ChatRequest, Message, OcrRequest};
+use mistralai::{ChatRequest, Message, Mistral, OcrRequest};
+
+#[test]
+fn third_resource_uses_the_same_generated_client_taxonomy() {
+    let client = Mistral::new("test");
+    let models = client.models();
+    let _list_all = models.list();
+    let _list_filtered = models.list_with(Some("mistral"), None);
+}
 
 #[test]
 fn generated_chat_request_maps_to_the_raw_wire_contract() {

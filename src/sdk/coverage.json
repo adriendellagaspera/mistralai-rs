@@ -1,12 +1,31 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "resources": {
     "chat": {
       "operations": [
         "chat_completion_v1_chat_completions_post",
-        "chat_completion_v1_chat_completions_post_stream"
-      ],
-      "request_fields": [
+        "chat_completion_v1_chat_completions_post"
+      ]
+    },
+    "ocr": {
+      "operations": [
+        "ocr_v1_ocr_post"
+      ]
+    },
+    "models": {
+      "operations": [
+        "list_models_v1_models_get"
+      ]
+    }
+  },
+  "models": {
+    "Message": {
+      "raw": "ChatCompletionRequestMessagesItemUnion",
+      "fields": []
+    },
+    "ChatRequest": {
+      "raw": "ChatCompletionRequest",
+      "fields": [
         "frequency_penalty",
         "guardrails",
         "max_tokens",
@@ -31,11 +50,46 @@
         "top_p"
       ]
     },
-    "ocr": {
-      "operations": [
-        "ocr_v1_ocr_post"
-      ],
-      "request_fields": [
+    "ChatResponse": {
+      "raw": "ChatCompletionResponse",
+      "fields": [
+        "choices",
+        "created",
+        "id",
+        "model",
+        "object",
+        "usage"
+      ]
+    },
+    "ChatStreamChunk": {
+      "raw": "CompletionChunk",
+      "fields": [
+        "choices",
+        "created",
+        "id",
+        "model",
+        "object",
+        "usage"
+      ]
+    },
+    "OcrPage": {
+      "raw": "OCRPageObject",
+      "fields": [
+        "blocks",
+        "confidence_scores",
+        "dimensions",
+        "footer",
+        "header",
+        "hyperlinks",
+        "images",
+        "index",
+        "markdown",
+        "tables"
+      ]
+    },
+    "OcrRequest": {
+      "raw": "OCRRequest",
+      "fields": [
         "bbox_annotation_format",
         "confidence_scores_granularity",
         "document",
@@ -51,6 +105,22 @@
         "model",
         "pages",
         "table_format"
+      ]
+    },
+    "OcrResponse": {
+      "raw": "OCRResponse",
+      "fields": [
+        "document_annotation",
+        "model",
+        "pages",
+        "usage_info"
+      ]
+    },
+    "ModelListResponse": {
+      "raw": "ModelList",
+      "fields": [
+        "data",
+        "object"
       ]
     }
   }

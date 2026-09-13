@@ -47,10 +47,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
-The primary API is a small, resource-oriented Rust facade. It constructs the
+The primary API is a resource-oriented Rust facade compiled from OpenAPI, the
+raw Rust AST and a small declarative semantic overlay. It constructs the
 generated wire types directly: ordinary use does not require JSON conversion or
-OpenAPI `operationId` names. The complete generated client remains available
-under `mistralai::raw` for operations not yet covered by the facade.
+OpenAPI `operationId` names. The compiler has no Chat/OCR-specific backend; the
+same emitters also produce `mistral.models().list()` and its filtered variant.
+The complete generated client remains available under `mistralai::raw` for
+operations not yet covered by the facade.
 
 Run the live example explicitly (this incurs normal Mistral API usage):
 
@@ -139,7 +142,8 @@ Prerequisites: Git, Rustup, Python 3.11+ with `venv`, and [Just](https://github.
 Rust/rustfmt is pinned by `rust-toolchain.toml`. The first codegen run installs
 the generator at an immutable source commit, verifies/applies a small source
 patch, and compiles with `cargo install --locked` into `.tools/`. An isolated
-Python environment installs pinned `ruamel.yaml` for YAML 1.2 preprocessing.
+Python environment installs pinned `ruamel.yaml` for YAML 1.2 and pinned
+tree-sitter/Rust grammar packages for structural raw-binding inspection.
 
 ```sh
 just generate
@@ -164,7 +168,7 @@ not rely on `git diff` ignoring untracked files. No timestamps enter the output.
 | --- | --- |
 | `codegen.lock` | Upstream repository/path/commit/hash, generator version/source commit/patch hash, YAML parser and Rust versions |
 | `spec/` | Unmodified official spec and upstream licensing |
-| `codegen/` | Raw generator configuration, semantic manifest, facade generator, preprocessing repairs and evaluation |
+| `codegen/` | Raw generator configuration, semantic overlay, typed facade compiler, preprocessing repairs and evaluation |
 | `scripts/` | Acquisition, isolated generation, validation and update tooling |
 | `src/generated/` | Committed generated Rust, dependency manifest and operation inventory |
 | `src/sdk/` | Committed generated resource facade plus its generic stable error runtime |
