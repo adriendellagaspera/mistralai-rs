@@ -2665,7 +2665,7 @@ impl HttpClient {
         conversation_id: impl AsRef<str>,
         request: ConversationAppendStreamRequest,
     ) -> Result<
-        impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>>,
+        impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>> + use<>,
         ApiOpError<AgentsApiV1ConversationsAppendStreamApiError>,
     > {
         let request_url = format!(
@@ -3291,7 +3291,7 @@ impl HttpClient {
         conversation_id: impl AsRef<str>,
         request: ConversationRestartStreamRequest,
     ) -> Result<
-        impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>>,
+        impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>> + use<>,
         ApiOpError<AgentsApiV1ConversationsRestartStreamApiError>,
     > {
         let request_url = format!(
@@ -3464,7 +3464,7 @@ impl HttpClient {
         &self,
         request: ConversationStreamRequest,
     ) -> Result<
-        impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>>,
+        impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>> + use<>,
         ApiOpError<AgentsApiV1ConversationsStartStreamApiError>,
     > {
         let request_url = format!("{}{}", self.base_url, "/v1/conversations");
@@ -3839,7 +3839,7 @@ impl HttpClient {
         &self,
         request: AudioTranscriptionRequestStream,
     ) -> Result<
-        impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>>,
+        impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>> + use<>,
         ApiOpError<serde_json::Value>,
     > {
         let request_url = format!("{}{}", self.base_url, "/v1/audio/transcriptions");
@@ -4389,7 +4389,7 @@ impl HttpClient {
         &self,
         request: ChatCompletionRequest,
     ) -> Result<
-        impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>>,
+        impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>> + use<>,
         ApiOpError<ChatCompletionV1ChatCompletionsPostStreamApiError>,
     > {
         let request_url = format!("{}{}", self.base_url, "/v1/chat/completions");
@@ -8910,7 +8910,7 @@ impl HttpClient {
         &self,
         request: FIMCompletionRequest,
     ) -> Result<
-        impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>>,
+        impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>> + use<>,
         ApiOpError<FimCompletionV1FimCompletionsPostStreamApiError>,
     > {
         let request_url = format!("{}{}", self.base_url, "/v1/fim/completions");
@@ -12228,7 +12228,7 @@ impl HttpClient {
         workflow_event_types: Option<impl AsRef<str>>,
         last_event_id: Option<impl AsRef<str>>,
     ) -> Result<
-        impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>>,
+        impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>> + use<>,
         ApiOpError<GetStreamEventsV1WorkflowsEventsStreamGetApiError>,
     > {
         let request_url = format!("{}{}", self.base_url, "/v1/workflows/events/stream");
@@ -18819,7 +18819,7 @@ impl HttpClient {
         &self,
         request: SpeechRequest,
     ) -> Result<
-        impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>>,
+        impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>> + use<>,
         ApiOpError<SpeechV1AudioSpeechPostStreamApiError>,
     > {
         let request_url = format!("{}{}", self.base_url, "/v1/audio/speech");
@@ -18899,7 +18899,7 @@ impl HttpClient {
         event_source: Option<impl AsRef<str>>,
         last_event_id: Option<impl AsRef<str>>,
     ) -> Result<
-        impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>>,
+        impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>> + use<>,
         ApiOpError<StreamV1WorkflowsExecutionsExecutionIdStreamGetApiError>,
     > {
         let request_url = format!(
