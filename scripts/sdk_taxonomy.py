@@ -116,7 +116,7 @@ def unique_match(pattern: str, source: str, label: str, *, flags: int = re.MULTI
 def parse_ts_function(path: Path) -> dict[str, str]:
     source = path.read_text()
     raw_path = unique_match(
-        r"\bpathToFunc\s*\(\s*[\"']([^\"']+)[\"']\s*\)",
+        r"\bpathToFunc\s*\(\s*[\"']([^\"']+)[\"']\s*,?\s*\)",
         source,
         f"path in {path}",
         flags=re.MULTILINE | re.DOTALL,
