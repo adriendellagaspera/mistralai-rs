@@ -44,6 +44,6 @@ byte-for-byte. The nightly uses the same pipeline.
 New operations remain immediately reachable through `raw` even before a new
 resource mapping is deliberately added to the semantic manifest.
 
-The current public projection covers Chat, OCR, Models, Embeddings, FIM and
-Classifiers/Moderations. `src/sdk/coverage.json` is the machine-readable boundary
+The current public projection covers Chat, OCR, Models, Embeddings, FIM,
+Classifiers/Moderations, and the JSON metadata operations for Files. `src/sdk/coverage.json` is the machine-readable boundary
 between mapped operations and the remaining raw-only surface.

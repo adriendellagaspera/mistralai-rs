@@ -1870,6 +1870,163 @@ impl From<ModerationResultSet> for ModerationResponse {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
+pub struct FileInfo<'a> {
+    raw: &'a FileSchema,
+}
+
+impl<'a> FileInfo<'a> {
+    pub(crate) fn new(raw: &'a FileSchema) -> Self {
+        Self { raw }
+    }
+    pub fn id(&self) -> &uuid::Uuid {
+        &self.raw.id
+    }
+    pub fn filename(&self) -> &str {
+        &self.raw.filename
+    }
+    pub fn size_bytes(&self) -> i64 {
+        self.raw.bytes
+    }
+    pub fn created_at(&self) -> i64 {
+        self.raw.created_at
+    }
+    pub fn raw(&self) -> &'a FileSchema {
+        self.raw
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct FileDetails {
+    raw: RetrieveFileOut,
+}
+
+impl FileDetails {
+    pub fn id(&self) -> &uuid::Uuid {
+        &self.raw.id
+    }
+    pub fn filename(&self) -> &str {
+        &self.raw.filename
+    }
+    pub fn size_bytes(&self) -> i64 {
+        self.raw.bytes
+    }
+    pub fn created_at(&self) -> i64 {
+        self.raw.created_at
+    }
+    pub fn deleted(&self) -> bool {
+        self.raw.deleted
+    }
+    pub fn raw(&self) -> &RetrieveFileOut {
+        &self.raw
+    }
+    pub fn into_raw(self) -> RetrieveFileOut {
+        self.raw
+    }
+}
+
+impl From<RetrieveFileOut> for FileDetails {
+    fn from(raw: RetrieveFileOut) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<FileDetails> for RetrieveFileOut {
+    fn from(value: FileDetails) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct FileList {
+    raw: ListFilesOut,
+}
+
+impl FileList {
+    pub fn files(&self) -> impl ExactSizeIterator<Item = FileInfo<'_>> {
+        self.raw.data.iter().map(FileInfo::new)
+    }
+    pub fn raw(&self) -> &ListFilesOut {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ListFilesOut {
+        self.raw
+    }
+}
+
+impl From<ListFilesOut> for FileList {
+    fn from(raw: ListFilesOut) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<FileList> for ListFilesOut {
+    fn from(value: FileList) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DeletedFile {
+    raw: DeleteFileOut,
+}
+
+impl DeletedFile {
+    pub fn id(&self) -> &uuid::Uuid {
+        &self.raw.id
+    }
+    pub fn deleted(&self) -> bool {
+        self.raw.deleted
+    }
+    pub fn raw(&self) -> &DeleteFileOut {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DeleteFileOut {
+        self.raw
+    }
+}
+
+impl From<DeleteFileOut> for DeletedFile {
+    fn from(raw: DeleteFileOut) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<DeletedFile> for DeleteFileOut {
+    fn from(value: DeletedFile) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct FileSignedUrl {
+    raw: FileSignedURL,
+}
+
+impl FileSignedUrl {
+    pub fn url(&self) -> &str {
+        &self.raw.url
+    }
+    pub fn raw(&self) -> &FileSignedURL {
+        &self.raw
+    }
+    pub fn into_raw(self) -> FileSignedURL {
+        self.raw
+    }
+}
+
+impl From<FileSignedURL> for FileSignedUrl {
+    fn from(raw: FileSignedURL) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<FileSignedUrl> for FileSignedURL {
+    fn from(value: FileSignedUrl) -> Self {
+        value.into_raw()
+    }
+}
+
 pub type ChatStream =
     Pin<Box<dyn Stream<Item = Result<ChatStreamChunk, SdkError>> + Send + 'static>>;
 pub type FimStream = Pin<Box<dyn Stream<Item = Result<FimStreamChunk, SdkError>> + Send + 'static>>;

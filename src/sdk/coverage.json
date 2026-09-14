@@ -483,7 +483,7 @@
     "files_api_routes_delete_file": {
       "method": "delete",
       "path": "/v1/files/{file_id}",
-      "status": "candidate_unverified",
+      "status": "mapped",
       "review_reasons": []
     },
     "files_api_routes_download_file": {
@@ -497,19 +497,19 @@
     "files_api_routes_get_signed_url": {
       "method": "get",
       "path": "/v1/files/{file_id}/url",
-      "status": "candidate_unverified",
+      "status": "mapped",
       "review_reasons": []
     },
     "files_api_routes_list_files": {
       "method": "get",
       "path": "/v1/files",
-      "status": "candidate_unverified",
+      "status": "mapped",
       "review_reasons": []
     },
     "files_api_routes_retrieve_file": {
       "method": "get",
       "path": "/v1/files/{file_id}",
-      "status": "candidate_unverified",
+      "status": "mapped",
       "review_reasons": []
     },
     "files_api_routes_upload_file": {
@@ -1300,6 +1300,14 @@
         "classifications_v1_classifications_post",
         "chat_classifications_v1_chat_classifications_post"
       ]
+    },
+    "files": {
+      "operations": [
+        "files_api_routes_list_files",
+        "files_api_routes_retrieve_file",
+        "files_api_routes_delete_file",
+        "files_api_routes_get_signed_url"
+      ]
     }
   },
   "models": {
@@ -1669,6 +1677,65 @@
         "id",
         "model",
         "results"
+      ]
+    },
+    "FileInfo": {
+      "raw": "FileSchema",
+      "fields": [
+        "bytes",
+        "created_at",
+        "expires_at",
+        "filename",
+        "id",
+        "mimetype",
+        "num_lines",
+        "object",
+        "purpose",
+        "sample_type",
+        "signature",
+        "source",
+        "visibility"
+      ]
+    },
+    "FileDetails": {
+      "raw": "RetrieveFileOut",
+      "fields": [
+        "bytes",
+        "created_at",
+        "deleted",
+        "expires_at",
+        "filename",
+        "id",
+        "mimetype",
+        "num_lines",
+        "object",
+        "purpose",
+        "sample_type",
+        "signature",
+        "source",
+        "visibility"
+      ]
+    },
+    "FileList": {
+      "raw": "ListFilesOut",
+      "fields": [
+        "data",
+        "object",
+        "total"
+      ]
+    },
+    "DeletedFile": {
+      "raw": "DeleteFileOut",
+      "fields": [
+        "deleted",
+        "id",
+        "object"
+      ]
+    },
+    "FileSignedUrl": {
+      "raw": "FileSignedURL",
+      "fields": [
+        "url"
       ]
     }
   }

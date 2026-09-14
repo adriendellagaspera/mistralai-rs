@@ -4,6 +4,7 @@ pub mod classifiers;
 pub mod embeddings;
 pub mod error;
 mod facade_types;
+pub mod files;
 pub mod fim;
 pub mod models;
 pub mod ocr;
@@ -17,11 +18,13 @@ pub use facade_types::{
     ChatModerationInput, ChatModerationParams, ChatRequest, ChatResponse, ChatStream,
     ChatStreamChunk, ClassificationInput, ClassificationParams, ClassificationResult,
     ClassificationResultSet, ClassifierConversation, ClassifierFineTunedModel,
-    CompletionFineTunedModel, DeleteModelResponse, Embedding, EmbeddingInput, EmbeddingParams,
-    EmbeddingResult, FimRequest, FimResponse, FimStream, FimStreamChunk, FineTunedModel, Message,
-    ModelListResponse, ModelResponse, ModerationResult, ModerationResultSet, OcrPage, OcrRequest,
-    OcrResponse, StopSequences, UnarchiveModelResponse, UpdateModelRequest, UpdateModelResponse,
+    CompletionFineTunedModel, DeleteModelResponse, DeletedFile, Embedding, EmbeddingInput,
+    EmbeddingParams, EmbeddingResult, FileDetails, FileInfo, FileList, FileSignedUrl, FimRequest,
+    FimResponse, FimStream, FimStreamChunk, FineTunedModel, Message, ModelListResponse,
+    ModelResponse, ModerationResult, ModerationResultSet, OcrPage, OcrRequest, OcrResponse,
+    StopSequences, UnarchiveModelResponse, UpdateModelRequest, UpdateModelResponse,
 };
+pub use files::Files;
 pub use fim::Fim;
 pub use models::Models;
 pub use ocr::Ocr;
@@ -61,6 +64,9 @@ impl Mistral {
     }
     pub fn classifiers(&self) -> Classifiers<'_> {
         Classifiers::new(&self.raw)
+    }
+    pub fn files(&self) -> Files<'_> {
+        Files::new(&self.raw)
     }
     pub fn raw(&self) -> &HttpClient {
         &self.raw
