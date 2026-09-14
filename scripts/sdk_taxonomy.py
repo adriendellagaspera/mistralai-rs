@@ -110,7 +110,7 @@ def unique_match(pattern: str, source: str, label: str) -> str:
 
 def parse_ts_function(path: Path) -> dict[str, str]:
     source = path.read_text()
-    raw_path = unique_match(r'pathToFunc\\(\\s*"([^"]+)"\\s*,?\\s*\\)', source, f"path in {path}")
+    raw_path = unique_match(r'pathToFunc\\([^\"]*\"([^\"]+)\"', source, f\"path in {path}\")
     method = unique_match(r'\bmethod:\s*"([A-Z]+)"', source, f"method in {path}")
     operation_id = unique_match(r'\boperationID:\s*"([^"]+)"', source, f"operation ID in {path}")
     return {
