@@ -3,7 +3,7 @@ use std::net::TcpListener;
 use std::thread::{self, JoinHandle};
 use std::time::Duration;
 
-use mistralai::{ChatCompletionRequest, Client};
+use mistralai::raw::{Client, types::ChatCompletionRequest};
 use serde_json::{Value, json};
 
 fn server(status: &str, body: Value) -> (String, JoinHandle<(String, Value)>) {
@@ -99,4 +99,36 @@ async fn api_error_is_returned_to_caller() {
         .await;
     assert!(result.is_err());
     worker.join().unwrap();
+}
+
+#[tokio::test]
+async fn generated_query_request_owns_strings_and_preserves_wire_encoding() {
+    use mistralai::{Mistral, models::ListModelsRequest};
+
+    let (url, worker) = server("200 OK", json!({"data": [], "object": "list"}));
+    let request = {
+        let temporary = String::from("a provider&co");
+        ListModelsRequest::default()
+            .provider(temporary)
+            .model("small/latest")
+    };
+    let client = Mistral::new("test-key").with_base_url(url);
+    let response = client.models().list_with(request).await.unwrap();
+    assert!(response.raw().data.as_ref().unwrap().is_empty());
+    let (header, payload) = worker.join().unwrap();
+    assert!(
+        header.starts_with(
+            "GET /v1/models?provider=a+provider%26co&model=small%2Flatest HTTP/1.1\r\n"
+        )
+    );
+    assert_eq!(payload, Value::Null);
+}
+
+#[tokio::test]
+async fn generated_parameterless_convenience_omits_optional_query() {
+    let (url, worker) = server("200 OK", json!({"data": []}));
+    let client = mistralai::Mistral::new("test-key").with_base_url(url);
+    client.models().list().await.unwrap();
+    let (header, _) = worker.join().unwrap();
+    assert!(header.starts_with("GET /v1/models HTTP/1.1\r\n"));
 }

@@ -91,6 +91,8 @@ def main():
         f"- New spec SHA-256: `{new['spec_sha256']}`\n"
         f"- Published spec: `{published_url}` (verified identical)\n"
         f"- Generator: `{old['generator']} {old['generator_version']}`\n"
+        f"- Generator source commit: `{old.get('generator_commit', 'published crate')}`\n"
+        f"- Generator patch SHA-256: `{old.get('generator_patch_sha256', 'none')}`\n"
         f"- Rust/rustfmt: `{old['rust_toolchain']}`\n"
         f"- [Upstream changes](https://github.com/{repo}/compare/{old['upstream_commit']}...{commit})\n\n"
         "Review the spec and generated API diff for breaking changes before merging.\n")

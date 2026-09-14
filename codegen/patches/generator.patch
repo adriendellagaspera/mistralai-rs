@@ -1,0 +1,185 @@
+--- a/src/client_generator.rs
++++ b/src/client_generator.rs
+@@ -172,6 +172,7 @@
+ #[derive(Clone, Copy)]
+ enum MultipartClientFieldKind {
+     RawBytes,
++    RepeatedText,
+     Base64,
+     Base64UrlUnpadded,
+     Text,
+@@ -257,6 +258,7 @@
+                 api_key: Option<String>,
+                 http_client: ClientWithMiddleware,
+                 custom_headers: BTreeMap<String, String>,
++                upload_filename: String,
+                 max_response_body_bytes: usize,
+             }
+ 
+@@ -426,6 +428,7 @@
+                         api_key: None,
+                         http_client,
+                         custom_headers: BTreeMap::new(),
++                        upload_filename: "upload".to_string(),
+                         max_response_body_bytes: #max_response_body_bytes,
+                     }
+                 }
+@@ -451,6 +454,7 @@
+                         api_key: None,
+                         http_client,
+                         custom_headers: BTreeMap::new(),
++                        upload_filename: "upload".to_string(),
+                         max_response_body_bytes: #max_response_body_bytes,
+                     }
+                 }
+@@ -470,6 +474,11 @@
+             }
+ 
+             /// Set the API key for authentication
++            pub fn with_upload_filename(mut self, filename: impl Into<String>) -> Self {
++                self.upload_filename = filename.into();
++                self
++            }
++
+             pub fn with_api_key(mut self, api_key: impl Into<String>) -> Self {
+                 self.api_key = Some(api_key.into());
+                 self
+@@ -1263,7 +1272,7 @@
+                 let mut chosen = base.clone();
+                 let mut suffix = 2;
+                 while !used.insert(chosen.clone()) {
+-                    chosen = format!("{base}_{suffix}");
++                    chosen = format!("{base}{suffix}");
+                     suffix += 1;
+                 }
+                 chosen
+@@ -1414,6 +1423,7 @@
+         let path = &op.path;
+         let request_param = self.generate_request_param(op);
+         let request_body = self.generate_request_body(op, analysis);
++        let stream_parameter = self.generate_stream_parameter(op, analysis);
+         let query_params = self.generate_query_params(op);
+         let header_params = self.generate_header_params(op);
+         let cookie_params = self.generate_cookie_params(op);
+@@ -1458,6 +1468,7 @@
+                 #url_construction
+ 
+                 let mut req = #http_method_call;
++                #stream_parameter
+                 #request_body
+ 
+                 #query_params
+@@ -1479,6 +1490,37 @@
+                 #error_handling
+             }
+         }
++    }
++
++    // Keep a declared boolean stream parameter aligned with the method's
++    // response contract, including absent/defaulted and nullable fields.
++    fn generate_stream_parameter(&self, op: &OperationInfo, analysis: &SchemaAnalysis) -> TokenStream {
++        use crate::analysis::{RequestBodyContent, SchemaType};
++        if !op.request_body_required { return TokenStream::new(); }
++        let name = match op.request_body.as_ref() {
++            Some(RequestBodyContent::Json { schema_name, .. })
++            | Some(RequestBodyContent::Multipart { schema_name, .. }) => schema_name,
++            _ => return TokenStream::new(),
++        };
++        let Some((resolved_name, schema)) = self.resolve_reference_schema(name, analysis) else {
++            return TokenStream::new();
++        };
++        let SchemaType::Object { properties, required, .. } = &schema.schema_type else {
++            return TokenStream::new();
++        };
++        let Some(property) = properties.get("stream") else { return TokenStream::new(); };
++        if !matches!(&property.schema_type, SchemaType::Primitive { rust_type, .. } if rust_type == "bool") {
++            return TokenStream::new();
++        }
++        let value = self.get_success_response(analysis, op).accept == Some("text/event-stream");
++        let value = if self.property_is_tri_state(resolved_name, "stream", property, required.contains("stream")) {
++            quote! { Some(Some(#value)) }
++        } else if !required.contains("stream") || self.property_is_nullable(resolved_name, "stream", property) {
++            quote! { Some(#value) }
++        } else {
++            quote! { #value }
++        };
++        quote! { let mut request = request; request.stream = #value; }
+     }
+ 
+     /// T3: emit the auth-token application based on the configured AuthConfig.
+@@ -2535,6 +2577,12 @@
+         analysis: &'a SchemaAnalysis,
+         visited: &mut std::collections::HashSet<String>,
+     ) -> Option<&'a serde_json::Value> {
++        if let Some(variants) = schema.get("anyOf").and_then(serde_json::Value::as_array) {
++            let non_null: Vec<_> = variants.iter().filter(|v| v.get("type").and_then(serde_json::Value::as_str) != Some("null")).collect();
++            if non_null.len() == 1 {
++                return Self::resolve_multipart_wire_schema(non_null[0], analysis, visited);
++            }
++        }
+         let Some(reference) = schema.get("$ref").and_then(serde_json::Value::as_str) else {
+             return Some(schema);
+         };
+@@ -2572,6 +2620,12 @@
+                     Some(MultipartClientFieldKind::Base64)
+                 } else {
+                     Some(MultipartClientFieldKind::Text)
++                }
++            }
++            crate::analysis::SchemaType::Array { item_type } => {
++                match Self::multipart_client_field_kind(item_type, analysis, visited) {
++                    Some(MultipartClientFieldKind::Text) => Some(MultipartClientFieldKind::RepeatedText),
++                    _ => None,
+                 }
+             }
+             crate::analysis::SchemaType::StringEnum { .. }
+@@ -2695,7 +2749,7 @@
+                 MultipartClientFieldKind::RawBytes => quote! {
+                     form = form.part(
+                         #wire_name,
+-                        reqwest::multipart::Part::bytes(value.to_vec()),
++                        reqwest::multipart::Part::bytes(value.to_vec()).file_name(self.upload_filename.clone()),
+                     );
+                 },
+                 MultipartClientFieldKind::Base64 => quote! {
+@@ -2711,6 +2765,11 @@
+                         #wire_name,
+                         base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(value),
+                     );
++                },
++                MultipartClientFieldKind::RepeatedText => quote! {
++                    for item in value {
++                        form = form.text(#wire_name, item.to_string());
++                    }
+                 },
+                 MultipartClientFieldKind::Text => quote! {
+                     form = form.text(#wire_name, value.to_string());
+@@ -3047,6 +3106,6 @@
+             ClientSuccessBody::Binary => quote! { bytes::Bytes },
+             ClientSuccessBody::EventStream => {
+-                quote! { impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>> }
++                quote! { futures_util::stream::BoxStream<'static, Result<bytes::Bytes, reqwest::Error>> }
+             }
+             ClientSuccessBody::Empty => quote! { () },
+         }
+@@ -3155,7 +3214,7 @@
+                 let status_code = status.as_u16();
+                 let headers = response.headers().clone();
+ 
+                 if #success_status_guard {
+-                    Ok(response.bytes_stream())
++                    Ok(Box::pin(response.bytes_stream()))
+                 } else {
+                     if status.is_success() {
+--- a/src/generator.rs
++++ b/src/generator.rs
+@@ -2274,7 +2274,8 @@
+ 
+                 let doc_comment = if let Some(desc) = &property.description {
+                     let sanitized_desc = self.sanitize_doc_comment(desc);
+-                    quote! { #[doc = #sanitized_desc] }
++                    let lines: Vec<_> = sanitized_desc.lines().collect();
++                    quote! { #(#[doc = #lines])* }
+                 } else {
+                     TokenStream::new()
+                 };

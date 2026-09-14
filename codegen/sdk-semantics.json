@@ -1,0 +1,79 @@
+{
+  "schema_version": 2,
+  "client": { "name": "Mistral" },
+  "models": {
+    "Message": {
+      "raw": "ChatCompletionRequestMessagesItemUnion",
+      "union": { "root": "ChatCompletionRequest", "path": ["messages", "items"], "payload": "content" }
+    },
+    "ChatRequest": {
+      "raw": "ChatCompletionRequest",
+      "constructor": ["model", "messages"],
+      "adapters": { "messages": "Message" },
+      "exclude": ["stream"]
+    },
+    "ChatResponse": {
+      "raw": "ChatCompletionResponse",
+      "borrowed": false,
+      "accessors": {
+        "text": { "kind": "first_string_variant", "path": ["choices", "first", "message", "content", "optional", "optional"] }
+      }
+    },
+    "ChatStreamChunk": {
+      "raw": "CompletionChunk",
+      "borrowed": false,
+      "accessors": {
+        "text": { "kind": "first_string_variant", "path": ["choices", "first", "delta", "content", "optional", "optional"] }
+      }
+    },
+    "OcrPage": {
+      "raw": "OCRPageObject",
+      "borrowed": true,
+      "accessors": {
+        "index": { "kind": "copy", "path": ["index"] },
+        "markdown": { "kind": "ref", "path": ["markdown"] }
+      }
+    },
+    "OcrRequest": {
+      "raw": "OCRRequest",
+      "exclude": ["document", "model"],
+      "union_factory": { "field": "document", "leading": ["model"], "rename": { "file": "file_id" } }
+    },
+    "OcrResponse": {
+      "raw": "OCRResponse",
+      "borrowed": false,
+      "accessors": {
+        "model": { "kind": "ref", "path": ["model"] },
+        "pages": { "kind": "iter", "path": ["pages"], "wrapper": "OcrPage" }
+      }
+    },
+    "ModelListResponse": { "raw": "ModelList", "borrowed": false, "accessors": {} }
+  },
+  "resources": {
+    "chat": {
+      "name": "Chat",
+      "operations": {
+        "complete": { "operation_id": "chat_completion_v1_chat_completions_post", "request": "ChatRequest", "response": "ChatResponse", "request_overrides": { "stream": false } },
+        "stream": {
+          "operation_id": "chat_completion_v1_chat_completions_post",
+          "raw_method": "chat_completion_v1_chat_completions_post_stream",
+          "request": "ChatRequest",
+          "request_overrides": { "stream": true },
+          "stream": { "item": "CompletionChunk", "wrapper": "ChatStreamChunk", "type": "ChatStream" }
+        }
+      }
+    },
+    "ocr": {
+      "name": "Ocr",
+      "operations": {
+        "process": { "operation_id": "ocr_v1_ocr_post", "request": "OcrRequest", "response": "OcrResponse" }
+      }
+    },
+    "models": {
+      "name": "Models",
+      "operations": {
+        "list": { "operation_id": "list_models_v1_models_get", "response": "ModelListResponse" }
+      }
+    }
+  }
+}

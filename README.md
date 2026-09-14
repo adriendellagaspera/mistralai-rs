@@ -18,7 +18,6 @@ Git; it has not been published to crates.io:
 [dependencies]
 mistralai = { package = "mistralai-sdk", git = "https://github.com/adriendellagaspera/mistralai-rs" }
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
-serde_json = "1"
 ```
 
 Pin a Git `rev` for reproducible consumer builds. No dependency on `agent-ir` or
@@ -27,27 +26,34 @@ any benchmark project exists in this SDK.
 ## Chat completion
 
 ```rust,no_run
-use mistralai::{ChatCompletionRequest, Client};
+use mistralai::{ChatRequest, Message, Mistral};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let client = Client::new().with_api_key(std::env::var("MISTRAL_API_KEY")?);
-    let request: ChatCompletionRequest = serde_json::from_value(serde_json::json!({
-        "model": "mistral-small-latest",
-        "messages": [{"role": "user", "content": "Say hello in French."}],
-        "stream": false,
-        "max_tokens": 64
-    }))?;
-    let response = client.chat_completion_v1_chat_completions_post(request).await?;
-    println!("{}", response.usage.prompt_tokens);
-    println!("{}", response.usage.completion_tokens);
+    let mistral = Mistral::new(std::env::var("MISTRAL_API_KEY")?);
+    let response = mistral
+        .chat()
+        .complete(
+            ChatRequest::new(
+                "mistral-small-latest",
+                [Message::user("Say hello in French.")],
+            )
+            .max_tokens(64),
+        )
+        .await?;
+    println!("{}", response.text().unwrap_or_default());
+    println!("{}", response.raw().usage.completion_tokens);
     Ok(())
 }
 ```
 
-The request and response are generated Rust types. JSON is only used above as a
-concise way to construct the request; there is no handwritten schema or client
-facade. `Client` is a re-export of the generated `HttpClient`.
+The primary API is a resource-oriented Rust facade compiled from OpenAPI, the
+raw Rust AST and a small declarative semantic overlay. It constructs the
+generated wire types directly: ordinary use does not require JSON conversion or
+OpenAPI `operationId` names. The compiler has no Chat/OCR-specific backend; the
+same emitters also produce `mistral.models().list()` and its filtered variant.
+The complete generated client remains available under `mistralai::raw` for
+operations not yet covered by the facade.
 
 Run the live example explicitly (this incurs normal Mistral API usage):
 
@@ -63,15 +69,68 @@ Do not send credentials to an endpoint you do not trust.
 
 ## API scope
 
-Initial scope: non-streaming chat completions, list models, retrieve a model,
-and all reachable request/response types, including tool calls, structured
-outputs and token usage. Operation names follow upstream `operationId`s.
+All **173 operations** and **481 component schemas** from the pinned official
+specification are included, including deprecated and beta endpoints. Four
+additional generated methods select alternative response media, for **177
+methods** in total. Names follow upstream `operationId`s.
 
-Streaming is not supported by the initial client: keep `stream` false or omit
-it. The official spec describes streaming in prose, but the JSON completion
-method does not decode SSE. Other API families are outside this initial scope.
-See [the generator evaluation](codegen/EVALUATION.md) and
-[CONTRIBUTING.md](CONTRIBUTING.md) for extending the selection.
+| API families | Coverage |
+| --- | --- |
+| Chat, FIM, models, embeddings, classifiers, OCR | Generated typed requests/responses |
+| Agents, conversations, connectors | Includes beta endpoints and conversation SSE |
+| Files, batch, fine-tuning, libraries/documents/accesses | Includes multipart uploads and binary downloads |
+| Audio transcription, speech, voices | Multipart arrays/files, transcription/speech SSE, WAV sample download |
+| Observability: datasets, records, judges, campaigns, completion events | All operations declared upstream |
+| Workflows: executions, runs, schedules, deployments, events, metrics, workers | All operations, including SSE feeds |
+
+The exact machine-readable inventory is
+[`src/generated/coverage.json`](src/generated/coverage.json). Generation fails
+if an operation is missing or a generated method contains a configuration stub.
+This measures **OpenAPI coverage**, not live-service verification: offline tests
+exercise representative wire behavior and edge cases, and beta/deprecated APIs
+retain upstream stability and availability constraints. No live tests run in CI.
+Undocumented service features and media absent from the spec are not inferred.
+
+### Streaming and uploads
+
+The Chat facade returns an owned, typed stream and handles SSE decoding:
+
+```rust,no_run
+use futures_util::StreamExt;
+use mistralai::{ChatRequest, Message, Mistral};
+
+# async fn example(mistral: Mistral) -> Result<(), Box<dyn std::error::Error>> {
+let mut stream = mistral
+    .chat()
+    .stream(ChatRequest::new(
+        "mistral-small-latest",
+        [Message::user("Say hello in French.")],
+    ))
+    .await?;
+while let Some(chunk) = stream.next().await {
+    if let Some(text) = chunk?.text() {
+        print!("{text}");
+    }
+}
+# Ok(())
+# }
+```
+
+See [`examples/chat_stream.rs`](examples/chat_stream.rs) for a complete example
+(`cargo run --example chat_stream`). The lower-level generated streaming
+methods and `streaming::events` remain available under the raw API for FIM,
+speech, conversations, transcription and workflows. SSE parsing is incremental,
+handles `[DONE]`, and limits each buffered event to 1 MiB. It never reconnects
+or replays billable requests automatically. Transport, JSON and size errors are
+returned to the caller. Dropping the stream cancels consumption.
+
+Multipart file fields accept `bytes::Bytes`. Use
+`client.with_upload_filename("input.jsonl")` to set the filename sent with uploads
+(the default is `upload`). This setting applies to file parts on that client;
+clone it for concurrent uploads with different filenames. Audio arrays are sent
+as repeated form fields, and absent/null optional parts are omitted.
+Use `get_voice_sample_audio_v1_audio_voices_voice_id_sample_get_wav` for WAV bytes;
+the original method retains the spec's JSON response variant.
 
 This is a pre-1.0 SDK. Upstream schema fixes and generator upgrades can change
 the generated public Rust API; automatic update PRs require human review and
@@ -79,9 +138,12 @@ are never merged or published automatically.
 
 ## Reproduce the SDK
 
-Prerequisites: Rustup, Python 3.11+, and [Just](https://github.com/casey/just).
+Prerequisites: Git, Rustup, Python 3.11+ with `venv`, and [Just](https://github.com/casey/just).
 Rust/rustfmt is pinned by `rust-toolchain.toml`. The first codegen run installs
-the exact generator version with `cargo install --locked` into `.tools/`.
+the generator at an immutable source commit, verifies/applies a small source
+patch, and compiles with `cargo install --locked` into `.tools/`. An isolated
+Python environment installs pinned `ruamel.yaml` for YAML 1.2 and pinned
+tree-sitter/Rust grammar packages for structural raw-binding inspection.
 
 ```sh
 just generate
@@ -94,22 +156,23 @@ No Mistral API key is needed. Generation reads the vendored spec and verifies
 its SHA-256; it never fetches a newer spec implicitly. After initial tool and
 dependency installation, regeneration can run offline.
 
-`just check-generated` generates into a fresh temporary directory, runs the
-generator's own `--check` in a second process, applies pinned rustfmt, and
-compares the complete file set and bytes with the committed SDK. It leaves the
-checkout unchanged, detects added/deleted files, and does not rely on `git diff`
-ignoring untracked files. No timestamps enter the generated output.
+`just check-generated` generates into a fresh temporary directory, runs the raw
+generator's own `--check` in a second process, generates the semantic facade,
+applies pinned rustfmt, and compares both layers byte-for-byte with the committed
+SDK. It leaves the checkout unchanged, detects added/deleted raw files, and does
+not rely on `git diff` ignoring untracked files. No timestamps enter the output.
 
 ## Source and automation
 
 | Location | Purpose |
 | --- | --- |
-| `codegen.lock` | Upstream repository/path/commit/hash, generator version, Rust version |
+| `codegen.lock` | Upstream repository/path/commit/hash, generator version/source commit/patch hash, YAML parser and Rust versions |
 | `spec/` | Unmodified official spec and upstream licensing |
-| `codegen/` | Generator configuration, one fail-closed preprocessing fix, and evaluation |
+| `codegen/` | Raw generator configuration, semantic overlay, typed facade compiler, preprocessing repairs and evaluation |
 | `scripts/` | Acquisition, isolated generation, validation and update tooling |
-| `src/generated/` | Committed generated Rust and `REQUIRED_DEPS.toml` |
-| `src/lib.rs`, `tests/`, `examples/` | Handwritten exports, offline tests and opt-in example |
+| `src/generated/` | Committed generated Rust, dependency manifest and operation inventory |
+| `src/sdk/` | Committed generated resource facade plus its generic stable error runtime |
+| `src/lib.rs`, `src/streaming.rs`, `tests/`, `examples/` | Public exports/SSE decoder, offline tests and opt-in examples |
 
 The source of truth is
 [`mistralai/platform-docs-public/openapi.yaml`](https://github.com/mistralai/platform-docs-public/blob/main/openapi.yaml).

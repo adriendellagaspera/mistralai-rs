@@ -66,3 +66,4 @@ jobs:
             codegen.lock
             spec/
             src/generated/
+            src/sdk/
