@@ -24,6 +24,7 @@ impl ListModelsRequest {
         self
     }
 }
+
 #[derive(Clone, Copy)]
 pub struct Models<'a> {
     raw: &'a HttpClient,
@@ -48,6 +49,59 @@ impl<'a> Models<'a> {
     ) -> Result<ModelListResponse, SdkError> {
         self.raw
             .list_models_v1_models_get(request.provider.as_deref(), request.model.as_deref())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn retrieve(&self, model_id: impl AsRef<str>) -> Result<ModelResponse, SdkError> {
+        self.raw
+            .retrieve_model_v1_models_model_id_get(model_id.as_ref())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn delete(&self, model_id: impl AsRef<str>) -> Result<DeleteModelResponse, SdkError> {
+        self.raw
+            .delete_model_v1_models_model_id_delete(model_id.as_ref())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn update(
+        &self,
+        model_id: impl AsRef<str>,
+        request: UpdateModelRequest,
+    ) -> Result<UpdateModelResponse, SdkError> {
+        self.raw
+            .jobs_api_routes_fine_tuning_update_fine_tuned_model(
+                model_id.as_ref(),
+                request.into_raw(),
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn archive(
+        &self,
+        model_id: impl AsRef<str>,
+    ) -> Result<ArchiveModelResponse, SdkError> {
+        self.raw
+            .jobs_api_routes_fine_tuning_archive_fine_tuned_model(model_id.as_ref())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn unarchive(
+        &self,
+        model_id: impl AsRef<str>,
+    ) -> Result<UnarchiveModelResponse, SdkError> {
+        self.raw
+            .jobs_api_routes_fine_tuning_unarchive_fine_tuned_model(model_id.as_ref())
             .await
             .map(Into::into)
             .map_err(Into::into)

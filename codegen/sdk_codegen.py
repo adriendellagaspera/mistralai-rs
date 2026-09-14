@@ -20,7 +20,7 @@ from rust_types import RustType, parse_type
 from rust_symbols import SymbolProvider, field_identifier
 from jsonschema import Draft202012Validator
 from sdk_contracts import public_surface, coverage_inventory
-from sdk_ir import (Accessor, ModelPolicy, RequestPolicy, UnionPolicy, ViewPolicy,
+from sdk_ir import (Accessor, ModelPolicy, RequestPolicy, SimpleUnionPolicy, UnionPolicy, ViewPolicy,
                     StreamPolicy, model_policy, stream_policy)
 
 
@@ -82,6 +82,7 @@ class RustIndex:
         parser = Parser(Language(tree_sitter_rust.language()))
         self.structs: dict[str, tuple[RustField, ...]] = {}
         self.enums: dict[str, tuple[RustVariant, ...]] = {}
+        self.aliases: dict[str, RustType] = {}
         self.operations: dict[str, RustOperation] = {}
         self.symbol_modules: dict[str, str] = {}
         for label, source in (("types", types_source), ("client", client_source)):
@@ -128,6 +129,9 @@ class RustIndex:
                         payload = _text(source, payload_nodes[0])
                     variants.append(RustVariant(variant_name, payload))
                 self.enums[name] = tuple(variants)
+            elif item.type == "type_item":
+                name = _text(source, item.child_by_field_name("name"))
+                self.aliases[name] = parse_type(_text(source, item.child_by_field_name("type")))
 
     def _index_client(self, source: bytes, root: Node) -> None:
         for item in root.named_children:
@@ -240,6 +244,18 @@ class OpenApiIndex:
     def response_schema(self, operation_id: str) -> str | None:
         return _ref_name(_success_schema(self.operation(operation_id)))
 
+    def response_matches(self, operation_id: str, raw: str, rust: RustIndex) -> bool:
+        """Reconcile named and inline successful response schemas with raw Rust."""
+        schema = _success_schema(self.operation(operation_id))
+        referenced = _ref_name(schema)
+        if referenced:
+            return referenced == raw
+        branches = schema.get("oneOf", []) or schema.get("anyOf", [])
+        payloads = {_ref_name(branch) for branch in branches}
+        if branches and None not in payloads and raw in rust.enums:
+            return payloads == {variant.payload for variant in rust.variants(raw)}
+        return False
+
     def union(self, root: str, path: Iterable[str]) -> tuple[str, dict[str, str]]:
         schema = self.schema(root)
         for segment in path:
@@ -289,6 +305,7 @@ class OperationSpec:
     response: str | None
     request_overrides: tuple[tuple[str, bool | None], ...]
     stream: StreamPolicy | None
+    request_raw: str | None = None
 
 
 @dataclass(frozen=True)
@@ -322,20 +339,35 @@ def build_ir(openapi: OpenApiIndex, rust: RustIndex, manifest: dict[str, Any]) -
         raise GenerationError("unsupported SDK semantic manifest version")
     models = []
     for name, config in manifest.get("models", {}).items():
-        _validate_keys(config, {"raw", "constructor", "exclude", "adapters", "union", "union_factory", "accessors", "borrowed"}, f"model {name}")
+        _validate_keys(config, {"raw", "constructor", "exclude", "adapters", "union", "simple_union", "union_factory", "accessors", "borrowed"}, f"model {name}")
         raw = config.get("raw", name)
         if "union" in config:
             union = config["union"]
-            _validate_keys(union, {"root", "path", "payload"}, f"union {name}")
+            _validate_keys(union, {"root", "path", "payload", "targets"}, f"union {name}")
             _, mapping = openapi.union(union["root"], union["path"])
-            variants = {variant.payload for variant in rust.variants(raw)}
-            missing = sorted(set(mapping.values()) - variants)
-            if missing:
-                raise GenerationError(f"raw union {raw} misses branches: {', '.join(missing)}")
+            for target in (raw, *union.get("targets", [])):
+                variants = {variant.payload for variant in rust.variants(target)}
+                missing = sorted(set(mapping.values()) - variants)
+                extra = sorted(variants - set(mapping.values()))
+                if missing or extra:
+                    raise GenerationError(
+                        f"raw union {target} branch drift: missing={missing}, extra={extra}"
+                    )
+        elif "simple_union" in config:
+            configured = set(config["simple_union"]["variants"])
+            actual = {variant.name for variant in rust.variants(raw)}
+            if configured != actual:
+                raise GenerationError(
+                    f"raw union {raw} variant drift: missing={sorted(actual - configured)}, "
+                    f"extra={sorted(configured - actual)}"
+                )
         else:
-            rust.fields(raw)
-            schema = openapi.schema(raw)
+            # Empty response views may deliberately encapsulate an inline raw
+            # enum. Accessor-bearing views still require a struct.
+            if config.get("accessors") or raw not in rust.enums:
+                rust.fields(raw)
             if "constructor" in config or "union_factory" in config:
+                schema = openapi.schema(raw)
                 wire_fields = set(schema.get("properties", {}))
                 raw_fields = {field.name.removeprefix("r#") for field in rust.fields(raw)}
                 if wire_fields != raw_fields:
@@ -354,6 +386,18 @@ def build_ir(openapi: OpenApiIndex, rust: RustIndex, manifest: dict[str, Any]) -
                     )
         models.append(ModelSpec(name, raw, model_policy(config)))
     model_names = {model.name for model in models}
+    for model in models:
+        references = []
+        if isinstance(model.config, RequestPolicy):
+            references.extend(adapter for _, adapter in model.config.adapters)
+        elif isinstance(model.config, SimpleUnionPolicy):
+            references.extend(adapter for _, _, adapter in model.config.variants if adapter)
+        elif isinstance(model.config, ViewPolicy):
+            references.extend(accessor.wrapper for _, accessor in model.config.accessors
+                              if accessor.wrapper)
+        unknown = sorted(set(references) - model_names)
+        if unknown:
+            raise GenerationError(f"model {model.name} references unknown facade models: {unknown}")
     resources = []
     for module, config in manifest.get("resources", {}).items():
         _validate_keys(config, {"name", "operations"}, f"resource {module}")
@@ -372,7 +416,9 @@ def build_ir(openapi: OpenApiIndex, rust: RustIndex, manifest: dict[str, Any]) -
                 model = next(model for model in models if model.name == request)
                 if openapi.request_schema(operation_id) != model.raw:
                     raise GenerationError(f"OpenAPI request drift for {operation_id}")
-                if not raw_operation.parameters or raw_operation.parameters[0].type != model.raw:
+                body_parameters = [parameter for parameter in raw_operation.parameters
+                                   if parameter.type == model.raw]
+                if len(body_parameters) != 1:
                     raise GenerationError(f"raw signature drift for {raw_method}")
                 request_fields = _field_map(rust, model.raw)
                 unknown_overrides = set(item.get("request_overrides", {})) - set(request_fields)
@@ -388,16 +434,15 @@ def build_ir(openapi: OpenApiIndex, rust: RustIndex, manifest: dict[str, Any]) -
                         raise GenerationError(f"invalid Boolean override: {model.raw}.{field}")
             elif item.get("request_overrides"):
                 raise GenerationError(f"request overrides require a body projection: {raw_method}")
-            raw_parameters = raw_operation.parameters[1:] if request else raw_operation.parameters
-            if request and raw_parameters:
-                raise GenerationError(f"body plus parameters requires a composite request projection: {raw_method}")
+            raw_parameters = tuple(parameter for parameter in raw_operation.parameters
+                                   if not request or parameter.type != model.raw)
             wire_parameter_names = tuple(parameter["name"].replace("-", "_")
                                          for parameter in wire_operation.get("parameters", []))
             if tuple(parameter.name for parameter in raw_parameters) != wire_parameter_names:
                 raise GenerationError(f"OpenAPI/raw parameter drift for {raw_method}")
             if response and not item.get("stream"):
                 model = next(model for model in models if model.name == response)
-                if openapi.response_schema(operation_id) != model.raw:
+                if not openapi.response_matches(operation_id, model.raw, rust):
                     raise GenerationError(f"OpenAPI response drift for {operation_id}")
                 if raw_operation.success_type != model.raw:
                     raise GenerationError(f"raw response drift for {raw_method}")
@@ -424,8 +469,11 @@ def build_ir(openapi: OpenApiIndex, rust: RustIndex, manifest: dict[str, Any]) -
                 lifetime, event = transport.arguments
                 if lifetime.spelling != "'static" or event.constructor != "Result" or tuple(arg.spelling for arg in event.arguments) != ("bytes::Bytes", "reqwest::Error"):
                     raise GenerationError(f"stream transport ownership/item drift: {raw_method}")
+            request_raw = (next(model.raw for model in models if model.name == request)
+                           if request else None)
             operations.append(OperationSpec(public_name, operation_id, raw_method, request, response,
-                                            tuple(item.get("request_overrides", {}).items()), stream_policy(item.get("stream"))))
+                                            tuple(item.get("request_overrides", {}).items()),
+                                            stream_policy(item.get("stream")), request_raw))
         resources.append(ResourceSpec(module, config["name"], tuple(operations)))
     ir = SdkIr(manifest.get("client", {}).get("name", "Client"), tuple(models), tuple(resources))
     _validate_symbols(ir, rust)
@@ -456,7 +504,8 @@ def _validate_symbols(ir: SdkIr, rust: RustIndex) -> None:
             for operation in resource.operations:
                 symbols.claim(operation.name, resource.name, operation.operation_id)
                 parameters = rust.operation(operation.raw_method).parameters
-                if not operation.request and parameters:
+                if (not operation.request and parameters
+                        and any(_option(parameter.type) for parameter in parameters)):
                     symbols.claim(_request_name(resource, operation), f"module:{resource.module}", operation.operation_id)
                     if all(_option(parameter.type) for parameter in parameters):
                         symbols.claim(operation.name + "_with", resource.name, operation.operation_id)
@@ -510,7 +559,11 @@ def _emit_setters(model: ModelSpec, rust: RustIndex) -> str:
                 f"new required field {model.raw}.{name}; constructor policy needs semantic review"
             )
         inner, nullable = optional
-        argument, value = _argument(name, inner)
+        adapter = dict(model.config.adapters).get(name)
+        if adapter:
+            argument, value = _constructor_arg(name, RustField(name, parse_type(inner)), adapter)
+        else:
+            argument, value = _argument(name, inner)
         methods.append(
             f"#[must_use]\npub fn {field_identifier(name)}(mut self, {argument}) -> Self {{\n"
             f"    self.raw.{field.name} = {_wrap(field.type, value)};\n    self\n}}"
@@ -526,10 +579,11 @@ def _emit_setters(model: ModelSpec, rust: RustIndex) -> str:
 def _constructor_arg(name: str, field: RustField, adapter: str | None) -> tuple[str, str]:
     name = field_identifier(name)
     if adapter:
-        if parse_type(field.type).unary("Vec") is None:
-            raise GenerationError(f"adapter for {name} requires a Vec raw field")
-        return (f"{name}: impl IntoIterator<Item = {adapter}>",
-                f"{name}.into_iter().map(Into::into).collect()")
+        if parse_type(field.type).unary("Vec") is not None:
+            return (f"{name}: impl IntoIterator<Item = {adapter}>",
+                    f"{name}.into_iter().map(Into::into).collect()")
+        return (f"{name}: impl Into<{adapter}>",
+                f"Into::<{adapter}>::into({name}).into()")
     optional = _option(field.type)
     effective = optional[0] if optional else field.type
     argument, value = _argument(name, effective)
@@ -627,11 +681,18 @@ def _emit_wrapper(model: ModelSpec, openapi: OpenApiIndex, rust: RustIndex) -> s
         f"pub fn as_raw(&self) -> &{model.raw} {{ &self.raw }}",
         f"pub fn into_raw(self) -> {model.raw} {{ self.raw }}",
     ))
+    default = (
+        f"\n\nimpl Default for {model.name} {{\n"
+        f"    fn default() -> Self {{ Self::new() }}\n}}"
+        if not constructor and model.config.factory is None else ""
+    )
     return (
         f"#[derive(Debug, Clone)]\npub struct {model.name} {{ raw: {model.raw} }}\n\n"
         f"impl {model.name} {{\n{_indent(chr(10).join(methods))}\n}}\n\n"
         f"impl From<{model.raw}> for {model.name} {{\n"
-        f"    fn from(raw: {model.raw}) -> Self {{ Self {{ raw }} }}\n}}"
+        f"    fn from(raw: {model.raw}) -> Self {{ Self {{ raw }} }}\n}}\n\n"
+        f"impl From<{model.name}> for {model.raw} {{\n"
+        f"    fn from(value: {model.name}) -> Self {{ value.into_raw() }}\n}}" + default
     )
 
 
@@ -667,28 +728,97 @@ def _emit_union(model: ModelSpec, openapi: OpenApiIndex, rust: RustIndex) -> str
     assert isinstance(model.config, UnionPolicy)
     config = model.config
     _, mapping = openapi.union(config.root, config.path)
-    raw_variants = {variant.payload: variant.name for variant in rust.variants(model.raw)}
-    variants, constructors, arms = [], [], []
+    variants, constructors = [], []
+    payload_expressions = {}
     for tag, raw_payload in sorted(mapping.items()):
         public = _public_variant(tag)
-        raw_variant = raw_variants[raw_payload]
         try:
             expression = _string_payload(raw_payload, config.payload, rust)
         except GenerationError:
             variants.append(f"{public}({raw_payload})")
             constructors.append(f"pub fn {tag.replace('-', '_')}(value: {raw_payload}) -> Self {{ Self::{public}(value) }}")
-            arms.append(f"{model.name}::{public}(value) => Self::{raw_variant}(value)")
+            payload_expressions[raw_payload] = (public, "value")
         else:
             variants.append(f"{public}(String)")
             constructors.append(f"pub fn {tag.replace('-', '_')}(content: impl Into<String>) -> Self {{ Self::{public}(content.into()) }}")
-            arms.append(f"{model.name}::{public}(content) => Self::{raw_variant}({expression})")
+            payload_expressions[raw_payload] = (public, expression)
+    conversions = []
+    for target in (model.raw, *config.targets):
+        raw_variants = {variant.payload: variant.name for variant in rust.variants(target)}
+        arms = []
+        for raw_payload in mapping.values():
+            public, expression = payload_expressions[raw_payload]
+            binding = "value" if expression == "value" else "content"
+            arms.append(f"{model.name}::{public}({binding}) => Self::{raw_variants[raw_payload]}({expression})")
+        conversions.append(
+            f"impl From<{model.name}> for {target} {{\n"
+            f"    fn from(value: {model.name}) -> Self {{\n        match value {{\n"
+            f"{_indent(','.join(arms), 12)}\n        }}\n    }}\n}}"
+        )
     return (
         f"#[derive(Debug, Clone)]\n#[non_exhaustive]\npub enum {model.name} {{\n"
         f"{_indent(','.join(variants))}\n}}\n\n"
         f"impl {model.name} {{\n{_indent(chr(10).join(constructors))}\n}}\n\n"
+        + "\n\n".join(conversions)
+    )
+
+
+def _emit_simple_union(model: ModelSpec, rust: RustIndex) -> str:
+    assert isinstance(model.config, SimpleUnionPolicy)
+    raw_variants = {variant.name: variant for variant in rust.variants(model.raw)}
+    variants, arms, reverse_arms, conversions = [], [], [], []
+    seen_payloads = set()
+    def expand(syntax: RustType) -> RustType:
+        return expand(rust.aliases[syntax.spelling]) if syntax.spelling in rust.aliases else syntax
+
+    def adapt_type(syntax: RustType, adapter: str) -> str:
+        syntax = expand(syntax)
+        if syntax.constructor == "Vec":
+            return f"Vec<{adapt_type(syntax.arguments[0], adapter)}>"
+        return adapter
+
+    def adapt_value(syntax: RustType, value: str) -> str:
+        syntax = expand(syntax)
+        if syntax.constructor == "Vec":
+            return f"{value}.into_iter().map(|value| {adapt_value(syntax.arguments[0], 'value')}).collect()"
+        return f"{value}.into()"
+
+    for raw_name, public_name, adapter in model.config.variants:
+        payload = raw_variants[raw_name].payload
+        if payload is None:
+            raise GenerationError(f"simple union {model.raw}::{raw_name} has no payload")
+        raw_syntax = expand(parse_type(payload))
+        public_type = (adapt_type(raw_syntax, adapter) if adapter
+                       else rust.qualified_type(raw_syntax.spelling))
+        raw_value = adapt_value(raw_syntax, "value") if adapter else "value"
+        variants.append(f"{public_name}({public_type})")
+        arms.append(f"{model.name}::{public_name}(value) => Self::{raw_name}({raw_value})")
+        reverse_value = adapt_value(raw_syntax, "value") if adapter else "value"
+        reverse_arms.append(f"{model.raw}::{raw_name}(value) => Self::{public_name}({reverse_value})")
+        if public_type not in seen_payloads:
+            conversions.append(
+                f"impl From<{public_type}> for {model.name} {{\n"
+                f"    fn from(value: {public_type}) -> Self {{ Self::{public_name}(value) }}\n}}"
+            )
+            seen_payloads.add(public_type)
+        if public_type == "String":
+            conversions.append(
+                f"impl From<&str> for {model.name} {{\n"
+                f"    fn from(value: &str) -> Self {{ Self::{public_name}(value.into()) }}\n}}"
+            )
+    reverse = (
+        f"\n\nimpl From<{model.raw}> for {model.name} {{\n"
+        f"    fn from(value: {model.raw}) -> Self {{ match value {{\n"
+        f"{_indent(','.join(reverse_arms), 8)}\n    }} }}\n}}"
+        if model.config.bidirectional else ""
+    )
+    return (
+        f"#[derive(Debug, Clone)]\n#[non_exhaustive]\npub enum {model.name} {{\n"
+        f"{_indent(','.join(variants))}\n}}\n\n"
+        + "\n\n".join(conversions) + "\n\n"
         f"impl From<{model.name}> for {model.raw} {{\n"
-        f"    fn from(value: {model.name}) -> Self {{\n        match value {{\n"
-        f"{_indent(','.join(arms), 12)}\n        }}\n    }}\n}}"
+        f"    fn from(value: {model.name}) -> Self {{ match value {{\n"
+        f"{_indent(','.join(arms), 8)}\n    }} }}\n}}" + reverse
     )
 
 
@@ -724,6 +854,21 @@ def _emit_accessor(name: str, config: Accessor, raw: str, rust: RustIndex) -> st
         marker = "&" if kind == "ref" else ""
         value = f"&{expression}" if kind == "ref" else expression
         return f"pub fn {name}(&self) -> {marker}{public_type} {{ {value} }}"
+    if kind in {"optional_ref", "optional_copy"}:
+        expression += "".join(f".{field}" for field in path)
+        inner = parse_type(result_type).unary("Option")
+        if inner is None:
+            raise GenerationError(f"accessor {name} expected Option, got {result_type}")
+        if kind == "optional_copy":
+            return f"pub fn {name}(&self) -> Option<{inner.spelling}> {{ {expression} }}"
+        vector = inner.unary("Vec")
+        if inner.spelling == "String":
+            public_type = "str"
+        elif vector:
+            public_type = f"[{vector.spelling}]"
+        else:
+            public_type = inner.spelling
+        return f"pub fn {name}(&self) -> Option<&{public_type}> {{ {expression}.as_deref() }}"
     if kind == "iter":
         expression += "".join(f".{field}" for field in path)
         _generic_inner(result_type, "Vec")
@@ -759,13 +904,16 @@ def _emit_view(model: ModelSpec, rust: RustIndex) -> str:
         f"impl {model.name} {{\n{_indent(accessors)}\n"
         f"    pub fn raw(&self) -> &{model.raw} {{ &self.raw }}\n"
         f"    pub fn into_raw(self) -> {model.raw} {{ self.raw }}\n}}\n\n"
-        f"impl From<{model.raw}> for {model.name} {{ fn from(raw: {model.raw}) -> Self {{ Self {{ raw }} }} }}"
+        f"impl From<{model.raw}> for {model.name} {{ fn from(raw: {model.raw}) -> Self {{ Self {{ raw }} }} }}\n\n"
+        f"impl From<{model.name}> for {model.raw} {{ fn from(value: {model.name}) -> Self {{ value.into_raw() }} }}"
     )
 
 
 def _emit_model(model: ModelSpec, openapi: OpenApiIndex, rust: RustIndex) -> str:
     if isinstance(model.config, UnionPolicy):
         return _emit_union(model, openapi, rust)
+    if isinstance(model.config, SimpleUnionPolicy):
+        return _emit_simple_union(model, rust)
     if isinstance(model.config, ViewPolicy):
         return _emit_view(model, rust)
     return _emit_wrapper(model, openapi, rust)
@@ -785,11 +933,22 @@ def _owned_parameter(type_name: str) -> tuple[str, bool]:
     return type_name, False
 
 
+def _direct_parameter(parameter: RustParameter, rust: RustIndex) -> tuple[str, str]:
+    name = field_identifier(parameter.name)
+    if parameter.type == "impl AsRef<str>":
+        return f"{name}: impl AsRef<str>", f"{name}.as_ref()"
+    if parameter.type == "&str":
+        return f"{name}: &str", name
+    owned, _ = _owned_parameter(parameter.type)
+    owned = rust.qualified_type(owned)
+    return _argument(parameter.name, owned)
+
+
 def _emit_parameters(resource: ResourceSpec, operation: OperationSpec, rust: RustIndex) -> str:
     if operation.request:
         return ""
     parameters = rust.operation(operation.raw_method).parameters
-    if not parameters:
+    if not parameters or not any(_option(parameter.type) for parameter in parameters):
         return ""
     name = _request_name(resource, operation)
     fields, arguments, values, setters = [], [], [], []
@@ -815,7 +974,7 @@ def _emit_parameters(resource: ResourceSpec, operation: OperationSpec, rust: Rus
 def _operation_arguments(operation: OperationSpec, rust: RustIndex, resource: ResourceSpec) -> tuple[str, str]:
     raw = rust.operation(operation.raw_method)
     if operation.request:
-        value = "request.into_raw()"
+        body = "request.into_raw()"
         if operation.request_overrides:
             assignments = []
             for field, configured in operation.request_overrides:
@@ -828,10 +987,26 @@ def _operation_arguments(operation: OperationSpec, rust: RustIndex, resource: Re
                 else:
                     raise GenerationError(f"unsupported request override literal for {field}")
                 assignments.append(f"raw.{field} = {value_expression};")
-            value = f"{{ let mut raw = request.into_raw(); {' '.join(assignments)} raw }}"
-        return f"request: {operation.request}", value
+            body = f"{{ let mut raw = request.into_raw(); {' '.join(assignments)} raw }}"
+        declarations, values = [], []
+        for parameter in raw.parameters:
+            if parameter.type == operation.request_raw:
+                declarations.append(f"request: {operation.request}")
+                values.append(body)
+                continue
+            declaration, value = _direct_parameter(parameter, rust)
+            declarations.append(declaration)
+            values.append(value)
+        return ", ".join(declarations), ", ".join(values)
     if not raw.parameters:
         return "", ""
+    if not any(_option(parameter.type) for parameter in raw.parameters):
+        declarations, values = [], []
+        for parameter in raw.parameters:
+            declaration, value = _direct_parameter(parameter, rust)
+            declarations.append(declaration)
+            values.append(value)
+        return ", ".join(declarations), ", ".join(values)
     values = []
     for parameter in raw.parameters:
         _, borrowed = _owned_parameter(parameter.type)

@@ -66,7 +66,26 @@ def public_surface(files: dict[str, str]) -> dict[str, str]:
     return dict(sorted(surface.items()))
 
 
+def _expanded_reexports(surface: dict[str, str]) -> dict[str, str]:
+    """Normalize legacy flat grouped reexports into one public path per item."""
+    expanded = {}
+    marker = "::reexport::"
+    for key, signature in surface.items():
+        if (marker in key and signature.startswith("pub use ")
+                and "::{" in signature and signature.endswith("};")):
+            head, members = signature[:-2].split("::{", 1)
+            if "{" not in members and "}" not in members:
+                filename = key.split(marker, 1)[0]
+                for member in members.split(","):
+                    declaration = f"{head}::{member.strip()};"
+                    expanded[f"{filename}{marker}{declaration}"] = declaration
+                continue
+        expanded[key] = signature
+    return expanded
+
+
 def compare_surface(before: dict[str, str], after: dict[str, str]) -> dict:
+    before, after = _expanded_reexports(before), _expanded_reexports(after)
     removed = sorted(before.keys() - after.keys())
     added = sorted(after.keys() - before.keys())
     changed = sorted(key for key in before.keys() & after.keys() if before[key] != after[key])

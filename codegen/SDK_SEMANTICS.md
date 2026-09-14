@@ -21,9 +21,15 @@ ownership, builders, enums and error handling.
 The generated OpenAPI layer remains complete and reproducible. The idiomatic SDK
 is generated as a projection over it, not implemented as a second HTTP client.
 `codegen/sdk_facade.py` reads the actual raw Rust structs and client methods,
-then applies the versioned semantic manifest. The committed `src/sdk/mod.rs`,
-`chat.rs`, and `ocr.rs` files are generated artifacts and carry an explicit
+then applies the versioned semantic manifest. Every resource module and
+`facade_types.rs` under `src/sdk/` is a generated artifact carrying an explicit
 `@generated` marker. Only the generic error runtime is handwritten.
+
+The IR supports required and optional operation parameters, a JSON body in any
+raw argument position, named or inline-union responses, discriminated semantic
+unions, recursively adapted simple unions, fluent request projections, response
+views, and owned SSE streams. These are protocol-level concepts: no emitter is
+specialized for a Mistral resource or schema name.
 
 ## Drift policy
 
@@ -38,6 +44,6 @@ byte-for-byte. The nightly uses the same pipeline.
 New operations remain immediately reachable through `raw` even before a new
 resource mapping is deliberately added to the semantic manifest.
 
-The Chat + OCR spike deliberately keeps the projection small. It exists to measure
-how much semantic glue is required before generalizing the pattern to all Mistral
-API families.
+The current public projection covers Chat, OCR, Models, Embeddings, FIM and
+Classifiers/Moderations. `src/sdk/coverage.json` is the machine-readable boundary
+between mapped operations and the remaining raw-only surface.

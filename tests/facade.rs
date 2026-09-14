@@ -1,4 +1,8 @@
-use mistralai::{ChatRequest, Message, Mistral, OcrRequest};
+use mistralai::{
+    ChatClassificationParams, ChatModerationParams, ChatRequest, ClassificationParams,
+    ClassifierConversation, EmbeddingParams, FimRequest, Message, Mistral, OcrRequest,
+    UpdateModelRequest,
+};
 
 #[test]
 fn third_resource_uses_the_same_generated_client_taxonomy() {
@@ -50,4 +54,77 @@ fn generated_ocr_request_covers_every_document_input_kind() {
         file.document,
         mistralai::raw::types::OCRRequestDocument::FileChunk(_)
     ));
+}
+
+#[test]
+fn expanded_resources_follow_the_official_sdk_taxonomy() {
+    let client = Mistral::new("test");
+
+    let models = client.models();
+    let _retrieve = models.retrieve("mistral-small-latest");
+    let _delete = models.delete("ft:test");
+    let _archive = models.archive("ft:test");
+    let _unarchive = models.unarchive("ft:test");
+    let _update = models.update(
+        "ft:test",
+        UpdateModelRequest::new()
+            .name("renamed")
+            .description("description"),
+    );
+
+    let embeddings = client.embeddings();
+    let _create = embeddings.create(EmbeddingParams::new("mistral-embed", "hello"));
+
+    let fim = client.fim();
+    let request = FimRequest::new("codestral-latest", "fn answer() -> ")
+        .stop(vec!["\n".to_owned(), "}".to_owned()]);
+    let _complete = fim.complete(request.clone());
+    let _stream = fim.stream(request);
+
+    let classifiers = client.classifiers();
+    let _moderate = classifiers.moderate(ClassificationParams::new(
+        "mistral-moderation-latest",
+        "safe text",
+    ));
+    let _classify = classifiers.classify(ClassificationParams::new(
+        "classifier-model",
+        vec!["first".to_owned(), "second".to_owned()],
+    ));
+    let _moderate_chat = classifiers.moderate_chat(ChatModerationParams::new(
+        "mistral-moderation-latest",
+        vec![Message::user("hello")],
+    ));
+    let conversation = ClassifierConversation::new([Message::user("classify this")]);
+    let _classify_chat = classifiers.classify_chat(ChatClassificationParams::new(
+        "classifier-model",
+        conversation,
+    ));
+}
+
+#[test]
+fn expanded_request_types_serialize_to_the_openapi_contract() {
+    let embedding = serde_json::to_value(
+        EmbeddingParams::new("mistral-embed", vec!["one".to_owned(), "two".to_owned()])
+            .output_dimension(256)
+            .into_raw(),
+    )
+    .unwrap();
+    assert_eq!(embedding["model"], "mistral-embed");
+    assert_eq!(embedding["input"], serde_json::json!(["one", "two"]));
+    assert_eq!(embedding["output_dimension"], 256);
+
+    let moderation = serde_json::to_value(
+        ChatModerationParams::new(
+            "mistral-moderation-latest",
+            vec![Message::system("policy"), Message::user("content")],
+        )
+        .into_raw(),
+    )
+    .unwrap();
+    assert_eq!(moderation["input"][0]["role"], "system");
+    assert_eq!(moderation["input"][1]["content"], "content");
+
+    let update =
+        serde_json::to_value(UpdateModelRequest::new().name("new name").into_raw()).unwrap();
+    assert_eq!(update, serde_json::json!({"name": "new name"}));
 }

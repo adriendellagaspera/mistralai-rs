@@ -55,6 +55,60 @@ impl From<Message> for ChatCompletionRequestMessagesItemUnion {
     }
 }
 
+impl From<Message> for ChatModerationRequestInputItemUnion {
+    fn from(value: Message) -> Self {
+        match value {
+            Message::Assistant(content) => Self::AssistantMessage(AssistantMessage {
+                content: Some(Some(AssistantMessageContent::String(content))),
+                prefix: None,
+                role: None,
+                tool_calls: None,
+            }),
+            Message::System(content) => Self::SystemMessage(SystemMessage {
+                content: SystemMessageContent::String(content),
+                role: None,
+            }),
+            Message::Tool(content) => Self::ToolMessage(ToolMessage {
+                content: Some(ToolMessageContent::String(content)),
+                name: None,
+                role: None,
+                tool_call_id: None,
+            }),
+            Message::User(content) => Self::UserMessage(UserMessage {
+                content: Some(UserMessageContent::String(content)),
+                role: None,
+            }),
+        }
+    }
+}
+
+impl From<Message> for InstructRequestMessagesItemUnion {
+    fn from(value: Message) -> Self {
+        match value {
+            Message::Assistant(content) => Self::AssistantMessage(AssistantMessage {
+                content: Some(Some(AssistantMessageContent::String(content))),
+                prefix: None,
+                role: None,
+                tool_calls: None,
+            }),
+            Message::System(content) => Self::SystemMessage(SystemMessage {
+                content: SystemMessageContent::String(content),
+                role: None,
+            }),
+            Message::Tool(content) => Self::ToolMessage(ToolMessage {
+                content: Some(ToolMessageContent::String(content)),
+                name: None,
+                role: None,
+                tool_call_id: None,
+            }),
+            Message::User(content) => Self::UserMessage(UserMessage {
+                content: Some(UserMessageContent::String(content)),
+                role: None,
+            }),
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct ChatRequest {
     raw: ChatCompletionRequest,
@@ -276,6 +330,12 @@ impl From<ChatCompletionRequest> for ChatRequest {
     }
 }
 
+impl From<ChatRequest> for ChatCompletionRequest {
+    fn from(value: ChatRequest) -> Self {
+        value.into_raw()
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct ChatResponse {
     raw: ChatCompletionResponse,
@@ -310,6 +370,12 @@ impl From<ChatCompletionResponse> for ChatResponse {
     }
 }
 
+impl From<ChatResponse> for ChatCompletionResponse {
+    fn from(value: ChatResponse) -> Self {
+        value.into_raw()
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct ChatStreamChunk {
     raw: CompletionChunk,
@@ -333,6 +399,12 @@ impl ChatStreamChunk {
 impl From<CompletionChunk> for ChatStreamChunk {
     fn from(raw: CompletionChunk) -> Self {
         Self { raw }
+    }
+}
+
+impl From<ChatStreamChunk> for CompletionChunk {
+    fn from(value: ChatStreamChunk) -> Self {
+        value.into_raw()
     }
 }
 
@@ -594,6 +666,12 @@ impl From<OCRRequest> for OcrRequest {
     }
 }
 
+impl From<OcrRequest> for OCRRequest {
+    fn from(value: OcrRequest) -> Self {
+        value.into_raw()
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct OcrResponse {
     raw: OCRResponse,
@@ -620,6 +698,12 @@ impl From<OCRResponse> for OcrResponse {
     }
 }
 
+impl From<OcrResponse> for OCRResponse {
+    fn from(value: OcrResponse) -> Self {
+        value.into_raw()
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct ModelListResponse {
     raw: ModelList,
@@ -640,5 +724,1152 @@ impl From<ModelList> for ModelListResponse {
     }
 }
 
+impl From<ModelListResponse> for ModelList {
+    fn from(value: ModelListResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct BaseModel {
+    raw: BaseModelCard,
+}
+
+impl BaseModel {
+    pub fn id(&self) -> &str {
+        &self.raw.id
+    }
+    pub fn raw(&self) -> &BaseModelCard {
+        &self.raw
+    }
+    pub fn into_raw(self) -> BaseModelCard {
+        self.raw
+    }
+}
+
+impl From<BaseModelCard> for BaseModel {
+    fn from(raw: BaseModelCard) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<BaseModel> for BaseModelCard {
+    fn from(value: BaseModel) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct FineTunedModel {
+    raw: FTModelCard,
+}
+
+impl FineTunedModel {
+    pub fn id(&self) -> &str {
+        &self.raw.id
+    }
+    pub fn archived(&self) -> Option<bool> {
+        self.raw.archived
+    }
+    pub fn raw(&self) -> &FTModelCard {
+        &self.raw
+    }
+    pub fn into_raw(self) -> FTModelCard {
+        self.raw
+    }
+}
+
+impl From<FTModelCard> for FineTunedModel {
+    fn from(raw: FTModelCard) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<FineTunedModel> for FTModelCard {
+    fn from(value: FineTunedModel) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub enum ModelResponse {
+    Base(BaseModel),
+    FineTuned(FineTunedModel),
+}
+
+impl From<BaseModel> for ModelResponse {
+    fn from(value: BaseModel) -> Self {
+        Self::Base(value)
+    }
+}
+
+impl From<FineTunedModel> for ModelResponse {
+    fn from(value: FineTunedModel) -> Self {
+        Self::FineTuned(value)
+    }
+}
+
+impl From<ModelResponse> for RetrieveModelV1ModelsModelIdGetResponse {
+    fn from(value: ModelResponse) -> Self {
+        match value {
+            ModelResponse::Base(value) => Self::BaseModelCard(value.into()),
+            ModelResponse::FineTuned(value) => Self::FTModelCard(value.into()),
+        }
+    }
+}
+
+impl From<RetrieveModelV1ModelsModelIdGetResponse> for ModelResponse {
+    fn from(value: RetrieveModelV1ModelsModelIdGetResponse) -> Self {
+        match value {
+            RetrieveModelV1ModelsModelIdGetResponse::BaseModelCard(value) => {
+                Self::Base(value.into())
+            }
+            RetrieveModelV1ModelsModelIdGetResponse::FTModelCard(value) => {
+                Self::FineTuned(value.into())
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DeleteModelResponse {
+    raw: DeleteModelOut,
+}
+
+impl DeleteModelResponse {
+    pub fn id(&self) -> &str {
+        &self.raw.id
+    }
+    pub fn deleted(&self) -> Option<bool> {
+        self.raw.deleted
+    }
+    pub fn raw(&self) -> &DeleteModelOut {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DeleteModelOut {
+        self.raw
+    }
+}
+
+impl From<DeleteModelOut> for DeleteModelResponse {
+    fn from(raw: DeleteModelOut) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<DeleteModelResponse> for DeleteModelOut {
+    fn from(value: DeleteModelResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ArchiveModelResponse {
+    raw: ArchiveFTModelOut,
+}
+
+impl ArchiveModelResponse {
+    pub fn id(&self) -> &str {
+        &self.raw.id
+    }
+    pub fn archived(&self) -> Option<bool> {
+        self.raw.archived
+    }
+    pub fn raw(&self) -> &ArchiveFTModelOut {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ArchiveFTModelOut {
+        self.raw
+    }
+}
+
+impl From<ArchiveFTModelOut> for ArchiveModelResponse {
+    fn from(raw: ArchiveFTModelOut) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ArchiveModelResponse> for ArchiveFTModelOut {
+    fn from(value: ArchiveModelResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UnarchiveModelResponse {
+    raw: UnarchiveFTModelOut,
+}
+
+impl UnarchiveModelResponse {
+    pub fn id(&self) -> &str {
+        &self.raw.id
+    }
+    pub fn archived(&self) -> Option<bool> {
+        self.raw.archived
+    }
+    pub fn raw(&self) -> &UnarchiveFTModelOut {
+        &self.raw
+    }
+    pub fn into_raw(self) -> UnarchiveFTModelOut {
+        self.raw
+    }
+}
+
+impl From<UnarchiveFTModelOut> for UnarchiveModelResponse {
+    fn from(raw: UnarchiveFTModelOut) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UnarchiveModelResponse> for UnarchiveFTModelOut {
+    fn from(value: UnarchiveModelResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateModelRequest {
+    raw: UpdateFTModelIn,
+}
+
+impl UpdateModelRequest {
+    pub fn new() -> Self {
+        Self {
+            raw: UpdateFTModelIn {
+                description: None,
+                name: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.raw.description = Some(Some(description.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn description_null(mut self) -> Self {
+        self.raw.description = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn name(mut self, name: impl Into<String>) -> Self {
+        self.raw.name = Some(Some(name.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn name_null(mut self) -> Self {
+        self.raw.name = Some(None);
+        self
+    }
+    pub fn from_raw(raw: UpdateFTModelIn) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &UpdateFTModelIn {
+        &self.raw
+    }
+    pub fn into_raw(self) -> UpdateFTModelIn {
+        self.raw
+    }
+}
+
+impl From<UpdateFTModelIn> for UpdateModelRequest {
+    fn from(raw: UpdateFTModelIn) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateModelRequest> for UpdateFTModelIn {
+    fn from(value: UpdateModelRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for UpdateModelRequest {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CompletionFineTunedModel {
+    raw: CompletionFTModelOut,
+}
+
+impl CompletionFineTunedModel {
+    pub fn id(&self) -> &str {
+        &self.raw.id
+    }
+    pub fn archived(&self) -> bool {
+        self.raw.archived
+    }
+    pub fn raw(&self) -> &CompletionFTModelOut {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CompletionFTModelOut {
+        self.raw
+    }
+}
+
+impl From<CompletionFTModelOut> for CompletionFineTunedModel {
+    fn from(raw: CompletionFTModelOut) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CompletionFineTunedModel> for CompletionFTModelOut {
+    fn from(value: CompletionFineTunedModel) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ClassifierFineTunedModel {
+    raw: ClassifierFTModelOut,
+}
+
+impl ClassifierFineTunedModel {
+    pub fn id(&self) -> &str {
+        &self.raw.id
+    }
+    pub fn archived(&self) -> bool {
+        self.raw.archived
+    }
+    pub fn raw(&self) -> &ClassifierFTModelOut {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ClassifierFTModelOut {
+        self.raw
+    }
+}
+
+impl From<ClassifierFTModelOut> for ClassifierFineTunedModel {
+    fn from(raw: ClassifierFTModelOut) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ClassifierFineTunedModel> for ClassifierFTModelOut {
+    fn from(value: ClassifierFineTunedModel) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub enum UpdateModelResponse {
+    Completion(CompletionFineTunedModel),
+    Classifier(ClassifierFineTunedModel),
+}
+
+impl From<CompletionFineTunedModel> for UpdateModelResponse {
+    fn from(value: CompletionFineTunedModel) -> Self {
+        Self::Completion(value)
+    }
+}
+
+impl From<ClassifierFineTunedModel> for UpdateModelResponse {
+    fn from(value: ClassifierFineTunedModel) -> Self {
+        Self::Classifier(value)
+    }
+}
+
+impl From<UpdateModelResponse> for JobsApiRoutesFineTuningUpdateFineTunedModelResponse {
+    fn from(value: UpdateModelResponse) -> Self {
+        match value {
+            UpdateModelResponse::Completion(value) => Self::CompletionFTModelOut(value.into()),
+            UpdateModelResponse::Classifier(value) => Self::ClassifierFTModelOut(value.into()),
+        }
+    }
+}
+
+impl From<JobsApiRoutesFineTuningUpdateFineTunedModelResponse> for UpdateModelResponse {
+    fn from(value: JobsApiRoutesFineTuningUpdateFineTunedModelResponse) -> Self {
+        match value {
+            JobsApiRoutesFineTuningUpdateFineTunedModelResponse::CompletionFTModelOut(value) => {
+                Self::Completion(value.into())
+            }
+            JobsApiRoutesFineTuningUpdateFineTunedModelResponse::ClassifierFTModelOut(value) => {
+                Self::Classifier(value.into())
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub enum EmbeddingInput {
+    Text(String),
+    Batch(Vec<String>),
+}
+
+impl From<String> for EmbeddingInput {
+    fn from(value: String) -> Self {
+        Self::Text(value)
+    }
+}
+
+impl From<&str> for EmbeddingInput {
+    fn from(value: &str) -> Self {
+        Self::Text(value.into())
+    }
+}
+
+impl From<Vec<String>> for EmbeddingInput {
+    fn from(value: Vec<String>) -> Self {
+        Self::Batch(value)
+    }
+}
+
+impl From<EmbeddingInput> for EmbeddingRequestInput {
+    fn from(value: EmbeddingInput) -> Self {
+        match value {
+            EmbeddingInput::Text(value) => Self::String(value),
+            EmbeddingInput::Batch(value) => Self::EmbeddingRequestInputStringArray(value),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct EmbeddingParams {
+    raw: EmbeddingRequest,
+}
+
+impl EmbeddingParams {
+    pub fn new(model: impl Into<String>, input: impl Into<EmbeddingInput>) -> Self {
+        Self {
+            raw: EmbeddingRequest {
+                encoding_format: None,
+                input: Into::<EmbeddingInput>::into(input).into(),
+                metadata: None,
+                model: model.into(),
+                output_dimension: None,
+                output_dtype: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn encoding_format(mut self, encoding_format: EncodingFormat) -> Self {
+        self.raw.encoding_format = Some(encoding_format);
+        self
+    }
+
+    #[must_use]
+    pub fn metadata(mut self, metadata: EmbeddingRequestMetadata) -> Self {
+        self.raw.metadata = Some(Some(metadata));
+        self
+    }
+
+    #[must_use]
+    pub fn metadata_null(mut self) -> Self {
+        self.raw.metadata = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn output_dimension(mut self, output_dimension: i64) -> Self {
+        self.raw.output_dimension = Some(Some(output_dimension));
+        self
+    }
+
+    #[must_use]
+    pub fn output_dimension_null(mut self) -> Self {
+        self.raw.output_dimension = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn output_dtype(mut self, output_dtype: EmbeddingDtype) -> Self {
+        self.raw.output_dtype = Some(output_dtype);
+        self
+    }
+    pub fn from_raw(raw: EmbeddingRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &EmbeddingRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> EmbeddingRequest {
+        self.raw
+    }
+}
+
+impl From<EmbeddingRequest> for EmbeddingParams {
+    fn from(raw: EmbeddingRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<EmbeddingParams> for EmbeddingRequest {
+    fn from(value: EmbeddingParams) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct Embedding<'a> {
+    raw: &'a EmbeddingResponseData,
+}
+
+impl<'a> Embedding<'a> {
+    pub(crate) fn new(raw: &'a EmbeddingResponseData) -> Self {
+        Self { raw }
+    }
+    pub fn index(&self) -> Option<i64> {
+        self.raw.index
+    }
+    pub fn values(&self) -> Option<&[f64]> {
+        self.raw.embedding.as_deref()
+    }
+    pub fn raw(&self) -> &'a EmbeddingResponseData {
+        self.raw
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct EmbeddingResult {
+    raw: EmbeddingResponse,
+}
+
+impl EmbeddingResult {
+    pub fn id(&self) -> &str {
+        &self.raw.id
+    }
+    pub fn model(&self) -> &str {
+        &self.raw.model
+    }
+    pub fn embeddings(&self) -> impl ExactSizeIterator<Item = Embedding<'_>> {
+        self.raw.data.iter().map(Embedding::new)
+    }
+    pub fn raw(&self) -> &EmbeddingResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> EmbeddingResponse {
+        self.raw
+    }
+}
+
+impl From<EmbeddingResponse> for EmbeddingResult {
+    fn from(raw: EmbeddingResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<EmbeddingResult> for EmbeddingResponse {
+    fn from(value: EmbeddingResult) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub enum StopSequences {
+    One(String),
+    Many(Vec<String>),
+}
+
+impl From<String> for StopSequences {
+    fn from(value: String) -> Self {
+        Self::One(value)
+    }
+}
+
+impl From<&str> for StopSequences {
+    fn from(value: &str) -> Self {
+        Self::One(value.into())
+    }
+}
+
+impl From<Vec<String>> for StopSequences {
+    fn from(value: Vec<String>) -> Self {
+        Self::Many(value)
+    }
+}
+
+impl From<StopSequences> for FIMCompletionRequestStop {
+    fn from(value: StopSequences) -> Self {
+        match value {
+            StopSequences::One(value) => Self::String(value),
+            StopSequences::Many(value) => Self::FIMCompletionRequestStopStringArray(value),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct FimRequest {
+    raw: FIMCompletionRequest,
+}
+
+impl FimRequest {
+    pub fn new(model: impl Into<String>, prompt: impl Into<String>) -> Self {
+        Self {
+            raw: FIMCompletionRequest {
+                max_tokens: None,
+                metadata: None,
+                min_tokens: None,
+                model: model.into(),
+                prompt: prompt.into(),
+                prompt_cache_key: None,
+                random_seed: None,
+                stop: None,
+                stream: None,
+                suffix: None,
+                temperature: None,
+                top_p: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn max_tokens(mut self, max_tokens: i64) -> Self {
+        self.raw.max_tokens = Some(Some(max_tokens));
+        self
+    }
+
+    #[must_use]
+    pub fn max_tokens_null(mut self) -> Self {
+        self.raw.max_tokens = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn metadata(mut self, metadata: FIMCompletionRequestMetadata) -> Self {
+        self.raw.metadata = Some(Some(metadata));
+        self
+    }
+
+    #[must_use]
+    pub fn metadata_null(mut self) -> Self {
+        self.raw.metadata = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn min_tokens(mut self, min_tokens: i64) -> Self {
+        self.raw.min_tokens = Some(Some(min_tokens));
+        self
+    }
+
+    #[must_use]
+    pub fn min_tokens_null(mut self) -> Self {
+        self.raw.min_tokens = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn prompt_cache_key(mut self, prompt_cache_key: impl Into<String>) -> Self {
+        self.raw.prompt_cache_key = Some(Some(prompt_cache_key.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn prompt_cache_key_null(mut self) -> Self {
+        self.raw.prompt_cache_key = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn random_seed(mut self, random_seed: i64) -> Self {
+        self.raw.random_seed = Some(Some(random_seed));
+        self
+    }
+
+    #[must_use]
+    pub fn random_seed_null(mut self) -> Self {
+        self.raw.random_seed = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn stop(mut self, stop: impl Into<StopSequences>) -> Self {
+        self.raw.stop = Some(Into::<StopSequences>::into(stop).into());
+        self
+    }
+
+    #[must_use]
+    pub fn suffix(mut self, suffix: impl Into<String>) -> Self {
+        self.raw.suffix = Some(Some(suffix.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn suffix_null(mut self) -> Self {
+        self.raw.suffix = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn temperature(mut self, temperature: f64) -> Self {
+        self.raw.temperature = Some(Some(temperature));
+        self
+    }
+
+    #[must_use]
+    pub fn temperature_null(mut self) -> Self {
+        self.raw.temperature = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn top_p(mut self, top_p: f64) -> Self {
+        self.raw.top_p = Some(top_p);
+        self
+    }
+    pub fn from_raw(raw: FIMCompletionRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &FIMCompletionRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> FIMCompletionRequest {
+        self.raw
+    }
+}
+
+impl From<FIMCompletionRequest> for FimRequest {
+    fn from(raw: FIMCompletionRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<FimRequest> for FIMCompletionRequest {
+    fn from(value: FimRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct FimResponse {
+    raw: FIMCompletionResponse,
+}
+
+impl FimResponse {
+    pub fn text(&self) -> Option<&str> {
+        match self
+            .raw
+            .choices
+            .first()?
+            .message
+            .content
+            .as_ref()?
+            .as_ref()?
+        {
+            AssistantMessageContent::String(value) => Some(value),
+            _ => None,
+        }
+    }
+    pub fn raw(&self) -> &FIMCompletionResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> FIMCompletionResponse {
+        self.raw
+    }
+}
+
+impl From<FIMCompletionResponse> for FimResponse {
+    fn from(raw: FIMCompletionResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<FimResponse> for FIMCompletionResponse {
+    fn from(value: FimResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct FimStreamChunk {
+    raw: CompletionChunk,
+}
+
+impl FimStreamChunk {
+    pub fn text(&self) -> Option<&str> {
+        match self.raw.choices.first()?.delta.content.as_ref()?.as_ref()? {
+            DeltaMessageContent::String(value) => Some(value),
+            _ => None,
+        }
+    }
+    pub fn raw(&self) -> &CompletionChunk {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CompletionChunk {
+        self.raw
+    }
+}
+
+impl From<CompletionChunk> for FimStreamChunk {
+    fn from(raw: CompletionChunk) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<FimStreamChunk> for CompletionChunk {
+    fn from(value: FimStreamChunk) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub enum ClassificationInput {
+    Text(String),
+    Batch(Vec<String>),
+}
+
+impl From<String> for ClassificationInput {
+    fn from(value: String) -> Self {
+        Self::Text(value)
+    }
+}
+
+impl From<&str> for ClassificationInput {
+    fn from(value: &str) -> Self {
+        Self::Text(value.into())
+    }
+}
+
+impl From<Vec<String>> for ClassificationInput {
+    fn from(value: Vec<String>) -> Self {
+        Self::Batch(value)
+    }
+}
+
+impl From<ClassificationInput> for ClassificationRequestInput {
+    fn from(value: ClassificationInput) -> Self {
+        match value {
+            ClassificationInput::Text(value) => Self::String(value),
+            ClassificationInput::Batch(value) => Self::ClassificationRequestInputStringArray(value),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ClassificationParams {
+    raw: ClassificationRequest,
+}
+
+impl ClassificationParams {
+    pub fn new(model: impl Into<String>, input: impl Into<ClassificationInput>) -> Self {
+        Self {
+            raw: ClassificationRequest {
+                input: Into::<ClassificationInput>::into(input).into(),
+                metadata: None,
+                model: model.into(),
+            },
+        }
+    }
+    #[must_use]
+    pub fn metadata(mut self, metadata: ClassificationRequestMetadata) -> Self {
+        self.raw.metadata = Some(Some(metadata));
+        self
+    }
+
+    #[must_use]
+    pub fn metadata_null(mut self) -> Self {
+        self.raw.metadata = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ClassificationRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ClassificationRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ClassificationRequest {
+        self.raw
+    }
+}
+
+impl From<ClassificationRequest> for ClassificationParams {
+    fn from(raw: ClassificationRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ClassificationParams> for ClassificationRequest {
+    fn from(value: ClassificationParams) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ClassifierConversation {
+    raw: InstructRequest,
+}
+
+impl ClassifierConversation {
+    pub fn new(messages: impl IntoIterator<Item = Message>) -> Self {
+        Self {
+            raw: InstructRequest {
+                messages: messages.into_iter().map(Into::into).collect(),
+            },
+        }
+    }
+    pub fn from_raw(raw: InstructRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &InstructRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> InstructRequest {
+        self.raw
+    }
+}
+
+impl From<InstructRequest> for ClassifierConversation {
+    fn from(raw: InstructRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ClassifierConversation> for InstructRequest {
+    fn from(value: ClassifierConversation) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub enum ChatClassificationInput {
+    Conversation(ClassifierConversation),
+    Batch(Vec<ClassifierConversation>),
+}
+
+impl From<ClassifierConversation> for ChatClassificationInput {
+    fn from(value: ClassifierConversation) -> Self {
+        Self::Conversation(value)
+    }
+}
+
+impl From<Vec<ClassifierConversation>> for ChatClassificationInput {
+    fn from(value: Vec<ClassifierConversation>) -> Self {
+        Self::Batch(value)
+    }
+}
+
+impl From<ChatClassificationInput> for ChatClassificationRequestInputs {
+    fn from(value: ChatClassificationInput) -> Self {
+        match value {
+            ChatClassificationInput::Conversation(value) => Self::InstructRequest(value.into()),
+            ChatClassificationInput::Batch(value) => {
+                Self::InstructRequestArray(value.into_iter().map(|value| value.into()).collect())
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub enum ChatModerationInput {
+    Conversation(Vec<Message>),
+    Batch(Vec<Vec<Message>>),
+}
+
+impl From<Vec<Message>> for ChatModerationInput {
+    fn from(value: Vec<Message>) -> Self {
+        Self::Conversation(value)
+    }
+}
+
+impl From<Vec<Vec<Message>>> for ChatModerationInput {
+    fn from(value: Vec<Vec<Message>>) -> Self {
+        Self::Batch(value)
+    }
+}
+
+impl From<ChatModerationInput> for ChatModerationRequestInput {
+    fn from(value: ChatModerationInput) -> Self {
+        match value {
+            ChatModerationInput::Conversation(value) => Self::ChatModerationRequestInputArray(
+                value.into_iter().map(|value| value.into()).collect(),
+            ),
+            ChatModerationInput::Batch(value) => Self::ChatModerationRequestInputArrayInline(
+                value
+                    .into_iter()
+                    .map(|value| value.into_iter().map(|value| value.into()).collect())
+                    .collect(),
+            ),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ChatClassificationParams {
+    raw: ChatClassificationRequest,
+}
+
+impl ChatClassificationParams {
+    pub fn new(model: impl Into<String>, input: impl Into<ChatClassificationInput>) -> Self {
+        Self {
+            raw: ChatClassificationRequest {
+                input: Into::<ChatClassificationInput>::into(input).into(),
+                model: model.into(),
+            },
+        }
+    }
+    pub fn from_raw(raw: ChatClassificationRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ChatClassificationRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ChatClassificationRequest {
+        self.raw
+    }
+}
+
+impl From<ChatClassificationRequest> for ChatClassificationParams {
+    fn from(raw: ChatClassificationRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ChatClassificationParams> for ChatClassificationRequest {
+    fn from(value: ChatClassificationParams) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ChatModerationParams {
+    raw: ChatModerationRequest,
+}
+
+impl ChatModerationParams {
+    pub fn new(model: impl Into<String>, input: impl Into<ChatModerationInput>) -> Self {
+        Self {
+            raw: ChatModerationRequest {
+                input: Into::<ChatModerationInput>::into(input).into(),
+                model: model.into(),
+            },
+        }
+    }
+    pub fn from_raw(raw: ChatModerationRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ChatModerationRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ChatModerationRequest {
+        self.raw
+    }
+}
+
+impl From<ChatModerationRequest> for ChatModerationParams {
+    fn from(raw: ChatModerationRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ChatModerationParams> for ChatModerationRequest {
+    fn from(value: ChatModerationParams) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct ClassificationResult<'a> {
+    raw: &'a ClassificationResponseResultsItem,
+}
+
+impl<'a> ClassificationResult<'a> {
+    pub(crate) fn new(raw: &'a ClassificationResponseResultsItem) -> Self {
+        Self { raw }
+    }
+
+    pub fn raw(&self) -> &'a ClassificationResponseResultsItem {
+        self.raw
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ClassificationResultSet {
+    raw: ClassificationResponse,
+}
+
+impl ClassificationResultSet {
+    pub fn id(&self) -> &str {
+        &self.raw.id
+    }
+    pub fn model(&self) -> &str {
+        &self.raw.model
+    }
+    pub fn results(&self) -> impl ExactSizeIterator<Item = ClassificationResult<'_>> {
+        self.raw.results.iter().map(ClassificationResult::new)
+    }
+    pub fn raw(&self) -> &ClassificationResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ClassificationResponse {
+        self.raw
+    }
+}
+
+impl From<ClassificationResponse> for ClassificationResultSet {
+    fn from(raw: ClassificationResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ClassificationResultSet> for ClassificationResponse {
+    fn from(value: ClassificationResultSet) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct ModerationResult<'a> {
+    raw: &'a ModerationObject,
+}
+
+impl<'a> ModerationResult<'a> {
+    pub(crate) fn new(raw: &'a ModerationObject) -> Self {
+        Self { raw }
+    }
+
+    pub fn raw(&self) -> &'a ModerationObject {
+        self.raw
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ModerationResultSet {
+    raw: ModerationResponse,
+}
+
+impl ModerationResultSet {
+    pub fn id(&self) -> &str {
+        &self.raw.id
+    }
+    pub fn model(&self) -> &str {
+        &self.raw.model
+    }
+    pub fn results(&self) -> impl ExactSizeIterator<Item = ModerationResult<'_>> {
+        self.raw.results.iter().map(ModerationResult::new)
+    }
+    pub fn raw(&self) -> &ModerationResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ModerationResponse {
+        self.raw
+    }
+}
+
+impl From<ModerationResponse> for ModerationResultSet {
+    fn from(raw: ModerationResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ModerationResultSet> for ModerationResponse {
+    fn from(value: ModerationResultSet) -> Self {
+        value.into_raw()
+    }
+}
+
 pub type ChatStream =
     Pin<Box<dyn Stream<Item = Result<ChatStreamChunk, SdkError>> + Send + 'static>>;
+pub type FimStream = Pin<Box<dyn Stream<Item = Result<FimStreamChunk, SdkError>> + Send + 'static>>;
