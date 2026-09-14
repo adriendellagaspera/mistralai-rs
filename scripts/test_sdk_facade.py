@@ -187,6 +187,23 @@ class GenericSdkCompilerTests(unittest.TestCase):
         self.assertEqual(compare_surface(before, before | {"A::limit": "pub fn limit(i64)"})["classification"], "additive")
         self.assertEqual(compare_surface(before, {})["classification"], "review_required")
 
+    def test_grouped_reexport_addition_is_additive(self):
+        before = {
+            "mod.rs::reexport::pub use facade_types::{A};":
+                "pub use facade_types::{A};",
+        }
+        after = {
+            "mod.rs::reexport::pub use facade_types::{A, B};":
+                "pub use facade_types::{A, B};",
+        }
+        report = compare_surface(before, after)
+        self.assertEqual(report["classification"], "additive")
+        self.assertEqual(report["removed"], [])
+        self.assertEqual(
+            report["added"],
+            ["mod.rs::reexport::pub use facade_types::B;"],
+        )
+
     def test_optional_query_addition_preserves_resource_signature(self):
         operation = sdk_codegen.OperationSpec("list", "list", "list", None, "Receipt", {}, None)
         resource = sdk_codegen.ResourceSpec("zoo", "Zoo", (operation,))
