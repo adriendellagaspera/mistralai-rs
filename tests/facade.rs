@@ -110,10 +110,8 @@ fn expanded_resources_follow_the_official_sdk_taxonomy() {
     let _retrieve = files.retrieve("00000000-0000-0000-0000-000000000000");
     let _delete = files.delete("00000000-0000-0000-0000-000000000000");
     let _signed_url = files.get_signed_url(
-        mistralai::files::GetSignedUrlFilesRequest::new(
-            "00000000-0000-0000-0000-000000000000",
-        )
-        .expiry(3600),
+        mistralai::files::GetSignedUrlFilesRequest::new("00000000-0000-0000-0000-000000000000")
+            .expiry(3600),
     );
 }
 
