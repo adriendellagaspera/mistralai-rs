@@ -36,14 +36,19 @@ does not establish architectural completeness.
 - `codegen.py probe` generates disposable projections and compiles them offline.
   On the pinned spec, 63 additional projections compile; 19 shape candidates
   fail closed with diagnostic reasons. These do not become public API and this
-  result proves mechanical generation, not polished product naming.
+  result proves mechanical generation, not polished product naming. Counts and
+  the canonical report digest are versioned; any candidate/rejection change
+  requires review rather than merely checking that one projection still works.
 
-## Still required before architectural sign-off
+## Validation completed for this scope
 
-- Validate the pinned compiler-aware compatibility tool and its supported
-  rustdoc format locally; declaration snapshots alone are insufficient.
-- Full pinned generation check, rustfmt, Clippy, Rust tests and doctests on the
-  final commit, followed by a successful remote CI run.
+- Full pinned regeneration matches byte-for-byte. Rustfmt, Clippy with warnings
+  denied, unit/integration tests, examples, doctests and the 63-projection probe
+  pass locally and in CI run 107.
+- Pinned cargo-semver-checks 0.50.0 runs on Rust 1.94 and reports 196 passing
+  checks against an identical baseline. Since the base of PR #7 has no facade,
+  this PR deliberately establishes its first compatibility baseline; subsequent
+  PRs compare declarations and rustdoc against their base revision.
 
 ## Alternatives: evidence, not a claimed benchmark
 

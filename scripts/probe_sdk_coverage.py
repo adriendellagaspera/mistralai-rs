@@ -5,6 +5,7 @@ No additional resource is committed or exposed by the SDK. Run with the pinned
 codegen Python environment after cargo dependencies have been fetched.
 """
 import json
+import hashlib
 from pathlib import Path
 import shutil
 import subprocess
@@ -55,9 +56,14 @@ def main():
     modules, rejected = probes(compiler.OpenApiIndex.load(ROOT / "spec/openapi.yaml"),
                                compiler.RustIndex.load(ROOT / "src/generated"),
                                json.loads((ROOT / "codegen/sdk-semantics.json").read_text()))
-    print(json.dumps({"generated_candidates": sorted(modules), "rejected_candidates": rejected}, indent=2), flush=True)
-    if not modules:
-        raise SystemExit("no candidates generated: investigate coverage regression")
+    report = {"generated_candidates": sorted(modules), "rejected_candidates": rejected}
+    print(json.dumps(report, indent=2), flush=True)
+    digest = hashlib.sha256(json.dumps(report, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+    baseline = json.loads((ROOT / "codegen/sdk-probe-baseline.json").read_text())
+    actual = {"schema_version": 1, "generated_candidates": len(modules),
+              "rejected_candidates": len(rejected), "report_sha256": digest}
+    if actual != baseline:
+        raise SystemExit(f"coverage probe drift requires review: expected {baseline}, got {actual}")
     with tempfile.TemporaryDirectory(prefix="sdk-coverage-probe-") as directory:
         path = Path(directory)
         (path / "src").mkdir()

@@ -83,8 +83,9 @@ migration, never an implicit interpretation of the new data.
 
 `coverage.json` inventories every upstream operation. `codegen.py probe` also
 generates temporary projections for unmapped JSON candidates and compiles them
-offline. This is a capability test, not an expansion of the public SDK scope or
-a claim that every compiled projection has product-quality naming.
+offline. The versioned candidate report digest makes capability drift an explicit
+review decision. This is not an expansion of the public SDK scope or a claim that
+every compiled projection has product-quality naming.
 
 `api-surface.json` records declarations, attributes and reexports. CI compares
 it to the PR base and requires review for changed/removed entries, then uses
