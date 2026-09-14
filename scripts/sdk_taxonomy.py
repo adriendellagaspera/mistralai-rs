@@ -164,7 +164,7 @@ def parse_typescript(root: Path) -> list[dict[str, Any]]:
         imports = {
             function: module
             for function, module in re.findall(
-                r'import\s*\{\s*(\w+)\s*\}\s*from\s*[\"']\.\./funcs/([^\"']+)\.js[\"'];',
+                r"import\s*\{\s*(\w+)\s*\}\s*from\s*[\"']\.\./funcs/([^\"']+)\.js[\"'];",
                 source,
             )
         }
