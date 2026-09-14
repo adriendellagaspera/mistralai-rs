@@ -16,7 +16,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Generate official SDK taxonomy artifact
-        run: python3 scripts/sdk_taxonomy.py update
+        run: python3 scripts/sdk_taxonomy_inventory.py update
       - name: Upload official SDK taxonomy artifact
         uses: actions/upload-artifact@v4
         with:
