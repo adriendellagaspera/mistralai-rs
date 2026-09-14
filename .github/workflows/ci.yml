@@ -3,7 +3,7 @@ on:
   push:
   pull_request:
 permissions:
-  contents: write
+  contents: read
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -25,17 +25,6 @@ jobs:
             .tools
             target
           key: sdk-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'codegen.lock') }}
-      - name: Bootstrap generated facade
-        run: python scripts/codegen.py generate
-      - name: Commit generated facade
-        run: |
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add src/sdk
-          if ! git diff --cached --quiet; then
-            git commit -m "chore: regenerate Files SDK facade"
-            git push
-          fi
       - name: Check generation, formatting, compilation, linting and tests
         run: bash scripts/validate.sh
       - name: Review generated public API changes

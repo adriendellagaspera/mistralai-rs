@@ -51,7 +51,7 @@ The primary API is a resource-oriented Rust facade compiled from OpenAPI, the
 raw Rust AST and a small declarative semantic overlay. It constructs the
 generated wire types directly: ordinary use does not require JSON conversion or
 OpenAPI `operationId` names. The compiler has no resource-specific backend; the
-same emitters produce Chat, OCR, Models, Embeddings, FIM and Classifiers.
+same emitters produce Chat, OCR, Models, Embeddings, FIM, Classifiers and Files.
 The complete generated client remains available under `mistralai::raw` for
 operations not yet covered by the facade.
 
@@ -108,7 +108,7 @@ methods** in total. Names follow upstream `operationId`s.
 The exact raw inventory is
 [`src/generated/coverage.json`](src/generated/coverage.json); the distinct
 idiomatic-facade inventory is [`src/sdk/coverage.json`](src/sdk/coverage.json).
-The current facade maps 14 distinct OpenAPI operations. Generation fails
+The current facade maps 18 distinct OpenAPI operations. Generation fails
 if an operation is missing or a generated method contains a configuration stub.
 This measures **OpenAPI coverage**, not live-service verification: offline tests
 exercise representative wire behavior and edge cases, and beta/deprecated APIs

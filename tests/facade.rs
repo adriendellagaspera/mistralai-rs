@@ -99,6 +99,22 @@ fn expanded_resources_follow_the_official_sdk_taxonomy() {
         "classifier-model",
         conversation,
     ));
+
+    let files = client.files();
+    let _list = files.list();
+    let _filtered = files.list_with(
+        mistralai::files::ListFilesRequest::default()
+            .purpose("batch")
+            .page_size(20),
+    );
+    let _retrieve = files.retrieve("00000000-0000-0000-0000-000000000000");
+    let _delete = files.delete("00000000-0000-0000-0000-000000000000");
+    let _signed_url = files.get_signed_url(
+        mistralai::files::GetSignedUrlFilesRequest::new(
+            "00000000-0000-0000-0000-000000000000",
+        )
+        .expiry(3600),
+    );
 }
 
 #[test]
