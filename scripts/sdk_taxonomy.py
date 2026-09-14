@@ -197,10 +197,12 @@ def call_name(call: ast.Call) -> str | None:
 def parse_python(root: Path) -> list[dict[str, Any]]:
     client_dir = root / "src/mistralai/client"
     classes: dict[str, tuple[Path, ast.ClassDef]] = {}
-    for path in sorted(client_dir.glob("*.py")):
+    for path in sorted(client_dir.rglob("*.py")):
         tree = ast.parse(path.read_text(), filename=str(path))
         for node in tree.body:
-            if isinstance(node, ast.ClassDef):
+            if isinstance(node, ast.ClassDef) and any(
+                isinstance(base, ast.Name) and base.id == "BaseSDK" for base in node.bases
+            ):
                 classes[node.name] = (path, node)
     if "Mistral" not in classes:
         raise ValueError("Python root SDK class Mistral was not found")
