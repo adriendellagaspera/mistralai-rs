@@ -101,18 +101,36 @@ def normalize_public_path(parts: list[str]) -> str:
     return ".".join(snake(part) for part in parts)
 
 
-def unique_match(pattern: str, source: str, label: str) -> str:
-    values = sorted(set(re.findall(pattern, source, re.MULTILINE)))
+def unique_match(pattern: str, source: str, label: str, *, flags: int = re.MULTILINE) -> str:
+    values = sorted(set(re.findall(pattern, source, flags)))
     if len(values) != 1:
         raise ValueError(f"Expected one {label}, found {values}")
-    return values[0]
+    value = values[0]
+    if isinstance(value, tuple):
+        if len(value) != 1:
+            raise ValueError(f"Expected one capture for {label}, found {value}")
+        return value[0]
+    return value
 
 
 def parse_ts_function(path: Path) -> dict[str, str]:
     source = path.read_text()
-    raw_path = unique_match(r'pathToFunc\([^"]*"([^"]+)"', source, f"path in {path}")
-    method = unique_match(r'\bmethod:\s*"([A-Z]+)"', source, f"method in {path}")
-    operation_id = unique_match(r'\boperationID:\s*"([^"]+)"', source, f"operation ID in {path}")
+    raw_path = unique_match(
+        r"\bpathToFunc\s*\(\s*[\"']([^\"']+)[\"']\s*\)",
+        source,
+        f"path in {path}",
+        flags=re.MULTILINE | re.DOTALL,
+    )
+    method = unique_match(
+        r"\bmethod\s*:\s*[\"']([A-Z]+)[\"']",
+        source,
+        f"method in {path}",
+    )
+    operation_id = unique_match(
+        r"\boperationID\s*:\s*[\"']([^\"']+)[\"']",
+        source,
+        f"operation ID in {path}",
+    )
     return {
         "http_method": method,
         "http_path": normalized_http_path(raw_path),
@@ -146,7 +164,7 @@ def parse_typescript(root: Path) -> list[dict[str, Any]]:
         imports = {
             function: module
             for function, module in re.findall(
-                r'import\s*\{\s*(\w+)\s*\}\s*from\s*"\.\./funcs/([^"]+)\.js";',
+                r'import\s*\{\s*(\w+)\s*\}\s*from\s*[\"']\.\./funcs/([^\"']+)\.js[\"'];',
                 source,
             )
         }
