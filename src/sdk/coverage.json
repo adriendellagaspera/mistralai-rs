@@ -216,7 +216,7 @@
     "chat_classifications_v1_chat_classifications_post": {
       "method": "post",
       "path": "/v1/chat/classifications",
-      "status": "candidate_unverified",
+      "status": "mapped",
       "review_reasons": []
     },
     "chat_completion_v1_chat_completions_post": {
@@ -228,13 +228,13 @@
     "chat_moderations_v1_chat_moderations_post": {
       "method": "post",
       "path": "/v1/chat/moderations",
-      "status": "candidate_unverified",
+      "status": "mapped",
       "review_reasons": []
     },
     "classifications_v1_classifications_post": {
       "method": "post",
       "path": "/v1/classifications",
-      "status": "candidate_unverified",
+      "status": "mapped",
       "review_reasons": []
     },
     "connector_call_tool_v1": {
@@ -435,7 +435,7 @@
     "delete_model_v1_models__model_id__delete": {
       "method": "delete",
       "path": "/v1/models/{model_id}",
-      "status": "capability_gap",
+      "status": "mapped",
       "review_reasons": [
         "raw_symbol_mapping"
       ]
@@ -451,7 +451,7 @@
     "embeddings_v1_embeddings_post": {
       "method": "post",
       "path": "/v1/embeddings",
-      "status": "candidate_unverified",
+      "status": "mapped",
       "review_reasons": []
     },
     "execute_workflow_registration_v1_workflows_registrations__workflow_registration_id__execute_post": {
@@ -524,7 +524,7 @@
     "fim_completion_v1_fim_completions_post": {
       "method": "post",
       "path": "/v1/fim/completions",
-      "status": "candidate_unverified",
+      "status": "mapped",
       "review_reasons": []
     },
     "get_campaign_by_id_v1_observability_campaigns__campaign_id__get": {
@@ -828,7 +828,7 @@
     "jobs_api_routes_fine_tuning_archive_fine_tuned_model": {
       "method": "post",
       "path": "/v1/fine_tuning/models/{model_id}/archive",
-      "status": "candidate_unverified",
+      "status": "mapped",
       "review_reasons": []
     },
     "jobs_api_routes_fine_tuning_cancel_fine_tuning_job": {
@@ -866,13 +866,13 @@
     "jobs_api_routes_fine_tuning_unarchive_fine_tuned_model": {
       "method": "delete",
       "path": "/v1/fine_tuning/models/{model_id}/archive",
-      "status": "candidate_unverified",
+      "status": "mapped",
       "review_reasons": []
     },
     "jobs_api_routes_fine_tuning_update_fine_tuned_model": {
       "method": "patch",
       "path": "/v1/fine_tuning/models/{model_id}",
-      "status": "capability_gap",
+      "status": "mapped",
       "review_reasons": [
         "composite_body_and_parameters"
       ]
@@ -1056,7 +1056,7 @@
     "moderations_v1_moderations_post": {
       "method": "post",
       "path": "/v1/moderations",
-      "status": "candidate_unverified",
+      "status": "mapped",
       "review_reasons": []
     },
     "ocr_v1_ocr_post": {
@@ -1132,7 +1132,7 @@
     "retrieve_model_v1_models__model_id__get": {
       "method": "get",
       "path": "/v1/models/{model_id}",
-      "status": "capability_gap",
+      "status": "mapped",
       "review_reasons": [
         "raw_symbol_mapping"
       ]
@@ -1274,7 +1274,31 @@
     },
     "models": {
       "operations": [
-        "list_models_v1_models_get"
+        "list_models_v1_models_get",
+        "retrieve_model_v1_models__model_id__get",
+        "delete_model_v1_models__model_id__delete",
+        "jobs_api_routes_fine_tuning_update_fine_tuned_model",
+        "jobs_api_routes_fine_tuning_archive_fine_tuned_model",
+        "jobs_api_routes_fine_tuning_unarchive_fine_tuned_model"
+      ]
+    },
+    "embeddings": {
+      "operations": [
+        "embeddings_v1_embeddings_post"
+      ]
+    },
+    "fim": {
+      "operations": [
+        "fim_completion_v1_fim_completions_post",
+        "fim_completion_v1_fim_completions_post"
+      ]
+    },
+    "classifiers": {
+      "operations": [
+        "moderations_v1_moderations_post",
+        "chat_moderations_v1_chat_moderations_post",
+        "classifications_v1_classifications_post",
+        "chat_classifications_v1_chat_classifications_post"
       ]
     }
   },
@@ -1381,6 +1405,270 @@
       "fields": [
         "data",
         "object"
+      ]
+    },
+    "BaseModel": {
+      "raw": "BaseModelCard",
+      "fields": [
+        "aliases",
+        "capabilities",
+        "created",
+        "default_model_temperature",
+        "deprecation",
+        "deprecation_replacement_model",
+        "description",
+        "id",
+        "max_context_length",
+        "name",
+        "object",
+        "owned_by",
+        "r#type"
+      ]
+    },
+    "FineTunedModel": {
+      "raw": "FTModelCard",
+      "fields": [
+        "aliases",
+        "archived",
+        "capabilities",
+        "created",
+        "default_model_temperature",
+        "deprecation",
+        "deprecation_replacement_model",
+        "description",
+        "id",
+        "job",
+        "max_context_length",
+        "name",
+        "object",
+        "owned_by",
+        "r#type",
+        "root"
+      ]
+    },
+    "ModelResponse": {
+      "raw": "RetrieveModelV1ModelsModelIdGetResponse",
+      "fields": []
+    },
+    "DeleteModelResponse": {
+      "raw": "DeleteModelOut",
+      "fields": [
+        "deleted",
+        "id",
+        "object"
+      ]
+    },
+    "ArchiveModelResponse": {
+      "raw": "ArchiveFTModelOut",
+      "fields": [
+        "archived",
+        "id",
+        "object"
+      ]
+    },
+    "UnarchiveModelResponse": {
+      "raw": "UnarchiveFTModelOut",
+      "fields": [
+        "archived",
+        "id",
+        "object"
+      ]
+    },
+    "UpdateModelRequest": {
+      "raw": "UpdateFTModelIn",
+      "fields": [
+        "description",
+        "name"
+      ]
+    },
+    "CompletionFineTunedModel": {
+      "raw": "CompletionFTModelOut",
+      "fields": [
+        "aliases",
+        "archived",
+        "capabilities",
+        "created",
+        "description",
+        "id",
+        "job",
+        "max_context_length",
+        "model_type",
+        "name",
+        "object",
+        "owned_by",
+        "root",
+        "root_version",
+        "workspace_id"
+      ]
+    },
+    "ClassifierFineTunedModel": {
+      "raw": "ClassifierFTModelOut",
+      "fields": [
+        "aliases",
+        "archived",
+        "capabilities",
+        "classifier_targets",
+        "created",
+        "description",
+        "id",
+        "job",
+        "max_context_length",
+        "model_type",
+        "name",
+        "object",
+        "owned_by",
+        "root",
+        "root_version",
+        "workspace_id"
+      ]
+    },
+    "UpdateModelResponse": {
+      "raw": "JobsApiRoutesFineTuningUpdateFineTunedModelResponse",
+      "fields": []
+    },
+    "EmbeddingInput": {
+      "raw": "EmbeddingRequestInput",
+      "fields": []
+    },
+    "EmbeddingParams": {
+      "raw": "EmbeddingRequest",
+      "fields": [
+        "encoding_format",
+        "input",
+        "metadata",
+        "model",
+        "output_dimension",
+        "output_dtype"
+      ]
+    },
+    "Embedding": {
+      "raw": "EmbeddingResponseData",
+      "fields": [
+        "embedding",
+        "index",
+        "object"
+      ]
+    },
+    "EmbeddingResult": {
+      "raw": "EmbeddingResponse",
+      "fields": [
+        "data",
+        "id",
+        "model",
+        "object",
+        "usage"
+      ]
+    },
+    "StopSequences": {
+      "raw": "FIMCompletionRequestStop",
+      "fields": []
+    },
+    "FimRequest": {
+      "raw": "FIMCompletionRequest",
+      "fields": [
+        "max_tokens",
+        "metadata",
+        "min_tokens",
+        "model",
+        "prompt",
+        "prompt_cache_key",
+        "random_seed",
+        "stop",
+        "stream",
+        "suffix",
+        "temperature",
+        "top_p"
+      ]
+    },
+    "FimResponse": {
+      "raw": "FIMCompletionResponse",
+      "fields": [
+        "choices",
+        "created",
+        "id",
+        "model",
+        "object",
+        "usage"
+      ]
+    },
+    "FimStreamChunk": {
+      "raw": "CompletionChunk",
+      "fields": [
+        "choices",
+        "created",
+        "id",
+        "model",
+        "object",
+        "usage"
+      ]
+    },
+    "ClassificationInput": {
+      "raw": "ClassificationRequestInput",
+      "fields": []
+    },
+    "ClassificationParams": {
+      "raw": "ClassificationRequest",
+      "fields": [
+        "input",
+        "metadata",
+        "model"
+      ]
+    },
+    "ClassifierConversation": {
+      "raw": "InstructRequest",
+      "fields": [
+        "messages"
+      ]
+    },
+    "ChatClassificationInput": {
+      "raw": "ChatClassificationRequestInputs",
+      "fields": []
+    },
+    "ChatModerationInput": {
+      "raw": "ChatModerationRequestInput",
+      "fields": []
+    },
+    "ChatClassificationParams": {
+      "raw": "ChatClassificationRequest",
+      "fields": [
+        "input",
+        "model"
+      ]
+    },
+    "ChatModerationParams": {
+      "raw": "ChatModerationRequest",
+      "fields": [
+        "input",
+        "model"
+      ]
+    },
+    "ClassificationResult": {
+      "raw": "ClassificationResponseResultsItem",
+      "fields": [
+        "additional_properties"
+      ]
+    },
+    "ClassificationResultSet": {
+      "raw": "ClassificationResponse",
+      "fields": [
+        "id",
+        "model",
+        "results"
+      ]
+    },
+    "ModerationResult": {
+      "raw": "ModerationObject",
+      "fields": [
+        "categories",
+        "category_scores"
+      ]
+    },
+    "ModerationResultSet": {
+      "raw": "ModerationResponse",
+      "fields": [
+        "id",
+        "model",
+        "results"
       ]
     }
   }

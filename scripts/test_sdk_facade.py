@@ -239,6 +239,48 @@ class GenericSdkCompilerTests(unittest.TestCase):
         self.assertEqual(index.qualified_type("Option<SortOrder>"), "Option<crate::generated::client::SortOrder>")
         self.assertEqual(index.qualified_type("Vec<AnimalRequest>"), "Vec<crate::generated::types::AnimalRequest>")
 
+    def test_body_and_path_parameter_are_composed_from_the_raw_ast(self):
+        document = openapi_document()
+        operation = document["paths"]["/animals"].pop("post")
+        operation["operationId"] = "update"
+        operation["parameters"] = [{
+            "name": "animal_id", "in": "path", "required": True,
+            "schema": {"type": "string"},
+        }]
+        document["paths"] = {"/animals/{animal_id}": {"patch": operation}}
+        overlay = manifest()
+        overlay["resources"]["zoo"]["operations"] = {
+            "update": {"operation_id": "update", "request": "Adoption", "response": "Receipt"}
+        }
+        self.openapi.write_text(json.dumps(document))
+        self.overlay.write_text(json.dumps(overlay))
+        (self.raw / "client.rs").write_text(CLIENT.replace(
+            "adopt(&self, request: AnimalRequest)",
+            "update(&self, animal_id: impl AsRef<str>, request: AnimalRequest)",
+        ))
+        resource = (self.generate() / "zoo.rs").read_text()
+        self.assertIn("pub async fn update(&self, animal_id: impl AsRef<str>, request: Adoption)", resource)
+        self.assertIn("self.raw.update(animal_id.as_ref(), request.into_raw())", resource)
+
+    def test_inline_response_union_is_reconciled_structurally(self):
+        document = openapi_document()
+        document["paths"]["/animals"]["post"]["responses"]["200"]["content"]["application/json"]["schema"] = {
+            "oneOf": [
+                {"$ref": "#/components/schemas/Cat"},
+                {"$ref": "#/components/schemas/Dog"},
+            ],
+            "discriminator": {"propertyName": "kind"},
+        }
+        index = sdk_codegen.RustIndex(TYPES.encode(), CLIENT.encode())
+        self.assertTrue(sdk_codegen.OpenApiIndex(document).response_matches("adopt", "AnimalUnion", index))
+
+    def test_overlay_model_references_fail_closed(self):
+        overlay = manifest()
+        overlay["models"]["Adoption"]["adapters"] = {"animals": "MissingAnimal"}
+        self.overlay.write_text(json.dumps(overlay))
+        with self.assertRaisesRegex(sdk_codegen.GenerationError, "unknown facade models"):
+            self.generate()
+
     def test_protocol_keyword_fields_are_escaped(self):
         document = openapi_document()
         document["components"]["schemas"]["AnimalRequest"]["properties"]["type"] = {"type": "string"}

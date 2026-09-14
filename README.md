@@ -50,10 +50,32 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 The primary API is a resource-oriented Rust facade compiled from OpenAPI, the
 raw Rust AST and a small declarative semantic overlay. It constructs the
 generated wire types directly: ordinary use does not require JSON conversion or
-OpenAPI `operationId` names. The compiler has no Chat/OCR-specific backend; the
-same emitters also produce `mistral.models().list()` and its filtered variant.
+OpenAPI `operationId` names. The compiler has no resource-specific backend; the
+same emitters produce Chat, OCR, Models, Embeddings, FIM and Classifiers.
 The complete generated client remains available under `mistralai::raw` for
 operations not yet covered by the facade.
+
+For example, the expanded generated surface includes:
+
+```rust,no_run
+use mistralai::{EmbeddingParams, FimRequest, Mistral};
+
+# async fn example(mistral: Mistral) -> Result<(), Box<dyn std::error::Error>> {
+let embeddings = mistral
+    .embeddings()
+    .create(EmbeddingParams::new("mistral-embed", "Text to embed"))
+    .await?;
+
+let completion = mistral
+    .fim()
+    .complete(FimRequest::new("codestral-latest", "fn answer() -> "))
+    .await?;
+
+println!("{} embeddings", embeddings.embeddings().len());
+println!("{}", completion.text().unwrap_or_default());
+# Ok(())
+# }
+```
 
 Run the live example explicitly (this incurs normal Mistral API usage):
 
@@ -83,8 +105,10 @@ methods** in total. Names follow upstream `operationId`s.
 | Observability: datasets, records, judges, campaigns, completion events | All operations declared upstream |
 | Workflows: executions, runs, schedules, deployments, events, metrics, workers | All operations, including SSE feeds |
 
-The exact machine-readable inventory is
-[`src/generated/coverage.json`](src/generated/coverage.json). Generation fails
+The exact raw inventory is
+[`src/generated/coverage.json`](src/generated/coverage.json); the distinct
+idiomatic-facade inventory is [`src/sdk/coverage.json`](src/sdk/coverage.json).
+The current facade maps 14 distinct OpenAPI operations. Generation fails
 if an operation is missing or a generated method contains a configuration stub.
 This measures **OpenAPI coverage**, not live-service verification: offline tests
 exercise representative wire behavior and edge cases, and beta/deprecated APIs

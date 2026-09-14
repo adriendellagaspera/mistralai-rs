@@ -10,6 +10,8 @@ from enum import StrEnum
 class AccessorKind(StrEnum):
     COPY = "copy"
     REF = "ref"
+    OPTIONAL_COPY = "optional_copy"
+    OPTIONAL_REF = "optional_ref"
     ITER = "iter"
     FIRST_STRING_VARIANT = "first_string_variant"
 
@@ -26,6 +28,13 @@ class UnionPolicy:
     root: str
     path: tuple[str, ...]
     payload: str
+    targets: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class SimpleUnionPolicy:
+    variants: tuple[tuple[str, str, str | None], ...]
+    bidirectional: bool
 
 
 @dataclass(frozen=True)
@@ -49,7 +58,7 @@ class ViewPolicy:
     accessors: tuple[tuple[str, Accessor], ...]
 
 
-ModelPolicy = UnionPolicy | RequestPolicy | ViewPolicy
+ModelPolicy = UnionPolicy | SimpleUnionPolicy | RequestPolicy | ViewPolicy
 
 
 @dataclass(frozen=True)
@@ -62,7 +71,14 @@ class StreamPolicy:
 def model_policy(config: dict) -> ModelPolicy:
     if "union" in config:
         union = config["union"]
-        return UnionPolicy(union["root"], tuple(union["path"]), union["payload"])
+        return UnionPolicy(union["root"], tuple(union["path"]), union["payload"],
+                           tuple(union.get("targets", ())))
+    if "simple_union" in config:
+        return SimpleUnionPolicy(tuple(
+            (raw, value if isinstance(value, str) else value["name"],
+             None if isinstance(value, str) else value.get("adapter"))
+            for raw, value in config["simple_union"]["variants"].items()
+        ), config["simple_union"].get("bidirectional", False))
     if "accessors" in config:
         return ViewPolicy(config.get("borrowed", True), tuple(
             (name, Accessor(AccessorKind(value["kind"]), tuple(value["path"]), value.get("wrapper")))
