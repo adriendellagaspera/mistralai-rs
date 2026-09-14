@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import difflib
+import hashlib
 import json
 from pathlib import Path
 from typing import Any
@@ -20,19 +21,22 @@ def normalized_paths(records: list[dict[str, Any]]) -> list[str]:
     return sorted({record["normalized_public_path"] for record in records})
 
 
+def canonical_digest(value: object) -> str:
+    payload = json.dumps(value, sort_keys=True, separators=(",", ":")).encode()
+    return "sha256:" + hashlib.sha256(payload).hexdigest()
+
+
 def compact_inventory(harvested: dict[str, Any]) -> dict[str, Any]:
-    operations: dict[str, dict[str, list[str]]] = {}
+    operations: dict[str, list[str]] = {}
     alias_differences: list[dict[str, Any]] = []
     divergences: list[dict[str, Any]] = []
 
     for operation in harvested["operations"]:
         typescript = normalized_paths(operation["typescript"])
         python = normalized_paths(operation["python"])
-        if typescript or python:
-            operations[operation["operation_id"]] = {
-                "typescript": typescript,
-                "python": python,
-            }
+        primary = typescript or python
+        if primary:
+            operations[operation["operation_id"]] = primary
         if not typescript or not python or typescript == python:
             continue
         common = sorted(set(typescript) & set(python))
@@ -88,12 +92,12 @@ def compact_inventory(harvested: dict[str, Any]) -> dict[str, Any]:
     summary["cross_sdk_divergences"] = len(divergences)
 
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "provenance": harvested["provenance"],
         "summary": summary,
         "operations": operations,
         "openapi_only": harvested["openapi_only"],
-        "sdk_only": sdk_only_operations,
+        "sdk_only_digest": canonical_digest(sdk_only_operations),
         "non_http_resources": harvested["non_http_resources"],
         "cross_sdk_alias_differences": alias_differences,
         "cross_sdk_divergences": divergences,
