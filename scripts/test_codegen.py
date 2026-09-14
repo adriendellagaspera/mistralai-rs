@@ -46,7 +46,9 @@ class UpdateTests(unittest.TestCase):
         self.old_spec = b"openapi: 3.1.0\ninfo: {}\n"
         self.lock = {
             "upstream_repository": "mistralai/platform-docs-public",
-            "upstream_spec_path": "openapi.yaml", "upstream_commit": "a" * 40,
+            "upstream_spec_path": "openapi.yaml",
+            "published_spec_url": "https://docs.mistral.ai/openapi.yaml",
+            "upstream_commit": "a" * 40,
             "spec_sha256": hashlib.sha256(self.old_spec).hexdigest(),
             "generator": "openapi-to-rust", "generator_version": "0.16.0",
             "rust_toolchain": "1.94.0",
@@ -56,24 +58,35 @@ class UpdateTests(unittest.TestCase):
         self.addCleanup(patch.stopall)
         patch.object(update_spec, "ROOT", self.root).start()
 
-    def test_new_commit_with_identical_spec_is_strict_noop(self):
+    def test_new_commit_with_identical_spec_is_strict_noop_and_checks_publication(self):
         before = codegen.snapshot(self.root)
         with patch.object(update_spec, "fetch", side_effect=[
-            json.dumps([{"sha": "b" * 40}]).encode(), self.old_spec,
+            json.dumps([{"sha": "b" * 40}]).encode(), self.old_spec, self.old_spec,
         ]):
+            update_spec.main()
+        self.assertEqual(before, codegen.snapshot(self.root))
+
+    def test_published_spec_divergence_fails_without_mutating_files(self):
+        before = codegen.snapshot(self.root)
+        published = self.old_spec + b"paths: {}\n"
+        with patch.object(update_spec, "fetch", side_effect=[
+            json.dumps([{"sha": "b" * 40}]).encode(), self.old_spec, published,
+        ]), self.assertRaisesRegex(ValueError, "Published OpenAPI specification diverges"):
             update_spec.main()
         self.assertEqual(before, codegen.snapshot(self.root))
 
     def test_changed_spec_updates_provenance_and_second_run_is_noop(self):
         new_spec = self.old_spec + b"paths: {}\n"
         with patch.object(update_spec, "fetch", side_effect=[
-            json.dumps([{"sha": "b" * 40}]).encode(), new_spec, b"license",
+            json.dumps([{"sha": "b" * 40}]).encode(), new_spec, new_spec, b"license",
         ]), patch.object(update_spec, "optional_notice", return_value=None):
             update_spec.main()
         lock = json.loads((self.root / "codegen.lock").read_text())
         self.assertEqual(lock["upstream_commit"], "b" * 40)
         codegen.verify_spec(new_spec, lock)
-        self.assertIn(self.lock["spec_sha256"], (self.root / "update-report.md").read_text())
+        report = (self.root / "update-report.md").read_text()
+        self.assertIn(self.lock["spec_sha256"], report)
+        self.assertIn(self.lock["published_spec_url"], report)
         self.assertIsNone(update_spec.updated_lock(lock, "c" * 40, new_spec))
 
     def test_failed_acquisition_leaves_pinned_files_unchanged(self):
