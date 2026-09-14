@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SDK semantics v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "client", "models", "resources"],
+  "properties": {
+    "schema_version": {"const": 2},
+    "client": {"type": "object", "additionalProperties": false, "required": ["name"], "properties": {"name": {"$ref": "#/$defs/identifier"}}},
+    "models": {"type": "object", "propertyNames": {"$ref": "#/$defs/identifier"}, "additionalProperties": {"$ref": "#/$defs/model"}},
+    "resources": {"type": "object", "propertyNames": {"$ref": "#/$defs/identifier"}, "additionalProperties": {"$ref": "#/$defs/resource"}}
+  },
+  "$defs": {
+    "identifier": {"type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]*$", "minLength": 1},
+    "names": {"type": "array", "items": {"$ref": "#/$defs/identifier"}, "uniqueItems": true},
+    "path": {"type": "array", "items": {"$ref": "#/$defs/identifier"}, "minItems": 1},
+    "mapping": {"type": "object", "propertyNames": {"$ref": "#/$defs/identifier"}, "additionalProperties": {"$ref": "#/$defs/identifier"}},
+    "union": {"type": "object", "additionalProperties": false, "required": ["root", "path", "payload"], "properties": {
+      "root": {"$ref": "#/$defs/identifier"}, "path": {"$ref": "#/$defs/path"}, "payload": {"$ref": "#/$defs/identifier"}
+    }},
+    "factory": {"type": "object", "additionalProperties": false, "required": ["field"], "properties": {
+      "field": {"$ref": "#/$defs/identifier"}, "leading": {"$ref": "#/$defs/names"}, "rename": {"$ref": "#/$defs/mapping"}
+    }},
+    "accessor": {"type": "object", "additionalProperties": false, "required": ["kind", "path"], "properties": {
+      "kind": {"enum": ["copy", "ref", "iter", "first_string_variant"]}, "path": {"$ref": "#/$defs/path"}, "wrapper": {"$ref": "#/$defs/identifier"}
+    }, "if": {"properties": {"kind": {"const": "iter"}}}, "then": {"required": ["wrapper"]}},
+    "model": {"type": "object", "additionalProperties": false, "properties": {
+      "raw": {"$ref": "#/$defs/identifier"}, "constructor": {"$ref": "#/$defs/names"}, "exclude": {"$ref": "#/$defs/names"},
+      "adapters": {"$ref": "#/$defs/mapping"}, "union": {"$ref": "#/$defs/union"}, "union_factory": {"$ref": "#/$defs/factory"},
+      "borrowed": {"type": "boolean"}, "accessors": {"type": "object", "propertyNames": {"$ref": "#/$defs/identifier"}, "additionalProperties": {"$ref": "#/$defs/accessor"}}
+    }, "oneOf": [
+      {"required": ["union"], "not": {"anyOf": [{"required": ["constructor"]}, {"required": ["union_factory"]}, {"required": ["accessors"]}]}},
+      {"required": ["constructor"], "not": {"anyOf": [{"required": ["union"]}, {"required": ["union_factory"]}, {"required": ["accessors"]}]}},
+      {"required": ["union_factory"], "not": {"anyOf": [{"required": ["union"]}, {"required": ["constructor"]}, {"required": ["accessors"]}]}},
+      {"required": ["accessors"], "not": {"anyOf": [{"required": ["union"]}, {"required": ["constructor"]}, {"required": ["union_factory"]}]}}
+    ]},
+    "stream": {"type": "object", "additionalProperties": false, "required": ["item", "type"], "properties": {
+      "item": {"$ref": "#/$defs/identifier"}, "wrapper": {"$ref": "#/$defs/identifier"}, "type": {"$ref": "#/$defs/identifier"}
+    }},
+    "operation": {"type": "object", "additionalProperties": false, "required": ["operation_id"], "properties": {
+      "operation_id": {"type": "string", "minLength": 1}, "raw_method": {"$ref": "#/$defs/identifier"},
+      "request": {"$ref": "#/$defs/identifier"}, "response": {"$ref": "#/$defs/identifier"}, "stream": {"$ref": "#/$defs/stream"},
+      "request_overrides": {"type": "object", "propertyNames": {"$ref": "#/$defs/identifier"}, "additionalProperties": {"type": ["boolean", "null"]}}
+    }},
+    "resource": {"type": "object", "additionalProperties": false, "required": ["name", "operations"], "properties": {
+      "name": {"$ref": "#/$defs/identifier"}, "operations": {"type": "object", "propertyNames": {"$ref": "#/$defs/identifier"}, "additionalProperties": {"$ref": "#/$defs/operation"}}
+    }}
+  }
+}

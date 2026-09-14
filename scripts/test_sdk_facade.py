@@ -7,6 +7,8 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "codegen"))
 import sdk_codegen
+from rust_types import parse_type
+from sdk_contracts import compare_surface, public_surface
 
 
 TYPES = """
@@ -143,6 +145,146 @@ class GenericSdkCompilerTests(unittest.TestCase):
         source = (ROOT / "codegen/sdk_codegen.py").read_text()
         for forbidden in ("generate_chat", "generate_ocr", "ChatCompletionRequest", "OCRRequest"):
             self.assertNotIn(forbidden, source)
+
+    def test_types_are_structural_not_delimiter_slices(self):
+        inner = parse_type("Option < Vec < Result<String, Error> > >").unary("Option")
+        self.assertEqual(inner.unary("Vec").constructor, "Result")
+        self.assertEqual(len(inner.unary("Vec").arguments), 2)
+        self.assertIsNone(parse_type("other::Option<String>").unary("Option"))
+        with self.assertRaises(ValueError):
+            parse_type("Option<String> ; fn injected() {}")
+
+    def test_overlay_rejects_wrong_nested_types(self):
+        overlay = manifest()
+        overlay["models"]["Adoption"]["constructor"] = "model"
+        self.overlay.write_text(json.dumps(overlay))
+        with self.assertRaisesRegex(sdk_codegen.GenerationError, "overlay /models/Adoption"):
+            self.generate()
+
+    def test_overlay_rejects_unknown_nested_keys(self):
+        overlay = manifest()
+        overlay["models"]["Receipt"]["accessors"] = {"id": {"kind": "ref", "path": ["id"], "body": "unsafe"}}
+        self.overlay.write_text(json.dumps(overlay))
+        with self.assertRaisesRegex(sdk_codegen.GenerationError, "overlay /models/Receipt"):
+            self.generate()
+
+    def test_overlay_rejects_unknown_version(self):
+        overlay = manifest()
+        overlay["schema_version"] = 3
+        self.overlay.write_text(json.dumps(overlay))
+        with self.assertRaisesRegex(sdk_codegen.GenerationError, "overlay /schema_version"):
+            self.generate()
+
+    def test_duplicate_methods_and_invalid_identifiers_fail_before_emission(self):
+        with self.assertRaisesRegex(ValueError, "duplicate emitted symbol"):
+            public_surface({"test.rs": "pub struct A; impl A { pub fn x() {} pub fn x() {} }"})
+        with self.assertRaisesRegex(ValueError, "invalid emitted Rust"):
+            public_surface({"test.rs": "pub struct 123;"})
+
+    def test_surface_changes_are_classified_conservatively(self):
+        before = {"A::new": "pub fn new() -> Self"}
+        self.assertEqual(compare_surface(before, before)["classification"], "unchanged")
+        self.assertEqual(compare_surface(before, before | {"A::limit": "pub fn limit(i64)"})["classification"], "additive")
+        self.assertEqual(compare_surface(before, {})["classification"], "review_required")
+
+    def test_optional_query_addition_preserves_resource_signature(self):
+        operation = sdk_codegen.OperationSpec("list", "list", "list", None, "Receipt", {}, None)
+        resource = sdk_codegen.ResourceSpec("zoo", "Zoo", (operation,))
+        old = sdk_codegen.RustIndex(TYPES.encode(), b"impl HttpClient { pub async fn list(&self, provider: Option<impl AsRef<str>>) -> Result<AnimalResponse, Error> { todo!() } }")
+        new = sdk_codegen.RustIndex(TYPES.encode(), b"impl HttpClient { pub async fn list(&self, provider: Option<impl AsRef<str>>, limit: Option<i64>) -> Result<AnimalResponse, Error> { todo!() } }")
+        before = sdk_codegen._emit_resource(resource, old)
+        after = sdk_codegen._emit_resource(resource, new)
+        signature = "pub async fn list_with(&self, request: ListZooRequest)"
+        self.assertIn(signature, before)
+        self.assertIn(signature, after)
+        self.assertIn("pub fn limit(mut self, limit: i64)", after)
+        diff = compare_surface(public_surface({"zoo.rs": before}), public_surface({"zoo.rs": after}))
+        self.assertEqual(diff["classification"], "additive")
+
+    def test_inventory_includes_unmapped_operations(self):
+        document = openapi_document()
+        document["paths"]["/binary"] = {"get": {"operationId": "download", "responses": {"200": {"content": {"application/octet-stream": {}}}}}}
+        self.openapi.write_text(json.dumps(document))
+        inventory = json.loads((self.generate() / "coverage.json").read_text())["inventory"]
+        self.assertEqual(set(inventory), {"adopt", "download"})
+        self.assertEqual(inventory["download"]["status"], "capability_gap")
+
+    def test_generation_is_deterministic(self):
+        target = self.generate()
+        before = {path.name: path.read_bytes() for path in target.iterdir()}
+        self.generate()
+        self.assertEqual(before, {path.name: path.read_bytes() for path in target.iterdir()})
+
+    def test_public_symbol_policy_rejects_collisions_and_keywords(self):
+        for name in ("Menagerie", "SdkError", "type"):
+            with self.subTest(name=name):
+                overlay = manifest()
+                overlay["resources"]["zoo"]["name"] = name
+                self.overlay.write_text(json.dumps(overlay))
+                with self.assertRaisesRegex(sdk_codegen.GenerationError, "symbol"):
+                    self.generate()
+
+    def test_backend_policies_are_immutable_typed_values(self):
+        from dataclasses import FrozenInstanceError
+        from sdk_ir import RequestPolicy
+        ir = sdk_codegen.build_ir(sdk_codegen.OpenApiIndex(openapi_document()),
+                                  sdk_codegen.RustIndex(TYPES.encode(), CLIENT.encode()), manifest())
+        request = next(model for model in ir.models if model.name == "Adoption")
+        self.assertIsInstance(request.config, RequestPolicy)
+        with self.assertRaises(FrozenInstanceError):
+            request.config.constructor = ()
+
+    def test_parameter_symbols_resolve_their_raw_module(self):
+        index = sdk_codegen.RustIndex(TYPES.encode(), (CLIENT + "\npub enum SortOrder { Asc, Desc }\n").encode())
+        self.assertEqual(index.qualified_type("Option<SortOrder>"), "Option<crate::generated::client::SortOrder>")
+        self.assertEqual(index.qualified_type("Vec<AnimalRequest>"), "Vec<crate::generated::types::AnimalRequest>")
+
+    def test_protocol_keyword_fields_are_escaped(self):
+        document = openapi_document()
+        document["components"]["schemas"]["AnimalRequest"]["properties"]["type"] = {"type": "string"}
+        self.openapi.write_text(json.dumps(document))
+        (self.raw / "types.rs").write_text(TYPES.replace("pub energy: Option<i64>,", "pub energy: Option<i64>, pub r#type: Option<String>,"))
+        output = (self.generate() / "facade_types.rs").read_text()
+        self.assertIn("pub fn r#type(mut self, r#type: impl Into<String>)", output)
+
+    def stream_fixture(self):
+        document = openapi_document()
+        overlay = manifest()
+        operation = document["paths"]["/animals"]["post"]
+        operation["responses"]["200"]["content"]["text/event-stream"] = {"schema": {"$ref": "#/components/schemas/AnimalResponse"}}
+        overlay["resources"]["zoo"]["operations"]["adopt"] = {
+            "operation_id": "adopt", "request": "Adoption",
+            "stream": {"item": "AnimalResponse", "wrapper": "Receipt", "type": "ReceiptStream"},
+        }
+        client = CLIENT.replace("Result<AnimalResponse, Error>", "Result<futures_util::stream::BoxStream<'static, Result<bytes::Bytes, reqwest::Error>>, Error>")
+        self.openapi.write_text(json.dumps(document))
+        self.overlay.write_text(json.dumps(overlay))
+        (self.raw / "client.rs").write_text(client)
+        return document, overlay, client
+
+    def test_stream_owned_payload_contract_is_validated(self):
+        self.stream_fixture()
+        self.assertIn("ReceiptStream", (self.generate() / "zoo.rs").read_text())
+
+    def test_borrowed_stream_transport_is_rejected(self):
+        _, _, client = self.stream_fixture()
+        (self.raw / "client.rs").write_text(client.replace("'static", "'_"))
+        with self.assertRaisesRegex(sdk_codegen.GenerationError, "ownership/item drift"):
+            self.generate()
+
+    def test_wrong_stream_wire_payload_is_rejected(self):
+        document, _, _ = self.stream_fixture()
+        document["paths"]["/animals"]["post"]["responses"]["200"]["content"]["text/event-stream"]["schema"] = {"type": "string"}
+        self.openapi.write_text(json.dumps(document))
+        with self.assertRaisesRegex(sdk_codegen.GenerationError, "stream payload drift"):
+            self.generate()
+
+    def test_request_override_type_is_validated_against_both_sources(self):
+        overlay = manifest()
+        overlay["resources"]["zoo"]["operations"]["adopt"]["request_overrides"] = {"energy": True}
+        self.overlay.write_text(json.dumps(overlay))
+        with self.assertRaisesRegex(sdk_codegen.GenerationError, "optional Boolean"):
+            self.generate()
 
 
 if __name__ == "__main__":

@@ -7,3 +7,4 @@ cargo check --locked --all-targets
 cargo clippy --locked --all-targets -- -D warnings
 cargo test --locked --all-targets
 cargo test --locked --doc
+python3 scripts/codegen.py probe

@@ -66,27 +66,28 @@ def generator(lock):
 
 
 def tooling_python(lock):
-    versions = "-".join((lock["ruamel_yaml_version"], lock["tree_sitter_version"], lock["tree_sitter_rust_version"]))
+    versions = "-".join((lock["ruamel_yaml_version"], lock["tree_sitter_version"], lock["tree_sitter_rust_version"], lock["jsonschema_version"]))
     environment = ROOT / ".tools" / f"python-sdk-codegen-{versions}"
     python = environment / "bin/python"
     if not python.exists():
         run(sys.executable, "-m", "venv", environment)
     try:
         version = subprocess.check_output(
-            [str(python), "-c", "import ruamel.yaml, tree_sitter, tree_sitter_rust; print(ruamel.yaml.__version__)"], text=True).strip()
+            [str(python), "-c", "import ruamel.yaml, tree_sitter, tree_sitter_rust, jsonschema; print(ruamel.yaml.__version__)"], text=True).strip()
     except subprocess.CalledProcessError:
         version = None
     if version != lock["ruamel_yaml_version"]:
         run(python, "-m", "pip", "install",
             f"ruamel.yaml=={lock['ruamel_yaml_version']}",
             f"tree-sitter=={lock['tree_sitter_version']}",
-            f"tree-sitter-rust=={lock['tree_sitter_rust_version']}")
+            f"tree-sitter-rust=={lock['tree_sitter_rust_version']}",
+            f"jsonschema=={lock['jsonschema_version']}")
     return python
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=["generate", "check"])
+    parser.add_argument("command", choices=["generate", "check", "probe"])
     args = parser.parse_args()
     lock = json.loads((ROOT / "codegen.lock").read_text())
     toolchain = tomllib.loads((ROOT / "rust-toolchain.toml").read_text())
@@ -96,6 +97,9 @@ def main():
     executable = generator(lock)
     python = tooling_python(lock)
     run(python, "-m", "unittest", "discover", "-s", ROOT / "scripts", "-p", "test_*.py")
+    if args.command == "probe":
+        run(python, ROOT / "scripts/probe_sdk_coverage.py")
+        return
     # Preserve relative paths from the checked-in config; never modify its options.
     with tempfile.TemporaryDirectory(prefix=".codegen-", dir=ROOT) as temp:
         work = Path(temp)
@@ -127,7 +131,7 @@ def main():
                 shutil.rmtree(target)
             shutil.copytree(generated, target)
             for path in facade_target.iterdir():
-                if path.is_file() and (path.name == "coverage.json" or path.read_bytes().startswith(GENERATED_MARKER)):
+                if path.is_file() and (path.name in {"coverage.json", "api-surface.json"} or path.read_bytes().startswith(GENERATED_MARKER)):
                     path.unlink()
             for path in facade.iterdir():
                 shutil.copy2(path, facade_target / path.name)
@@ -145,7 +149,7 @@ def main():
             expected_facade = snapshot(facade)
             committed_facade = {
                 path.name: path.read_bytes() for path in facade_target.iterdir()
-                if path.is_file() and (path.name == "coverage.json" or path.read_bytes().startswith(GENERATED_MARKER))
+                if path.is_file() and (path.name in {"coverage.json", "api-surface.json"} or path.read_bytes().startswith(GENERATED_MARKER))
             }
             facade_changed = differences(committed_facade, expected_facade)
             for name in facade_changed:

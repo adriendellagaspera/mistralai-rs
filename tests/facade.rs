@@ -5,7 +5,8 @@ fn third_resource_uses_the_same_generated_client_taxonomy() {
     let client = Mistral::new("test");
     let models = client.models();
     let _list_all = models.list();
-    let _list_filtered = models.list_with(Some("mistral"), None);
+    let _list_filtered =
+        models.list_with(mistralai::models::ListModelsRequest::default().provider("mistral"));
 }
 
 #[test]

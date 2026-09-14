@@ -12,5 +12,7 @@
   "generator_patch_sha256": "6b70ecc9bbc81d60ae0883abbd64f473e748ee43920683827dcca897c7d23493",
   "ruamel_yaml_version": "0.18.6",
   "tree_sitter_version": "0.25.2",
-  "tree_sitter_rust_version": "0.24.0"
+  "tree_sitter_rust_version": "0.24.0",
+  "jsonschema_version": "4.23.0",
+  "cargo_semver_checks_version": "0.50.0"
 }

@@ -61,3 +61,33 @@ No Python emitter is added per endpoint. A genuinely new OpenAPI shape requires
 one generic IR capability plus an unrelated fixture test, rather than a
 service-specific template. The test suite uses a fictional animal API and also
 generates the real Models resource to enforce both sides of that rule.
+
+## Compiler contracts
+
+The validated overlay is lowered into immutable policies in `sdk_ir.py` before
+emission. `rust_types.py` inspects generic type structure and `rust_symbols.py`
+allocates names without silently renaming existing public APIs. The raw adapter
+resolves parameter symbols to their defining module, including client-local
+enums. Ambiguous or reserved product names require an explicit overlay decision;
+protocol-owned Rust keyword fields use raw identifiers.
+
+Non-body parameters are projected into owned request objects with private
+fields. For example, filtered model listing takes
+`models::ListModelsRequest::default().provider("mistral")`; adding an optional
+parameter generates a setter without changing the resource method signature.
+The no-argument convenience method remains available.
+
+`sdk-semantics.schema.json` defines the accepted version and rejects unknown or
+ill-typed nested policies. Changing manifest version requires a deliberate
+migration, never an implicit interpretation of the new data.
+
+`coverage.json` inventories every upstream operation. `codegen.py probe` also
+generates temporary projections for unmapped JSON candidates and compiles them
+offline. This is a capability test, not an expansion of the public SDK scope or
+a claim that every compiled projection has product-quality naming.
+
+`api-surface.json` records declarations, attributes and reexports. CI compares
+it to the PR base and requires review for changed/removed entries, then uses
+pinned cargo-semver-checks for compiler-aware compatibility once a baseline
+exists. Neither layer claims to prove every possible behavioral compatibility
+property. See `PR7_ACCEPTANCE.md` for remaining external evaluation constraints.

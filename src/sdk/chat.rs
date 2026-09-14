@@ -4,6 +4,7 @@ use crate::generated::client::HttpClient;
 use crate::generated::types::*;
 use crate::streaming;
 use futures_util::StreamExt;
+
 #[derive(Clone, Copy)]
 pub struct Chat<'a> {
     raw: &'a HttpClient,
