@@ -1,4 +1,3 @@
-import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -118,7 +117,9 @@ class TaxonomyTests(unittest.TestCase):
             )
             (root / "src/funcs/filesList.ts").write_text(
                 'export function filesList() {\n'
-                ' const path = pathToFunc("/v1/files")();\n'
+                ' const path = pathToFunc(\n'
+                '   "/v1/files",\n'
+                ' )();\n'
                 ' const context = { operationID: "files_list" };\n'
                 ' return request({ method: "GET", path });\n'
                 '}\n'
@@ -126,6 +127,41 @@ class TaxonomyTests(unittest.TestCase):
             records = sdk_taxonomy.parse_typescript(root)
             self.assertEqual("files.list", records[0]["public_path"])
             self.assertEqual("files_list", records[0]["operation_id"])
+
+    def test_python_extraction_records_known_non_http_resource(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            client = root / "src/mistralai/client"
+            extra = root / "src/mistralai/extra/realtime"
+            client.mkdir(parents=True)
+            extra.mkdir(parents=True)
+            (client / "sdk.py").write_text(
+                "class Mistral(BaseSDK):\n"
+                "    def _init_sdks(self):\n"
+                "        self.audio = Audio()\n"
+                "    def list_models(self):\n"
+                "        self._build_request(method='GET', path='/v1/models')\n"
+                "        HookContext(operation_id='models_list')\n"
+            )
+            (client / "audio.py").write_text(
+                "class Audio(BaseSDK):\n"
+                "    @property\n"
+                "    def realtime(self):\n"
+                "        self._realtime = RealtimeTranscription()\n"
+                "        return self._realtime\n"
+            )
+            (extra / "transcription.py").write_text(
+                "class RealtimeTranscription:\n"
+                "    pass\n"
+            )
+            records, non_http = sdk_taxonomy.parse_python(root)
+            self.assertEqual("list_models", records[0]["public_path"])
+            self.assertEqual("audio.realtime", non_http[0]["public_path"])
+            self.assertEqual("non_http_resource", non_http[0]["reason"])
+            self.assertEqual(
+                "src/mistralai/extra/realtime/transcription.py",
+                non_http[0]["source_file"],
+            )
 
 
 if __name__ == "__main__":
