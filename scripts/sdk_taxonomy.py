@@ -212,20 +212,33 @@ def call_name(call: ast.Call) -> str | None:
     return None
 
 
-def parse_python(root: Path) -> list[dict[str, Any]]:
-    client_dir = root / "src/mistralai/client"
+def is_base_sdk_class(node: ast.ClassDef) -> bool:
+    return any(isinstance(base, ast.Name) and base.id == "BaseSDK" for base in node.bases)
+
+
+def is_property(statement: ast.FunctionDef | ast.AsyncFunctionDef) -> bool:
+    return any(isinstance(decorator, ast.Name) and decorator.id == "property" for decorator in statement.decorator_list)
+
+
+def parse_python(root: Path) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    package_dir = root / "src/mistralai"
     classes: dict[str, tuple[Path, ast.ClassDef]] = {}
-    for path in sorted(client_dir.rglob("*.py")):
+    known_classes: dict[str, list[tuple[Path, ast.ClassDef]]] = defaultdict(list)
+    for path in sorted(package_dir.rglob("*.py")):
         tree = ast.parse(path.read_text(), filename=str(path))
         for node in tree.body:
-            if isinstance(node, ast.ClassDef) and any(
-                isinstance(base, ast.Name) and base.id == "BaseSDK" for base in node.bases
-            ):
+            if not isinstance(node, ast.ClassDef):
+                continue
+            known_classes[node.name].append((path, node))
+            if is_base_sdk_class(node):
+                if node.name in classes:
+                    raise ValueError(f"Duplicate Python SDK class {node.name}")
                 classes[node.name] = (path, node)
     if "Mistral" not in classes:
         raise ValueError("Python root SDK class Mistral was not found")
 
     records: list[dict[str, Any]] = []
+    non_http_resources: list[dict[str, Any]] = []
     visited: set[tuple[str, tuple[str, ...]]] = set()
 
     def children(node: ast.ClassDef) -> dict[str, str]:
@@ -238,6 +251,7 @@ def parse_python(root: Path) -> list[dict[str, Any]]:
                         for attr, pair in value.items():
                             result[attr] = pair[1]
             if isinstance(statement, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                property_name = statement.name if is_property(statement) else None
                 for inner in ast.walk(statement):
                     if not isinstance(inner, ast.Assign) or not isinstance(inner.value, ast.Call):
                         continue
@@ -249,8 +263,26 @@ def parse_python(root: Path) -> list[dict[str, Any]]:
                             and isinstance(target.value, ast.Name)
                             and target.value.id == "self"
                         ):
-                            result[target.attr] = inner.value.func.id
+                            attr = property_name if property_name is not None else target.attr
+                            result[attr] = inner.value.func.id
         return result
+
+    def record_non_http(child_class: str, resource: tuple[str, ...]) -> None:
+        candidates = known_classes.get(child_class, [])
+        if not candidates:
+            raise ValueError(f"Unknown Python SDK class {child_class}")
+        if len(candidates) != 1:
+            paths = sorted(path.relative_to(root).as_posix() for path, _ in candidates)
+            raise ValueError(f"Ambiguous Python SDK class {child_class}: {paths}")
+        path, _ = candidates[0]
+        parts = list(resource)
+        non_http_resources.append({
+            "class": child_class,
+            "normalized_public_path": normalize_public_path(parts),
+            "public_path": ".".join(parts),
+            "reason": "non_http_resource",
+            "source_file": path.relative_to(root).as_posix(),
+        })
 
     def visit(class_name: str, resource: tuple[str, ...]) -> None:
         marker = (class_name, resource)
@@ -258,7 +290,8 @@ def parse_python(root: Path) -> list[dict[str, Any]]:
             return
         visited.add(marker)
         if class_name not in classes:
-            raise ValueError(f"Unknown Python SDK class {class_name}")
+            record_non_http(class_name, resource)
+            return
         path, node = classes[class_name]
         for statement in node.body:
             if not isinstance(statement, ast.FunctionDef):
@@ -291,7 +324,10 @@ def parse_python(root: Path) -> list[dict[str, Any]]:
     visit("Mistral", ())
     if not records:
         raise ValueError("No Python SDK methods were extracted")
-    return sorted(records, key=lambda item: (item["public_path"], item["http_method"], item["http_path"]))
+    return (
+        sorted(records, key=lambda item: (item["public_path"], item["http_method"], item["http_path"])),
+        sorted(non_http_resources, key=lambda item: item["public_path"]),
+    )
 
 
 def reconcile(
@@ -354,7 +390,9 @@ def build_inventory(
     coverage: dict[str, Any],
     typescript_records: list[dict[str, Any]],
     python_records: list[dict[str, Any]],
+    python_non_http_resources: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
+    python_non_http_resources = python_non_http_resources or []
     raw_operations = coverage["operations"]
     ts_matched, ts_unresolved = reconcile("typescript", typescript_records, raw_operations)
     py_matched, py_unresolved = reconcile("python", python_records, raw_operations)
@@ -416,6 +454,7 @@ def build_inventory(
             "openapi_only": len(upstream_ids - covered_upstream),
             "typescript_methods": len(typescript_records),
             "python_methods": len(python_records),
+            "python_non_http_resources": len(python_non_http_resources),
             "typescript_unresolved": len(ts_unresolved),
             "python_unresolved": len(py_unresolved),
             "cross_sdk_divergences": len(divergences),
@@ -423,6 +462,7 @@ def build_inventory(
         "operations": operations,
         "openapi_only": sorted(upstream_ids - covered_upstream),
         "sdk_only": unresolved,
+        "non_http_resources": {"python": python_non_http_resources},
         "cross_sdk_divergences": divergences,
     }
 
@@ -436,11 +476,13 @@ def generate(lock: dict[str, Any]) -> dict[str, Any]:
         lock["official_python_sdk_repository"],
         lock["official_python_sdk_commit"],
     )
+    python_records, python_non_http_resources = parse_python(py_root)
     return build_inventory(
         lock,
         load_json(COVERAGE_PATH),
         parse_typescript(ts_root),
-        parse_python(py_root),
+        python_records,
+        python_non_http_resources,
     )
 
 
