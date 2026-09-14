@@ -6,8 +6,14 @@ use std::time::{Duration, Instant};
 use bytes::Bytes;
 use futures_util::StreamExt;
 use mistralai::{
-    AudioTranscriptionRequest, ChatCompletionRequest, Client, CompletionChunk, EmbeddingRequest,
-    FilesApiRoutesUploadFileRequest, streaming,
+    raw::{
+        Client,
+        types::{
+            AudioTranscriptionRequest, ChatCompletionRequest, CompletionChunk, EmbeddingRequest,
+            FilesApiRoutesUploadFileRequest,
+        },
+    },
+    streaming,
 };
 use serde_json::json;
 
@@ -209,15 +215,17 @@ async fn generated_chat_stream_sends_stream_flag_and_decodes_sse() {
 
 #[test]
 fn repaired_workflow_list_and_sharing_delete_match_wire_fields() {
-    let workflows: mistralai::WorkflowListResponse =
+    let workflows: mistralai::raw::types::WorkflowListResponse =
         serde_json::from_value(json!({"workflows":[],"next_cursor":null})).unwrap();
     assert!(workflows.workflows.is_empty());
     assert!(
-        serde_json::from_value::<mistralai::WorkflowListResponse>(json!({"next_cursor":null}))
-            .is_err()
+        serde_json::from_value::<mistralai::raw::types::WorkflowListResponse>(
+            json!({"next_cursor":null}),
+        )
+        .is_err()
     );
-    let sharing: mistralai::SharingDelete = serde_json::from_value(json!({
-        "share_with_uuid":"00000000-0000-0000-0000-000000000001", "share_with_type":"user"}))
+    let sharing: mistralai::raw::types::SharingDelete = serde_json::from_value(json!({
+        "share_with_uuid":"00000000-0000-0000-0000-000000000001", "share_with_type":"User"}))
     .unwrap();
     assert!(
         serde_json::to_value(sharing)
@@ -231,7 +239,8 @@ fn repaired_workflow_list_and_sharing_delete_match_wire_fields() {
 async fn native_audio_stream_sets_mode_and_decodes_typed_envelope() {
     let body = b"event: transcription.text.delta\ndata: {\"type\":\"transcription.text.delta\",\"text\":\"hello\"}\n\n";
     let (url, worker) = server("200 OK", "text/event-stream", body);
-    let mut request = mistralai::AudioTranscriptionRequestStream::new("voxtral-test".into());
+    let mut request =
+        mistralai::raw::types::AudioTranscriptionRequestStream::new("voxtral-test".into());
     request.file_id = Some(Some("file-id".into()));
     let client = Client::new().with_base_url(&url);
     let bytes = client
@@ -239,7 +248,7 @@ async fn native_audio_stream_sets_mode_and_decodes_typed_envelope() {
         .await
         .unwrap();
     let events: Vec<_> = streaming::events(bytes).collect().await;
-    let event: mistralai::TranscriptionStreamEvents =
+    let event: mistralai::raw::types::TranscriptionStreamEvents =
         events[0].as_ref().unwrap().envelope().unwrap();
     assert_eq!(event.event.to_string(), "transcription.text.delta");
     let (headers, payload) = worker.join().unwrap();
@@ -248,7 +257,7 @@ async fn native_audio_stream_sets_mode_and_decodes_typed_envelope() {
 }
 
 #[tokio::test]
-async fn workflow_feed_sends_cursor_headers_without_buffering_json() {
+async fn workflow_feed_encodes_query_parameters_without_buffering_json() {
     let (url, worker) = server("200 OK", "text/event-stream", b"data: {\"test\":true}\n\n");
     let client = Client::new().with_base_url(&url);
     let bytes = client
@@ -263,7 +272,6 @@ async fn workflow_feed_sends_cursor_headers_without_buffering_json() {
     assert_eq!(events.len(), 1);
     let (headers, _) = worker.join().unwrap();
     assert!(headers.starts_with(
-        "GET /v1/workflows/executions/execution%2Fid/stream?event_source=worker+a HTTP/1.1"
+        "GET /v1/workflows/executions/execution%2Fid/stream?event_source=worker+a&last_event_id=cursor-7 HTTP/1.1"
     ));
-    assert!(headers.to_lowercase().contains("last-event-id: cursor-7"));
 }

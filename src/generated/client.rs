@@ -2665,7 +2665,7 @@ impl HttpClient {
         conversation_id: impl AsRef<str>,
         request: ConversationAppendStreamRequest,
     ) -> Result<
-        impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>>,
+        futures_util::stream::BoxStream<'static, Result<bytes::Bytes, reqwest::Error>>,
         ApiOpError<AgentsApiV1ConversationsAppendStreamApiError>,
     > {
         let request_url = format!(
@@ -2696,7 +2696,7 @@ impl HttpClient {
         let status_code = status.as_u16();
         let headers = response.headers().clone();
         if false || status_code == 200u16 {
-            Ok(response.bytes_stream())
+            Ok(Box::pin(response.bytes_stream()))
         } else {
             if status.is_success() {
                 return Err(ApiOpError::Api(ApiError {
@@ -3291,7 +3291,7 @@ impl HttpClient {
         conversation_id: impl AsRef<str>,
         request: ConversationRestartStreamRequest,
     ) -> Result<
-        impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>>,
+        futures_util::stream::BoxStream<'static, Result<bytes::Bytes, reqwest::Error>>,
         ApiOpError<AgentsApiV1ConversationsRestartStreamApiError>,
     > {
         let request_url = format!(
@@ -3322,7 +3322,7 @@ impl HttpClient {
         let status_code = status.as_u16();
         let headers = response.headers().clone();
         if false || status_code == 200u16 {
-            Ok(response.bytes_stream())
+            Ok(Box::pin(response.bytes_stream()))
         } else {
             if status.is_success() {
                 return Err(ApiOpError::Api(ApiError {
@@ -3464,7 +3464,7 @@ impl HttpClient {
         &self,
         request: ConversationStreamRequest,
     ) -> Result<
-        impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>>,
+        futures_util::stream::BoxStream<'static, Result<bytes::Bytes, reqwest::Error>>,
         ApiOpError<AgentsApiV1ConversationsStartStreamApiError>,
     > {
         let request_url = format!("{}{}", self.base_url, "/v1/conversations");
@@ -3488,7 +3488,7 @@ impl HttpClient {
         let status_code = status.as_u16();
         let headers = response.headers().clone();
         if false || status_code == 200u16 {
-            Ok(response.bytes_stream())
+            Ok(Box::pin(response.bytes_stream()))
         } else {
             if status.is_success() {
                 return Err(ApiOpError::Api(ApiError {
@@ -3839,7 +3839,7 @@ impl HttpClient {
         &self,
         request: AudioTranscriptionRequestStream,
     ) -> Result<
-        impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>>,
+        futures_util::stream::BoxStream<'static, Result<bytes::Bytes, reqwest::Error>>,
         ApiOpError<serde_json::Value>,
     > {
         let request_url = format!("{}{}", self.base_url, "/v1/audio/transcriptions");
@@ -3899,7 +3899,7 @@ impl HttpClient {
         let status_code = status.as_u16();
         let headers = response.headers().clone();
         if false || status_code == 200u16 {
-            Ok(response.bytes_stream())
+            Ok(Box::pin(response.bytes_stream()))
         } else {
             if status.is_success() {
                 return Err(ApiOpError::Api(ApiError {
@@ -4389,7 +4389,7 @@ impl HttpClient {
         &self,
         request: ChatCompletionRequest,
     ) -> Result<
-        impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>>,
+        futures_util::stream::BoxStream<'static, Result<bytes::Bytes, reqwest::Error>>,
         ApiOpError<ChatCompletionV1ChatCompletionsPostStreamApiError>,
     > {
         let request_url = format!("{}{}", self.base_url, "/v1/chat/completions");
@@ -4413,7 +4413,7 @@ impl HttpClient {
         let status_code = status.as_u16();
         let headers = response.headers().clone();
         if false || status_code == 200u16 {
-            Ok(response.bytes_stream())
+            Ok(Box::pin(response.bytes_stream()))
         } else {
             if status.is_success() {
                 return Err(ApiOpError::Api(ApiError {
@@ -8910,7 +8910,7 @@ impl HttpClient {
         &self,
         request: FIMCompletionRequest,
     ) -> Result<
-        impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>>,
+        futures_util::stream::BoxStream<'static, Result<bytes::Bytes, reqwest::Error>>,
         ApiOpError<FimCompletionV1FimCompletionsPostStreamApiError>,
     > {
         let request_url = format!("{}{}", self.base_url, "/v1/fim/completions");
@@ -8934,7 +8934,7 @@ impl HttpClient {
         let status_code = status.as_u16();
         let headers = response.headers().clone();
         if false || status_code == 200u16 {
-            Ok(response.bytes_stream())
+            Ok(Box::pin(response.bytes_stream()))
         } else {
             if status.is_success() {
                 return Err(ApiOpError::Api(ApiError {
@@ -12228,7 +12228,7 @@ impl HttpClient {
         workflow_event_types: Option<impl AsRef<str>>,
         last_event_id: Option<impl AsRef<str>>,
     ) -> Result<
-        impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>>,
+        futures_util::stream::BoxStream<'static, Result<bytes::Bytes, reqwest::Error>>,
         ApiOpError<GetStreamEventsV1WorkflowsEventsStreamGetApiError>,
     > {
         let request_url = format!("{}{}", self.base_url, "/v1/workflows/events/stream");
@@ -12292,7 +12292,7 @@ impl HttpClient {
         let status_code = status.as_u16();
         let headers = response.headers().clone();
         if false || status_code == 200u16 {
-            Ok(response.bytes_stream())
+            Ok(Box::pin(response.bytes_stream()))
         } else {
             if status.is_success() {
                 return Err(ApiOpError::Api(ApiError {
@@ -18819,7 +18819,7 @@ impl HttpClient {
         &self,
         request: SpeechRequest,
     ) -> Result<
-        impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>>,
+        futures_util::stream::BoxStream<'static, Result<bytes::Bytes, reqwest::Error>>,
         ApiOpError<SpeechV1AudioSpeechPostStreamApiError>,
     > {
         let request_url = format!("{}{}", self.base_url, "/v1/audio/speech");
@@ -18843,7 +18843,7 @@ impl HttpClient {
         let status_code = status.as_u16();
         let headers = response.headers().clone();
         if false || status_code == 200u16 {
-            Ok(response.bytes_stream())
+            Ok(Box::pin(response.bytes_stream()))
         } else {
             if status.is_success() {
                 return Err(ApiOpError::Api(ApiError {
@@ -18899,7 +18899,7 @@ impl HttpClient {
         event_source: Option<impl AsRef<str>>,
         last_event_id: Option<impl AsRef<str>>,
     ) -> Result<
-        impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>>,
+        futures_util::stream::BoxStream<'static, Result<bytes::Bytes, reqwest::Error>>,
         ApiOpError<StreamV1WorkflowsExecutionsExecutionIdStreamGetApiError>,
     > {
         let request_url = format!(
@@ -18937,7 +18937,7 @@ impl HttpClient {
         let status_code = status.as_u16();
         let headers = response.headers().clone();
         if false || status_code == 200u16 {
-            Ok(response.bytes_stream())
+            Ok(Box::pin(response.bytes_stream()))
         } else {
             if status.is_success() {
                 return Err(ApiOpError::Api(ApiError {

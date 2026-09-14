@@ -1,7 +1,7 @@
 use bytes::Bytes;
 use futures_util::{StreamExt, stream};
+use mistralai::raw::types::{CompletionChunk, CompletionEvent};
 use mistralai::streaming::{Error, MAX_EVENT_BYTES, events, json_events};
-use mistralai::{CompletionChunk, CompletionEvent};
 
 fn chunks(bytes: &[u8], split: usize) -> impl futures_util::Stream<Item = Result<Bytes, String>> {
     stream::iter(vec![
