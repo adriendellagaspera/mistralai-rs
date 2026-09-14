@@ -6,6 +6,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 import sdk_taxonomy
+import sdk_taxonomy_inventory
 
 
 class TaxonomyTests(unittest.TestCase):
@@ -89,14 +90,53 @@ class TaxonomyTests(unittest.TestCase):
             "http_path": "/v1/files",
             "transport_variant": "default",
         }
-        inventory = sdk_taxonomy.build_inventory(
+        harvested = sdk_taxonomy.build_inventory(
             lock,
             coverage,
             [{**common, "public_path": "files.list", "normalized_public_path": "files.list"}],
             [{**common, "public_path": "files.all", "normalized_public_path": "files.all"}],
         )
+        inventory = sdk_taxonomy_inventory.compact_inventory(harvested)
         self.assertEqual(1, inventory["summary"]["cross_sdk_divergences"])
-        self.assertEqual("public_path_mismatch", inventory["cross_sdk_divergences"][0]["reason"])
+        self.assertEqual("public_path_conflict", inventory["cross_sdk_divergences"][0]["reason"])
+
+    def test_cross_sdk_extra_alias_is_not_a_conflict(self):
+        lock = {
+            "upstream_repository": "mistralai/spec",
+            "upstream_commit": "a" * 40,
+            "official_typescript_sdk_repository": "mistralai/client-ts",
+            "official_typescript_sdk_commit": "b" * 40,
+            "official_python_sdk_repository": "mistralai/client-python",
+            "official_python_sdk_commit": "c" * 40,
+        }
+        coverage = {"operations": [{
+            "operation_id": "chat_complete",
+            "method": "POST",
+            "path": "/v1/chat/completions",
+            "upstream": True,
+        }]}
+        common = {
+            "operation_id": "chat_complete",
+            "http_method": "POST",
+            "http_path": "/v1/chat/completions",
+            "transport_variant": "default",
+        }
+        harvested = sdk_taxonomy.build_inventory(
+            lock,
+            coverage,
+            [
+                {**common, "public_path": "chat.complete", "normalized_public_path": "chat.complete"},
+                {**common, "public_path": "chat.parse", "normalized_public_path": "chat.parse"},
+            ],
+            [{**common, "public_path": "chat.complete", "normalized_public_path": "chat.complete"}],
+        )
+        inventory = sdk_taxonomy_inventory.compact_inventory(harvested)
+        self.assertEqual(0, inventory["summary"]["cross_sdk_divergences"])
+        self.assertEqual(1, inventory["summary"]["cross_sdk_alias_differences"])
+        self.assertEqual(
+            ["chat.complete"],
+            inventory["cross_sdk_alias_differences"][0]["common"],
+        )
 
     def test_typescript_extraction_follows_resource_graph(self):
         with tempfile.TemporaryDirectory() as temporary:
