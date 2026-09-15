@@ -1,0 +1,44 @@
+name: Analyze inline raw Rust types
+on:
+  push:
+    branches: [feat/inline-response-projection]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  analyze:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: python -m pip install 'ruamel.yaml==0.18.6' 'tree-sitter==0.25.2' 'tree-sitter-rust==0.24.0' 'jsonschema==4.23.0'
+      - run: |
+          python - <<'PY'
+          import json, sys
+          sys.path.insert(0,'codegen')
+          import sdk_codegen as c
+          r=c.RustIndex.load(__import__('pathlib').Path('src/generated'))
+          names=[
+            'AgentsApiV1AgentsListResponse','AgentsApiV1AgentsListVersionAliasesResponse','AgentsApiV1AgentsListVersionsResponse',
+            'AgentsApiV1ConversationsGetResponse','AgentsApiV1ConversationsListResponse','ConnectorGetAuthenticationMethodsV1Response',
+            'ConnectorListToolsV1Response','ExecuteWorkflowRegistrationV1WorkflowsRegistrationsWorkflowRegistrationIdExecutePostResponse',
+            'ExecuteWorkflowV1WorkflowsWorkflowIdentifierExecutePostResponse','GetRunHistoryV1WorkflowsRunsRunIdHistoryGetResponse',
+            'GetWorkflowExecutionHistoryV1WorkflowsExecutionsExecutionIdHistoryGetResponse','LibrariesDocumentsGetExtractedTextSignedUrlV1Response',
+            'LibrariesDocumentsGetSignedUrlV1Response']
+          def describe(name, depth=0):
+            pad='  '*depth
+            if name in r.aliases:
+              t=r.aliases[name]
+              print(pad+'alias '+name+' = '+t.spelling)
+              for arg in t.arguments:
+                if arg.spelling in r.aliases or arg.spelling in r.enums or arg.spelling in r.structs:
+                  describe(arg.spelling,depth+1)
+            elif name in r.enums:
+              print(pad+'enum '+name+' = '+repr([(v.name,v.payload) for v in r.enums[name]]))
+              for v in r.enums[name]:
+                if v.payload and (v.payload in r.aliases or v.payload in r.enums or v.payload in r.structs): describe(v.payload,depth+1)
+            elif name in r.structs:
+              print(pad+'struct '+name+' fields='+repr([(f.name,f.type) for f in r.structs[name]]))
+            else: print(pad+'unknown '+name)
+          for n in names:
+            print('===',n); describe(n)
+          PY
