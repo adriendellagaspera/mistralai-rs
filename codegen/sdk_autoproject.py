@@ -161,6 +161,10 @@ def _alias_name(raw: str) -> str:
     return f"{raw}Value"
 
 
+def _union_name(raw: str) -> str:
+    return f"{raw}Value"
+
+
 def _ensure_view_model(models: dict[str, Any], schemas: dict[str, Any], raw: str,
                        borrowed: bool = False) -> str:
     name = _view_name(raw)
@@ -231,6 +235,64 @@ def _ensure_alias_model(models: dict[str, Any], raw: str, rust: Any) -> tuple[st
     return name, None
 
 
+def _omittable_singleton_enum(schema: dict[str, Any], raw_type: str, schemas: dict[str, Any], rust: Any) -> bool:
+    schema, _ = _nullable(schema)
+    reference = _schema_ref(schema)
+    target = schemas.get(reference, {}) if reference else schema
+    values = target.get("enum")
+    singleton = (isinstance(values, list) and len(values) == 1) or "const" in target
+    if not singleton:
+        return False
+    syntax = _strip_options(parse_type(raw_type))
+    return syntax.spelling in rust.enums and len(rust.enums[syntax.spelling]) == 1
+
+
+def _ensure_union_model(models: dict[str, Any], schemas: dict[str, Any], schema: dict[str, Any],
+                        raw: str, rust: Any, resolving: tuple[str, ...]) -> tuple[str | None, str | None]:
+    existing = _existing_model_by_raw(models, raw, False)
+    if existing:
+        return existing, None
+    branches = schema.get("oneOf", []) or schema.get("anyOf", [])
+    non_null = [branch for branch in branches if branch.get("type") != "null"]
+    references = [_schema_ref(branch) for branch in non_null]
+    if len(non_null) < 2 or any(reference is None for reference in references) or raw not in rust.enums:
+        return None, "request_model_projection"
+    variants = rust.enums[raw]
+    if any(variant.payload is None for variant in variants):
+        return None, "request_model_projection"
+    by_payload = {variant.payload: variant.name for variant in variants}
+    if len(by_payload) != len(variants) or set(by_payload) != set(references):
+        return None, "request_model_projection"
+
+    discriminator = schema.get("discriminator", {})
+    mapping = discriminator.get("mapping", {}) if isinstance(discriminator, dict) else {}
+    tags_by_ref = {
+        value.rsplit("/", 1)[-1]: tag
+        for tag, value in mapping.items()
+        if isinstance(value, str)
+    }
+    if mapping and set(tags_by_ref) != set(references):
+        return None, "request_model_projection"
+
+    facade_variants: dict[str, Any] = {}
+    seen_public: set[str] = set()
+    for reference in references:
+        adapter, reason = _ensure_request_model(models, schemas, reference, rust, resolving)
+        if reason or adapter is None:
+            return None, reason or "request_model_projection"
+        public = _pascal(tags_by_ref.get(reference, reference).lower() if reference in tags_by_ref else reference)
+        if not public or public in seen_public:
+            return None, "request_model_projection"
+        seen_public.add(public)
+        facade_variants[by_payload[reference]] = {"name": public, "adapter": adapter}
+
+    name = _union_name(raw)
+    if name in models and models[name].get("raw", name) != raw:
+        return None, "request_model_projection"
+    models[name] = {"raw": raw, "simple_union": {"variants": facade_variants}}
+    return name, None
+
+
 def _request_field_adapter(models: dict[str, Any], schemas: dict[str, Any], schema: dict[str, Any],
                            raw_type: str, rust: Any, resolving: tuple[str, ...]) -> tuple[str | None, str | None]:
     schema, _ = _nullable(schema)
@@ -240,6 +302,9 @@ def _request_field_adapter(models: dict[str, Any], schemas: dict[str, Any], sche
         if inner is None:
             return None, "request_model_projection"
         return _request_field_adapter(models, schemas, schema.get("items", {}), inner.spelling, rust, resolving)
+
+    if schema.get("oneOf") or schema.get("anyOf"):
+        return _ensure_union_model(models, schemas, schema, syntax.spelling, rust, resolving)
 
     reference = _schema_ref(schema)
     if reference:
@@ -290,7 +355,14 @@ def _ensure_request_model(models: dict[str, Any], schemas: dict[str, Any], raw: 
     if set(raw_fields) != set(properties):
         return None, "request_model_projection"
     adapters: dict[str, str] = {}
+    excluded: list[str] = []
+    required = set(schema.get("required", []))
     for field, field_schema in sorted(properties.items()):
+        if field not in required and _omittable_singleton_enum(
+            field_schema, raw_fields[field].type, schemas, rust
+        ):
+            excluded.append(field)
+            continue
         adapter, reason = _request_field_adapter(
             models, schemas, field_schema, raw_fields[field].type, rust, (*resolving, raw)
         )
@@ -304,6 +376,8 @@ def _ensure_request_model(models: dict[str, Any], schemas: dict[str, Any], raw: 
     config: dict[str, Any] = {"raw": raw, "constructor": list(schema.get("required", []))}
     if adapters:
         config["adapters"] = adapters
+    if excluded:
+        config["exclude"] = excluded
     models[name] = config
     return name, None
 

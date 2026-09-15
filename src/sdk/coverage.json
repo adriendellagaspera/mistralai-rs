@@ -372,7 +372,7 @@
     "create_judge_v1_observability_judges_post": {
       "method": "post",
       "path": "/v1/observability/judges",
-      "status": "candidate_unverified",
+      "status": "mapped",
       "review_reasons": []
     },
     "create_voice_v1_audio_voices_post": {
@@ -885,7 +885,7 @@
     "judge_dataset_record_v1_observability_dataset_records__dataset_record_id__live_judging_post": {
       "method": "post",
       "path": "/v1/observability/dataset-records/{dataset_record_id}/live-judging",
-      "status": "capability_gap",
+      "status": "mapped",
       "review_reasons": [
         "composite_body_and_parameters",
         "raw_symbol_mapping"
@@ -1203,7 +1203,7 @@
     "update_judge_v1_observability_judges__judge_id__put": {
       "method": "put",
       "path": "/v1/observability/judges/{judge_id}",
-      "status": "capability_gap",
+      "status": "mapped",
       "review_reasons": [
         "composite_body_and_parameters",
         "raw_symbol_mapping"
@@ -1364,6 +1364,15 @@
         "update_dataset_v1_observability_datasets__dataset_id__patch"
       ]
     },
+    "beta_observability_judges": {
+      "operations": [
+        "create_judge_v1_observability_judges_post",
+        "delete_judge_v1_observability_judges__judge_id__delete",
+        "get_judge_by_id_v1_observability_judges__judge_id__get",
+        "get_judges_v1_observability_judges_get",
+        "update_judge_v1_observability_judges__judge_id__put"
+      ]
+    },
     "audio": {
       "operations": []
     },
@@ -1380,14 +1389,8 @@
       "operations": [
         "delete_dataset_record_v1_observability_dataset_records__dataset_record_id__delete",
         "delete_dataset_records_v1_observability_dataset_records_bulk_delete_post",
-        "get_dataset_record_v1_observability_dataset_records__dataset_record_id__get"
-      ]
-    },
-    "beta_observability_judges": {
-      "operations": [
-        "delete_judge_v1_observability_judges__judge_id__delete",
-        "get_judge_by_id_v1_observability_judges__judge_id__get",
-        "get_judges_v1_observability_judges_get"
+        "get_dataset_record_v1_observability_dataset_records__dataset_record_id__get",
+        "judge_dataset_record_v1_observability_dataset_records__dataset_record_id__live_judging_post"
       ]
     },
     "workflows_deployments": {
@@ -2076,6 +2079,45 @@
         "workspace_id"
       ]
     },
+    "JudgeClassificationOutputOptionParams": {
+      "raw": "JudgeClassificationOutputOption",
+      "fields": [
+        "description",
+        "value"
+      ]
+    },
+    "JudgeClassificationOutputParams": {
+      "raw": "JudgeClassificationOutput",
+      "fields": [
+        "options",
+        "r#type"
+      ]
+    },
+    "JudgeRegressionOutputParams": {
+      "raw": "JudgeRegressionOutput",
+      "fields": [
+        "max",
+        "max_description",
+        "min",
+        "min_description",
+        "r#type"
+      ]
+    },
+    "PostJudgeInSchemaOutputValue": {
+      "raw": "PostJudgeInSchemaOutput",
+      "fields": []
+    },
+    "PostJudgeInSchemaParams": {
+      "raw": "PostJudgeInSchema",
+      "fields": [
+        "description",
+        "instructions",
+        "model_name",
+        "name",
+        "output",
+        "tools"
+      ]
+    },
     "VoiceResponseView": {
       "raw": "VoiceResponse",
       "fields": [
@@ -2345,6 +2387,12 @@
         "answer"
       ]
     },
+    "PostDatasetRecordJudgingInSchemaParams": {
+      "raw": "PostDatasetRecordJudgingInSchema",
+      "fields": [
+        "judge_definition"
+      ]
+    },
     "LibraryOutView": {
       "raw": "LibraryOut",
       "fields": [
@@ -2532,6 +2580,21 @@
         "name"
       ]
     },
+    "PutJudgeInSchemaOutputValue": {
+      "raw": "PutJudgeInSchemaOutput",
+      "fields": []
+    },
+    "PutJudgeInSchemaParams": {
+      "raw": "PutJudgeInSchema",
+      "fields": [
+        "description",
+        "instructions",
+        "model_name",
+        "name",
+        "output",
+        "tools"
+      ]
+    },
     "VoiceUpdateRequestParams": {
       "raw": "VoiceUpdateRequest",
       "fields": [
@@ -2566,9 +2629,9 @@
   },
   "automatic_projection": {
     "schema_version": 1,
-    "added_count": 82,
-    "rejected_count": 73,
-    "report_sha256": "c255727de174afd3caba62cec0f811c2040f8e32362a89b9dc282d6fb6b07aa8",
+    "added_count": 85,
+    "rejected_count": 70,
+    "report_sha256": "afa6551228d201f6d3dc55aa29e22b2e88b434b80c8782fdce372542bdb5cdbe",
     "added": [
       "agents_api_v1_agents_create_or_update_alias",
       "agents_api_v1_agents_delete",
@@ -2595,6 +2658,7 @@
       "connector_list_v1",
       "connector_list_workspace_credentials_v1",
       "create_dataset_v1_observability_datasets_post",
+      "create_judge_v1_observability_judges_post",
       "create_voice_v1_audio_voices_post",
       "delete_dataset_record_v1_observability_dataset_records__dataset_record_id__delete",
       "delete_dataset_records_v1_observability_dataset_records_bulk_delete_post",
@@ -2627,6 +2691,7 @@
       "jobs_api_routes_batch_cancel_batch_job",
       "jobs_api_routes_batch_get_batch_job",
       "jobs_api_routes_batch_get_batch_jobs",
+      "judge_dataset_record_v1_observability_dataset_records__dataset_record_id__live_judging_post",
       "libraries_create_v1",
       "libraries_delete_v1",
       "libraries_documents_delete_v1",
@@ -2650,6 +2715,7 @@
       "unarchive_workflow_v1_workflows__workflow_identifier__unarchive_put",
       "unschedule_workflow_v1_workflows_schedules__schedule_id__delete",
       "update_dataset_v1_observability_datasets__dataset_id__patch",
+      "update_judge_v1_observability_judges__judge_id__put",
       "update_voice_v1_audio_voices__voice_id__patch",
       "update_workflow_v1_workflows__workflow_identifier__put"
     ],
@@ -2680,7 +2746,6 @@
       "connector_update_v1": "request_model_projection",
       "create_campaign_v1_observability_campaigns_post": "missing_official_taxonomy",
       "create_dataset_record_v1_observability_datasets__dataset_id__records_post": "request_model_projection",
-      "create_judge_v1_observability_judges_post": "request_model_projection",
       "delete_campaign_v1_observability_campaigns__campaign_id__delete": "missing_official_taxonomy",
       "execute_workflow_registration_v1_workflows_registrations__workflow_registration_id__execute_post": "inline_or_unresolved_response",
       "execute_workflow_v1_workflows__workflow_identifier__execute_post": "inline_or_unresolved_response",
@@ -2709,7 +2774,6 @@
       "jobs_api_routes_fine_tuning_start_fine_tuning_job": "missing_official_taxonomy",
       "judge_chat_completion_event_v1_observability_chat_completion_events__event_id__live_judging_post": "missing_official_taxonomy",
       "judge_conversation_v1_observability_judges__judge_id__live_judging_post": "request_model_projection",
-      "judge_dataset_record_v1_observability_dataset_records__dataset_record_id__live_judging_post": "request_model_projection",
       "libraries_documents_get_extracted_text_signed_url_v1": "inline_or_unresolved_response",
       "libraries_documents_get_signed_url_v1": "inline_or_unresolved_response",
       "libraries_documents_update_v1": "request_model_projection",
@@ -2725,7 +2789,6 @@
       "stream_v1_workflows_executions__execution_id__stream_get": "non_json_success",
       "update_dataset_record_payload_v1_observability_dataset_records__dataset_record_id__payload_put": "request_model_projection",
       "update_dataset_record_properties_v1_observability_dataset_records__dataset_record_id__properties_put": "request_model_projection",
-      "update_judge_v1_observability_judges__judge_id__put": "request_model_projection",
       "update_workflow_execution_v1_workflows_executions__execution_id__updates_post": "request_model_projection"
     }
   }

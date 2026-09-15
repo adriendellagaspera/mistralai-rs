@@ -101,6 +101,90 @@ class AutoProjectionTests(unittest.TestCase):
         self.assertEqual({"tool": "ToolParams"}, expanded["models"]["CreateThingParams"]["adapters"])
         self.assertEqual(["name"], expanded["models"]["ToolParams"]["constructor"])
 
+    def test_projects_discriminated_request_union_without_raw_type_leaks(self):
+        api = FakeOpenApi()
+        api.schemas.update({
+            "CreateThing": {
+                "type": "object", "required": ["name", "mode"],
+                "properties": {
+                    "name": {"type": "string"},
+                    "mode": {
+                        "oneOf": [
+                            {"$ref": "#/components/schemas/FastMode"},
+                            {"$ref": "#/components/schemas/SafeMode"},
+                        ],
+                        "discriminator": {
+                            "propertyName": "type",
+                            "mapping": {
+                                "fast": "#/components/schemas/FastMode",
+                                "safe": "#/components/schemas/SafeMode",
+                            },
+                        },
+                    },
+                },
+            },
+            "FastMode": {
+                "type": "object", "required": ["value"],
+                "properties": {
+                    "value": {"type": "string"},
+                    "type": {"$ref": "#/components/schemas/FastModeType"},
+                },
+            },
+            "SafeMode": {
+                "type": "object", "required": ["value"],
+                "properties": {
+                    "value": {"type": "integer"},
+                    "type": {"$ref": "#/components/schemas/SafeModeType"},
+                },
+            },
+            "FastModeType": {"type": "string", "enum": ["fast"]},
+            "SafeModeType": {"type": "string", "enum": ["safe"]},
+        })
+        fields = {
+            "CreateThing": (
+                SimpleNamespace(name="name", type="String"),
+                SimpleNamespace(name="mode", type="ModeUnion"),
+            ),
+            "FastMode": (
+                SimpleNamespace(name="value", type="String"),
+                SimpleNamespace(name="type", type="Option<FastModeType>"),
+            ),
+            "SafeMode": (
+                SimpleNamespace(name="value", type="i64"),
+                SimpleNamespace(name="type", type="Option<SafeModeType>"),
+            ),
+        }
+        enums = {
+            "ModeUnion": (
+                SimpleNamespace(name="FastMode", payload="FastMode"),
+                SimpleNamespace(name="SafeMode", payload="SafeMode"),
+            ),
+            "FastModeType": (SimpleNamespace(name="Fast", payload=None),),
+            "SafeModeType": (SimpleNamespace(name="Safe", payload=None),),
+        }
+        rust = SimpleNamespace(
+            structs=set(fields), aliases={}, enums=enums,
+            symbol_modules={name: "types" for name in (*fields, *enums)},
+            fields=lambda name: fields[name],
+        )
+        expanded, report = sdk_autoproject.expand_manifest(
+            api, manifest(),
+            {"operations": {"create_thing": ["things.create"]}},
+            raw_coverage("create_thing"), rust,
+        )
+        self.assertEqual(1, report["added_count"])
+        self.assertEqual(
+            {"mode": "ModeUnionValue"},
+            expanded["models"]["CreateThingParams"]["adapters"],
+        )
+        self.assertEqual(["type"], expanded["models"]["FastModeParams"]["exclude"])
+        self.assertEqual(["type"], expanded["models"]["SafeModeParams"]["exclude"])
+        variants = expanded["models"]["ModeUnionValue"]["simple_union"]["variants"]
+        self.assertEqual({
+            "FastMode": {"name": "Fast", "adapter": "FastModeParams"},
+            "SafeMode": {"name": "Safe", "adapter": "SafeModeParams"},
+        }, variants)
+
     def test_projects_safe_map_alias_without_leaking_generated_alias_name(self):
         api = FakeOpenApi()
         api.schemas["CreateThing"]["properties"]["metadata"] = {

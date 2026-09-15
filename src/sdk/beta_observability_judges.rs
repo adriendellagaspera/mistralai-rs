@@ -46,6 +46,7 @@ impl ListBetaObservabilityJudgesRequest {
         self
     }
 }
+
 #[derive(Clone, Copy)]
 pub struct BetaObservabilityJudges<'a> {
     raw: &'a HttpClient,
@@ -55,6 +56,17 @@ impl<'a> BetaObservabilityJudges<'a> {
     pub(crate) fn new(raw: &'a HttpClient) -> Self {
         Self { raw }
     }
+    pub async fn create(
+        &self,
+        request: PostJudgeInSchemaParams,
+    ) -> Result<JudgePreviewView, SdkError> {
+        self.raw
+            .create_judge_v1_observability_judges_post(request.into_raw())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
     pub async fn delete(&self, judge_id: impl AsRef<str>) -> Result<(), SdkError> {
         self.raw
             .delete_judge_v1_observability_judges_judge_id_delete(judge_id.as_ref())
@@ -98,6 +110,20 @@ impl<'a> BetaObservabilityJudges<'a> {
             )
             .await
             .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn update(
+        &self,
+        judge_id: impl AsRef<str>,
+        request: PutJudgeInSchemaParams,
+    ) -> Result<(), SdkError> {
+        self.raw
+            .update_judge_v1_observability_judges_judge_id_put(
+                judge_id.as_ref(),
+                request.into_raw(),
+            )
+            .await
             .map_err(Into::into)
     }
 }
