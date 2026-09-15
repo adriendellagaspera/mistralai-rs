@@ -103,6 +103,29 @@ RequestProjection = NoRequest | ParametersRequest | JsonRequest
 
 
 @dataclass(frozen=True)
+class ParameterField:
+    name: str
+    type: str
+    constructor_argument: str | None
+    constructor_value: str | None
+    setter_argument: str | None
+    setter_value: str | None
+
+
+@dataclass(frozen=True)
+class ParameterRequestSpec:
+    name: str
+    fields: tuple[ParameterField, ...]
+
+
+@dataclass(frozen=True)
+class OperationCall:
+    arguments: str
+    raw_arguments: str
+    default_raw_arguments: str | None
+
+
+@dataclass(frozen=True)
 class JsonResponse:
     model: str
     raw: str
@@ -141,6 +164,8 @@ class OperationSpec:
     raw_signature: RawSignature
     request_projection: RequestProjection
     response_projection: ResponseProjection
+    call: OperationCall
+    parameter_request: ParameterRequestSpec | None
 
     @property
     def request(self) -> str | None:
