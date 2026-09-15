@@ -60,7 +60,26 @@ def core_type(raw_type: str) -> str:
     return syntax.spelling
 
 
-def union_details(schema: dict, raw_type: str) -> str | None:
+def payload_details(name: str) -> str:
+    schema = openapi.schemas.get(name, {})
+    required = schema.get("required", [])
+    properties = ",".join(f"{field}:{describe(value)}" for field, value in sorted(schema.get("properties", {}).items()))
+    if name in rust.structs:
+        raw = ",".join(f"{field.name.removeprefix('r#')}:{field.type}" for field in rust.fields(name))
+        kind = "struct"
+    elif name in rust.aliases:
+        raw = rust.aliases[name].spelling
+        kind = "alias"
+    elif name in rust.enums:
+        raw = ",".join(f"{variant.name}:{variant.payload or '-'}" for variant in rust.variants(name))
+        kind = "enum"
+    else:
+        raw = "missing"
+        kind = "missing"
+    return f"{name} {kind} required={required} schema=[{properties}] raw=[{raw}]"
+
+
+def union_details(schema: dict, raw_type: str) -> tuple[str, list[str]] | None:
     schema, _ = sdk_autoproject._nullable(schema)
     while schema.get("type") == "array":
         schema = schema.get("items", {})
@@ -76,15 +95,17 @@ def union_details(schema: dict, raw_type: str) -> str | None:
         f"{variant.name}:{variant.payload or '-'}" for variant in variants
     )
     branch_desc = []
+    payload_rows = []
     for branch in branches:
         branch_ref = sdk_autoproject._schema_ref(branch)
         if branch_ref:
             branch_desc.append(f"ref:{branch_ref}")
+            payload_rows.append(payload_details(branch_ref))
         else:
             branch_desc.append(describe(branch))
     discriminator = schema.get("discriminator", {})
     mapping = discriminator.get("mapping", {}) if isinstance(discriminator, dict) else {}
-    return f"raw={raw_union}[{raw_desc}] branches=[{','.join(branch_desc)}] mapping={mapping}"
+    return f"raw={raw_union}[{raw_desc}] branches=[{','.join(branch_desc)}] mapping={mapping}", payload_rows
 
 
 summary = Counter()
@@ -118,7 +139,7 @@ for operation_id in targets:
             failures.append((field, failure, describe(field_schema), raw_field.type))
             details = union_details(field_schema, raw_field.type)
             if details:
-                union_rows.append(f"{field}: {details}")
+                union_rows.append((field, *details))
     if not failures:
         failures.append(("<model>", "model_level_mismatch", "-", "-"))
     categories = sorted({shape.split(":", 1)[0] for _, _, shape, _ in failures})
@@ -126,8 +147,10 @@ for operation_id in targets:
         summary[category] += 1
     details = "; ".join(f"{field}={shape} -> {raw_type}" for field, _, shape, raw_type in failures)
     print(f"{operation_id}\t{','.join(categories)}\t{details}")
-    for row in union_rows:
-        print(f"  UNION {row}")
+    for field, union, payloads in union_rows:
+        print(f"  UNION {field}: {union}")
+        for payload in payloads:
+            print(f"    PAYLOAD {payload}")
 
 print("SUMMARY")
 for key, count in summary.most_common():
