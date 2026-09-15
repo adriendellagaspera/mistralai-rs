@@ -82,6 +82,8 @@ jobs:
           PY
       - name: Apply binary-stream compiler changes
         run: python3 scripts/materialize_binary_stream.py
+      - name: Account for binary stream companions in coverage
+        run: python3 scripts/materialize_binary_stream_coverage.py
       - name: Refresh official SDK taxonomy
         run: python3 scripts/sdk_taxonomy_inventory.py update
       - name: Regenerate raw SDK and facade
@@ -130,7 +132,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          rm scripts/materialize_binary_stream.py .github/workflows/materialize-binary-stream.yml
+          rm scripts/materialize_binary_stream.py scripts/materialize_binary_stream_coverage.py .github/workflows/materialize-binary-stream.yml
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add -A
