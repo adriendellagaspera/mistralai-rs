@@ -30,20 +30,20 @@ class ResolvedFacadeIrTests(unittest.TestCase):
         )
 
     def test_request_algebra_distinguishes_no_request_from_parameters(self):
+        operation = sdk_codegen.OperationSpec(
+            "get", "get", "get", None, None, (), None, None, True,
+        )
         no_request = sdk_codegen._resolved_ir(
             sdk_codegen.SdkIr(
                 "Client",
                 (),
                 (sdk_codegen.ResourceSpec(
-                    ("health",),
-                    "health",
-                    "Health",
-                    (sdk_codegen.OperationSpec("get", "get", "get", None, "Receipt", (), None),),
+                    ("health",), "health", "Health", (operation,),
                 ),),
             ),
             sdk_codegen.RustIndex(
-                b"pub struct AnimalResponse { pub id: String }",
-                b"impl HttpClient { pub async fn get(&self) -> Result<AnimalResponse, Error> { todo!() } }",
+                b"",
+                b"impl HttpClient { pub async fn get(&self) -> Result<(), Error> { todo!() } }",
             ),
         )
         self.assertIsInstance(no_request.resources[0].operations[0].request_projection, NoRequest)
@@ -53,15 +53,12 @@ class ResolvedFacadeIrTests(unittest.TestCase):
                 "Client",
                 (),
                 (sdk_codegen.ResourceSpec(
-                    ("health",),
-                    "health",
-                    "Health",
-                    (sdk_codegen.OperationSpec("get", "get", "get", None, "Receipt", (), None),),
+                    ("health",), "health", "Health", (operation,),
                 ),),
             ),
             sdk_codegen.RustIndex(
-                b"pub struct AnimalResponse { pub id: String }",
-                b"impl HttpClient { pub async fn get(&self, id: impl AsRef<str>) -> Result<AnimalResponse, Error> { todo!() } }",
+                b"",
+                b"impl HttpClient { pub async fn get(&self, id: impl AsRef<str>) -> Result<(), Error> { todo!() } }",
             ),
         )
         self.assertIsInstance(parameters.resources[0].operations[0].request_projection, ParametersRequest)
