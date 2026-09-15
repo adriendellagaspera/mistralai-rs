@@ -2554,7 +2554,7 @@
     "schema_version": 1,
     "added_count": 80,
     "rejected_count": 75,
-    "report_sha256": "03fa8af1b8f16d717bdfb1a4981f96b72e28289ad39c19a6df2eb60a08b253b5",
+    "report_sha256": "3d349469ba2a8cdcb3230f73d5fa046a4ed8fe05bec41d871ec1e178da839eac",
     "added": [
       "agents_api_v1_agents_create_or_update_alias",
       "agents_api_v1_agents_delete",
@@ -2683,7 +2683,7 @@
       "get_run_history_v1_workflows_runs__run_id__history_get": "inline_or_unresolved_response",
       "get_similar_chat_completion_events_v1_observability_chat_completion_events__event_id__similar_events_get": "missing_official_taxonomy",
       "get_stream_events_v1_workflows_events_stream_get": "non_json_success",
-      "get_voice_sample_audio_v1_audio_voices__voice_id__sample_get": "multiple_success_media",
+      "get_voice_sample_audio_v1_audio_voices__voice_id__sample_get": "official_binary_transport_mismatch",
       "get_worker_info_v1_workflows_workers_whoami_get": "missing_official_taxonomy",
       "get_workflow_execution_history_v1_workflows_executions__execution_id__history_get": "inline_or_unresolved_response",
       "jobs_api_routes_batch_create_batch_job": "request_model_projection",

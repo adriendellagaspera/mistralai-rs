@@ -28,6 +28,7 @@ def canonical_digest(value: object) -> str:
 
 def compact_inventory(harvested: dict[str, Any]) -> dict[str, Any]:
     operations: dict[str, list[str]] = {}
+    operation_transports: dict[str, str] = {}
     alias_differences: list[dict[str, Any]] = []
     divergences: list[dict[str, Any]] = []
 
@@ -37,6 +38,25 @@ def compact_inventory(harvested: dict[str, Any]) -> dict[str, Any]:
         primary = typescript or python
         if primary:
             operations[operation["operation_id"]] = primary
+        ts_transports = sorted({
+            record["response_transport"]
+            for record in operation["typescript"]
+            if record.get("response_transport")
+        })
+        py_transports = sorted({
+            record["response_transport"]
+            for record in operation["python"]
+            if record.get("response_transport")
+        })
+        if len(ts_transports) == 1 and ts_transports == py_transports:
+            operation_transports[operation["operation_id"]] = ts_transports[0]
+        elif ts_transports and py_transports and ts_transports != py_transports:
+            divergences.append({
+                "operation_id": operation["operation_id"],
+                "typescript": ts_transports,
+                "python": py_transports,
+                "reason": "response_transport_conflict",
+            })
         if not typescript or not python or typescript == python:
             continue
         common = sorted(set(typescript) & set(python))
@@ -92,10 +112,11 @@ def compact_inventory(harvested: dict[str, Any]) -> dict[str, Any]:
     summary["cross_sdk_divergences"] = len(divergences)
 
     return {
-        "schema_version": 2,
+        "schema_version": 3,
         "provenance": harvested["provenance"],
         "summary": summary,
         "operations": operations,
+        "operation_transports": operation_transports,
         "openapi_only": harvested["openapi_only"],
         "sdk_only_digest": canonical_digest(sdk_only_operations),
         "non_http_resources": harvested["non_http_resources"],

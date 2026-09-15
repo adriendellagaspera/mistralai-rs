@@ -470,8 +470,12 @@ def build_ir(openapi: OpenApiIndex, rust: RustIndex, manifest: dict[str, Any]) -
                 schema = payload.get("schema", {})
                 if schema.get("type") != "string" or schema.get("format") != "binary":
                     raise GenerationError(f"binary response drift for {operation_id}")
-                if raw_operation.success_type != "bytes::Bytes":
-                    raise GenerationError(f"raw binary response drift for {raw_method}")
+                transport = parse_type(raw_operation.success_type)
+                if transport.constructor != "futures_util::stream::BoxStream" or len(transport.arguments) != 2:
+                    raise GenerationError(f"raw binary response is not an owned BoxStream: {raw_method}")
+                lifetime, event = transport.arguments
+                if lifetime.spelling != "'static" or event.constructor != "Result" or tuple(arg.spelling for arg in event.arguments) != ("bytes::Bytes", "reqwest::Error"):
+                    raise GenerationError(f"raw binary response ownership/item drift: {raw_method}")
             if response and not item.get("stream"):
                 model = next(model for model in models if model.name == response)
                 if not openapi.response_matches(operation_id, model.raw, rust):
@@ -1081,8 +1085,13 @@ def _emit_operation(operation: OperationSpec, rust: RustIndex, resource: Resourc
     if operation.binary_response:
         separator = ", " if arguments else ""
         return (
-            f"pub async fn {operation.name}(&self{separator}{arguments}) -> Result<bytes::Bytes, SdkError> {{\n"
-            f"    self.raw.{operation.raw_method}({call}).await.map_err(Into::into)\n}}"
+            f"pub async fn {operation.name}(&self{separator}{arguments}) -> Result<BinaryStream, SdkError> {{\n"
+            f"    let bytes = self.raw.{operation.raw_method}({call}).await.map_err(SdkError::from)?;\n"
+            f"    let chunks = bytes.map(|chunk| chunk.map_err(|error| {{\n"
+            f"        let transport = TransportError::from(crate::generated::client::HttpError::Network(error));\n"
+            f"        SdkError::from(transport)\n"
+            f"    }}));\n"
+            f"    Ok(Box::pin(chunks))\n}}"
         )
     if not operation.response:
         raise GenerationError(f"operation {operation.operation_id} needs a response projection")
@@ -1108,8 +1117,10 @@ def _emit_operation(operation: OperationSpec, rust: RustIndex, resource: Resourc
 
 def _emit_resource(resource: ResourceSpec, rust: RustIndex, resources: tuple[ResourceSpec, ...]) -> str:
     streaming = any(operation.stream for operation in resource.operations)
-    imports = ("use futures_util::StreamExt;\nuse crate::streaming;\n"
-               "use crate::generated::types::*;\n" if streaming else "")
+    binary = any(operation.binary_response for operation in resource.operations)
+    imports = "use futures_util::StreamExt;\n" if streaming or binary else ""
+    if streaming:
+        imports += "use crate::streaming;\nuse crate::generated::types::*;\n"
     operations = "\n\n".join(_emit_operation(operation, rust, resource) for operation in resource.operations)
     requests = "\n".join(_emit_parameters(resource, operation, rust) for operation in resource.operations)
     children = sorted(
@@ -1142,6 +1153,8 @@ def _emit_mod(ir: SdkIr) -> str:
     exported_types.extend(operation.stream.type
                           for resource in ir.resources for operation in resource.operations
                           if operation.stream)
+    if any(operation.binary_response for resource in ir.resources for operation in resource.operations):
+        exported_types.append("BinaryStream")
     models = ", ".join(exported_types)
     accessors = "\n".join(
         f"pub fn {resource.path[0]}(&self) -> {resource.name}<'_> {{ {resource.name}::new(&self.raw) }}"
@@ -1199,6 +1212,10 @@ def generate(raw: Path, target: Path, manifest_path: Path, openapi_path: Path | 
     model_source = GENERATED + "use std::pin::Pin;\nuse futures_util::Stream;\nuse super::SdkError;\nuse crate::generated::types::*;\n\n"
     model_source += "\n\n".join(_emit_model(model, openapi, rust) for model in ir.models)
     aliases = []
+    if any(operation.binary_response for resource in ir.resources for operation in resource.operations):
+        aliases.append(
+            "pub type BinaryStream = Pin<Box<dyn Stream<Item = Result<bytes::Bytes, SdkError>> + Send + 'static>>;"
+        )
     for resource in ir.resources:
         for operation in resource.operations:
             if operation.stream:

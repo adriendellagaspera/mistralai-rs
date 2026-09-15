@@ -10,7 +10,7 @@
   "rust_toolchain": "1.94.0",
   "generator_repository": "gpu-cli/openapi-to-rust",
   "generator_commit": "2af34b86ca9f38c35787f13ec5841989efcf4b99",
-  "generator_patch_sha256": "6b70ecc9bbc81d60ae0883abbd64f473e748ee43920683827dcca897c7d23493",
+  "generator_patch_sha256": "5047f7877c2e62b45f4fefb7e0ecd35929368d6e00051f460a87d9c77d631a41",
   "official_typescript_sdk_repository": "mistralai/client-ts",
   "official_typescript_sdk_commit": "d8f2d2539cf00d13d429653ab891b66a3524a2a9",
   "official_python_sdk_repository": "mistralai/client-python",

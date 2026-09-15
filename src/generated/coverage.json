@@ -1,5 +1,5 @@
 {
-  "generated_methods": 177,
+  "generated_methods": 179,
   "operations": [
     {
       "method": "POST",
@@ -895,6 +895,7 @@
       "upstream": true
     },
     {
+      "binary_stream_method": "files_api_routes_download_file_stream",
       "method": "GET",
       "operation_id": "files_api_routes_download_file",
       "path": "/v1/files/{file_id}/content",
@@ -1313,6 +1314,7 @@
       "upstream": true
     },
     {
+      "binary_stream_method": "get_voice_sample_audio_v1_audio_voices_voice_id_sample_get_wav_stream",
       "method": "GET",
       "operation_id": "get_voice_sample_audio_v1_audio_voices__voice_id__sample_get_wav",
       "path": "/v1/audio/voices/{voice_id}/sample",

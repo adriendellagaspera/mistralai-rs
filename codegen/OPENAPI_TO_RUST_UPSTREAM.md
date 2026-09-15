@@ -5,7 +5,7 @@ generator:
   crate: openapi-to-rust
   version: 0.16.0
   commit: 2af34b86ca9f38c35787f13ec5841989efcf4b99
-  patch_sha256: 6b70ecc9bbc81d60ae0883abbd64f473e748ee43920683827dcca897c7d23493
+  patch_sha256: 5047f7877c2e62b45f4fefb7e0ecd35929368d6e00051f460a87d9c77d631a41
 consumer:
   repository: adriendellagaspera/mistralai-rs
   openapi_repository: mistralai/platform-docs-public
@@ -445,4 +445,41 @@ empty_docs:
 lint_policy:
   - no crate-wide allow(warnings)
   - generated-only allow attributes accepted when structural elimination is impossible
+```
+
+## 9. Binary success bodies need a streaming client variant
+
+```yaml
+title: Generate an owned streaming variant for binary response bodies
+priority: critical
+component: src/client_generator.rs
+```
+
+### Actual
+
+```text
+Binary success responses are buffered into bytes::Bytes and therefore inherit the global in-memory response limit.
+```
+
+### Required API shape
+
+```rust
+async fn download_stream(...) -> Result<
+    futures_util::stream::BoxStream<'static, Result<bytes::Bytes, reqwest::Error>>,
+    ApiOpError<_>,
+>
+```
+
+The existing buffered method remains available for compatibility. The streaming variant must preserve the same path, parameters, authentication, Accept header, status selection, and bounded error-body handling.
+
+### Acceptance criteria
+
+```yaml
+- existing buffered binary method remains unchanged
+- companion streaming method is additive
+- success body is never buffered
+- returned stream is owned, Send and static
+- dropping the stream cancels response consumption
+- non-success responses remain bounded and inspectable
+- content negotiation matches the binary media type
 ```

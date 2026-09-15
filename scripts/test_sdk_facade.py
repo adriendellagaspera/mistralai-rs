@@ -232,7 +232,7 @@ class GenericSdkCompilerTests(unittest.TestCase):
         diff = compare_surface(public_surface({"zoo.rs": before}), public_surface({"zoo.rs": after}))
         self.assertEqual(diff["classification"], "additive")
 
-    def test_binary_success_is_validated_and_emitted_as_bytes(self):
+    def test_binary_success_is_validated_and_emitted_as_stream(self):
         document = openapi_document()
         document["paths"]["/animals/{animal_id}/content"] = {
             "get": {
@@ -256,12 +256,12 @@ class GenericSdkCompilerTests(unittest.TestCase):
         self.overlay.write_text(json.dumps(overlay))
         (self.raw / "client.rs").write_text(CLIENT + """
 impl HttpClient {
-    pub async fn download_animal(&self, animal_id: impl AsRef<str>) -> Result<bytes::Bytes, Error> { todo!() }
+    pub async fn download_animal(&self, animal_id: impl AsRef<str>) -> Result<futures_util::stream::BoxStream<'static, Result<bytes::Bytes, reqwest::Error>>, Error> { todo!() }
 }
 """)
         resource = (self.generate() / "zoo.rs").read_text()
         self.assertIn(
-            "pub async fn download(&self, animal_id: impl AsRef<str>) -> Result<bytes::Bytes, SdkError>",
+            "pub async fn download(&self, animal_id: impl AsRef<str>) -> Result<BinaryStream, SdkError>",
             resource,
         )
 

@@ -106,7 +106,12 @@ class AutoProjectionTests(unittest.TestCase):
         expanded, report = sdk_autoproject.expand_manifest(
             api, manifest(),
             {"operations": {"download_thing": ["things.download"]}},
-            raw_coverage("download_thing"),
+            {"operations": [{
+                "operation_id": "download_thing",
+                "rust_method": "download_thing",
+                "binary_stream_method": "download_thing_stream",
+                "upstream": True,
+            }]},
         )
         self.assertEqual(1, report["added_count"])
         operation = expanded["resources"]["things"]["operations"]["download"]
@@ -153,6 +158,35 @@ class AutoProjectionTests(unittest.TestCase):
                 raw_coverage("list_things", "create_thing_alias"),
             )
 
+
+    def test_official_binary_transport_selects_mixed_media_binary_variant(self):
+        api = FakeOpenApi()
+        api.operations["sample_audio"] = {
+            "x-sdk-path": "/v1/audio/voices/{voice_id}/sample",
+            "x-sdk-method": "get",
+            "responses": {"200": {"content": {
+                "application/json": {"schema": {"$ref": "#/components/schemas/Thing"}},
+                "audio/wav": {"schema": {"type": "string", "format": "binary"}},
+            }}},
+            "parameters": [],
+        }
+        coverage = {"operations": [
+            {"operation_id": "sample_audio", "rust_method": "sample_audio", "method": "GET",
+             "path": "/v1/audio/voices/{voice_id}/sample", "success_media": ["application/json", "audio/wav"], "upstream": True},
+            {"operation_id": "sample_audio_wav", "rust_method": "sample_audio_wav",
+             "binary_stream_method": "sample_audio_wav_stream", "method": "GET",
+             "path": "/v1/audio/voices/{voice_id}/sample", "success_media": ["audio/wav"], "upstream": False},
+        ]}
+        expanded, report = sdk_autoproject.expand_manifest(
+            api, manifest(),
+            {"operations": {"sample_audio": ["audio.voices.get_sample_audio"]},
+             "operation_transports": {"sample_audio": "binary_stream"}},
+            coverage,
+        )
+        self.assertEqual(1, report["added_count"])
+        operation = expanded["resources"]["audio_voices"]["operations"]["get_sample_audio"]
+        self.assertTrue(operation["binary_response"])
+        self.assertEqual("sample_audio_wav_stream", operation["raw_method"])
 
 if __name__ == "__main__":
     unittest.main()

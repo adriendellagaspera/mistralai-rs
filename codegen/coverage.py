@@ -13,10 +13,37 @@ def operations(spec):
             for method, op in item.items() if method in METHODS]
 
 
+def rust_method(operation_id):
+    return re.sub(r"_+", "_", operation_id.replace("-", "_")).lower()
+
+
+def binary_stream_method(op):
+    success = [response for status, response in op.get("responses", {}).items()
+               if str(status).startswith("2")]
+    if len(success) != 1:
+        return None
+    content = success[0].get("content", {})
+    if len(content) != 1:
+        return None
+    payload = next(iter(content.values()))
+    schema = payload.get("schema", {})
+    if schema.get("type") == "string" and schema.get("format") == "binary":
+        return rust_method(op["operationId"]) + "_stream"
+    return None
+
+
 def inventory(original, spec, client):
     methods = re.findall(r"pub async fn (\w+)\s*\(", client)
-    if len(methods) != len(operations(spec)):
-        raise ValueError(f"Expected {len(operations(spec))} generated methods, found {len(methods)}")
+    if len(methods) != len(set(methods)):
+        raise ValueError("Generated client contains duplicate async method names")
+    expected = {rust_method(op["operationId"]) for _, _, op in operations(spec)}
+    expected |= {method for _, _, op in operations(spec)
+                 if (method := binary_stream_method(op)) is not None}
+    actual = set(methods)
+    if actual != expected:
+        missing = sorted(expected - actual)
+        extra = sorted(actual - expected)
+        raise ValueError(f"Generated method drift: missing={missing}, extra={extra}")
     if re.search(r'HttpError::Config\s*\(\s*"', client) or "unimplemented!" in client or "todo!" in client:
         raise ValueError("Generated client contains a runtime configuration stub")
     inventory = []
@@ -24,15 +51,18 @@ def inventory(original, spec, client):
     for path, method, op in operations(spec):
         # Error enum docs retain exact upstream IDs, independent of Rust casing.
         # Untyped-error endpoints still carry their IDs in the generated method.
-        snake = re.sub(r"_+", "_", op["operationId"].replace("-", "_")).lower()
+        snake = rust_method(op["operationId"])
         if snake not in methods:
             raise ValueError(f"Missing generated operation: {op['operationId']} ({snake})")
-        inventory.append({"operation_id": op["operationId"], "method": method.upper(),
-                          "path": path.split("#")[0], "rust_method": snake,
-                          "upstream": op["operationId"] in upstream,
-                          "tags": op.get("tags", []),
-                          "success_media": sorted({media for status, response in op.get("responses", {}).items()
-                              if str(status).startswith("2") for media in response.get("content", {})})})
+        entry = {"operation_id": op["operationId"], "method": method.upper(),
+                 "path": path.split("#")[0], "rust_method": snake,
+                 "upstream": op["operationId"] in upstream,
+                 "tags": op.get("tags", []),
+                 "success_media": sorted({media for status, response in op.get("responses", {}).items()
+                     if str(status).startswith("2") for media in response.get("content", {})})}
+        if stream_method := binary_stream_method(op):
+            entry["binary_stream_method"] = stream_method
+        inventory.append(entry)
     return {
         "upstream_operations": len(upstream), "generated_methods": len(methods),
         "operations": sorted(inventory, key=lambda op: op["operation_id"])

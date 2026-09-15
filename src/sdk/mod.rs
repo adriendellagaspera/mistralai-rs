@@ -53,9 +53,9 @@ pub use error::{ApiError, SdkError, TransportError, TransportErrorKind};
 pub use facade_types::{
     AgentAliasResponseView, AgentListPageView, AgentView, ArchiveModelResponse,
     AuthUrlResponseView, BaseModel, BatchExecutionBodyParams, BatchExecutionResponseView,
-    BatchJobOutView, BatchJobsOutView, ChatClassificationInput, ChatClassificationParams,
-    ChatModerationInput, ChatModerationParams, ChatRequest, ChatResponse, ChatStream,
-    ChatStreamChunk, ClassificationInput, ClassificationParams, ClassificationResult,
+    BatchJobOutView, BatchJobsOutView, BinaryStream, ChatClassificationInput,
+    ChatClassificationParams, ChatModerationInput, ChatModerationParams, ChatRequest, ChatResponse,
+    ChatStream, ChatStreamChunk, ClassificationInput, ClassificationParams, ClassificationResult,
     ClassificationResultSet, ClassifierConversation, ClassifierFineTunedModel,
     CompletionFineTunedModel, ConnectorView, ConversationHistoryView, ConversationMessagesView,
     ConversationResponseView, CredentialsResponseView, DatasetExportView, DatasetImportTaskView,

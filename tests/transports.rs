@@ -156,6 +156,21 @@ async fn binary_downloads_and_wav_use_correct_media_and_escaped_paths() {
     let (headers, _) = worker.join().unwrap();
     assert!(headers.starts_with("GET /v1/audio/voices/test/sample HTTP/1.1"));
     assert!(headers.to_lowercase().contains("accept: audio/wav"));
+
+    let (url, worker) = server("200 OK", "application/octet-stream", bytes);
+    let streamed = Client::new()
+        .with_base_url(&url)
+        .files_api_routes_download_file_stream("streamed")
+        .await
+        .unwrap()
+        .fold(Vec::new(), |mut body, chunk| async move {
+            body.extend_from_slice(&chunk.unwrap());
+            body
+        })
+        .await;
+    assert_eq!(streamed, bytes);
+    let (headers, _) = worker.join().unwrap();
+    assert!(headers.starts_with("GET /v1/files/streamed/content HTTP/1.1"));
 }
 
 #[tokio::test]
