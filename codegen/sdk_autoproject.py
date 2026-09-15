@@ -59,15 +59,16 @@ def _simple_schema(schema: dict[str, Any]) -> bool:
     return False
 
 
-def _simple_accessor(schema: dict[str, Any]) -> str | None:
+def _simple_accessor(schema: dict[str, Any], required: bool = True) -> str | None:
     schema, nullable = _nullable(schema)
+    optional = nullable or not required
     if "$ref" in schema or "enum" in schema or "const" in schema or "format" in schema:
         return None
     kind = schema.get("type")
     if kind == "string":
-        return "optional_ref" if nullable else "ref"
+        return "optional_ref" if optional else "ref"
     if kind in {"integer", "number", "boolean"}:
-        return "optional_copy" if nullable else "copy"
+        return "optional_copy" if optional else "copy"
     return None
 
 
@@ -133,15 +134,17 @@ def _ensure_view_model(models: dict[str, Any], schemas: dict[str, Any], raw: str
     visiting.add(raw)
     schema = schemas.get(raw, {})
     accessors: dict[str, Any] = {}
+    required_fields = set(schema.get("required", []))
     for field, field_schema in sorted(schema.get("properties", {}).items()):
         if field in RUST_KEYWORDS or not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", field):
             continue
-        kind = _simple_accessor(field_schema)
+        required = field in required_fields
+        kind = _simple_accessor(field_schema, required)
         if kind:
             accessors[field] = {"kind": kind, "path": [field]}
             continue
         normalized, nullable = _nullable(field_schema)
-        if nullable:
+        if nullable or not required:
             continue
         if normalized.get("type") == "array":
             child_raw = _schema_ref(normalized.get("items", {}))
