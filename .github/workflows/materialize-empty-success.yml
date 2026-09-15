@@ -1,0 +1,44 @@
+name: Materialize empty success projection
+on:
+  push:
+    branches:
+      - feat/empty-success-projection
+permissions:
+  contents: write
+concurrency:
+  group: materialize-empty-success-projection
+  cancel-in-progress: true
+jobs:
+  materialize:
+    if: github.repository == 'adriendellagaspera/mistralai-rs'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install pinned Rust toolchain
+        run: rustup show
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            .tools
+            target
+          key: sdk-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'codegen.lock') }}
+      - name: Apply empty-success compiler primitive
+        run: |
+          python3 codegen/materialize_empty_success.py
+          python3 scripts/codegen.py generate
+          bash scripts/validate.sh
+      - name: Commit materialized implementation
+        run: |
+          rm codegen/materialize_empty_success.py
+          rm .github/workflows/materialize-empty-success.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --check
+          git commit -m 'feat: project empty success responses'
+          git push origin HEAD:feat/empty-success-projection
