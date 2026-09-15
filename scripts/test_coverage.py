@@ -62,7 +62,6 @@ class CoverageTests(unittest.TestCase):
         digest = hashlib.sha256((ROOT / "codegen/patches/generator.patch").read_bytes()).hexdigest()
         self.assertEqual(digest, lock["generator_patch_sha256"])
 
-
     def test_inventory_tracks_exact_binary_stream_companions(self):
         spec = {"paths": {"/v1/files/{file_id}/content": {"get": {
             "operationId": "download_file",
@@ -77,8 +76,13 @@ class CoverageTests(unittest.TestCase):
         report = coverage.inventory(spec, spec, client)
         self.assertEqual(2, report["generated_methods"])
         self.assertEqual("download_file_stream", report["operations"][0]["binary_stream_method"])
-        with self.assertRaises(ValueError):
-            coverage.inventory(spec, spec, client + "pub async fn unexpected(&self) {}")
+        for broken in [
+            "pub async fn download_file(&self) {}",
+            client + "pub async fn unexpected(&self) {}",
+        ]:
+            with self.assertRaises(ValueError):
+                coverage.inventory(spec, spec, broken)
+
 
 if __name__ == "__main__":
     unittest.main()
