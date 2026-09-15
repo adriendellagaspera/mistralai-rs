@@ -164,8 +164,8 @@ class OperationSpec:
     raw_signature: RawSignature
     request_projection: RequestProjection
     response_projection: ResponseProjection
-    call: OperationCall
-    parameter_request: ParameterRequestSpec | None
+    call: OperationCall | None = None
+    parameter_request: ParameterRequestSpec | None = None
 
     @property
     def request(self) -> str | None:
