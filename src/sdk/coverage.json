@@ -476,7 +476,7 @@
     "files_api_routes_download_file": {
       "method": "get",
       "path": "/v1/files/{file_id}/content",
-      "status": "capability_gap",
+      "status": "mapped",
       "review_reasons": [
         "non_json_success"
       ]
@@ -1283,7 +1283,8 @@
         "files_api_routes_list_files",
         "files_api_routes_retrieve_file",
         "files_api_routes_delete_file",
-        "files_api_routes_get_signed_url"
+        "files_api_routes_get_signed_url",
+        "files_api_routes_download_file"
       ]
     },
     "beta": {
@@ -2551,9 +2552,9 @@
   },
   "automatic_projection": {
     "schema_version": 1,
-    "added_count": 79,
-    "rejected_count": 76,
-    "report_sha256": "6c32d9f281d072878e7021d1a1641101a4c1229aebcca89260db011a2fee87e5",
+    "added_count": 80,
+    "rejected_count": 75,
+    "report_sha256": "3d349469ba2a8cdcb3230f73d5fa046a4ed8fe05bec41d871ec1e178da839eac",
     "added": [
       "agents_api_v1_agents_create_or_update_alias",
       "agents_api_v1_agents_delete",
@@ -2586,6 +2587,7 @@
       "delete_judge_v1_observability_judges__judge_id__delete",
       "delete_voice_v1_audio_voices__voice_id__delete",
       "export_dataset_to_jsonl_v1_observability_datasets__dataset_id__exports_to_jsonl_get",
+      "files_api_routes_download_file",
       "get_dataset_by_id_v1_observability_datasets__dataset_id__get",
       "get_dataset_import_task_v1_observability_datasets__dataset_id__tasks__task_id__get",
       "get_dataset_import_tasks_v1_observability_datasets__dataset_id__tasks_get",
@@ -2667,7 +2669,6 @@
       "delete_dataset_records_v1_observability_dataset_records_bulk_delete_post": "request_model_projection",
       "execute_workflow_registration_v1_workflows_registrations__workflow_registration_id__execute_post": "inline_or_unresolved_response",
       "execute_workflow_v1_workflows__workflow_identifier__execute_post": "inline_or_unresolved_response",
-      "files_api_routes_download_file": "non_json_success",
       "files_api_routes_upload_file": "request_media_projection",
       "get_campaign_by_id_v1_observability_campaigns__campaign_id__get": "missing_official_taxonomy",
       "get_campaign_selected_events_v1_observability_campaigns__campaign_id__selected_events_get": "missing_official_taxonomy",
@@ -2682,7 +2683,7 @@
       "get_run_history_v1_workflows_runs__run_id__history_get": "inline_or_unresolved_response",
       "get_similar_chat_completion_events_v1_observability_chat_completion_events__event_id__similar_events_get": "missing_official_taxonomy",
       "get_stream_events_v1_workflows_events_stream_get": "non_json_success",
-      "get_voice_sample_audio_v1_audio_voices__voice_id__sample_get": "multiple_success_media",
+      "get_voice_sample_audio_v1_audio_voices__voice_id__sample_get": "official_binary_transport_mismatch",
       "get_worker_info_v1_workflows_workers_whoami_get": "missing_official_taxonomy",
       "get_workflow_execution_history_v1_workflows_executions__execution_id__history_get": "inline_or_unresolved_response",
       "jobs_api_routes_batch_create_batch_job": "request_model_projection",

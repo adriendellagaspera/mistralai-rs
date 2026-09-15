@@ -47,7 +47,7 @@
     }},
     "operation": {"type": "object", "additionalProperties": false, "required": ["operation_id"], "properties": {
       "operation_id": {"type": "string", "minLength": 1}, "raw_method": {"$ref": "#/$defs/identifier"},
-      "request": {"$ref": "#/$defs/identifier"}, "response": {"$ref": "#/$defs/identifier"}, "empty_response": {"const": true}, "stream": {"$ref": "#/$defs/stream"},
+      "request": {"$ref": "#/$defs/identifier"}, "response": {"$ref": "#/$defs/identifier"}, "empty_response": {"const": true}, "binary_response": {"const": true}, "stream": {"$ref": "#/$defs/stream"},
       "request_overrides": {"type": "object", "propertyNames": {"$ref": "#/$defs/identifier"}, "additionalProperties": {"type": ["boolean", "null"]}}
     }},
     "resource": {"type": "object", "additionalProperties": false, "required": ["name", "operations"], "properties": {

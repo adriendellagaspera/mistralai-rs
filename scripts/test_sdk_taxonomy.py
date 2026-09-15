@@ -152,7 +152,7 @@ class TaxonomyTests(unittest.TestCase):
             (root / "src/sdk/files.ts").write_text(
                 'import { filesList } from "../funcs/filesList.js";\n'
                 'export class Files extends ClientSDK {\n'
-                '  async list(): Promise<void> { return filesList(this); }\n'
+                '  async list(): Promise<ReadableStream<Uint8Array>> { return filesList(this); }\n'
                 '}\n'
             )
             (root / "src/funcs/filesList.ts").write_text(
@@ -167,6 +167,7 @@ class TaxonomyTests(unittest.TestCase):
             records = sdk_taxonomy.parse_typescript(root)
             self.assertEqual("files.list", records[0]["public_path"])
             self.assertEqual("files_list", records[0]["operation_id"])
+            self.assertEqual("binary_stream", records[0]["response_transport"])
 
     def test_python_extraction_records_known_non_http_resource(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -203,6 +204,45 @@ class TaxonomyTests(unittest.TestCase):
                 non_http[0]["source_file"],
             )
 
+
+    def test_python_binary_stream_transport_is_harvested(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            client = root / "src/mistralai/client"
+            client.mkdir(parents=True)
+            (client / "sdk.py").write_text(
+                "class Mistral(BaseSDK):\n"
+                "    def download(self):\n"
+                "        self._build_request(method='GET', path='/v1/files/x', accept_header_value='application/octet-stream')\n"
+                "        HookContext(operation_id='files_download')\n"
+                "        self.do_request(stream=True)\n"
+            )
+            records, _ = sdk_taxonomy.parse_python(root)
+            self.assertEqual("binary_stream", records[0]["response_transport"])
+
+    def test_compact_inventory_requires_cross_sdk_transport_agreement(self):
+        lock = {
+            "upstream_repository": "mistralai/spec",
+            "upstream_commit": "a" * 40,
+            "official_typescript_sdk_repository": "mistralai/client-ts",
+            "official_typescript_sdk_commit": "b" * 40,
+            "official_python_sdk_repository": "mistralai/client-python",
+            "official_python_sdk_commit": "c" * 40,
+        }
+        coverage = {"operations": [{
+            "operation_id": "files_download", "method": "GET",
+            "path": "/v1/files/x", "upstream": True,
+        }]}
+        common = {
+            "operation_id": "files_download", "http_method": "GET",
+            "http_path": "/v1/files/x", "transport_variant": "default",
+            "public_path": "files.download", "normalized_public_path": "files.download",
+            "response_transport": "binary_stream",
+        }
+        harvested = sdk_taxonomy.build_inventory(lock, coverage, [common], [common])
+        inventory = sdk_taxonomy_inventory.compact_inventory(harvested)
+        self.assertEqual(3, inventory["schema_version"])
+        self.assertEqual("binary_stream", inventory["operation_transports"]["files_download"])
 
 if __name__ == "__main__":
     unittest.main()

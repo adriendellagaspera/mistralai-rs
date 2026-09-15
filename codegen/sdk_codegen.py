@@ -308,6 +308,7 @@ class OperationSpec:
     stream: StreamPolicy | None
     request_raw: str | None = None
     empty_response: bool = False
+    binary_response: bool = False
 
 
 @dataclass(frozen=True)
@@ -406,17 +407,18 @@ def build_ir(openapi: OpenApiIndex, rust: RustIndex, manifest: dict[str, Any]) -
         _validate_keys(config, {"name", "path", "operations"}, f"resource {module}")
         operations = []
         for public_name, item in config.get("operations", {}).items():
-            _validate_keys(item, {"operation_id", "raw_method", "request", "response", "empty_response", "request_overrides", "stream"}, f"operation {module}.{public_name}")
+            _validate_keys(item, {"operation_id", "raw_method", "request", "response", "empty_response", "binary_response", "request_overrides", "stream"}, f"operation {module}.{public_name}")
             operation_id = item["operation_id"]
             raw_method = item.get("raw_method", operation_id)
             raw_operation = rust.operation(raw_method)
             wire_operation = openapi.operation(operation_id)
             request, response = item.get("request"), item.get("response")
             empty_response = item.get("empty_response", False)
-            success_modes = int(bool(response)) + int(bool(item.get("stream"))) + int(empty_response)
+            binary_response = item.get("binary_response", False)
+            success_modes = int(bool(response)) + int(bool(item.get("stream"))) + int(empty_response) + int(binary_response)
             if success_modes != 1:
                 raise GenerationError(
-                    f"operation {module}.{public_name} requires exactly one response, stream or empty_response projection"
+                    f"operation {module}.{public_name} requires exactly one response, stream, empty_response or binary_response projection"
                 )
             for referenced in (request, response):
                 if referenced and referenced not in model_names:
@@ -459,6 +461,21 @@ def build_ir(openapi: OpenApiIndex, rust: RustIndex, manifest: dict[str, Any]) -
                     raise GenerationError(f"empty response drift for {operation_id}")
                 if raw_operation.success_type != "()":
                     raise GenerationError(f"raw empty response drift for {raw_method}")
+            if binary_response:
+                success = [value for status, value in wire_operation.get("responses", {}).items()
+                           if str(status).startswith("2")]
+                if len(success) != 1 or len(success[0].get("content", {})) != 1:
+                    raise GenerationError(f"binary response drift for {operation_id}")
+                payload = next(iter(success[0]["content"].values()))
+                schema = payload.get("schema", {})
+                if schema.get("type") != "string" or schema.get("format") != "binary":
+                    raise GenerationError(f"binary response drift for {operation_id}")
+                transport = parse_type(raw_operation.success_type)
+                if transport.constructor != "futures_util::stream::BoxStream" or len(transport.arguments) != 2:
+                    raise GenerationError(f"raw binary response is not an owned BoxStream: {raw_method}")
+                lifetime, event = transport.arguments
+                if lifetime.spelling != "'static" or event.constructor != "Result" or tuple(arg.spelling for arg in event.arguments) != ("bytes::Bytes", "reqwest::Error"):
+                    raise GenerationError(f"raw binary response ownership/item drift: {raw_method}")
             if response and not item.get("stream"):
                 model = next(model for model in models if model.name == response)
                 if not openapi.response_matches(operation_id, model.raw, rust):
@@ -492,7 +509,7 @@ def build_ir(openapi: OpenApiIndex, rust: RustIndex, manifest: dict[str, Any]) -
                            if request else None)
             operations.append(OperationSpec(public_name, operation_id, raw_method, request, response,
                                             tuple(item.get("request_overrides", {}).items()),
-                                            stream_policy(item.get("stream")), request_raw, empty_response))
+                                            stream_policy(item.get("stream")), request_raw, empty_response, binary_response))
         resource_path = tuple(config.get("path", (module,)))
         if not resource_path:
             raise GenerationError(f"resource {module} has an empty path")
@@ -1065,6 +1082,17 @@ def _emit_operation(operation: OperationSpec, rust: RustIndex, resource: Resourc
             f"pub async fn {operation.name}(&self{separator}{arguments}) -> Result<(), SdkError> {{\n"
             f"    self.raw.{operation.raw_method}({call}).await.map_err(Into::into)\n}}"
         )
+    if operation.binary_response:
+        separator = ", " if arguments else ""
+        return (
+            f"pub async fn {operation.name}(&self{separator}{arguments}) -> Result<BinaryStream, SdkError> {{\n"
+            f"    let bytes = self.raw.{operation.raw_method}({call}).await.map_err(SdkError::from)?;\n"
+            f"    let chunks = bytes.map(|chunk| chunk.map_err(|error| {{\n"
+            f"        let transport = TransportError::from(crate::generated::client::HttpError::Network(error));\n"
+            f"        SdkError::from(transport)\n"
+            f"    }}));\n"
+            f"    Ok(Box::pin(chunks))\n}}"
+        )
     if not operation.response:
         raise GenerationError(f"operation {operation.operation_id} needs a response projection")
     raw_parameters = rust.operation(operation.raw_method).parameters
@@ -1089,8 +1117,10 @@ def _emit_operation(operation: OperationSpec, rust: RustIndex, resource: Resourc
 
 def _emit_resource(resource: ResourceSpec, rust: RustIndex, resources: tuple[ResourceSpec, ...]) -> str:
     streaming = any(operation.stream for operation in resource.operations)
-    imports = ("use futures_util::StreamExt;\nuse crate::streaming;\n"
-               "use crate::generated::types::*;\n" if streaming else "")
+    binary = any(operation.binary_response for operation in resource.operations)
+    imports = "use futures_util::StreamExt;\n" if streaming or binary else ""
+    if streaming:
+        imports += "use crate::streaming;\nuse crate::generated::types::*;\n"
     operations = "\n\n".join(_emit_operation(operation, rust, resource) for operation in resource.operations)
     requests = "\n".join(_emit_parameters(resource, operation, rust) for operation in resource.operations)
     children = sorted(
@@ -1123,6 +1153,8 @@ def _emit_mod(ir: SdkIr) -> str:
     exported_types.extend(operation.stream.type
                           for resource in ir.resources for operation in resource.operations
                           if operation.stream)
+    if any(operation.binary_response for resource in ir.resources for operation in resource.operations):
+        exported_types.append("BinaryStream")
     models = ", ".join(exported_types)
     accessors = "\n".join(
         f"pub fn {resource.path[0]}(&self) -> {resource.name}<'_> {{ {resource.name}::new(&self.raw) }}"
@@ -1180,6 +1212,10 @@ def generate(raw: Path, target: Path, manifest_path: Path, openapi_path: Path | 
     model_source = GENERATED + "use std::pin::Pin;\nuse futures_util::Stream;\nuse super::SdkError;\nuse crate::generated::types::*;\n\n"
     model_source += "\n\n".join(_emit_model(model, openapi, rust) for model in ir.models)
     aliases = []
+    if any(operation.binary_response for resource in ir.resources for operation in resource.operations):
+        aliases.append(
+            "pub type BinaryStream = Pin<Box<dyn Stream<Item = Result<bytes::Bytes, SdkError>> + Send + 'static>>;"
+        )
     for resource in ir.resources:
         for operation in resource.operations:
             if operation.stream:

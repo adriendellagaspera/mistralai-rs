@@ -83,7 +83,20 @@ def _schema_ref(schema: dict[str, Any]) -> str | None:
     return ref.rsplit("/", 1)[-1] if isinstance(ref, str) else None
 
 
-def _success_contract(operation: dict[str, Any]) -> tuple[str | None, dict[str, Any] | None, str | None]:
+def _binary_media(operation: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    success = [response for status, response in operation.get("responses", {}).items()
+               if str(status).startswith("2")]
+    if len(success) != 1:
+        return {}
+    result = {}
+    for media, payload in success[0].get("content", {}).items():
+        schema = payload.get("schema", {})
+        if schema.get("type") == "string" and schema.get("format") == "binary":
+            result[media] = schema
+    return result
+
+
+def _success_contract(operation: dict[str, Any], preferred_transport: str | None = None) -> tuple[str | None, dict[str, Any] | None, str | None]:
     success = [response for status, response in operation.get("responses", {}).items()
                if str(status).startswith("2")]
     if len(success) != 1:
@@ -91,11 +104,20 @@ def _success_contract(operation: dict[str, Any]) -> tuple[str | None, dict[str, 
     content = success[0].get("content", {})
     if not content:
         return "empty", None, None
-    if "application/json" not in content:
-        return None, None, "non_json_success"
-    if set(content) != {"application/json"}:
-        return None, None, "multiple_success_media"
-    return "json", content["application/json"].get("schema", {}), None
+    if preferred_transport == "binary_stream":
+        binary = _binary_media(operation)
+        if len(binary) == 1:
+            return "binary", next(iter(binary.values())), None
+        return None, None, "official_binary_transport_mismatch"
+    if "application/json" in content:
+        if set(content) != {"application/json"}:
+            return None, None, "multiple_success_media"
+        return "json", content["application/json"].get("schema", {}), None
+    if len(content) == 1:
+        binary = _binary_media(operation)
+        if len(binary) == 1:
+            return "binary", next(iter(binary.values())), None
+    return None, None, "non_json_success"
 
 
 def _request_json_schema(operation: dict[str, Any]) -> tuple[dict[str, Any] | None, str | None]:
@@ -182,8 +204,10 @@ def expand_manifest(openapi: Any, manifest: dict[str, Any], taxonomy: dict[str, 
     expanded = deepcopy(manifest)
     models: dict[str, Any] = expanded.setdefault("models", {})
     resources: dict[str, Any] = expanded.setdefault("resources", {})
+    raw_operations = raw_coverage.get("operations", [])
     raw_methods = {item["operation_id"]: item["rust_method"]
-                   for item in raw_coverage.get("operations", []) if item.get("upstream", True)}
+                   for item in raw_operations if item.get("upstream", True)}
+    raw_by_id = {item["operation_id"]: item for item in raw_operations}
     mapped = {item["operation_id"] for resource in resources.values()
               for item in resource.get("operations", {}).values()}
     added: list[str] = []
@@ -211,10 +235,38 @@ def expand_manifest(openapi: Any, manifest: dict[str, Any], taxonomy: dict[str, 
             rejected[operation_id] = "raw_symbol_mapping"
             continue
 
-        response_kind, response_schema, reason = _success_contract(operation)
+        response_transport = taxonomy.get("operation_transports", {}).get(operation_id)
+        response_kind, response_schema, reason = _success_contract(operation, response_transport)
         if reason:
             rejected[operation_id] = reason
             continue
+        if response_kind == "binary":
+            binary_media = set(_binary_media(operation))
+            success = [response for status, response in operation.get("responses", {}).items()
+                    if str(status).startswith("2")]
+            content = success[0].get("content", {}) if len(success) == 1 else {}
+            if len(content) == 1:
+                stream_method = raw_by_id.get(operation_id, {}).get("binary_stream_method")
+                if not stream_method:
+                    rejected[operation_id] = "raw_binary_transport_mapping"
+                    continue
+                raw_method = stream_method
+            else:
+                route_path = operation.get("x-sdk-path", "").split("#", 1)[0].rstrip("/") or "/"
+                route_method = operation.get("x-sdk-method", "").upper()
+                candidates = [
+                    item for item in raw_operations
+                    if item.get("method") == route_method
+                    and (item.get("path", "").split("#", 1)[0].rstrip("/") or "/") == route_path
+                    and item.get("success_media")
+                    and item.get("binary_stream_method")
+                    and set(item["success_media"]).issubset(binary_media)
+                ]
+                if len(candidates) == 1:
+                    raw_method = candidates[0]["binary_stream_method"]
+                else:
+                    rejected[operation_id] = "raw_binary_transport_mapping"
+                    continue
         response = None
         if response_kind == "json":
             response_raw = _schema_ref(response_schema or {})
@@ -259,6 +311,8 @@ def expand_manifest(openapi: Any, manifest: dict[str, Any], taxonomy: dict[str, 
             item["response"] = response
         elif response_kind == "empty":
             item["empty_response"] = True
+        elif response_kind == "binary":
+            item["binary_response"] = True
         if raw_method != operation_id:
             item["raw_method"] = raw_method
         if request:

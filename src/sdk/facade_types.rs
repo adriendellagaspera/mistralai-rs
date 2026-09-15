@@ -4478,6 +4478,8 @@ impl Default for WorkflowUpdateRequestParams {
     }
 }
 
+pub type BinaryStream =
+    Pin<Box<dyn Stream<Item = Result<bytes::Bytes, SdkError>> + Send + 'static>>;
 pub type ChatStream =
     Pin<Box<dyn Stream<Item = Result<ChatStreamChunk, SdkError>> + Send + 'static>>;
 pub type FimStream = Pin<Box<dyn Stream<Item = Result<FimStreamChunk, SdkError>> + Send + 'static>>;

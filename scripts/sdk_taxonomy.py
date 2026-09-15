@@ -182,12 +182,19 @@ def parse_typescript(root: Path) -> list[dict[str, Any]]:
                 raise ValueError(f"Ambiguous TypeScript function call in {path}:{match.group(1)}: {called}")
             function = called[0]
             endpoint = parse_ts_function(root / "src/funcs" / f"{imports[function]}.ts")
-            records.append({
+            record = {
                 **endpoint,
                 "function": function,
                 "public_path": ".".join((*resource, match.group(1))),
                 "normalized_public_path": normalize_public_path([*resource, match.group(1)]),
-            })
+            }
+            if re.search(
+                r"\)\s*:\s*Promise<\s*ReadableStream<\s*Uint8Array\s*>\s*>",
+                segment,
+                re.MULTILINE | re.DOTALL,
+            ):
+                record["response_transport"] = "binary_stream"
+            records.append(record)
         for child, child_class in re.findall(r"^  get\s+(\w+)\(\):\s*(\w+)\s*\{", source, re.MULTILINE):
             visit(child_class, (*resource, child))
 
@@ -298,7 +305,8 @@ def parse_python(root: Path) -> tuple[list[dict[str, Any]], list[dict[str, Any]]
                 continue
             if statement.name.startswith("_") or statement.name.endswith("_async"):
                 continue
-            http_method = http_path = operation_id = None
+            http_method = http_path = operation_id = accept_media = None
+            streamed_response = False
             for inner in ast.walk(statement):
                 if not isinstance(inner, ast.Call):
                     continue
@@ -306,10 +314,18 @@ def parse_python(root: Path) -> tuple[list[dict[str, Any]], list[dict[str, Any]]
                 if name == "_build_request":
                     http_method = literal_keyword(inner, "method")
                     http_path = literal_keyword(inner, "path")
+                    accept_media = literal_keyword(inner, "accept_header_value")
                 elif name == "HookContext":
                     operation_id = literal_keyword(inner, "operation_id")
+                elif name == "do_request":
+                    streamed_response = any(
+                        keyword.arg == "stream"
+                        and isinstance(keyword.value, ast.Constant)
+                        and keyword.value.value is True
+                        for keyword in inner.keywords
+                    )
             if http_method and http_path and operation_id:
-                records.append({
+                record = {
                     "http_method": http_method,
                     "http_path": normalized_http_path(http_path),
                     "operation_id": operation_id,
@@ -317,7 +333,10 @@ def parse_python(root: Path) -> tuple[list[dict[str, Any]], list[dict[str, Any]]
                     "public_path": ".".join((*resource, statement.name)),
                     "normalized_public_path": normalize_public_path([*resource, statement.name]),
                     "source_file": path.relative_to(root).as_posix(),
-                })
+                }
+                if streamed_response and accept_media != "text/event-stream":
+                    record["response_transport"] = "binary_stream"
+                records.append(record)
         for child, child_class in sorted(children(node).items()):
             visit(child_class, (*resource, child))
 
@@ -381,6 +400,8 @@ def reconcile(
         }
         if "function" in record:
             public["function"] = record["function"]
+        if record.get("response_transport"):
+            public["response_transport"] = record["response_transport"]
         matched[raw["operation_id"]].append(public)
     return dict(matched), unresolved
 

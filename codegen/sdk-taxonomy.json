@@ -68,164 +68,483 @@
     "post_dataset_records_from_campaign_v1_observability_datasets__dataset_id__imports_from_campaign_post",
     "post_dataset_records_from_explorer_v1_observability_datasets__dataset_id__imports_from_explorer_post"
   ],
+  "operation_transports": {
+    "files_api_routes_download_file": "binary_stream",
+    "get_voice_sample_audio_v1_audio_voices__voice_id__sample_get": "binary_stream"
+  },
   "operations": {
-    "agents_api_v1_agents_create": ["beta.agents.create"],
-    "agents_api_v1_agents_create_or_update_alias": ["beta.agents.create_version_alias"],
-    "agents_api_v1_agents_delete": ["beta.agents.delete"],
-    "agents_api_v1_agents_delete_alias": ["beta.agents.delete_version_alias"],
-    "agents_api_v1_agents_get": ["beta.agents.get"],
-    "agents_api_v1_agents_get_version": ["beta.agents.get_version"],
-    "agents_api_v1_agents_list": ["beta.agents.list"],
-    "agents_api_v1_agents_list_pages": ["beta.agents.list_pages"],
-    "agents_api_v1_agents_list_version_aliases": ["beta.agents.list_version_aliases"],
-    "agents_api_v1_agents_list_versions": ["beta.agents.list_versions"],
-    "agents_api_v1_agents_update": ["beta.agents.update"],
-    "agents_api_v1_agents_update_version": ["beta.agents.update_version"],
-    "agents_api_v1_conversations_append": ["beta.conversations.append"],
-    "agents_api_v1_conversations_append_stream": ["beta.conversations.append_stream"],
-    "agents_api_v1_conversations_delete": ["beta.conversations.delete"],
-    "agents_api_v1_conversations_get": ["beta.conversations.get"],
-    "agents_api_v1_conversations_history": ["beta.conversations.get_history"],
-    "agents_api_v1_conversations_list": ["beta.conversations.list"],
-    "agents_api_v1_conversations_messages": ["beta.conversations.get_messages"],
-    "agents_api_v1_conversations_restart": ["beta.conversations.restart"],
-    "agents_api_v1_conversations_restart_stream": ["beta.conversations.restart_stream"],
-    "agents_api_v1_conversations_start": ["beta.conversations.start"],
-    "agents_api_v1_conversations_start_stream": ["beta.conversations.start_stream"],
-    "agents_completion_v1_agents_completions_post": ["agents.complete", "agents.stream"],
-    "archive_workflow_v1_workflows__workflow_identifier__archive_put": ["workflows.archive_workflow"],
-    "audio_api_v1_transcriptions_post": ["audio.transcriptions.complete"],
-    "audio_api_v1_transcriptions_post_stream": ["audio.transcriptions.stream"],
-    "batch_cancel_workflow_executions_v1_workflows_executions_cancel_post": ["workflows.executions.batch_cancel_workflow_executions"],
-    "batch_terminate_workflow_executions_v1_workflows_executions_terminate_post": ["workflows.executions.batch_terminate_workflow_executions"],
-    "cancel_workflow_execution_v1_workflows_executions__execution_id__cancel_post": ["workflows.executions.cancel_workflow_execution"],
-    "chat_classifications_v1_chat_classifications_post": ["classifiers.classify_chat"],
-    "chat_completion_v1_chat_completions_post": ["chat.complete", "chat.parse"],
-    "chat_completion_v1_chat_completions_post_stream": ["chat.parse_stream", "chat.stream"],
-    "chat_moderations_v1_chat_moderations_post": ["classifiers.moderate_chat"],
-    "classifications_v1_classifications_post": ["classifiers.classify"],
-    "connector_call_tool_v1": ["beta.connectors.call_tool"],
-    "connector_create_v1": ["beta.connectors.create"],
-    "connector_delete_organization_credentials_v1": ["beta.connectors.delete_organization_credentials"],
-    "connector_delete_user_credentials_v1": ["beta.connectors.delete_user_credentials"],
-    "connector_delete_v1": ["beta.connectors.delete"],
-    "connector_delete_workspace_credentials_v1": ["beta.connectors.delete_workspace_credentials"],
-    "connector_get_auth_url_v1": ["beta.connectors.get_auth_url"],
-    "connector_get_authentication_methods_v1": ["beta.connectors.get_authentication_methods"],
-    "connector_get_v1": ["beta.connectors.get"],
-    "connector_list_organization_credentials_v1": ["beta.connectors.list_organization_credentials"],
-    "connector_list_tools_v1": ["beta.connectors.list_tools"],
-    "connector_list_user_credentials_v1": ["beta.connectors.list_user_credentials"],
-    "connector_list_v1": ["beta.connectors.list"],
-    "connector_list_workspace_credentials_v1": ["beta.connectors.list_workspace_credentials"],
-    "connector_update_v1": ["beta.connectors.update"],
-    "create_dataset_record_v1_observability_datasets__dataset_id__records_post": ["beta.observability.datasets.create_record"],
-    "create_dataset_v1_observability_datasets_post": ["beta.observability.datasets.create"],
-    "create_judge_v1_observability_judges_post": ["beta.observability.judges.create"],
-    "create_voice_v1_audio_voices_post": ["audio.voices.create"],
-    "delete_dataset_record_v1_observability_dataset_records__dataset_record_id__delete": ["beta.observability.datasets.records.delete"],
-    "delete_dataset_records_v1_observability_dataset_records_bulk_delete_post": ["beta.observability.datasets.records.bulk_delete"],
-    "delete_dataset_v1_observability_datasets__dataset_id__delete": ["beta.observability.datasets.delete"],
-    "delete_judge_v1_observability_judges__judge_id__delete": ["beta.observability.judges.delete"],
-    "delete_model_v1_models__model_id__delete": ["models.delete"],
-    "delete_voice_v1_audio_voices__voice_id__delete": ["audio.voices.delete"],
-    "embeddings_v1_embeddings_post": ["embeddings.create"],
-    "execute_workflow_registration_v1_workflows_registrations__workflow_registration_id__execute_post": ["workflows.execute_workflow_registration"],
-    "execute_workflow_v1_workflows__workflow_identifier__execute_post": ["workflows.execute_workflow"],
-    "export_dataset_to_jsonl_v1_observability_datasets__dataset_id__exports_to_jsonl_get": ["beta.observability.datasets.export_to_jsonl"],
-    "files_api_routes_delete_file": ["files.delete"],
-    "files_api_routes_download_file": ["files.download"],
-    "files_api_routes_get_signed_url": ["files.get_signed_url"],
-    "files_api_routes_list_files": ["files.list"],
-    "files_api_routes_retrieve_file": ["files.retrieve"],
-    "files_api_routes_upload_file": ["files.upload"],
-    "fim_completion_v1_fim_completions_post": ["fim.complete"],
-    "fim_completion_v1_fim_completions_post_stream": ["fim.stream"],
-    "get_dataset_by_id_v1_observability_datasets__dataset_id__get": ["beta.observability.datasets.fetch"],
-    "get_dataset_import_task_v1_observability_datasets__dataset_id__tasks__task_id__get": ["beta.observability.datasets.fetch_task"],
-    "get_dataset_import_tasks_v1_observability_datasets__dataset_id__tasks_get": ["beta.observability.datasets.list_tasks"],
-    "get_dataset_record_v1_observability_dataset_records__dataset_record_id__get": ["beta.observability.datasets.records.fetch"],
-    "get_dataset_records_v1_observability_datasets__dataset_id__records_get": ["beta.observability.datasets.list_records"],
-    "get_datasets_v1_observability_datasets_get": ["beta.observability.datasets.list"],
-    "get_deployment_v1_workflows_deployments__name__get": ["workflows.deployments.get_deployment"],
-    "get_judge_by_id_v1_observability_judges__judge_id__get": ["beta.observability.judges.fetch"],
-    "get_judges_v1_observability_judges_get": ["beta.observability.judges.list"],
-    "get_run_history_v1_workflows_runs__run_id__history_get": ["workflows.runs.get_run_history"],
-    "get_run_v1_workflows_runs__run_id__get": ["workflows.runs.get_run"],
-    "get_schedules_v1_workflows_schedules_get": ["workflows.schedules.get_schedules"],
-    "get_stream_events_v1_workflows_events_stream_get": ["events.get_stream_events", "workflows.events.get_stream_events"],
-    "get_voice_sample_audio_v1_audio_voices__voice_id__sample_get": ["audio.voices.get_sample_audio"],
-    "get_voice_v1_audio_voices__voice_id__get": ["audio.voices.get"],
-    "get_workflow_events_v1_workflows_events_list_get": ["events.get_workflow_events", "workflows.events.get_workflow_events"],
-    "get_workflow_execution_history_v1_workflows_executions__execution_id__history_get": ["workflows.executions.get_workflow_execution_history"],
-    "get_workflow_execution_trace_events": ["workflows.executions.get_workflow_execution_trace_events"],
-    "get_workflow_execution_trace_otel": ["workflows.executions.get_workflow_execution_trace_otel"],
-    "get_workflow_execution_trace_summary": ["workflows.executions.get_workflow_execution_trace_summary"],
-    "get_workflow_execution_v1_workflows_executions__execution_id__get": ["workflows.executions.get_workflow_execution"],
-    "get_workflow_metrics_v1_workflows__workflow_name__metrics_get": ["workflows.metrics.get_workflow_metrics"],
-    "get_workflow_registration_v1_workflows_registrations__workflow_registration_id__get": ["workflows.get_workflow_registration"],
-    "get_workflow_registrations_v1_workflows_registrations_get": ["workflows.get_workflow_registrations"],
-    "get_workflow_v1_workflows__workflow_identifier__get": ["workflows.get_workflow"],
-    "jobs_api_routes_batch_cancel_batch_job": ["batch.jobs.cancel"],
-    "jobs_api_routes_batch_create_batch_job": ["batch.jobs.create"],
-    "jobs_api_routes_batch_get_batch_job": ["batch.jobs.get"],
-    "jobs_api_routes_batch_get_batch_jobs": ["batch.jobs.list"],
-    "jobs_api_routes_fine_tuning_archive_fine_tuned_model": ["models.archive"],
-    "jobs_api_routes_fine_tuning_unarchive_fine_tuned_model": ["models.unarchive"],
-    "jobs_api_routes_fine_tuning_update_fine_tuned_model": ["models.update"],
-    "judge_conversation_v1_observability_judges__judge_id__live_judging_post": ["beta.observability.judges.judge_conversation"],
-    "judge_dataset_record_v1_observability_dataset_records__dataset_record_id__live_judging_post": ["beta.observability.datasets.records.judge"],
-    "libraries_create_v1": ["beta.libraries.create"],
-    "libraries_delete_v1": ["beta.libraries.delete"],
-    "libraries_documents_delete_v1": ["beta.libraries.documents.delete"],
-    "libraries_documents_get_extracted_text_signed_url_v1": ["beta.libraries.documents.extracted_text_signed_url"],
-    "libraries_documents_get_signed_url_v1": ["beta.libraries.documents.get_signed_url"],
-    "libraries_documents_get_status_v1": ["beta.libraries.documents.status"],
-    "libraries_documents_get_text_content_v1": ["beta.libraries.documents.text_content"],
-    "libraries_documents_get_v1": ["beta.libraries.documents.get"],
-    "libraries_documents_list_v1": ["beta.libraries.documents.list"],
-    "libraries_documents_reprocess_v1": ["beta.libraries.documents.reprocess"],
-    "libraries_documents_update_v1": ["beta.libraries.documents.libraries_documents_update_v1"],
-    "libraries_documents_upload_v1": ["beta.libraries.documents.upload"],
-    "libraries_get_v1": ["beta.libraries.get"],
-    "libraries_list_v1": ["beta.libraries.list"],
-    "libraries_share_create_v1": ["beta.libraries.accesses.update_or_create"],
-    "libraries_share_delete_v1": ["beta.libraries.accesses.delete"],
-    "libraries_share_list_v1": ["beta.libraries.accesses.list"],
-    "libraries_update_v1": ["beta.libraries.libraries_update_v1"],
-    "list_deployments_v1_workflows_deployments_get": ["workflows.deployments.list_deployments"],
-    "list_models_v1_models_get": ["models.list"],
-    "list_runs_v1_workflows_runs_get": ["workflows.runs.list_runs"],
-    "list_voices_v1_audio_voices_get": ["audio.voices.list"],
-    "moderations_v1_moderations_post": ["classifiers.moderate"],
-    "ocr_v1_ocr_post": ["ocr.process"],
-    "post_dataset_records_from_dataset_v1_observability_datasets__dataset_id__imports_from_dataset_post": ["beta.observability.datasets.import_from_dataset_records"],
-    "post_dataset_records_from_file_v1_observability_datasets__dataset_id__imports_from_file_post": ["beta.observability.datasets.import_from_file"],
-    "post_dataset_records_from_playground_v1_observability_datasets__dataset_id__imports_from_playground_post": ["beta.observability.datasets.import_from_playground"],
-    "query_workflow_execution_v1_workflows_executions__execution_id__queries_post": ["workflows.executions.query_workflow_execution"],
-    "reset_workflow_v1_workflows_executions__execution_id__reset_post": ["workflows.executions.reset_workflow"],
-    "retrieve_model_v1_models__model_id__get": ["models.retrieve"],
-    "schedule_workflow_v1_workflows_schedules_post": ["workflows.schedules.schedule_workflow"],
-    "signal_workflow_execution_v1_workflows_executions__execution_id__signals_post": ["workflows.executions.signal_workflow_execution"],
-    "speech_v1_audio_speech_post": ["audio.speech.complete"],
-    "stream_v1_workflows_executions__execution_id__stream_get": ["workflows.executions.stream"],
-    "terminate_workflow_execution_v1_workflows_executions__execution_id__terminate_post": ["workflows.executions.terminate_workflow_execution"],
-    "unarchive_workflow_v1_workflows__workflow_identifier__unarchive_put": ["workflows.unarchive_workflow"],
-    "unschedule_workflow_v1_workflows_schedules__schedule_id__delete": ["workflows.schedules.unschedule_workflow"],
-    "update_dataset_record_payload_v1_observability_dataset_records__dataset_record_id__payload_put": ["beta.observability.datasets.records.update_payload"],
-    "update_dataset_record_properties_v1_observability_dataset_records__dataset_record_id__properties_put": ["beta.observability.datasets.records.update_properties"],
-    "update_dataset_v1_observability_datasets__dataset_id__patch": ["beta.observability.datasets.update"],
-    "update_judge_v1_observability_judges__judge_id__put": ["beta.observability.judges.update"],
-    "update_voice_v1_audio_voices__voice_id__patch": ["audio.voices.update"],
-    "update_workflow_execution_v1_workflows_executions__execution_id__updates_post": ["workflows.executions.update_workflow_execution"],
-    "update_workflow_v1_workflows__workflow_identifier__put": ["workflows.update_workflow"]
+    "agents_api_v1_agents_create": [
+      "beta.agents.create"
+    ],
+    "agents_api_v1_agents_create_or_update_alias": [
+      "beta.agents.create_version_alias"
+    ],
+    "agents_api_v1_agents_delete": [
+      "beta.agents.delete"
+    ],
+    "agents_api_v1_agents_delete_alias": [
+      "beta.agents.delete_version_alias"
+    ],
+    "agents_api_v1_agents_get": [
+      "beta.agents.get"
+    ],
+    "agents_api_v1_agents_get_version": [
+      "beta.agents.get_version"
+    ],
+    "agents_api_v1_agents_list": [
+      "beta.agents.list"
+    ],
+    "agents_api_v1_agents_list_pages": [
+      "beta.agents.list_pages"
+    ],
+    "agents_api_v1_agents_list_version_aliases": [
+      "beta.agents.list_version_aliases"
+    ],
+    "agents_api_v1_agents_list_versions": [
+      "beta.agents.list_versions"
+    ],
+    "agents_api_v1_agents_update": [
+      "beta.agents.update"
+    ],
+    "agents_api_v1_agents_update_version": [
+      "beta.agents.update_version"
+    ],
+    "agents_api_v1_conversations_append": [
+      "beta.conversations.append"
+    ],
+    "agents_api_v1_conversations_append_stream": [
+      "beta.conversations.append_stream"
+    ],
+    "agents_api_v1_conversations_delete": [
+      "beta.conversations.delete"
+    ],
+    "agents_api_v1_conversations_get": [
+      "beta.conversations.get"
+    ],
+    "agents_api_v1_conversations_history": [
+      "beta.conversations.get_history"
+    ],
+    "agents_api_v1_conversations_list": [
+      "beta.conversations.list"
+    ],
+    "agents_api_v1_conversations_messages": [
+      "beta.conversations.get_messages"
+    ],
+    "agents_api_v1_conversations_restart": [
+      "beta.conversations.restart"
+    ],
+    "agents_api_v1_conversations_restart_stream": [
+      "beta.conversations.restart_stream"
+    ],
+    "agents_api_v1_conversations_start": [
+      "beta.conversations.start"
+    ],
+    "agents_api_v1_conversations_start_stream": [
+      "beta.conversations.start_stream"
+    ],
+    "agents_completion_v1_agents_completions_post": [
+      "agents.complete",
+      "agents.stream"
+    ],
+    "archive_workflow_v1_workflows__workflow_identifier__archive_put": [
+      "workflows.archive_workflow"
+    ],
+    "audio_api_v1_transcriptions_post": [
+      "audio.transcriptions.complete"
+    ],
+    "audio_api_v1_transcriptions_post_stream": [
+      "audio.transcriptions.stream"
+    ],
+    "batch_cancel_workflow_executions_v1_workflows_executions_cancel_post": [
+      "workflows.executions.batch_cancel_workflow_executions"
+    ],
+    "batch_terminate_workflow_executions_v1_workflows_executions_terminate_post": [
+      "workflows.executions.batch_terminate_workflow_executions"
+    ],
+    "cancel_workflow_execution_v1_workflows_executions__execution_id__cancel_post": [
+      "workflows.executions.cancel_workflow_execution"
+    ],
+    "chat_classifications_v1_chat_classifications_post": [
+      "classifiers.classify_chat"
+    ],
+    "chat_completion_v1_chat_completions_post": [
+      "chat.complete",
+      "chat.parse"
+    ],
+    "chat_completion_v1_chat_completions_post_stream": [
+      "chat.parse_stream",
+      "chat.stream"
+    ],
+    "chat_moderations_v1_chat_moderations_post": [
+      "classifiers.moderate_chat"
+    ],
+    "classifications_v1_classifications_post": [
+      "classifiers.classify"
+    ],
+    "connector_call_tool_v1": [
+      "beta.connectors.call_tool"
+    ],
+    "connector_create_v1": [
+      "beta.connectors.create"
+    ],
+    "connector_delete_organization_credentials_v1": [
+      "beta.connectors.delete_organization_credentials"
+    ],
+    "connector_delete_user_credentials_v1": [
+      "beta.connectors.delete_user_credentials"
+    ],
+    "connector_delete_v1": [
+      "beta.connectors.delete"
+    ],
+    "connector_delete_workspace_credentials_v1": [
+      "beta.connectors.delete_workspace_credentials"
+    ],
+    "connector_get_auth_url_v1": [
+      "beta.connectors.get_auth_url"
+    ],
+    "connector_get_authentication_methods_v1": [
+      "beta.connectors.get_authentication_methods"
+    ],
+    "connector_get_v1": [
+      "beta.connectors.get"
+    ],
+    "connector_list_organization_credentials_v1": [
+      "beta.connectors.list_organization_credentials"
+    ],
+    "connector_list_tools_v1": [
+      "beta.connectors.list_tools"
+    ],
+    "connector_list_user_credentials_v1": [
+      "beta.connectors.list_user_credentials"
+    ],
+    "connector_list_v1": [
+      "beta.connectors.list"
+    ],
+    "connector_list_workspace_credentials_v1": [
+      "beta.connectors.list_workspace_credentials"
+    ],
+    "connector_update_v1": [
+      "beta.connectors.update"
+    ],
+    "create_dataset_record_v1_observability_datasets__dataset_id__records_post": [
+      "beta.observability.datasets.create_record"
+    ],
+    "create_dataset_v1_observability_datasets_post": [
+      "beta.observability.datasets.create"
+    ],
+    "create_judge_v1_observability_judges_post": [
+      "beta.observability.judges.create"
+    ],
+    "create_voice_v1_audio_voices_post": [
+      "audio.voices.create"
+    ],
+    "delete_dataset_record_v1_observability_dataset_records__dataset_record_id__delete": [
+      "beta.observability.datasets.records.delete"
+    ],
+    "delete_dataset_records_v1_observability_dataset_records_bulk_delete_post": [
+      "beta.observability.datasets.records.bulk_delete"
+    ],
+    "delete_dataset_v1_observability_datasets__dataset_id__delete": [
+      "beta.observability.datasets.delete"
+    ],
+    "delete_judge_v1_observability_judges__judge_id__delete": [
+      "beta.observability.judges.delete"
+    ],
+    "delete_model_v1_models__model_id__delete": [
+      "models.delete"
+    ],
+    "delete_voice_v1_audio_voices__voice_id__delete": [
+      "audio.voices.delete"
+    ],
+    "embeddings_v1_embeddings_post": [
+      "embeddings.create"
+    ],
+    "execute_workflow_registration_v1_workflows_registrations__workflow_registration_id__execute_post": [
+      "workflows.execute_workflow_registration"
+    ],
+    "execute_workflow_v1_workflows__workflow_identifier__execute_post": [
+      "workflows.execute_workflow"
+    ],
+    "export_dataset_to_jsonl_v1_observability_datasets__dataset_id__exports_to_jsonl_get": [
+      "beta.observability.datasets.export_to_jsonl"
+    ],
+    "files_api_routes_delete_file": [
+      "files.delete"
+    ],
+    "files_api_routes_download_file": [
+      "files.download"
+    ],
+    "files_api_routes_get_signed_url": [
+      "files.get_signed_url"
+    ],
+    "files_api_routes_list_files": [
+      "files.list"
+    ],
+    "files_api_routes_retrieve_file": [
+      "files.retrieve"
+    ],
+    "files_api_routes_upload_file": [
+      "files.upload"
+    ],
+    "fim_completion_v1_fim_completions_post": [
+      "fim.complete"
+    ],
+    "fim_completion_v1_fim_completions_post_stream": [
+      "fim.stream"
+    ],
+    "get_dataset_by_id_v1_observability_datasets__dataset_id__get": [
+      "beta.observability.datasets.fetch"
+    ],
+    "get_dataset_import_task_v1_observability_datasets__dataset_id__tasks__task_id__get": [
+      "beta.observability.datasets.fetch_task"
+    ],
+    "get_dataset_import_tasks_v1_observability_datasets__dataset_id__tasks_get": [
+      "beta.observability.datasets.list_tasks"
+    ],
+    "get_dataset_record_v1_observability_dataset_records__dataset_record_id__get": [
+      "beta.observability.datasets.records.fetch"
+    ],
+    "get_dataset_records_v1_observability_datasets__dataset_id__records_get": [
+      "beta.observability.datasets.list_records"
+    ],
+    "get_datasets_v1_observability_datasets_get": [
+      "beta.observability.datasets.list"
+    ],
+    "get_deployment_v1_workflows_deployments__name__get": [
+      "workflows.deployments.get_deployment"
+    ],
+    "get_judge_by_id_v1_observability_judges__judge_id__get": [
+      "beta.observability.judges.fetch"
+    ],
+    "get_judges_v1_observability_judges_get": [
+      "beta.observability.judges.list"
+    ],
+    "get_run_history_v1_workflows_runs__run_id__history_get": [
+      "workflows.runs.get_run_history"
+    ],
+    "get_run_v1_workflows_runs__run_id__get": [
+      "workflows.runs.get_run"
+    ],
+    "get_schedules_v1_workflows_schedules_get": [
+      "workflows.schedules.get_schedules"
+    ],
+    "get_stream_events_v1_workflows_events_stream_get": [
+      "events.get_stream_events",
+      "workflows.events.get_stream_events"
+    ],
+    "get_voice_sample_audio_v1_audio_voices__voice_id__sample_get": [
+      "audio.voices.get_sample_audio"
+    ],
+    "get_voice_v1_audio_voices__voice_id__get": [
+      "audio.voices.get"
+    ],
+    "get_workflow_events_v1_workflows_events_list_get": [
+      "events.get_workflow_events",
+      "workflows.events.get_workflow_events"
+    ],
+    "get_workflow_execution_history_v1_workflows_executions__execution_id__history_get": [
+      "workflows.executions.get_workflow_execution_history"
+    ],
+    "get_workflow_execution_trace_events": [
+      "workflows.executions.get_workflow_execution_trace_events"
+    ],
+    "get_workflow_execution_trace_otel": [
+      "workflows.executions.get_workflow_execution_trace_otel"
+    ],
+    "get_workflow_execution_trace_summary": [
+      "workflows.executions.get_workflow_execution_trace_summary"
+    ],
+    "get_workflow_execution_v1_workflows_executions__execution_id__get": [
+      "workflows.executions.get_workflow_execution"
+    ],
+    "get_workflow_metrics_v1_workflows__workflow_name__metrics_get": [
+      "workflows.metrics.get_workflow_metrics"
+    ],
+    "get_workflow_registration_v1_workflows_registrations__workflow_registration_id__get": [
+      "workflows.get_workflow_registration"
+    ],
+    "get_workflow_registrations_v1_workflows_registrations_get": [
+      "workflows.get_workflow_registrations"
+    ],
+    "get_workflow_v1_workflows__workflow_identifier__get": [
+      "workflows.get_workflow"
+    ],
+    "jobs_api_routes_batch_cancel_batch_job": [
+      "batch.jobs.cancel"
+    ],
+    "jobs_api_routes_batch_create_batch_job": [
+      "batch.jobs.create"
+    ],
+    "jobs_api_routes_batch_get_batch_job": [
+      "batch.jobs.get"
+    ],
+    "jobs_api_routes_batch_get_batch_jobs": [
+      "batch.jobs.list"
+    ],
+    "jobs_api_routes_fine_tuning_archive_fine_tuned_model": [
+      "models.archive"
+    ],
+    "jobs_api_routes_fine_tuning_unarchive_fine_tuned_model": [
+      "models.unarchive"
+    ],
+    "jobs_api_routes_fine_tuning_update_fine_tuned_model": [
+      "models.update"
+    ],
+    "judge_conversation_v1_observability_judges__judge_id__live_judging_post": [
+      "beta.observability.judges.judge_conversation"
+    ],
+    "judge_dataset_record_v1_observability_dataset_records__dataset_record_id__live_judging_post": [
+      "beta.observability.datasets.records.judge"
+    ],
+    "libraries_create_v1": [
+      "beta.libraries.create"
+    ],
+    "libraries_delete_v1": [
+      "beta.libraries.delete"
+    ],
+    "libraries_documents_delete_v1": [
+      "beta.libraries.documents.delete"
+    ],
+    "libraries_documents_get_extracted_text_signed_url_v1": [
+      "beta.libraries.documents.extracted_text_signed_url"
+    ],
+    "libraries_documents_get_signed_url_v1": [
+      "beta.libraries.documents.get_signed_url"
+    ],
+    "libraries_documents_get_status_v1": [
+      "beta.libraries.documents.status"
+    ],
+    "libraries_documents_get_text_content_v1": [
+      "beta.libraries.documents.text_content"
+    ],
+    "libraries_documents_get_v1": [
+      "beta.libraries.documents.get"
+    ],
+    "libraries_documents_list_v1": [
+      "beta.libraries.documents.list"
+    ],
+    "libraries_documents_reprocess_v1": [
+      "beta.libraries.documents.reprocess"
+    ],
+    "libraries_documents_update_v1": [
+      "beta.libraries.documents.libraries_documents_update_v1"
+    ],
+    "libraries_documents_upload_v1": [
+      "beta.libraries.documents.upload"
+    ],
+    "libraries_get_v1": [
+      "beta.libraries.get"
+    ],
+    "libraries_list_v1": [
+      "beta.libraries.list"
+    ],
+    "libraries_share_create_v1": [
+      "beta.libraries.accesses.update_or_create"
+    ],
+    "libraries_share_delete_v1": [
+      "beta.libraries.accesses.delete"
+    ],
+    "libraries_share_list_v1": [
+      "beta.libraries.accesses.list"
+    ],
+    "libraries_update_v1": [
+      "beta.libraries.libraries_update_v1"
+    ],
+    "list_deployments_v1_workflows_deployments_get": [
+      "workflows.deployments.list_deployments"
+    ],
+    "list_models_v1_models_get": [
+      "models.list"
+    ],
+    "list_runs_v1_workflows_runs_get": [
+      "workflows.runs.list_runs"
+    ],
+    "list_voices_v1_audio_voices_get": [
+      "audio.voices.list"
+    ],
+    "moderations_v1_moderations_post": [
+      "classifiers.moderate"
+    ],
+    "ocr_v1_ocr_post": [
+      "ocr.process"
+    ],
+    "post_dataset_records_from_dataset_v1_observability_datasets__dataset_id__imports_from_dataset_post": [
+      "beta.observability.datasets.import_from_dataset_records"
+    ],
+    "post_dataset_records_from_file_v1_observability_datasets__dataset_id__imports_from_file_post": [
+      "beta.observability.datasets.import_from_file"
+    ],
+    "post_dataset_records_from_playground_v1_observability_datasets__dataset_id__imports_from_playground_post": [
+      "beta.observability.datasets.import_from_playground"
+    ],
+    "query_workflow_execution_v1_workflows_executions__execution_id__queries_post": [
+      "workflows.executions.query_workflow_execution"
+    ],
+    "reset_workflow_v1_workflows_executions__execution_id__reset_post": [
+      "workflows.executions.reset_workflow"
+    ],
+    "retrieve_model_v1_models__model_id__get": [
+      "models.retrieve"
+    ],
+    "schedule_workflow_v1_workflows_schedules_post": [
+      "workflows.schedules.schedule_workflow"
+    ],
+    "signal_workflow_execution_v1_workflows_executions__execution_id__signals_post": [
+      "workflows.executions.signal_workflow_execution"
+    ],
+    "speech_v1_audio_speech_post": [
+      "audio.speech.complete"
+    ],
+    "stream_v1_workflows_executions__execution_id__stream_get": [
+      "workflows.executions.stream"
+    ],
+    "terminate_workflow_execution_v1_workflows_executions__execution_id__terminate_post": [
+      "workflows.executions.terminate_workflow_execution"
+    ],
+    "unarchive_workflow_v1_workflows__workflow_identifier__unarchive_put": [
+      "workflows.unarchive_workflow"
+    ],
+    "unschedule_workflow_v1_workflows_schedules__schedule_id__delete": [
+      "workflows.schedules.unschedule_workflow"
+    ],
+    "update_dataset_record_payload_v1_observability_dataset_records__dataset_record_id__payload_put": [
+      "beta.observability.datasets.records.update_payload"
+    ],
+    "update_dataset_record_properties_v1_observability_dataset_records__dataset_record_id__properties_put": [
+      "beta.observability.datasets.records.update_properties"
+    ],
+    "update_dataset_v1_observability_datasets__dataset_id__patch": [
+      "beta.observability.datasets.update"
+    ],
+    "update_judge_v1_observability_judges__judge_id__put": [
+      "beta.observability.judges.update"
+    ],
+    "update_voice_v1_audio_voices__voice_id__patch": [
+      "audio.voices.update"
+    ],
+    "update_workflow_execution_v1_workflows_executions__execution_id__updates_post": [
+      "workflows.executions.update_workflow_execution"
+    ],
+    "update_workflow_v1_workflows__workflow_identifier__put": [
+      "workflows.update_workflow"
+    ]
   },
   "provenance": {
-    "protocol": {"artifact": "src/generated/coverage.json", "commit": "ff846cf93d91df6fe04d0a5e540ecbe1e0ecc691", "repository": "mistralai/platform-docs-public"},
-    "python": {"commit": "3653cd9a5169fc151a0787232aed70eeea88e52a", "repository": "mistralai/client-python"},
-    "typescript": {"commit": "d8f2d2539cf00d13d429653ab891b66a3524a2a9", "repository": "mistralai/client-ts"}
+    "protocol": {
+      "artifact": "src/generated/coverage.json",
+      "commit": "ff846cf93d91df6fe04d0a5e540ecbe1e0ecc691",
+      "repository": "mistralai/platform-docs-public"
+    },
+    "python": {
+      "commit": "3653cd9a5169fc151a0787232aed70eeea88e52a",
+      "repository": "mistralai/client-python"
+    },
+    "typescript": {
+      "commit": "d8f2d2539cf00d13d429653ab891b66a3524a2a9",
+      "repository": "mistralai/client-ts"
+    }
   },
-  "schema_version": 2,
+  "schema_version": 3,
   "sdk_only_digest": "sha256:715205c05c7411b3b86e04228dc8e30f2284dabf5842f96de6078a3e73ece7f0",
   "summary": {
     "cross_sdk_alias_differences": 2,
