@@ -1,0 +1,45 @@
+name: Materialize issue 19 unions
+on:
+  push:
+    branches: [feat/complex-request-model-projection]
+permissions:
+  contents: write
+jobs:
+  materialize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install pinned Rust toolchain
+        run: rustup show
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            .tools
+            target
+          key: sdk-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'codegen.lock') }}
+      - name: Materialize generic request unions
+        run: |
+          python3 scripts/materialize_issue_19_unions.py
+          python3 scripts/codegen.py generate
+          PYTHON=$(find .tools -path '*/bin/python' -type f -o -type l | grep '/bin/python$' | head -n1)
+          "$PYTHON" scripts/update_probe_baseline_issue_19.py
+          bash scripts/validate.sh
+      - name: Remove analysis scaffolding and commit
+        run: |
+          rm -f \
+            scripts/analyze_issue_19_next.py \
+            scripts/materialize_issue_19_unions.py \
+            scripts/update_probe_baseline_issue_19.py \
+            .github/workflows/analyze-issue-19-next.yml \
+            .github/workflows/materialize-issue-19-unions.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'feat: project request unions generically'
+          git push origin HEAD:feat/complex-request-model-projection
