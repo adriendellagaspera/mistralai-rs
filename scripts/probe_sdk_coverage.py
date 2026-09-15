@@ -41,7 +41,7 @@ def probes(openapi, rust, configured):
             probe = compiler.build_ir(openapi, rust, overlay)
             model_source = "use crate::generated::types::*;\n" + "\n".join(
                 compiler._emit_model(model, openapi, rust) for model in probe.models)
-            resource_source = compiler._emit_resource(probe.resources[0], rust)
+            resource_source = compiler._emit_resource(probe.resources[0], rust, probe.resources)
             public_surface({"types.rs": model_source, "resource.rs": resource_source})
             modules[operation_id] = (
                 f"mod probe_{index} {{ use mistralai::SdkError;\n"
@@ -53,9 +53,15 @@ def probes(openapi, rust, configured):
 
 
 def main():
-    modules, rejected = probes(compiler.OpenApiIndex.load(ROOT / "spec/openapi.yaml"),
-                               compiler.RustIndex.load(ROOT / "src/generated"),
-                               json.loads((ROOT / "codegen/sdk-semantics.json").read_text()))
+    openapi = compiler.OpenApiIndex.load(ROOT / "spec/openapi.yaml")
+    rust = compiler.RustIndex.load(ROOT / "src/generated")
+    configured = json.loads((ROOT / "codegen/sdk-semantics.json").read_text())
+    configured, _ = compiler.expand_manifest(
+        openapi, configured,
+        json.loads((ROOT / "codegen/sdk-taxonomy.json").read_text()),
+        json.loads((ROOT / "src/generated/coverage.json").read_text()),
+    )
+    modules, rejected = probes(openapi, rust, configured)
     report = {"generated_candidates": sorted(modules), "rejected_candidates": rejected}
     print(json.dumps(report, indent=2), flush=True)
     digest = hashlib.sha256(json.dumps(report, sort_keys=True, separators=(",", ":")).encode()).hexdigest()

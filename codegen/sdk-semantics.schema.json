@@ -51,7 +51,8 @@
       "request_overrides": {"type": "object", "propertyNames": {"$ref": "#/$defs/identifier"}, "additionalProperties": {"type": ["boolean", "null"]}}
     }},
     "resource": {"type": "object", "additionalProperties": false, "required": ["name", "operations"], "properties": {
-      "name": {"$ref": "#/$defs/identifier"}, "operations": {"type": "object", "propertyNames": {"$ref": "#/$defs/identifier"}, "additionalProperties": {"$ref": "#/$defs/operation"}}
+      "name": {"$ref": "#/$defs/identifier"}, "path": {"$ref": "#/$defs/path"},
+      "operations": {"type": "object", "propertyNames": {"$ref": "#/$defs/identifier"}, "additionalProperties": {"$ref": "#/$defs/operation"}}
     }}
   }
 }
