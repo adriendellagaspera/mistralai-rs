@@ -8,7 +8,7 @@
 +    def test_nested_resources_emit_hierarchical_accessors(self):
 +        operation = sdk_codegen.OperationSpec("list", "list", "list", None, "Receipt", (), None)
 +        root = sdk_codegen.ResourceSpec(("batch",), "batch", "Batch", ())
-+        child = sdk_codegen.ResourceSpec(("batch", "jobs"), "batch__jobs", "BatchJobs", (operation,))
++        child = sdk_codegen.ResourceSpec(("batch", "jobs"), "batch_jobs", "BatchJobs", (operation,))
 +        rust = sdk_codegen.RustIndex(
 +            TYPES.encode(),
 +            b"impl HttpClient { pub async fn list(&self) -> Result<AnimalResponse, Error> { todo!() } }",
@@ -17,7 +17,7 @@
 +        mod_source = sdk_codegen._emit_mod(sdk_codegen.SdkIr("Client", (), (root, child)))
 +        self.assertIn("pub fn jobs(&self) -> BatchJobs<'a>", root_source)
 +        self.assertIn("pub fn batch(&self) -> Batch<'_>", mod_source)
-+        self.assertNotIn("pub fn batch__jobs(&self)", mod_source)
++        self.assertNotIn("pub fn batch_jobs(&self)", mod_source)
 +
      def test_optional_query_addition_preserves_resource_signature(self):
          operation = sdk_codegen.OperationSpec("list", "list", "list", None, "Receipt", {}, None)
