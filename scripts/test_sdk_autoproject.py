@@ -97,18 +97,21 @@ class AutoProjectionTests(unittest.TestCase):
         self.assertTrue(operation["empty_response"])
         self.assertNotIn("response", operation)
 
-    def test_binary_success_stays_review_debt(self):
+    def test_projects_binary_success_without_fake_response_model(self):
         api = FakeOpenApi()
         api.operations["download_thing"] = {
             "responses": {"200": {"content": {"application/octet-stream": {"schema": {"type": "string", "format": "binary"}}}}},
             "parameters": [],
         }
-        _, report = sdk_autoproject.expand_manifest(
+        expanded, report = sdk_autoproject.expand_manifest(
             api, manifest(),
             {"operations": {"download_thing": ["things.download"]}},
             raw_coverage("download_thing"),
         )
-        self.assertEqual("non_json_success", report["rejected"]["download_thing"])
+        self.assertEqual(1, report["added_count"])
+        operation = expanded["resources"]["things"]["operations"]["download"]
+        self.assertTrue(operation["binary_response"])
+        self.assertNotIn("response", operation)
 
     def test_equal_depth_aliases_require_review(self):
         _, report = sdk_autoproject.expand_manifest(
