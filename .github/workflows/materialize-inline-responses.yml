@@ -29,7 +29,8 @@ jobs:
       - name: Apply generic inline response primitives
         run: |
           python scripts/apply_inline_response_projection.py
-          python -m py_compile codegen/sdk_codegen.py codegen/sdk_autoproject.py scripts/probe_sdk_coverage.py
+          python scripts/fix_inline_projection_clippy.py
+          python -m py_compile codegen/sdk_codegen.py codegen/sdk_autoproject.py codegen/sdk_ir.py scripts/probe_sdk_coverage.py
       - name: Regenerate SDK
         run: python scripts/codegen.py generate
       - name: Refresh probe baseline
@@ -59,6 +60,7 @@ jobs:
       - name: Remove diagnostics/bootstrap and commit generated tree
         run: |
           rm -f scripts/apply_inline_response_projection.py \
+            scripts/fix_inline_projection_clippy.py \
             .github/workflows/materialize-inline-responses.yml \
             .github/workflows/analyze-inline-responses.yml \
             .github/workflows/analyze-inline-rust-types.yml
