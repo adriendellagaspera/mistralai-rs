@@ -14,7 +14,6 @@ impl<'a> Chat<'a> {
     pub(crate) fn new(raw: &'a HttpClient) -> Self {
         Self { raw }
     }
-
     pub async fn complete(&self, request: ChatRequest) -> Result<ChatResponse, SdkError> {
         self.raw
             .chat_completion_v1_chat_completions_post({

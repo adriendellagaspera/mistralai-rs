@@ -14,7 +14,6 @@ impl<'a> Fim<'a> {
     pub(crate) fn new(raw: &'a HttpClient) -> Self {
         Self { raw }
     }
-
     pub async fn complete(&self, request: FimRequest) -> Result<FimResponse, SdkError> {
         self.raw
             .fim_completion_v1_fim_completions_post({

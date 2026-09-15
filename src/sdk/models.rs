@@ -34,7 +34,6 @@ impl<'a> Models<'a> {
     pub(crate) fn new(raw: &'a HttpClient) -> Self {
         Self { raw }
     }
-
     pub async fn list(&self) -> Result<ModelListResponse, SdkError> {
         self.raw
             .list_models_v1_models_get(None::<&str>, None::<&str>)

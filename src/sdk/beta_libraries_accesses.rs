@@ -2,17 +2,17 @@
 use super::*;
 use crate::generated::client::HttpClient;
 #[derive(Clone, Copy)]
-pub struct Ocr<'a> {
+pub struct BetaLibrariesAccesses<'a> {
     raw: &'a HttpClient,
 }
 
-impl<'a> Ocr<'a> {
+impl<'a> BetaLibrariesAccesses<'a> {
     pub(crate) fn new(raw: &'a HttpClient) -> Self {
         Self { raw }
     }
-    pub async fn process(&self, request: OcrRequest) -> Result<OcrResponse, SdkError> {
+    pub async fn list(&self, library_id: impl AsRef<str>) -> Result<ListSharingOutView, SdkError> {
         self.raw
-            .ocr_v1_ocr_post(request.into_raw())
+            .libraries_share_list_v1(library_id.as_ref())
             .await
             .map(Into::into)
             .map_err(Into::into)
