@@ -33,46 +33,49 @@ jobs:
           from pathlib import Path
           path = Path("scripts/materialize_binary_stream.py")
           text = path.read_text()
-          old = '''        if response_kind == "binary":
-              binary_media = set(_binary_media(operation))
-              route_path = operation.get("x-sdk-path", "").split("#", 1)[0].rstrip("/") or "/"
-              route_method = operation.get("x-sdk-method", "").upper()
-              candidates = [
-                  item for item in raw_operations
-                  if item.get("method") == route_method
-                  and (item.get("path", "").split("#", 1)[0].rstrip("/") or "/") == route_path
-                  and item.get("success_media")
-                  and set(item["success_media"]).issubset(binary_media)
-              ]
-              if len(candidates) == 1:
-                  raw_method = candidates[0]["rust_method"] + "_stream"
-              else:
-                  rejected[operation_id] = "raw_binary_transport_mapping"
-                  continue
-          '''
-          new = '''        if response_kind == "binary":
-              binary_media = set(_binary_media(operation))
-              success = [response for status, response in operation.get("responses", {}).items()
-                         if str(status).startswith("2")]
-              content = success[0].get("content", {}) if len(success) == 1 else {}
-              if len(content) == 1:
-                  raw_method = raw_method + "_stream"
-              else:
-                  route_path = operation.get("x-sdk-path", "").split("#", 1)[0].rstrip("/") or "/"
-                  route_method = operation.get("x-sdk-method", "").upper()
-                  candidates = [
-                      item for item in raw_operations
-                      if item.get("method") == route_method
-                      and (item.get("path", "").split("#", 1)[0].rstrip("/") or "/") == route_path
-                      and item.get("success_media")
-                      and set(item["success_media"]).issubset(binary_media)
-                  ]
-                  if len(candidates) == 1:
-                      raw_method = candidates[0]["rust_method"] + "_stream"
-                  else:
-                      rejected[operation_id] = "raw_binary_transport_mapping"
-                      continue
-          '''
+          i8, i12, i16, i20 = (" " * n for n in (8, 12, 16, 20))
+          old = "\n".join([
+              i8 + 'if response_kind == "binary":',
+              i12 + 'binary_media = set(_binary_media(operation))',
+              i12 + 'route_path = operation.get("x-sdk-path", "").split("#", 1)[0].rstrip("/") or "/"',
+              i12 + 'route_method = operation.get("x-sdk-method", "").upper()',
+              i12 + 'candidates = [',
+              i16 + 'item for item in raw_operations',
+              i16 + 'if item.get("method") == route_method',
+              i16 + 'and (item.get("path", "").split("#", 1)[0].rstrip("/") or "/") == route_path',
+              i16 + 'and item.get("success_media")',
+              i16 + 'and set(item["success_media"]).issubset(binary_media)',
+              i12 + ']',
+              i12 + 'if len(candidates) == 1:',
+              i16 + 'raw_method = candidates[0]["rust_method"] + "_stream"',
+              i12 + 'else:',
+              i16 + 'rejected[operation_id] = "raw_binary_transport_mapping"',
+              i16 + 'continue',
+          ]) + "\n"
+          new = "\n".join([
+              i8 + 'if response_kind == "binary":',
+              i12 + 'binary_media = set(_binary_media(operation))',
+              i12 + 'success = [response for status, response in operation.get("responses", {}).items()',
+              i20 + 'if str(status).startswith("2")]',
+              i12 + 'content = success[0].get("content", {}) if len(success) == 1 else {}',
+              i12 + 'if len(content) == 1:',
+              i16 + 'raw_method = raw_method + "_stream"',
+              i12 + 'else:',
+              i16 + 'route_path = operation.get("x-sdk-path", "").split("#", 1)[0].rstrip("/") or "/"',
+              i16 + 'route_method = operation.get("x-sdk-method", "").upper()',
+              i16 + 'candidates = [',
+              i20 + 'item for item in raw_operations',
+              i20 + 'if item.get("method") == route_method',
+              i20 + 'and (item.get("path", "").split("#", 1)[0].rstrip("/") or "/") == route_path',
+              i20 + 'and item.get("success_media")',
+              i20 + 'and set(item["success_media"]).issubset(binary_media)',
+              i16 + ']',
+              i16 + 'if len(candidates) == 1:',
+              i20 + 'raw_method = candidates[0]["rust_method"] + "_stream"',
+              i16 + 'else:',
+              i20 + 'rejected[operation_id] = "raw_binary_transport_mapping"',
+              i20 + 'continue',
+          ]) + "\n"
           if text.count(old) != 1:
               raise SystemExit(f"binary mapping patch drift: {text.count(old)}")
           path.write_text(text.replace(old, new, 1))
