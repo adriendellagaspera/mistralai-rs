@@ -75,7 +75,8 @@ jobs:
       - name: Generate facade and reviewed probe baseline
         run: |
           python3 scripts/codegen.py generate
-          PYTHON=$(find .tools -path '*python-sdk-codegen*/bin/python' -type f | head -1)
+          PYTHON=$(find .tools -path '*python-sdk-codegen*/bin/python' | head -1)
+          test -n "$PYTHON"
           "$PYTHON" - <<'PY'
           import hashlib
           import json
