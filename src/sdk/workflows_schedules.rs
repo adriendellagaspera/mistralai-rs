@@ -2,17 +2,17 @@
 use super::*;
 use crate::generated::client::HttpClient;
 #[derive(Clone, Copy)]
-pub struct Ocr<'a> {
+pub struct WorkflowsSchedules<'a> {
     raw: &'a HttpClient,
 }
 
-impl<'a> Ocr<'a> {
+impl<'a> WorkflowsSchedules<'a> {
     pub(crate) fn new(raw: &'a HttpClient) -> Self {
         Self { raw }
     }
-    pub async fn process(&self, request: OcrRequest) -> Result<OcrResponse, SdkError> {
+    pub async fn get_schedules(&self) -> Result<WorkflowScheduleListResponseView, SdkError> {
         self.raw
-            .ocr_v1_ocr_post(request.into_raw())
+            .get_schedules_v1_workflows_schedules_get()
             .await
             .map(Into::into)
             .map_err(Into::into)

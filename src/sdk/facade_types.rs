@@ -2027,6 +2027,2395 @@ impl From<FileSignedUrl> for FileSignedURL {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct AgentView {
+    raw: Agent,
+}
+
+impl AgentView {
+    pub fn deployment_chat(&self) -> bool {
+        self.raw.deployment_chat
+    }
+    pub fn id(&self) -> &str {
+        &self.raw.id
+    }
+    pub fn model(&self) -> &str {
+        &self.raw.model
+    }
+    pub fn name(&self) -> &str {
+        &self.raw.name
+    }
+    pub fn source(&self) -> &str {
+        &self.raw.source
+    }
+    pub fn version(&self) -> i64 {
+        self.raw.version
+    }
+    pub fn raw(&self) -> &Agent {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Agent {
+        self.raw
+    }
+}
+
+impl From<Agent> for AgentView {
+    fn from(raw: Agent) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<AgentView> for Agent {
+    fn from(value: AgentView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct AgentAliasResponseView {
+    raw: AgentAliasResponse,
+}
+
+impl AgentAliasResponseView {
+    pub fn alias(&self) -> &str {
+        &self.raw.alias
+    }
+    pub fn version(&self) -> i64 {
+        self.raw.version
+    }
+    pub fn raw(&self) -> &AgentAliasResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AgentAliasResponse {
+        self.raw
+    }
+}
+
+impl From<AgentAliasResponse> for AgentAliasResponseView {
+    fn from(raw: AgentAliasResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<AgentAliasResponseView> for AgentAliasResponse {
+    fn from(value: AgentAliasResponseView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct AgentListPageView {
+    raw: AgentListPage,
+}
+
+impl AgentListPageView {
+    pub fn raw(&self) -> &AgentListPage {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AgentListPage {
+        self.raw
+    }
+}
+
+impl From<AgentListPage> for AgentListPageView {
+    fn from(raw: AgentListPage) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<AgentListPageView> for AgentListPage {
+    fn from(value: AgentListPageView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ConversationResponseView {
+    raw: ConversationResponse,
+}
+
+impl ConversationResponseView {
+    pub fn conversation_id(&self) -> &str {
+        &self.raw.conversation_id
+    }
+    pub fn raw(&self) -> &ConversationResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ConversationResponse {
+        self.raw
+    }
+}
+
+impl From<ConversationResponse> for ConversationResponseView {
+    fn from(raw: ConversationResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ConversationResponseView> for ConversationResponse {
+    fn from(value: ConversationResponseView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ConversationHistoryView {
+    raw: ConversationHistory,
+}
+
+impl ConversationHistoryView {
+    pub fn conversation_id(&self) -> &str {
+        &self.raw.conversation_id
+    }
+    pub fn raw(&self) -> &ConversationHistory {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ConversationHistory {
+        self.raw
+    }
+}
+
+impl From<ConversationHistory> for ConversationHistoryView {
+    fn from(raw: ConversationHistory) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ConversationHistoryView> for ConversationHistory {
+    fn from(value: ConversationHistoryView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ConversationMessagesView {
+    raw: ConversationMessages,
+}
+
+impl ConversationMessagesView {
+    pub fn conversation_id(&self) -> &str {
+        &self.raw.conversation_id
+    }
+    pub fn raw(&self) -> &ConversationMessages {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ConversationMessages {
+        self.raw
+    }
+}
+
+impl From<ConversationMessages> for ConversationMessagesView {
+    fn from(raw: ConversationMessages) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ConversationMessagesView> for ConversationMessages {
+    fn from(value: ConversationMessagesView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct WorkflowArchiveResponseView {
+    raw: WorkflowArchiveResponse,
+}
+
+impl WorkflowArchiveResponseView {
+    pub fn raw(&self) -> &WorkflowArchiveResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowArchiveResponse {
+        self.raw
+    }
+}
+
+impl From<WorkflowArchiveResponse> for WorkflowArchiveResponseView {
+    fn from(raw: WorkflowArchiveResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<WorkflowArchiveResponseView> for WorkflowArchiveResponse {
+    fn from(value: WorkflowArchiveResponseView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct TranscriptionResponseView {
+    raw: TranscriptionResponse,
+}
+
+impl TranscriptionResponseView {
+    pub fn model(&self) -> &str {
+        &self.raw.model
+    }
+    pub fn text(&self) -> &str {
+        &self.raw.text
+    }
+    pub fn raw(&self) -> &TranscriptionResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> TranscriptionResponse {
+        self.raw
+    }
+}
+
+impl From<TranscriptionResponse> for TranscriptionResponseView {
+    fn from(raw: TranscriptionResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<TranscriptionResponseView> for TranscriptionResponse {
+    fn from(value: TranscriptionResponseView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct BatchExecutionResponseView {
+    raw: BatchExecutionResponse,
+}
+
+impl BatchExecutionResponseView {
+    pub fn raw(&self) -> &BatchExecutionResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> BatchExecutionResponse {
+        self.raw
+    }
+}
+
+impl From<BatchExecutionResponse> for BatchExecutionResponseView {
+    fn from(raw: BatchExecutionResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<BatchExecutionResponseView> for BatchExecutionResponse {
+    fn from(value: BatchExecutionResponseView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct BatchExecutionBodyParams {
+    raw: BatchExecutionBody,
+}
+
+impl BatchExecutionBodyParams {
+    pub fn new(execution_ids: Vec<String>) -> Self {
+        Self {
+            raw: BatchExecutionBody { execution_ids },
+        }
+    }
+    pub fn from_raw(raw: BatchExecutionBody) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &BatchExecutionBody {
+        &self.raw
+    }
+    pub fn into_raw(self) -> BatchExecutionBody {
+        self.raw
+    }
+}
+
+impl From<BatchExecutionBody> for BatchExecutionBodyParams {
+    fn from(raw: BatchExecutionBody) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<BatchExecutionBodyParams> for BatchExecutionBody {
+    fn from(value: BatchExecutionBodyParams) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct MCPToolCallResponseView {
+    raw: MCPToolCallResponse,
+}
+
+impl MCPToolCallResponseView {
+    pub fn raw(&self) -> &MCPToolCallResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> MCPToolCallResponse {
+        self.raw
+    }
+}
+
+impl From<MCPToolCallResponse> for MCPToolCallResponseView {
+    fn from(raw: MCPToolCallResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<MCPToolCallResponseView> for MCPToolCallResponse {
+    fn from(value: MCPToolCallResponseView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ConnectorView {
+    raw: Connector,
+}
+
+impl ConnectorView {
+    pub fn description(&self) -> &str {
+        &self.raw.description
+    }
+    pub fn name(&self) -> &str {
+        &self.raw.name
+    }
+    pub fn raw(&self) -> &Connector {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Connector {
+        self.raw
+    }
+}
+
+impl From<Connector> for ConnectorView {
+    fn from(raw: Connector) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ConnectorView> for Connector {
+    fn from(value: ConnectorView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct MessageResponseView {
+    raw: MessageResponse,
+}
+
+impl MessageResponseView {
+    pub fn message(&self) -> &str {
+        &self.raw.message
+    }
+    pub fn raw(&self) -> &MessageResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> MessageResponse {
+        self.raw
+    }
+}
+
+impl From<MessageResponse> for MessageResponseView {
+    fn from(raw: MessageResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<MessageResponseView> for MessageResponse {
+    fn from(value: MessageResponseView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct AuthUrlResponseView {
+    raw: AuthUrlResponse,
+}
+
+impl AuthUrlResponseView {
+    pub fn auth_url(&self) -> &str {
+        &self.raw.auth_url
+    }
+    pub fn ttl(&self) -> i64 {
+        self.raw.ttl
+    }
+    pub fn raw(&self) -> &AuthUrlResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AuthUrlResponse {
+        self.raw
+    }
+}
+
+impl From<AuthUrlResponse> for AuthUrlResponseView {
+    fn from(raw: AuthUrlResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<AuthUrlResponseView> for AuthUrlResponse {
+    fn from(value: AuthUrlResponseView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CredentialsResponseView {
+    raw: CredentialsResponse,
+}
+
+impl CredentialsResponseView {
+    pub fn raw(&self) -> &CredentialsResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CredentialsResponse {
+        self.raw
+    }
+}
+
+impl From<CredentialsResponse> for CredentialsResponseView {
+    fn from(raw: CredentialsResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CredentialsResponseView> for CredentialsResponse {
+    fn from(value: CredentialsResponseView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct PaginatedConnectorsView {
+    raw: PaginatedConnectors,
+}
+
+impl PaginatedConnectorsView {
+    pub fn raw(&self) -> &PaginatedConnectors {
+        &self.raw
+    }
+    pub fn into_raw(self) -> PaginatedConnectors {
+        self.raw
+    }
+}
+
+impl From<PaginatedConnectors> for PaginatedConnectorsView {
+    fn from(raw: PaginatedConnectors) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<PaginatedConnectorsView> for PaginatedConnectors {
+    fn from(value: PaginatedConnectorsView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DatasetRecordView {
+    raw: DatasetRecord,
+}
+
+impl DatasetRecordView {
+    pub fn raw(&self) -> &DatasetRecord {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DatasetRecord {
+        self.raw
+    }
+}
+
+impl From<DatasetRecord> for DatasetRecordView {
+    fn from(raw: DatasetRecord) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<DatasetRecordView> for DatasetRecord {
+    fn from(value: DatasetRecordView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DatasetView {
+    raw: Dataset,
+}
+
+impl DatasetView {
+    pub fn description(&self) -> &str {
+        &self.raw.description
+    }
+    pub fn name(&self) -> &str {
+        &self.raw.name
+    }
+    pub fn raw(&self) -> &Dataset {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Dataset {
+        self.raw
+    }
+}
+
+impl From<Dataset> for DatasetView {
+    fn from(raw: Dataset) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<DatasetView> for Dataset {
+    fn from(value: DatasetView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct PostDatasetInSchemaParams {
+    raw: PostDatasetInSchema,
+}
+
+impl PostDatasetInSchemaParams {
+    pub fn new(name: impl Into<String>, description: impl Into<String>) -> Self {
+        Self {
+            raw: PostDatasetInSchema {
+                description: description.into(),
+                name: name.into(),
+            },
+        }
+    }
+    pub fn from_raw(raw: PostDatasetInSchema) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &PostDatasetInSchema {
+        &self.raw
+    }
+    pub fn into_raw(self) -> PostDatasetInSchema {
+        self.raw
+    }
+}
+
+impl From<PostDatasetInSchema> for PostDatasetInSchemaParams {
+    fn from(raw: PostDatasetInSchema) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<PostDatasetInSchemaParams> for PostDatasetInSchema {
+    fn from(value: PostDatasetInSchemaParams) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct JudgePreviewView {
+    raw: JudgePreview,
+}
+
+impl JudgePreviewView {
+    pub fn description(&self) -> &str {
+        &self.raw.description
+    }
+    pub fn instructions(&self) -> &str {
+        &self.raw.instructions
+    }
+    pub fn model_name(&self) -> &str {
+        &self.raw.model_name
+    }
+    pub fn name(&self) -> &str {
+        &self.raw.name
+    }
+    pub fn raw(&self) -> &JudgePreview {
+        &self.raw
+    }
+    pub fn into_raw(self) -> JudgePreview {
+        self.raw
+    }
+}
+
+impl From<JudgePreview> for JudgePreviewView {
+    fn from(raw: JudgePreview) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<JudgePreviewView> for JudgePreview {
+    fn from(value: JudgePreviewView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct VoiceResponseView {
+    raw: VoiceResponse,
+}
+
+impl VoiceResponseView {
+    pub fn name(&self) -> &str {
+        &self.raw.name
+    }
+    pub fn retention_notice(&self) -> Option<i64> {
+        self.raw.retention_notice
+    }
+    pub fn raw(&self) -> &VoiceResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> VoiceResponse {
+        self.raw
+    }
+}
+
+impl From<VoiceResponse> for VoiceResponseView {
+    fn from(raw: VoiceResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<VoiceResponseView> for VoiceResponse {
+    fn from(value: VoiceResponseView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct VoiceCreateRequestParams {
+    raw: VoiceCreateRequest,
+}
+
+impl VoiceCreateRequestParams {
+    pub fn new(name: impl Into<String>, sample_audio: impl Into<String>) -> Self {
+        Self {
+            raw: VoiceCreateRequest {
+                age: None,
+                color: None,
+                gender: None,
+                languages: None,
+                name: name.into(),
+                retention_notice: None,
+                sample_audio: sample_audio.into(),
+                sample_filename: None,
+                slug: None,
+                tags: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn age(mut self, age: i64) -> Self {
+        self.raw.age = Some(Some(age));
+        self
+    }
+
+    #[must_use]
+    pub fn age_null(mut self) -> Self {
+        self.raw.age = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn color(mut self, color: impl Into<String>) -> Self {
+        self.raw.color = Some(Some(color.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn color_null(mut self) -> Self {
+        self.raw.color = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn gender(mut self, gender: impl Into<String>) -> Self {
+        self.raw.gender = Some(Some(gender.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn gender_null(mut self) -> Self {
+        self.raw.gender = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn languages(mut self, languages: Vec<String>) -> Self {
+        self.raw.languages = Some(languages);
+        self
+    }
+
+    #[must_use]
+    pub fn retention_notice(mut self, retention_notice: i64) -> Self {
+        self.raw.retention_notice = Some(retention_notice);
+        self
+    }
+
+    #[must_use]
+    pub fn sample_filename(mut self, sample_filename: impl Into<String>) -> Self {
+        self.raw.sample_filename = Some(Some(sample_filename.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn sample_filename_null(mut self) -> Self {
+        self.raw.sample_filename = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn slug(mut self, slug: impl Into<String>) -> Self {
+        self.raw.slug = Some(Some(slug.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn slug_null(mut self) -> Self {
+        self.raw.slug = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn tags(mut self, tags: Vec<String>) -> Self {
+        self.raw.tags = Some(Some(tags));
+        self
+    }
+
+    #[must_use]
+    pub fn tags_null(mut self) -> Self {
+        self.raw.tags = Some(None);
+        self
+    }
+    pub fn from_raw(raw: VoiceCreateRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &VoiceCreateRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> VoiceCreateRequest {
+        self.raw
+    }
+}
+
+impl From<VoiceCreateRequest> for VoiceCreateRequestParams {
+    fn from(raw: VoiceCreateRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<VoiceCreateRequestParams> for VoiceCreateRequest {
+    fn from(value: VoiceCreateRequestParams) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DatasetExportView {
+    raw: DatasetExport,
+}
+
+impl DatasetExportView {
+    pub fn file_url(&self) -> &str {
+        &self.raw.file_url
+    }
+    pub fn raw(&self) -> &DatasetExport {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DatasetExport {
+        self.raw
+    }
+}
+
+impl From<DatasetExport> for DatasetExportView {
+    fn from(raw: DatasetExport) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<DatasetExportView> for DatasetExport {
+    fn from(value: DatasetExportView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UploadFileOutView {
+    raw: UploadFileOut,
+}
+
+impl UploadFileOutView {
+    pub fn bytes(&self) -> i64 {
+        self.raw.bytes
+    }
+    pub fn created_at(&self) -> i64 {
+        self.raw.created_at
+    }
+    pub fn filename(&self) -> &str {
+        &self.raw.filename
+    }
+    pub fn object(&self) -> &str {
+        &self.raw.object
+    }
+    pub fn raw(&self) -> &UploadFileOut {
+        &self.raw
+    }
+    pub fn into_raw(self) -> UploadFileOut {
+        self.raw
+    }
+}
+
+impl From<UploadFileOut> for UploadFileOutView {
+    fn from(raw: UploadFileOut) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UploadFileOutView> for UploadFileOut {
+    fn from(value: UploadFileOutView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DatasetPreviewView {
+    raw: DatasetPreview,
+}
+
+impl DatasetPreviewView {
+    pub fn description(&self) -> &str {
+        &self.raw.description
+    }
+    pub fn name(&self) -> &str {
+        &self.raw.name
+    }
+    pub fn raw(&self) -> &DatasetPreview {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DatasetPreview {
+        self.raw
+    }
+}
+
+impl From<DatasetPreview> for DatasetPreviewView {
+    fn from(raw: DatasetPreview) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<DatasetPreviewView> for DatasetPreview {
+    fn from(value: DatasetPreviewView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DatasetImportTaskView {
+    raw: DatasetImportTask,
+}
+
+impl DatasetImportTaskView {
+    pub fn raw(&self) -> &DatasetImportTask {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DatasetImportTask {
+        self.raw
+    }
+}
+
+impl From<DatasetImportTask> for DatasetImportTaskView {
+    fn from(raw: DatasetImportTask) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<DatasetImportTaskView> for DatasetImportTask {
+    fn from(value: DatasetImportTaskView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DatasetImportTasksView {
+    raw: DatasetImportTasks,
+}
+
+impl DatasetImportTasksView {
+    pub fn raw(&self) -> &DatasetImportTasks {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DatasetImportTasks {
+        self.raw
+    }
+}
+
+impl From<DatasetImportTasks> for DatasetImportTasksView {
+    fn from(raw: DatasetImportTasks) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<DatasetImportTasksView> for DatasetImportTasks {
+    fn from(value: DatasetImportTasksView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DatasetRecordsView {
+    raw: DatasetRecords,
+}
+
+impl DatasetRecordsView {
+    pub fn raw(&self) -> &DatasetRecords {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DatasetRecords {
+        self.raw
+    }
+}
+
+impl From<DatasetRecords> for DatasetRecordsView {
+    fn from(raw: DatasetRecords) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<DatasetRecordsView> for DatasetRecords {
+    fn from(value: DatasetRecordsView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DatasetPreviewsView {
+    raw: DatasetPreviews,
+}
+
+impl DatasetPreviewsView {
+    pub fn raw(&self) -> &DatasetPreviews {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DatasetPreviews {
+        self.raw
+    }
+}
+
+impl From<DatasetPreviews> for DatasetPreviewsView {
+    fn from(raw: DatasetPreviews) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<DatasetPreviewsView> for DatasetPreviews {
+    fn from(value: DatasetPreviewsView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DeploymentDetailResponseView {
+    raw: DeploymentDetailResponse,
+}
+
+impl DeploymentDetailResponseView {
+    pub fn is_active(&self) -> bool {
+        self.raw.is_active
+    }
+    pub fn name(&self) -> &str {
+        &self.raw.name
+    }
+    pub fn raw(&self) -> &DeploymentDetailResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DeploymentDetailResponse {
+        self.raw
+    }
+}
+
+impl From<DeploymentDetailResponse> for DeploymentDetailResponseView {
+    fn from(raw: DeploymentDetailResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<DeploymentDetailResponseView> for DeploymentDetailResponse {
+    fn from(value: DeploymentDetailResponseView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct JudgePreviewsView {
+    raw: JudgePreviews,
+}
+
+impl JudgePreviewsView {
+    pub fn raw(&self) -> &JudgePreviews {
+        &self.raw
+    }
+    pub fn into_raw(self) -> JudgePreviews {
+        self.raw
+    }
+}
+
+impl From<JudgePreviews> for JudgePreviewsView {
+    fn from(raw: JudgePreviews) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<JudgePreviewsView> for JudgePreviews {
+    fn from(value: JudgePreviewsView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct WorkflowExecutionResponseView {
+    raw: WorkflowExecutionResponse,
+}
+
+impl WorkflowExecutionResponseView {
+    pub fn execution_id(&self) -> &str {
+        &self.raw.execution_id
+    }
+    pub fn root_execution_id(&self) -> &str {
+        &self.raw.root_execution_id
+    }
+    pub fn workflow_name(&self) -> &str {
+        &self.raw.workflow_name
+    }
+    pub fn raw(&self) -> &WorkflowExecutionResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowExecutionResponse {
+        self.raw
+    }
+}
+
+impl From<WorkflowExecutionResponse> for WorkflowExecutionResponseView {
+    fn from(raw: WorkflowExecutionResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<WorkflowExecutionResponseView> for WorkflowExecutionResponse {
+    fn from(value: WorkflowExecutionResponseView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct WorkflowScheduleListResponseView {
+    raw: WorkflowScheduleListResponse,
+}
+
+impl WorkflowScheduleListResponseView {
+    pub fn raw(&self) -> &WorkflowScheduleListResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowScheduleListResponse {
+        self.raw
+    }
+}
+
+impl From<WorkflowScheduleListResponse> for WorkflowScheduleListResponseView {
+    fn from(raw: WorkflowScheduleListResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<WorkflowScheduleListResponseView> for WorkflowScheduleListResponse {
+    fn from(value: WorkflowScheduleListResponseView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListWorkflowEventResponseView {
+    raw: ListWorkflowEventResponse,
+}
+
+impl ListWorkflowEventResponseView {
+    pub fn raw(&self) -> &ListWorkflowEventResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ListWorkflowEventResponse {
+        self.raw
+    }
+}
+
+impl From<ListWorkflowEventResponse> for ListWorkflowEventResponseView {
+    fn from(raw: ListWorkflowEventResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListWorkflowEventResponseView> for ListWorkflowEventResponse {
+    fn from(value: ListWorkflowEventResponseView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct WorkflowExecutionTraceEventsResponseView {
+    raw: WorkflowExecutionTraceEventsResponse,
+}
+
+impl WorkflowExecutionTraceEventsResponseView {
+    pub fn execution_id(&self) -> &str {
+        &self.raw.execution_id
+    }
+    pub fn root_execution_id(&self) -> &str {
+        &self.raw.root_execution_id
+    }
+    pub fn workflow_name(&self) -> &str {
+        &self.raw.workflow_name
+    }
+    pub fn raw(&self) -> &WorkflowExecutionTraceEventsResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowExecutionTraceEventsResponse {
+        self.raw
+    }
+}
+
+impl From<WorkflowExecutionTraceEventsResponse> for WorkflowExecutionTraceEventsResponseView {
+    fn from(raw: WorkflowExecutionTraceEventsResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<WorkflowExecutionTraceEventsResponseView> for WorkflowExecutionTraceEventsResponse {
+    fn from(value: WorkflowExecutionTraceEventsResponseView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct WorkflowExecutionTraceOTelResponseView {
+    raw: WorkflowExecutionTraceOTelResponse,
+}
+
+impl WorkflowExecutionTraceOTelResponseView {
+    pub fn data_source(&self) -> &str {
+        &self.raw.data_source
+    }
+    pub fn execution_id(&self) -> &str {
+        &self.raw.execution_id
+    }
+    pub fn root_execution_id(&self) -> &str {
+        &self.raw.root_execution_id
+    }
+    pub fn workflow_name(&self) -> &str {
+        &self.raw.workflow_name
+    }
+    pub fn raw(&self) -> &WorkflowExecutionTraceOTelResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowExecutionTraceOTelResponse {
+        self.raw
+    }
+}
+
+impl From<WorkflowExecutionTraceOTelResponse> for WorkflowExecutionTraceOTelResponseView {
+    fn from(raw: WorkflowExecutionTraceOTelResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<WorkflowExecutionTraceOTelResponseView> for WorkflowExecutionTraceOTelResponse {
+    fn from(value: WorkflowExecutionTraceOTelResponseView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct WorkflowExecutionTraceSummaryResponseView {
+    raw: WorkflowExecutionTraceSummaryResponse,
+}
+
+impl WorkflowExecutionTraceSummaryResponseView {
+    pub fn execution_id(&self) -> &str {
+        &self.raw.execution_id
+    }
+    pub fn root_execution_id(&self) -> &str {
+        &self.raw.root_execution_id
+    }
+    pub fn workflow_name(&self) -> &str {
+        &self.raw.workflow_name
+    }
+    pub fn raw(&self) -> &WorkflowExecutionTraceSummaryResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowExecutionTraceSummaryResponse {
+        self.raw
+    }
+}
+
+impl From<WorkflowExecutionTraceSummaryResponse> for WorkflowExecutionTraceSummaryResponseView {
+    fn from(raw: WorkflowExecutionTraceSummaryResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<WorkflowExecutionTraceSummaryResponseView> for WorkflowExecutionTraceSummaryResponse {
+    fn from(value: WorkflowExecutionTraceSummaryResponseView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct WorkflowMetricsView {
+    raw: WorkflowMetrics,
+}
+
+impl WorkflowMetricsView {
+    pub fn raw(&self) -> &WorkflowMetrics {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowMetrics {
+        self.raw
+    }
+}
+
+impl From<WorkflowMetrics> for WorkflowMetricsView {
+    fn from(raw: WorkflowMetrics) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<WorkflowMetricsView> for WorkflowMetrics {
+    fn from(value: WorkflowMetricsView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct WorkflowRegistrationGetResponseView {
+    raw: WorkflowRegistrationGetResponse,
+}
+
+impl WorkflowRegistrationGetResponseView {
+    pub fn raw(&self) -> &WorkflowRegistrationGetResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowRegistrationGetResponse {
+        self.raw
+    }
+}
+
+impl From<WorkflowRegistrationGetResponse> for WorkflowRegistrationGetResponseView {
+    fn from(raw: WorkflowRegistrationGetResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<WorkflowRegistrationGetResponseView> for WorkflowRegistrationGetResponse {
+    fn from(value: WorkflowRegistrationGetResponseView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct WorkflowRegistrationListResponseView {
+    raw: WorkflowRegistrationListResponse,
+}
+
+impl WorkflowRegistrationListResponseView {
+    pub fn raw(&self) -> &WorkflowRegistrationListResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowRegistrationListResponse {
+        self.raw
+    }
+}
+
+impl From<WorkflowRegistrationListResponse> for WorkflowRegistrationListResponseView {
+    fn from(raw: WorkflowRegistrationListResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<WorkflowRegistrationListResponseView> for WorkflowRegistrationListResponse {
+    fn from(value: WorkflowRegistrationListResponseView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct WorkflowGetResponseView {
+    raw: WorkflowGetResponse,
+}
+
+impl WorkflowGetResponseView {
+    pub fn raw(&self) -> &WorkflowGetResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowGetResponse {
+        self.raw
+    }
+}
+
+impl From<WorkflowGetResponse> for WorkflowGetResponseView {
+    fn from(raw: WorkflowGetResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<WorkflowGetResponseView> for WorkflowGetResponse {
+    fn from(value: WorkflowGetResponseView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct BatchJobOutView {
+    raw: BatchJobOut,
+}
+
+impl BatchJobOutView {
+    pub fn completed_requests(&self) -> i64 {
+        self.raw.completed_requests
+    }
+    pub fn created_at(&self) -> i64 {
+        self.raw.created_at
+    }
+    pub fn endpoint(&self) -> &str {
+        &self.raw.endpoint
+    }
+    pub fn failed_requests(&self) -> i64 {
+        self.raw.failed_requests
+    }
+    pub fn id(&self) -> &str {
+        &self.raw.id
+    }
+    pub fn succeeded_requests(&self) -> i64 {
+        self.raw.succeeded_requests
+    }
+    pub fn total_requests(&self) -> i64 {
+        self.raw.total_requests
+    }
+    pub fn raw(&self) -> &BatchJobOut {
+        &self.raw
+    }
+    pub fn into_raw(self) -> BatchJobOut {
+        self.raw
+    }
+}
+
+impl From<BatchJobOut> for BatchJobOutView {
+    fn from(raw: BatchJobOut) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<BatchJobOutView> for BatchJobOut {
+    fn from(value: BatchJobOutView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct BatchJobsOutView {
+    raw: BatchJobsOut,
+}
+
+impl BatchJobsOutView {
+    pub fn total(&self) -> i64 {
+        self.raw.total
+    }
+    pub fn raw(&self) -> &BatchJobsOut {
+        &self.raw
+    }
+    pub fn into_raw(self) -> BatchJobsOut {
+        self.raw
+    }
+}
+
+impl From<BatchJobsOut> for BatchJobsOutView {
+    fn from(raw: BatchJobsOut) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<BatchJobsOutView> for BatchJobsOut {
+    fn from(value: BatchJobsOutView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct JudgeOutputView {
+    raw: JudgeOutput,
+}
+
+impl JudgeOutputView {
+    pub fn analysis(&self) -> &str {
+        &self.raw.analysis
+    }
+    pub fn raw(&self) -> &JudgeOutput {
+        &self.raw
+    }
+    pub fn into_raw(self) -> JudgeOutput {
+        self.raw
+    }
+}
+
+impl From<JudgeOutput> for JudgeOutputView {
+    fn from(raw: JudgeOutput) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<JudgeOutputView> for JudgeOutput {
+    fn from(value: JudgeOutputView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct LibraryOutView {
+    raw: LibraryOut,
+}
+
+impl LibraryOutView {
+    pub fn name(&self) -> &str {
+        &self.raw.name
+    }
+    pub fn nb_documents(&self) -> i64 {
+        self.raw.nb_documents
+    }
+    pub fn owner_type(&self) -> &str {
+        &self.raw.owner_type
+    }
+    pub fn total_size(&self) -> i64 {
+        self.raw.total_size
+    }
+    pub fn raw(&self) -> &LibraryOut {
+        &self.raw
+    }
+    pub fn into_raw(self) -> LibraryOut {
+        self.raw
+    }
+}
+
+impl From<LibraryOut> for LibraryOutView {
+    fn from(raw: LibraryOut) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<LibraryOutView> for LibraryOut {
+    fn from(value: LibraryOutView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct LibraryInParams {
+    raw: LibraryIn,
+}
+
+impl LibraryInParams {
+    pub fn new(name: impl Into<String>) -> Self {
+        Self {
+            raw: LibraryIn {
+                chunk_size: None,
+                description: None,
+                name: name.into(),
+            },
+        }
+    }
+    #[must_use]
+    pub fn chunk_size(mut self, chunk_size: i64) -> Self {
+        self.raw.chunk_size = Some(Some(chunk_size));
+        self
+    }
+
+    #[must_use]
+    pub fn chunk_size_null(mut self) -> Self {
+        self.raw.chunk_size = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.raw.description = Some(Some(description.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn description_null(mut self) -> Self {
+        self.raw.description = Some(None);
+        self
+    }
+    pub fn from_raw(raw: LibraryIn) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &LibraryIn {
+        &self.raw
+    }
+    pub fn into_raw(self) -> LibraryIn {
+        self.raw
+    }
+}
+
+impl From<LibraryIn> for LibraryInParams {
+    fn from(raw: LibraryIn) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<LibraryInParams> for LibraryIn {
+    fn from(value: LibraryInParams) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ProcessingStatusOutView {
+    raw: ProcessingStatusOut,
+}
+
+impl ProcessingStatusOutView {
+    pub fn processing_status(&self) -> &str {
+        &self.raw.processing_status
+    }
+    pub fn raw(&self) -> &ProcessingStatusOut {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ProcessingStatusOut {
+        self.raw
+    }
+}
+
+impl From<ProcessingStatusOut> for ProcessingStatusOutView {
+    fn from(raw: ProcessingStatusOut) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ProcessingStatusOutView> for ProcessingStatusOut {
+    fn from(value: ProcessingStatusOutView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DocumentTextContentView {
+    raw: DocumentTextContent,
+}
+
+impl DocumentTextContentView {
+    pub fn text(&self) -> &str {
+        &self.raw.text
+    }
+    pub fn raw(&self) -> &DocumentTextContent {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DocumentTextContent {
+        self.raw
+    }
+}
+
+impl From<DocumentTextContent> for DocumentTextContentView {
+    fn from(raw: DocumentTextContent) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<DocumentTextContentView> for DocumentTextContent {
+    fn from(value: DocumentTextContentView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DocumentOutView {
+    raw: DocumentOut,
+}
+
+impl DocumentOutView {
+    pub fn name(&self) -> &str {
+        &self.raw.name
+    }
+    pub fn processing_status(&self) -> &str {
+        &self.raw.processing_status
+    }
+    pub fn tokens_processing_total(&self) -> i64 {
+        self.raw.tokens_processing_total
+    }
+    pub fn uploaded_by_type(&self) -> &str {
+        &self.raw.uploaded_by_type
+    }
+    pub fn raw(&self) -> &DocumentOut {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DocumentOut {
+        self.raw
+    }
+}
+
+impl From<DocumentOut> for DocumentOutView {
+    fn from(raw: DocumentOut) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<DocumentOutView> for DocumentOut {
+    fn from(value: DocumentOutView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListDocumentOutView {
+    raw: ListDocumentOut,
+}
+
+impl ListDocumentOutView {
+    pub fn raw(&self) -> &ListDocumentOut {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ListDocumentOut {
+        self.raw
+    }
+}
+
+impl From<ListDocumentOut> for ListDocumentOutView {
+    fn from(raw: ListDocumentOut) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListDocumentOutView> for ListDocumentOut {
+    fn from(value: ListDocumentOutView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListLibraryOutView {
+    raw: ListLibraryOut,
+}
+
+impl ListLibraryOutView {
+    pub fn raw(&self) -> &ListLibraryOut {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ListLibraryOut {
+        self.raw
+    }
+}
+
+impl From<ListLibraryOut> for ListLibraryOutView {
+    fn from(raw: ListLibraryOut) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListLibraryOutView> for ListLibraryOut {
+    fn from(value: ListLibraryOutView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SharingOutView {
+    raw: SharingOut,
+}
+
+impl SharingOutView {
+    pub fn role(&self) -> &str {
+        &self.raw.role
+    }
+    pub fn share_with_type(&self) -> &str {
+        &self.raw.share_with_type
+    }
+    pub fn raw(&self) -> &SharingOut {
+        &self.raw
+    }
+    pub fn into_raw(self) -> SharingOut {
+        self.raw
+    }
+}
+
+impl From<SharingOut> for SharingOutView {
+    fn from(raw: SharingOut) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<SharingOutView> for SharingOut {
+    fn from(value: SharingOutView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListSharingOutView {
+    raw: ListSharingOut,
+}
+
+impl ListSharingOutView {
+    pub fn raw(&self) -> &ListSharingOut {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ListSharingOut {
+        self.raw
+    }
+}
+
+impl From<ListSharingOut> for ListSharingOutView {
+    fn from(raw: ListSharingOut) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListSharingOutView> for ListSharingOut {
+    fn from(value: ListSharingOutView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct LibraryInUpdateParams {
+    raw: LibraryInUpdate,
+}
+
+impl LibraryInUpdateParams {
+    pub fn new() -> Self {
+        Self {
+            raw: LibraryInUpdate {
+                description: None,
+                name: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.raw.description = Some(Some(description.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn description_null(mut self) -> Self {
+        self.raw.description = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn name(mut self, name: impl Into<String>) -> Self {
+        self.raw.name = Some(Some(name.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn name_null(mut self) -> Self {
+        self.raw.name = Some(None);
+        self
+    }
+    pub fn from_raw(raw: LibraryInUpdate) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &LibraryInUpdate {
+        &self.raw
+    }
+    pub fn into_raw(self) -> LibraryInUpdate {
+        self.raw
+    }
+}
+
+impl From<LibraryInUpdate> for LibraryInUpdateParams {
+    fn from(raw: LibraryInUpdate) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<LibraryInUpdateParams> for LibraryInUpdate {
+    fn from(value: LibraryInUpdateParams) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for LibraryInUpdateParams {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DeploymentListResponseView {
+    raw: DeploymentListResponse,
+}
+
+impl DeploymentListResponseView {
+    pub fn raw(&self) -> &DeploymentListResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DeploymentListResponse {
+        self.raw
+    }
+}
+
+impl From<DeploymentListResponse> for DeploymentListResponseView {
+    fn from(raw: DeploymentListResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<DeploymentListResponseView> for DeploymentListResponse {
+    fn from(value: DeploymentListResponseView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct WorkflowExecutionListResponseView {
+    raw: WorkflowExecutionListResponse,
+}
+
+impl WorkflowExecutionListResponseView {
+    pub fn raw(&self) -> &WorkflowExecutionListResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowExecutionListResponse {
+        self.raw
+    }
+}
+
+impl From<WorkflowExecutionListResponse> for WorkflowExecutionListResponseView {
+    fn from(raw: WorkflowExecutionListResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<WorkflowExecutionListResponseView> for WorkflowExecutionListResponse {
+    fn from(value: WorkflowExecutionListResponseView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct VoiceListResponseView {
+    raw: VoiceListResponse,
+}
+
+impl VoiceListResponseView {
+    pub fn page(&self) -> i64 {
+        self.raw.page
+    }
+    pub fn page_size(&self) -> i64 {
+        self.raw.page_size
+    }
+    pub fn total(&self) -> i64 {
+        self.raw.total
+    }
+    pub fn total_pages(&self) -> i64 {
+        self.raw.total_pages
+    }
+    pub fn raw(&self) -> &VoiceListResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> VoiceListResponse {
+        self.raw
+    }
+}
+
+impl From<VoiceListResponse> for VoiceListResponseView {
+    fn from(raw: VoiceListResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<VoiceListResponseView> for VoiceListResponse {
+    fn from(value: VoiceListResponseView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct PostDatasetImportFromFileInSchemaParams {
+    raw: PostDatasetImportFromFileInSchema,
+}
+
+impl PostDatasetImportFromFileInSchemaParams {
+    pub fn new(file_id: impl Into<String>) -> Self {
+        Self {
+            raw: PostDatasetImportFromFileInSchema {
+                file_id: file_id.into(),
+            },
+        }
+    }
+    pub fn from_raw(raw: PostDatasetImportFromFileInSchema) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &PostDatasetImportFromFileInSchema {
+        &self.raw
+    }
+    pub fn into_raw(self) -> PostDatasetImportFromFileInSchema {
+        self.raw
+    }
+}
+
+impl From<PostDatasetImportFromFileInSchema> for PostDatasetImportFromFileInSchemaParams {
+    fn from(raw: PostDatasetImportFromFileInSchema) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<PostDatasetImportFromFileInSchemaParams> for PostDatasetImportFromFileInSchema {
+    fn from(value: PostDatasetImportFromFileInSchemaParams) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct PostDatasetImportFromPlaygroundInSchemaParams {
+    raw: PostDatasetImportFromPlaygroundInSchema,
+}
+
+impl PostDatasetImportFromPlaygroundInSchemaParams {
+    pub fn new(conversation_ids: Vec<String>) -> Self {
+        Self {
+            raw: PostDatasetImportFromPlaygroundInSchema { conversation_ids },
+        }
+    }
+    pub fn from_raw(raw: PostDatasetImportFromPlaygroundInSchema) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &PostDatasetImportFromPlaygroundInSchema {
+        &self.raw
+    }
+    pub fn into_raw(self) -> PostDatasetImportFromPlaygroundInSchema {
+        self.raw
+    }
+}
+
+impl From<PostDatasetImportFromPlaygroundInSchema>
+    for PostDatasetImportFromPlaygroundInSchemaParams
+{
+    fn from(raw: PostDatasetImportFromPlaygroundInSchema) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<PostDatasetImportFromPlaygroundInSchemaParams>
+    for PostDatasetImportFromPlaygroundInSchema
+{
+    fn from(value: PostDatasetImportFromPlaygroundInSchemaParams) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct QueryWorkflowResponseView {
+    raw: QueryWorkflowResponse,
+}
+
+impl QueryWorkflowResponseView {
+    pub fn query_name(&self) -> &str {
+        &self.raw.query_name
+    }
+    pub fn raw(&self) -> &QueryWorkflowResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> QueryWorkflowResponse {
+        self.raw
+    }
+}
+
+impl From<QueryWorkflowResponse> for QueryWorkflowResponseView {
+    fn from(raw: QueryWorkflowResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<QueryWorkflowResponseView> for QueryWorkflowResponse {
+    fn from(value: QueryWorkflowResponseView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct WorkflowScheduleResponseView {
+    raw: WorkflowScheduleResponse,
+}
+
+impl WorkflowScheduleResponseView {
+    pub fn schedule_id(&self) -> &str {
+        &self.raw.schedule_id
+    }
+    pub fn raw(&self) -> &WorkflowScheduleResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowScheduleResponse {
+        self.raw
+    }
+}
+
+impl From<WorkflowScheduleResponse> for WorkflowScheduleResponseView {
+    fn from(raw: WorkflowScheduleResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<WorkflowScheduleResponseView> for WorkflowScheduleResponse {
+    fn from(value: WorkflowScheduleResponseView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SignalWorkflowResponseView {
+    raw: SignalWorkflowResponse,
+}
+
+impl SignalWorkflowResponseView {
+    pub fn message(&self) -> Option<&str> {
+        self.raw.message.as_deref()
+    }
+    pub fn raw(&self) -> &SignalWorkflowResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> SignalWorkflowResponse {
+        self.raw
+    }
+}
+
+impl From<SignalWorkflowResponse> for SignalWorkflowResponseView {
+    fn from(raw: SignalWorkflowResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<SignalWorkflowResponseView> for SignalWorkflowResponse {
+    fn from(value: SignalWorkflowResponseView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct WorkflowUnarchiveResponseView {
+    raw: WorkflowUnarchiveResponse,
+}
+
+impl WorkflowUnarchiveResponseView {
+    pub fn raw(&self) -> &WorkflowUnarchiveResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowUnarchiveResponse {
+        self.raw
+    }
+}
+
+impl From<WorkflowUnarchiveResponse> for WorkflowUnarchiveResponseView {
+    fn from(raw: WorkflowUnarchiveResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<WorkflowUnarchiveResponseView> for WorkflowUnarchiveResponse {
+    fn from(value: WorkflowUnarchiveResponseView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct PatchDatasetInSchemaParams {
+    raw: PatchDatasetInSchema,
+}
+
+impl PatchDatasetInSchemaParams {
+    pub fn new() -> Self {
+        Self {
+            raw: PatchDatasetInSchema {
+                description: None,
+                name: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.raw.description = Some(Some(description.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn description_null(mut self) -> Self {
+        self.raw.description = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn name(mut self, name: impl Into<String>) -> Self {
+        self.raw.name = Some(Some(name.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn name_null(mut self) -> Self {
+        self.raw.name = Some(None);
+        self
+    }
+    pub fn from_raw(raw: PatchDatasetInSchema) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &PatchDatasetInSchema {
+        &self.raw
+    }
+    pub fn into_raw(self) -> PatchDatasetInSchema {
+        self.raw
+    }
+}
+
+impl From<PatchDatasetInSchema> for PatchDatasetInSchemaParams {
+    fn from(raw: PatchDatasetInSchema) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<PatchDatasetInSchemaParams> for PatchDatasetInSchema {
+    fn from(value: PatchDatasetInSchemaParams) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for PatchDatasetInSchemaParams {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct VoiceUpdateRequestParams {
+    raw: VoiceUpdateRequest,
+}
+
+impl VoiceUpdateRequestParams {
+    pub fn new() -> Self {
+        Self {
+            raw: VoiceUpdateRequest {
+                age: None,
+                gender: None,
+                languages: None,
+                name: None,
+                tags: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn age(mut self, age: i64) -> Self {
+        self.raw.age = Some(Some(age));
+        self
+    }
+
+    #[must_use]
+    pub fn age_null(mut self) -> Self {
+        self.raw.age = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn gender(mut self, gender: impl Into<String>) -> Self {
+        self.raw.gender = Some(Some(gender.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn gender_null(mut self) -> Self {
+        self.raw.gender = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn languages(mut self, languages: Vec<String>) -> Self {
+        self.raw.languages = Some(Some(languages));
+        self
+    }
+
+    #[must_use]
+    pub fn languages_null(mut self) -> Self {
+        self.raw.languages = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn name(mut self, name: impl Into<String>) -> Self {
+        self.raw.name = Some(Some(name.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn name_null(mut self) -> Self {
+        self.raw.name = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn tags(mut self, tags: Vec<String>) -> Self {
+        self.raw.tags = Some(Some(tags));
+        self
+    }
+
+    #[must_use]
+    pub fn tags_null(mut self) -> Self {
+        self.raw.tags = Some(None);
+        self
+    }
+    pub fn from_raw(raw: VoiceUpdateRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &VoiceUpdateRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> VoiceUpdateRequest {
+        self.raw
+    }
+}
+
+impl From<VoiceUpdateRequest> for VoiceUpdateRequestParams {
+    fn from(raw: VoiceUpdateRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<VoiceUpdateRequestParams> for VoiceUpdateRequest {
+    fn from(value: VoiceUpdateRequestParams) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for VoiceUpdateRequestParams {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateWorkflowResponseView {
+    raw: UpdateWorkflowResponse,
+}
+
+impl UpdateWorkflowResponseView {
+    pub fn update_name(&self) -> &str {
+        &self.raw.update_name
+    }
+    pub fn raw(&self) -> &UpdateWorkflowResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> UpdateWorkflowResponse {
+        self.raw
+    }
+}
+
+impl From<UpdateWorkflowResponse> for UpdateWorkflowResponseView {
+    fn from(raw: UpdateWorkflowResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateWorkflowResponseView> for UpdateWorkflowResponse {
+    fn from(value: UpdateWorkflowResponseView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct WorkflowUpdateResponseView {
+    raw: WorkflowUpdateResponse,
+}
+
+impl WorkflowUpdateResponseView {
+    pub fn raw(&self) -> &WorkflowUpdateResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowUpdateResponse {
+        self.raw
+    }
+}
+
+impl From<WorkflowUpdateResponse> for WorkflowUpdateResponseView {
+    fn from(raw: WorkflowUpdateResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<WorkflowUpdateResponseView> for WorkflowUpdateResponse {
+    fn from(value: WorkflowUpdateResponseView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct WorkflowUpdateRequestParams {
+    raw: WorkflowUpdateRequest,
+}
+
+impl WorkflowUpdateRequestParams {
+    pub fn new() -> Self {
+        Self {
+            raw: WorkflowUpdateRequest {
+                available_in_chat_assistant: None,
+                description: None,
+                display_name: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn available_in_chat_assistant(mut self, available_in_chat_assistant: bool) -> Self {
+        self.raw.available_in_chat_assistant = Some(Some(available_in_chat_assistant));
+        self
+    }
+
+    #[must_use]
+    pub fn available_in_chat_assistant_null(mut self) -> Self {
+        self.raw.available_in_chat_assistant = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.raw.description = Some(Some(description.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn description_null(mut self) -> Self {
+        self.raw.description = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn display_name(mut self, display_name: impl Into<String>) -> Self {
+        self.raw.display_name = Some(Some(display_name.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn display_name_null(mut self) -> Self {
+        self.raw.display_name = Some(None);
+        self
+    }
+    pub fn from_raw(raw: WorkflowUpdateRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &WorkflowUpdateRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowUpdateRequest {
+        self.raw
+    }
+}
+
+impl From<WorkflowUpdateRequest> for WorkflowUpdateRequestParams {
+    fn from(raw: WorkflowUpdateRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<WorkflowUpdateRequestParams> for WorkflowUpdateRequest {
+    fn from(value: WorkflowUpdateRequestParams) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for WorkflowUpdateRequestParams {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub type ChatStream =
     Pin<Box<dyn Stream<Item = Result<ChatStreamChunk, SdkError>> + Send + 'static>>;
 pub type FimStream = Pin<Box<dyn Stream<Item = Result<FimStreamChunk, SdkError>> + Send + 'static>>;

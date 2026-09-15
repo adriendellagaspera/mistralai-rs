@@ -94,7 +94,6 @@ impl<'a> Files<'a> {
     pub(crate) fn new(raw: &'a HttpClient) -> Self {
         Self { raw }
     }
-
     pub async fn list(&self) -> Result<FileList, SdkError> {
         self.raw
             .files_api_routes_list_files(

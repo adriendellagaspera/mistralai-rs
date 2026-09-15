@@ -11,7 +11,6 @@ impl<'a> Classifiers<'a> {
     pub(crate) fn new(raw: &'a HttpClient) -> Self {
         Self { raw }
     }
-
     pub async fn moderate(
         &self,
         request: ClassificationParams,
