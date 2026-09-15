@@ -3,16 +3,21 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import sys
 from typing import Any
 
 from ruamel.yaml import YAML
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "codegen"))
+from sdk_codegen import RustIndex
+
 spec = YAML(typ="safe").load((ROOT / "spec/openapi.yaml").read_text())
 coverage = json.loads((ROOT / "src/sdk/coverage.json").read_text())
 rejected = coverage["automatic_projection"]["rejected"]
 targets = sorted(op for op, reason in rejected.items() if reason == "request_model_projection")
 schemas = spec.get("components", {}).get("schemas", {})
+rust = RustIndex.load(ROOT / "src/generated")
 operations: dict[str, dict[str, Any]] = {}
 for path, item in spec.get("paths", {}).items():
     for method in ("get", "post", "put", "patch", "delete", "head", "options"):
@@ -85,7 +90,9 @@ for operation_id in targets:
     observed = sorted(features(schema))
     for feature in observed:
         summary[feature] = summary.get(feature, 0) + 1
+    fields = ", ".join(f"{field.name}:{field.type}" for field in rust.fields(ref)) if ref in rust.structs else "<not-struct>"
     print(f"{operation_id}\t{ref}\t{','.join(observed)}")
+    print(f"  RAW {fields}")
 print("SUMMARY")
 for feature, count in sorted(summary.items(), key=lambda item: (-item[1], item[0])):
     print(f"{feature}\t{count}")
