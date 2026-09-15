@@ -21,6 +21,7 @@ from rust_symbols import SymbolProvider, field_identifier
 from jsonschema import Draft202012Validator
 from sdk_contracts import public_surface, coverage_inventory
 from sdk_autoproject import expand_manifest
+import sdk_ir as resolved_ir
 from sdk_ir import (Accessor, ModelPolicy, RequestPolicy, SimpleUnionPolicy, UnionPolicy, ViewPolicy,
                     StreamPolicy, model_policy, stream_policy)
 
@@ -326,13 +327,62 @@ class SdkIr:
     resources: tuple[ResourceSpec, ...]
 
 
+def _resolved_ir(ir: SdkIr, rust: RustIndex) -> resolved_ir.FacadeIr:
+    """Lower the validated projection plan into the closed facade IR."""
+    models = tuple(resolved_ir.ModelSpec(model.name, model.raw, model.config) for model in ir.models)
+    resources = []
+    for resource in ir.resources:
+        operations = []
+        for operation in resource.operations:
+            raw = rust.operation(operation.raw_method)
+            signature = resolved_ir.RawSignature(
+                tuple(resolved_ir.RawParameter(parameter.name, parameter.type)
+                      for parameter in raw.parameters),
+                raw.return_type,
+                raw.success_type,
+            )
+            if operation.request:
+                request = resolved_ir.JsonRequest(
+                    operation.request,
+                    operation.request_raw or "",
+                    operation.request_overrides,
+                )
+            elif raw.parameters:
+                request = resolved_ir.ParametersRequest()
+            else:
+                request = resolved_ir.NoRequest()
+            if operation.stream:
+                response = resolved_ir.SseResponse(operation.stream)
+            elif operation.empty_response:
+                response = resolved_ir.EmptyResponse()
+            elif operation.binary_response:
+                response = resolved_ir.BinaryResponse()
+            elif operation.response:
+                model = next(model for model in models if model.name == operation.response)
+                response = resolved_ir.JsonResponse(operation.response, model.raw)
+            else:
+                raise GenerationError(f"operation {operation.operation_id} needs a response projection")
+            operations.append(resolved_ir.OperationSpec(
+                operation.name,
+                operation.operation_id,
+                operation.raw_method,
+                signature,
+                request,
+                response,
+            ))
+        resources.append(resolved_ir.ResourceSpec(
+            resource.path, resource.module, resource.name, tuple(operations),
+        ))
+    return resolved_ir.FacadeIr(ir.client_name, models, tuple(resources))
+
+
 def _validate_keys(value: dict[str, Any], allowed: set[str], context: str) -> None:
     unknown = sorted(set(value) - allowed)
     if unknown:
         raise GenerationError(f"unknown {context} keys: {', '.join(unknown)}")
 
 
-def build_ir(openapi: OpenApiIndex, rust: RustIndex, manifest: dict[str, Any]) -> SdkIr:
+def build_ir(openapi: OpenApiIndex, rust: RustIndex, manifest: dict[str, Any]) -> resolved_ir.FacadeIr:
     schema = json.loads(Path(__file__).with_name("sdk-semantics.schema.json").read_text())
     errors = sorted(Draft202012Validator(schema).iter_errors(manifest), key=lambda error: str(error.path))
     if errors:
@@ -514,9 +564,9 @@ def build_ir(openapi: OpenApiIndex, rust: RustIndex, manifest: dict[str, Any]) -
         if not resource_path:
             raise GenerationError(f"resource {module} has an empty path")
         resources.append(ResourceSpec(resource_path, module, config["name"], tuple(operations)))
-    ir = SdkIr(manifest.get("client", {}).get("name", "Client"), tuple(models), tuple(resources))
-    _validate_symbols(ir, rust)
-    return ir
+    plan = SdkIr(manifest.get("client", {}).get("name", "Client"), tuple(models), tuple(resources))
+    _validate_symbols(plan, rust)
+    return _resolved_ir(plan, rust)
 
 
 def _validate_symbols(ir: SdkIr, rust: RustIndex) -> None:
