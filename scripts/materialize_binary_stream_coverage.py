@@ -157,6 +157,30 @@ def update_tests() -> None:
 '''
     append_before_main(path, addition)
 
+    auto = ROOT / "scripts/test_sdk_autoproject.py"
+    replace_once(
+        auto,
+        '''            raw_coverage("download_thing"),
+''',
+        '''            {"operations": [{
+                "operation_id": "download_thing",
+                "rust_method": "download_thing",
+                "binary_stream_method": "download_thing_stream",
+                "upstream": True,
+            }]},
+''',
+    )
+    replace_once(
+        auto,
+        '''            {"operation_id": "sample_audio_wav", "rust_method": "sample_audio_wav", "method": "GET",
+             "path": "/v1/audio/voices/{voice_id}/sample", "success_media": ["audio/wav"], "upstream": False},
+''',
+        '''            {"operation_id": "sample_audio_wav", "rust_method": "sample_audio_wav",
+             "binary_stream_method": "sample_audio_wav_stream", "method": "GET",
+             "path": "/v1/audio/voices/{voice_id}/sample", "success_media": ["audio/wav"], "upstream": False},
+''',
+    )
+
 
 def main() -> None:
     update_coverage()
