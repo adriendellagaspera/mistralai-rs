@@ -1,0 +1,41 @@
+name: Rebase issue 19 on current main
+on:
+  push:
+    branches: [issue-19-complex-request-model-projection]
+permissions:
+  contents: write
+jobs:
+  integrate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Merge validated issue 19 implementation
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git fetch origin feat/complex-request-model-projection
+          git merge --no-ff --no-edit origin/feat/complex-request-model-projection
+      - name: Install pinned Rust toolchain
+        run: rustup show
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            .tools
+            target
+          key: sdk-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'codegen.lock') }}
+      - name: Regenerate and validate on current main
+        run: |
+          python3 scripts/codegen.py generate
+          bash scripts/validate.sh
+      - name: Remove integration scaffolding and push
+        run: |
+          rm -f .github/workflows/rebase-issue-19.yml
+          git add -A
+          git commit -m 'chore: remove issue 19 integration scaffolding'
+          git push origin HEAD:issue-19-complex-request-model-projection
