@@ -20,7 +20,46 @@ jobs:
       - name: Apply proven compiler changes
         run: |
           git apply -p1 codegen/sdk_codegen.patch
-          git apply -p1 scripts/test_sdk_facade.patch
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('scripts/test_sdk_facade.py')
+          source = path.read_text()
+          marker = '    def test_optional_query_addition_preserves_resource_signature(self):\n'
+          nested = '''    def test_nested_resources_emit_hierarchical_accessors(self):
+              operation = sdk_codegen.OperationSpec("list", "list", "list", None, "Receipt", (), None)
+              root = sdk_codegen.ResourceSpec(("batch",), "batch", "Batch", ())
+              child = sdk_codegen.ResourceSpec(("batch", "jobs"), "batch_jobs", "BatchJobs", (operation,))
+              rust = sdk_codegen.RustIndex(
+                  TYPES.encode(),
+                  b"impl HttpClient { pub async fn list(&self) -> Result<AnimalResponse, Error> { todo!() } }",
+              )
+              root_source = sdk_codegen._emit_resource(root, rust, (root, child))
+              mod_source = sdk_codegen._emit_mod(sdk_codegen.SdkIr("Client", (), (root, child)))
+              self.assertIn("pub fn jobs(&self) -> BatchJobs<'a>", root_source)
+              self.assertIn("pub fn batch(&self) -> Batch<'_>", mod_source)
+              self.assertNotIn("pub fn batch_jobs(&self)", mod_source)
+
+          '''
+          if marker not in source:
+              raise SystemExit('optional query test marker not found')
+          source = source.replace(marker, nested + marker, 1)
+          source = source.replace(
+              'resource = sdk_codegen.ResourceSpec("zoo", "Zoo", (operation,))',
+              'resource = sdk_codegen.ResourceSpec(("zoo",), "zoo", "Zoo", (operation,))',
+              1,
+          )
+          source = source.replace(
+              'before = sdk_codegen._emit_resource(resource, old)',
+              'before = sdk_codegen._emit_resource(resource, old, (resource,))',
+              1,
+          )
+          source = source.replace(
+              'after = sdk_codegen._emit_resource(resource, new)',
+              'after = sdk_codegen._emit_resource(resource, new, (resource,))',
+              1,
+          )
+          path.write_text(source)
+          PY
       - name: Install pinned Rust toolchain
         run: rustup show
       - uses: actions/cache@v4
