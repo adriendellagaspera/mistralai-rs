@@ -26,6 +26,57 @@ jobs:
             .tools
             target
           key: sdk-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'codegen.lock') }}
+      - name: Preserve direct mapping for pure binary endpoints
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path("scripts/materialize_binary_stream.py")
+          text = path.read_text()
+          old = '''        if response_kind == "binary":
+              binary_media = set(_binary_media(operation))
+              route_path = operation.get("x-sdk-path", "").split("#", 1)[0].rstrip("/") or "/"
+              route_method = operation.get("x-sdk-method", "").upper()
+              candidates = [
+                  item for item in raw_operations
+                  if item.get("method") == route_method
+                  and (item.get("path", "").split("#", 1)[0].rstrip("/") or "/") == route_path
+                  and item.get("success_media")
+                  and set(item["success_media"]).issubset(binary_media)
+              ]
+              if len(candidates) == 1:
+                  raw_method = candidates[0]["rust_method"] + "_stream"
+              else:
+                  rejected[operation_id] = "raw_binary_transport_mapping"
+                  continue
+          '''
+          new = '''        if response_kind == "binary":
+              binary_media = set(_binary_media(operation))
+              success = [response for status, response in operation.get("responses", {}).items()
+                         if str(status).startswith("2")]
+              content = success[0].get("content", {}) if len(success) == 1 else {}
+              if len(content) == 1:
+                  raw_method = raw_method + "_stream"
+              else:
+                  route_path = operation.get("x-sdk-path", "").split("#", 1)[0].rstrip("/") or "/"
+                  route_method = operation.get("x-sdk-method", "").upper()
+                  candidates = [
+                      item for item in raw_operations
+                      if item.get("method") == route_method
+                      and (item.get("path", "").split("#", 1)[0].rstrip("/") or "/") == route_path
+                      and item.get("success_media")
+                      and set(item["success_media"]).issubset(binary_media)
+                  ]
+                  if len(candidates) == 1:
+                      raw_method = candidates[0]["rust_method"] + "_stream"
+                  else:
+                      rejected[operation_id] = "raw_binary_transport_mapping"
+                      continue
+          '''
+          if text.count(old) != 1:
+              raise SystemExit(f"binary mapping patch drift: {text.count(old)}")
+          path.write_text(text.replace(old, new, 1))
+          PY
       - name: Apply binary-stream compiler changes
         run: python3 scripts/materialize_binary_stream.py
       - name: Refresh official SDK taxonomy
