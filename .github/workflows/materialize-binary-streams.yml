@@ -1,0 +1,45 @@
+name: Materialize binary response streams
+on:
+  push:
+    branches:
+      - feat/binary-response-streams
+permissions:
+  contents: write
+concurrency:
+  group: materialize-binary-response-streams
+  cancel-in-progress: true
+jobs:
+  materialize:
+    if: github.repository == 'adriendellagaspera/mistralai-rs'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install pinned Rust toolchain
+        run: rustup show
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            .tools
+            target
+          key: sdk-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'codegen.lock') }}
+      - name: Apply binary-response stream primitive
+        run: |
+          python3 codegen/materialize_binary_streams.py
+          python3 codegen/materialize_binary_lock.py
+          python3 scripts/codegen.py generate
+          bash scripts/validate.sh
+      - name: Commit materialized implementation
+        run: |
+          rm codegen/materialize_binary_streams.py codegen/materialize_binary_lock.py
+          rm .github/workflows/materialize-binary-streams.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --check
+          git commit -m 'feat: stream binary responses'
+          git push origin HEAD:feat/binary-response-streams
