@@ -91,11 +91,16 @@ def _success_contract(operation: dict[str, Any]) -> tuple[str | None, dict[str, 
     content = success[0].get("content", {})
     if not content:
         return "empty", None, None
-    if "application/json" not in content:
-        return None, None, "non_json_success"
-    if set(content) != {"application/json"}:
-        return None, None, "multiple_success_media"
-    return "json", content["application/json"].get("schema", {}), None
+    if "application/json" in content:
+        if set(content) != {"application/json"}:
+            return None, None, "multiple_success_media"
+        return "json", content["application/json"].get("schema", {}), None
+    if len(content) == 1:
+        payload = next(iter(content.values()))
+        schema = payload.get("schema", {})
+        if schema.get("type") == "string" and schema.get("format") == "binary":
+            return "binary", schema, None
+    return None, None, "non_json_success"
 
 
 def _request_json_schema(operation: dict[str, Any]) -> tuple[dict[str, Any] | None, str | None]:
@@ -259,6 +264,8 @@ def expand_manifest(openapi: Any, manifest: dict[str, Any], taxonomy: dict[str, 
             item["response"] = response
         elif response_kind == "empty":
             item["empty_response"] = True
+        elif response_kind == "binary":
+            item["binary_response"] = True
         if raw_method != operation_id:
             item["raw_method"] = raw_method
         if request:

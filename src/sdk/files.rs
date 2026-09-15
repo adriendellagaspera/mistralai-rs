@@ -85,6 +85,7 @@ impl GetSignedUrlFilesRequest {
         self
     }
 }
+
 #[derive(Clone, Copy)]
 pub struct Files<'a> {
     raw: &'a HttpClient,
@@ -152,6 +153,13 @@ impl<'a> Files<'a> {
             .files_api_routes_get_signed_url(request.file_id.as_str(), request.expiry)
             .await
             .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn download(&self, file_id: impl AsRef<str>) -> Result<bytes::Bytes, SdkError> {
+        self.raw
+            .files_api_routes_download_file(file_id.as_ref())
+            .await
             .map_err(Into::into)
     }
 }

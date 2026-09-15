@@ -232,6 +232,39 @@ class GenericSdkCompilerTests(unittest.TestCase):
         diff = compare_surface(public_surface({"zoo.rs": before}), public_surface({"zoo.rs": after}))
         self.assertEqual(diff["classification"], "additive")
 
+    def test_binary_success_is_validated_and_emitted_as_bytes(self):
+        document = openapi_document()
+        document["paths"]["/animals/{animal_id}/content"] = {
+            "get": {
+                "operationId": "download_animal",
+                "parameters": [{
+                    "name": "animal_id", "in": "path", "required": True,
+                    "schema": {"type": "string"},
+                }],
+                "responses": {"200": {
+                    "content": {"application/octet-stream": {
+                        "schema": {"type": "string", "format": "binary"}
+                    }}
+                }},
+            }
+        }
+        overlay = manifest()
+        overlay["resources"]["zoo"]["operations"]["download"] = {
+            "operation_id": "download_animal", "binary_response": True,
+        }
+        self.openapi.write_text(json.dumps(document))
+        self.overlay.write_text(json.dumps(overlay))
+        (self.raw / "client.rs").write_text(CLIENT + """
+impl HttpClient {
+    pub async fn download_animal(&self, animal_id: impl AsRef<str>) -> Result<bytes::Bytes, Error> { todo!() }
+}
+""")
+        resource = (self.generate() / "zoo.rs").read_text()
+        self.assertIn(
+            "pub async fn download(&self, animal_id: impl AsRef<str>) -> Result<bytes::Bytes, SdkError>",
+            resource,
+        )
+
     def test_empty_success_is_validated_and_emitted_as_unit(self):
         document = openapi_document()
         document["paths"]["/animals/{animal_id}"] = {

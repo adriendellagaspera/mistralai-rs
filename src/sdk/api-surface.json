@@ -1190,6 +1190,7 @@
   "files.rs::::GetSignedUrlFilesRequest": "pub struct GetSignedUrlFilesRequest { }",
   "files.rs::::ListFilesRequest": "pub struct ListFilesRequest { }",
   "files.rs::Files<'a>::delete": "pub async fn delete(&self, file_id: impl AsRef<str>) -> Result<DeletedFile, SdkError>",
+  "files.rs::Files<'a>::download": "pub async fn download(&self, file_id: impl AsRef<str>) -> Result<bytes::Bytes, SdkError>",
   "files.rs::Files<'a>::get_signed_url": "pub async fn get_signed_url(&self, request: GetSignedUrlFilesRequest) -> Result<FileSignedUrl, SdkError>",
   "files.rs::Files<'a>::list": "pub async fn list(&self) -> Result<FileList, SdkError>",
   "files.rs::Files<'a>::list_with": "pub async fn list_with(&self, request: ListFilesRequest) -> Result<FileList, SdkError>",
