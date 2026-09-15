@@ -34,6 +34,7 @@ jobs:
           python3 codegen/materialize_binary_test_fix.py
           python3 codegen/materialize_binary_coverage_fix.py
           python3 scripts/codegen.py generate
+          cargo fmt --all
           bash scripts/validate.sh
       - name: Commit materialized implementation
         run: |
