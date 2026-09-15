@@ -2799,6 +2799,40 @@ impl From<VoiceCreateRequestParams> for VoiceCreateRequest {
 }
 
 #[derive(Debug, Clone)]
+pub struct DeleteDatasetRecordsInSchemaParams {
+    raw: DeleteDatasetRecordsInSchema,
+}
+
+impl DeleteDatasetRecordsInSchemaParams {
+    pub fn new(dataset_record_ids: Vec<String>) -> Self {
+        Self {
+            raw: DeleteDatasetRecordsInSchema { dataset_record_ids },
+        }
+    }
+    pub fn from_raw(raw: DeleteDatasetRecordsInSchema) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &DeleteDatasetRecordsInSchema {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DeleteDatasetRecordsInSchema {
+        self.raw
+    }
+}
+
+impl From<DeleteDatasetRecordsInSchema> for DeleteDatasetRecordsInSchemaParams {
+    fn from(raw: DeleteDatasetRecordsInSchema) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<DeleteDatasetRecordsInSchemaParams> for DeleteDatasetRecordsInSchema {
+    fn from(value: DeleteDatasetRecordsInSchemaParams) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct DatasetExportView {
     raw: DatasetExport,
 }
@@ -3920,6 +3954,40 @@ impl From<VoiceListResponse> for VoiceListResponseView {
 
 impl From<VoiceListResponseView> for VoiceListResponse {
     fn from(value: VoiceListResponseView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct PostDatasetImportFromDatasetInSchemaParams {
+    raw: PostDatasetImportFromDatasetInSchema,
+}
+
+impl PostDatasetImportFromDatasetInSchemaParams {
+    pub fn new(dataset_record_ids: Vec<String>) -> Self {
+        Self {
+            raw: PostDatasetImportFromDatasetInSchema { dataset_record_ids },
+        }
+    }
+    pub fn from_raw(raw: PostDatasetImportFromDatasetInSchema) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &PostDatasetImportFromDatasetInSchema {
+        &self.raw
+    }
+    pub fn into_raw(self) -> PostDatasetImportFromDatasetInSchema {
+        self.raw
+    }
+}
+
+impl From<PostDatasetImportFromDatasetInSchema> for PostDatasetImportFromDatasetInSchemaParams {
+    fn from(raw: PostDatasetImportFromDatasetInSchema) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<PostDatasetImportFromDatasetInSchemaParams> for PostDatasetImportFromDatasetInSchema {
+    fn from(value: PostDatasetImportFromDatasetInSchemaParams) -> Self {
         value.into_raw()
     }
 }

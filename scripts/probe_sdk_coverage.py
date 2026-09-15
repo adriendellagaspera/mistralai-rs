@@ -69,6 +69,7 @@ def main():
         openapi, configured,
         json.loads((ROOT / "codegen/sdk-taxonomy.json").read_text()),
         json.loads((ROOT / "src/generated/coverage.json").read_text()),
+        rust,
     )
     modules, rejected = probes(openapi, rust, configured)
     report = {"generated_candidates": sorted(modules), "rejected_candidates": rejected}

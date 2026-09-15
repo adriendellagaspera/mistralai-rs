@@ -205,6 +205,14 @@ impl<'a> BetaObservabilityDatasets<'a> {
             .map_err(Into::into)
     }
 
+    pub async fn import_from_dataset_records(
+        &self,
+        dataset_id: impl AsRef<str>,
+        request: PostDatasetImportFromDatasetInSchemaParams,
+    ) -> Result<DatasetImportTaskView, SdkError> {
+        self.raw.post_dataset_records_from_dataset_v1_observability_datasets_dataset_id_imports_from_dataset_post(dataset_id.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
+    }
+
     pub async fn import_from_file(
         &self,
         dataset_id: impl AsRef<str>,

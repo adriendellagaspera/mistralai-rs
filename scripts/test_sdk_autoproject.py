@@ -1,6 +1,9 @@
 import sys
 from pathlib import Path
 import unittest
+from types import SimpleNamespace
+
+from rust_types import parse_type
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "codegen"))
@@ -70,16 +73,60 @@ class AutoProjectionTests(unittest.TestCase):
         self.assertEqual("CreateThingParams", expanded["resources"]["beta_things"]["operations"]["create"]["request"])
         self.assertEqual("ThingView", expanded["resources"]["beta_things"]["operations"]["list"]["response"])
 
-    def test_complex_request_is_review_debt_not_raw_type_leak(self):
+    def test_projects_nested_request_objects_with_generated_adapters(self):
         api = FakeOpenApi()
         api.schemas["CreateThing"]["properties"]["tool"] = {"$ref": "#/components/schemas/Tool"}
-        _, report = sdk_autoproject.expand_manifest(
+        api.schemas["Tool"] = {
+            "type": "object", "required": ["name"],
+            "properties": {"name": {"type": "string"}},
+        }
+        fields = {
+            "CreateThing": (
+                SimpleNamespace(name="name", type="String"),
+                SimpleNamespace(name="enabled", type="Option<bool>"),
+                SimpleNamespace(name="tool", type="Option<Tool>"),
+            ),
+            "Tool": (SimpleNamespace(name="name", type="String"),),
+        }
+        rust = SimpleNamespace(
+            structs=set(fields), aliases={}, symbol_modules={name: "types" for name in fields},
+            fields=lambda name: fields[name],
+        )
+        expanded, report = sdk_autoproject.expand_manifest(
             api, manifest(),
             {"operations": {"create_thing": ["things.create"]}},
-            raw_coverage("create_thing"),
+            raw_coverage("create_thing"), rust,
         )
-        self.assertEqual(0, report["added_count"])
-        self.assertEqual("request_model_projection", report["rejected"]["create_thing"])
+        self.assertEqual(1, report["added_count"])
+        self.assertEqual({"tool": "ToolParams"}, expanded["models"]["CreateThingParams"]["adapters"])
+        self.assertEqual(["name"], expanded["models"]["ToolParams"]["constructor"])
+
+    def test_projects_safe_map_alias_without_leaking_generated_alias_name(self):
+        api = FakeOpenApi()
+        api.schemas["CreateThing"]["properties"]["metadata"] = {
+            "type": "object", "additionalProperties": True,
+        }
+        fields = {
+            "CreateThing": (
+                SimpleNamespace(name="name", type="String"),
+                SimpleNamespace(name="enabled", type="Option<bool>"),
+                SimpleNamespace(name="metadata", type="Option<MetadataDict>"),
+            ),
+        }
+        rust = SimpleNamespace(
+            structs=set(fields),
+            aliases={"MetadataDict": parse_type("std::collections::BTreeMap<String, serde_json::Value>")},
+            symbol_modules={"CreateThing": "types", "MetadataDict": "types"},
+            fields=lambda name: fields[name],
+        )
+        expanded, report = sdk_autoproject.expand_manifest(
+            api, manifest(),
+            {"operations": {"create_thing": ["things.create"]}},
+            raw_coverage("create_thing"), rust,
+        )
+        self.assertEqual(1, report["added_count"])
+        self.assertEqual({"metadata": "MetadataDictValue"}, expanded["models"]["CreateThingParams"]["adapters"])
+        self.assertTrue(expanded["models"]["MetadataDictValue"]["type_alias"])
 
     def test_projects_empty_success_without_fake_response_model(self):
         api = FakeOpenApi()

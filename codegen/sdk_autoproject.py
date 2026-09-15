@@ -14,6 +14,8 @@ import json
 import re
 from typing import Any
 
+from rust_types import RustType, parse_type
+
 
 RUST_KEYWORDS = {
     "as", "break", "const", "continue", "crate", "else", "enum", "extern",
@@ -49,13 +51,16 @@ def _nullable(schema: dict[str, Any]) -> tuple[dict[str, Any], bool]:
 
 def _simple_schema(schema: dict[str, Any]) -> bool:
     schema, _ = _nullable(schema)
-    if "$ref" in schema or "enum" in schema or "const" in schema or "format" in schema:
+    if "$ref" in schema or "enum" in schema or "const" in schema:
         return False
     kind = schema.get("type")
     if kind in {"string", "integer", "number", "boolean"}:
         return True
     if kind == "array":
         return _simple_schema(schema.get("items", {}))
+    if kind == "object" and not schema.get("properties"):
+        additional = schema.get("additionalProperties")
+        return additional is True or (isinstance(additional, dict) and _simple_schema(additional))
     return False
 
 
@@ -152,6 +157,10 @@ def _request_name(raw: str) -> str:
     return f"{raw}Params"
 
 
+def _alias_name(raw: str) -> str:
+    return f"{raw}Value"
+
+
 def _ensure_view_model(models: dict[str, Any], schemas: dict[str, Any], raw: str,
                        borrowed: bool = False) -> str:
     name = _view_name(raw)
@@ -183,23 +192,124 @@ def _existing_model_by_raw(models: dict[str, Any], raw: str, request: bool) -> s
     return None
 
 
-def _ensure_request_model(models: dict[str, Any], schemas: dict[str, Any], raw: str) -> tuple[str | None, str | None]:
+def _strip_options(syntax: RustType) -> RustType:
+    while (inner := syntax.unary("Option")) is not None:
+        syntax = inner
+    return syntax
+
+
+def _raw_public_leaf(syntax: RustType, rust: Any) -> bool:
+    if syntax.spelling in rust.aliases or syntax.spelling in rust.symbol_modules:
+        return False
+    if syntax.kind == "generic_type":
+        return all(_raw_public_leaf(argument, rust) for argument in syntax.arguments)
+    return True
+
+
+def _safe_alias(syntax: RustType, rust: Any, seen: tuple[str, ...] = ()) -> bool:
+    if syntax.spelling in rust.aliases:
+        if syntax.spelling in seen:
+            return False
+        return _safe_alias(rust.aliases[syntax.spelling], rust, (*seen, syntax.spelling))
+    if syntax.spelling in rust.symbol_modules:
+        return False
+    if syntax.kind == "generic_type":
+        return all(_safe_alias(argument, rust, seen) for argument in syntax.arguments)
+    return True
+
+
+def _ensure_alias_model(models: dict[str, Any], raw: str, rust: Any) -> tuple[str | None, str | None]:
+    if raw not in rust.aliases or not _safe_alias(rust.aliases[raw], rust, (raw,)):
+        return None, "request_model_projection"
+    existing = _existing_model_by_raw(models, raw, False)
+    if existing:
+        return existing, None
+    name = _alias_name(raw)
+    if name in models and models[name].get("raw", name) != raw:
+        return None, "request_model_projection"
+    models[name] = {"raw": raw, "type_alias": True}
+    return name, None
+
+
+def _request_field_adapter(models: dict[str, Any], schemas: dict[str, Any], schema: dict[str, Any],
+                           raw_type: str, rust: Any, resolving: tuple[str, ...]) -> tuple[str | None, str | None]:
+    schema, _ = _nullable(schema)
+    syntax = _strip_options(parse_type(raw_type))
+    if schema.get("type") == "array":
+        inner = syntax.unary("Vec")
+        if inner is None:
+            return None, "request_model_projection"
+        return _request_field_adapter(models, schemas, schema.get("items", {}), inner.spelling, rust, resolving)
+
+    reference = _schema_ref(schema)
+    if reference:
+        target = schemas.get(reference, {})
+        if target.get("type") == "object" and target.get("properties"):
+            if syntax.spelling != reference:
+                return None, "request_model_projection"
+            return _ensure_request_model(models, schemas, reference, rust, resolving)
+        if target.get("type") == "object" and target.get("additionalProperties"):
+            if syntax.spelling in rust.aliases:
+                return _ensure_alias_model(models, syntax.spelling, rust)
+            return (None, None) if _raw_public_leaf(syntax, rust) else (None, "request_model_projection")
+        if _simple_schema(target):
+            if syntax.spelling in rust.aliases:
+                return _ensure_alias_model(models, syntax.spelling, rust)
+            return (None, None) if _raw_public_leaf(syntax, rust) else (None, "request_model_projection")
+        return None, "request_model_projection"
+
+    if schema.get("type") == "object" and schema.get("additionalProperties"):
+        if syntax.spelling in rust.aliases:
+            return _ensure_alias_model(models, syntax.spelling, rust)
+        return (None, None) if _raw_public_leaf(syntax, rust) else (None, "request_model_projection")
+    if _simple_schema(schema):
+        if syntax.spelling in rust.aliases:
+            return _ensure_alias_model(models, syntax.spelling, rust)
+        return (None, None) if _raw_public_leaf(syntax, rust) else (None, "request_model_projection")
+    return None, "request_model_projection"
+
+
+def _ensure_request_model(models: dict[str, Any], schemas: dict[str, Any], raw: str,
+                          rust: Any | None = None, resolving: tuple[str, ...] = ()) -> tuple[str | None, str | None]:
     existing = _existing_model_by_raw(models, raw, True)
     if existing:
         return existing, None
     schema = schemas.get(raw)
-    if not schema or schema.get("type") != "object":
+    if not schema or schema.get("type") != "object" or raw in resolving:
         return None, "request_model_projection"
     properties = schema.get("properties", {})
-    if not all(_simple_schema(value) for value in properties.values()):
+    if rust is None:
+        if not all(_simple_schema(value) for value in properties.values()):
+            return None, "request_model_projection"
+        name = _request_name(raw)
+        models[name] = {"raw": raw, "constructor": list(schema.get("required", []))}
+        return name, None
+    if raw not in rust.structs:
         return None, "request_model_projection"
+    raw_fields = {field.name.removeprefix("r#"): field for field in rust.fields(raw)}
+    if set(raw_fields) != set(properties):
+        return None, "request_model_projection"
+    adapters: dict[str, str] = {}
+    for field, field_schema in sorted(properties.items()):
+        adapter, reason = _request_field_adapter(
+            models, schemas, field_schema, raw_fields[field].type, rust, (*resolving, raw)
+        )
+        if reason:
+            return None, reason
+        if adapter:
+            adapters[field] = adapter
     name = _request_name(raw)
-    models[name] = {"raw": raw, "constructor": list(schema.get("required", []))}
+    if name in models and models[name].get("raw", name) != raw:
+        return None, "request_model_projection"
+    config: dict[str, Any] = {"raw": raw, "constructor": list(schema.get("required", []))}
+    if adapters:
+        config["adapters"] = adapters
+    models[name] = config
     return name, None
 
 
 def expand_manifest(openapi: Any, manifest: dict[str, Any], taxonomy: dict[str, Any],
-                    raw_coverage: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
+                    raw_coverage: dict[str, Any], rust: Any | None = None) -> tuple[dict[str, Any], dict[str, Any]]:
     """Return overlay + deterministic report for automatically projected operations."""
     expanded = deepcopy(manifest)
     models: dict[str, Any] = expanded.setdefault("models", {})
@@ -283,8 +393,11 @@ def expand_manifest(openapi: Any, manifest: dict[str, Any], taxonomy: dict[str, 
         request = None
         if request_schema:
             request_raw = _schema_ref(request_schema)
-            request, reason = _ensure_request_model(models, openapi.schemas, request_raw)
+            model_snapshot = set(models)
+            request, reason = _ensure_request_model(models, openapi.schemas, request_raw, rust)
             if reason:
+                for model_name in set(models) - model_snapshot:
+                    del models[model_name]
                 rejected[operation_id] = reason
                 continue
 

@@ -45,6 +45,11 @@ class UnionFactory:
 
 
 @dataclass(frozen=True)
+class TypeAliasPolicy:
+    pass
+
+
+@dataclass(frozen=True)
 class RequestPolicy:
     constructor: tuple[str, ...]
     exclude: tuple[str, ...]
@@ -58,7 +63,7 @@ class ViewPolicy:
     accessors: tuple[tuple[str, Accessor], ...]
 
 
-ModelPolicy = UnionPolicy | SimpleUnionPolicy | RequestPolicy | ViewPolicy
+ModelPolicy = UnionPolicy | SimpleUnionPolicy | TypeAliasPolicy | RequestPolicy | ViewPolicy
 
 
 @dataclass(frozen=True)
@@ -79,6 +84,8 @@ def model_policy(config: dict) -> ModelPolicy:
              None if isinstance(value, str) else value.get("adapter"))
             for raw, value in config["simple_union"]["variants"].items()
         ), config["simple_union"].get("bidirectional", False))
+    if config.get("type_alias"):
+        return TypeAliasPolicy()
     if "accessors" in config:
         return ViewPolicy(config.get("borrowed", True), tuple(
             (name, Accessor(AccessorKind(value["kind"]), tuple(value["path"]), value.get("wrapper")))

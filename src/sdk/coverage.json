@@ -400,7 +400,7 @@
     "delete_dataset_records_v1_observability_dataset_records_bulk_delete_post": {
       "method": "post",
       "path": "/v1/observability/dataset-records/bulk-delete",
-      "status": "candidate_unverified",
+      "status": "mapped",
       "review_reasons": []
     },
     "delete_dataset_v1_observability_datasets__dataset_id__delete": {
@@ -1060,7 +1060,7 @@
     "post_dataset_records_from_dataset_v1_observability_datasets__dataset_id__imports_from_dataset_post": {
       "method": "post",
       "path": "/v1/observability/datasets/{dataset_id}/imports/from-dataset",
-      "status": "capability_gap",
+      "status": "mapped",
       "review_reasons": [
         "composite_body_and_parameters",
         "raw_symbol_mapping"
@@ -1358,6 +1358,7 @@
         "get_dataset_import_tasks_v1_observability_datasets__dataset_id__tasks_get",
         "get_dataset_records_v1_observability_datasets__dataset_id__records_get",
         "get_datasets_v1_observability_datasets_get",
+        "post_dataset_records_from_dataset_v1_observability_datasets__dataset_id__imports_from_dataset_post",
         "post_dataset_records_from_file_v1_observability_datasets__dataset_id__imports_from_file_post",
         "post_dataset_records_from_playground_v1_observability_datasets__dataset_id__imports_from_playground_post",
         "update_dataset_v1_observability_datasets__dataset_id__patch"
@@ -1378,6 +1379,7 @@
     "beta_observability_datasets_records": {
       "operations": [
         "delete_dataset_record_v1_observability_dataset_records__dataset_record_id__delete",
+        "delete_dataset_records_v1_observability_dataset_records_bulk_delete_post",
         "get_dataset_record_v1_observability_dataset_records__dataset_record_id__get"
       ]
     },
@@ -2105,6 +2107,12 @@
         "tags"
       ]
     },
+    "DeleteDatasetRecordsInSchemaParams": {
+      "raw": "DeleteDatasetRecordsInSchema",
+      "fields": [
+        "dataset_record_ids"
+      ]
+    },
     "DatasetExportView": {
       "raw": "DatasetExport",
       "fields": [
@@ -2465,6 +2473,12 @@
         "total_pages"
       ]
     },
+    "PostDatasetImportFromDatasetInSchemaParams": {
+      "raw": "PostDatasetImportFromDatasetInSchema",
+      "fields": [
+        "dataset_record_ids"
+      ]
+    },
     "PostDatasetImportFromFileInSchemaParams": {
       "raw": "PostDatasetImportFromFileInSchema",
       "fields": [
@@ -2552,9 +2566,9 @@
   },
   "automatic_projection": {
     "schema_version": 1,
-    "added_count": 80,
-    "rejected_count": 75,
-    "report_sha256": "3d349469ba2a8cdcb3230f73d5fa046a4ed8fe05bec41d871ec1e178da839eac",
+    "added_count": 82,
+    "rejected_count": 73,
+    "report_sha256": "c255727de174afd3caba62cec0f811c2040f8e32362a89b9dc282d6fb6b07aa8",
     "added": [
       "agents_api_v1_agents_create_or_update_alias",
       "agents_api_v1_agents_delete",
@@ -2583,6 +2597,7 @@
       "create_dataset_v1_observability_datasets_post",
       "create_voice_v1_audio_voices_post",
       "delete_dataset_record_v1_observability_dataset_records__dataset_record_id__delete",
+      "delete_dataset_records_v1_observability_dataset_records_bulk_delete_post",
       "delete_dataset_v1_observability_datasets__dataset_id__delete",
       "delete_judge_v1_observability_judges__judge_id__delete",
       "delete_voice_v1_audio_voices__voice_id__delete",
@@ -2627,6 +2642,7 @@
       "list_deployments_v1_workflows_deployments_get",
       "list_runs_v1_workflows_runs_get",
       "list_voices_v1_audio_voices_get",
+      "post_dataset_records_from_dataset_v1_observability_datasets__dataset_id__imports_from_dataset_post",
       "post_dataset_records_from_file_v1_observability_datasets__dataset_id__imports_from_file_post",
       "post_dataset_records_from_playground_v1_observability_datasets__dataset_id__imports_from_playground_post",
       "reset_workflow_v1_workflows_executions__execution_id__reset_post",
@@ -2666,7 +2682,6 @@
       "create_dataset_record_v1_observability_datasets__dataset_id__records_post": "request_model_projection",
       "create_judge_v1_observability_judges_post": "request_model_projection",
       "delete_campaign_v1_observability_campaigns__campaign_id__delete": "missing_official_taxonomy",
-      "delete_dataset_records_v1_observability_dataset_records_bulk_delete_post": "request_model_projection",
       "execute_workflow_registration_v1_workflows_registrations__workflow_registration_id__execute_post": "inline_or_unresolved_response",
       "execute_workflow_v1_workflows__workflow_identifier__execute_post": "inline_or_unresolved_response",
       "files_api_routes_upload_file": "request_media_projection",
@@ -2702,7 +2717,6 @@
       "libraries_share_create_v1": "request_model_projection",
       "libraries_share_delete_v1": "request_model_projection",
       "post_dataset_records_from_campaign_v1_observability_datasets__dataset_id__imports_from_campaign_post": "missing_official_taxonomy",
-      "post_dataset_records_from_dataset_v1_observability_datasets__dataset_id__imports_from_dataset_post": "request_model_projection",
       "post_dataset_records_from_explorer_v1_observability_datasets__dataset_id__imports_from_explorer_post": "missing_official_taxonomy",
       "query_workflow_execution_v1_workflows_executions__execution_id__queries_post": "request_model_projection",
       "schedule_workflow_v1_workflows_schedules_post": "request_model_projection",
