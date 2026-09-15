@@ -1,4 +1,4 @@
-name: Update Mistral OpenAPI SDK
+name: Update Mistral SDK Sources
 on:
   schedule:
     - cron: '23 3 * * *'
@@ -17,12 +17,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
-      - name: Acquire latest official spec at immutable commit
+      - name: Acquire latest official sources at immutable commits
         id: upstream
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           python3 scripts/update_spec.py
+          python3 scripts/sdk_taxonomy.py pin-latest
           if git diff --quiet -- spec codegen.lock; then
             echo 'changed=false' >> "$GITHUB_OUTPUT"
           else
@@ -44,6 +45,7 @@ jobs:
         if: steps.upstream.outputs.changed == 'true'
         run: |
           python3 scripts/codegen.py generate
+          python3 scripts/sdk_taxonomy_inventory.py update
           bash scripts/validate.sh
       - name: Inspect and summarize changed files
         if: steps.upstream.outputs.changed == 'true'
@@ -58,12 +60,13 @@ jobs:
           token: ${{ github.token }}
           branch: automation/update-mistral-openapi
           base: main
-          title: 'chore: update Mistral OpenAPI SDK'
-          commit-message: 'chore: update Mistral OpenAPI SDK'
+          title: 'chore: update Mistral SDK sources'
+          commit-message: 'chore: update Mistral SDK sources'
           body-path: update-report.md
           delete-branch: true
           add-paths: |
             codegen.lock
+            codegen/sdk-taxonomy.json
             spec/
             src/generated/
             src/sdk/
