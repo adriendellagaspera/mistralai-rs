@@ -12,5 +12,9 @@ jobs:
       - name: Classify request projection gaps
         run: |
           python3 -m venv /tmp/issue19
-          /tmp/issue19/bin/pip install 'ruamel.yaml==0.18.6'
+          /tmp/issue19/bin/pip install \
+            'ruamel.yaml==0.18.6' \
+            'tree-sitter==0.25.2' \
+            'tree-sitter-rust==0.24.0' \
+            'jsonschema==4.23.0'
           /tmp/issue19/bin/python scripts/analyze_issue_19.py
