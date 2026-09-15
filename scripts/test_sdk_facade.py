@@ -100,6 +100,16 @@ class GenericSdkCompilerTests(unittest.TestCase):
         sdk_codegen.generate(self.raw, target, self.overlay, self.openapi)
         return target
 
+    def test_public_type_alias_expands_safe_generated_alias(self):
+        source = TYPES + "\npub type MetadataDict = std::collections::BTreeMap<String, serde_json::Value>;\n"
+        rust = sdk_codegen.RustIndex(source.encode(), CLIENT.encode())
+        model = sdk_codegen.ModelSpec("MetadataValue", "MetadataDict", sdk_codegen.model_policy({"type_alias": True}))
+        emitted = sdk_codegen._emit_model(model, sdk_codegen.OpenApiIndex(openapi_document()), rust)
+        self.assertEqual(
+            "pub type MetadataValue = std::collections::BTreeMap<String, serde_json::Value>;",
+            emitted,
+        )
+
     def test_unrelated_api_uses_the_same_generic_emitters(self):
         target = self.generate()
         types = (target / "facade_types.rs").read_text()
