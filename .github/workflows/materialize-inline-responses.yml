@@ -1,0 +1,69 @@
+name: Materialize inline response projection
+on:
+  push:
+    branches: [feat/inline-response-projection]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: materialize-inline-responses
+  cancel-in-progress: true
+jobs:
+  materialize:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install pinned Rust toolchain
+        run: rustup show
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            .tools
+            target
+          key: sdk-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'codegen.lock') }}
+      - name: Apply generic inline response primitives
+        run: |
+          python scripts/apply_inline_response_projection.py
+          python -m py_compile codegen/sdk_codegen.py codegen/sdk_autoproject.py scripts/probe_sdk_coverage.py
+      - name: Regenerate SDK
+        run: python scripts/codegen.py generate
+      - name: Refresh probe baseline
+        run: |
+          PYTHON=$(find .tools -path '*python-sdk-codegen*/bin/python' | head -1)
+          "$PYTHON" - <<'PY'
+          import hashlib, json, sys
+          from pathlib import Path
+          ROOT=Path.cwd(); sys.path[:0]=[str(ROOT/'codegen'),str(ROOT/'scripts')]
+          import sdk_codegen as compiler
+          from probe_sdk_coverage import probes
+          openapi=compiler.OpenApiIndex.load(ROOT/'spec/openapi.yaml')
+          rust=compiler.RustIndex.load(ROOT/'src/generated')
+          configured=json.loads((ROOT/'codegen/sdk-semantics.json').read_text())
+          configured,_=compiler.expand_manifest(openapi,configured,
+              json.loads((ROOT/'codegen/sdk-taxonomy.json').read_text()),
+              json.loads((ROOT/'src/generated/coverage.json').read_text()),rust)
+          modules,rejected=probes(openapi,rust,configured)
+          report={'generated_candidates':sorted(modules),'rejected_candidates':rejected}
+          baseline={'schema_version':1,'generated_candidates':len(modules),'rejected_candidates':len(rejected),
+              'report_sha256':hashlib.sha256(json.dumps(report,sort_keys=True,separators=(',',':')).encode()).hexdigest()}
+          (ROOT/'codegen/sdk-probe-baseline.json').write_text(json.dumps(baseline,indent=2)+'\n')
+          print(json.dumps(baseline,indent=2))
+          PY
+      - name: Validate final tree
+        run: bash scripts/validate.sh
+      - name: Remove diagnostics/bootstrap and commit generated tree
+        run: |
+          rm -f scripts/apply_inline_response_projection.py \
+            .github/workflows/materialize-inline-responses.yml \
+            .github/workflows/analyze-inline-responses.yml \
+            .github/workflows/analyze-inline-rust-types.yml
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -A
+          git commit -m 'feat: project inline response shapes'
+          git push origin HEAD:feat/inline-response-projection
