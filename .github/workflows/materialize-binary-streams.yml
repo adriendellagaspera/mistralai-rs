@@ -32,11 +32,12 @@ jobs:
           python3 codegen/materialize_binary_streams.py
           python3 codegen/materialize_binary_lock.py
           python3 codegen/materialize_binary_test_fix.py
+          python3 codegen/materialize_binary_coverage_fix.py
           python3 scripts/codegen.py generate
           bash scripts/validate.sh
       - name: Commit materialized implementation
         run: |
-          rm codegen/materialize_binary_streams.py codegen/materialize_binary_lock.py codegen/materialize_binary_test_fix.py
+          rm codegen/materialize_binary_streams.py codegen/materialize_binary_lock.py codegen/materialize_binary_test_fix.py codegen/materialize_binary_coverage_fix.py
           rm .github/workflows/materialize-binary-streams.yml
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
