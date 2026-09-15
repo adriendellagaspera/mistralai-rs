@@ -29,6 +29,14 @@ jobs:
             .tools
             target
           key: sdk-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'codegen.lock') }}
+      - name: Generate bulk semantic facade
+        run: python3 scripts/codegen.py generate
+      - name: Upload generated semantic facade
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bulk-generated-sdk
+          path: src/sdk
       - name: Check generation, formatting, compilation, linting and tests
         run: bash scripts/validate.sh
       - name: Review generated public API changes
