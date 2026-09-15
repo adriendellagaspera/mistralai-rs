@@ -11,6 +11,7 @@ sys.path.insert(0, str(ROOT / "codegen"))
 
 import sdk_autoproject
 import sdk_codegen
+from rust_types import parse_type
 
 openapi = sdk_codegen.OpenApiIndex.load(ROOT / "spec/openapi.yaml")
 rust = sdk_codegen.RustIndex.load(ROOT / "src/generated")
@@ -50,6 +51,42 @@ def describe(schema: dict) -> str:
     return prefix + f"other:{kind}"
 
 
+def core_type(raw_type: str) -> str:
+    syntax = parse_type(raw_type)
+    while (inner := syntax.unary("Option")) is not None:
+        syntax = inner
+    while (inner := syntax.unary("Vec")) is not None:
+        syntax = inner
+    return syntax.spelling
+
+
+def union_details(schema: dict, raw_type: str) -> str | None:
+    schema, _ = sdk_autoproject._nullable(schema)
+    while schema.get("type") == "array":
+        schema = schema.get("items", {})
+    ref = sdk_autoproject._schema_ref(schema)
+    if ref:
+        schema = openapi.schemas.get(ref, {})
+    branches = schema.get("oneOf", []) or schema.get("anyOf", [])
+    if not branches:
+        return None
+    raw_union = core_type(raw_type)
+    variants = rust.enums.get(raw_union)
+    raw_desc = "not-enum" if variants is None else ",".join(
+        f"{variant.name}:{variant.payload or '-'}" for variant in variants
+    )
+    branch_desc = []
+    for branch in branches:
+        branch_ref = sdk_autoproject._schema_ref(branch)
+        if branch_ref:
+            branch_desc.append(f"ref:{branch_ref}")
+        else:
+            branch_desc.append(describe(branch))
+    discriminator = schema.get("discriminator", {})
+    mapping = discriminator.get("mapping", {}) if isinstance(discriminator, dict) else {}
+    return f"raw={raw_union}[{raw_desc}] branches=[{','.join(branch_desc)}] mapping={mapping}"
+
+
 summary = Counter()
 print(f"remaining request_model_projection operations: {len(targets)}")
 for operation_id in targets:
@@ -67,6 +104,7 @@ for operation_id in targets:
     schema = openapi.schemas[raw]
     raw_fields = {field.name.removeprefix("r#"): field for field in rust.fields(raw)}
     failures = []
+    union_rows = []
     models = {}
     for field, field_schema in sorted(schema.get("properties", {}).items()):
         raw_field = raw_fields.get(field)
@@ -78,13 +116,18 @@ for operation_id in targets:
         )
         if failure:
             failures.append((field, failure, describe(field_schema), raw_field.type))
+            details = union_details(field_schema, raw_field.type)
+            if details:
+                union_rows.append(f"{field}: {details}")
     if not failures:
         failures.append(("<model>", "model_level_mismatch", "-", "-"))
-    categories = sorted({shape.split(":", 1)[0].replace("nullable", "nullable") for _, _, shape, _ in failures})
+    categories = sorted({shape.split(":", 1)[0] for _, _, shape, _ in failures})
     for category in categories:
         summary[category] += 1
     details = "; ".join(f"{field}={shape} -> {raw_type}" for field, _, shape, raw_type in failures)
     print(f"{operation_id}\t{','.join(categories)}\t{details}")
+    for row in union_rows:
+        print(f"  UNION {row}")
 
 print("SUMMARY")
 for key, count in summary.most_common():
