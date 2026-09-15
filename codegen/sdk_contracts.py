@@ -108,7 +108,8 @@ def coverage_inventory(openapi, rust, ir) -> dict:
         responses = [r for status, r in operation.get("responses", {}).items() if str(status).startswith("2")]
         if len(responses) != 1:
             reasons.append("multiple_success_contracts")
-        if not any("application/json" in response.get("content", {}) for response in responses):
+        if (any(response.get("content") for response in responses)
+                and not any("application/json" in response.get("content", {}) for response in responses)):
             reasons.append("non_json_success")
         if any(p.get("in") not in {"query", "path"} or "$ref" in p for p in operation.get("parameters", [])):
             reasons.append("parameter_binding_projection")

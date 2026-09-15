@@ -55,6 +55,7 @@ impl ListBetaLibrariesDocumentsRequest {
         self
     }
 }
+
 #[derive(Clone, Copy)]
 pub struct BetaLibrariesDocuments<'a> {
     raw: &'a HttpClient,
@@ -64,6 +65,17 @@ impl<'a> BetaLibrariesDocuments<'a> {
     pub(crate) fn new(raw: &'a HttpClient) -> Self {
         Self { raw }
     }
+    pub async fn delete(
+        &self,
+        library_id: impl AsRef<str>,
+        document_id: impl AsRef<str>,
+    ) -> Result<(), SdkError> {
+        self.raw
+            .libraries_documents_delete_v1(library_id.as_ref(), document_id.as_ref())
+            .await
+            .map_err(Into::into)
+    }
+
     pub async fn status(
         &self,
         library_id: impl AsRef<str>,
@@ -116,6 +128,17 @@ impl<'a> BetaLibrariesDocuments<'a> {
             )
             .await
             .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn reprocess(
+        &self,
+        library_id: impl AsRef<str>,
+        document_id: impl AsRef<str>,
+    ) -> Result<(), SdkError> {
+        self.raw
+            .libraries_documents_reprocess_v1(library_id.as_ref(), document_id.as_ref())
+            .await
             .map_err(Into::into)
     }
 }

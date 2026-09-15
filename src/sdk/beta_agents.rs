@@ -109,6 +109,24 @@ impl<'a> BetaAgents<'a> {
             .map_err(Into::into)
     }
 
+    pub async fn delete(&self, agent_id: impl AsRef<str>) -> Result<(), SdkError> {
+        self.raw
+            .agents_api_v1_agents_delete(agent_id.as_ref())
+            .await
+            .map_err(Into::into)
+    }
+
+    pub async fn delete_version_alias(
+        &self,
+        agent_id: impl AsRef<str>,
+        alias: impl AsRef<str>,
+    ) -> Result<(), SdkError> {
+        self.raw
+            .agents_api_v1_agents_delete_alias(agent_id.as_ref(), alias.as_ref())
+            .await
+            .map_err(Into::into)
+    }
+
     pub async fn get(&self, request: GetBetaAgentsRequest) -> Result<AgentView, SdkError> {
         self.raw
             .agents_api_v1_agents_get(request.agent_id.as_str(), request.agent_version.as_deref())

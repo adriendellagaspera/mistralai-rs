@@ -63,6 +63,18 @@ impl<'a> WorkflowsExecutions<'a> {
             .map_err(Into::into)
     }
 
+    pub async fn cancel_workflow_execution(
+        &self,
+        execution_id: impl AsRef<str>,
+    ) -> Result<(), SdkError> {
+        self.raw
+            .cancel_workflow_execution_v1_workflows_executions_execution_id_cancel_post(
+                execution_id.as_ref(),
+            )
+            .await
+            .map_err(Into::into)
+    }
+
     pub async fn get_workflow_execution_trace_events(
         &self,
         request: GetWorkflowExecutionTraceEventsWorkflowsExecutionsRequest,
@@ -108,6 +120,32 @@ impl<'a> WorkflowsExecutions<'a> {
             .get_workflow_execution_v1_workflows_executions_execution_id_get(execution_id.as_ref())
             .await
             .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn reset_workflow(
+        &self,
+        execution_id: impl AsRef<str>,
+        request: ResetInvocationBodyParams,
+    ) -> Result<(), SdkError> {
+        self.raw
+            .reset_workflow_v1_workflows_executions_execution_id_reset_post(
+                execution_id.as_ref(),
+                request.into_raw(),
+            )
+            .await
+            .map_err(Into::into)
+    }
+
+    pub async fn terminate_workflow_execution(
+        &self,
+        execution_id: impl AsRef<str>,
+    ) -> Result<(), SdkError> {
+        self.raw
+            .terminate_workflow_execution_v1_workflows_executions_execution_id_terminate_post(
+                execution_id.as_ref(),
+            )
+            .await
             .map_err(Into::into)
     }
 }

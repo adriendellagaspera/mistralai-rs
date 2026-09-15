@@ -4028,6 +4028,68 @@ impl From<QueryWorkflowResponseView> for QueryWorkflowResponse {
 }
 
 #[derive(Debug, Clone)]
+pub struct ResetInvocationBodyParams {
+    raw: ResetInvocationBody,
+}
+
+impl ResetInvocationBodyParams {
+    pub fn new(event_id: i64) -> Self {
+        Self {
+            raw: ResetInvocationBody {
+                event_id,
+                exclude_signals: None,
+                exclude_updates: None,
+                reason: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn exclude_signals(mut self, exclude_signals: bool) -> Self {
+        self.raw.exclude_signals = Some(exclude_signals);
+        self
+    }
+
+    #[must_use]
+    pub fn exclude_updates(mut self, exclude_updates: bool) -> Self {
+        self.raw.exclude_updates = Some(exclude_updates);
+        self
+    }
+
+    #[must_use]
+    pub fn reason(mut self, reason: impl Into<String>) -> Self {
+        self.raw.reason = Some(Some(reason.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn reason_null(mut self) -> Self {
+        self.raw.reason = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ResetInvocationBody) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ResetInvocationBody {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ResetInvocationBody {
+        self.raw
+    }
+}
+
+impl From<ResetInvocationBody> for ResetInvocationBodyParams {
+    fn from(raw: ResetInvocationBody) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ResetInvocationBodyParams> for ResetInvocationBody {
+    fn from(value: ResetInvocationBodyParams) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct WorkflowScheduleResponseView {
     raw: WorkflowScheduleResponse,
 }

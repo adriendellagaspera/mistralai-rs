@@ -11,6 +11,13 @@ impl<'a> BetaConversations<'a> {
     pub(crate) fn new(raw: &'a HttpClient) -> Self {
         Self { raw }
     }
+    pub async fn delete(&self, conversation_id: impl AsRef<str>) -> Result<(), SdkError> {
+        self.raw
+            .agents_api_v1_conversations_delete(conversation_id.as_ref())
+            .await
+            .map_err(Into::into)
+    }
+
     pub async fn get_history(
         &self,
         conversation_id: impl AsRef<str>,

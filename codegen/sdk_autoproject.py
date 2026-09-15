@@ -83,17 +83,19 @@ def _schema_ref(schema: dict[str, Any]) -> str | None:
     return ref.rsplit("/", 1)[-1] if isinstance(ref, str) else None
 
 
-def _success_json_schema(operation: dict[str, Any]) -> tuple[dict[str, Any] | None, str | None]:
+def _success_contract(operation: dict[str, Any]) -> tuple[str | None, dict[str, Any] | None, str | None]:
     success = [response for status, response in operation.get("responses", {}).items()
                if str(status).startswith("2")]
     if len(success) != 1:
-        return None, "multiple_success_contracts"
+        return None, None, "multiple_success_contracts"
     content = success[0].get("content", {})
+    if not content:
+        return "empty", None, None
     if "application/json" not in content:
-        return None, "non_json_success"
+        return None, None, "non_json_success"
     if set(content) != {"application/json"}:
-        return None, "multiple_success_media"
-    return content["application/json"].get("schema", {}), None
+        return None, None, "multiple_success_media"
+    return "json", content["application/json"].get("schema", {}), None
 
 
 def _request_json_schema(operation: dict[str, Any]) -> tuple[dict[str, Any] | None, str | None]:
@@ -209,16 +211,18 @@ def expand_manifest(openapi: Any, manifest: dict[str, Any], taxonomy: dict[str, 
             rejected[operation_id] = "raw_symbol_mapping"
             continue
 
-        response_schema, reason = _success_json_schema(operation)
+        response_kind, response_schema, reason = _success_contract(operation)
         if reason:
             rejected[operation_id] = reason
             continue
-        response_raw = _schema_ref(response_schema or {})
-        if not response_raw:
-            rejected[operation_id] = "inline_or_unresolved_response"
-            continue
-        existing_response = _existing_model_by_raw(models, response_raw, False)
-        response = existing_response or _ensure_view_model(models, openapi.schemas, response_raw)
+        response = None
+        if response_kind == "json":
+            response_raw = _schema_ref(response_schema or {})
+            if not response_raw:
+                rejected[operation_id] = "inline_or_unresolved_response"
+                continue
+            existing_response = _existing_model_by_raw(models, response_raw, False)
+            response = existing_response or _ensure_view_model(models, openapi.schemas, response_raw)
 
         request_schema, reason = _request_json_schema(operation)
         if reason:
@@ -250,7 +254,11 @@ def expand_manifest(openapi: Any, manifest: dict[str, Any], taxonomy: dict[str, 
         if public_name in resource["operations"]:
             rejected[operation_id] = "public_method_collision"
             continue
-        item: dict[str, Any] = {"operation_id": operation_id, "response": response}
+        item: dict[str, Any] = {"operation_id": operation_id}
+        if response is not None:
+            item["response"] = response
+        elif response_kind == "empty":
+            item["empty_response"] = True
         if raw_method != operation_id:
             item["raw_method"] = raw_method
         if request:

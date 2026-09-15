@@ -307,6 +307,7 @@ class OperationSpec:
     request_overrides: tuple[tuple[str, bool | None], ...]
     stream: StreamPolicy | None
     request_raw: str | None = None
+    empty_response: bool = False
 
 
 @dataclass(frozen=True)
@@ -405,12 +406,18 @@ def build_ir(openapi: OpenApiIndex, rust: RustIndex, manifest: dict[str, Any]) -
         _validate_keys(config, {"name", "path", "operations"}, f"resource {module}")
         operations = []
         for public_name, item in config.get("operations", {}).items():
-            _validate_keys(item, {"operation_id", "raw_method", "request", "response", "request_overrides", "stream"}, f"operation {module}.{public_name}")
+            _validate_keys(item, {"operation_id", "raw_method", "request", "response", "empty_response", "request_overrides", "stream"}, f"operation {module}.{public_name}")
             operation_id = item["operation_id"]
             raw_method = item.get("raw_method", operation_id)
             raw_operation = rust.operation(raw_method)
             wire_operation = openapi.operation(operation_id)
             request, response = item.get("request"), item.get("response")
+            empty_response = item.get("empty_response", False)
+            success_modes = int(bool(response)) + int(bool(item.get("stream"))) + int(empty_response)
+            if success_modes != 1:
+                raise GenerationError(
+                    f"operation {module}.{public_name} requires exactly one response, stream or empty_response projection"
+                )
             for referenced in (request, response):
                 if referenced and referenced not in model_names:
                     raise GenerationError(f"unknown facade model {referenced}")
@@ -445,6 +452,13 @@ def build_ir(openapi: OpenApiIndex, rust: RustIndex, manifest: dict[str, Any]) -
                 raise GenerationError(f"duplicate raw parameter names for {raw_method}")
             if sorted(raw_parameter_names) != sorted(wire_parameter_names):
                 raise GenerationError(f"OpenAPI/raw parameter drift for {raw_method}")
+            if empty_response:
+                success = [value for status, value in wire_operation.get("responses", {}).items()
+                           if str(status).startswith("2")]
+                if len(success) != 1 or success[0].get("content"):
+                    raise GenerationError(f"empty response drift for {operation_id}")
+                if raw_operation.success_type != "()":
+                    raise GenerationError(f"raw empty response drift for {raw_method}")
             if response and not item.get("stream"):
                 model = next(model for model in models if model.name == response)
                 if not openapi.response_matches(operation_id, model.raw, rust):
@@ -478,7 +492,7 @@ def build_ir(openapi: OpenApiIndex, rust: RustIndex, manifest: dict[str, Any]) -
                            if request else None)
             operations.append(OperationSpec(public_name, operation_id, raw_method, request, response,
                                             tuple(item.get("request_overrides", {}).items()),
-                                            stream_policy(item.get("stream")), request_raw))
+                                            stream_policy(item.get("stream")), request_raw, empty_response))
         resource_path = tuple(config.get("path", (module,)))
         if not resource_path:
             raise GenerationError(f"resource {module} has an empty path")
@@ -1044,6 +1058,12 @@ def _emit_operation(operation: OperationSpec, rust: RustIndex, resource: Resourc
             f"    let events = streaming::json_events::<_, _, {item}>(bytes)\n"
             f"        .map(|event| event.map(|event| {wrapper}::from(event.data)).map_err(Into::into));\n"
             f"    Ok(Box::pin(events))\n}}"
+        )
+    if operation.empty_response:
+        separator = ", " if arguments else ""
+        return (
+            f"pub async fn {operation.name}(&self{separator}{arguments}) -> Result<(), SdkError> {{\n"
+            f"    self.raw.{operation.raw_method}({call}).await.map_err(Into::into)\n}}"
         )
     if not operation.response:
         raise GenerationError(f"operation {operation.operation_id} needs a response projection")
