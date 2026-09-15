@@ -61,7 +61,13 @@ def _simple_schema(schema: dict[str, Any]) -> bool:
 
 def _simple_accessor(schema: dict[str, Any], required: bool = True) -> str | None:
     schema, nullable = _nullable(schema)
-    optional = nullable or not required
+    # Nullable OpenAPI fields are currently emitted by the raw generator as
+    # Option<Option<T>> in several models. Do not guess away that distinction
+    # in the semantic layer; a later transport/model primitive can normalize it
+    # deliberately. The operation itself remains safely projectable.
+    if nullable:
+        return None
+    optional = not required
     if "$ref" in schema or "enum" in schema or "const" in schema or "format" in schema:
         return None
     kind = schema.get("type")
@@ -123,36 +129,23 @@ def _request_name(raw: str) -> str:
 
 
 def _ensure_view_model(models: dict[str, Any], schemas: dict[str, Any], raw: str,
-                       borrowed: bool, visiting: set[str] | None = None) -> str:
+                       borrowed: bool = False) -> str:
     name = _view_name(raw)
     if name in models:
         return name
-    visiting = set() if visiting is None else visiting
-    if raw in visiting:
-        models[name] = {"raw": raw, "borrowed": borrowed, "accessors": {}}
-        return name
-    visiting.add(raw)
     schema = schemas.get(raw, {})
     accessors: dict[str, Any] = {}
     required_fields = set(schema.get("required", []))
     for field, field_schema in sorted(schema.get("properties", {}).items()):
         if field in RUST_KEYWORDS or not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", field):
             continue
-        required = field in required_fields
-        kind = _simple_accessor(field_schema, required)
+        kind = _simple_accessor(field_schema, field in required_fields)
         if kind:
             accessors[field] = {"kind": kind, "path": [field]}
-            continue
-        normalized, nullable = _nullable(field_schema)
-        if nullable or not required:
-            continue
-        if normalized.get("type") == "array":
-            child_raw = _schema_ref(normalized.get("items", {}))
-            if child_raw and child_raw in schemas and child_raw not in visiting:
-                child = _ensure_view_model(models, schemas, child_raw, True, visiting)
-                accessors[field] = {"kind": "iter", "path": [field], "wrapper": child}
+    # Nested arrays/objects deliberately stay opaque in the first bulk pass.
+    # Auto-generating borrowed child wrappers requires proving lifetime shape
+    # against the raw Rust AST, which is a separate generic compiler primitive.
     models[name] = {"raw": raw, "borrowed": borrowed, "accessors": accessors}
-    visiting.remove(raw)
     return name
 
 
@@ -225,7 +218,7 @@ def expand_manifest(openapi: Any, manifest: dict[str, Any], taxonomy: dict[str, 
             rejected[operation_id] = "inline_or_unresolved_response"
             continue
         existing_response = _existing_model_by_raw(models, response_raw, False)
-        response = existing_response or _ensure_view_model(models, openapi.schemas, response_raw, False)
+        response = existing_response or _ensure_view_model(models, openapi.schemas, response_raw)
 
         request_schema, reason = _request_json_schema(operation)
         if reason:
