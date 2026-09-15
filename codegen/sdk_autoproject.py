@@ -30,7 +30,7 @@ def _pascal(value: str) -> str:
 
 
 def _resource_key(path: tuple[str, ...]) -> str:
-    return "__".join(path)
+    return "_".join(path)
 
 
 def _resource_name(path: tuple[str, ...]) -> str:
@@ -237,6 +237,9 @@ def expand_manifest(openapi: Any, manifest: dict[str, Any], taxonomy: dict[str, 
         for depth in range(1, len(resource_path) + 1):
             path = resource_path[:depth]
             key = _resource_key(path)
+            existing = resources.get(key)
+            if existing is not None and tuple(existing.get("path", (key,))) != path:
+                raise ValueError(f"resource module collision for {'.'.join(path)}")
             resource = resources.setdefault(key, {
                 "name": _resource_name(path),
                 "path": list(path),
