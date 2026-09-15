@@ -22,12 +22,12 @@ jobs:
             ~/.cargo/git
             .tools
             target
-          key: issue19-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'codegen.lock') }}
+          key: sdk-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'codegen.lock') }}
       - name: Materialize generic request projection
         run: |
           python3 scripts/materialize_issue_19.py
           python3 scripts/codegen.py generate
-          PYTHON=$(find .tools -path '*/bin/python' -type f | head -n1)
+          PYTHON=$(find .tools -path '*/bin/python' -name python | head -n1)
           "$PYTHON" scripts/update_probe_baseline_issue_19.py
           bash scripts/validate.sh
       - name: Remove materialization scaffolding and commit
