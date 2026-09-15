@@ -1,0 +1,85 @@
+name: Materialize binary stream projection
+on:
+  push:
+    branches:
+      - feat/binary-success-responses
+permissions:
+  contents: write
+concurrency:
+  group: materialize-binary-stream
+  cancel-in-progress: true
+jobs:
+  materialize:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install pinned Rust toolchain
+        run: rustup show
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            .tools
+            target
+          key: sdk-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'codegen.lock') }}
+      - name: Apply binary-stream compiler changes
+        run: python3 scripts/materialize_binary_stream.py
+      - name: Refresh official SDK taxonomy
+        run: python3 scripts/sdk_taxonomy_inventory.py update
+      - name: Regenerate raw SDK and facade
+        run: python3 scripts/codegen.py generate
+      - name: Refresh coverage probe baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          PYTHON=$(find .tools -path '*/bin/python' \( -type f -o -type l \) | head -n1)
+          "$PYTHON" - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+          import sys
+          ROOT = Path.cwd()
+          sys.path.insert(0, str(ROOT / "codegen"))
+          sys.path.insert(0, str(ROOT / "scripts"))
+          import sdk_codegen as compiler
+          import probe_sdk_coverage as probe
+          openapi = compiler.OpenApiIndex.load(ROOT / "spec/openapi.yaml")
+          rust = compiler.RustIndex.load(ROOT / "src/generated")
+          configured = json.loads((ROOT / "codegen/sdk-semantics.json").read_text())
+          configured, _ = compiler.expand_manifest(
+              openapi,
+              configured,
+              json.loads((ROOT / "codegen/sdk-taxonomy.json").read_text()),
+              json.loads((ROOT / "src/generated/coverage.json").read_text()),
+          )
+          modules, rejected = probe.probes(openapi, rust, configured)
+          report = {"generated_candidates": sorted(modules), "rejected_candidates": rejected}
+          digest = hashlib.sha256(
+              json.dumps(report, sort_keys=True, separators=(",", ":")).encode()
+          ).hexdigest()
+          actual = {
+              "schema_version": 1,
+              "generated_candidates": len(modules),
+              "rejected_candidates": len(rejected),
+              "report_sha256": digest,
+          }
+          (ROOT / "codegen/sdk-probe-baseline.json").write_text(json.dumps(actual, indent=2) + "\n")
+          print(actual)
+          PY
+      - name: Validate materialized tree
+        run: bash scripts/validate.sh
+      - name: Commit materialized sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm scripts/materialize_binary_stream.py .github/workflows/materialize-binary-stream.yml
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -A
+          git diff --cached --stat
+          git commit -m 'feat: align binary streams with official Mistral SDKs'
+          git push origin HEAD:feat/binary-success-responses
