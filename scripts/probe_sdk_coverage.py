@@ -1,4 +1,4 @@
-"""Compile disposable projections for unmapped JSON operation candidates.
+"""Compile disposable projections for unmapped operation candidates.
 
 This validates generic compiler capabilities, not public naming or ergonomics.
 No additional resource is committed or exposed by the SDK. Run with the pinned
@@ -28,11 +28,20 @@ def probes(openapi, rust, configured):
             continue
         try:
             request = openapi.request_schema(operation_id)
-            response = openapi.response_schema(operation_id)
-            if not response:
-                raise compiler.GenerationError("response is not a referenced model")
-            models = {"ProbeResponse": {"raw": response, "borrowed": False, "accessors": {}}}
-            operation = {"operation_id": operation_id, "response": "ProbeResponse"}
+            wire_operation = openapi.operation(operation_id)
+            success = [response for status, response in wire_operation.get("responses", {}).items()
+                       if str(status).startswith("2")]
+            empty_response = len(success) == 1 and not success[0].get("content")
+            models = {}
+            operation = {"operation_id": operation_id}
+            if empty_response:
+                operation["empty_response"] = True
+            else:
+                response = openapi.response_schema(operation_id)
+                if not response:
+                    raise compiler.GenerationError("response is not a referenced model")
+                models["ProbeResponse"] = {"raw": response, "borrowed": False, "accessors": {}}
+                operation["response"] = "ProbeResponse"
             if request:
                 models["ProbeRequest"] = {"raw": request, "constructor": sorted(openapi.schema(request).get("required", []))}
                 operation["request"] = "ProbeRequest"

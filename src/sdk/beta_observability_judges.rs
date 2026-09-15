@@ -55,6 +55,13 @@ impl<'a> BetaObservabilityJudges<'a> {
     pub(crate) fn new(raw: &'a HttpClient) -> Self {
         Self { raw }
     }
+    pub async fn delete(&self, judge_id: impl AsRef<str>) -> Result<(), SdkError> {
+        self.raw
+            .delete_judge_v1_observability_judges_judge_id_delete(judge_id.as_ref())
+            .await
+            .map_err(Into::into)
+    }
+
     pub async fn fetch(&self, judge_id: impl AsRef<str>) -> Result<JudgePreviewView, SdkError> {
         self.raw
             .get_judge_by_id_v1_observability_judges_judge_id_get(judge_id.as_ref())

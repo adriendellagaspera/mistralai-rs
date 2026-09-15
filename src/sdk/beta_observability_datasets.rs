@@ -109,6 +109,13 @@ impl<'a> BetaObservabilityDatasets<'a> {
             .map_err(Into::into)
     }
 
+    pub async fn delete(&self, dataset_id: impl AsRef<str>) -> Result<(), SdkError> {
+        self.raw
+            .delete_dataset_v1_observability_datasets_dataset_id_delete(dataset_id.as_ref())
+            .await
+            .map_err(Into::into)
+    }
+
     pub async fn export_to_jsonl(
         &self,
         dataset_id: impl AsRef<str>,

@@ -81,6 +81,35 @@ class AutoProjectionTests(unittest.TestCase):
         self.assertEqual(0, report["added_count"])
         self.assertEqual("request_model_projection", report["rejected"]["create_thing"])
 
+    def test_projects_empty_success_without_fake_response_model(self):
+        api = FakeOpenApi()
+        api.operations["delete_thing"] = {
+            "responses": {"204": {"description": "No Content"}},
+            "parameters": [],
+        }
+        expanded, report = sdk_autoproject.expand_manifest(
+            api, manifest(),
+            {"operations": {"delete_thing": ["things.delete"]}},
+            raw_coverage("delete_thing"),
+        )
+        self.assertEqual(1, report["added_count"])
+        operation = expanded["resources"]["things"]["operations"]["delete"]
+        self.assertTrue(operation["empty_response"])
+        self.assertNotIn("response", operation)
+
+    def test_binary_success_stays_review_debt(self):
+        api = FakeOpenApi()
+        api.operations["download_thing"] = {
+            "responses": {"200": {"content": {"application/octet-stream": {"schema": {"type": "string", "format": "binary"}}}}},
+            "parameters": [],
+        }
+        _, report = sdk_autoproject.expand_manifest(
+            api, manifest(),
+            {"operations": {"download_thing": ["things.download"]}},
+            raw_coverage("download_thing"),
+        )
+        self.assertEqual("non_json_success", report["rejected"]["download_thing"])
+
     def test_equal_depth_aliases_require_review(self):
         _, report = sdk_autoproject.expand_manifest(
             FakeOpenApi(), manifest(),

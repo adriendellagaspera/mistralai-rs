@@ -232,6 +232,55 @@ class GenericSdkCompilerTests(unittest.TestCase):
         diff = compare_surface(public_surface({"zoo.rs": before}), public_surface({"zoo.rs": after}))
         self.assertEqual(diff["classification"], "additive")
 
+    def test_empty_success_is_validated_and_emitted_as_unit(self):
+        document = openapi_document()
+        document["paths"]["/animals/{animal_id}"] = {
+            "delete": {
+                "operationId": "delete_animal",
+                "parameters": [{
+                    "name": "animal_id", "in": "path", "required": True,
+                    "schema": {"type": "string"},
+                }],
+                "responses": {"204": {"description": "No Content"}},
+            }
+        }
+        overlay = manifest()
+        overlay["resources"]["zoo"]["operations"]["delete"] = {
+            "operation_id": "delete_animal", "empty_response": True,
+        }
+        self.openapi.write_text(json.dumps(document))
+        self.overlay.write_text(json.dumps(overlay))
+        (self.raw / "client.rs").write_text(CLIENT + """
+impl HttpClient {
+    pub async fn delete_animal(&self, animal_id: impl AsRef<str>) -> Result<(), Error> { todo!() }
+}
+""")
+        resource = (self.generate() / "zoo.rs").read_text()
+        self.assertIn(
+            "pub async fn delete(&self, animal_id: impl AsRef<str>) -> Result<(), SdkError>",
+            resource,
+        )
+        self.assertIn("self.raw.delete_animal(animal_id.as_ref()).await.map_err(Into::into)", resource)
+
+    def test_empty_success_raw_drift_fails_closed(self):
+        document = openapi_document()
+        document["paths"]["/delete"] = {
+            "delete": {"operationId": "delete_animal", "responses": {"204": {"description": "No Content"}}}
+        }
+        overlay = manifest()
+        overlay["resources"]["zoo"]["operations"]["delete"] = {
+            "operation_id": "delete_animal", "empty_response": True,
+        }
+        self.openapi.write_text(json.dumps(document))
+        self.overlay.write_text(json.dumps(overlay))
+        (self.raw / "client.rs").write_text(CLIENT + """
+impl HttpClient {
+    pub async fn delete_animal(&self) -> Result<AnimalResponse, Error> { todo!() }
+}
+""")
+        with self.assertRaisesRegex(sdk_codegen.GenerationError, "raw empty response drift"):
+            self.generate()
+
     def test_inventory_includes_unmapped_operations(self):
         document = openapi_document()
         document["paths"]["/binary"] = {"get": {"operationId": "download", "responses": {"200": {"content": {"application/octet-stream": {}}}}}}

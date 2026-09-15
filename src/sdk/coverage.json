@@ -16,18 +16,14 @@
     "agents_api_v1_agents_delete": {
       "method": "delete",
       "path": "/v1/agents/{agent_id}",
-      "status": "capability_gap",
-      "review_reasons": [
-        "non_json_success"
-      ]
+      "status": "mapped",
+      "review_reasons": []
     },
     "agents_api_v1_agents_delete_alias": {
       "method": "delete",
       "path": "/v1/agents/{agent_id}/aliases",
-      "status": "capability_gap",
-      "review_reasons": [
-        "non_json_success"
-      ]
+      "status": "mapped",
+      "review_reasons": []
     },
     "agents_api_v1_agents_get": {
       "method": "get",
@@ -99,10 +95,8 @@
     "agents_api_v1_conversations_delete": {
       "method": "delete",
       "path": "/v1/conversations/{conversation_id}",
-      "status": "capability_gap",
-      "review_reasons": [
-        "non_json_success"
-      ]
+      "status": "mapped",
+      "review_reasons": []
     },
     "agents_api_v1_conversations_get": {
       "method": "get",
@@ -207,9 +201,8 @@
     "cancel_workflow_execution_v1_workflows_executions__execution_id__cancel_post": {
       "method": "post",
       "path": "/v1/workflows/executions/{execution_id}/cancel",
-      "status": "capability_gap",
+      "status": "mapped",
       "review_reasons": [
-        "non_json_success",
         "raw_symbol_mapping"
       ]
     },
@@ -393,42 +386,36 @@
       "path": "/v1/observability/campaigns/{campaign_id}",
       "status": "capability_gap",
       "review_reasons": [
-        "non_json_success",
         "raw_symbol_mapping"
       ]
     },
     "delete_dataset_record_v1_observability_dataset_records__dataset_record_id__delete": {
       "method": "delete",
       "path": "/v1/observability/dataset-records/{dataset_record_id}",
-      "status": "capability_gap",
+      "status": "mapped",
       "review_reasons": [
-        "non_json_success",
         "raw_symbol_mapping"
       ]
     },
     "delete_dataset_records_v1_observability_dataset_records_bulk_delete_post": {
       "method": "post",
       "path": "/v1/observability/dataset-records/bulk-delete",
-      "status": "capability_gap",
-      "review_reasons": [
-        "non_json_success"
-      ]
+      "status": "candidate_unverified",
+      "review_reasons": []
     },
     "delete_dataset_v1_observability_datasets__dataset_id__delete": {
       "method": "delete",
       "path": "/v1/observability/datasets/{dataset_id}",
-      "status": "capability_gap",
+      "status": "mapped",
       "review_reasons": [
-        "non_json_success",
         "raw_symbol_mapping"
       ]
     },
     "delete_judge_v1_observability_judges__judge_id__delete": {
       "method": "delete",
       "path": "/v1/observability/judges/{judge_id}",
-      "status": "capability_gap",
+      "status": "mapped",
       "review_reasons": [
-        "non_json_success",
         "raw_symbol_mapping"
       ]
     },
@@ -919,10 +906,8 @@
     "libraries_documents_delete_v1": {
       "method": "delete",
       "path": "/v1/libraries/{library_id}/documents/{document_id}",
-      "status": "capability_gap",
-      "review_reasons": [
-        "non_json_success"
-      ]
+      "status": "mapped",
+      "review_reasons": []
     },
     "libraries_documents_get_extracted_text_signed_url_v1": {
       "method": "get",
@@ -963,10 +948,8 @@
     "libraries_documents_reprocess_v1": {
       "method": "post",
       "path": "/v1/libraries/{library_id}/documents/{document_id}/reprocess",
-      "status": "capability_gap",
-      "review_reasons": [
-        "non_json_success"
-      ]
+      "status": "mapped",
+      "review_reasons": []
     },
     "libraries_documents_update_v1": {
       "method": "put",
@@ -1122,10 +1105,9 @@
     "reset_workflow_v1_workflows_executions__execution_id__reset_post": {
       "method": "post",
       "path": "/v1/workflows/executions/{execution_id}/reset",
-      "status": "capability_gap",
+      "status": "mapped",
       "review_reasons": [
         "composite_body_and_parameters",
-        "non_json_success",
         "raw_symbol_mapping"
       ]
     },
@@ -1170,9 +1152,8 @@
     "terminate_workflow_execution_v1_workflows_executions__execution_id__terminate_post": {
       "method": "post",
       "path": "/v1/workflows/executions/{execution_id}/terminate",
-      "status": "capability_gap",
+      "status": "mapped",
       "review_reasons": [
-        "non_json_success",
         "raw_symbol_mapping"
       ]
     },
@@ -1187,9 +1168,8 @@
     "unschedule_workflow_v1_workflows_schedules__schedule_id__delete": {
       "method": "delete",
       "path": "/v1/workflows/schedules/{schedule_id}",
-      "status": "capability_gap",
+      "status": "mapped",
       "review_reasons": [
-        "non_json_success",
         "raw_symbol_mapping"
       ]
     },
@@ -1199,7 +1179,6 @@
       "status": "capability_gap",
       "review_reasons": [
         "composite_body_and_parameters",
-        "non_json_success",
         "raw_symbol_mapping"
       ]
     },
@@ -1209,7 +1188,6 @@
       "status": "capability_gap",
       "review_reasons": [
         "composite_body_and_parameters",
-        "non_json_success",
         "raw_symbol_mapping"
       ]
     },
@@ -1228,7 +1206,6 @@
       "status": "capability_gap",
       "review_reasons": [
         "composite_body_and_parameters",
-        "non_json_success",
         "raw_symbol_mapping"
       ]
     },
@@ -1315,6 +1292,8 @@
     "beta_agents": {
       "operations": [
         "agents_api_v1_agents_create_or_update_alias",
+        "agents_api_v1_agents_delete",
+        "agents_api_v1_agents_delete_alias",
         "agents_api_v1_agents_get",
         "agents_api_v1_agents_get_version",
         "agents_api_v1_agents_list_pages",
@@ -1323,6 +1302,7 @@
     },
     "beta_conversations": {
       "operations": [
+        "agents_api_v1_conversations_delete",
         "agents_api_v1_conversations_history",
         "agents_api_v1_conversations_messages"
       ]
@@ -1341,10 +1321,13 @@
       "operations": [
         "batch_cancel_workflow_executions_v1_workflows_executions_cancel_post",
         "batch_terminate_workflow_executions_v1_workflows_executions_terminate_post",
+        "cancel_workflow_execution_v1_workflows_executions__execution_id__cancel_post",
         "get_workflow_execution_trace_events",
         "get_workflow_execution_trace_otel",
         "get_workflow_execution_trace_summary",
-        "get_workflow_execution_v1_workflows_executions__execution_id__get"
+        "get_workflow_execution_v1_workflows_executions__execution_id__get",
+        "reset_workflow_v1_workflows_executions__execution_id__reset_post",
+        "terminate_workflow_execution_v1_workflows_executions__execution_id__terminate_post"
       ]
     },
     "beta_connectors": {
@@ -1367,6 +1350,7 @@
     "beta_observability_datasets": {
       "operations": [
         "create_dataset_v1_observability_datasets_post",
+        "delete_dataset_v1_observability_datasets__dataset_id__delete",
         "export_dataset_to_jsonl_v1_observability_datasets__dataset_id__exports_to_jsonl_get",
         "get_dataset_by_id_v1_observability_datasets__dataset_id__get",
         "get_dataset_import_task_v1_observability_datasets__dataset_id__tasks__task_id__get",
@@ -1392,19 +1376,21 @@
     },
     "beta_observability_datasets_records": {
       "operations": [
+        "delete_dataset_record_v1_observability_dataset_records__dataset_record_id__delete",
         "get_dataset_record_v1_observability_dataset_records__dataset_record_id__get"
+      ]
+    },
+    "beta_observability_judges": {
+      "operations": [
+        "delete_judge_v1_observability_judges__judge_id__delete",
+        "get_judge_by_id_v1_observability_judges__judge_id__get",
+        "get_judges_v1_observability_judges_get"
       ]
     },
     "workflows_deployments": {
       "operations": [
         "get_deployment_v1_workflows_deployments__name__get",
         "list_deployments_v1_workflows_deployments_get"
-      ]
-    },
-    "beta_observability_judges": {
-      "operations": [
-        "get_judge_by_id_v1_observability_judges__judge_id__get",
-        "get_judges_v1_observability_judges_get"
       ]
     },
     "workflows_runs": {
@@ -1415,7 +1401,8 @@
     },
     "workflows_schedules": {
       "operations": [
-        "get_schedules_v1_workflows_schedules_get"
+        "get_schedules_v1_workflows_schedules_get",
+        "unschedule_workflow_v1_workflows_schedules__schedule_id__delete"
       ]
     },
     "workflows_events": {
@@ -1449,10 +1436,12 @@
     },
     "beta_libraries_documents": {
       "operations": [
+        "libraries_documents_delete_v1",
         "libraries_documents_get_status_v1",
         "libraries_documents_get_text_content_v1",
         "libraries_documents_get_v1",
-        "libraries_documents_list_v1"
+        "libraries_documents_list_v1",
+        "libraries_documents_reprocess_v1"
       ]
     },
     "beta_libraries_accesses": {
@@ -2494,6 +2483,15 @@
         "result"
       ]
     },
+    "ResetInvocationBodyParams": {
+      "raw": "ResetInvocationBody",
+      "fields": [
+        "event_id",
+        "exclude_signals",
+        "exclude_updates",
+        "reason"
+      ]
+    },
     "WorkflowScheduleResponseView": {
       "raw": "WorkflowScheduleResponse",
       "fields": [
@@ -2553,20 +2551,24 @@
   },
   "automatic_projection": {
     "schema_version": 1,
-    "added_count": 67,
-    "rejected_count": 88,
-    "report_sha256": "96a172349ed1577d7ce126e0ceed2da7a262845f12d1d990c7b27db5c231cb14",
+    "added_count": 79,
+    "rejected_count": 76,
+    "report_sha256": "6c32d9f281d072878e7021d1a1641101a4c1229aebcca89260db011a2fee87e5",
     "added": [
       "agents_api_v1_agents_create_or_update_alias",
+      "agents_api_v1_agents_delete",
+      "agents_api_v1_agents_delete_alias",
       "agents_api_v1_agents_get",
       "agents_api_v1_agents_get_version",
       "agents_api_v1_agents_list_pages",
       "agents_api_v1_agents_update_version",
+      "agents_api_v1_conversations_delete",
       "agents_api_v1_conversations_history",
       "agents_api_v1_conversations_messages",
       "archive_workflow_v1_workflows__workflow_identifier__archive_put",
       "batch_cancel_workflow_executions_v1_workflows_executions_cancel_post",
       "batch_terminate_workflow_executions_v1_workflows_executions_terminate_post",
+      "cancel_workflow_execution_v1_workflows_executions__execution_id__cancel_post",
       "connector_delete_organization_credentials_v1",
       "connector_delete_user_credentials_v1",
       "connector_delete_v1",
@@ -2579,6 +2581,9 @@
       "connector_list_workspace_credentials_v1",
       "create_dataset_v1_observability_datasets_post",
       "create_voice_v1_audio_voices_post",
+      "delete_dataset_record_v1_observability_dataset_records__dataset_record_id__delete",
+      "delete_dataset_v1_observability_datasets__dataset_id__delete",
+      "delete_judge_v1_observability_judges__judge_id__delete",
       "delete_voice_v1_audio_voices__voice_id__delete",
       "export_dataset_to_jsonl_v1_observability_datasets__dataset_id__exports_to_jsonl_get",
       "get_dataset_by_id_v1_observability_datasets__dataset_id__get",
@@ -2607,10 +2612,12 @@
       "jobs_api_routes_batch_get_batch_jobs",
       "libraries_create_v1",
       "libraries_delete_v1",
+      "libraries_documents_delete_v1",
       "libraries_documents_get_status_v1",
       "libraries_documents_get_text_content_v1",
       "libraries_documents_get_v1",
       "libraries_documents_list_v1",
+      "libraries_documents_reprocess_v1",
       "libraries_get_v1",
       "libraries_list_v1",
       "libraries_share_list_v1",
@@ -2620,22 +2627,22 @@
       "list_voices_v1_audio_voices_get",
       "post_dataset_records_from_file_v1_observability_datasets__dataset_id__imports_from_file_post",
       "post_dataset_records_from_playground_v1_observability_datasets__dataset_id__imports_from_playground_post",
+      "reset_workflow_v1_workflows_executions__execution_id__reset_post",
+      "terminate_workflow_execution_v1_workflows_executions__execution_id__terminate_post",
       "unarchive_workflow_v1_workflows__workflow_identifier__unarchive_put",
+      "unschedule_workflow_v1_workflows_schedules__schedule_id__delete",
       "update_dataset_v1_observability_datasets__dataset_id__patch",
       "update_voice_v1_audio_voices__voice_id__patch",
       "update_workflow_v1_workflows__workflow_identifier__put"
     ],
     "rejected": {
       "agents_api_v1_agents_create": "request_model_projection",
-      "agents_api_v1_agents_delete": "non_json_success",
-      "agents_api_v1_agents_delete_alias": "non_json_success",
       "agents_api_v1_agents_list": "inline_or_unresolved_response",
       "agents_api_v1_agents_list_version_aliases": "inline_or_unresolved_response",
       "agents_api_v1_agents_list_versions": "inline_or_unresolved_response",
       "agents_api_v1_agents_update": "request_model_projection",
       "agents_api_v1_conversations_append": "request_model_projection",
       "agents_api_v1_conversations_append_stream": "non_json_success",
-      "agents_api_v1_conversations_delete": "non_json_success",
       "agents_api_v1_conversations_get": "inline_or_unresolved_response",
       "agents_api_v1_conversations_list": "inline_or_unresolved_response",
       "agents_api_v1_conversations_restart": "request_model_projection",
@@ -2645,7 +2652,6 @@
       "agents_completion_v1_agents_completions_post": "taxonomy_alias_ambiguity",
       "audio_api_v1_transcriptions_post": "request_media_projection",
       "audio_api_v1_transcriptions_post_stream": "non_json_success",
-      "cancel_workflow_execution_v1_workflows_executions__execution_id__cancel_post": "non_json_success",
       "connector_call_tool_v1": "request_model_projection",
       "connector_create_or_update_organization_credentials_v1": "missing_official_taxonomy",
       "connector_create_or_update_user_credentials_v1": "missing_official_taxonomy",
@@ -2658,10 +2664,7 @@
       "create_dataset_record_v1_observability_datasets__dataset_id__records_post": "request_model_projection",
       "create_judge_v1_observability_judges_post": "request_model_projection",
       "delete_campaign_v1_observability_campaigns__campaign_id__delete": "missing_official_taxonomy",
-      "delete_dataset_record_v1_observability_dataset_records__dataset_record_id__delete": "non_json_success",
-      "delete_dataset_records_v1_observability_dataset_records_bulk_delete_post": "non_json_success",
-      "delete_dataset_v1_observability_datasets__dataset_id__delete": "non_json_success",
-      "delete_judge_v1_observability_judges__judge_id__delete": "non_json_success",
+      "delete_dataset_records_v1_observability_dataset_records_bulk_delete_post": "request_model_projection",
       "execute_workflow_registration_v1_workflows_registrations__workflow_registration_id__execute_post": "inline_or_unresolved_response",
       "execute_workflow_v1_workflows__workflow_identifier__execute_post": "inline_or_unresolved_response",
       "files_api_routes_download_file": "non_json_success",
@@ -2691,10 +2694,8 @@
       "judge_chat_completion_event_v1_observability_chat_completion_events__event_id__live_judging_post": "missing_official_taxonomy",
       "judge_conversation_v1_observability_judges__judge_id__live_judging_post": "request_model_projection",
       "judge_dataset_record_v1_observability_dataset_records__dataset_record_id__live_judging_post": "request_model_projection",
-      "libraries_documents_delete_v1": "non_json_success",
       "libraries_documents_get_extracted_text_signed_url_v1": "inline_or_unresolved_response",
       "libraries_documents_get_signed_url_v1": "inline_or_unresolved_response",
-      "libraries_documents_reprocess_v1": "non_json_success",
       "libraries_documents_update_v1": "request_model_projection",
       "libraries_documents_upload_v1": "multiple_success_contracts",
       "libraries_share_create_v1": "request_model_projection",
@@ -2703,16 +2704,13 @@
       "post_dataset_records_from_dataset_v1_observability_datasets__dataset_id__imports_from_dataset_post": "request_model_projection",
       "post_dataset_records_from_explorer_v1_observability_datasets__dataset_id__imports_from_explorer_post": "missing_official_taxonomy",
       "query_workflow_execution_v1_workflows_executions__execution_id__queries_post": "request_model_projection",
-      "reset_workflow_v1_workflows_executions__execution_id__reset_post": "non_json_success",
       "schedule_workflow_v1_workflows_schedules_post": "request_model_projection",
       "signal_workflow_execution_v1_workflows_executions__execution_id__signals_post": "request_model_projection",
       "speech_v1_audio_speech_post": "multiple_success_media",
       "stream_v1_workflows_executions__execution_id__stream_get": "non_json_success",
-      "terminate_workflow_execution_v1_workflows_executions__execution_id__terminate_post": "non_json_success",
-      "unschedule_workflow_v1_workflows_schedules__schedule_id__delete": "non_json_success",
-      "update_dataset_record_payload_v1_observability_dataset_records__dataset_record_id__payload_put": "non_json_success",
-      "update_dataset_record_properties_v1_observability_dataset_records__dataset_record_id__properties_put": "non_json_success",
-      "update_judge_v1_observability_judges__judge_id__put": "non_json_success",
+      "update_dataset_record_payload_v1_observability_dataset_records__dataset_record_id__payload_put": "request_model_projection",
+      "update_dataset_record_properties_v1_observability_dataset_records__dataset_record_id__properties_put": "request_model_projection",
+      "update_judge_v1_observability_judges__judge_id__put": "request_model_projection",
       "update_workflow_execution_v1_workflows_executions__execution_id__updates_post": "request_model_projection"
     }
   }
