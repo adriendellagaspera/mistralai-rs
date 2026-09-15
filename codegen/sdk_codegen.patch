@@ -1,5 +1,5 @@
 --- mistralai-rs-baseline/codegen/sdk_codegen.py	2026-09-15 12:15:52.000000000 +0000
-+++ mistralai-rs-bulk/codegen/sdk_codegen.py	2026-09-15 12:20:36.340135013 +0000
++++ mistralai-rs-bulk/codegen/sdk_codegen.py	2026-09-15 12:30:58.768344301 +0000
 @@ -20,6 +20,7 @@
  from rust_symbols import SymbolProvider, field_identifier
  from jsonschema import Draft202012Validator
@@ -25,7 +25,19 @@
          operations = []
          for public_name, item in config.get("operations", {}).items():
              _validate_keys(item, {"operation_id", "raw_method", "request", "response", "request_overrides", "stream"}, f"operation {module}.{public_name}")
-@@ -474,7 +476,10 @@
+@@ -438,7 +440,10 @@
+                                    if not request or parameter.type != model.raw)
+             wire_parameter_names = tuple(parameter["name"].replace("-", "_")
+                                          for parameter in wire_operation.get("parameters", []))
+-            if tuple(parameter.name for parameter in raw_parameters) != wire_parameter_names:
++            raw_parameter_names = tuple(parameter.name.removeprefix("r#") for parameter in raw_parameters)
++            if len(set(raw_parameter_names)) != len(raw_parameter_names):
++                raise GenerationError(f"duplicate raw parameter names for {raw_method}")
++            if sorted(raw_parameter_names) != sorted(wire_parameter_names):
+                 raise GenerationError(f"OpenAPI/raw parameter drift for {raw_method}")
+             if response and not item.get("stream"):
+                 model = next(model for model in models if model.name == response)
+@@ -474,7 +479,10 @@
              operations.append(OperationSpec(public_name, operation_id, raw_method, request, response,
                                              tuple(item.get("request_overrides", {}).items()),
                                              stream_policy(item.get("stream")), request_raw))
@@ -37,7 +49,7 @@
      ir = SdkIr(manifest.get("client", {}).get("name", "Client"), tuple(models), tuple(resources))
      _validate_symbols(ir, rust)
      return ir
-@@ -494,13 +499,20 @@
+@@ -494,13 +502,20 @@
                  raise ValueError(f"facade model {model.name} shadows imported raw type; choose an explicit semantic name")
          for reserved in ("error", "facade_types", "mod"):
              symbols.claim(reserved if reserved != "mod" else "mod_file", "modules", "runtime")
@@ -59,7 +71,7 @@
              for operation in resource.operations:
                  symbols.claim(operation.name, resource.name, operation.operation_id)
                  parameters = rust.operation(operation.raw_method).parameters
-@@ -1052,24 +1064,37 @@
+@@ -1052,24 +1067,37 @@
      )
  
  
@@ -101,7 +113,7 @@
      resources = "\n".join(f"pub use {resource.module}::{resource.name};" for resource in ir.resources)
      exported_types = [model.name for model in ir.models]
      exported_types.extend(operation.stream.type
-@@ -1077,8 +1102,8 @@
+@@ -1077,8 +1105,8 @@
                            if operation.stream)
      models = ", ".join(exported_types)
      accessors = "\n".join(
@@ -112,7 +124,7 @@
      )
      return GENERATED + f"""{declarations}
  pub mod error;
-@@ -1108,14 +1133,24 @@
+@@ -1108,14 +1136,24 @@
  """
  
  
@@ -138,7 +150,7 @@
      ir = build_ir(openapi, rust, manifest)
      target.mkdir(parents=True, exist_ok=True)
  
-@@ -1136,7 +1171,7 @@
+@@ -1136,7 +1174,7 @@
          filename = f"{resource.module}.rs"
          if filename in files or filename == "error.rs":
              raise GenerationError(f"resource collides with reserved output {filename}")
@@ -147,7 +159,7 @@
      try:
          surface = public_surface(files)
      except ValueError as error:
-@@ -1152,6 +1187,8 @@
+@@ -1152,6 +1190,8 @@
          "models": {model.name: {"raw": model.raw, "fields": sorted(field.name for field in rust.fields(model.raw)) if model.raw in rust.structs else []}
                     for model in ir.models},
      }
@@ -156,7 +168,7 @@
      (target / "coverage.json").write_text(json.dumps(coverage, indent=2) + "\n")
  
  
-@@ -1161,8 +1198,9 @@
+@@ -1161,8 +1201,9 @@
      parser.add_argument("target", type=Path)
      parser.add_argument("--manifest", type=Path, required=True)
      parser.add_argument("--openapi", type=Path)
