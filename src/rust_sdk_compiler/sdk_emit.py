@@ -395,7 +395,7 @@ def emit_resource(
                  for operation in resource.operations)
     imports = "use futures_util::StreamExt;\n" if streaming or binary else ""
     if streaming:
-        imports += f"use {runtime.sse_module};\n" + _prelude_imports(binding)
+        imports += _prelude_imports(binding)
     operations = "\n\n".join(
         emit_operation(operation, runtime) for operation in resource.operations
     )
