@@ -24,7 +24,7 @@ jobs:
         run: python3 scripts/codegen.py check
       - name: Print automatic projection report
         run: |
-          PYTHON=$(find .tools -path '*/bin/python' -type f | head -1)
+          PYTHON=$(find .tools -path '*/bin/python' | head -1)
           "$PYTHON" - <<'PY'
           import json, sys
           from pathlib import Path
