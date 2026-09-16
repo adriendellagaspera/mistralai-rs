@@ -163,13 +163,7 @@ impl<'a> Files<'a> {
             .files_api_routes_download_file_stream(file_id.as_ref())
             .await
             .map_err(SdkError::from)?;
-        let chunks = bytes.map(|chunk| {
-            chunk.map_err(|error| {
-                let transport =
-                    TransportError::from(crate::generated::client::HttpError::Network(error));
-                SdkError::from(transport)
-            })
-        });
+        let chunks = bytes.map(|chunk| chunk.map_err(Into::into));
         Ok(Box::pin(chunks))
     }
 }
