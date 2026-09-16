@@ -83,12 +83,13 @@ class ResolvedEmissionTests(unittest.TestCase):
                           "sdk_codegen", "sdk_model_lowering", "sdk_operation_lowering"):
             self.assertNotIn(forbidden, source)
 
-    def test_pipeline_is_the_only_source_aware_orchestrator(self):
+    def test_repository_pipeline_delegates_compilation_to_core(self):
         source = (ROOT / "codegen/sdk_pipeline.py").read_text()
-        self.assertIn("sdk_emit.emit(ir)", source)
+        self.assertIn("sdk_compiler.compile_facade", source)
+        self.assertNotIn("sdk_emit", source)
+        self.assertNotIn("resolve_models", source)
+        self.assertNotIn("resolve_operations", source)
         self.assertNotIn("frontend._emit_model", source)
-        self.assertNotIn("sdk_emit.emit_resource", source)
-        self.assertNotIn("sdk_emit.emit_mod", source)
 
 
 if __name__ == "__main__":
