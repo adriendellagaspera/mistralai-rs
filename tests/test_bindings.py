@@ -29,14 +29,16 @@ class BindingsPackageTests(unittest.TestCase):
         for name in ("menagerie", "library"):
             with self.subTest(name=name):
                 root = FIXTURES / name
-                expected = json.loads((root / "rust-bindings.json").read_text())
+                expected = Bindings.from_dict(
+                    json.loads((root / "rust-bindings.json").read_text())
+                )
                 actual = parse_bindings(
                     (root / "types.rs").read_bytes(),
                     (root / "client.rs").read_bytes(),
                 )
                 self.assertIsInstance(actual, Bindings)
-                self.assertEqual(actual.to_dict(), expected)
-                self.assertEqual(read_bindings(root).to_dict(), expected)
+                self.assertEqual(actual, expected)
+                self.assertEqual(read_bindings(root), expected)
 
     def test_package_does_not_import_compiler_internals(self):
         source = (SRC / "openapi_to_rust_bindings" / "parser.py").read_text()
