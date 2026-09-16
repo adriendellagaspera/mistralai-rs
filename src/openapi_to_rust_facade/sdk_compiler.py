@@ -36,6 +36,25 @@ def compile_ir(
         raise GenerationError(str(error)) from error
 
 
+def _validate_runtime(ir: FacadeIr, runtime: RustFacadeRuntime) -> None:
+    public_types = {ir.client_name, *(model.name for model in ir.models)}
+    public_types.update(resource.name for resource in ir.resources)
+    exported_runtime = set(runtime.error_exports) | {runtime.error_type}
+    collisions = sorted(public_types & exported_runtime)
+    if collisions:
+        raise GenerationError(
+            f"facade symbols collide with runtime exports: {collisions}"
+        )
+    resource_modules = {resource.module for resource in ir.resources}
+    if runtime.error_module in resource_modules or runtime.error_module in {
+        "mod",
+        "facade_types",
+    }:
+        raise GenerationError(
+            f"runtime error module collides with generated module: {runtime.error_module}"
+        )
+
+
 def compile_facade(
     openapi: OpenApiIndex,
     raw: RawIr,
@@ -45,4 +64,5 @@ def compile_facade(
 ) -> tuple[FacadeIr, dict[str, str]]:
     """Compile explicit semantics to resolved IR and deterministic Rust files."""
     ir = compile_ir(openapi, raw, manifest)
+    _validate_runtime(ir, runtime)
     return ir, sdk_emit.emit(ir, raw.binding, runtime)
