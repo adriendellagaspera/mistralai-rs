@@ -1,19 +1,16 @@
-"""Orchestrate semantic validation, lowering, and pure Rust emission."""
+"""Orchestrate projection, generic compilation, and repository audit outputs."""
 
 import argparse
 import json
 from pathlib import Path
 
-import sdk_codegen as frontend
-import sdk_emit
+import sdk_compiler
 from sdk_autoproject import expand_manifest
 from sdk_contracts import coverage_inventory, public_surface
-from sdk_model_lowering import resolve_models
-from sdk_operation_lowering import resolve_operations
 
 
-GENERATED = frontend.GENERATED
-GenerationError = frontend.GenerationError
+GENERATED = sdk_compiler.GENERATED
+GenerationError = sdk_compiler.GenerationError
 
 
 def generate(raw: Path, target: Path, manifest_path: Path, openapi_path: Path | None = None,
@@ -28,7 +25,8 @@ def generate(raw: Path, target: Path, manifest_path: Path, openapi_path: Path | 
         if candidate.exists():
             taxonomy_path = candidate
     manifest = json.loads(manifest_path.read_text())
-    openapi, rust = frontend.OpenApiIndex.load(openapi_path), frontend.RustIndex.load(raw)
+    openapi = sdk_compiler.OpenApiIndex.load(openapi_path)
+    rust = sdk_compiler.RustIndex.load(raw)
     projection_report = None
     if taxonomy_path is not None:
         taxonomy = json.loads(taxonomy_path.read_text())
@@ -36,12 +34,7 @@ def generate(raw: Path, target: Path, manifest_path: Path, openapi_path: Path | 
         manifest, projection_report = expand_manifest(
             openapi, manifest, taxonomy, raw_coverage, rust
         )
-    ir = frontend.build_ir(openapi, rust, manifest)
-    try:
-        ir = resolve_models(resolve_operations(ir, rust), openapi, rust)
-        files = sdk_emit.emit(ir)
-    except ValueError as error:
-        raise GenerationError(str(error)) from error
+    ir, files = sdk_compiler.compile_facade(openapi, rust, manifest)
     target.mkdir(parents=True, exist_ok=True)
 
     try:
