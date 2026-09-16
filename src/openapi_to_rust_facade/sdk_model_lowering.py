@@ -12,6 +12,7 @@ from sdk_ir import (AccessorKind, AliasModelSpec, ArgumentKind, ArgumentSpec,
                     CollectIntoValue, ConstructorSpec, EnumValue, FactorySpec,
                     FacadeIr, IntoModelValue, IntoStringValue, LiteralValue,
                     MapIntoValue, MapModelSpec, MapPolicy, ModelSpec, RequestPolicy, ResolvedAccessor,
+                    ScalarEnumModelSpec, ScalarEnumPolicy,
                     SetterSpec, SimpleUnionBranchSpec, SimpleUnionModelSpec,
                     SimpleUnionPolicy, SomeValue, StructFieldValue, StructValue,
                     TypeAliasPolicy, UnionBranchSpec, UnionModelSpec, UnionPolicy,
@@ -431,6 +432,30 @@ def _resolve_map(model: ModelSpec, openapi, raw_index) -> MapModelSpec:
     return MapModelSpec(_public_alias_type(mapping, raw_index), field.name)
 
 
+def _resolve_scalar_enum(model: ModelSpec, openapi, raw_index) -> ScalarEnumModelSpec:
+    assert isinstance(model.config, ScalarEnumPolicy)
+    schema = _schema_at(openapi, model.config.root, model.config.path)
+    values = schema.get("enum")
+    if (schema.get("type") != "string" or not isinstance(values, list) or not values
+            or not all(isinstance(value, str) for value in values)):
+        raise ModelLoweringError(
+            f"scalar enum policy {model.name} does not resolve to a string enum"
+        )
+    variants = raw_index.variants(model.raw)
+    if not variants or any(variant.payload is not None or variant.wire_name is None
+                           for variant in variants):
+        raise ModelLoweringError(
+            f"raw scalar enum {model.raw} requires unit variants with serde rename provenance"
+        )
+    by_wire = {variant.wire_name: variant.name for variant in variants}
+    if len(by_wire) != len(variants) or set(by_wire) != set(values):
+        raise ModelLoweringError(
+            f"raw scalar enum {model.raw} wire drift: "
+            f"expected={sorted(values)}, actual={sorted(by_wire)}"
+        )
+    return ScalarEnumModelSpec(tuple(by_wire[value] for value in values))
+
+
 def _resolve_model(model: ModelSpec, openapi, raw_index):
     if isinstance(model.config, UnionPolicy):
         return _resolve_union(model, openapi, raw_index)
@@ -442,6 +467,8 @@ def _resolve_model(model: ModelSpec, openapi, raw_index):
         )
     if isinstance(model.config, MapPolicy):
         return _resolve_map(model, openapi, raw_index)
+    if isinstance(model.config, ScalarEnumPolicy):
+        return _resolve_scalar_enum(model, openapi, raw_index)
     if isinstance(model.config, ViewPolicy):
         return _resolve_view(model, raw_index)
     return _resolve_wrapper(model, openapi, raw_index)

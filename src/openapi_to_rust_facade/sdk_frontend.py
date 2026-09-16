@@ -245,7 +245,7 @@ def build_ir(openapi: OpenApiIndex, rust: RawIr, manifest: dict[str, Any]) -> re
         raise GenerationError("unsupported SDK semantic manifest version")
     models = []
     for name, config in manifest.get("models", {}).items():
-        _validate_keys(config, {"raw", "constructor", "exclude", "adapters", "union", "simple_union", "type_alias", "map", "union_factory", "accessors", "borrowed"}, f"model {name}")
+        _validate_keys(config, {"raw", "constructor", "exclude", "adapters", "union", "simple_union", "type_alias", "map", "scalar_enum", "union_factory", "accessors", "borrowed"}, f"model {name}")
         raw = config.get("raw", name)
         if "union" in config:
             union = config["union"]

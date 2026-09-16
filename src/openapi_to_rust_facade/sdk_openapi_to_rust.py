@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import re
 
 from tree_sitter import Language, Node, Parser
 import tree_sitter_rust
@@ -23,6 +24,17 @@ def _text(source: bytes, node: Node | None) -> str:
 
 def _children(node: Node | None, kind: str) -> list[Node]:
     return [child for child in node.named_children if child.type == kind] if node else []
+
+
+def _serde_rename(attributes: list[str]) -> str | None:
+    matches = []
+    for attribute in attributes:
+        match = re.fullmatch(r'#\[serde\(rename\s*=\s*"([^"]+)"\)\]', attribute)
+        if match:
+            matches.append(match.group(1))
+    if len(matches) > 1:
+        raise OpenApiToRustAdapterError("multiple serde rename attributes on raw enum variant")
+    return matches[0] if matches else None
 
 
 class OpenApiToRustAdapter:
@@ -72,18 +84,33 @@ class OpenApiToRustAdapter:
             elif item.type == "enum_item":
                 name = _text(types_source, item.child_by_field_name("name"))
                 variants = []
-                for variant in _children(item.child_by_field_name("body"), "enum_variant"):
+                pending_attributes: list[str] = []
+                body_node = item.child_by_field_name("body")
+                for child in body_node.named_children if body_node else ():
+                    if child.type == "attribute_item":
+                        pending_attributes.append(_text(types_source, child))
+                        continue
+                    if child.type != "enum_variant":
+                        continue
+                    variant = child
                     variant_name = _text(types_source, variant.child_by_field_name("name"))
+                    attributes = pending_attributes + [
+                        _text(types_source, attribute)
+                        for attribute in _children(variant, "attribute_item")
+                    ]
+                    pending_attributes = []
                     body = variant.child_by_field_name("body")
                     payload = None
                     if body and body.type == "ordered_field_declaration_list":
-                        payload_nodes = list(body.named_children)
+                        payload_nodes = [node for node in body.named_children if node.type != "attribute_item"]
                         if len(payload_nodes) != 1:
                             raise OpenApiToRustAdapterError(
                                 f"raw enum {name}::{variant_name} is not unary"
                             )
                         payload = _text(types_source, payload_nodes[0])
-                    variants.append(RawVariant(variant_name, payload))
+                    variants.append(RawVariant(
+                        variant_name, payload, _serde_rename(attributes)
+                    ))
                 enums[name] = tuple(variants)
             elif item.type == "type_item":
                 name = _text(types_source, item.child_by_field_name("name"))

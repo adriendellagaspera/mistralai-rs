@@ -27,6 +27,7 @@ class RawField:
 class RawVariant:
     name: str
     payload: str | None
+    wire_name: str | None = None
 
 
 @dataclass(frozen=True)
@@ -87,8 +88,9 @@ class RawIr:
                 for name, fields in value["structs"].items()
             }
             enums = {
-                name: tuple(RawVariant(variant["name"], variant.get("payload"))
-                            for variant in variants)
+                name: tuple(RawVariant(
+                    variant["name"], variant.get("payload"), variant.get("wire_name")
+                ) for variant in variants)
                 for name, variants in value["enums"].items()
             }
             aliases = {
@@ -127,8 +129,8 @@ class RawIr:
                 for name, fields in self._structs
             },
             "enums": {
-                name: [{"name": variant.name, "payload": variant.payload}
-                       for variant in variants]
+                name: [{"name": variant.name, "payload": variant.payload,
+                        "wire_name": variant.wire_name} for variant in variants]
                 for name, variants in self._enums
             },
             "aliases": {name: syntax.spelling for name, syntax in self._aliases},
