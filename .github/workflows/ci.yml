@@ -19,7 +19,28 @@ jobs:
           from pathlib import Path
           import textwrap
           source = Path('.github/workflows/restructure-tooling-bootstrap.yml').read_text()
-          block = source.split('        run: |\n', 1)[1]
-          Path('/tmp/restructure-tooling.sh').write_text(textwrap.dedent(block))
+          block = textwrap.dedent(source.split('        run: |\n', 1)[1])
+          needle = '          chmod +x tooling/quality/validate.sh\n'
+          fix = r'''          python3 - <<'PYFIX'
+          from pathlib import Path
+
+          p = Path('tooling/tests/test_coverage.py')
+          text = p.read_text()
+          text = text.replace('ROOT / "codegen.lock"', 'ROOT / "tooling/sources/lock.json"')
+          text = text.replace('ROOT / "codegen/patches/generator.patch"', 'ROOT / "tooling/pipeline/openapi-to-rust.patch"')
+          p.write_text(text)
+
+          p = Path('tooling/tests/test_pipeline.py')
+          text = p.read_text()
+          text = text.replace('(self.root / "spec").mkdir()', '(self.root / "tooling/sources/openapi").mkdir(parents=True)')
+          text = text.replace('self.root / "codegen.lock"', 'self.root / "tooling/sources/lock.json"')
+          text = text.replace('self.root / "spec/openapi.yaml"', 'self.root / "tooling/sources/openapi/openapi.yaml"')
+          p.write_text(text)
+          PYFIX
+'''
+          if needle not in block:
+              raise SystemExit('bootstrap insertion point missing')
+          block = block.replace(needle, fix + needle)
+          Path('/tmp/restructure-tooling.sh').write_text(block)
           PY
           bash /tmp/restructure-tooling.sh
