@@ -1,38 +1,61 @@
-# openapi-to-rust-facade
+# openapi-rust-facade
 
-`openapi-to-rust-facade` compiles a deterministic, idiomatic Rust facade from three explicit inputs:
+`openapi-rust-facade` is a deterministic compiler for idiomatic Rust facades. Its core has no dependency on a particular Rust OpenAPI generator.
 
 ```text
-OpenAPI --------------------------\
-                                   -> validated FacadeIr -> Rust facade
-openapi-to-rust output -> RawIr --/
-explicit facade policy ----------/
+OpenAPI -------------------\
+RustBindingsIr -------------> validated FacadeIr -> deterministic Rust facade
+explicit facade policy ----/
+RustFacadeRuntime ---------/
 ```
 
-OpenAPI remains the wire-contract authority. `RawIr` describes the generated Rust symbols and signatures the facade must call. The policy supplies public naming and ergonomics that HTTP cannot express. Ambiguous drift fails closed.
+OpenAPI is the wire-contract authority. `RustBindingsIr` describes the Rust types, operation signatures, symbol paths and raw-client binding that already exist. The explicit facade policy supplies public naming and ergonomics that HTTP cannot express. Ambiguous drift fails closed.
+
+## Compiler API
+
+The core package depends only on YAML and JSON-schema support. It does not import tree-sitter or parse generated Rust source.
+
+```python
+from openapi_rust_facade import OpenApiIndex, RustBindingsIr, compile_facade
+
+wire = OpenApiIndex(openapi_document)
+bindings = RustBindingsIr.from_dict(bindings_document)
+ir, files = compile_facade(wire, bindings, policy)
+```
+
+`RustBindingsIr` schema version 2 is defined by `rust-bindings.schema.json`. Generator-specific module layouts and client names are data in that contract, not compiler constants. Consumer-owned error and streaming support is supplied through `RustFacadeRuntime`.
+
+## openapi-to-rust adapter
+
+`openapi-to-rust` is one optional bindings backend, not part of the compiler core. Install the adapter dependencies with:
+
+```text
+pip install 'openapi-rust-facade[openapi-to-rust]'
+```
+
+Then normalize generated source into the generic bindings contract:
+
+```python
+from openapi_rust_facade.adapters.openapi_to_rust import OpenApiToRustAdapter
+
+bindings = OpenApiToRustAdapter.load(generated_directory)
+```
+
+Only this adapter knows the `types.rs` / `client.rs` layout, `HttpClient`, `crate::generated::*`, serde attributes, or the Rust AST parser. An upstream machine-readable bindings sidecar can eventually replace this source parsing without changing the compiler.
 
 ## Compatibility
 
-Version `0.1.1` is validated against `openapi-to-rust` `0.16.0`, repository `gpu-cli/openapi-to-rust`, commit `2af34b86ca9f38c35787f13ec5841989efcf4b99`. The exact machine-readable contract is also recorded in `COMPATIBILITY.json`.
+Version `0.2.0` of the compiler uses Rust bindings schema version 2. The bundled `openapi-to-rust` adapter is validated against `openapi-to-rust` `0.16.0`, repository `gpu-cli/openapi-to-rust`, commit `2af34b86ca9f38c35787f13ec5841989efcf4b99`. The exact contract is recorded in `COMPATIBILITY.json`.
 
-The adapter currently parses `types.rs` and `client.rs`. `RawIr` is serializable through `to_dict()` / `from_dict()`, and `raw-ir.schema.json` defines the candidate sidecar an upstream generator could emit to remove source reparsing later.
+Compatibility is intentionally split in two:
 
-## API
-
-```python
-from openapi_to_rust_facade import OpenApiIndex, OpenApiToRustAdapter, compile_facade
-
-openapi = OpenApiIndex(document)
-raw = OpenApiToRustAdapter.parse(types_source, client_source)
-ir, files = compile_facade(openapi, raw, policy)
-```
-
-The compiler does not discover product taxonomy, track API coverage, or perform repository-specific semver audits. Those are consumer concerns.
+- compiler compatibility is defined by OpenAPI + `RustBindingsIr` + facade policy + runtime contract;
+- adapter compatibility is defined by whether a concrete generator revision can still normalize its output into equivalent `RustBindingsIr` and preserve the resulting facade.
 
 ## Validation
 
-The standalone test suite contains two unrelated fixtures plus focused primitive tests. Menagerie exercises discriminated request unions and wrapper projection. Library exercises nested resources, JSON bodies, optional parameters, empty success responses, and binary success streams. The scalar-enum test verifies that exact wire values carried by raw enum provenance lower into a public facade enum without generated-type leakage. Running the same fixture twice must produce byte-identical source maps.
+The standalone suite contains two unrelated fixtures. Menagerie exercises discriminated request unions and wrapper projection. Library exercises nested resources, JSON bodies, optional parameters, empty responses and binary streams. Core tests compile only from checked-in `RustBindingsIr` sidecars; adapter tests separately prove that `openapi-to-rust` source parsing reproduces those sidecars exactly. Repeated compilation must produce byte-identical source maps.
 
 ## Provenance and license
 
-The compiler sources in this package are extracted from the same repository history that introduced the facade compiler; the compatible `openapi-to-rust` backend is referenced and tested but none of its source code is vendored here. The package is licensed under either MIT or Apache-2.0, at your option, matching the included license files and keeping later upstream contribution possible.
+The compiler was extracted from the facade work originally developed in `mistralai-rs`; no `openapi-to-rust` source code is vendored. The package is licensed under either MIT or Apache-2.0, at your option, preserving a clean path for later upstream contribution.

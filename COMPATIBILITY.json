@@ -1,8 +1,9 @@
 {
   "schema_version": 1,
-  "package_version": "0.1.1",
-  "raw_ir_schema_version": 1,
-  "backend": {
+  "package_name": "openapi-rust-facade",
+  "package_version": "0.2.0",
+  "rust_bindings_schema_version": 2,
+  "adapter": {
     "name": "openapi-to-rust",
     "version": "0.16.0",
     "repository": "gpu-cli/openapi-to-rust",

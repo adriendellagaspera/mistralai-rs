@@ -3,23 +3,27 @@ requires = ["setuptools==75.8.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "openapi-to-rust-facade"
-version = "0.1.1"
-description = "Deterministic compiler from OpenAPI plus openapi-to-rust bindings to an idiomatic Rust SDK facade"
+name = "openapi-rust-facade"
+version = "0.2.0"
+description = "Deterministic Rust facade compiler over OpenAPI, normalized Rust bindings IR, and explicit facade policy"
 readme = "README.md"
 requires-python = ">=3.11"
 license = {text = "MIT OR Apache-2.0"}
 dependencies = [
   "ruamel.yaml==0.18.6",
+  "jsonschema==4.23.0",
+]
+
+[project.optional-dependencies]
+openapi-to-rust = [
   "tree-sitter==0.25.2",
   "tree-sitter-rust==0.24.0",
-  "jsonschema==4.23.0",
 ]
 
 [tool.setuptools]
 package-dir = {"" = "src"}
-packages = ["openapi_to_rust_facade"]
+packages = ["openapi_rust_facade", "openapi_rust_facade.adapters"]
 include-package-data = true
 
 [tool.setuptools.package-data]
-openapi_to_rust_facade = ["*.json"]
+openapi_rust_facade = ["*.json"]

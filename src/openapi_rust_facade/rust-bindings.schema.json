@@ -1,11 +1,19 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "openapi-to-rust facade RawIr sidecar",
+  "title": "Rust bindings IR consumed by openapi-to-rust-facade",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "structs", "enums", "aliases", "operations", "symbol_modules"],
+  "required": [
+    "schema_version",
+    "structs",
+    "enums",
+    "aliases",
+    "operations",
+    "symbol_paths",
+    "binding"
+  ],
   "properties": {
-    "schema_version": {"const": 1},
+    "schema_version": {"const": 2},
     "structs": {
       "type": "object",
       "additionalProperties": {
@@ -62,13 +70,56 @@
             }
           },
           "return_type": {"type": "string"},
-          "success_type": {"type": "string"}
+          "success_type": {"type": "string"},
+          "stream": {
+            "oneOf": [
+              {"type": "null"},
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["item_type", "error_type", "lifetime"],
+                "properties": {
+                  "item_type": {"type": "string"},
+                  "error_type": {"type": "string"},
+                  "lifetime": {"type": "string"}
+                }
+              }
+            ]
+          }
         }
       }
     },
-    "symbol_modules": {
+    "symbol_paths": {
       "type": "object",
-      "additionalProperties": {"enum": ["types", "client"]}
+      "additionalProperties": {"type": "string"}
+    },
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["client", "type_preludes"],
+      "properties": {
+        "client": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type_path",
+            "constructor",
+            "api_key_builder",
+            "base_url_builder"
+          ],
+          "properties": {
+            "type_path": {"type": "string"},
+            "constructor": {"type": "string"},
+            "api_key_builder": {"type": "string"},
+            "base_url_builder": {"type": "string"}
+          }
+        },
+        "type_preludes": {
+          "type": "array",
+          "items": {"type": "string"},
+          "uniqueItems": true
+        }
+      }
     }
   }
 }
