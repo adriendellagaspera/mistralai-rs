@@ -265,7 +265,7 @@
     "connector_create_v1": {
       "method": "post",
       "path": "/v1/connectors",
-      "status": "candidate_unverified",
+      "status": "mapped",
       "review_reasons": []
     },
     "connector_delete_organization_credentials_v1": {
@@ -797,7 +797,7 @@
     "jobs_api_routes_batch_create_batch_job": {
       "method": "post",
       "path": "/v1/batch/jobs",
-      "status": "candidate_unverified",
+      "status": "mapped",
       "review_reasons": []
     },
     "jobs_api_routes_batch_get_batch_job": {
@@ -985,7 +985,7 @@
     "libraries_share_create_v1": {
       "method": "put",
       "path": "/v1/libraries/{library_id}/share",
-      "status": "capability_gap",
+      "status": "mapped",
       "review_reasons": [
         "composite_body_and_parameters"
       ]
@@ -1334,6 +1334,7 @@
     "beta_connectors": {
       "operations": [
         "connector_call_tool_v1",
+        "connector_create_v1",
         "connector_delete_organization_credentials_v1",
         "connector_delete_user_credentials_v1",
         "connector_delete_v1",
@@ -1431,6 +1432,7 @@
     "batch_jobs": {
       "operations": [
         "jobs_api_routes_batch_cancel_batch_job",
+        "jobs_api_routes_batch_create_batch_job",
         "jobs_api_routes_batch_get_batch_job",
         "jobs_api_routes_batch_get_batch_jobs"
       ]
@@ -1457,6 +1459,7 @@
     },
     "beta_libraries_accesses": {
       "operations": [
+        "libraries_share_create_v1",
         "libraries_share_list_v1"
       ]
     }
@@ -2016,6 +2019,36 @@
         "tools"
       ]
     },
+    "AuthDataParams": {
+      "raw": "AuthData",
+      "fields": [
+        "client_id",
+        "client_secret"
+      ]
+    },
+    "ConnectorMCPCreateHeadersMap": {
+      "raw": "ConnectorMCPCreateHeaders",
+      "fields": [
+        "additional_properties"
+      ]
+    },
+    "ResourceVisibilityValue": {
+      "raw": "ResourceVisibility",
+      "fields": []
+    },
+    "ConnectorMCPCreateParams": {
+      "raw": "ConnectorMCPCreate",
+      "fields": [
+        "auth_data",
+        "description",
+        "headers",
+        "icon_url",
+        "name",
+        "server",
+        "system_prompt",
+        "visibility"
+      ]
+    },
     "MessageResponseView": {
       "raw": "MessageResponse",
       "fields": [
@@ -2041,13 +2074,6 @@
       "fields": [
         "items",
         "pagination"
-      ]
-    },
-    "AuthDataParams": {
-      "raw": "AuthData",
-      "fields": [
-        "client_id",
-        "client_secret"
       ]
     },
     "ConnectorMCPUpdateConnectionConfigMap": {
@@ -2428,6 +2454,41 @@
         "total_requests"
       ]
     },
+    "ApiEndpointValue": {
+      "raw": "ApiEndpoint",
+      "fields": []
+    },
+    "BatchJobInMetadataMap": {
+      "raw": "BatchJobInMetadata",
+      "fields": [
+        "additional_properties"
+      ]
+    },
+    "BatchRequestBodyMap": {
+      "raw": "BatchRequestBody",
+      "fields": [
+        "additional_properties"
+      ]
+    },
+    "BatchRequestParams": {
+      "raw": "BatchRequest",
+      "fields": [
+        "body",
+        "custom_id"
+      ]
+    },
+    "BatchJobInParams": {
+      "raw": "BatchJobIn",
+      "fields": [
+        "agent_id",
+        "endpoint",
+        "input_files",
+        "metadata",
+        "model",
+        "requests",
+        "timeout_hours"
+      ]
+    },
     "BatchJobsOutView": {
       "raw": "BatchJobsOut",
       "fields": [
@@ -2571,6 +2632,23 @@
         "share_with_type",
         "share_with_uuid",
         "user_id"
+      ]
+    },
+    "ShareEnumValue": {
+      "raw": "ShareEnum",
+      "fields": []
+    },
+    "EntityTypeValue": {
+      "raw": "EntityType",
+      "fields": []
+    },
+    "SharingInParams": {
+      "raw": "SharingIn",
+      "fields": [
+        "level",
+        "org_id",
+        "share_with_type",
+        "share_with_uuid"
       ]
     },
     "ListSharingOutView": {
@@ -2729,9 +2807,9 @@
   },
   "automatic_projection": {
     "schema_version": 1,
-    "added_count": 90,
-    "rejected_count": 65,
-    "report_sha256": "adf265d502e646c8f003e5fcd4b1021bff2ca3c0329bb5a00203849da34ee8e7",
+    "added_count": 93,
+    "rejected_count": 62,
+    "report_sha256": "ecf077c2c9ca2c034cc2de55cda04acabb9c48ea5ef2e3b30a6f0849be06c7de",
     "added": [
       "agents_api_v1_agents_create_or_update_alias",
       "agents_api_v1_agents_delete",
@@ -2748,6 +2826,7 @@
       "batch_terminate_workflow_executions_v1_workflows_executions_terminate_post",
       "cancel_workflow_execution_v1_workflows_executions__execution_id__cancel_post",
       "connector_call_tool_v1",
+      "connector_create_v1",
       "connector_delete_organization_credentials_v1",
       "connector_delete_user_credentials_v1",
       "connector_delete_v1",
@@ -2791,6 +2870,7 @@
       "get_workflow_registrations_v1_workflows_registrations_get",
       "get_workflow_v1_workflows__workflow_identifier__get",
       "jobs_api_routes_batch_cancel_batch_job",
+      "jobs_api_routes_batch_create_batch_job",
       "jobs_api_routes_batch_get_batch_job",
       "jobs_api_routes_batch_get_batch_jobs",
       "judge_conversation_v1_observability_judges__judge_id__live_judging_post",
@@ -2806,6 +2886,7 @@
       "libraries_documents_update_v1",
       "libraries_get_v1",
       "libraries_list_v1",
+      "libraries_share_create_v1",
       "libraries_share_list_v1",
       "libraries_update_v1",
       "list_deployments_v1_workflows_deployments_get",
@@ -2844,7 +2925,6 @@
       "connector_create_or_update_organization_credentials_v1": "missing_official_taxonomy",
       "connector_create_or_update_user_credentials_v1": "missing_official_taxonomy",
       "connector_create_or_update_workspace_credentials_v1": "missing_official_taxonomy",
-      "connector_create_v1": "request_model_projection",
       "connector_get_authentication_methods_v1": "inline_or_unresolved_response",
       "connector_list_tools_v1": "inline_or_unresolved_response",
       "create_campaign_v1_observability_campaigns_post": "missing_official_taxonomy",
@@ -2869,7 +2949,6 @@
       "get_voice_sample_audio_v1_audio_voices__voice_id__sample_get": "official_binary_transport_mismatch",
       "get_worker_info_v1_workflows_workers_whoami_get": "missing_official_taxonomy",
       "get_workflow_execution_history_v1_workflows_executions__execution_id__history_get": "inline_or_unresolved_response",
-      "jobs_api_routes_batch_create_batch_job": "request_model_projection",
       "jobs_api_routes_fine_tuning_cancel_fine_tuning_job": "missing_official_taxonomy",
       "jobs_api_routes_fine_tuning_create_fine_tuning_job": "missing_official_taxonomy",
       "jobs_api_routes_fine_tuning_get_fine_tuning_job": "missing_official_taxonomy",
@@ -2879,7 +2958,6 @@
       "libraries_documents_get_extracted_text_signed_url_v1": "inline_or_unresolved_response",
       "libraries_documents_get_signed_url_v1": "inline_or_unresolved_response",
       "libraries_documents_upload_v1": "multiple_success_contracts",
-      "libraries_share_create_v1": "request_model_projection",
       "libraries_share_delete_v1": "request_model_projection",
       "post_dataset_records_from_campaign_v1_observability_datasets__dataset_id__imports_from_campaign_post": "missing_official_taxonomy",
       "post_dataset_records_from_explorer_v1_observability_datasets__dataset_id__imports_from_explorer_post": "missing_official_taxonomy",

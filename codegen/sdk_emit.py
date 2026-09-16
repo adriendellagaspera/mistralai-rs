@@ -8,6 +8,7 @@ from sdk_ir import (AccessorKind, AliasModelSpec, ArgumentKind, ArgumentSpec,
                     BinaryResponse, CollectIntoValue, EmptyResponse, EnumValue,
                     FacadeIr, IntoModelValue, IntoStringValue, JsonResponse,
                     LiteralValue, MapIntoValue, MapModelSpec, ModelSpec, OperationSpec,
+                    ScalarEnumModelSpec,
                     ResourceSpec, SimpleUnionModelSpec, SomeValue, SseResponse,
                     StructValue, UnionModelSpec, VariableValue, ViewModelSpec,
                     WrapperModelSpec)
@@ -266,6 +267,21 @@ def _emit_map(model: ModelSpec, spec: MapModelSpec) -> str:
     )
 
 
+def _emit_scalar_enum(model: ModelSpec, spec: ScalarEnumModelSpec) -> str:
+    variants = ",".join(spec.variants)
+    arms = ",".join(
+        f"{model.name}::{variant} => Self::{variant}" for variant in spec.variants
+    )
+    return (
+        f"#[derive(Debug, Clone, Copy, PartialEq, Eq)]\n"
+        f"#[non_exhaustive]\npub enum {model.name} {{\n"
+        f"{_indent(variants)}\n}}\n\n"
+        f"impl From<{model.name}> for {model.raw} {{\n"
+        f"    fn from(value: {model.name}) -> Self {{ match value {{\n"
+        f"{_indent(arms, 8)}\n    }} }}\n}}"
+    )
+
+
 def emit_model(model: ModelSpec) -> str:
     spec = model.render
     if isinstance(spec, WrapperModelSpec):
@@ -280,6 +296,8 @@ def emit_model(model: ModelSpec) -> str:
         return f"pub type {model.name} = {spec.public_type};"
     if isinstance(spec, MapModelSpec):
         return _emit_map(model, spec)
+    if isinstance(spec, ScalarEnumModelSpec):
+        return _emit_scalar_enum(model, spec)
     raise TypeError(f"model {model.name} has not been resolved for rendering")
 
 

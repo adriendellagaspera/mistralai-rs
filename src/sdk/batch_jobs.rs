@@ -113,6 +113,14 @@ impl<'a> BatchJobs<'a> {
             .map_err(Into::into)
     }
 
+    pub async fn create(&self, request: BatchJobInParams) -> Result<BatchJobOutView, SdkError> {
+        self.raw
+            .jobs_api_routes_batch_create_batch_job(request.into_raw())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
     pub async fn get(&self, request: GetBatchJobsRequest) -> Result<BatchJobOutView, SdkError> {
         self.raw
             .jobs_api_routes_batch_get_batch_job(request.job_id.as_str(), request.inline.as_deref())

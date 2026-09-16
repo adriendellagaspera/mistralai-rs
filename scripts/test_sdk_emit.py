@@ -13,9 +13,11 @@ import sdk_codegen
 import sdk_compiler
 import sdk_emit
 import sdk_pipeline
+import sdk_model_lowering
+from sdk_openapi_to_rust import OpenApiToRustAdapter
 from sdk_ir import (AliasModelSpec, EmptyResponse, FacadeIr, ModelSpec, NoRequest,
                     OperationCall, OperationSpec, RawSignature, ResourceSpec,
-                    TypeAliasPolicy)
+                    ScalarEnumModelSpec, ScalarEnumPolicy, TypeAliasPolicy)
 from sdk_raw_ir import RawIr
 from test_sdk_facade import CLIENT, TYPES, manifest, openapi_document
 
@@ -49,6 +51,62 @@ class ResolvedEmissionTests(unittest.TestCase):
                 sdk_pipeline.generate(raw, root / "sdk", overlay, openapi, taxonomy)
             self.assertIsInstance(seen["raw"], RawIr)
             self.assertIn("adopt", seen["raw"].operations)
+
+    def test_scalar_enum_lowers_wire_contract_before_source_free_emission(self):
+        raw = OpenApiToRustAdapter.parse(
+            b'''pub enum RawVisibility {
+                #[serde(rename = "shared_global")]
+                SharedGlobal,
+                #[serde(rename = "private")]
+                Private,
+            }''',
+            b"impl HttpClient {}",
+        )
+        openapi = sdk_compiler.OpenApiIndex({
+            "openapi": "3.1.0", "paths": {},
+            "components": {"schemas": {"Root": {
+                "type": "object",
+                "properties": {"visibility": {
+                    "type": "string", "enum": ["shared_global", "private"],
+                }},
+            }}},
+        })
+        model = ModelSpec(
+            "VisibilityValue", "RawVisibility",
+            ScalarEnumPolicy("Root", ("visibility",)),
+        )
+        resolved = sdk_model_lowering.resolve_models(
+            FacadeIr("Client", (model,), ()), openapi, raw,
+        )
+        spec = resolved.models[0].render
+        self.assertIsInstance(spec, ScalarEnumModelSpec)
+        self.assertEqual(("SharedGlobal", "Private"), spec.variants)
+        source = sdk_emit.emit_model(resolved.models[0])
+        self.assertIn("pub enum VisibilityValue", source)
+        self.assertIn("VisibilityValue::SharedGlobal => Self::SharedGlobal", source)
+        self.assertNotIn("shared_global", source)
+
+    def test_scalar_enum_lowering_rejects_wire_drift(self):
+        raw = OpenApiToRustAdapter.parse(
+            b'''pub enum RawVisibility {
+                #[serde(rename = "shared_global")]
+                SharedGlobal,
+            }''',
+            b"impl HttpClient {}",
+        )
+        openapi = sdk_compiler.OpenApiIndex({
+            "openapi": "3.1.0", "paths": {},
+            "components": {"schemas": {"Root": {
+                "type": "object",
+                "properties": {"visibility": {"type": "string", "enum": ["private"]}},
+            }}},
+        })
+        model = ModelSpec(
+            "VisibilityValue", "RawVisibility",
+            ScalarEnumPolicy("Root", ("visibility",)),
+        )
+        with self.assertRaisesRegex(sdk_model_lowering.ModelLoweringError, "wire drift"):
+            sdk_model_lowering.resolve_models(FacadeIr("Client", (model,), ()), openapi, raw)
 
     def test_renderer_emits_hand_built_ir_without_source_contracts(self):
         model = ModelSpec(

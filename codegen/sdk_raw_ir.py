@@ -27,6 +27,7 @@ class RawField:
 class RawVariant:
     name: str
     payload: str | None
+    wire_name: str | None = None
 
 
 @dataclass(frozen=True)

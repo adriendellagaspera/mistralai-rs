@@ -73,6 +73,92 @@ class AutoProjectionTests(unittest.TestCase):
         self.assertEqual("CreateThingParams", expanded["resources"]["beta_things"]["operations"]["create"]["request"])
         self.assertEqual("ThingView", expanded["resources"]["beta_things"]["operations"]["list"]["response"])
 
+    def test_projects_named_scalar_enum_without_raw_type_leak(self):
+        api = FakeOpenApi()
+        api.schemas["CreateThing"] = {
+            "type": "object", "required": ["visibility"],
+            "properties": {
+                "visibility": {"$ref": "#/components/schemas/ResourceVisibility"},
+            },
+        }
+        api.schemas["ResourceVisibility"] = {
+            "type": "string", "enum": ["shared_global", "private"],
+        }
+        fields = {"CreateThing": (
+            SimpleNamespace(name="visibility", type="ResourceVisibility"),
+        )}
+        enums = {"ResourceVisibility": (
+            SimpleNamespace(name="SharedGlobal", payload=None, wire_name="shared_global"),
+            SimpleNamespace(name="Private", payload=None, wire_name="private"),
+        )}
+        rust = SimpleNamespace(
+            structs=set(fields), aliases={}, enums=enums,
+            symbol_modules={"CreateThing": "types", "ResourceVisibility": "types"},
+            fields=lambda name: fields[name],
+        )
+        expanded, report = sdk_autoproject.expand_manifest(
+            api, manifest(), {"operations": {"create_thing": ["things.create"]}},
+            raw_coverage("create_thing"), rust,
+        )
+        self.assertEqual(1, report["added_count"])
+        self.assertEqual(
+            {"visibility": "ResourceVisibilityValue"},
+            expanded["models"]["CreateThingParams"]["adapters"],
+        )
+        self.assertEqual(
+            {"raw": "ResourceVisibility",
+             "scalar_enum": {"root": "ResourceVisibility", "path": []}},
+            expanded["models"]["ResourceVisibilityValue"],
+        )
+
+    def test_scalar_enum_projection_fails_closed_on_wire_drift(self):
+        api = FakeOpenApi()
+        api.schemas["CreateThing"] = {
+            "type": "object", "required": ["visibility"],
+            "properties": {
+                "visibility": {"$ref": "#/components/schemas/ResourceVisibility"},
+            },
+        }
+        api.schemas["ResourceVisibility"] = {"type": "string", "enum": ["private"]}
+        fields = {"CreateThing": (
+            SimpleNamespace(name="visibility", type="ResourceVisibility"),
+        )}
+        enums = {"ResourceVisibility": (
+            SimpleNamespace(name="Private", payload=None, wire_name="shared_global"),
+        )}
+        rust = SimpleNamespace(
+            structs=set(fields), aliases={}, enums=enums,
+            symbol_modules={"CreateThing": "types", "ResourceVisibility": "types"},
+            fields=lambda name: fields[name],
+        )
+        _, report = sdk_autoproject.expand_manifest(
+            api, manifest(), {"operations": {"create_thing": ["things.create"]}},
+            raw_coverage("create_thing"), rust,
+        )
+        self.assertEqual("request_model_projection", report["rejected"]["create_thing"])
+
+    def test_rejects_required_field_missing_from_wire_properties(self):
+        api = FakeOpenApi()
+        api.schemas["CreateThing"]["required"] = ["name", "missing"]
+        fields = {
+            "CreateThing": (
+                SimpleNamespace(name="name", type="String"),
+                SimpleNamespace(name="enabled", type="Option<bool>"),
+            ),
+        }
+        rust = SimpleNamespace(
+            structs=set(fields), aliases={}, enums={},
+            symbol_modules={"CreateThing": "types"},
+            fields=lambda name: fields[name],
+        )
+        expanded, report = sdk_autoproject.expand_manifest(
+            api, manifest(),
+            {"operations": {"create_thing": ["things.create"]}},
+            raw_coverage("create_thing"), rust,
+        )
+        self.assertEqual("request_model_projection", report["rejected"]["create_thing"])
+        self.assertNotIn("CreateThingParams", expanded["models"])
+
     def test_projects_nested_request_objects_with_generated_adapters(self):
         api = FakeOpenApi()
         api.schemas["CreateThing"]["properties"]["tool"] = {"$ref": "#/components/schemas/Tool"}

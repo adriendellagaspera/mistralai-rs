@@ -54,6 +54,22 @@ class CompilerBoundaryTests(unittest.TestCase):
 
 
 class OpenApiToRustAdapterTests(unittest.TestCase):
+    def test_adapter_preserves_explicit_enum_wire_names(self):
+        raw = OpenApiToRustAdapter.parse(
+            b'''pub enum Visibility {
+                #[serde(rename = "shared_global")]
+                SharedGlobal,
+                #[serde(rename = "private")]
+                Private,
+            }''',
+            b"impl HttpClient {}",
+        )
+        self.assertEqual(
+            [("SharedGlobal", None, "shared_global"), ("Private", None, "private")],
+            [(variant.name, variant.payload, variant.wire_name)
+             for variant in raw.variants("Visibility")],
+        )
+
     def test_adapter_normalizes_supported_raw_shapes(self):
         types = TYPES + "\npub type MetadataDict = std::collections::BTreeMap<String, serde_json::Value>;\n"
         client = CLIENT + """
