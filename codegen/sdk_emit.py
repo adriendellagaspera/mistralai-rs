@@ -7,7 +7,7 @@ generated raw Rust, syntax trees, or semantic-overlay dictionaries.
 from sdk_ir import (AccessorKind, AliasModelSpec, ArgumentKind, ArgumentSpec,
                     BinaryResponse, CollectIntoValue, EmptyResponse, EnumValue,
                     FacadeIr, IntoModelValue, IntoStringValue, JsonResponse,
-                    LiteralValue, MapIntoValue, ModelSpec, OperationSpec,
+                    LiteralValue, MapIntoValue, MapModelSpec, ModelSpec, OperationSpec,
                     ResourceSpec, SimpleUnionModelSpec, SomeValue, SseResponse,
                     StructValue, UnionModelSpec, VariableValue, ViewModelSpec,
                     WrapperModelSpec)
@@ -246,6 +246,26 @@ def _emit_view(model: ModelSpec, spec: ViewModelSpec) -> str:
     )
 
 
+def _emit_map(model: ModelSpec, spec: MapModelSpec) -> str:
+    return (
+        f"#[derive(Debug, Clone, Default)]\npub struct {model.name} {{ values: {spec.public_type} }}\n\n"
+        f"impl {model.name} {{\n"
+        f"    pub fn new(values: {spec.public_type}) -> Self {{ Self {{ values }} }}\n"
+        f"    pub fn as_map(&self) -> &{spec.public_type} {{ &self.values }}\n"
+        f"    pub fn into_map(self) -> {spec.public_type} {{ self.values }}\n"
+        f"}}\n\n"
+        f"impl From<{spec.public_type}> for {model.name} {{\n"
+        f"    fn from(values: {spec.public_type}) -> Self {{ Self {{ values }} }}\n"
+        f"}}\n\n"
+        f"impl From<{model.raw}> for {model.name} {{\n"
+        f"    fn from(value: {model.raw}) -> Self {{ Self {{ values: value.{spec.raw_field} }} }}\n"
+        f"}}\n\n"
+        f"impl From<{model.name}> for {model.raw} {{\n"
+        f"    fn from(value: {model.name}) -> Self {{ Self {{ {spec.raw_field}: value.values }} }}\n"
+        f"}}"
+    )
+
+
 def emit_model(model: ModelSpec) -> str:
     spec = model.render
     if isinstance(spec, WrapperModelSpec):
@@ -258,6 +278,8 @@ def emit_model(model: ModelSpec) -> str:
         return _emit_view(model, spec)
     if isinstance(spec, AliasModelSpec):
         return f"pub type {model.name} = {spec.public_type};"
+    if isinstance(spec, MapModelSpec):
+        return _emit_map(model, spec)
     raise TypeError(f"model {model.name} has not been resolved for rendering")
 
 

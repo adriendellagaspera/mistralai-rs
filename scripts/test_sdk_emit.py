@@ -12,8 +12,9 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import sdk_codegen
 import sdk_compiler
 import sdk_emit
+import sdk_model_lowering
 import sdk_pipeline
-from sdk_ir import (AliasModelSpec, EmptyResponse, FacadeIr, ModelSpec, NoRequest,
+from sdk_ir import (AliasModelSpec, EmptyResponse, FacadeIr, MapModelSpec, MapPolicy, ModelSpec, NoRequest,
                     OperationCall, OperationSpec, RawSignature, ResourceSpec,
                     TypeAliasPolicy)
 from test_sdk_facade import CLIENT, TYPES, manifest, openapi_document
@@ -62,6 +63,47 @@ class ResolvedEmissionTests(unittest.TestCase):
                 sdk_pipeline.generate(raw, root / "sdk", overlay, openapi, taxonomy)
             self.assertIsInstance(seen["rust"], sdk_compiler.RustIndex)
             self.assertIn("adopt", seen["rust"].operations)
+
+    def test_map_policy_lowers_to_source_agnostic_render_spec(self):
+        rust = sdk_codegen.RustIndex(
+            b"pub struct RawMetadata { pub additional_properties: std::collections::BTreeMap<String, serde_json::Value>, }",
+            b"impl HttpClient {}",
+        )
+        openapi = sdk_codegen.OpenApiIndex({
+            "openapi": "3.1.0", "paths": {},
+            "components": {"schemas": {"Root": {
+                "type": "object",
+                "properties": {"metadata": {"type": "object", "additionalProperties": True}},
+            }}},
+        })
+        model = ModelSpec("Metadata", "RawMetadata", MapPolicy("Root", ("metadata",)))
+        resolved = sdk_model_lowering.resolve_models(FacadeIr("Client", (model,), ()), openapi, rust)
+        spec = resolved.models[0].render
+        self.assertIsInstance(spec, MapModelSpec)
+        self.assertEqual(
+            "std::collections::BTreeMap<String, serde_json::Value>", spec.public_type
+        )
+        source = sdk_emit.emit_model(resolved.models[0])
+        self.assertIn("pub struct Metadata { values: std::collections::BTreeMap<String, serde_json::Value> }", source)
+        self.assertIn("value.additional_properties", source)
+
+    def test_map_policy_fails_closed_on_raw_shape_drift(self):
+        rust = sdk_codegen.RustIndex(
+            b"pub struct RawMetadata { pub values: std::collections::BTreeMap<String, serde_json::Value>, }",
+            b"impl HttpClient {}",
+        )
+        openapi = sdk_codegen.OpenApiIndex({
+            "openapi": "3.1.0", "paths": {},
+            "components": {"schemas": {"Root": {
+                "type": "object",
+                "properties": {"metadata": {"type": "object", "additionalProperties": True}},
+            }}},
+        })
+        model = ModelSpec("Metadata", "RawMetadata", MapPolicy("Root", ("metadata",)))
+        with self.assertRaisesRegex(
+            sdk_model_lowering.ModelLoweringError, "must contain only additional_properties"
+        ):
+            sdk_model_lowering.resolve_models(FacadeIr("Client", (model,), ()), openapi, rust)
 
     def test_renderer_emits_hand_built_ir_without_source_contracts(self):
         model = ModelSpec(

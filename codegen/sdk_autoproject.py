@@ -165,6 +165,10 @@ def _union_name(raw: str) -> str:
     return f"{raw}Value"
 
 
+def _map_name(raw: str) -> str:
+    return f"{raw}Map"
+
+
 def _ensure_view_model(models: dict[str, Any], schemas: dict[str, Any], raw: str,
                        borrowed: bool = False) -> str:
     name = _view_name(raw)
@@ -235,6 +239,44 @@ def _ensure_alias_model(models: dict[str, Any], raw: str, rust: Any) -> tuple[st
     return name, None
 
 
+def _generated_map_wrapper(schema: dict[str, Any], raw: str, rust: Any) -> bool:
+    if raw not in rust.structs:
+        return False
+    fields = rust.fields(raw)
+    if len(fields) != 1 or fields[0].name.removeprefix("r#") != "additional_properties":
+        return False
+    mapping = parse_type(fields[0].type)
+    if mapping.constructor != "std::collections::BTreeMap" or len(mapping.arguments) != 2:
+        return False
+    key, value = mapping.arguments
+    if key.spelling != "String":
+        return False
+    additional = schema.get("additionalProperties")
+    if additional is True:
+        return value.spelling == "serde_json::Value"
+    if not isinstance(additional, dict):
+        return False
+    if value.spelling == "serde_json::Value":
+        return True
+    additional, _ = _nullable(additional)
+    expected = {"string": "String", "integer": "i64", "number": "f64", "boolean": "bool"}.get(additional.get("type"))
+    return expected == value.spelling
+
+
+def _ensure_map_model(models: dict[str, Any], schema: dict[str, Any], raw: str, rust: Any,
+                      root: str, path: tuple[str, ...]) -> tuple[str | None, str | None]:
+    if not _generated_map_wrapper(schema, raw, rust):
+        return None, "request_model_projection"
+    for name, config in models.items():
+        if config.get("raw", name) == raw and "map" in config:
+            return name, None
+    name = _map_name(raw)
+    if name in models and models[name].get("raw", name) != raw:
+        return None, "request_model_projection"
+    models[name] = {"raw": raw, "map": {"root": root, "path": list(path)}}
+    return name, None
+
+
 def _omittable_singleton_enum(schema: dict[str, Any], raw_type: str, schemas: dict[str, Any], rust: Any) -> bool:
     schema, _ = _nullable(schema)
     reference = _schema_ref(schema)
@@ -294,14 +336,15 @@ def _ensure_union_model(models: dict[str, Any], schemas: dict[str, Any], schema:
 
 
 def _request_field_adapter(models: dict[str, Any], schemas: dict[str, Any], schema: dict[str, Any],
-                           raw_type: str, rust: Any, resolving: tuple[str, ...]) -> tuple[str | None, str | None]:
+                           raw_type: str, rust: Any, resolving: tuple[str, ...],
+                           root: str, path: tuple[str, ...]) -> tuple[str | None, str | None]:
     schema, _ = _nullable(schema)
     syntax = _strip_options(parse_type(raw_type))
     if schema.get("type") == "array":
         inner = syntax.unary("Vec")
         if inner is None:
             return None, "request_model_projection"
-        return _request_field_adapter(models, schemas, schema.get("items", {}), inner.spelling, rust, resolving)
+        return _request_field_adapter(models, schemas, schema.get("items", {}), inner.spelling, rust, resolving, root, (*path, "items"))
 
     if schema.get("oneOf") or schema.get("anyOf"):
         return _ensure_union_model(models, schemas, schema, syntax.spelling, rust, resolving)
@@ -316,6 +359,8 @@ def _request_field_adapter(models: dict[str, Any], schemas: dict[str, Any], sche
         if target.get("type") == "object" and target.get("additionalProperties"):
             if syntax.spelling in rust.aliases:
                 return _ensure_alias_model(models, syntax.spelling, rust)
+            if _generated_map_wrapper(target, syntax.spelling, rust):
+                return _ensure_map_model(models, target, syntax.spelling, rust, reference, ())
             return (None, None) if _raw_public_leaf(syntax, rust) else (None, "request_model_projection")
         if _simple_schema(target):
             if syntax.spelling in rust.aliases:
@@ -326,6 +371,8 @@ def _request_field_adapter(models: dict[str, Any], schemas: dict[str, Any], sche
     if schema.get("type") == "object" and schema.get("additionalProperties"):
         if syntax.spelling in rust.aliases:
             return _ensure_alias_model(models, syntax.spelling, rust)
+        if _generated_map_wrapper(schema, syntax.spelling, rust):
+            return _ensure_map_model(models, schema, syntax.spelling, rust, root, path)
         return (None, None) if _raw_public_leaf(syntax, rust) else (None, "request_model_projection")
     if _simple_schema(schema):
         if syntax.spelling in rust.aliases:
@@ -364,7 +411,8 @@ def _ensure_request_model(models: dict[str, Any], schemas: dict[str, Any], raw: 
             excluded.append(field)
             continue
         adapter, reason = _request_field_adapter(
-            models, schemas, field_schema, raw_fields[field].type, rust, (*resolving, raw)
+            models, schemas, field_schema, raw_fields[field].type, rust, (*resolving, raw),
+            raw, (field,)
         )
         if reason:
             return None, reason

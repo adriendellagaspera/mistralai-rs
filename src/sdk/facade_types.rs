@@ -2360,6 +2360,92 @@ impl From<MCPToolCallResponseView> for MCPToolCallResponse {
     }
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct MCPToolCallRequestArgumentsMap {
+    values: std::collections::BTreeMap<String, serde_json::Value>,
+}
+
+impl MCPToolCallRequestArgumentsMap {
+    pub fn new(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
+        Self { values }
+    }
+    pub fn as_map(&self) -> &std::collections::BTreeMap<String, serde_json::Value> {
+        &self.values
+    }
+    pub fn into_map(self) -> std::collections::BTreeMap<String, serde_json::Value> {
+        self.values
+    }
+}
+
+impl From<std::collections::BTreeMap<String, serde_json::Value>>
+    for MCPToolCallRequestArgumentsMap
+{
+    fn from(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
+        Self { values }
+    }
+}
+
+impl From<MCPToolCallRequestArguments> for MCPToolCallRequestArgumentsMap {
+    fn from(value: MCPToolCallRequestArguments) -> Self {
+        Self {
+            values: value.additional_properties,
+        }
+    }
+}
+
+impl From<MCPToolCallRequestArgumentsMap> for MCPToolCallRequestArguments {
+    fn from(value: MCPToolCallRequestArgumentsMap) -> Self {
+        Self {
+            additional_properties: value.values,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct MCPToolCallRequestParams {
+    raw: MCPToolCallRequest,
+}
+
+impl MCPToolCallRequestParams {
+    pub fn new() -> Self {
+        Self {
+            raw: MCPToolCallRequest { arguments: None },
+        }
+    }
+    #[must_use]
+    pub fn arguments(mut self, arguments: impl Into<MCPToolCallRequestArgumentsMap>) -> Self {
+        self.raw.arguments = Some(Into::<MCPToolCallRequestArgumentsMap>::into(arguments).into());
+        self
+    }
+    pub fn from_raw(raw: MCPToolCallRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &MCPToolCallRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> MCPToolCallRequest {
+        self.raw
+    }
+}
+
+impl From<MCPToolCallRequest> for MCPToolCallRequestParams {
+    fn from(raw: MCPToolCallRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<MCPToolCallRequestParams> for MCPToolCallRequest {
+    fn from(value: MCPToolCallRequestParams) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for MCPToolCallRequestParams {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct ConnectorView {
     raw: Connector,
@@ -2502,6 +2588,333 @@ impl From<PaginatedConnectors> for PaginatedConnectorsView {
 impl From<PaginatedConnectorsView> for PaginatedConnectors {
     fn from(value: PaginatedConnectorsView) -> Self {
         value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct AuthDataParams {
+    raw: AuthData,
+}
+
+impl AuthDataParams {
+    pub fn new(client_id: impl Into<String>, client_secret: impl Into<String>) -> Self {
+        Self {
+            raw: AuthData {
+                client_id: client_id.into(),
+                client_secret: client_secret.into(),
+            },
+        }
+    }
+    pub fn from_raw(raw: AuthData) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &AuthData {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AuthData {
+        self.raw
+    }
+}
+
+impl From<AuthData> for AuthDataParams {
+    fn from(raw: AuthData) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<AuthDataParams> for AuthData {
+    fn from(value: AuthDataParams) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct ConnectorMCPUpdateConnectionConfigMap {
+    values: std::collections::BTreeMap<String, serde_json::Value>,
+}
+
+impl ConnectorMCPUpdateConnectionConfigMap {
+    pub fn new(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
+        Self { values }
+    }
+    pub fn as_map(&self) -> &std::collections::BTreeMap<String, serde_json::Value> {
+        &self.values
+    }
+    pub fn into_map(self) -> std::collections::BTreeMap<String, serde_json::Value> {
+        self.values
+    }
+}
+
+impl From<std::collections::BTreeMap<String, serde_json::Value>>
+    for ConnectorMCPUpdateConnectionConfigMap
+{
+    fn from(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
+        Self { values }
+    }
+}
+
+impl From<ConnectorMCPUpdateConnectionConfig> for ConnectorMCPUpdateConnectionConfigMap {
+    fn from(value: ConnectorMCPUpdateConnectionConfig) -> Self {
+        Self {
+            values: value.additional_properties,
+        }
+    }
+}
+
+impl From<ConnectorMCPUpdateConnectionConfigMap> for ConnectorMCPUpdateConnectionConfig {
+    fn from(value: ConnectorMCPUpdateConnectionConfigMap) -> Self {
+        Self {
+            additional_properties: value.values,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct ConnectorMCPUpdateConnectionSecretsMap {
+    values: std::collections::BTreeMap<String, serde_json::Value>,
+}
+
+impl ConnectorMCPUpdateConnectionSecretsMap {
+    pub fn new(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
+        Self { values }
+    }
+    pub fn as_map(&self) -> &std::collections::BTreeMap<String, serde_json::Value> {
+        &self.values
+    }
+    pub fn into_map(self) -> std::collections::BTreeMap<String, serde_json::Value> {
+        self.values
+    }
+}
+
+impl From<std::collections::BTreeMap<String, serde_json::Value>>
+    for ConnectorMCPUpdateConnectionSecretsMap
+{
+    fn from(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
+        Self { values }
+    }
+}
+
+impl From<ConnectorMCPUpdateConnectionSecrets> for ConnectorMCPUpdateConnectionSecretsMap {
+    fn from(value: ConnectorMCPUpdateConnectionSecrets) -> Self {
+        Self {
+            values: value.additional_properties,
+        }
+    }
+}
+
+impl From<ConnectorMCPUpdateConnectionSecretsMap> for ConnectorMCPUpdateConnectionSecrets {
+    fn from(value: ConnectorMCPUpdateConnectionSecretsMap) -> Self {
+        Self {
+            additional_properties: value.values,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct ConnectorMCPUpdateHeadersMap {
+    values: std::collections::BTreeMap<String, serde_json::Value>,
+}
+
+impl ConnectorMCPUpdateHeadersMap {
+    pub fn new(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
+        Self { values }
+    }
+    pub fn as_map(&self) -> &std::collections::BTreeMap<String, serde_json::Value> {
+        &self.values
+    }
+    pub fn into_map(self) -> std::collections::BTreeMap<String, serde_json::Value> {
+        self.values
+    }
+}
+
+impl From<std::collections::BTreeMap<String, serde_json::Value>> for ConnectorMCPUpdateHeadersMap {
+    fn from(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
+        Self { values }
+    }
+}
+
+impl From<ConnectorMCPUpdateHeaders> for ConnectorMCPUpdateHeadersMap {
+    fn from(value: ConnectorMCPUpdateHeaders) -> Self {
+        Self {
+            values: value.additional_properties,
+        }
+    }
+}
+
+impl From<ConnectorMCPUpdateHeadersMap> for ConnectorMCPUpdateHeaders {
+    fn from(value: ConnectorMCPUpdateHeadersMap) -> Self {
+        Self {
+            additional_properties: value.values,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ConnectorMCPUpdateParams {
+    raw: ConnectorMCPUpdate,
+}
+
+impl ConnectorMCPUpdateParams {
+    pub fn new() -> Self {
+        Self {
+            raw: ConnectorMCPUpdate {
+                auth_data: None,
+                connection_config: None,
+                connection_secrets: None,
+                description: None,
+                headers: None,
+                icon_url: None,
+                name: None,
+                server: None,
+                system_prompt: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn auth_data(mut self, auth_data: impl Into<AuthDataParams>) -> Self {
+        self.raw.auth_data = Some(Some(Into::<AuthDataParams>::into(auth_data).into()));
+        self
+    }
+
+    #[must_use]
+    pub fn auth_data_null(mut self) -> Self {
+        self.raw.auth_data = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn connection_config(
+        mut self,
+        connection_config: impl Into<ConnectorMCPUpdateConnectionConfigMap>,
+    ) -> Self {
+        self.raw.connection_config = Some(Some(
+            Into::<ConnectorMCPUpdateConnectionConfigMap>::into(connection_config).into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn connection_config_null(mut self) -> Self {
+        self.raw.connection_config = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn connection_secrets(
+        mut self,
+        connection_secrets: impl Into<ConnectorMCPUpdateConnectionSecretsMap>,
+    ) -> Self {
+        self.raw.connection_secrets = Some(Some(
+            Into::<ConnectorMCPUpdateConnectionSecretsMap>::into(connection_secrets).into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn connection_secrets_null(mut self) -> Self {
+        self.raw.connection_secrets = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.raw.description = Some(Some(description.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn description_null(mut self) -> Self {
+        self.raw.description = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn headers(mut self, headers: impl Into<ConnectorMCPUpdateHeadersMap>) -> Self {
+        self.raw.headers = Some(Some(
+            Into::<ConnectorMCPUpdateHeadersMap>::into(headers).into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn headers_null(mut self) -> Self {
+        self.raw.headers = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn icon_url(mut self, icon_url: impl Into<String>) -> Self {
+        self.raw.icon_url = Some(Some(icon_url.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn icon_url_null(mut self) -> Self {
+        self.raw.icon_url = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn name(mut self, name: impl Into<String>) -> Self {
+        self.raw.name = Some(Some(name.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn name_null(mut self) -> Self {
+        self.raw.name = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn server(mut self, server: url::Url) -> Self {
+        self.raw.server = Some(Some(server));
+        self
+    }
+
+    #[must_use]
+    pub fn server_null(mut self) -> Self {
+        self.raw.server = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn system_prompt(mut self, system_prompt: impl Into<String>) -> Self {
+        self.raw.system_prompt = Some(Some(system_prompt.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn system_prompt_null(mut self) -> Self {
+        self.raw.system_prompt = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ConnectorMCPUpdate) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ConnectorMCPUpdate {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ConnectorMCPUpdate {
+        self.raw
+    }
+}
+
+impl From<ConnectorMCPUpdate> for ConnectorMCPUpdateParams {
+    fn from(raw: ConnectorMCPUpdate) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ConnectorMCPUpdateParams> for ConnectorMCPUpdate {
+    fn from(value: ConnectorMCPUpdateParams) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for ConnectorMCPUpdateParams {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -3702,6 +4115,143 @@ impl From<JudgeOutputView> for JudgeOutput {
     }
 }
 
+#[derive(Debug, Clone, Default)]
+pub struct JudgeConversationRequestMessagesItemMap {
+    values: std::collections::BTreeMap<String, serde_json::Value>,
+}
+
+impl JudgeConversationRequestMessagesItemMap {
+    pub fn new(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
+        Self { values }
+    }
+    pub fn as_map(&self) -> &std::collections::BTreeMap<String, serde_json::Value> {
+        &self.values
+    }
+    pub fn into_map(self) -> std::collections::BTreeMap<String, serde_json::Value> {
+        self.values
+    }
+}
+
+impl From<std::collections::BTreeMap<String, serde_json::Value>>
+    for JudgeConversationRequestMessagesItemMap
+{
+    fn from(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
+        Self { values }
+    }
+}
+
+impl From<JudgeConversationRequestMessagesItem> for JudgeConversationRequestMessagesItemMap {
+    fn from(value: JudgeConversationRequestMessagesItem) -> Self {
+        Self {
+            values: value.additional_properties,
+        }
+    }
+}
+
+impl From<JudgeConversationRequestMessagesItemMap> for JudgeConversationRequestMessagesItem {
+    fn from(value: JudgeConversationRequestMessagesItemMap) -> Self {
+        Self {
+            additional_properties: value.values,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct JudgeConversationRequestPropertiesMap {
+    values: std::collections::BTreeMap<String, serde_json::Value>,
+}
+
+impl JudgeConversationRequestPropertiesMap {
+    pub fn new(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
+        Self { values }
+    }
+    pub fn as_map(&self) -> &std::collections::BTreeMap<String, serde_json::Value> {
+        &self.values
+    }
+    pub fn into_map(self) -> std::collections::BTreeMap<String, serde_json::Value> {
+        self.values
+    }
+}
+
+impl From<std::collections::BTreeMap<String, serde_json::Value>>
+    for JudgeConversationRequestPropertiesMap
+{
+    fn from(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
+        Self { values }
+    }
+}
+
+impl From<JudgeConversationRequestProperties> for JudgeConversationRequestPropertiesMap {
+    fn from(value: JudgeConversationRequestProperties) -> Self {
+        Self {
+            values: value.additional_properties,
+        }
+    }
+}
+
+impl From<JudgeConversationRequestPropertiesMap> for JudgeConversationRequestProperties {
+    fn from(value: JudgeConversationRequestPropertiesMap) -> Self {
+        Self {
+            additional_properties: value.values,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct JudgeConversationRequestParams {
+    raw: JudgeConversationRequest,
+}
+
+impl JudgeConversationRequestParams {
+    pub fn new(
+        messages: impl IntoIterator<Item = JudgeConversationRequestMessagesItemMap>,
+    ) -> Self {
+        Self {
+            raw: JudgeConversationRequest {
+                messages: messages.into_iter().map(Into::into).collect(),
+                properties: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn properties(
+        mut self,
+        properties: impl Into<JudgeConversationRequestPropertiesMap>,
+    ) -> Self {
+        self.raw.properties = Some(Some(
+            Into::<JudgeConversationRequestPropertiesMap>::into(properties).into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn properties_null(mut self) -> Self {
+        self.raw.properties = Some(None);
+        self
+    }
+    pub fn from_raw(raw: JudgeConversationRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &JudgeConversationRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> JudgeConversationRequest {
+        self.raw
+    }
+}
+
+impl From<JudgeConversationRequest> for JudgeConversationRequestParams {
+    fn from(raw: JudgeConversationRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<JudgeConversationRequestParams> for JudgeConversationRequest {
+    fn from(value: JudgeConversationRequestParams) -> Self {
+        value.into_raw()
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct PostDatasetRecordJudgingInSchemaParams {
     raw: PostDatasetRecordJudgingInSchema,
@@ -3956,6 +4506,113 @@ impl From<ListDocumentOut> for ListDocumentOutView {
 impl From<ListDocumentOutView> for ListDocumentOut {
     fn from(value: ListDocumentOutView) -> Self {
         value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct DocumentUpdateInAttributesMap {
+    values: std::collections::BTreeMap<String, serde_json::Value>,
+}
+
+impl DocumentUpdateInAttributesMap {
+    pub fn new(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
+        Self { values }
+    }
+    pub fn as_map(&self) -> &std::collections::BTreeMap<String, serde_json::Value> {
+        &self.values
+    }
+    pub fn into_map(self) -> std::collections::BTreeMap<String, serde_json::Value> {
+        self.values
+    }
+}
+
+impl From<std::collections::BTreeMap<String, serde_json::Value>> for DocumentUpdateInAttributesMap {
+    fn from(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
+        Self { values }
+    }
+}
+
+impl From<DocumentUpdateInAttributes> for DocumentUpdateInAttributesMap {
+    fn from(value: DocumentUpdateInAttributes) -> Self {
+        Self {
+            values: value.additional_properties,
+        }
+    }
+}
+
+impl From<DocumentUpdateInAttributesMap> for DocumentUpdateInAttributes {
+    fn from(value: DocumentUpdateInAttributesMap) -> Self {
+        Self {
+            additional_properties: value.values,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DocumentUpdateInParams {
+    raw: DocumentUpdateIn,
+}
+
+impl DocumentUpdateInParams {
+    pub fn new() -> Self {
+        Self {
+            raw: DocumentUpdateIn {
+                attributes: None,
+                name: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn attributes(mut self, attributes: impl Into<DocumentUpdateInAttributesMap>) -> Self {
+        self.raw.attributes = Some(Some(
+            Into::<DocumentUpdateInAttributesMap>::into(attributes).into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn attributes_null(mut self) -> Self {
+        self.raw.attributes = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn name(mut self, name: impl Into<String>) -> Self {
+        self.raw.name = Some(Some(name.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn name_null(mut self) -> Self {
+        self.raw.name = Some(None);
+        self
+    }
+    pub fn from_raw(raw: DocumentUpdateIn) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &DocumentUpdateIn {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DocumentUpdateIn {
+        self.raw
+    }
+}
+
+impl From<DocumentUpdateIn> for DocumentUpdateInParams {
+    fn from(raw: DocumentUpdateIn) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<DocumentUpdateInParams> for DocumentUpdateIn {
+    fn from(value: DocumentUpdateInParams) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for DocumentUpdateInParams {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -4478,6 +5135,90 @@ impl From<WorkflowUnarchiveResponse> for WorkflowUnarchiveResponseView {
 
 impl From<WorkflowUnarchiveResponseView> for WorkflowUnarchiveResponse {
     fn from(value: WorkflowUnarchiveResponseView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct PutDatasetRecordPropertiesInSchemaPropertiesMap {
+    values: std::collections::BTreeMap<String, serde_json::Value>,
+}
+
+impl PutDatasetRecordPropertiesInSchemaPropertiesMap {
+    pub fn new(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
+        Self { values }
+    }
+    pub fn as_map(&self) -> &std::collections::BTreeMap<String, serde_json::Value> {
+        &self.values
+    }
+    pub fn into_map(self) -> std::collections::BTreeMap<String, serde_json::Value> {
+        self.values
+    }
+}
+
+impl From<std::collections::BTreeMap<String, serde_json::Value>>
+    for PutDatasetRecordPropertiesInSchemaPropertiesMap
+{
+    fn from(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
+        Self { values }
+    }
+}
+
+impl From<PutDatasetRecordPropertiesInSchemaProperties>
+    for PutDatasetRecordPropertiesInSchemaPropertiesMap
+{
+    fn from(value: PutDatasetRecordPropertiesInSchemaProperties) -> Self {
+        Self {
+            values: value.additional_properties,
+        }
+    }
+}
+
+impl From<PutDatasetRecordPropertiesInSchemaPropertiesMap>
+    for PutDatasetRecordPropertiesInSchemaProperties
+{
+    fn from(value: PutDatasetRecordPropertiesInSchemaPropertiesMap) -> Self {
+        Self {
+            additional_properties: value.values,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct PutDatasetRecordPropertiesInSchemaParams {
+    raw: PutDatasetRecordPropertiesInSchema,
+}
+
+impl PutDatasetRecordPropertiesInSchemaParams {
+    pub fn new(properties: impl Into<PutDatasetRecordPropertiesInSchemaPropertiesMap>) -> Self {
+        Self {
+            raw: PutDatasetRecordPropertiesInSchema {
+                properties: Into::<PutDatasetRecordPropertiesInSchemaPropertiesMap>::into(
+                    properties,
+                )
+                .into(),
+            },
+        }
+    }
+    pub fn from_raw(raw: PutDatasetRecordPropertiesInSchema) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &PutDatasetRecordPropertiesInSchema {
+        &self.raw
+    }
+    pub fn into_raw(self) -> PutDatasetRecordPropertiesInSchema {
+        self.raw
+    }
+}
+
+impl From<PutDatasetRecordPropertiesInSchema> for PutDatasetRecordPropertiesInSchemaParams {
+    fn from(raw: PutDatasetRecordPropertiesInSchema) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<PutDatasetRecordPropertiesInSchemaParams> for PutDatasetRecordPropertiesInSchema {
+    fn from(value: PutDatasetRecordPropertiesInSchemaParams) -> Self {
         value.into_raw()
     }
 }
