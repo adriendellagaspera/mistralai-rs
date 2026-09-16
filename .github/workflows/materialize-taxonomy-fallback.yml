@@ -1,0 +1,113 @@
+name: Materialize taxonomy fallback
+on:
+  push:
+    branches: [issue-23-taxonomy-fallback-v2]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: write
+concurrency:
+  group: materialize-taxonomy-fallback-v2
+  cancel-in-progress: true
+jobs:
+  materialize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install pinned Rust toolchain
+        run: rustup show
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            .tools
+            target
+          key: sdk-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'codegen.lock') }}
+      - name: Apply deterministic taxonomy fallback
+        run: |
+          git show 83df7d28495c13b95e122e4ea275668fbdb7cf75:scripts/_implement_taxonomy_fallback.py > scripts/_apply_taxonomy_fallback.py
+          sed -i 's#codegen/sdk_autoproject.py#codegen/mistral/sdk_autoproject.py#g' scripts/_apply_taxonomy_fallback.py
+          sed -i 's#scripts/test_sdk_autoproject.py#codegen_tests/test_sdk_autoproject.py#g' scripts/_apply_taxonomy_fallback.py
+          python3 scripts/_apply_taxonomy_fallback.py
+          python3 -m py_compile codegen/mistral/sdk_autoproject.py codegen_tests/test_sdk_autoproject.py
+      - name: Regenerate SDK
+        run: python3 scripts/codegen.py generate
+      - name: Refresh coverage probe baseline
+        run: |
+          PYTHON=$(find .tools -path '*python-sdk-codegen*/bin/python' | head -1)
+          "$PYTHON" - <<'PY'
+          import hashlib, json, sys
+          from pathlib import Path
+          from openapi_to_rust_bindings import read_bindings
+          from rust_sdk_compiler import OpenApi
+          ROOT = Path.cwd()
+          sys.path[:0] = [str(ROOT / 'codegen' / 'mistral'), str(ROOT / 'scripts')]
+          from sdk_autoproject import expand_manifest
+          from probe_sdk_coverage import probes
+          openapi = OpenApi.load(ROOT / 'spec/openapi.yaml')
+          bindings = read_bindings(ROOT / 'src/generated')
+          configured = json.loads((ROOT / 'codegen/sdk-semantics.json').read_text())
+          configured, projection = expand_manifest(
+              openapi,
+              configured,
+              json.loads((ROOT / 'codegen/sdk-taxonomy.json').read_text()),
+              json.loads((ROOT / 'src/generated/coverage.json').read_text()),
+              bindings,
+          )
+          modules, rejected = probes(openapi, bindings, configured)
+          report = {'generated_candidates': sorted(modules), 'rejected_candidates': rejected}
+          baseline = {
+              'schema_version': 1,
+              'generated_candidates': len(modules),
+              'rejected_candidates': len(rejected),
+              'report_sha256': hashlib.sha256(
+                  json.dumps(report, sort_keys=True, separators=(',', ':')).encode()
+              ).hexdigest(),
+          }
+          (ROOT / 'codegen/sdk-probe-baseline.json').write_text(json.dumps(baseline, indent=2) + '\n')
+          print('PROJECTION=' + json.dumps({
+              'added_count': projection['added_count'],
+              'rejected_count': projection['rejected_count'],
+          }, sort_keys=True))
+          print('BASELINE=' + json.dumps(baseline, sort_keys=True))
+          PY
+      - name: Validate final tree
+        run: bash scripts/validate.sh
+      - name: Report residual gaps
+        run: |
+          PYTHON=$(find .tools -path '*python-sdk-codegen*/bin/python' | head -1)
+          "$PYTHON" - <<'PY'
+          import json, sys
+          from collections import Counter
+          from pathlib import Path
+          from openapi_to_rust_bindings import read_bindings
+          from rust_sdk_compiler import OpenApi
+          ROOT = Path.cwd()
+          sys.path.insert(0, str(ROOT / 'codegen' / 'mistral'))
+          from sdk_autoproject import expand_manifest
+          openapi = OpenApi.load(ROOT / 'spec/openapi.yaml')
+          bindings = read_bindings(ROOT / 'src/generated')
+          _, report = expand_manifest(
+              openapi,
+              json.loads((ROOT / 'codegen/sdk-semantics.json').read_text()),
+              json.loads((ROOT / 'codegen/sdk-taxonomy.json').read_text()),
+              json.loads((ROOT / 'src/generated/coverage.json').read_text()),
+              bindings,
+          )
+          print('AUTO_COVERAGE=' + f"{report['added_count']}/{report['rejected_count']}")
+          print('REASONS=' + json.dumps(Counter(report['rejected'].values()), sort_keys=True))
+          print('REJECTED=' + json.dumps(report['rejected'], sort_keys=True))
+          PY
+      - name: Commit clean implementation
+        run: |
+          rm -f scripts/_apply_taxonomy_fallback.py .github/workflows/materialize-taxonomy-fallback.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'feat: derive taxonomy fallback from OpenAPI tags'
+          git push origin HEAD:issue-23-taxonomy-fallback-v2
