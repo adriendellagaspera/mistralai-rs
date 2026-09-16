@@ -194,6 +194,17 @@ impl<'a> BetaConnectors<'a> {
             .map_err(Into::into)
     }
 
+    pub async fn create(
+        &self,
+        request: ConnectorMCPCreateParams,
+    ) -> Result<ConnectorView, SdkError> {
+        self.raw
+            .connector_create_v1(request.into_raw())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
     pub async fn delete_organization_credentials(
         &self,
         credentials_name: impl AsRef<str>,

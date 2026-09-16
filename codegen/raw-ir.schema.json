@@ -28,10 +28,11 @@
         "items": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["name", "payload"],
+          "required": ["name", "payload", "wire_name"],
           "properties": {
             "name": {"type": "string"},
-            "payload": {"type": ["string", "null"]}
+            "payload": {"type": ["string", "null"]},
+            "wire_name": {"type": ["string", "null"]}
           }
         }
       }

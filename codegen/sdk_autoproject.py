@@ -169,6 +169,10 @@ def _map_name(raw: str) -> str:
     return f"{raw}Map"
 
 
+def _scalar_enum_name(raw: str) -> str:
+    return f"{raw}Value"
+
+
 def _ensure_view_model(models: dict[str, Any], schemas: dict[str, Any], raw: str,
                        borrowed: bool = False) -> str:
     name = _view_name(raw)
@@ -277,6 +281,34 @@ def _ensure_map_model(models: dict[str, Any], schema: dict[str, Any], raw: str, 
     return name, None
 
 
+def _generated_scalar_enum(schema: dict[str, Any], raw: str, rust: Any) -> bool:
+    values = schema.get("enum")
+    if (schema.get("type") != "string" or not isinstance(values, list) or not values
+            or not all(isinstance(value, str) for value in values)):
+        return False
+    variants = rust.enums.get(raw)
+    if not variants or any(variant.payload is not None or variant.wire_name is None
+                           for variant in variants):
+        return False
+    wire = [variant.wire_name for variant in variants]
+    return len(set(wire)) == len(wire) and set(wire) == set(values)
+
+
+def _ensure_scalar_enum_model(models: dict[str, Any], schema: dict[str, Any], raw: str,
+                              rust: Any, root: str,
+                              path: tuple[str, ...]) -> tuple[str | None, str | None]:
+    if not _generated_scalar_enum(schema, raw, rust):
+        return None, "request_model_projection"
+    for name, config in models.items():
+        if config.get("raw", name) == raw and "scalar_enum" in config:
+            return name, None
+    name = _scalar_enum_name(raw)
+    if name in models and models[name].get("raw", name) != raw:
+        return None, "request_model_projection"
+    models[name] = {"raw": raw, "scalar_enum": {"root": root, "path": list(path)}}
+    return name, None
+
+
 def _omittable_singleton_enum(schema: dict[str, Any], raw_type: str, schemas: dict[str, Any], rust: Any) -> bool:
     schema, _ = _nullable(schema)
     reference = _schema_ref(schema)
@@ -352,6 +384,10 @@ def _request_field_adapter(models: dict[str, Any], schemas: dict[str, Any], sche
     reference = _schema_ref(schema)
     if reference:
         target = schemas.get(reference, {})
+        if target.get("type") == "string" and target.get("enum"):
+            return _ensure_scalar_enum_model(
+                models, target, syntax.spelling, rust, reference, ()
+            )
         if target.get("type") == "object" and target.get("properties"):
             if syntax.spelling != reference:
                 return None, "request_model_projection"
@@ -368,6 +404,10 @@ def _request_field_adapter(models: dict[str, Any], schemas: dict[str, Any], sche
             return (None, None) if _raw_public_leaf(syntax, rust) else (None, "request_model_projection")
         return None, "request_model_projection"
 
+    if schema.get("type") == "string" and schema.get("enum"):
+        return _ensure_scalar_enum_model(
+            models, schema, syntax.spelling, rust, root, path
+        )
     if schema.get("type") == "object" and schema.get("additionalProperties"):
         if syntax.spelling in rust.aliases:
             return _ensure_alias_model(models, syntax.spelling, rust)
@@ -390,6 +430,9 @@ def _ensure_request_model(models: dict[str, Any], schemas: dict[str, Any], raw: 
     if not schema or schema.get("type") != "object" or raw in resolving:
         return None, "request_model_projection"
     properties = schema.get("properties", {})
+    required = set(schema.get("required", []))
+    if not required <= set(properties):
+        return None, "request_model_projection"
     if rust is None:
         if not all(_simple_schema(value) for value in properties.values()):
             return None, "request_model_projection"

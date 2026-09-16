@@ -2479,6 +2479,200 @@ impl From<ConnectorView> for Connector {
 }
 
 #[derive(Debug, Clone)]
+pub struct AuthDataParams {
+    raw: AuthData,
+}
+
+impl AuthDataParams {
+    pub fn new(client_id: impl Into<String>, client_secret: impl Into<String>) -> Self {
+        Self {
+            raw: AuthData {
+                client_id: client_id.into(),
+                client_secret: client_secret.into(),
+            },
+        }
+    }
+    pub fn from_raw(raw: AuthData) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &AuthData {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AuthData {
+        self.raw
+    }
+}
+
+impl From<AuthData> for AuthDataParams {
+    fn from(raw: AuthData) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<AuthDataParams> for AuthData {
+    fn from(value: AuthDataParams) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct ConnectorMCPCreateHeadersMap {
+    values: std::collections::BTreeMap<String, serde_json::Value>,
+}
+
+impl ConnectorMCPCreateHeadersMap {
+    pub fn new(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
+        Self { values }
+    }
+    pub fn as_map(&self) -> &std::collections::BTreeMap<String, serde_json::Value> {
+        &self.values
+    }
+    pub fn into_map(self) -> std::collections::BTreeMap<String, serde_json::Value> {
+        self.values
+    }
+}
+
+impl From<std::collections::BTreeMap<String, serde_json::Value>> for ConnectorMCPCreateHeadersMap {
+    fn from(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
+        Self { values }
+    }
+}
+
+impl From<ConnectorMCPCreateHeaders> for ConnectorMCPCreateHeadersMap {
+    fn from(value: ConnectorMCPCreateHeaders) -> Self {
+        Self {
+            values: value.additional_properties,
+        }
+    }
+}
+
+impl From<ConnectorMCPCreateHeadersMap> for ConnectorMCPCreateHeaders {
+    fn from(value: ConnectorMCPCreateHeadersMap) -> Self {
+        Self {
+            additional_properties: value.values,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[non_exhaustive]
+pub enum ResourceVisibilityValue {
+    SharedGlobal,
+    SharedOrg,
+    SharedWorkspace,
+    Private,
+}
+
+impl From<ResourceVisibilityValue> for ResourceVisibility {
+    fn from(value: ResourceVisibilityValue) -> Self {
+        match value {
+            ResourceVisibilityValue::SharedGlobal => Self::SharedGlobal,
+            ResourceVisibilityValue::SharedOrg => Self::SharedOrg,
+            ResourceVisibilityValue::SharedWorkspace => Self::SharedWorkspace,
+            ResourceVisibilityValue::Private => Self::Private,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ConnectorMCPCreateParams {
+    raw: ConnectorMCPCreate,
+}
+
+impl ConnectorMCPCreateParams {
+    pub fn new(name: impl Into<String>, description: impl Into<String>, server: url::Url) -> Self {
+        Self {
+            raw: ConnectorMCPCreate {
+                auth_data: None,
+                description: description.into(),
+                headers: None,
+                icon_url: None,
+                name: name.into(),
+                server,
+                system_prompt: None,
+                visibility: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn auth_data(mut self, auth_data: impl Into<AuthDataParams>) -> Self {
+        self.raw.auth_data = Some(Some(Into::<AuthDataParams>::into(auth_data).into()));
+        self
+    }
+
+    #[must_use]
+    pub fn auth_data_null(mut self) -> Self {
+        self.raw.auth_data = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn headers(mut self, headers: impl Into<ConnectorMCPCreateHeadersMap>) -> Self {
+        self.raw.headers = Some(Some(
+            Into::<ConnectorMCPCreateHeadersMap>::into(headers).into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn headers_null(mut self) -> Self {
+        self.raw.headers = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn icon_url(mut self, icon_url: impl Into<String>) -> Self {
+        self.raw.icon_url = Some(Some(icon_url.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn icon_url_null(mut self) -> Self {
+        self.raw.icon_url = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn system_prompt(mut self, system_prompt: impl Into<String>) -> Self {
+        self.raw.system_prompt = Some(Some(system_prompt.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn system_prompt_null(mut self) -> Self {
+        self.raw.system_prompt = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn visibility(mut self, visibility: impl Into<ResourceVisibilityValue>) -> Self {
+        self.raw.visibility = Some(Into::<ResourceVisibilityValue>::into(visibility).into());
+        self
+    }
+    pub fn from_raw(raw: ConnectorMCPCreate) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ConnectorMCPCreate {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ConnectorMCPCreate {
+        self.raw
+    }
+}
+
+impl From<ConnectorMCPCreate> for ConnectorMCPCreateParams {
+    fn from(raw: ConnectorMCPCreate) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ConnectorMCPCreateParams> for ConnectorMCPCreate {
+    fn from(value: ConnectorMCPCreateParams) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct MessageResponseView {
     raw: MessageResponse,
 }
@@ -2587,43 +2781,6 @@ impl From<PaginatedConnectors> for PaginatedConnectorsView {
 
 impl From<PaginatedConnectorsView> for PaginatedConnectors {
     fn from(value: PaginatedConnectorsView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct AuthDataParams {
-    raw: AuthData,
-}
-
-impl AuthDataParams {
-    pub fn new(client_id: impl Into<String>, client_secret: impl Into<String>) -> Self {
-        Self {
-            raw: AuthData {
-                client_id: client_id.into(),
-                client_secret: client_secret.into(),
-            },
-        }
-    }
-    pub fn from_raw(raw: AuthData) -> Self {
-        Self { raw }
-    }
-    pub fn as_raw(&self) -> &AuthData {
-        &self.raw
-    }
-    pub fn into_raw(self) -> AuthData {
-        self.raw
-    }
-}
-
-impl From<AuthData> for AuthDataParams {
-    fn from(raw: AuthData) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<AuthDataParams> for AuthData {
-    fn from(value: AuthDataParams) -> Self {
         value.into_raw()
     }
 }
@@ -4057,6 +4214,271 @@ impl From<BatchJobOutView> for BatchJobOut {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[non_exhaustive]
+pub enum ApiEndpointValue {
+    V1ChatCompletions,
+    V1Embeddings,
+    V1FimCompletions,
+    V1Moderations,
+    V1ChatModerations,
+    V1Ocr,
+    V1Classifications,
+    V1ChatClassifications,
+    V1Conversations,
+    V1AudioTranscriptions,
+}
+
+impl From<ApiEndpointValue> for ApiEndpoint {
+    fn from(value: ApiEndpointValue) -> Self {
+        match value {
+            ApiEndpointValue::V1ChatCompletions => Self::V1ChatCompletions,
+            ApiEndpointValue::V1Embeddings => Self::V1Embeddings,
+            ApiEndpointValue::V1FimCompletions => Self::V1FimCompletions,
+            ApiEndpointValue::V1Moderations => Self::V1Moderations,
+            ApiEndpointValue::V1ChatModerations => Self::V1ChatModerations,
+            ApiEndpointValue::V1Ocr => Self::V1Ocr,
+            ApiEndpointValue::V1Classifications => Self::V1Classifications,
+            ApiEndpointValue::V1ChatClassifications => Self::V1ChatClassifications,
+            ApiEndpointValue::V1Conversations => Self::V1Conversations,
+            ApiEndpointValue::V1AudioTranscriptions => Self::V1AudioTranscriptions,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct BatchJobInMetadataMap {
+    values: std::collections::BTreeMap<String, String>,
+}
+
+impl BatchJobInMetadataMap {
+    pub fn new(values: std::collections::BTreeMap<String, String>) -> Self {
+        Self { values }
+    }
+    pub fn as_map(&self) -> &std::collections::BTreeMap<String, String> {
+        &self.values
+    }
+    pub fn into_map(self) -> std::collections::BTreeMap<String, String> {
+        self.values
+    }
+}
+
+impl From<std::collections::BTreeMap<String, String>> for BatchJobInMetadataMap {
+    fn from(values: std::collections::BTreeMap<String, String>) -> Self {
+        Self { values }
+    }
+}
+
+impl From<BatchJobInMetadata> for BatchJobInMetadataMap {
+    fn from(value: BatchJobInMetadata) -> Self {
+        Self {
+            values: value.additional_properties,
+        }
+    }
+}
+
+impl From<BatchJobInMetadataMap> for BatchJobInMetadata {
+    fn from(value: BatchJobInMetadataMap) -> Self {
+        Self {
+            additional_properties: value.values,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct BatchRequestBodyMap {
+    values: std::collections::BTreeMap<String, serde_json::Value>,
+}
+
+impl BatchRequestBodyMap {
+    pub fn new(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
+        Self { values }
+    }
+    pub fn as_map(&self) -> &std::collections::BTreeMap<String, serde_json::Value> {
+        &self.values
+    }
+    pub fn into_map(self) -> std::collections::BTreeMap<String, serde_json::Value> {
+        self.values
+    }
+}
+
+impl From<std::collections::BTreeMap<String, serde_json::Value>> for BatchRequestBodyMap {
+    fn from(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
+        Self { values }
+    }
+}
+
+impl From<BatchRequestBody> for BatchRequestBodyMap {
+    fn from(value: BatchRequestBody) -> Self {
+        Self {
+            values: value.additional_properties,
+        }
+    }
+}
+
+impl From<BatchRequestBodyMap> for BatchRequestBody {
+    fn from(value: BatchRequestBodyMap) -> Self {
+        Self {
+            additional_properties: value.values,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct BatchRequestParams {
+    raw: BatchRequest,
+}
+
+impl BatchRequestParams {
+    pub fn new(body: impl Into<BatchRequestBodyMap>) -> Self {
+        Self {
+            raw: BatchRequest {
+                body: Into::<BatchRequestBodyMap>::into(body).into(),
+                custom_id: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn custom_id(mut self, custom_id: impl Into<String>) -> Self {
+        self.raw.custom_id = Some(Some(custom_id.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn custom_id_null(mut self) -> Self {
+        self.raw.custom_id = Some(None);
+        self
+    }
+    pub fn from_raw(raw: BatchRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &BatchRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> BatchRequest {
+        self.raw
+    }
+}
+
+impl From<BatchRequest> for BatchRequestParams {
+    fn from(raw: BatchRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<BatchRequestParams> for BatchRequest {
+    fn from(value: BatchRequestParams) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct BatchJobInParams {
+    raw: BatchJobIn,
+}
+
+impl BatchJobInParams {
+    pub fn new(endpoint: impl Into<ApiEndpointValue>) -> Self {
+        Self {
+            raw: BatchJobIn {
+                agent_id: None,
+                endpoint: Into::<ApiEndpointValue>::into(endpoint).into(),
+                input_files: None,
+                metadata: None,
+                model: None,
+                requests: None,
+                timeout_hours: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn agent_id(mut self, agent_id: impl Into<String>) -> Self {
+        self.raw.agent_id = Some(Some(agent_id.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn agent_id_null(mut self) -> Self {
+        self.raw.agent_id = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn input_files(mut self, input_files: Vec<String>) -> Self {
+        self.raw.input_files = Some(Some(input_files));
+        self
+    }
+
+    #[must_use]
+    pub fn input_files_null(mut self) -> Self {
+        self.raw.input_files = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn metadata(mut self, metadata: impl Into<BatchJobInMetadataMap>) -> Self {
+        self.raw.metadata = Some(Some(Into::<BatchJobInMetadataMap>::into(metadata).into()));
+        self
+    }
+
+    #[must_use]
+    pub fn metadata_null(mut self) -> Self {
+        self.raw.metadata = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn model(mut self, model: impl Into<String>) -> Self {
+        self.raw.model = Some(Some(model.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn model_null(mut self) -> Self {
+        self.raw.model = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn requests(mut self, requests: impl IntoIterator<Item = BatchRequestParams>) -> Self {
+        self.raw.requests = Some(Some(requests.into_iter().map(Into::into).collect()));
+        self
+    }
+
+    #[must_use]
+    pub fn requests_null(mut self) -> Self {
+        self.raw.requests = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn timeout_hours(mut self, timeout_hours: i64) -> Self {
+        self.raw.timeout_hours = Some(timeout_hours);
+        self
+    }
+    pub fn from_raw(raw: BatchJobIn) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &BatchJobIn {
+        &self.raw
+    }
+    pub fn into_raw(self) -> BatchJobIn {
+        self.raw
+    }
+}
+
+impl From<BatchJobIn> for BatchJobInParams {
+    fn from(raw: BatchJobIn) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<BatchJobInParams> for BatchJobIn {
+    fn from(value: BatchJobInParams) -> Self {
+        value.into_raw()
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct BatchJobsOutView {
     raw: BatchJobsOut,
@@ -4670,6 +5092,94 @@ impl From<SharingOut> for SharingOutView {
 
 impl From<SharingOutView> for SharingOut {
     fn from(value: SharingOutView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[non_exhaustive]
+pub enum ShareEnumValue {
+    Viewer,
+    Editor,
+}
+
+impl From<ShareEnumValue> for ShareEnum {
+    fn from(value: ShareEnumValue) -> Self {
+        match value {
+            ShareEnumValue::Viewer => Self::Viewer,
+            ShareEnumValue::Editor => Self::Editor,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[non_exhaustive]
+pub enum EntityTypeValue {
+    User,
+    Workspace,
+    Org,
+}
+
+impl From<EntityTypeValue> for EntityType {
+    fn from(value: EntityTypeValue) -> Self {
+        match value {
+            EntityTypeValue::User => Self::User,
+            EntityTypeValue::Workspace => Self::Workspace,
+            EntityTypeValue::Org => Self::Org,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SharingInParams {
+    raw: SharingIn,
+}
+
+impl SharingInParams {
+    pub fn new(
+        share_with_uuid: uuid::Uuid,
+        share_with_type: impl Into<EntityTypeValue>,
+        level: impl Into<ShareEnumValue>,
+    ) -> Self {
+        Self {
+            raw: SharingIn {
+                level: Into::<ShareEnumValue>::into(level).into(),
+                org_id: None,
+                share_with_type: Into::<EntityTypeValue>::into(share_with_type).into(),
+                share_with_uuid,
+            },
+        }
+    }
+    #[must_use]
+    pub fn org_id(mut self, org_id: uuid::Uuid) -> Self {
+        self.raw.org_id = Some(Some(org_id));
+        self
+    }
+
+    #[must_use]
+    pub fn org_id_null(mut self) -> Self {
+        self.raw.org_id = Some(None);
+        self
+    }
+    pub fn from_raw(raw: SharingIn) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &SharingIn {
+        &self.raw
+    }
+    pub fn into_raw(self) -> SharingIn {
+        self.raw
+    }
+}
+
+impl From<SharingIn> for SharingInParams {
+    fn from(raw: SharingIn) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<SharingInParams> for SharingIn {
+    fn from(value: SharingInParams) -> Self {
         value.into_raw()
     }
 }

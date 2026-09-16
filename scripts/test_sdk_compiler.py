@@ -79,6 +79,22 @@ impl HttpClient {
 """
         return OpenApiToRustAdapter.parse(types.encode(), client.encode())
 
+    def test_adapter_preserves_explicit_enum_wire_names(self):
+        raw = OpenApiToRustAdapter.parse(
+            b'''pub enum Visibility {
+                #[serde(rename = "shared_global")]
+                SharedGlobal,
+                #[serde(rename = "private")]
+                Private,
+            }''',
+            b"impl HttpClient {}",
+        )
+        self.assertEqual(
+            [("SharedGlobal", None, "shared_global"), ("Private", None, "private")],
+            [(variant.name, variant.payload, variant.wire_name)
+             for variant in raw.variants("Visibility")],
+        )
+
     def test_adapter_normalizes_supported_raw_shapes(self):
         raw = self.fixture()
 
