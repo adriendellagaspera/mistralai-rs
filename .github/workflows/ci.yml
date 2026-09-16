@@ -13,6 +13,8 @@ jobs:
         with:
           ref: cleanup/sdk-only-no-codegen
           fetch-depth: 0
+      - name: Install pinned Rust toolchain
+        run: rustup show
       - name: Run one-shot restructure
         run: |
           python3 - <<'PY'
