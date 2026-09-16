@@ -22,7 +22,7 @@ jobs:
           key: sdk-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'codegen.lock') }}
       - name: Prepare pinned codegen environment
         run: python3 scripts/codegen.py check
-      - name: Print automatic projection report
+      - name: Classify request model projection failures
         run: |
           PYTHON=$(find .tools -path '*/bin/python' | head -1)
           "$PYTHON" - <<'PY'
@@ -31,13 +31,77 @@ jobs:
           ROOT = Path.cwd()
           sys.path.insert(0, str(ROOT / 'codegen'))
           import sdk_codegen as compiler
+          import sdk_autoproject as ap
+          from rust_types import parse_type
+
           openapi = compiler.OpenApiIndex.load(ROOT / 'spec/openapi.yaml')
           rust = compiler.RustIndex.load(ROOT / 'src/generated')
           manifest = json.loads((ROOT / 'codegen/sdk-semantics.json').read_text())
           taxonomy = json.loads((ROOT / 'codegen/sdk-taxonomy.json').read_text())
           raw = json.loads((ROOT / 'src/generated/coverage.json').read_text())
           _, report = compiler.expand_manifest(openapi, manifest, taxonomy, raw, rust)
-          print('AUTO_REPORT_START')
-          print(json.dumps(report, indent=2, sort_keys=True))
-          print('AUTO_REPORT_END')
+          targets = [op for op, reason in report['rejected'].items() if reason == 'request_model_projection']
+
+          def strip(s):
+              while True:
+                  inner = s.unary('Option') or s.unary('Vec')
+                  if inner is None: return s
+                  s = inner
+
+          def schema_summary(schema):
+              ref = schema.get('$ref')
+              target = openapi.schemas.get(ref.rsplit('/',1)[-1], {}) if ref else schema
+              return {
+                  'ref': ref.rsplit('/',1)[-1] if ref else None,
+                  'type': target.get('type'),
+                  'enum': target.get('enum'),
+                  'const': target.get('const'),
+                  'oneOf': [x.get('$ref','').rsplit('/',1)[-1] or x.get('type') for x in target.get('oneOf',[])],
+                  'anyOf': [x.get('$ref','').rsplit('/',1)[-1] or x.get('type') for x in target.get('anyOf',[])],
+                  'properties': sorted(target.get('properties',{})),
+                  'additionalProperties': bool(target.get('additionalProperties')),
+              }
+
+          def diagnose_model(raw_name, schema_name, prefix='', seen=()):
+              if raw_name in seen or raw_name not in rust.structs:
+                  return []
+              schema = openapi.schemas.get(schema_name, {})
+              props = schema.get('properties', {})
+              raw_fields = {f.name.removeprefix('r#'): f for f in rust.fields(raw_name)}
+              rows = []
+              for name, field_schema in sorted(props.items()):
+                  field = raw_fields.get(name)
+                  if field is None:
+                      rows.append({'path': prefix+name, 'failure': 'raw_field_missing', 'schema': schema_summary(field_schema)})
+                      continue
+                  models = {}
+                  adapter, reason = ap._request_field_adapter(models, openapi.schemas, field_schema, field.type, rust, (), schema_name, (name,))
+                  if reason is None:
+                      continue
+                  syntax = strip(parse_type(field.type))
+                  row = {
+                      'path': prefix+name,
+                      'raw_type': field.type,
+                      'core_raw': syntax.spelling,
+                      'raw_kind': ('enum' if syntax.spelling in rust.enums else 'struct' if syntax.spelling in rust.structs else 'alias' if syntax.spelling in rust.aliases else 'public'),
+                      'schema': schema_summary(field_schema),
+                  }
+                  if syntax.spelling in rust.enums:
+                      row['raw_variants'] = [{'name': v.name, 'payload': v.payload} for v in rust.enums[syntax.spelling]]
+                  rows.append(row)
+                  ref = field_schema.get('$ref')
+                  if ref:
+                      ref_name = ref.rsplit('/',1)[-1]
+                      target = openapi.schemas.get(ref_name,{})
+                      if target.get('type') == 'object' and target.get('properties') and syntax.spelling in rust.structs:
+                          rows.extend(diagnose_model(syntax.spelling, ref_name, prefix+name+'.', (*seen, raw_name)))
+              return rows
+
+          output = {}
+          for op in targets:
+              request = openapi.request_schema(op)
+              output[op] = {'request': request, 'failures': diagnose_model(request, request) if request else []}
+          print('REQUEST_DEBT_START')
+          print(json.dumps(output, indent=2, sort_keys=True))
+          print('REQUEST_DEBT_END')
           PY
