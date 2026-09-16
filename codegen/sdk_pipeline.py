@@ -26,15 +26,15 @@ def generate(raw: Path, target: Path, manifest_path: Path, openapi_path: Path | 
             taxonomy_path = candidate
     manifest = json.loads(manifest_path.read_text())
     openapi = sdk_compiler.OpenApiIndex.load(openapi_path)
-    rust = sdk_compiler.RustIndex.load(raw)
+    raw_ir = sdk_compiler.load_raw_ir(raw)
     projection_report = None
     if taxonomy_path is not None:
         taxonomy = json.loads(taxonomy_path.read_text())
         raw_coverage = json.loads((raw / "coverage.json").read_text())
         manifest, projection_report = expand_manifest(
-            openapi, manifest, taxonomy, raw_coverage, rust
+            openapi, manifest, taxonomy, raw_coverage, raw_ir
         )
-    ir, files = sdk_compiler.compile_facade(openapi, rust, manifest)
+    ir, files = sdk_compiler.compile_facade(openapi, raw_ir, manifest)
     target.mkdir(parents=True, exist_ok=True)
 
     try:
@@ -46,10 +46,10 @@ def generate(raw: Path, target: Path, manifest_path: Path, openapi_path: Path | 
     (target / "api-surface.json").write_text(json.dumps(surface, indent=2) + "\n")
     coverage = {
         "schema_version": 2,
-        "inventory": coverage_inventory(openapi, rust, ir),
+        "inventory": coverage_inventory(openapi, raw_ir, ir),
         "resources": {resource.module: {"operations": [operation.operation_id for operation in resource.operations]}
                       for resource in ir.resources},
-        "models": {model.name: {"raw": model.raw, "fields": sorted(field.name for field in rust.fields(model.raw)) if model.raw in rust.structs else []}
+        "models": {model.name: {"raw": model.raw, "fields": sorted(field.name for field in raw_ir.fields(model.raw)) if model.raw in raw_ir.structs else []}
                    for model in ir.models},
     }
     if projection_report is not None:

@@ -16,6 +16,7 @@ import sdk_pipeline
 from sdk_ir import (AliasModelSpec, EmptyResponse, FacadeIr, ModelSpec, NoRequest,
                     OperationCall, OperationSpec, RawSignature, ResourceSpec,
                     TypeAliasPolicy)
+from sdk_raw_ir import RawIr
 from test_sdk_facade import CLIENT, TYPES, manifest, openapi_document
 
 
@@ -24,7 +25,7 @@ class ResolvedEmissionTests(unittest.TestCase):
         self.assertIs(sdk_codegen.generate, sdk_pipeline.generate)
         self.assertIs(sdk_codegen.GenerationError, sdk_compiler.GenerationError)
 
-    def test_pipeline_passes_raw_index_to_automatic_projection(self):
+    def test_pipeline_passes_raw_ir_to_automatic_projection(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             raw = root / "raw"
@@ -40,14 +41,14 @@ class ResolvedEmissionTests(unittest.TestCase):
             taxonomy.write_text(json.dumps({"operations": {}}))
             seen = {}
 
-            def project(openapi_index, current, taxonomy_ir, raw_coverage, rust_index):
-                seen["rust"] = rust_index
+            def project(openapi_index, current, taxonomy_ir, raw_coverage, raw_ir):
+                seen["raw"] = raw_ir
                 return current, None
 
             with patch.object(sdk_pipeline, "expand_manifest", side_effect=project):
                 sdk_pipeline.generate(raw, root / "sdk", overlay, openapi, taxonomy)
-            self.assertIsInstance(seen["rust"], sdk_compiler.RustIndex)
-            self.assertIn("adopt", seen["rust"].operations)
+            self.assertIsInstance(seen["raw"], RawIr)
+            self.assertIn("adopt", seen["raw"].operations)
 
     def test_renderer_emits_hand_built_ir_without_source_contracts(self):
         model = ModelSpec(
