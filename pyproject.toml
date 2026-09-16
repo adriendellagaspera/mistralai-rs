@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "openapi-to-rust-facade"
-version = "0.1.0"
+version = "0.1.1"
 description = "Deterministic compiler from OpenAPI plus openapi-to-rust bindings to an idiomatic Rust SDK facade"
 readme = "README.md"
 requires-python = ">=3.11"
