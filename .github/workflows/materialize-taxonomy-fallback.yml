@@ -2,6 +2,8 @@ name: Materialize taxonomy fallback
 on:
   push:
     branches: [issue-23-taxonomy-fallback-v2]
+  pull_request:
+    branches: [main]
 permissions:
   contents: write
 concurrency:
