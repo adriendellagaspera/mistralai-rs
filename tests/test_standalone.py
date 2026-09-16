@@ -1,3 +1,4 @@
+import importlib.resources
 import json
 from pathlib import Path
 import sys
@@ -6,49 +7,55 @@ import unittest
 
 from jsonschema import Draft202012Validator
 
-ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / "src"
-FIXTURES = Path(__file__).resolve().parent / "fixtures"
-sys.path.insert(0, str(SRC))
-
-from openapi_to_rust_facade import (  # noqa: E402
+import openapi_rust_facade as package
+from openapi_rust_facade import (
     OpenApiIndex,
-    RawIr,
+    RustBindingsIr,
     RustFacadeRuntime,
     __version__,
     compile_facade,
 )
 
+ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
+FIXTURES = Path(__file__).resolve().parent / "fixtures"
 
-def load_raw(name: str) -> RawIr:
-    value = json.loads((FIXTURES / name / "raw-ir.json").read_text())
-    schema = json.loads((SRC / "openapi_to_rust_facade" / "raw-ir.schema.json").read_text())
+
+def load_bindings(name: str) -> RustBindingsIr:
+    value = json.loads((FIXTURES / name / "rust-bindings.json").read_text())
+    schema = json.loads(
+        importlib.resources.files(package).joinpath("rust-bindings.schema.json").read_text()
+    )
     Draft202012Validator(schema).validate(value)
-    return RawIr.from_dict(value)
+    return RustBindingsIr.from_dict(value)
 
 
 def compile_fixture(name: str):
     root = FIXTURES / name
     document = json.loads((root / "openapi.json").read_text())
     policy = json.loads((root / "policy.json").read_text())
-    raw = load_raw(name)
-    ir, files = compile_facade(OpenApiIndex(document), raw, policy)
-    return ir, files, raw
+    bindings = load_bindings(name)
+    ir, files = compile_facade(OpenApiIndex(document), bindings, policy)
+    return ir, files, bindings
 
 
 class StandaloneCompilerTests(unittest.TestCase):
+    def test_tests_use_installed_package_not_source_tree(self):
+        package_path = Path(package.__file__).resolve()
+        self.assertNotEqual(package_path.parent, SRC / "openapi_rust_facade")
+
     def test_importing_core_does_not_import_adapter_runtime(self):
         self.assertNotIn("tree_sitter", sys.modules)
         self.assertNotIn("tree_sitter_rust", sys.modules)
 
     def test_menagerie_is_an_independent_fixture(self):
-        ir, files, raw = compile_fixture("menagerie")
+        ir, files, bindings = compile_fixture("menagerie")
         self.assertEqual(ir.client_name, "Menagerie")
         self.assertEqual(set(files), {"facade_types.rs", "zoo.rs", "mod.rs"})
         self.assertIn("pub enum Animal", files["facade_types.rs"])
         self.assertIn("pub fn cat(content: impl Into<String>)", files["facade_types.rs"])
         self.assertIn("pub async fn adopt(&self, request: Adoption)", files["zoo.rs"])
-        self.assertEqual(RawIr.from_dict(raw.to_dict()), raw)
+        self.assertEqual(RustBindingsIr.from_dict(bindings.to_dict()), bindings)
 
     def test_library_exercises_hierarchy_and_multiple_transport_primitives(self):
         ir, files, _ = compile_fixture("library")
@@ -77,12 +84,12 @@ class StandaloneCompilerTests(unittest.TestCase):
         self.assertIn("chunk.map_err(Into::into)", resource)
 
     def test_binding_paths_are_data_not_compiler_constants(self):
-        raw = load_raw("menagerie")
+        bindings = load_bindings("menagerie")
         self.assertEqual(
-            raw.qualified_type("Vec<AnimalUnion>"),
+            bindings.qualified_type("Vec<AnimalUnion>"),
             "Vec<crate::generated::types::AnimalUnion>",
         )
-        custom = raw.to_dict()
+        custom = bindings.to_dict()
         custom["binding"]["client"]["type_path"] = "crate::wire::Client"
         custom["binding"]["type_preludes"] = ["crate::wire::models::*"]
         custom["symbol_paths"] = {
@@ -91,13 +98,15 @@ class StandaloneCompilerTests(unittest.TestCase):
         }
         document = json.loads((FIXTURES / "menagerie" / "openapi.json").read_text())
         policy = json.loads((FIXTURES / "menagerie" / "policy.json").read_text())
-        _, files = compile_facade(OpenApiIndex(document), RawIr.from_dict(custom), policy)
+        _, files = compile_facade(
+            OpenApiIndex(document), RustBindingsIr.from_dict(custom), policy
+        )
         self.assertIn("use crate::wire::Client;", files["mod.rs"])
         self.assertIn("use crate::wire::models::*;", files["facade_types.rs"])
         self.assertNotIn("crate::generated", "".join(files.values()))
 
     def test_runtime_support_paths_are_explicit(self):
-        raw = load_raw("menagerie")
+        bindings = load_bindings("menagerie")
         document = json.loads((FIXTURES / "menagerie" / "openapi.json").read_text())
         policy = json.loads((FIXTURES / "menagerie" / "policy.json").read_text())
         runtime = RustFacadeRuntime(
@@ -108,7 +117,9 @@ class StandaloneCompilerTests(unittest.TestCase):
             sse_function="decode_json",
             generated_marker="// generated fixture\n",
         )
-        _, files = compile_facade(OpenApiIndex(document), raw, policy, runtime=runtime)
+        _, files = compile_facade(
+            OpenApiIndex(document), bindings, policy, runtime=runtime
+        )
         self.assertTrue(files["mod.rs"].startswith("// generated fixture\n"))
         self.assertIn("pub mod support;", files["mod.rs"])
         self.assertIn("pub use support::{FacadeError};", files["mod.rs"])
@@ -118,42 +129,61 @@ class StandaloneCompilerTests(unittest.TestCase):
             "openapi": "3.1.0",
             "info": {"title": "Enum fixture", "version": "1"},
             "paths": {},
-            "components": {"schemas": {"ResourceVisibility": {
-                "type": "string", "enum": ["shared_global", "private"],
-            }}},
+            "components": {
+                "schemas": {
+                    "ResourceVisibility": {
+                        "type": "string",
+                        "enum": ["shared_global", "private"],
+                    }
+                }
+            },
         }
-        raw = RawIr.from_dict({
-            "schema_version": 2,
-            "structs": {},
-            "enums": {"ResourceVisibility": [
-                {"name": "SharedGlobal", "payload": None, "wire_name": "shared_global"},
-                {"name": "Private", "payload": None, "wire_name": "private"},
-            ]},
-            "aliases": {},
-            "operations": {},
-            "symbol_paths": {
-                "ResourceVisibility": "crate::raw::ResourceVisibility",
-            },
-            "binding": {
-                "client": {
-                    "type_path": "crate::raw::Client",
-                    "constructor": "new",
-                    "api_key_builder": "with_api_key",
-                    "base_url_builder": "with_base_url",
+        bindings = RustBindingsIr.from_dict(
+            {
+                "schema_version": 2,
+                "structs": {},
+                "enums": {
+                    "ResourceVisibility": [
+                        {
+                            "name": "SharedGlobal",
+                            "payload": None,
+                            "wire_name": "shared_global",
+                        },
+                        {
+                            "name": "Private",
+                            "payload": None,
+                            "wire_name": "private",
+                        },
+                    ]
                 },
-                "type_preludes": ["crate::raw::*"],
-            },
-        })
+                "aliases": {},
+                "operations": {},
+                "symbol_paths": {
+                    "ResourceVisibility": "crate::raw::ResourceVisibility",
+                },
+                "binding": {
+                    "client": {
+                        "type_path": "crate::raw::Client",
+                        "constructor": "new",
+                        "api_key_builder": "with_api_key",
+                        "base_url_builder": "with_base_url",
+                    },
+                    "type_preludes": ["crate::raw::*"],
+                },
+            }
+        )
         policy = {
             "schema_version": 2,
             "client": {"name": "EnumClient"},
-            "models": {"ResourceVisibilityValue": {
-                "raw": "ResourceVisibility",
-                "scalar_enum": {"root": "ResourceVisibility", "path": []},
-            }},
+            "models": {
+                "ResourceVisibilityValue": {
+                    "raw": "ResourceVisibility",
+                    "scalar_enum": {"root": "ResourceVisibility", "path": []},
+                }
+            },
             "resources": {},
         }
-        _, files = compile_facade(OpenApiIndex(document), raw, policy)
+        _, files = compile_facade(OpenApiIndex(document), bindings, policy)
         facade = files["facade_types.rs"]
         self.assertIn("pub enum ResourceVisibilityValue", facade)
         self.assertIn("SharedGlobal", facade)
@@ -168,6 +198,7 @@ class StandaloneCompilerTests(unittest.TestCase):
 
     def test_package_metadata_separates_core_and_adapter_dependencies(self):
         project = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]
+        self.assertEqual(project["name"], "openapi-rust-facade")
         self.assertEqual(project["version"], __version__)
         self.assertEqual(
             set(project["dependencies"]),
@@ -178,17 +209,22 @@ class StandaloneCompilerTests(unittest.TestCase):
             {"tree-sitter==0.25.2", "tree-sitter-rust==0.24.0"},
         )
         compatibility = json.loads((ROOT / "COMPATIBILITY.json").read_text())
+        self.assertEqual(compatibility["package_name"], "openapi-rust-facade")
         self.assertEqual(compatibility["package_version"], __version__)
-        self.assertEqual(compatibility["raw_ir_schema_version"], 2)
-        self.assertEqual(compatibility["backend"]["name"], "openapi-to-rust")
+        self.assertEqual(compatibility["rust_bindings_schema_version"], 2)
+        self.assertEqual(compatibility["adapter"]["name"], "openapi-to-rust")
 
     def test_compiler_core_contains_no_backend_layout_or_parser_dependency(self):
-        root = SRC / "openapi_to_rust_facade"
-        forbidden = ("crate::generated", "HttpClient", "tree_sitter")
+        root = SRC / "openapi_rust_facade"
+        forbidden = ("crate::generated", "HttpClient", "tree_sitter", "openapi_to_rust")
         for path in root.glob("*.py"):
             source = path.read_text()
             for needle in forbidden:
                 self.assertNotIn(needle, source, f"{needle} leaked into {path.name}")
+
+    def test_public_api_uses_rust_bindings_terminology(self):
+        self.assertIn("RustBindingsIr", package.__all__)
+        self.assertNotIn("RawIr", package.__all__)
 
     def test_generic_package_and_fixtures_contain_no_product_backend(self):
         forbidden = ("mistralai", "ChatCompletionRequest", "OCRRequest")
