@@ -10,6 +10,17 @@ from jsonschema import Draft202012Validator
 import rust_sdk_compiler as package
 from rust_sdk_compiler import Bindings, OpenApi, Policy, Runtime, compile, lower
 from rust_sdk_compiler.rust_types import parse_type
+from rust_sdk_compiler.sdk_emit import emit_resource
+from rust_sdk_compiler.sdk_ir import (
+    NoRequest,
+    OperationCall,
+    OperationSpec,
+    RawSignature,
+    ResourceSpec,
+    SseResponse,
+    StreamPolicy,
+)
+from rust_sdk_compiler.sdk_raw_ir import RawBindingLayout, RawClientBinding
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
@@ -105,6 +116,37 @@ class StandaloneCompilerTests(unittest.TestCase):
         compilation, _ = compile_fixture("menagerie", runtime=runtime)
         self.assertTrue(compilation.files["mod.rs"].startswith("// generated fixture\n"))
         self.assertIn("pub mod support;", compilation.files["mod.rs"])
+
+    def test_sse_runtime_path_is_qualified_without_redundant_import(self):
+        runtime = Runtime(
+            error_type="FacadeError",
+            error_module="support",
+            error_exports=("FacadeError",),
+            sse_module="crate::events",
+            sse_function="decode_json",
+        )
+        operation = OperationSpec(
+            name="watch",
+            operation_id="watch",
+            raw_method="watch_raw",
+            raw_signature=RawSignature((), "RawResult", "RawEvent"),
+            request_projection=NoRequest(),
+            response_projection=SseResponse(StreamPolicy("RawEvent", "Event", "EventStream")),
+            call=OperationCall("", "", None),
+        )
+        resource = ResourceSpec(("events",), "events", "Events", (operation,))
+        binding = RawBindingLayout(
+            RawClientBinding(
+                "crate::raw::Client",
+                "new",
+                "with_api_key",
+                "with_base_url",
+            ),
+            ("crate::raw::RawEvent",),
+        )
+        source = emit_resource(resource, (resource,), binding, runtime)
+        self.assertIn("crate::events::decode_json::<_, _, RawEvent>(bytes)", source)
+        self.assertNotIn("use crate::events;", source)
 
     def test_lower_stops_before_emission(self):
         root = FIXTURES / "menagerie"
