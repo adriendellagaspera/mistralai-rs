@@ -8,8 +8,16 @@ import unittest
 from jsonschema import Draft202012Validator
 
 import rust_sdk_compiler as package
-from rust_sdk_compiler import Bindings, OpenApi, Policy, Runtime, compile, lower
-from rust_sdk_compiler.rust_types import parse_type
+from rust_sdk_compiler import (
+    Bindings,
+    OpenApi,
+    Policy,
+    Runtime,
+    Type,
+    compile,
+    lower,
+    parse_type,
+)
 from rust_sdk_compiler.sdk_emit import emit_resource
 from rust_sdk_compiler.sdk_ir import (
     NoRequest,
@@ -58,8 +66,10 @@ class StandaloneCompilerTests(unittest.TestCase):
                 "OpenApi",
                 "Policy",
                 "Runtime",
+                "Type",
                 "compile",
                 "lower",
+                "parse_type",
             },
         )
 
@@ -82,6 +92,7 @@ class StandaloneCompilerTests(unittest.TestCase):
 
     def test_structural_type_parser_rejects_statement_suffixes(self):
         parsed = parse_type("Option < Vec < Result<String, Error> > >")
+        self.assertIsInstance(parsed, Type)
         self.assertEqual(parsed.unary("Option").unary("Vec").constructor, "Result")
         self.assertEqual(parse_type("[u8; 32]").spelling, "[u8; 32]")
         with self.assertRaises(ValueError):
