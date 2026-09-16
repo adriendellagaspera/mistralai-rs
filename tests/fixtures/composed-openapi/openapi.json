@@ -36,6 +36,29 @@
           }
         ]
       },
+      "StreamingCommandBase": {
+        "type": "object",
+        "properties": {
+          "stream": {"type": "boolean", "default": true}
+        }
+      },
+      "NonStreamingCommand": {
+        "allOf": [
+          {"$ref": "#/components/schemas/StreamingCommandBase"},
+          {
+            "type": "object",
+            "properties": {
+              "stream": {"type": "boolean", "enum": [false], "default": false}
+            }
+          }
+        ]
+      },
+      "ImpossibleCommand": {
+        "allOf": [
+          {"type": "object", "properties": {"mode": {"type": "string", "enum": ["a"]}}},
+          {"type": "object", "properties": {"mode": {"type": "string", "enum": ["b"]}}}
+        ]
+      },
       "Conflict": {
         "allOf": [
           {"type": "object", "properties": {"value": {"type": "string"}}},
