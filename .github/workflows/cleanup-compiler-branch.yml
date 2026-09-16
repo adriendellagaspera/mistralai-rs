@@ -1,0 +1,28 @@
+name: Clean compiler release branch
+on:
+  push:
+    branches: [rust-sdk-compiler-request-object-schema]
+permissions:
+  contents: write
+jobs:
+  cleanup:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: rust-sdk-compiler-request-object-schema
+          fetch-depth: 0
+      - name: Remove local packaging artifacts
+        run: |
+          set -euo pipefail
+          rm -rf build src/rust_sdk_compiler.egg-info tests/__pycache__
+      - name: Commit cleanup
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git rm .github/workflows/cleanup-compiler-branch.yml
+          git add -A
+          git commit -m 'chore: remove packaging artifacts'
+          git push origin HEAD:rust-sdk-compiler-request-object-schema
