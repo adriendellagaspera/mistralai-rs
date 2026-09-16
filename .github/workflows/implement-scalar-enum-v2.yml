@@ -31,6 +31,29 @@ jobs:
             .tools
             target
           key: sdk-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'codegen.lock') }}
+      - name: Diagnose projected delete sharing model
+        run: |
+          PYTHON=$(find .tools -path '*/bin/python' | head -1)
+          "$PYTHON" - <<'PY'
+          import json, sys
+          from pathlib import Path
+          ROOT = Path.cwd()
+          sys.path.insert(0, str(ROOT / 'codegen'))
+          import sdk_compiler as compiler
+          from sdk_autoproject import expand_manifest
+          openapi = compiler.OpenApiIndex.load(ROOT / 'spec/openapi.yaml')
+          raw = compiler.load_raw_ir(ROOT / 'src/generated')
+          manifest = json.loads((ROOT / 'codegen/sdk-semantics.json').read_text())
+          expanded, report = expand_manifest(
+              openapi, manifest,
+              json.loads((ROOT / 'codegen/sdk-taxonomy.json').read_text()),
+              json.loads((ROOT / 'src/generated/coverage.json').read_text()), raw,
+          )
+          print('SHARING_DELETE_SCHEMA=' + json.dumps(openapi.schema('SharingDelete'), sort_keys=True))
+          print('SHARING_DELETE_RAW_FIELDS=' + json.dumps([(f.name, f.type) for f in raw.fields('SharingDelete')]))
+          print('SHARING_DELETE_MODELS=' + json.dumps({k:v for k,v in expanded['models'].items() if v.get('raw', k) == 'SharingDelete'}, sort_keys=True))
+          print('SHARE_DELETE_REPORT=' + str(report['rejected'].get('libraries_share_delete_v1')))
+          PY
       - name: Regenerate facade
         run: python3 scripts/codegen.py generate
       - name: Refresh probe baseline
