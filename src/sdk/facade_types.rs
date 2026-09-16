@@ -2639,6 +2639,211 @@ impl From<JudgePreviewView> for JudgePreview {
 }
 
 #[derive(Debug, Clone)]
+pub struct JudgeClassificationOutputOptionParams {
+    raw: JudgeClassificationOutputOption,
+}
+
+impl JudgeClassificationOutputOptionParams {
+    pub fn new(value: impl Into<String>, description: impl Into<String>) -> Self {
+        Self {
+            raw: JudgeClassificationOutputOption {
+                description: description.into(),
+                value: value.into(),
+            },
+        }
+    }
+    pub fn from_raw(raw: JudgeClassificationOutputOption) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &JudgeClassificationOutputOption {
+        &self.raw
+    }
+    pub fn into_raw(self) -> JudgeClassificationOutputOption {
+        self.raw
+    }
+}
+
+impl From<JudgeClassificationOutputOption> for JudgeClassificationOutputOptionParams {
+    fn from(raw: JudgeClassificationOutputOption) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<JudgeClassificationOutputOptionParams> for JudgeClassificationOutputOption {
+    fn from(value: JudgeClassificationOutputOptionParams) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct JudgeClassificationOutputParams {
+    raw: JudgeClassificationOutput,
+}
+
+impl JudgeClassificationOutputParams {
+    pub fn new(options: impl IntoIterator<Item = JudgeClassificationOutputOptionParams>) -> Self {
+        Self {
+            raw: JudgeClassificationOutput {
+                options: options.into_iter().map(Into::into).collect(),
+                r#type: None,
+            },
+        }
+    }
+    pub fn from_raw(raw: JudgeClassificationOutput) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &JudgeClassificationOutput {
+        &self.raw
+    }
+    pub fn into_raw(self) -> JudgeClassificationOutput {
+        self.raw
+    }
+}
+
+impl From<JudgeClassificationOutput> for JudgeClassificationOutputParams {
+    fn from(raw: JudgeClassificationOutput) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<JudgeClassificationOutputParams> for JudgeClassificationOutput {
+    fn from(value: JudgeClassificationOutputParams) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct JudgeRegressionOutputParams {
+    raw: JudgeRegressionOutput,
+}
+
+impl JudgeRegressionOutputParams {
+    pub fn new(min_description: impl Into<String>, max_description: impl Into<String>) -> Self {
+        Self {
+            raw: JudgeRegressionOutput {
+                max: None,
+                max_description: max_description.into(),
+                min: None,
+                min_description: min_description.into(),
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn max(mut self, max: f64) -> Self {
+        self.raw.max = Some(max);
+        self
+    }
+
+    #[must_use]
+    pub fn min(mut self, min: f64) -> Self {
+        self.raw.min = Some(min);
+        self
+    }
+    pub fn from_raw(raw: JudgeRegressionOutput) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &JudgeRegressionOutput {
+        &self.raw
+    }
+    pub fn into_raw(self) -> JudgeRegressionOutput {
+        self.raw
+    }
+}
+
+impl From<JudgeRegressionOutput> for JudgeRegressionOutputParams {
+    fn from(raw: JudgeRegressionOutput) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<JudgeRegressionOutputParams> for JudgeRegressionOutput {
+    fn from(value: JudgeRegressionOutputParams) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub enum PostJudgeInSchemaOutputValue {
+    Classification(JudgeClassificationOutputParams),
+    Regression(JudgeRegressionOutputParams),
+}
+
+impl From<JudgeClassificationOutputParams> for PostJudgeInSchemaOutputValue {
+    fn from(value: JudgeClassificationOutputParams) -> Self {
+        Self::Classification(value)
+    }
+}
+
+impl From<JudgeRegressionOutputParams> for PostJudgeInSchemaOutputValue {
+    fn from(value: JudgeRegressionOutputParams) -> Self {
+        Self::Regression(value)
+    }
+}
+
+impl From<PostJudgeInSchemaOutputValue> for PostJudgeInSchemaOutput {
+    fn from(value: PostJudgeInSchemaOutputValue) -> Self {
+        match value {
+            PostJudgeInSchemaOutputValue::Classification(value) => {
+                Self::JudgeClassificationOutput(value.into())
+            }
+            PostJudgeInSchemaOutputValue::Regression(value) => {
+                Self::JudgeRegressionOutput(value.into())
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct PostJudgeInSchemaParams {
+    raw: PostJudgeInSchema,
+}
+
+impl PostJudgeInSchemaParams {
+    pub fn new(
+        name: impl Into<String>,
+        description: impl Into<String>,
+        model_name: impl Into<String>,
+        output: impl Into<PostJudgeInSchemaOutputValue>,
+        instructions: impl Into<String>,
+        tools: Vec<String>,
+    ) -> Self {
+        Self {
+            raw: PostJudgeInSchema {
+                description: description.into(),
+                instructions: instructions.into(),
+                model_name: model_name.into(),
+                name: name.into(),
+                output: Into::<PostJudgeInSchemaOutputValue>::into(output).into(),
+                tools,
+            },
+        }
+    }
+    pub fn from_raw(raw: PostJudgeInSchema) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &PostJudgeInSchema {
+        &self.raw
+    }
+    pub fn into_raw(self) -> PostJudgeInSchema {
+        self.raw
+    }
+}
+
+impl From<PostJudgeInSchema> for PostJudgeInSchemaParams {
+    fn from(raw: PostJudgeInSchema) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<PostJudgeInSchemaParams> for PostJudgeInSchema {
+    fn from(value: PostJudgeInSchemaParams) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct VoiceResponseView {
     raw: VoiceResponse,
 }
@@ -2794,6 +2999,40 @@ impl From<VoiceCreateRequest> for VoiceCreateRequestParams {
 
 impl From<VoiceCreateRequestParams> for VoiceCreateRequest {
     fn from(value: VoiceCreateRequestParams) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DeleteDatasetRecordsInSchemaParams {
+    raw: DeleteDatasetRecordsInSchema,
+}
+
+impl DeleteDatasetRecordsInSchemaParams {
+    pub fn new(dataset_record_ids: Vec<String>) -> Self {
+        Self {
+            raw: DeleteDatasetRecordsInSchema { dataset_record_ids },
+        }
+    }
+    pub fn from_raw(raw: DeleteDatasetRecordsInSchema) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &DeleteDatasetRecordsInSchema {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DeleteDatasetRecordsInSchema {
+        self.raw
+    }
+}
+
+impl From<DeleteDatasetRecordsInSchema> for DeleteDatasetRecordsInSchemaParams {
+    fn from(raw: DeleteDatasetRecordsInSchema) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<DeleteDatasetRecordsInSchemaParams> for DeleteDatasetRecordsInSchema {
+    fn from(value: DeleteDatasetRecordsInSchemaParams) -> Self {
         value.into_raw()
     }
 }
@@ -3464,6 +3703,42 @@ impl From<JudgeOutputView> for JudgeOutput {
 }
 
 #[derive(Debug, Clone)]
+pub struct PostDatasetRecordJudgingInSchemaParams {
+    raw: PostDatasetRecordJudgingInSchema,
+}
+
+impl PostDatasetRecordJudgingInSchemaParams {
+    pub fn new(judge_definition: impl Into<PostJudgeInSchemaParams>) -> Self {
+        Self {
+            raw: PostDatasetRecordJudgingInSchema {
+                judge_definition: Into::<PostJudgeInSchemaParams>::into(judge_definition).into(),
+            },
+        }
+    }
+    pub fn from_raw(raw: PostDatasetRecordJudgingInSchema) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &PostDatasetRecordJudgingInSchema {
+        &self.raw
+    }
+    pub fn into_raw(self) -> PostDatasetRecordJudgingInSchema {
+        self.raw
+    }
+}
+
+impl From<PostDatasetRecordJudgingInSchema> for PostDatasetRecordJudgingInSchemaParams {
+    fn from(raw: PostDatasetRecordJudgingInSchema) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<PostDatasetRecordJudgingInSchemaParams> for PostDatasetRecordJudgingInSchema {
+    fn from(value: PostDatasetRecordJudgingInSchemaParams) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct LibraryOutView {
     raw: LibraryOut,
 }
@@ -3925,6 +4200,40 @@ impl From<VoiceListResponseView> for VoiceListResponse {
 }
 
 #[derive(Debug, Clone)]
+pub struct PostDatasetImportFromDatasetInSchemaParams {
+    raw: PostDatasetImportFromDatasetInSchema,
+}
+
+impl PostDatasetImportFromDatasetInSchemaParams {
+    pub fn new(dataset_record_ids: Vec<String>) -> Self {
+        Self {
+            raw: PostDatasetImportFromDatasetInSchema { dataset_record_ids },
+        }
+    }
+    pub fn from_raw(raw: PostDatasetImportFromDatasetInSchema) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &PostDatasetImportFromDatasetInSchema {
+        &self.raw
+    }
+    pub fn into_raw(self) -> PostDatasetImportFromDatasetInSchema {
+        self.raw
+    }
+}
+
+impl From<PostDatasetImportFromDatasetInSchema> for PostDatasetImportFromDatasetInSchemaParams {
+    fn from(raw: PostDatasetImportFromDatasetInSchema) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<PostDatasetImportFromDatasetInSchemaParams> for PostDatasetImportFromDatasetInSchema {
+    fn from(value: PostDatasetImportFromDatasetInSchemaParams) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct PostDatasetImportFromFileInSchemaParams {
     raw: PostDatasetImportFromFileInSchema,
 }
@@ -4236,6 +4545,86 @@ impl From<PatchDatasetInSchemaParams> for PatchDatasetInSchema {
 impl Default for PatchDatasetInSchemaParams {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub enum PutJudgeInSchemaOutputValue {
+    Classification(JudgeClassificationOutputParams),
+    Regression(JudgeRegressionOutputParams),
+}
+
+impl From<JudgeClassificationOutputParams> for PutJudgeInSchemaOutputValue {
+    fn from(value: JudgeClassificationOutputParams) -> Self {
+        Self::Classification(value)
+    }
+}
+
+impl From<JudgeRegressionOutputParams> for PutJudgeInSchemaOutputValue {
+    fn from(value: JudgeRegressionOutputParams) -> Self {
+        Self::Regression(value)
+    }
+}
+
+impl From<PutJudgeInSchemaOutputValue> for PutJudgeInSchemaOutput {
+    fn from(value: PutJudgeInSchemaOutputValue) -> Self {
+        match value {
+            PutJudgeInSchemaOutputValue::Classification(value) => {
+                Self::JudgeClassificationOutput(value.into())
+            }
+            PutJudgeInSchemaOutputValue::Regression(value) => {
+                Self::JudgeRegressionOutput(value.into())
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct PutJudgeInSchemaParams {
+    raw: PutJudgeInSchema,
+}
+
+impl PutJudgeInSchemaParams {
+    pub fn new(
+        name: impl Into<String>,
+        description: impl Into<String>,
+        model_name: impl Into<String>,
+        output: impl Into<PutJudgeInSchemaOutputValue>,
+        instructions: impl Into<String>,
+        tools: Vec<String>,
+    ) -> Self {
+        Self {
+            raw: PutJudgeInSchema {
+                description: description.into(),
+                instructions: instructions.into(),
+                model_name: model_name.into(),
+                name: name.into(),
+                output: Into::<PutJudgeInSchemaOutputValue>::into(output).into(),
+                tools,
+            },
+        }
+    }
+    pub fn from_raw(raw: PutJudgeInSchema) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &PutJudgeInSchema {
+        &self.raw
+    }
+    pub fn into_raw(self) -> PutJudgeInSchema {
+        self.raw
+    }
+}
+
+impl From<PutJudgeInSchema> for PutJudgeInSchemaParams {
+    fn from(raw: PutJudgeInSchema) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<PutJudgeInSchemaParams> for PutJudgeInSchema {
+    fn from(value: PutJudgeInSchemaParams) -> Self {
+        value.into_raw()
     }
 }
 

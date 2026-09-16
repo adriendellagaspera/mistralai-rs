@@ -20,6 +20,18 @@ impl<'a> BetaObservabilityDatasetsRecords<'a> {
             .map_err(Into::into)
     }
 
+    pub async fn bulk_delete(
+        &self,
+        request: DeleteDatasetRecordsInSchemaParams,
+    ) -> Result<(), SdkError> {
+        self.raw
+            .delete_dataset_records_v1_observability_dataset_records_bulk_delete_post(
+                request.into_raw(),
+            )
+            .await
+            .map_err(Into::into)
+    }
+
     pub async fn fetch(
         &self,
         dataset_record_id: impl AsRef<str>,
@@ -31,5 +43,13 @@ impl<'a> BetaObservabilityDatasetsRecords<'a> {
             .await
             .map(Into::into)
             .map_err(Into::into)
+    }
+
+    pub async fn judge(
+        &self,
+        dataset_record_id: impl AsRef<str>,
+        request: PostDatasetRecordJudgingInSchemaParams,
+    ) -> Result<JudgeOutputView, SdkError> {
+        self.raw.judge_dataset_record_v1_observability_dataset_records_dataset_record_id_live_judging_post(dataset_record_id.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
     }
 }

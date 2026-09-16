@@ -33,12 +33,13 @@
     }, "if": {"properties": {"kind": {"const": "iter"}}}, "then": {"required": ["wrapper"]}},
     "model": {"type": "object", "additionalProperties": false, "properties": {
       "raw": {"$ref": "#/$defs/identifier"}, "constructor": {"$ref": "#/$defs/names"}, "exclude": {"$ref": "#/$defs/names"},
-      "adapters": {"$ref": "#/$defs/mapping"}, "union": {"$ref": "#/$defs/union"}, "simple_union": {"$ref": "#/$defs/simple_union"}, "union_factory": {"$ref": "#/$defs/factory"},
+      "adapters": {"$ref": "#/$defs/mapping"}, "union": {"$ref": "#/$defs/union"}, "simple_union": {"$ref": "#/$defs/simple_union"}, "type_alias": {"const": true}, "union_factory": {"$ref": "#/$defs/factory"},
       "borrowed": {"type": "boolean"}, "accessors": {"type": "object", "propertyNames": {"$ref": "#/$defs/identifier"}, "additionalProperties": {"$ref": "#/$defs/accessor"}}
     }, "oneOf": [
       {"required": ["union"], "not": {"anyOf": [{"required": ["constructor"]}, {"required": ["union_factory"]}, {"required": ["accessors"]}]}},
-      {"required": ["simple_union"], "not": {"anyOf": [{"required": ["union"]}, {"required": ["constructor"]}, {"required": ["union_factory"]}, {"required": ["accessors"]}]}},
-      {"required": ["constructor"], "not": {"anyOf": [{"required": ["union"]}, {"required": ["union_factory"]}, {"required": ["accessors"]}]}},
+      {"required": ["simple_union"], "not": {"anyOf": [{"required": ["union"]}, {"required": ["type_alias"]}, {"required": ["constructor"]}, {"required": ["union_factory"]}, {"required": ["accessors"]}]}},
+      {"required": ["type_alias"], "not": {"anyOf": [{"required": ["union"]}, {"required": ["simple_union"]}, {"required": ["constructor"]}, {"required": ["union_factory"]}, {"required": ["accessors"]}]}},
+      {"required": ["constructor"], "not": {"anyOf": [{"required": ["union"]}, {"required": ["simple_union"]}, {"required": ["type_alias"]}, {"required": ["union_factory"]}, {"required": ["accessors"]}]}},
       {"required": ["union_factory"], "not": {"anyOf": [{"required": ["union"]}, {"required": ["constructor"]}, {"required": ["accessors"]}]}},
       {"required": ["accessors"], "not": {"anyOf": [{"required": ["union"]}, {"required": ["constructor"]}, {"required": ["union_factory"]}]}}
     ]},
