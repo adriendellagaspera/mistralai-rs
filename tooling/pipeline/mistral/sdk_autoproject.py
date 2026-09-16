@@ -14,7 +14,7 @@ import json
 import re
 from typing import Any
 
-from rust_types import RustType, parse_type
+from rust_sdk_compiler import GenerationError, Type, parse_type
 
 
 RUST_KEYWORDS = {
@@ -327,13 +327,13 @@ def _existing_model_by_raw(models: dict[str, Any], raw: str, request: bool) -> s
     return None
 
 
-def _strip_options(syntax: RustType) -> RustType:
+def _strip_options(syntax: Type) -> Type:
     while (inner := syntax.unary("Option")) is not None:
         syntax = inner
     return syntax
 
 
-def _raw_public_leaf(syntax: RustType, rust: Any) -> bool:
+def _raw_public_leaf(syntax: Type, rust: Any) -> bool:
     if syntax.spelling in rust.aliases or syntax.spelling in rust.symbol_paths:
         return False
     if syntax.kind == "generic_type":
@@ -341,7 +341,7 @@ def _raw_public_leaf(syntax: RustType, rust: Any) -> bool:
     return True
 
 
-def _safe_alias(syntax: RustType, rust: Any, seen: tuple[str, ...] = ()) -> bool:
+def _safe_alias(syntax: Type, rust: Any, seen: tuple[str, ...] = ()) -> bool:
     if syntax.spelling in rust.aliases:
         if syntax.spelling in seen:
             return False
@@ -432,7 +432,7 @@ def _ensure_scalar_enum_model(models: dict[str, Any], schema: dict[str, Any], ra
     return name, None
 
 
-def _omittable_singleton_enum(schema: dict[str, Any], raw_type: str, schemas: dict[str, Any], rust: Any) -> bool:
+def _omittable_singleton(schema: dict[str, Any], raw_type: str, schemas: dict[str, Any], rust: Any) -> bool:
     schema, _ = _nullable(schema)
     reference = _schema_ref(schema)
     target = schemas.get(reference, {}) if reference else schema
@@ -440,8 +440,22 @@ def _omittable_singleton_enum(schema: dict[str, Any], raw_type: str, schemas: di
     singleton = (isinstance(values, list) and len(values) == 1) or "const" in target
     if not singleton:
         return False
-    syntax = _strip_options(parse_type(raw_type))
-    return syntax.spelling in rust.enums and len(rust.enums[syntax.spelling]) == 1
+    parsed = parse_type(raw_type)
+    syntax = _strip_options(parsed)
+    if syntax.spelling in rust.enums:
+        return len(rust.enums[syntax.spelling]) == 1
+    if parsed.unary("Option") is None:
+        return False
+    literal = target.get("const") if "const" in target else values[0]
+    if isinstance(literal, bool):
+        return syntax.spelling == "bool"
+    if isinstance(literal, str):
+        return syntax.spelling == "String"
+    if isinstance(literal, int):
+        return syntax.spelling in {"i8", "i16", "i32", "i64", "isize", "u8", "u16", "u32", "u64", "usize"}
+    if isinstance(literal, float):
+        return syntax.spelling in {"f32", "f64"}
+    return False
 
 
 def _ensure_union_model(models: dict[str, Any], schemas: dict[str, Any], schema: dict[str, Any],
@@ -571,7 +585,7 @@ def _ensure_request_model(models: dict[str, Any], schemas: dict[str, Any], raw: 
     excluded: list[str] = []
     required = set(schema.get("required", []))
     for field, field_schema in sorted(properties.items()):
-        if field not in required and _omittable_singleton_enum(
+        if field not in required and _omittable_singleton(
             field_schema, raw_fields[field].type, schemas, rust
         ):
             excluded.append(field)
@@ -611,6 +625,16 @@ def expand_manifest(openapi: Any, manifest: dict[str, Any], taxonomy: dict[str, 
     added: list[str] = []
     rejected: dict[str, str] = {}
     fallback_resources, fallback_prefixes = _fallback_context(openapi, taxonomy)
+    request_schemas = dict(openapi.schemas)
+    for schema_name, schema in sorted(openapi.schemas.items()):
+        if not schema.get("allOf"):
+            continue
+        try:
+            request_schemas[schema_name] = openapi.object_schema(schema_name)
+        except GenerationError:
+            # Non-object or contradictory compositions remain unprojectable and
+            # are rejected by the existing request-model checks below.
+            pass
 
     for operation_id, operation in sorted(openapi.operations.items()):
         if operation_id in mapped:
@@ -688,7 +712,7 @@ def expand_manifest(openapi: Any, manifest: dict[str, Any], taxonomy: dict[str, 
         if request_schema:
             request_raw = _schema_ref(request_schema)
             model_snapshot = set(models)
-            request, reason = _ensure_request_model(models, openapi.schemas, request_raw, rust)
+            request, reason = _ensure_request_model(models, request_schemas, request_raw, rust)
             if reason:
                 for model_name in set(models) - model_snapshot:
                     del models[model_name]

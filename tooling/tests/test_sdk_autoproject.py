@@ -3,7 +3,7 @@ from pathlib import Path
 import unittest
 from types import SimpleNamespace
 
-from rust_types import parse_type
+from rust_sdk_compiler import OpenApi, parse_type
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tooling" / "pipeline" / "mistral"))
@@ -72,6 +72,54 @@ class AutoProjectionTests(unittest.TestCase):
         self.assertIn("create", expanded["resources"]["beta_things"]["operations"])
         self.assertEqual("CreateThingParams", expanded["resources"]["beta_things"]["operations"]["create"]["request"])
         self.assertEqual("ThingView", expanded["resources"]["beta_things"]["operations"]["list"]["response"])
+
+    def test_projects_composed_request_and_omits_optional_singleton_scalar(self):
+        api = OpenApi({
+            "openapi": "3.1.0",
+            "info": {"title": "fixture", "version": "1"},
+            "paths": {
+                "/things": {
+                    "post": {
+                        "operationId": "create_thing",
+                        "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/CreateThing"}}}},
+                        "responses": {"200": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Thing"}}}}},
+                    }
+                }
+            },
+            "components": {"schemas": {
+                "Thing": {"type": "object", "properties": {"id": {"type": "string"}}},
+                "CreateThingBase": {
+                    "type": "object",
+                    "additionalProperties": False,
+                    "properties": {"name": {"type": "string"}},
+                    "required": ["name"],
+                },
+                "CreateThing": {
+                    "allOf": [
+                        {"$ref": "#/components/schemas/CreateThingBase"},
+                        {"type": "object", "properties": {"stream": {"type": "boolean", "enum": [False]}}},
+                    ]
+                },
+            }},
+        })
+        fields = {"CreateThing": (
+            SimpleNamespace(name="name", type="String"),
+            SimpleNamespace(name="stream", type="Option<bool>"),
+        )}
+        rust = SimpleNamespace(
+            structs=set(fields), aliases={}, enums={},
+            symbol_paths={"CreateThing": "types"},
+            fields=lambda name: fields[name],
+        )
+        expanded, report = sdk_autoproject.expand_manifest(
+            api, manifest(),
+            {"operations": {"create_thing": ["things.create"]}},
+            raw_coverage("create_thing"), rust,
+        )
+        self.assertEqual(1, report["added_count"])
+        request = expanded["models"]["CreateThingParams"]
+        self.assertEqual(["name"], request["constructor"])
+        self.assertEqual(["stream"], request["exclude"])
 
     def test_projects_named_scalar_enum_without_raw_type_leak(self):
         api = FakeOpenApi()
