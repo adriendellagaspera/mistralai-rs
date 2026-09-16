@@ -93,7 +93,7 @@ class AutoProjectionTests(unittest.TestCase):
         )}
         rust = SimpleNamespace(
             structs=set(fields), aliases={}, enums=enums,
-            symbol_modules={"CreateThing": "types", "ResourceVisibility": "types"},
+            symbol_paths={"CreateThing": "types", "ResourceVisibility": "types"},
             fields=lambda name: fields[name],
         )
         expanded, report = sdk_autoproject.expand_manifest(
@@ -128,7 +128,7 @@ class AutoProjectionTests(unittest.TestCase):
         )}
         rust = SimpleNamespace(
             structs=set(fields), aliases={}, enums=enums,
-            symbol_modules={"CreateThing": "types", "ResourceVisibility": "types"},
+            symbol_paths={"CreateThing": "types", "ResourceVisibility": "types"},
             fields=lambda name: fields[name],
         )
         _, report = sdk_autoproject.expand_manifest(
@@ -148,7 +148,7 @@ class AutoProjectionTests(unittest.TestCase):
         }
         rust = SimpleNamespace(
             structs=set(fields), aliases={}, enums={},
-            symbol_modules={"CreateThing": "types"},
+            symbol_paths={"CreateThing": "types"},
             fields=lambda name: fields[name],
         )
         expanded, report = sdk_autoproject.expand_manifest(
@@ -175,7 +175,7 @@ class AutoProjectionTests(unittest.TestCase):
             "Tool": (SimpleNamespace(name="name", type="String"),),
         }
         rust = SimpleNamespace(
-            structs=set(fields), aliases={}, symbol_modules={name: "types" for name in fields},
+            structs=set(fields), aliases={}, symbol_paths={name: "types" for name in fields},
             fields=lambda name: fields[name],
         )
         expanded, report = sdk_autoproject.expand_manifest(
@@ -250,7 +250,7 @@ class AutoProjectionTests(unittest.TestCase):
         }
         rust = SimpleNamespace(
             structs=set(fields), aliases={}, enums=enums,
-            symbol_modules={name: "types" for name in (*fields, *enums)},
+            symbol_paths={name: "types" for name in (*fields, *enums)},
             fields=lambda name: fields[name],
         )
         expanded, report = sdk_autoproject.expand_manifest(
@@ -291,7 +291,7 @@ class AutoProjectionTests(unittest.TestCase):
         }
         rust = SimpleNamespace(
             structs=set(fields), aliases={}, enums={},
-            symbol_modules={name: "types" for name in fields},
+            symbol_paths={name: "types" for name in fields},
             fields=lambda name: fields[name],
         )
         expanded, report = sdk_autoproject.expand_manifest(
@@ -322,7 +322,7 @@ class AutoProjectionTests(unittest.TestCase):
         rust = SimpleNamespace(
             structs=set(fields),
             aliases={"MetadataDict": parse_type("std::collections::BTreeMap<String, serde_json::Value>")},
-            symbol_modules={"CreateThing": "types", "MetadataDict": "types"},
+            symbol_paths={"CreateThing": "types", "MetadataDict": "types"},
             fields=lambda name: fields[name],
         )
         expanded, report = sdk_autoproject.expand_manifest(
