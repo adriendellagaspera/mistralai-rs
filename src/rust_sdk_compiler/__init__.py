@@ -1,19 +1,17 @@
-"""Public API for the standalone OpenAPI-to-Rust facade compiler."""
+"""Public API for the standalone Rust SDK compiler."""
 
-from .sdk_compiler import GenerationError, OpenApiIndex, compile_facade, compile_ir
-from .sdk_raw_ir import RawBindingLayout, RawClientBinding, RustBindingsIr
-from .sdk_runtime import DEFAULT_RUNTIME, RustFacadeRuntime
+from .api import Bindings, Compilation, OpenApi, Policy, Runtime, compile, lower
+from .sdk_frontend import GenerationError
 
 __version__ = "0.2.0"
 
 __all__ = [
-    "DEFAULT_RUNTIME",
+    "Bindings",
+    "Compilation",
     "GenerationError",
-    "OpenApiIndex",
-    "RawBindingLayout",
-    "RawClientBinding",
-    "RustBindingsIr",
-    "RustFacadeRuntime",
-    "compile_facade",
-    "compile_ir",
+    "OpenApi",
+    "Policy",
+    "Runtime",
+    "compile",
+    "lower",
 ]
