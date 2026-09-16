@@ -1,6 +1,9 @@
+import json
 from pathlib import Path
 import sys
 import unittest
+
+from jsonschema import Draft202012Validator
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "codegen"))
@@ -10,6 +13,7 @@ import sdk_codegen as compatibility
 import sdk_compiler
 import sdk_frontend
 from sdk_openapi_to_rust import OpenApiToRustAdapter
+from sdk_raw_ir import RawIr
 from test_sdk_facade import CLIENT, TYPES, manifest, openapi_document
 
 
@@ -27,10 +31,11 @@ class CompilerBoundaryTests(unittest.TestCase):
         self.assertNotIn("coverage.json", files)
         self.assertNotIn("api-surface.json", files)
 
-    def test_compatibility_frontend_reexports_extracted_frontend(self):
+    def test_legacy_raw_index_exists_only_on_compatibility_surface(self):
         self.assertIs(compatibility.build_ir, sdk_frontend.build_ir)
         self.assertIs(compatibility.OpenApiIndex, sdk_frontend.OpenApiIndex)
-        self.assertIs(compatibility.RustIndex, sdk_frontend.RustIndex)
+        self.assertFalse(hasattr(sdk_frontend, "RustIndex"))
+        self.assertIsInstance(compatibility.RustIndex(TYPES.encode(), CLIENT.encode()), RawIr)
 
     def test_compiler_dependency_graph_excludes_projection_and_audit_tooling(self):
         sources = [
@@ -52,8 +57,28 @@ class CompilerBoundaryTests(unittest.TestCase):
             ):
                 self.assertNotIn(forbidden, source)
 
+    def test_raw_source_parser_is_localized_to_adapter(self):
+        frontend = (ROOT / "codegen/sdk_frontend.py").read_text()
+        adapter = (ROOT / "codegen/sdk_openapi_to_rust.py").read_text()
+        for forbidden in ("tree_sitter", "tree_sitter_rust", "Language(", "Parser(",
+                          "OpenApiToRustAdapter"):
+            self.assertNotIn(forbidden, frontend)
+        self.assertIn("tree_sitter", adapter)
+        self.assertIn("Parser(", adapter)
+
 
 class OpenApiToRustAdapterTests(unittest.TestCase):
+    def fixture(self):
+        types = TYPES + "\npub type MetadataDict = std::collections::BTreeMap<String, serde_json::Value>;\n"
+        client = CLIENT + """
+impl HttpClient {
+    pub async fn delete_animal(&self, animal_id: impl AsRef<str>) -> Result<(), Error> { todo!() }
+    pub async fn download_animal(&self) -> Result<futures_util::stream::BoxStream<'static, Result<bytes::Bytes, reqwest::Error>>, Error> { todo!() }
+    pub async fn stream_animals(&self, request: AnimalRequest) -> Result<futures_util::stream::BoxStream<'static, Result<bytes::Bytes, reqwest::Error>>, Error> { todo!() }
+}
+"""
+        return OpenApiToRustAdapter.parse(types.encode(), client.encode())
+
     def test_adapter_preserves_explicit_enum_wire_names(self):
         raw = OpenApiToRustAdapter.parse(
             b'''pub enum Visibility {
@@ -71,15 +96,7 @@ class OpenApiToRustAdapterTests(unittest.TestCase):
         )
 
     def test_adapter_normalizes_supported_raw_shapes(self):
-        types = TYPES + "\npub type MetadataDict = std::collections::BTreeMap<String, serde_json::Value>;\n"
-        client = CLIENT + """
-impl HttpClient {
-    pub async fn delete_animal(&self, animal_id: impl AsRef<str>) -> Result<(), Error> { todo!() }
-    pub async fn download_animal(&self) -> Result<futures_util::stream::BoxStream<'static, Result<bytes::Bytes, reqwest::Error>>, Error> { todo!() }
-    pub async fn stream_animals(&self, request: AnimalRequest) -> Result<futures_util::stream::BoxStream<'static, Result<bytes::Bytes, reqwest::Error>>, Error> { todo!() }
-}
-"""
-        raw = OpenApiToRustAdapter.parse(types.encode(), client.encode())
+        raw = self.fixture()
 
         self.assertEqual([field.name for field in raw.fields("AnimalRequest")], ["animals", "model", "energy"])
         self.assertEqual([(variant.name, variant.payload) for variant in raw.variants("AnimalUnion")],
@@ -98,6 +115,19 @@ impl HttpClient {
         )
         with self.assertRaises(TypeError):
             raw.structs["Injected"] = ()
+
+    def test_raw_ir_sidecar_round_trip_matches_schema(self):
+        raw = self.fixture()
+        sidecar = raw.to_dict()
+        schema = json.loads((ROOT / "codegen/raw-ir.schema.json").read_text())
+        Draft202012Validator(schema).validate(sidecar)
+        self.assertEqual(raw, RawIr.from_dict(sidecar))
+
+    def test_raw_ir_sidecar_rejects_unknown_version(self):
+        sidecar = self.fixture().to_dict()
+        sidecar["schema_version"] = 2
+        with self.assertRaisesRegex(ValueError, "sidecar version"):
+            RawIr.from_dict(sidecar)
 
 
 if __name__ == "__main__":
