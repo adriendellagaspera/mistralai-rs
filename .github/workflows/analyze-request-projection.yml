@@ -1,0 +1,21 @@
+name: Analyze request projection debt
+on:
+  push:
+    branches: [issue-19-request-projection-followup]
+permissions:
+  contents: read
+jobs:
+  analyze:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pinned Python analysis dependencies
+        run: |
+          python3 -m venv .tools/analysis
+          .tools/analysis/bin/python -m pip install \
+            'ruamel.yaml==0.18.6' \
+            'tree-sitter==0.25.2' \
+            'tree-sitter-rust==0.24.0' \
+            'jsonschema==4.23.0'
+      - name: Analyze remaining request projection debt
+        run: .tools/analysis/bin/python scripts/analyze_request_projection_debt.py
