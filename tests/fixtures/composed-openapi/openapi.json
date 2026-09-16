@@ -1,0 +1,58 @@
+{
+  "openapi": "3.1.0",
+  "info": {"title": "Composed fixture", "version": "1.0.0"},
+  "paths": {},
+  "components": {
+    "schemas": {
+      "BaseCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": {"type": "string"},
+          "metadata": {"type": "object", "additionalProperties": true}
+        },
+        "required": ["name"]
+      },
+      "Command": {
+        "allOf": [
+          {"$ref": "#/components/schemas/BaseCommand"},
+          {
+            "type": "object",
+            "properties": {
+              "dry_run": {"type": "boolean", "enum": [false]}
+            }
+          }
+        ]
+      },
+      "NestedCommand": {
+        "allOf": [
+          {"$ref": "#/components/schemas/Command"},
+          {
+            "type": "object",
+            "properties": {
+              "priority": {"type": "integer"}
+            },
+            "required": ["priority"]
+          }
+        ]
+      },
+      "Conflict": {
+        "allOf": [
+          {"type": "object", "properties": {"value": {"type": "string"}}},
+          {"type": "object", "properties": {"value": {"type": "integer"}}}
+        ]
+      },
+      "BrokenRequired": {
+        "type": "object",
+        "properties": {"name": {"type": "string"}},
+        "required": ["missing"]
+      },
+      "RecursiveA": {
+        "allOf": [{"$ref": "#/components/schemas/RecursiveB"}]
+      },
+      "RecursiveB": {
+        "allOf": [{"$ref": "#/components/schemas/RecursiveA"}]
+      }
+    }
+  }
+}
