@@ -20,9 +20,9 @@ from sdk_autoproject import expand_manifest
 from sdk_contracts import coverage_inventory, public_surface
 
 
-def probes(openapi, rust, configured):
-    ir = compiler.compile_ir(openapi, rust, configured)
-    inventory = coverage_inventory(openapi, rust, ir)
+def probes(openapi, raw, configured):
+    ir = compiler.compile_ir(openapi, raw, configured)
+    inventory = coverage_inventory(openapi, raw, ir)
     modules, rejected = {}, {}
     for index, (operation_id, entry) in enumerate(inventory.items()):
         if entry["status"] != "candidate_unverified":
@@ -48,7 +48,7 @@ def probes(openapi, rust, configured):
                 operation["request"] = "ProbeRequest"
             overlay = {"schema_version": 2, "client": {"name": "ProbeClient"}, "models": models,
                        "resources": {"resource": {"name": "ProbeResource", "operations": {"invoke": operation}}}}
-            _, files = compiler.compile_facade(openapi, rust, overlay)
+            _, files = compiler.compile_facade(openapi, raw, overlay)
             public_surface(files)
             model_source = files["facade_types.rs"]
             resource_source = files["resource.rs"]
@@ -63,15 +63,15 @@ def probes(openapi, rust, configured):
 
 def main():
     openapi = compiler.OpenApiIndex.load(ROOT / "spec/openapi.yaml")
-    rust = compiler.RustIndex.load(ROOT / "src/generated")
+    raw = compiler.load_raw_ir(ROOT / "src/generated")
     configured = json.loads((ROOT / "codegen/sdk-semantics.json").read_text())
     configured, _ = expand_manifest(
         openapi, configured,
         json.loads((ROOT / "codegen/sdk-taxonomy.json").read_text()),
         json.loads((ROOT / "src/generated/coverage.json").read_text()),
-        rust,
+        raw,
     )
-    modules, rejected = probes(openapi, rust, configured)
+    modules, rejected = probes(openapi, raw, configured)
     report = {"generated_candidates": sorted(modules), "rejected_candidates": rejected}
     print(json.dumps(report, indent=2), flush=True)
     digest = hashlib.sha256(json.dumps(report, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
