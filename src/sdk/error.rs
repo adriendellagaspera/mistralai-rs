@@ -98,6 +98,16 @@ impl From<HttpError> for TransportError {
     }
 }
 
+impl From<reqwest::Error> for TransportError {
+    fn from(source: reqwest::Error) -> Self {
+        Self {
+            kind: TransportErrorKind::Network,
+            message: source.to_string(),
+            source: Some(Box::new(source)),
+        }
+    }
+}
+
 /// An HTTP response rejected by the Mistral API.
 ///
 /// The stable facade deliberately does not expose operation-specific generated
@@ -190,6 +200,12 @@ pub enum SdkError {
 impl From<ApiError> for SdkError {
     fn from(error: ApiError) -> Self {
         Self::Api(Box::new(error))
+    }
+}
+
+impl From<reqwest::Error> for SdkError {
+    fn from(error: reqwest::Error) -> Self {
+        Self::Transport(error.into())
     }
 }
 
