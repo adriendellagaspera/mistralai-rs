@@ -28,7 +28,7 @@ def _children(node: Node | None, kind: str) -> list[Node]:
 def _serde_rename(attributes: list[str]) -> str | None:
     matches = []
     for attribute in attributes:
-        match = re.fullmatch(r'#[serde\(rename\s*=\s*"([^"]+)"\)]', attribute)
+        match = re.fullmatch(r'#\[serde\(rename\s*=\s*"([^"]+)"\)\]', attribute)
         if match:
             matches.append(match.group(1))
     if len(matches) > 1:
