@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "package_name": "openapi-to-rust-bindings",
-  "package_version": "0.2.0",
+  "package_version": "0.2.1",
   "bindings_schema_version": 2,
   "sidecar": "rust-bindings.json",
   "compiler": {
     "name": "rust-sdk-compiler",
-    "commit": "fe1bef526d19b3e1613cd05a027ebc0f5875535c"
+    "commit": "8357b0e487bd06898099f687c9918a0c5db02db4"
   },
   "backend": {
     "name": "openapi-to-rust",
