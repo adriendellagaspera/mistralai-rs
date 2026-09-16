@@ -123,7 +123,7 @@ def _emit_union(model: ModelSpec, spec: UnionModelSpec) -> str:
     constructors = [
         f"pub fn {branch.constructor_name}({_emit_argument(branch.argument)}) -> Self {{ "
         f"Self::{branch.public_name}({branch.argument.name}"
-        + (".into()" if branch.argument.kind == ArgumentKind.INTO_STRING else "") + ") }}"
+        + (".into()" if branch.argument.kind == ArgumentKind.INTO_STRING else "") + ") }"
         for branch in spec.branches
     ]
     branches = {branch.raw_payload: branch for branch in spec.branches}
