@@ -6,7 +6,9 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "codegen"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
+import sdk_codegen as legacy_frontend
 import sdk_compiler
+import sdk_frontend
 from test_sdk_facade import CLIENT, TYPES, manifest, openapi_document
 
 
@@ -24,19 +26,38 @@ class CompilerBoundaryTests(unittest.TestCase):
         self.assertNotIn("coverage.json", files)
         self.assertNotIn("api-surface.json", files)
 
-    def test_compiler_module_does_not_import_projection_or_audit_tooling(self):
-        source = (ROOT / "codegen/sdk_compiler.py").read_text()
-        for forbidden in (
-            "import sdk_autoproject",
-            "from sdk_autoproject",
-            "import sdk_contracts",
-            "from sdk_contracts",
-            "import sdk_pipeline",
-            "from sdk_pipeline",
-            "coverage_inventory(",
-            "public_surface(",
-        ):
-            self.assertNotIn(forbidden, source)
+    def test_extracted_frontend_matches_legacy_frontend_ir(self):
+        document = openapi_document()
+        policy = manifest()
+        extracted = sdk_frontend.build_ir(
+            sdk_frontend.OpenApiIndex(document),
+            sdk_frontend.RustIndex(TYPES.encode(), CLIENT.encode()),
+            policy,
+        )
+        legacy = legacy_frontend.build_ir(
+            legacy_frontend.OpenApiIndex(document),
+            legacy_frontend.RustIndex(TYPES.encode(), CLIENT.encode()),
+            policy,
+        )
+        self.assertEqual(extracted, legacy)
+
+    def test_compiler_dependency_graph_excludes_projection_and_audit_tooling(self):
+        sources = [
+            (ROOT / "codegen/sdk_compiler.py").read_text(),
+            (ROOT / "codegen/sdk_frontend.py").read_text(),
+        ]
+        for source in sources:
+            for forbidden in (
+                "import sdk_autoproject",
+                "from sdk_autoproject",
+                "import sdk_contracts",
+                "from sdk_contracts",
+                "import sdk_pipeline",
+                "from sdk_pipeline",
+                "coverage_inventory(",
+                "public_surface(",
+            ):
+                self.assertNotIn(forbidden, source)
 
 
 if __name__ == "__main__":
