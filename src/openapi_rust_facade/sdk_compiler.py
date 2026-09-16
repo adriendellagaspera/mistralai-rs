@@ -1,7 +1,7 @@
 """Compile OpenAPI + normalized Rust bindings + policy into a Rust facade.
 
-This is the generator-agnostic compiler boundary. Concrete generators live in
-``openapi_to_rust_facade.adapters`` and only produce :class:`RawIr`.
+This is the generator-agnostic compiler boundary. Concrete generators are
+adapter concerns and only produce :class:`RustBindingsIr`.
 """
 
 from __future__ import annotations
@@ -13,7 +13,7 @@ from . import sdk_frontend as frontend
 from .sdk_ir import FacadeIr
 from .sdk_model_lowering import resolve_models
 from .sdk_operation_lowering import resolve_operations
-from .sdk_raw_ir import RawIr
+from .sdk_raw_ir import RustBindingsIr
 from .sdk_runtime import DEFAULT_RUNTIME, RustFacadeRuntime
 
 
@@ -23,13 +23,13 @@ OpenApiIndex = frontend.OpenApiIndex
 
 def compile_ir(
     openapi: OpenApiIndex,
-    raw: RawIr,
+    bindings: RustBindingsIr,
     manifest: dict[str, Any],
 ) -> FacadeIr:
     """Validate and lower one explicit semantic facade policy."""
     try:
-        ir = frontend.build_ir(openapi, raw, manifest)
-        return resolve_models(resolve_operations(ir, raw), openapi, raw)
+        ir = frontend.build_ir(openapi, bindings, manifest)
+        return resolve_models(resolve_operations(ir, bindings), openapi, bindings)
     except ValueError as error:
         if isinstance(error, GenerationError):
             raise
@@ -57,12 +57,12 @@ def _validate_runtime(ir: FacadeIr, runtime: RustFacadeRuntime) -> None:
 
 def compile_facade(
     openapi: OpenApiIndex,
-    raw: RawIr,
+    bindings: RustBindingsIr,
     manifest: dict[str, Any],
     *,
     runtime: RustFacadeRuntime = DEFAULT_RUNTIME,
 ) -> tuple[FacadeIr, dict[str, str]]:
     """Compile explicit semantics to resolved IR and deterministic Rust files."""
-    ir = compile_ir(openapi, raw, manifest)
+    ir = compile_ir(openapi, bindings, manifest)
     _validate_runtime(ir, runtime)
-    return ir, sdk_emit.emit(ir, raw.binding, runtime)
+    return ir, sdk_emit.emit(ir, bindings.binding, runtime)
