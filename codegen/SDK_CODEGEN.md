@@ -1,112 +1,63 @@
-# Semantic SDK compiler
+# SDK code generation
 
-The public Rust SDK surface is compiled, not handwritten. `mistralai-rs` owns
-Mistral-specific policy, runtime support and repository checks. Two separately
-versioned tools are pinned in `codegen.lock`:
-
-- `rust-sdk-compiler`: the backend-neutral compiler;
-- `openapi-to-rust-bindings`: the compatibility layer that normalizes the current
-  raw generator output into the compiler's `Bindings` contract.
+The public Rust SDK surface is compiled, not handwritten. `mistralai-rs` owns Mistral-specific policy, runtime integration and repository gates; generic code generation is supplied by independently pinned tools.
 
 ## Pipeline
 
 ```text
-openapi-to-rust output
-        |
-        v
-openapi-to-rust-bindings
-        |
-        v
-     Bindings --------------------\
-                                   \
-Mistral OpenAPI ------> OpenApi ----> rust-sdk-compiler -> Compilation
-                                   /
-Mistral policy --------> Policy ---/
-Mistral runtime -------> Runtime --/
+openapi-to-rust -> generated Rust -> openapi-to-rust-bindings -> Bindings
+                                                              |
+Mistral OpenAPI -------------------------------------> OpenApi |
+Mistral semantic policy -----------------------------> Policy  |
+Mistral runtime conventions -------------------------> Runtime |
+                                                              v
+                                                       rust-sdk-compiler
+                                                              |
+                                                              v
+                                                        Compilation -> src/sdk
 
-Mistral official SDK taxonomy -> auto-projection/planning
-Mistral repository ------------> coverage/API/semver audits
+Official Python/TypeScript SDKs -> Mistral taxonomy / auto-projection
+mistralai-rs                    -> coverage / API / semver audits
 ```
 
-`rust-sdk-compiler` knows nothing about `openapi-to-rust`, generated file names,
-`HttpClient`, tree-sitter or Mistral. Its small public API is `OpenApi`,
-`Bindings`, `Policy`, `Runtime`, `Compilation`, `lower()` and `compile()`.
-`lower()` produces the resolved SDK IR; `compile()` additionally renders the
-deterministic Rust file set.
+`rust-sdk-compiler` is backend-neutral and Rust-specific. It does not parse generated source and knows nothing about `openapi-to-rust`, tree-sitter or Mistral. Its public API is deliberately small: `OpenApi`, `Bindings`, `Policy`, `Runtime`, `Compilation`, `lower()` and `compile()`.
 
-`openapi-to-rust-bindings` owns every current backend convention: `types.rs`,
-`client.rs`, `HttpClient`, generated module paths, serde enum renames and the raw
-stream ABI. Its public API is functional: `parse_bindings()` and
-`read_bindings()` return the compiler's public `Bindings` value. It imports no
-compiler internals.
+`openapi-to-rust-bindings` owns compatibility with the current raw generator output. `parse_bindings()` and `read_bindings()` normalize `types.rs` / `client.rs`, serde wire names, operation signatures, symbol paths and stream ABI into `Bindings`. Backend parsing does not belong in the compiler.
 
-`mistralai-rs` does not maintain a copied compiler implementation. The repository
-keeps Mistral-specific projection/taxonomy logic, generation orchestration,
-runtime support, coverage and public-API gates, plus narrow local shims for
-historical repository tests. `scripts/codegen.py` fetches both immutable tool
-commits from `codegen.lock`, verifies their Git trees and installs them into the
-pinned codegen environment.
+`scripts/codegen.py` fetches both tools at the exact commits recorded in `codegen.lock`, verifies their Git trees and installs them in an isolated environment. `codegen/sdk_pipeline.py` owns the Mistral-specific orchestration around those public APIs.
 
-The semantic policy remains declarative. It assigns stable public names,
-constructor field order, resource grouping, convenience access paths and
-intentional stream semantics. It contains no Rust statements or method bodies.
-OpenAPI remains the wire-contract authority.
+## Inputs
 
-## Bindings contract
+`OpenApi` is the HTTP/wire contract. `Bindings` describes the Rust surface that actually exists:
 
-`Bindings` describes the Rust surface that actually exists and that the compiler
-may target:
+- structs, fields and types;
+- enums, variants and wire names;
+- aliases and resolved Rust symbol paths;
+- operations, ordered parameters, return/success types and stream semantics;
+- the generated client path and its construction/configuration methods.
 
-- structs and public fields/types;
-- enums, variants, wire names and unary payloads;
-- type aliases;
-- raw operations, ordered parameters, return and successful payload types;
-- normalized stream item/error/lifetime semantics;
-- fully resolved Rust paths for generated symbols;
-- the raw client path and its constructor/configuration methods.
+`Policy` describes only the desired public SDK shape: names, resource hierarchy, constructors, accessors and intentional transport conveniences. It contains no Rust method bodies.
 
-The compiler ships the versioned `rust-bindings.schema.json` interchange format.
-The representation contains JSON values and Rust type strings, never parser
-nodes, source locations or generator-specific module labels. A producer can
-construct `Bindings` directly or serialize the same schema.
+`Runtime` contains consumer-owned support paths such as `SdkError`, streaming helpers and the generated-file marker. Error conversion and stream support specific to this crate therefore remain in `mistralai-rs`.
 
-If a future `openapi-to-rust` release emits this contract directly,
-`openapi-to-rust-bindings` can collapse to validation/loading without any change
-to `rust-sdk-compiler` or Mistral policy.
+The compiler ships a versioned `rust-bindings.schema.json` interchange contract. A backend producer may construct `Bindings` directly or serialize that schema. If `openapi-to-rust` eventually emits equivalent metadata itself, `openapi-to-rust-bindings` can shrink to validation/loading without changing the compiler or Mistral policy.
 
-## Runtime ownership
+## Ownership
 
-The compiler does not own SDK-specific support code. `Runtime` tells emission
-which consumer-owned error and streaming paths to reference. In this repository,
-`src/sdk/error.rs`, `crate::streaming` and the historical generated-file marker
-remain Mistral concerns. Raw network-error conversion therefore belongs here,
-not in the generic compiler.
+A change belongs in `rust-sdk-compiler` when it is a generic Rust SDK compilation capability and can be demonstrated with an unrelated fixture. A change belongs in `openapi-to-rust-bindings` when only the concrete raw-generator representation changed. Mistral taxonomy, official-SDK evidence, source pins, auto-projection decisions and coverage targets stay in this repository.
+
+Repository audit artifacts (`coverage.json`, projection probes, `api-surface.json`, cargo-semver-checks) consume compiler output but are not compiler inputs.
 
 ## Drift policy
 
-Compatible changes are mechanical: an optional request property creates a
-fluent setter and a new discriminated branch creates a public enum variant.
-Ambiguous changes stop generation with a semantic-review error, including:
+Generation fails closed when source contracts cannot be reconciled safely. Examples include:
 
-- OpenAPI and Rust binding field sets disagree;
-- a required request field lacks constructor policy;
+- OpenAPI and Rust binding fields disagree;
+- a required request field has no valid public projection;
 - an operation no longer accepts or returns the configured schema;
-- an inferred union has no unique discriminator;
-- a convenience factory branch needs more than one unexplained input.
+- a union/discriminator cannot be resolved uniquely;
+- an unsupported request or response transport appears.
 
-`scripts/codegen.py check` regenerates raw bindings and the SDK surface in
-isolation, formats with the pinned Rust toolchain, and compares content and file
-sets. The nightly update therefore cannot silently retain stale generated files.
+Compatible additions are handled mechanically when an existing primitive already describes them. A new generic primitive is implemented once in the compiler with non-Mistral fixture coverage, then consumed here through policy/planning.
 
-## Extending the compiler
-
-Adding an operation composed only of already-supported primitives should need no
-compiler change: policy/planning supplies names and selected conveniences. A new
-generic compiler shape belongs in `rust-sdk-compiler` and must be demonstrated by
-an unrelated fixture. Changes caused only by the concrete raw generator belong
-in `openapi-to-rust-bindings`.
-
-Mistral-specific taxonomy harvesting, source pins, automatic projection policy
-and coverage goals remain in this repository. `coverage.json`, projection probes,
-`api-surface.json` and pinned `cargo-semver-checks` are consumer-side review gates
-and do not belong to either generic package.
+`scripts/codegen.py check` regenerates both raw bindings and the SDK surface in temporary directories, formats with the pinned Rust toolchain and compares the complete committed file sets byte-for-byte. No timestamp or mutable dependency is allowed to affect output.
