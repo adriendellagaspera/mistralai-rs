@@ -45,11 +45,21 @@ class RawParameter:
 
 
 @dataclass(frozen=True)
+class RawStreamBinding:
+    """Semantic stream contract independent from its concrete Rust wrapper type."""
+
+    item_type: str
+    error_type: str
+    lifetime: str
+
+
+@dataclass(frozen=True)
 class RawOperation:
     name: str
     parameters: tuple[RawParameter, ...]
     return_type: str
     success_type: str
+    stream: RawStreamBinding | None = None
 
 
 @dataclass(frozen=True)
@@ -129,8 +139,19 @@ class RawIr:
             aliases = {
                 name: parse_type(type_name) for name, type_name in value["aliases"].items()
             }
-            operations = {
-                name: RawOperation(
+            operations = {}
+            for name, operation in value["operations"].items():
+                stream_value = operation.get("stream")
+                stream = (
+                    RawStreamBinding(
+                        stream_value["item_type"],
+                        stream_value["error_type"],
+                        stream_value["lifetime"],
+                    )
+                    if stream_value is not None
+                    else None
+                )
+                operations[name] = RawOperation(
                     operation["name"],
                     tuple(
                         RawParameter(parameter["name"], parse_type(parameter["type"]))
@@ -138,9 +159,8 @@ class RawIr:
                     ),
                     operation["return_type"],
                     operation["success_type"],
+                    stream,
                 )
-                for name, operation in value["operations"].items()
-            }
             symbol_paths = {
                 name: path for name, path in value["symbol_paths"].items()
             }
@@ -194,6 +214,15 @@ class RawIr:
                     ],
                     "return_type": operation.return_type,
                     "success_type": operation.success_type,
+                    "stream": (
+                        {
+                            "item_type": operation.stream.item_type,
+                            "error_type": operation.stream.error_type,
+                            "lifetime": operation.stream.lifetime,
+                        }
+                        if operation.stream is not None
+                        else None
+                    ),
                 }
                 for name, operation in self._operations
             },
