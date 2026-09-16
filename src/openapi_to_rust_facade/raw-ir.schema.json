@@ -70,7 +70,22 @@
             }
           },
           "return_type": {"type": "string"},
-          "success_type": {"type": "string"}
+          "success_type": {"type": "string"},
+          "stream": {
+            "oneOf": [
+              {"type": "null"},
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["item_type", "error_type", "lifetime"],
+                "properties": {
+                  "item_type": {"type": "string"},
+                  "error_type": {"type": "string"},
+                  "lifetime": {"type": "string"}
+                }
+              }
+            ]
+          }
         }
       }
     },
