@@ -15,12 +15,13 @@ import tomllib
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "codegen"))
-import sdk_codegen as compiler
+import sdk_compiler as compiler
+from sdk_autoproject import expand_manifest
 from sdk_contracts import coverage_inventory, public_surface
 
 
 def probes(openapi, rust, configured):
-    ir = compiler.build_ir(openapi, rust, configured)
+    ir = compiler.compile_ir(openapi, rust, configured)
     inventory = coverage_inventory(openapi, rust, ir)
     modules, rejected = {}, {}
     for index, (operation_id, entry) in enumerate(inventory.items()):
@@ -47,11 +48,10 @@ def probes(openapi, rust, configured):
                 operation["request"] = "ProbeRequest"
             overlay = {"schema_version": 2, "client": {"name": "ProbeClient"}, "models": models,
                        "resources": {"resource": {"name": "ProbeResource", "operations": {"invoke": operation}}}}
-            probe = compiler.build_ir(openapi, rust, overlay)
-            model_source = "use crate::generated::types::*;\n" + "\n".join(
-                compiler._emit_model(model, openapi, rust) for model in probe.models)
-            resource_source = compiler._emit_resource(probe.resources[0], rust, probe.resources)
-            public_surface({"types.rs": model_source, "resource.rs": resource_source})
+            _, files = compiler.compile_facade(openapi, rust, overlay)
+            public_surface(files)
+            model_source = files["facade_types.rs"]
+            resource_source = files["resource.rs"]
             modules[operation_id] = (
                 f"mod probe_{index} {{ use mistralai::SdkError;\n"
                 f"mod facade_types {{ {model_source} }}\nuse facade_types::*;\n"
@@ -65,7 +65,7 @@ def main():
     openapi = compiler.OpenApiIndex.load(ROOT / "spec/openapi.yaml")
     rust = compiler.RustIndex.load(ROOT / "src/generated")
     configured = json.loads((ROOT / "codegen/sdk-semantics.json").read_text())
-    configured, _ = compiler.expand_manifest(
+    configured, _ = expand_manifest(
         openapi, configured,
         json.loads((ROOT / "codegen/sdk-taxonomy.json").read_text()),
         json.loads((ROOT / "src/generated/coverage.json").read_text()),
@@ -80,14 +80,18 @@ def main():
               "rejected_candidates": len(rejected), "report_sha256": digest}
     if actual != baseline:
         raise SystemExit(f"coverage probe drift requires review: expected {baseline}, got {actual}")
+    dependencies = tomllib.loads((ROOT / "Cargo.toml").read_text())["dependencies"]
+    def dependency_version(name):
+        configured = dependencies[name]
+        return configured if isinstance(configured, str) else configured["version"]
     with tempfile.TemporaryDirectory(prefix="sdk-coverage-probe-") as directory:
         path = Path(directory)
         (path / "src").mkdir()
         (path / "Cargo.toml").write_text(
             '[package]\nname = "sdk-coverage-probe"\nversion = "0.0.0"\nedition = "2024"\n'
             f'[dependencies]\nmistralai = {{ package = "mistralai-sdk", path = {json.dumps(str(ROOT))} }}\n'
-            + "\n".join(f'{name} = {json.dumps(tomllib.loads((ROOT / "Cargo.toml").read_text())["dependencies"][name]["version"])}'
-                        for name in ("url", "uuid")) + "\n")
+            + "\n".join(f'{name} = {json.dumps(dependency_version(name))}'
+                        for name in ("url", "uuid", "futures-util")) + "\n")
         shutil.copyfile(ROOT / "Cargo.lock", path / "Cargo.lock")
         (path / "src/lib.rs").write_text(
             '#![allow(dead_code, unused_imports)]\nmod generated { pub use mistralai::raw::{client, types}; }\n'
