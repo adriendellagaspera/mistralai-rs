@@ -69,27 +69,31 @@ def generator(lock):
     return executable
 
 
-def facade_tool_source(lock):
-    commit = lock["facade_tool_commit"]
-    source = ROOT / ".tools" / f"openapi-to-rust-facade-{commit}"
+def tool_source(lock, prefix):
+    name = lock[f"{prefix}_tool"]
+    commit = lock[f"{prefix}_tool_commit"]
+    source = ROOT / ".tools" / f"{name}-{commit}"
     if not (source / ".git").exists():
         if source.exists():
             shutil.rmtree(source)
         run("git", "init", source)
         run(
             "git", "fetch", "--depth=1",
-            f"https://github.com/{lock['facade_tool_repository']}.git",
+            f"https://github.com/{lock[f'{prefix}_tool_repository']}.git",
             commit,
             cwd=source,
         )
         run("git", "checkout", "--detach", "FETCH_HEAD", cwd=source)
     actual_commit = output("git", "rev-parse", "HEAD", cwd=source)
     if actual_commit != commit:
-        raise ValueError(f"Facade tool commit mismatch: expected {commit}, got {actual_commit}")
-    actual_tree = output("git", "rev-parse", "HEAD^{tree}", cwd=source)
-    if actual_tree != lock["facade_tool_tree_sha"]:
         raise ValueError(
-            f"Facade tool tree mismatch: expected {lock['facade_tool_tree_sha']}, got {actual_tree}"
+            f"{name} commit mismatch: expected {commit}, got {actual_commit}"
+        )
+    actual_tree = output("git", "rev-parse", "HEAD^{tree}", cwd=source)
+    expected_tree = lock[f"{prefix}_tool_tree_sha"]
+    if actual_tree != expected_tree:
+        raise ValueError(
+            f"{name} tree mismatch: expected {expected_tree}, got {actual_tree}"
         )
     return source
 
@@ -100,7 +104,8 @@ def tooling_python(lock):
         lock["tree_sitter_version"],
         lock["tree_sitter_rust_version"],
         lock["jsonschema_version"],
-        lock["facade_tool_commit"],
+        lock["compiler_tool_commit"],
+        lock["bindings_tool_commit"],
     ))
     environment = ROOT / ".tools" / f"python-sdk-codegen-{versions}"
     python = environment / "bin/python"
@@ -119,16 +124,28 @@ def tooling_python(lock):
             f"tree-sitter=={lock['tree_sitter_version']}",
             f"tree-sitter-rust=={lock['tree_sitter_rust_version']}",
             f"jsonschema=={lock['jsonschema_version']}")
-    source = facade_tool_source(lock)
+
+    compiler_source = tool_source(lock, "compiler")
     try:
-        facade_version = output(
+        compiler_version = output(
             python, "-c",
-            "import openapi_to_rust_facade; print(openapi_to_rust_facade.__version__)",
+            "import rust_sdk_compiler; print(rust_sdk_compiler.__version__)",
         )
     except subprocess.CalledProcessError:
-        facade_version = None
-    if facade_version != lock["facade_tool_version"]:
-        run(python, "-m", "pip", "install", "--no-deps", source)
+        compiler_version = None
+    if compiler_version != lock["compiler_tool_version"]:
+        run(python, "-m", "pip", "install", "--no-deps", compiler_source)
+
+    bindings_source = tool_source(lock, "bindings")
+    try:
+        bindings_version = output(
+            python, "-c",
+            "import openapi_to_rust_bindings; print(openapi_to_rust_bindings.__version__)",
+        )
+    except subprocess.CalledProcessError:
+        bindings_version = None
+    if bindings_version != lock["bindings_tool_version"]:
+        run(python, "-m", "pip", "install", "--no-deps", bindings_source)
     return python
 
 

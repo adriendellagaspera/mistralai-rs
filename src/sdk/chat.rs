@@ -2,7 +2,6 @@
 use super::*;
 use crate::generated::client::HttpClient;
 use crate::generated::types::*;
-use crate::streaming;
 use futures_util::StreamExt;
 
 #[derive(Clone, Copy)]
@@ -36,7 +35,7 @@ impl<'a> Chat<'a> {
             })
             .await
             .map_err(SdkError::from)?;
-        let events = streaming::json_events::<_, _, CompletionChunk>(bytes).map(|event| {
+        let events = crate::streaming::json_events::<_, _, CompletionChunk>(bytes).map(|event| {
             event
                 .map(|event| ChatStreamChunk::from(event.data))
                 .map_err(Into::into)

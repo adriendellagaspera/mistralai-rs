@@ -211,7 +211,7 @@ def _strip_options(syntax: RustType) -> RustType:
 
 
 def _raw_public_leaf(syntax: RustType, rust: Any) -> bool:
-    if syntax.spelling in rust.aliases or syntax.spelling in rust.symbol_modules:
+    if syntax.spelling in rust.aliases or syntax.spelling in rust.symbol_paths:
         return False
     if syntax.kind == "generic_type":
         return all(_raw_public_leaf(argument, rust) for argument in syntax.arguments)
@@ -223,7 +223,7 @@ def _safe_alias(syntax: RustType, rust: Any, seen: tuple[str, ...] = ()) -> bool
         if syntax.spelling in seen:
             return False
         return _safe_alias(rust.aliases[syntax.spelling], rust, (*seen, syntax.spelling))
-    if syntax.spelling in rust.symbol_modules:
+    if syntax.spelling in rust.symbol_paths:
         return False
     if syntax.kind == "generic_type":
         return all(_safe_alias(argument, rust, seen) for argument in syntax.arguments)

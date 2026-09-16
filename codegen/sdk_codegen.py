@@ -1,21 +1,20 @@
-"""Compatibility surface for the extracted facade compiler.
+"""Compatibility surface for historical repository compiler tests.
 
-New code should import :mod:`openapi_to_rust_facade` or :mod:`sdk_pipeline`
-directly. This module keeps historical test/import entry points working while
-routing all compilation and emission through the pinned external package.
+Production code generation goes through :mod:`sdk_pipeline`. This module keeps
+legacy test helpers local to mistralai-rs without expanding rust-sdk-compiler's
+public API.
 """
 
 from __future__ import annotations
 
 from pathlib import Path
 
-# Bootstrap historical module aliases (`sdk_ir`, `sdk_emit`, ...) from the
-# installed facade package before importing the legacy compatibility names below.
-import openapi_to_rust_facade  # noqa: F401
-import sdk_emit
-import sdk_frontend as frontend
-from sdk_frontend import *  # noqa: F401,F403 - deliberate compatibility re-export
-from sdk_ir import (
+from openapi_to_rust_bindings import parse_bindings, read_bindings
+from rust_sdk_compiler import Bindings as RawIr
+from rust_sdk_compiler import sdk_emit
+from rust_sdk_compiler import sdk_frontend as frontend
+from rust_sdk_compiler.sdk_frontend import *  # noqa: F401,F403 - compatibility re-export
+from rust_sdk_compiler.sdk_ir import (
     BinaryResponse,
     EmptyResponse,
     FacadeIr,
@@ -32,14 +31,12 @@ from sdk_ir import (
     model_policy,
     stream_policy,
 )
-from sdk_model_lowering import resolve_models
-from sdk_openapi_to_rust import OpenApiToRustAdapter
-from sdk_operation_lowering import resolve_operations
-from sdk_pipeline import generate, main
-from sdk_raw_ir import RawIr
+from rust_sdk_compiler.sdk_model_lowering import resolve_models
+from rust_sdk_compiler.sdk_operation_lowering import resolve_operations
+from rust_sdk_compiler.sdk_raw_ir import RawBindingLayout, RawClientBinding
+from sdk_pipeline import RUNTIME, generate, main
 
 
-# Explicit aliases document the legacy plan types intentionally retained here.
 ModelSpec = frontend.ModelSpec
 OperationSpec = frontend.OperationSpec
 ResourceSpec = frontend.ResourceSpec
@@ -48,18 +45,18 @@ _resolved_ir = frontend._resolved_ir
 
 
 class RustIndex:
-    """Deprecated raw-index compatibility constructor backed by the canonical adapter."""
+    """Deprecated raw-index compatibility constructor."""
 
     def __new__(cls, types_source: bytes, client_source: bytes) -> RawIr:
         try:
-            return OpenApiToRustAdapter.parse(types_source, client_source)
+            return parse_bindings(types_source, client_source)
         except ValueError as error:
             raise GenerationError(str(error)) from error
 
     @classmethod
     def load(cls, raw: Path) -> RawIr:
         try:
-            return OpenApiToRustAdapter.load(raw)
+            return read_bindings(raw)
         except ValueError as error:
             raise GenerationError(str(error)) from error
 
@@ -117,7 +114,6 @@ def _resolved_resources(
 
 
 def _emit_model(model: ModelSpec, openapi: OpenApiIndex, rust: RawIr) -> str:
-    """Compatibility adapter for historical renderer-focused tests."""
     ir = FacadeIr(
         "Client",
         (ResolvedModelSpec(model.name, model.raw, model.config),),
@@ -132,15 +128,13 @@ def _emit_resource(
     rust: RawIr,
     resources: tuple[ResourceSpec, ...],
 ) -> str:
-    """Compatibility adapter that still exercises the canonical operation lowering."""
     resolved_resources = _resolved_resources(resources, rust)
     ir = resolve_operations(FacadeIr("Client", (), resolved_resources), rust)
     resolved = next(candidate for candidate in ir.resources if candidate.path == resource.path)
-    return sdk_emit.emit_resource(resolved, ir.resources)
+    return sdk_emit.emit_resource(resolved, ir.resources, rust.binding, RUNTIME)
 
 
 def _emit_mod(ir: SdkIr) -> str:
-    """Compatibility adapter for resource-hierarchy tests that need no raw lookup."""
     models = tuple(ResolvedModelSpec(model.name, model.raw, model.config) for model in ir.models)
     resources = []
     for resource in ir.resources:
@@ -176,7 +170,20 @@ def _emit_mod(ir: SdkIr) -> str:
                 tuple(operations),
             )
         )
-    return sdk_emit.emit_mod(FacadeIr(ir.client_name, models, tuple(resources)))
+    binding = RawBindingLayout(
+        RawClientBinding(
+            "crate::generated::client::HttpClient",
+            "new",
+            "with_api_key",
+            "with_base_url",
+        ),
+        ("crate::generated::types::*",),
+    )
+    return sdk_emit.emit_mod(
+        FacadeIr(ir.client_name, models, tuple(resources)),
+        binding,
+        RUNTIME,
+    )
 
 
 if __name__ == "__main__":
