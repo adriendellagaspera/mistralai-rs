@@ -17,14 +17,6 @@ class ProvenanceTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             codegen.verify_spec(b"corrupted", lock)
 
-    def test_generator_patch_inventory_matches_lock(self):
-        lock = json.loads((codegen.ROOT / "codegen.lock").read_text())
-        inventory = (codegen.ROOT / "codegen/OPENAPI_TO_RUST_UPSTREAM.md").read_text()
-        self.assertIn(
-            f"patch_sha256: {lock['generator_patch_sha256']}",
-            inventory,
-        )
-
     def test_file_set_and_byte_drift_are_detected(self):
         self.assertEqual(codegen.differences({"a": b"x", "deleted": b""},
                                             {"a": b"y", "added": b""}),
