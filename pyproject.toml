@@ -3,21 +3,18 @@ requires = ["setuptools==75.8.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "rust-sdk-compiler"
-version = "0.2.0"
-description = "Deterministic compiler for idiomatic Rust SDK surfaces from OpenAPI, normalized bindings, and explicit policy"
+name = "openapi-to-rust-bindings"
+version = "0.1.0"
+description = "Normalize openapi-to-rust generated sources into rust-sdk-compiler Bindings"
 readme = "README.md"
 requires-python = ">=3.11"
 license = {text = "MIT OR Apache-2.0"}
 dependencies = [
-  "ruamel.yaml==0.18.6",
-  "jsonschema==4.23.0",
+  "rust-sdk-compiler @ git+https://github.com/adriendellagaspera/mistralai-rs.git@5bda3f6b704edf5b6a9d8788010c4117321ceb5e",
+  "tree-sitter==0.25.2",
+  "tree-sitter-rust==0.24.0",
 ]
 
 [tool.setuptools]
 package-dir = {"" = "src"}
-packages = ["rust_sdk_compiler"]
-include-package-data = true
-
-[tool.setuptools.package-data]
-rust_sdk_compiler = ["*.json"]
+packages = ["openapi_to_rust_bindings"]

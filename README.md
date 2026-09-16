@@ -1,26 +1,17 @@
-# rust-sdk-compiler
+# openapi-to-rust-bindings
 
-`rust-sdk-compiler` deterministically compiles an idiomatic Rust SDK surface from four explicit inputs:
+`openapi-to-rust-bindings` is the compatibility layer between `openapi-to-rust` generated Rust and `rust-sdk-compiler`.
 
-- `OpenApi`: the HTTP/wire contract;
-- `Bindings`: the Rust types and callable operations that actually exist;
-- `Policy`: the public SDK shape to expose;
-- `Runtime`: consumer-owned support conventions such as error and streaming paths.
-
-The compiler is backend-neutral. It does not parse generator output, know `openapi-to-rust`, or depend on tree-sitter. Generator-specific compatibility packages only need to produce `Bindings`.
+It exposes a deliberately small functional API:
 
 ```python
-from rust_sdk_compiler import Bindings, OpenApi, Policy, Runtime, compile
+from openapi_to_rust_bindings import parse_bindings, read_bindings
 
-openapi = OpenApi.load("openapi.yaml")
-bindings = Bindings.from_dict(...)
-policy = Policy.from_dict(...)
-
-compilation = compile(openapi, bindings, policy, runtime=Runtime())
-compilation.ir
-compilation.files
+bindings = read_bindings(generated_dir)
+# or
+bindings = parse_bindings(types_source, client_source)
 ```
 
-`lower(openapi, bindings, policy)` stops after semantic lowering and returns the resolved SDK IR without rendering Rust files.
+Both functions return the public `Bindings` type from `rust-sdk-compiler`. This package owns all knowledge of `openapi-to-rust` source layout and conventions (`types.rs`, `client.rs`, `HttpClient`, generated module paths and BoxStream encoding). It does not import compiler internals.
 
-The versioned `rust-bindings.schema.json` sidecar is the stable interchange contract for backend-specific producers. The compiler fails closed on unsupported or ambiguous source shapes.
+The package is validated against the exact `openapi-to-rust` backend revision recorded in `COMPATIBILITY.json` and against an exact `rust-sdk-compiler` commit.
