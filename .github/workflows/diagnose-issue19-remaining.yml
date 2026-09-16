@@ -1,0 +1,26 @@
+name: Diagnose issue 19 remaining request gaps
+on:
+  push:
+    branches: [issue-19-next-request-primitive]
+permissions:
+  contents: read
+jobs:
+  diagnose:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            .tools
+            target
+          key: sdk-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'codegen.lock') }}
+      - name: Ensure pinned codegen environment
+        run: python3 scripts/codegen.py generate
+      - name: Diagnose remaining request-model gaps
+        run: |
+          PYTHON=$(find .tools -path '*/bin/python' | head -1)
+          "$PYTHON" scripts/_diagnose_issue19_remaining.py
