@@ -65,6 +65,38 @@ class StandalonePackageTests(unittest.TestCase):
             resource,
         )
 
+    def test_scalar_enum_is_lowered_from_wire_provenance(self):
+        document = {
+            "openapi": "3.1.0",
+            "info": {"title": "Enum fixture", "version": "1"},
+            "paths": {},
+            "components": {"schemas": {"ResourceVisibility": {
+                "type": "string", "enum": ["shared_global", "private"],
+            }}},
+        }
+        types = b'''pub enum ResourceVisibility {
+    #[serde(rename = "shared_global")]
+    SharedGlobal,
+    #[serde(rename = "private")]
+    Private,
+}
+'''
+        raw = OpenApiToRustAdapter.parse(types, b"")
+        policy = {
+            "schema_version": 2,
+            "client": {"name": "EnumClient"},
+            "models": {"ResourceVisibilityValue": {
+                "raw": "ResourceVisibility",
+                "scalar_enum": {"root": "ResourceVisibility", "path": []},
+            }},
+            "resources": {},
+        }
+        _, files = compile_facade(OpenApiIndex(document), raw, policy)
+        facade = files["facade_types.rs"]
+        self.assertIn("pub enum ResourceVisibilityValue", facade)
+        self.assertIn("SharedGlobal", facade)
+        self.assertIn("Private", facade)
+
     def test_generation_is_deterministic_for_both_fixtures(self):
         for name in ("menagerie", "library"):
             with self.subTest(name=name):
