@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_candidates": 9,
-  "rejected_candidates": 14,
-  "report_sha256": "f85b58efd8cbcfad278ba21af4e3cc086b68187ec4cc9f5befc91d9a1f2199d6"
+  "generated_candidates": 14,
+  "rejected_candidates": 18,
+  "report_sha256": "530c9cde0ee7b16a6da9a142ad2394ca861dffaeee0615833de7e4e1cc4c512c"
 }

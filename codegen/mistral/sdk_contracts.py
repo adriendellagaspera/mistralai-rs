@@ -103,8 +103,6 @@ def coverage_inventory(openapi, rust, ir) -> dict:
             reasons.append("request_media_projection")
         if content and not openapi.request_schema(operation_id):
             reasons.append("inline_or_unresolved_request")
-        if content and operation.get("parameters"):
-            reasons.append("composite_body_and_parameters")
         responses = [r for status, r in operation.get("responses", {}).items() if str(status).startswith("2")]
         if len(responses) != 1:
             reasons.append("multiple_success_contracts")
