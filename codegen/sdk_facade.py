@@ -1,10 +1,10 @@
 """Compatibility CLI for the semantic SDK compiler.
 
-All parsing, validation and emission lives in :mod:`sdk_codegen`; this entry
-point intentionally contains no Mistral-specific code or Rust templates.
+The pipeline validates source contracts before lowering them to immutable facade
+IR. Rust rendering consumes only that resolved IR for operations and resources.
 """
 
-from sdk_codegen import GENERATED, GenerationError, generate, main
+from sdk_pipeline import GENERATED, GenerationError, generate, main
 
 __all__ = ["GENERATED", "GenerationError", "generate", "main"]
 
