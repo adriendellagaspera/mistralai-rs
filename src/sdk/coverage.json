@@ -64,10 +64,8 @@
     "agents_api_v1_agents_update": {
       "method": "patch",
       "path": "/v1/agents/{agent_id}",
-      "status": "capability_gap",
-      "review_reasons": [
-        "composite_body_and_parameters"
-      ]
+      "status": "candidate_unverified",
+      "review_reasons": []
     },
     "agents_api_v1_agents_update_version": {
       "method": "patch",
@@ -78,17 +76,14 @@
     "agents_api_v1_conversations_append": {
       "method": "post",
       "path": "/v1/conversations/{conversation_id}",
-      "status": "capability_gap",
-      "review_reasons": [
-        "composite_body_and_parameters"
-      ]
+      "status": "candidate_unverified",
+      "review_reasons": []
     },
     "agents_api_v1_conversations_append_stream": {
       "method": "post",
       "path": "/v1/conversations/{conversation_id}#stream",
       "status": "capability_gap",
       "review_reasons": [
-        "composite_body_and_parameters",
         "non_json_success"
       ]
     },
@@ -125,17 +120,14 @@
     "agents_api_v1_conversations_restart": {
       "method": "post",
       "path": "/v1/conversations/{conversation_id}/restart",
-      "status": "capability_gap",
-      "review_reasons": [
-        "composite_body_and_parameters"
-      ]
+      "status": "candidate_unverified",
+      "review_reasons": []
     },
     "agents_api_v1_conversations_restart_stream": {
       "method": "post",
       "path": "/v1/conversations/{conversation_id}/restart#stream",
       "status": "capability_gap",
       "review_reasons": [
-        "composite_body_and_parameters",
         "non_json_success"
       ]
     },
@@ -234,33 +226,25 @@
       "method": "post",
       "path": "/v1/connectors/{connector_id_or_name}/tools/{tool_name}/call",
       "status": "mapped",
-      "review_reasons": [
-        "composite_body_and_parameters"
-      ]
+      "review_reasons": []
     },
     "connector_create_or_update_organization_credentials_v1": {
       "method": "post",
       "path": "/v1/connectors/{connector_id_or_name}/organization/credentials",
-      "status": "capability_gap",
-      "review_reasons": [
-        "composite_body_and_parameters"
-      ]
+      "status": "candidate_unverified",
+      "review_reasons": []
     },
     "connector_create_or_update_user_credentials_v1": {
       "method": "post",
       "path": "/v1/connectors/{connector_id_or_name}/user/credentials",
-      "status": "capability_gap",
-      "review_reasons": [
-        "composite_body_and_parameters"
-      ]
+      "status": "candidate_unverified",
+      "review_reasons": []
     },
     "connector_create_or_update_workspace_credentials_v1": {
       "method": "post",
       "path": "/v1/connectors/{connector_id_or_name}/workspace/credentials",
-      "status": "capability_gap",
-      "review_reasons": [
-        "composite_body_and_parameters"
-      ]
+      "status": "candidate_unverified",
+      "review_reasons": []
     },
     "connector_create_v1": {
       "method": "post",
@@ -344,9 +328,7 @@
       "method": "patch",
       "path": "/v1/connectors/{connector_id}#id",
       "status": "mapped",
-      "review_reasons": [
-        "composite_body_and_parameters"
-      ]
+      "review_reasons": []
     },
     "create_campaign_v1_observability_campaigns_post": {
       "method": "post",
@@ -359,7 +341,6 @@
       "path": "/v1/observability/datasets/{dataset_id}/records",
       "status": "capability_gap",
       "review_reasons": [
-        "composite_body_and_parameters",
         "raw_symbol_mapping"
       ]
     },
@@ -446,7 +427,6 @@
       "path": "/v1/workflows/registrations/{workflow_registration_id}/execute",
       "status": "capability_gap",
       "review_reasons": [
-        "composite_body_and_parameters",
         "raw_symbol_mapping"
       ]
     },
@@ -455,7 +435,6 @@
       "path": "/v1/workflows/{workflow_identifier}/execute",
       "status": "capability_gap",
       "review_reasons": [
-        "composite_body_and_parameters",
         "raw_symbol_mapping"
       ]
     },
@@ -561,17 +540,14 @@
     "get_chat_completion_events_v1_observability_chat_completion_events_search_post": {
       "method": "post",
       "path": "/v1/observability/chat-completion-events/search",
-      "status": "capability_gap",
-      "review_reasons": [
-        "composite_body_and_parameters"
-      ]
+      "status": "candidate_unverified",
+      "review_reasons": []
     },
     "get_chat_completion_field_options_counts_v1_observability_chat_completion_fields__field_name__options_counts_post": {
       "method": "post",
       "path": "/v1/observability/chat-completion-fields/{field_name}/options-counts",
       "status": "capability_gap",
       "review_reasons": [
-        "composite_body_and_parameters",
         "raw_symbol_mapping"
       ]
     },
@@ -827,10 +803,8 @@
     "jobs_api_routes_fine_tuning_create_fine_tuning_job": {
       "method": "post",
       "path": "/v1/fine_tuning/jobs",
-      "status": "capability_gap",
-      "review_reasons": [
-        "composite_body_and_parameters"
-      ]
+      "status": "candidate_unverified",
+      "review_reasons": []
     },
     "jobs_api_routes_fine_tuning_get_fine_tuning_job": {
       "method": "get",
@@ -860,16 +834,13 @@
       "method": "patch",
       "path": "/v1/fine_tuning/models/{model_id}",
       "status": "mapped",
-      "review_reasons": [
-        "composite_body_and_parameters"
-      ]
+      "review_reasons": []
     },
     "judge_chat_completion_event_v1_observability_chat_completion_events__event_id__live_judging_post": {
       "method": "post",
       "path": "/v1/observability/chat-completion-events/{event_id}/live-judging",
       "status": "capability_gap",
       "review_reasons": [
-        "composite_body_and_parameters",
         "raw_symbol_mapping"
       ]
     },
@@ -878,7 +849,6 @@
       "path": "/v1/observability/judges/{judge_id}/live-judging",
       "status": "mapped",
       "review_reasons": [
-        "composite_body_and_parameters",
         "raw_symbol_mapping"
       ]
     },
@@ -887,7 +857,6 @@
       "path": "/v1/observability/dataset-records/{dataset_record_id}/live-judging",
       "status": "mapped",
       "review_reasons": [
-        "composite_body_and_parameters",
         "raw_symbol_mapping"
       ]
     },
@@ -955,9 +924,7 @@
       "method": "put",
       "path": "/v1/libraries/{library_id}/documents/{document_id}",
       "status": "mapped",
-      "review_reasons": [
-        "composite_body_and_parameters"
-      ]
+      "review_reasons": []
     },
     "libraries_documents_upload_v1": {
       "method": "post",
@@ -966,7 +933,6 @@
       "review_reasons": [
         "request_media_projection",
         "inline_or_unresolved_request",
-        "composite_body_and_parameters",
         "multiple_success_contracts"
       ]
     },
@@ -986,17 +952,13 @@
       "method": "put",
       "path": "/v1/libraries/{library_id}/share",
       "status": "mapped",
-      "review_reasons": [
-        "composite_body_and_parameters"
-      ]
+      "review_reasons": []
     },
     "libraries_share_delete_v1": {
       "method": "delete",
       "path": "/v1/libraries/{library_id}/share",
-      "status": "capability_gap",
-      "review_reasons": [
-        "composite_body_and_parameters"
-      ]
+      "status": "candidate_unverified",
+      "review_reasons": []
     },
     "libraries_share_list_v1": {
       "method": "get",
@@ -1008,9 +970,7 @@
       "method": "put",
       "path": "/v1/libraries/{library_id}",
       "status": "mapped",
-      "review_reasons": [
-        "composite_body_and_parameters"
-      ]
+      "review_reasons": []
     },
     "list_deployments_v1_workflows_deployments_get": {
       "method": "get",
@@ -1053,7 +1013,6 @@
       "path": "/v1/observability/datasets/{dataset_id}/imports/from-campaign",
       "status": "capability_gap",
       "review_reasons": [
-        "composite_body_and_parameters",
         "raw_symbol_mapping"
       ]
     },
@@ -1062,7 +1021,6 @@
       "path": "/v1/observability/datasets/{dataset_id}/imports/from-dataset",
       "status": "mapped",
       "review_reasons": [
-        "composite_body_and_parameters",
         "raw_symbol_mapping"
       ]
     },
@@ -1071,7 +1029,6 @@
       "path": "/v1/observability/datasets/{dataset_id}/imports/from-explorer",
       "status": "capability_gap",
       "review_reasons": [
-        "composite_body_and_parameters",
         "raw_symbol_mapping"
       ]
     },
@@ -1080,7 +1037,6 @@
       "path": "/v1/observability/datasets/{dataset_id}/imports/from-file",
       "status": "mapped",
       "review_reasons": [
-        "composite_body_and_parameters",
         "raw_symbol_mapping"
       ]
     },
@@ -1089,7 +1045,6 @@
       "path": "/v1/observability/datasets/{dataset_id}/imports/from-playground",
       "status": "mapped",
       "review_reasons": [
-        "composite_body_and_parameters",
         "raw_symbol_mapping"
       ]
     },
@@ -1098,7 +1053,6 @@
       "path": "/v1/workflows/executions/{execution_id}/queries",
       "status": "capability_gap",
       "review_reasons": [
-        "composite_body_and_parameters",
         "raw_symbol_mapping"
       ]
     },
@@ -1107,7 +1061,6 @@
       "path": "/v1/workflows/executions/{execution_id}/reset",
       "status": "mapped",
       "review_reasons": [
-        "composite_body_and_parameters",
         "raw_symbol_mapping"
       ]
     },
@@ -1130,7 +1083,6 @@
       "path": "/v1/workflows/executions/{execution_id}/signals",
       "status": "capability_gap",
       "review_reasons": [
-        "composite_body_and_parameters",
         "raw_symbol_mapping"
       ]
     },
@@ -1178,7 +1130,6 @@
       "path": "/v1/observability/dataset-records/{dataset_record_id}/payload",
       "status": "capability_gap",
       "review_reasons": [
-        "composite_body_and_parameters",
         "raw_symbol_mapping"
       ]
     },
@@ -1187,7 +1138,6 @@
       "path": "/v1/observability/dataset-records/{dataset_record_id}/properties",
       "status": "mapped",
       "review_reasons": [
-        "composite_body_and_parameters",
         "raw_symbol_mapping"
       ]
     },
@@ -1196,7 +1146,6 @@
       "path": "/v1/observability/datasets/{dataset_id}",
       "status": "mapped",
       "review_reasons": [
-        "composite_body_and_parameters",
         "raw_symbol_mapping"
       ]
     },
@@ -1205,7 +1154,6 @@
       "path": "/v1/observability/judges/{judge_id}",
       "status": "mapped",
       "review_reasons": [
-        "composite_body_and_parameters",
         "raw_symbol_mapping"
       ]
     },
@@ -1214,7 +1162,6 @@
       "path": "/v1/audio/voices/{voice_id}",
       "status": "mapped",
       "review_reasons": [
-        "composite_body_and_parameters",
         "raw_symbol_mapping"
       ]
     },
@@ -1223,7 +1170,6 @@
       "path": "/v1/workflows/executions/{execution_id}/updates",
       "status": "capability_gap",
       "review_reasons": [
-        "composite_body_and_parameters",
         "raw_symbol_mapping"
       ]
     },
@@ -1232,7 +1178,6 @@
       "path": "/v1/workflows/{workflow_identifier}",
       "status": "mapped",
       "review_reasons": [
-        "composite_body_and_parameters",
         "raw_symbol_mapping"
       ]
     }

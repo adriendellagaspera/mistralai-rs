@@ -1,11 +1,12 @@
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "codegen" / "mistral"))
 
-from sdk_contracts import compare_surface, public_surface
+from sdk_contracts import compare_surface, coverage_inventory, public_surface
 
 
 class SdkContractTests(unittest.TestCase):
@@ -44,6 +45,39 @@ class SdkContractTests(unittest.TestCase):
             report["added"],
             ["mod.rs::reexport::pub use facade_types::B;"],
         )
+
+    def test_json_body_plus_path_parameter_is_not_a_capability_gap(self):
+        operation = {
+            "x-sdk-method": "PATCH",
+            "x-sdk-path": "/widgets/{widget_id}",
+            "parameters": [{"name": "widget_id", "in": "path"}],
+            "requestBody": {
+                "content": {
+                    "application/json": {
+                        "schema": {"$ref": "#/components/schemas/UpdateWidget"}
+                    }
+                }
+            },
+            "responses": {
+                "200": {
+                    "content": {
+                        "application/json": {
+                            "schema": {"$ref": "#/components/schemas/Widget"}
+                        }
+                    }
+                }
+            },
+        }
+        openapi = SimpleNamespace(
+            operations={"update_widget": operation},
+            request_schema=lambda operation_id: "UpdateWidget",
+        )
+        rust = SimpleNamespace(operations={"update_widget": object()})
+        ir = SimpleNamespace(resources=())
+
+        entry = coverage_inventory(openapi, rust, ir)["update_widget"]
+        self.assertEqual(entry["status"], "candidate_unverified")
+        self.assertEqual(entry["review_reasons"], [])
 
 
 if __name__ == "__main__":
