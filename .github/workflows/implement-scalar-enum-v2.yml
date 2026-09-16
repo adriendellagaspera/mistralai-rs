@@ -21,56 +21,8 @@ jobs:
           git merge --no-edit origin/main
       - name: Apply scalar enum primitive
         run: python3 scripts/_issue19_scalar_enum_v2.py
-      - name: Enforce required-field drift guard
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-
-          path = Path('codegen/sdk_autoproject.py')
-          text = path.read_text()
-          old = '''    properties = schema.get("properties", {})
-    if rust is None:
-'''
-          new = '''    properties = schema.get("properties", {})
-    required = set(schema.get("required", []))
-    if not required <= set(properties):
-        return None, "request_model_projection"
-    if rust is None:
-'''
-          if old not in text:
-              raise SystemExit('required-field guard anchor missing')
-          path.write_text(text.replace(old, new, 1))
-
-          path = Path('scripts/test_sdk_autoproject.py')
-          text = path.read_text()
-          anchor = '    def test_projects_nested_request_objects_with_generated_adapters(self):\n'
-          test = '''    def test_rejects_required_field_missing_from_wire_properties(self):
-        api = FakeOpenApi()
-        api.schemas["CreateThing"]["required"] = ["name", "missing"]
-        fields = {
-            "CreateThing": (
-                SimpleNamespace(name="name", type="String"),
-                SimpleNamespace(name="enabled", type="Option<bool>"),
-            ),
-        }
-        rust = SimpleNamespace(
-            structs=set(fields), aliases={}, enums={},
-            symbol_modules={"CreateThing": "types"},
-            fields=lambda name: fields[name],
-        )
-        expanded, report = sdk_autoproject.expand_manifest(
-            api, manifest(),
-            {"operations": {"create_thing": ["things.create"]}},
-            raw_coverage("create_thing"), rust,
-        )
-        self.assertEqual("request_model_projection", report["rejected"]["create_thing"])
-        self.assertNotIn("CreateThingParams", expanded["models"])
-
-'''
-          if anchor not in text:
-              raise SystemExit('required-field test anchor missing')
-          path.write_text(text.replace(anchor, test + anchor, 1))
-          PY
+      - name: Apply required-field drift guard
+        run: python3 scripts/_issue19_required_guard.py
       - name: Install pinned Rust toolchain
         run: rustup show
       - uses: actions/cache@v4
@@ -137,7 +89,7 @@ jobs:
           PY
       - name: Commit clean increment
         run: |
-          rm scripts/_issue19_scalar_enum_v2.py .github/workflows/implement-scalar-enum-v2.yml
+          rm scripts/_issue19_scalar_enum_v2.py scripts/_issue19_required_guard.py .github/workflows/implement-scalar-enum-v2.yml
           git add -A
           git commit -m 'feat: project scalar request enums generically'
           git push origin HEAD:issue-19-scalar-enum-projection-v2
