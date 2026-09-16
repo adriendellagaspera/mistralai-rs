@@ -137,16 +137,139 @@ def _request_json_schema(operation: dict[str, Any]) -> tuple[dict[str, Any] | No
     return schema, None
 
 
-def _canonical_public_path(paths: list[str]) -> tuple[str | None, str | None]:
+def _success_media(operation: dict[str, Any]) -> set[str]:
+    return {
+        media
+        for status, response in operation.get("responses", {}).items()
+        if str(status).startswith("2")
+        for media in response.get("content", {})
+    }
+
+
+def _stream_public_path(path: str) -> bool:
+    method = path.rsplit(".", 1)[-1]
+    return method == "stream" or method.endswith("_stream")
+
+
+def _canonical_public_path(
+    paths: list[str], operation: dict[str, Any] | None = None
+) -> tuple[str | None, str | None]:
     if not paths:
         return None, "missing_official_taxonomy"
-    # Prefer the most structured official path. Multiple equal-depth paths are
-    # true aliases or transport conveniences and need an explicit semantic call.
+    # Prefer the most structured official path. At equal depth, use transport
+    # evidence only when it identifies one stream/non-stream convenience alias.
     depth = max(path.count(".") for path in paths)
     candidates = sorted(path for path in paths if path.count(".") == depth)
+    if len(candidates) == 1:
+        return candidates[0], None
+    if operation is not None:
+        media = _success_media(operation)
+        stream = [path for path in candidates if _stream_public_path(path)]
+        ordinary = [path for path in candidates if not _stream_public_path(path)]
+        if media == {"text/event-stream"} and len(stream) == 1:
+            return stream[0], None
+        if "application/json" in media and "text/event-stream" not in media and len(ordinary) == 1:
+            return ordinary[0], None
+    return None, "taxonomy_alias_ambiguity"
+
+
+def _identifier(value: str) -> str:
+    return re.sub(r"_+", "_", re.sub(r"[^A-Za-z0-9_]", "_", value)).strip("_").lower()
+
+
+def _operation_stem(operation_id: str) -> str:
+    version = re.search(r"_v[0-9]+(?:_|$)", operation_id)
+    stem = operation_id[:version.start()] if version and version.start() else operation_id
+    return _identifier(stem)
+
+
+def _common_operation_prefix(operation_ids: list[str]) -> tuple[str, ...]:
+    if len(operation_ids) < 2:
+        return ()
+    split = [_operation_stem(operation_id).split("_") for operation_id in operation_ids]
+    prefix: list[str] = []
+    for values in zip(*split):
+        if len(set(values)) != 1:
+            break
+        prefix.append(values[0])
+    # Never strip a semantic action merely because every operation in a small
+    # tag family happens to share that verb.
+    if prefix and prefix[0] in {
+        "get", "list", "create", "update", "delete", "post", "put", "patch",
+        "start", "cancel", "judge", "execute", "archive", "export", "import",
+    }:
+        return ()
+    return tuple(prefix)
+
+
+def _fallback_context(openapi: Any, taxonomy: dict[str, Any]) -> tuple[
+    dict[str, set[tuple[str, ...]]], dict[str, tuple[str, ...]]
+]:
+    resources: dict[str, set[tuple[str, ...]]] = {}
+    operation_ids_by_tag: dict[str, list[str]] = {}
+    for operation_id, operation in sorted(openapi.operations.items()):
+        tags = operation.get("tags", [])
+        for tag in tags:
+            operation_ids_by_tag.setdefault(tag, []).append(operation_id)
+        paths = taxonomy.get("operations", {}).get(operation_id, [])
+        public_path, reason = _canonical_public_path(paths, operation)
+        if reason or public_path is None:
+            continue
+        parts = tuple(public_path.split("."))
+        if len(parts) < 2:
+            continue
+        for tag in tags:
+            resources.setdefault(tag, set()).add(parts[:-1])
+    prefixes = {
+        tag: _common_operation_prefix(operation_ids)
+        for tag, operation_ids in operation_ids_by_tag.items()
+    }
+    return resources, prefixes
+
+
+def _fallback_resource_path(
+    tag: str, resources: dict[str, set[tuple[str, ...]]]
+) -> tuple[tuple[str, ...] | None, str | None]:
+    tag_parts = tag.split(".")
+    for depth in range(len(tag_parts), 0, -1):
+        parent = ".".join(tag_parts[:depth])
+        candidates = resources.get(parent, set())
+        if len(candidates) > 1:
+            return None, "taxonomy_fallback_ambiguity"
+        if len(candidates) == 1:
+            base = next(iter(candidates))
+            suffix = tuple(_identifier(part) for part in tag_parts[depth:])
+            if any(not part for part in suffix):
+                return None, "invalid_fallback_taxonomy"
+            return (*base, *suffix), None
+    normalized = tuple(_identifier(part) for part in tag_parts)
+    if not normalized or any(not part for part in normalized):
+        return None, "invalid_fallback_taxonomy"
+    return normalized, None
+
+
+def _fallback_public_path(
+    operation_id: str,
+    operation: dict[str, Any],
+    resources: dict[str, set[tuple[str, ...]]],
+    prefixes: dict[str, tuple[str, ...]],
+) -> tuple[str | None, str | None]:
+    candidates: set[str] = set()
+    for tag in operation.get("tags", []):
+        resource, reason = _fallback_resource_path(tag, resources)
+        if reason or resource is None:
+            return None, reason or "missing_official_taxonomy"
+        method_tokens = _operation_stem(operation_id).split("_")
+        prefix = prefixes.get(tag, ())
+        if prefix and tuple(method_tokens[:len(prefix)]) == prefix and len(method_tokens) > len(prefix):
+            method_tokens = method_tokens[len(prefix):]
+        method = "_".join(method_tokens)
+        if not method:
+            return None, "invalid_fallback_taxonomy"
+        candidates.add(".".join((*resource, method)))
     if len(candidates) != 1:
-        return None, "taxonomy_alias_ambiguity"
-    return candidates[0], None
+        return None, "taxonomy_fallback_ambiguity" if candidates else "missing_official_taxonomy"
+    return next(iter(candidates)), None
 
 
 def _view_name(raw: str) -> str:
@@ -487,12 +610,18 @@ def expand_manifest(openapi: Any, manifest: dict[str, Any], taxonomy: dict[str, 
               for item in resource.get("operations", {}).values()}
     added: list[str] = []
     rejected: dict[str, str] = {}
+    fallback_resources, fallback_prefixes = _fallback_context(openapi, taxonomy)
 
     for operation_id, operation in sorted(openapi.operations.items()):
         if operation_id in mapped:
             continue
         paths = taxonomy.get("operations", {}).get(operation_id, [])
-        public_path, reason = _canonical_public_path(paths)
+        if paths:
+            public_path, reason = _canonical_public_path(paths, operation)
+        else:
+            public_path, reason = _fallback_public_path(
+                operation_id, operation, fallback_resources, fallback_prefixes
+            )
         if reason:
             rejected[operation_id] = reason
             continue

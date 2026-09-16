@@ -10,6 +10,14 @@ impl<'a> BetaObservability<'a> {
     pub(crate) fn new(raw: &'a HttpClient) -> Self {
         Self { raw }
     }
+    pub fn campaigns(&self) -> BetaObservabilityCampaigns<'a> {
+        BetaObservabilityCampaigns::new(self.raw)
+    }
+
+    pub fn chat_completion_events(&self) -> BetaObservabilityChatCompletionEvents<'a> {
+        BetaObservabilityChatCompletionEvents::new(self.raw)
+    }
+
     pub fn datasets(&self) -> BetaObservabilityDatasets<'a> {
         BetaObservabilityDatasets::new(self.raw)
     }

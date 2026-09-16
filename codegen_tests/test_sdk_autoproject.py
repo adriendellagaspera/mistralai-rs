@@ -379,6 +379,65 @@ class AutoProjectionTests(unittest.TestCase):
         )
         self.assertEqual("taxonomy_alias_ambiguity", report["rejected"]["list_things"])
 
+    def test_json_transport_resolves_stream_convenience_alias(self):
+        expanded, report = sdk_autoproject.expand_manifest(
+            FakeOpenApi(), manifest(),
+            {"operations": {"list_things": ["things.complete", "things.stream"]}},
+            raw_coverage("list_things"),
+        )
+        self.assertEqual(1, report["added_count"])
+        self.assertIn("complete", expanded["resources"]["things"]["operations"])
+
+    def test_missing_official_taxonomy_uses_openapi_tag_fallback(self):
+        api = FakeOpenApi()
+        api.operations["list_things"]["tags"] = ["beta.things"]
+        expanded, report = sdk_autoproject.expand_manifest(
+            api, manifest(), {"operations": {}}, raw_coverage("list_things"),
+        )
+        self.assertEqual(1, report["added_count"])
+        self.assertIn("list_things", expanded["resources"]["beta_things"]["operations"])
+
+    def test_fallback_inherits_known_parent_resource_mapping(self):
+        api = FakeOpenApi()
+        api.operations["list_things"]["tags"] = ["beta.workflows"]
+        api.operations["worker_info"] = {
+            "tags": ["beta.workflows.workers"],
+            "responses": {"200": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Thing"}}}}},
+            "parameters": [],
+        }
+        expanded, report = sdk_autoproject.expand_manifest(
+            api, manifest(),
+            {"operations": {"list_things": ["workflows.list"]}},
+            raw_coverage("list_things", "worker_info"),
+        )
+        self.assertEqual(2, report["added_count"])
+        self.assertIn("worker_info", expanded["resources"]["workflows_workers"]["operations"])
+
+    def test_fallback_strips_only_nonsemantic_common_operation_prefix(self):
+        api = FakeOpenApi()
+        api.operations = {
+            "connector_list_v1": {
+                "tags": ["beta.connectors"],
+                "responses": {"200": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Thing"}}}}},
+                "parameters": [],
+            },
+            "connector_create_or_update_credentials_v1": {
+                "tags": ["beta.connectors"],
+                "responses": {"200": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Thing"}}}}},
+                "parameters": [],
+            },
+        }
+        expanded, report = sdk_autoproject.expand_manifest(
+            api, manifest(),
+            {"operations": {"connector_list_v1": ["beta.connectors.list"]}},
+            raw_coverage("connector_list_v1", "connector_create_or_update_credentials_v1"),
+        )
+        self.assertEqual(2, report["added_count"])
+        self.assertIn(
+            "create_or_update_credentials",
+            expanded["resources"]["beta_connectors"]["operations"],
+        )
+
     def test_nullable_response_field_is_not_flattened(self):
         api = FakeOpenApi()
         api.schemas["Thing"]["properties"]["description"] = {

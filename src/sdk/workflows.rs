@@ -144,6 +144,10 @@ impl<'a> Workflows<'a> {
         WorkflowsSchedules::new(self.raw)
     }
 
+    pub fn workers(&self) -> WorkflowsWorkers<'a> {
+        WorkflowsWorkers::new(self.raw)
+    }
+
     pub async fn archive_workflow(
         &self,
         workflow_identifier: impl AsRef<str>,

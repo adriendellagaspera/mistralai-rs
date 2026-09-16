@@ -194,6 +194,51 @@ impl<'a> BetaConnectors<'a> {
             .map_err(Into::into)
     }
 
+    pub async fn create_or_update_organization_credentials(
+        &self,
+        connector_id_or_name: impl AsRef<str>,
+        request: CredentialsCreateOrUpdateParams,
+    ) -> Result<MessageResponseView, SdkError> {
+        self.raw
+            .connector_create_or_update_organization_credentials_v1(
+                connector_id_or_name.as_ref(),
+                request.into_raw(),
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn create_or_update_user_credentials(
+        &self,
+        connector_id_or_name: impl AsRef<str>,
+        request: CredentialsCreateOrUpdateParams,
+    ) -> Result<MessageResponseView, SdkError> {
+        self.raw
+            .connector_create_or_update_user_credentials_v1(
+                connector_id_or_name.as_ref(),
+                request.into_raw(),
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn create_or_update_workspace_credentials(
+        &self,
+        connector_id_or_name: impl AsRef<str>,
+        request: CredentialsCreateOrUpdateParams,
+    ) -> Result<MessageResponseView, SdkError> {
+        self.raw
+            .connector_create_or_update_workspace_credentials_v1(
+                connector_id_or_name.as_ref(),
+                request.into_raw(),
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
     pub async fn create(
         &self,
         request: ConnectorMCPCreateParams,
