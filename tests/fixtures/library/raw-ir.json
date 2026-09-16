@@ -46,7 +46,12 @@
         {"name": "book_id", "type": "impl AsRef<str>"}
       ],
       "return_type": "Result<futures_util::stream::BoxStream<'static, Result<bytes::Bytes, reqwest::Error>>, Error>",
-      "success_type": "futures_util::stream::BoxStream<'static, Result<bytes::Bytes, reqwest::Error>>"
+      "success_type": "futures_util::stream::BoxStream<'static, Result<bytes::Bytes, reqwest::Error>>",
+      "stream": {
+        "item_type": "bytes::Bytes",
+        "error_type": "reqwest::Error",
+        "lifetime": "'static"
+      }
     }
   },
   "symbol_paths": {
