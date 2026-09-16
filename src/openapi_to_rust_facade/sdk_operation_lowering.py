@@ -1,15 +1,22 @@
 """Resolve operation call shapes from validated facade and raw IR.
 
-All raw-generator inspection needed by operation/resource emission stops here.
+All raw-binding inspection needed by operation/resource emission stops here.
 The renderer receives only immutable values from :mod:`sdk_ir`.
 """
 
 from dataclasses import replace
 
-from rust_symbols import field_identifier
-from rust_types import parse_type
-from sdk_ir import (FacadeIr, JsonRequest, OperationCall, OperationSpec,
-                    ParameterField, ParameterRequestSpec, ResourceSpec)
+from .rust_symbols import field_identifier
+from .rust_types import parse_type
+from .sdk_ir import (
+    FacadeIr,
+    JsonRequest,
+    OperationCall,
+    OperationSpec,
+    ParameterField,
+    ParameterRequestSpec,
+    ResourceSpec,
+)
 
 
 class OperationLoweringError(ValueError):
@@ -23,8 +30,11 @@ def _option(type_name: str) -> str | None:
 
 def _argument(name: str, type_name: str) -> tuple[str, str]:
     name = field_identifier(name)
-    return ((f"{name}: impl Into<String>", f"{name}.into()")
-            if type_name == "String" else (f"{name}: {type_name}", name))
+    return (
+        (f"{name}: impl Into<String>", f"{name}.into()")
+        if type_name == "String"
+        else (f"{name}: {type_name}", name)
+    )
 
 
 def _owned_parameter(type_name: str) -> tuple[str, bool]:
@@ -33,7 +43,9 @@ def _owned_parameter(type_name: str) -> tuple[str, bool]:
     if inner in {"impl AsRef<str>", "&str"}:
         return ("Option<String>" if optional is not None else "String"), True
     if "impl " in inner or "&" in inner:
-        raise OperationLoweringError(f"unsupported owned parameter projection: {type_name}")
+        raise OperationLoweringError(
+            f"unsupported owned parameter projection: {type_name}"
+        )
     return type_name, False
 
 
@@ -48,14 +60,22 @@ def _direct_parameter(parameter, raw_index) -> tuple[str, str]:
 
 
 def _request_name(resource: ResourceSpec, operation: OperationSpec) -> str:
-    return "".join(part.title() for part in operation.name.split("_")) + resource.name + "Request"
+    return (
+        "".join(part.title() for part in operation.name.split("_"))
+        + resource.name
+        + "Request"
+    )
 
 
-def _parameter_request(resource: ResourceSpec, operation: OperationSpec, raw_index) -> ParameterRequestSpec | None:
+def _parameter_request(
+    resource: ResourceSpec, operation: OperationSpec, raw_index
+) -> ParameterRequestSpec | None:
     if isinstance(operation.request_projection, JsonRequest):
         return None
     parameters = operation.raw_signature.parameters
-    if not parameters or not any(_option(parameter.type) is not None for parameter in parameters):
+    if not parameters or not any(
+        _option(parameter.type) is not None for parameter in parameters
+    ):
         return None
     fields = []
     for parameter in parameters:
@@ -64,18 +84,34 @@ def _parameter_request(resource: ResourceSpec, operation: OperationSpec, raw_ind
         optional = _option(owned)
         if optional is not None:
             setter_argument, setter_value = _argument(parameter.name, optional)
-            fields.append(ParameterField(
-                parameter.name, owned, None, None, setter_argument, setter_value,
-            ))
+            fields.append(
+                ParameterField(
+                    parameter.name,
+                    owned,
+                    None,
+                    None,
+                    setter_argument,
+                    setter_value,
+                )
+            )
         else:
             constructor_argument, constructor_value = _argument(parameter.name, owned)
-            fields.append(ParameterField(
-                parameter.name, owned, constructor_argument, constructor_value, None, None,
-            ))
+            fields.append(
+                ParameterField(
+                    parameter.name,
+                    owned,
+                    constructor_argument,
+                    constructor_value,
+                    None,
+                    None,
+                )
+            )
     return ParameterRequestSpec(_request_name(resource, operation), tuple(fields))
 
 
-def _operation_call(resource: ResourceSpec, operation: OperationSpec, raw_index) -> OperationCall:
+def _operation_call(
+    resource: ResourceSpec, operation: OperationSpec, raw_index
+) -> OperationCall:
     parameters = operation.raw_signature.parameters
     request = operation.request_projection
     if isinstance(request, JsonRequest):
@@ -90,7 +126,9 @@ def _operation_call(resource: ResourceSpec, operation: OperationSpec, raw_index)
                 elif configured is None:
                     value_expression = "None"
                 else:
-                    raise OperationLoweringError(f"unsupported request override literal for {field}")
+                    raise OperationLoweringError(
+                        f"unsupported request override literal for {field}"
+                    )
                 assignments.append(f"raw.{field} = {value_expression};")
             body = f"{{ let mut raw = request.into_raw(); {' '.join(assignments)} raw }}"
         declarations, values = [], []
@@ -117,16 +155,24 @@ def _operation_call(resource: ResourceSpec, operation: OperationSpec, raw_index)
         _, borrowed = _owned_parameter(parameter.type)
         value = f"request.{parameter.name}"
         if borrowed:
-            value += ".as_deref()" if _option(parameter.type) is not None else ".as_str()"
+            value += (
+                ".as_deref()"
+                if _option(parameter.type) is not None
+                else ".as_str()"
+            )
         values.append(value)
     default = None
     if all(_option(parameter.type) is not None for parameter in parameters):
         default = ", ".join(
-            "None::<&str>" if parameter.type == "Option<impl AsRef<str>>" else "None"
+            "None::<&str>"
+            if parameter.type == "Option<impl AsRef<str>>"
+            else "None"
             for parameter in parameters
         )
     return OperationCall(
-        f"request: {_request_name(resource, operation)}", ", ".join(values), default,
+        f"request: {_request_name(resource, operation)}",
+        ", ".join(values),
+        default,
     )
 
 
