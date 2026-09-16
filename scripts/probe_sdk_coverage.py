@@ -91,7 +91,7 @@ def probes(openapi, bindings, configured):
 
 
 def main():
-    openapi = OpenApi.load(ROOT / "spec/openapi.yaml")
+    openapi = OpenApi.load(ROOT / "tooling/sources/openapi/openapi.yaml")
     bindings = read_bindings(ROOT / "src/generated")
     configured = json.loads((ROOT / "codegen/sdk-semantics.json").read_text())
     configured, _ = expand_manifest(
