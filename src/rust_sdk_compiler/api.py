@@ -64,16 +64,25 @@ class Runtime(RustFacadeRuntime):
 
 
 @dataclass(frozen=True)
+class Ir(FacadeIr):
+    """Fully resolved SDK intermediate representation."""
+
+
+def _public_ir(value: FacadeIr) -> Ir:
+    return Ir(value.client_name, value.models, value.resources)
+
+
+@dataclass(frozen=True)
 class Compilation:
     """Resolved SDK IR plus deterministic generated files."""
 
-    ir: FacadeIr
+    ir: Ir
     files: Mapping[str, str]
 
 
-def lower(openapi: OpenApi, bindings: Bindings, policy: Policy) -> FacadeIr:
+def lower(openapi: OpenApi, bindings: Bindings, policy: Policy) -> Ir:
     """Validate and lower compiler inputs to resolved SDK IR."""
-    return sdk_compiler.compile_ir(openapi, bindings, policy.to_dict())
+    return _public_ir(sdk_compiler.compile_ir(openapi, bindings, policy.to_dict()))
 
 
 def compile(
@@ -91,4 +100,4 @@ def compile(
         policy.to_dict(),
         **kwargs,
     )
-    return Compilation(ir, MappingProxyType(dict(files)))
+    return Compilation(_public_ir(ir), MappingProxyType(dict(files)))
