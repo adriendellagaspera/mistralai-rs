@@ -31,6 +31,17 @@ def verify_spec(data, lock):
         raise ValueError(f"Spec SHA-256 mismatch: expected {lock['spec_sha256']}, got {actual}")
 
 
+def ensure_rust_toolchain(toolchain):
+    config = toolchain["toolchain"]
+    args = [
+        "rustup", "toolchain", "install", config["channel"],
+        "--profile", config.get("profile", "minimal"),
+    ]
+    for component in config.get("components", []):
+        args.extend(("--component", component))
+    run(*args)
+
+
 def snapshot(directory):
     return {p.relative_to(directory).as_posix(): p.read_bytes()
             for p in sorted(directory.rglob("*")) if p.is_file()}
@@ -157,6 +168,7 @@ def main():
     toolchain = tomllib.loads((ROOT / "rust-toolchain.toml").read_text())
     if toolchain["toolchain"]["channel"] != lock["rust_toolchain"]:
         raise ValueError("rust-toolchain.toml and codegen.lock disagree")
+    ensure_rust_toolchain(toolchain)
     verify_spec((ROOT / "spec/openapi.yaml").read_bytes(), lock)
     executable = generator(lock)
     python = tooling_python(lock)
