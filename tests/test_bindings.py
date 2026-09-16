@@ -64,12 +64,14 @@ pub enum State {
     def test_metadata_pins_compiler_and_backend_contracts(self):
         project = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]
         self.assertEqual(project["name"], "openapi-to-rust-bindings")
-        self.assertIn("rust-sdk-compiler @ git+https://github.com/adriendellagaspera/mistralai-rs.git@5bda3f6b704edf5b6a9d8788010c4117321ceb5e", project["dependencies"])
+        self.assertEqual(project["version"], package.__version__)
+        self.assertIn("rust-sdk-compiler @ git+https://github.com/adriendellagaspera/mistralai-rs.git@1bed0ed0b05eeeb0ca9d9b937d62c729cb7234aa", project["dependencies"])
         compatibility = json.loads((ROOT / "COMPATIBILITY.json").read_text())
+        self.assertEqual(compatibility["package_version"], package.__version__)
         self.assertEqual(compatibility["bindings_schema_version"], 2)
         self.assertEqual(
             compatibility["compiler"]["commit"],
-            "5bda3f6b704edf5b6a9d8788010c4117321ceb5e",
+            "1bed0ed0b05eeeb0ca9d9b937d62c729cb7234aa",
         )
         self.assertEqual(
             compatibility["backend"]["commit"],
