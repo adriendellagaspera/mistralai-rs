@@ -29,6 +29,46 @@ class RustType:
         return None
 
 
+def _validate_type_spelling(value: str) -> None:
+    """Reject statement boundaries while retaining unknown type syntax as opaque."""
+    angles = parentheses = brackets = braces = 0
+    in_string = False
+    escaped = False
+    for char in value:
+        if in_string:
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == '"':
+                in_string = False
+            continue
+        if char == '"':
+            in_string = True
+        elif char == "<":
+            angles += 1
+        elif char == ">":
+            angles -= 1
+        elif char == "(":
+            parentheses += 1
+        elif char == ")":
+            parentheses -= 1
+        elif char == "[":
+            brackets += 1
+        elif char == "]":
+            brackets -= 1
+        elif char == "{":
+            braces += 1
+        elif char == "}":
+            braces -= 1
+        elif char == ";" and angles == parentheses == brackets == braces == 0:
+            raise ValueError("unexpected Rust statement boundary in type")
+        if min(angles, parentheses, brackets, braces) < 0:
+            raise ValueError("unbalanced Rust type delimiters")
+    if in_string or any((angles, parentheses, brackets, braces)):
+        raise ValueError("unbalanced Rust type delimiters")
+
+
 def _split_arguments(value: str) -> tuple[str, ...]:
     parts: list[str] = []
     start = 0
@@ -126,6 +166,7 @@ def parse_type(spelling: str) -> RustType:
     spelling = spelling.strip()
     if not spelling:
         raise ValueError("empty Rust type")
+    _validate_type_spelling(spelling)
     generic = _outer_generic(spelling)
     if generic is None:
         return RustType("opaque_type", spelling)
