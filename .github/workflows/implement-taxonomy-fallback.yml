@@ -1,0 +1,95 @@
+name: Implement taxonomy fallback
+on:
+  push:
+    branches: [issue-23-taxonomy-fallback]
+permissions:
+  contents: write
+jobs:
+  implement:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Sync main and apply implementation
+        run: |
+          git fetch origin main
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git merge --no-edit origin/main
+          python3 scripts/_implement_taxonomy_fallback.py
+      - name: Install pinned Rust toolchain
+        run: rustup show
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            .tools
+            target
+          key: sdk-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'codegen.lock') }}
+      - name: Regenerate facade
+        run: python3 scripts/codegen.py generate
+      - name: Refresh probe baseline
+        run: |
+          PYTHON=$(find .tools -path '*/bin/python' | head -1)
+          "$PYTHON" - <<'PY'
+          import hashlib, json, sys
+          from pathlib import Path
+          ROOT = Path.cwd()
+          sys.path.insert(0, str(ROOT / 'codegen'))
+          import sdk_compiler as compiler
+          import probe_sdk_coverage as probe
+          from sdk_autoproject import expand_manifest
+          openapi = compiler.OpenApiIndex.load(ROOT / 'spec/openapi.yaml')
+          raw = compiler.load_raw_ir(ROOT / 'src/generated')
+          configured = json.loads((ROOT / 'codegen/sdk-semantics.json').read_text())
+          configured, _ = expand_manifest(
+              openapi, configured,
+              json.loads((ROOT / 'codegen/sdk-taxonomy.json').read_text()),
+              json.loads((ROOT / 'src/generated/coverage.json').read_text()), raw,
+          )
+          modules, rejected = probe.probes(openapi, raw, configured)
+          report = {'generated_candidates': sorted(modules), 'rejected_candidates': rejected}
+          digest = hashlib.sha256(json.dumps(report, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+          baseline = {'schema_version': 1, 'generated_candidates': len(modules),
+                      'rejected_candidates': len(rejected), 'report_sha256': digest}
+          (ROOT / 'codegen/sdk-probe-baseline.json').write_text(json.dumps(baseline, indent=2) + '\n')
+          print('PROBE_BASELINE=' + json.dumps(baseline, sort_keys=True))
+          PY
+      - name: Validate
+        run: bash scripts/validate.sh
+      - name: Report coverage
+        run: |
+          PYTHON=$(find .tools -path '*/bin/python' | head -1)
+          "$PYTHON" - <<'PY'
+          import json, sys
+          from collections import Counter
+          from pathlib import Path
+          ROOT = Path.cwd()
+          sys.path.insert(0, str(ROOT / 'codegen'))
+          import sdk_compiler as compiler
+          from sdk_autoproject import expand_manifest
+          openapi = compiler.OpenApiIndex.load(ROOT / 'spec/openapi.yaml')
+          raw = compiler.load_raw_ir(ROOT / 'src/generated')
+          _, report = expand_manifest(
+              openapi,
+              json.loads((ROOT / 'codegen/sdk-semantics.json').read_text()),
+              json.loads((ROOT / 'codegen/sdk-taxonomy.json').read_text()),
+              json.loads((ROOT / 'src/generated/coverage.json').read_text()), raw,
+          )
+          print(f"AUTO_COVERAGE={report['added_count']}/{report['rejected_count']}")
+          print('REASONS=' + json.dumps(Counter(report['rejected'].values()), sort_keys=True))
+          for operation_id in report['added']:
+              if not json.loads((ROOT / 'codegen/sdk-taxonomy.json').read_text()).get('operations', {}).get(operation_id):
+                  print('FALLBACK_ADDED=' + operation_id)
+          PY
+      - name: Commit clean implementation
+        run: |
+          rm scripts/_diagnose_taxonomy_fallback.py scripts/_implement_taxonomy_fallback.py
+          rm .github/workflows/diagnose-taxonomy-fallback.yml .github/workflows/implement-taxonomy-fallback.yml
+          git add -A
+          git commit -m 'feat: fall back to OpenAPI taxonomy deterministically'
+          git push origin HEAD:issue-23-taxonomy-fallback
