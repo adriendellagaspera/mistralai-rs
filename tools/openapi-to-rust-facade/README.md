@@ -33,4 +33,6 @@ The compiler does not discover product taxonomy, track API coverage, or perform 
 
 The standalone test suite contains two unrelated fixtures. Menagerie exercises discriminated request unions and wrapper projection. Library exercises nested resources, JSON bodies, optional parameters, empty success responses, and binary success streams. Running the same fixture twice must produce byte-identical source maps.
 
-Licensed under either MIT or Apache-2.0, at your option.
+## Provenance and license
+
+The compiler sources in this package are extracted from the same repository history that introduced the facade compiler; the compatible `openapi-to-rust` backend is referenced and tested but none of its source code is vendored here. The package is licensed under either MIT or Apache-2.0, at your option, matching the included license files and keeping later upstream contribution possible.
