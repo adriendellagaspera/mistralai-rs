@@ -8,7 +8,10 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "codegen"))
 
 from rust_types import parse_type
-from sdk_autoproject import _nullable, _request_json_schema, _schema_ref, _simple_schema, _safe_alias, _raw_public_leaf
+from sdk_autoproject import (
+    _nullable, _request_json_schema, _schema_ref, _simple_schema,
+    _safe_alias, _raw_public_leaf, expand_manifest,
+)
 from sdk_codegen import OpenApiIndex, RustIndex
 
 
@@ -126,6 +129,19 @@ def main():
     rust = RustIndex.load(ROOT / "src/generated")
     sdk_coverage = json.loads((ROOT / "src/sdk/coverage.json").read_text())
     raw_coverage = json.loads((ROOT / "src/generated/coverage.json").read_text())
+    manifest = json.loads((ROOT / "codegen/sdk-semantics.json").read_text())
+    taxonomy = json.loads((ROOT / "codegen/sdk-taxonomy.json").read_text())
+    _, report_without_rust = expand_manifest(openapi, manifest, taxonomy, raw_coverage)
+    _, report_with_rust = expand_manifest(openapi, manifest, taxonomy, raw_coverage, rust)
+    print(
+        "PROJECTION_PATHS "
+        f"without_rust={report_without_rust['added_count']}/{report_without_rust['rejected_count']} "
+        f"with_rust={report_with_rust['added_count']}/{report_with_rust['rejected_count']} "
+        f"committed={sdk_coverage['automatic_projection']['added_count']}/{sdk_coverage['automatic_projection']['rejected_count']}"
+    )
+    only_with_rust = sorted(set(report_with_rust["added"]) - set(report_without_rust["added"]))
+    print("ONLY_WITH_RUST " + ",".join(only_with_rust))
+
     raw_methods = {item["operation_id"]: item["rust_method"] for item in raw_coverage["operations"] if item.get("upstream", True)}
     rejected = sdk_coverage["automatic_projection"]["rejected"]
     targets = [op for op, reason in rejected.items() if reason == "request_model_projection"]
