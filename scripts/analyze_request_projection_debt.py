@@ -139,8 +139,10 @@ def main():
         f"with_rust={report_with_rust['added_count']}/{report_with_rust['rejected_count']} "
         f"committed={sdk_coverage['automatic_projection']['added_count']}/{sdk_coverage['automatic_projection']['rejected_count']}"
     )
-    only_with_rust = sorted(set(report_with_rust["added"]) - set(report_without_rust["added"]))
-    print("ONLY_WITH_RUST " + ",".join(only_with_rust))
+    without_set = set(report_without_rust["added"])
+    with_set = set(report_with_rust["added"])
+    print("ONLY_WITH_RUST " + ",".join(sorted(with_set - without_set)))
+    print("ONLY_WITHOUT_RUST " + ",".join(sorted(without_set - with_set)))
 
     raw_methods = {item["operation_id"]: item["rust_method"] for item in raw_coverage["operations"] if item.get("upstream", True)}
     rejected = sdk_coverage["automatic_projection"]["rejected"]
