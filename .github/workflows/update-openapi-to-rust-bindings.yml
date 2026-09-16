@@ -1,0 +1,136 @@
+name: Track openapi-to-rust Bindings Compatibility
+
+on:
+  schedule:
+    - cron: '47 4 * * *'
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - .github/workflows/update-openapi-to-rust-bindings.yml
+      - scripts/check_openapi_to_rust_bindings.py
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: update-openapi-to-rust-bindings
+  cancel-in-progress: false
+
+jobs:
+  compatibility:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Checkout bindings package and resolve backend revisions
+        id: backend
+        run: |
+          git fetch origin refs/heads/openapi-to-rust-bindings:refs/remotes/origin/openapi-to-rust-bindings
+          rm -rf .bindings-package
+          git worktree add --detach .bindings-package origin/openapi-to-rust-bindings
+          baseline="$(python3 -c 'import json; print(json.load(open(".bindings-package/COMPATIBILITY.json"))["backend"]["commit"])')"
+          candidate="$(git ls-remote https://github.com/gpu-cli/openapi-to-rust.git refs/heads/main | awk '{print $1}')"
+          test -n "$candidate"
+          echo "baseline=$baseline" >> "$GITHUB_OUTPUT"
+          echo "candidate=$candidate" >> "$GITHUB_OUTPUT"
+          if [ "$baseline" = "$candidate" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/cache@v4
+        if: steps.backend.outputs.changed == 'true'
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            .tools/openapi-to-rust-backends
+          key: openapi-to-rust-bindings-${{ runner.os }}-${{ steps.backend.outputs.baseline }}-${{ steps.backend.outputs.candidate }}
+          restore-keys: |
+            openapi-to-rust-bindings-${{ runner.os }}-
+
+      - name: Install and test pinned bindings package
+        run: |
+          python3 -m venv .tools/bindings-sync-python
+          .tools/bindings-sync-python/bin/python -m pip install --disable-pip-version-check .bindings-package
+          .tools/bindings-sync-python/bin/python -m unittest discover -s .bindings-package/tests -p 'test_*.py'
+
+      - name: Build baseline and candidate generators
+        if: steps.backend.outputs.changed == 'true'
+        run: |
+          build_generator() {
+            commit="$1"
+            install="$PWD/.tools/openapi-to-rust-backends/$commit"
+            binary="$install/bin/openapi-to-rust"
+            if [ ! -x "$binary" ]; then
+              source="$RUNNER_TEMP/openapi-to-rust-$commit"
+              rm -rf "$source"
+              git init "$source"
+              git -C "$source" fetch --depth=1 https://github.com/gpu-cli/openapi-to-rust.git "$commit"
+              git -C "$source" checkout --detach FETCH_HEAD
+              cargo install --locked --path "$source" --root "$install"
+            fi
+          }
+          build_generator '${{ steps.backend.outputs.baseline }}'
+          build_generator '${{ steps.backend.outputs.candidate }}'
+
+      - name: Compare normalized Bindings
+        if: steps.backend.outputs.changed == 'true'
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          extra=()
+          if [ "$EVENT_NAME" != 'pull_request' ]; then
+            extra+=(--update-compatibility)
+          fi
+          .tools/bindings-sync-python/bin/python scripts/check_openapi_to_rust_bindings.py \
+            --bindings-root .bindings-package \
+            --baseline-generator ".tools/openapi-to-rust-backends/${{ steps.backend.outputs.baseline }}/bin/openapi-to-rust" \
+            --candidate-generator ".tools/openapi-to-rust-backends/${{ steps.backend.outputs.candidate }}/bin/openapi-to-rust" \
+            --candidate-commit '${{ steps.backend.outputs.candidate }}' \
+            --report "$RUNNER_TEMP/openapi-to-rust-bindings-report.md" \
+            "${extra[@]}"
+
+      - name: Publish compatibility summary
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/openapi-to-rust-bindings-report.md" ]; then
+            cat "$RUNNER_TEMP/openapi-to-rust-bindings-report.md" >> "$GITHUB_STEP_SUMMARY"
+          elif [ '${{ steps.backend.outputs.changed }}' = 'false' ]; then
+            echo 'openapi-to-rust-bindings is already pinned to upstream main.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Create or update reviewed backend-sync PR
+        if: steps.backend.outputs.changed == 'true' && github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          cd .bindings-package
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git checkout -B automation/openapi-to-rust-bindings-sync
+          git add COMPATIBILITY.json
+          if git diff --cached --quiet; then
+            echo 'No compatibility metadata changed.'
+            exit 0
+          fi
+          version="$(python3 -c 'import json; print(json.load(open("COMPATIBILITY.json"))["backend"]["version"])')"
+          git commit -m "chore: validate openapi-to-rust $version"
+          git push --force origin HEAD:automation/openapi-to-rust-bindings-sync
+          pr="$(gh pr list --repo "$REPO" --base openapi-to-rust-bindings --head automation/openapi-to-rust-bindings-sync --state open --json number --jq '.[0].number // empty')"
+          title="chore: validate openapi-to-rust $version for bindings"
+          if [ -n "$pr" ]; then
+            gh pr edit "$pr" --repo "$REPO" --title "$title" --body-file "$RUNNER_TEMP/openapi-to-rust-bindings-report.md"
+          else
+            gh pr create --repo "$REPO" --base openapi-to-rust-bindings --head automation/openapi-to-rust-bindings-sync --title "$title" --body-file "$RUNNER_TEMP/openapi-to-rust-bindings-report.md"
+          fi
