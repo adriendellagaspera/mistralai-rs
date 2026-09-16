@@ -21,6 +21,7 @@ from ..sdk_raw_ir import (
     RawIr,
     RawOperation,
     RawParameter,
+    RawStreamBinding,
     RawVariant,
 )
 
@@ -52,11 +53,27 @@ def _serde_rename(attributes: list[str]) -> str | None:
     return matches[0] if matches else None
 
 
+def _stream_binding(success_type: str) -> RawStreamBinding | None:
+    """Normalize the concrete BoxStream ABI emitted by openapi-to-rust."""
+    syntax = parse_type(success_type)
+    if syntax.constructor != "futures_util::stream::BoxStream" or len(syntax.arguments) != 2:
+        return None
+    lifetime, event = syntax.arguments
+    if event.constructor != "Result" or len(event.arguments) != 2:
+        return None
+    return RawStreamBinding(
+        item_type=event.arguments[0].spelling,
+        error_type=event.arguments[1].spelling,
+        lifetime=lifetime.spelling,
+    )
+
+
 class OpenApiToRustAdapter:
     """Parse the supported ``openapi-to-rust`` source layout into :class:`RawIr`.
 
     This module is intentionally the only place that knows the backend's file
-    names, ``HttpClient`` convention, generated module paths, or Rust AST shape.
+    names, ``HttpClient`` convention, generated module paths, BoxStream encoding,
+    or Rust AST shape.
     """
 
     CLIENT_TYPE = "HttpClient"
@@ -208,6 +225,7 @@ class OpenApiToRustAdapter:
                     tuple(parameters),
                     _text(client_source, return_node),
                     success_type,
+                    _stream_binding(success_type),
                 )
         if client_source.strip() and not found_client:
             raise OpenApiToRustAdapterError("openapi-to-rust HttpClient impl not found")
