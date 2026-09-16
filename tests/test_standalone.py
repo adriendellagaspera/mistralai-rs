@@ -4,6 +4,8 @@ import sys
 import tomllib
 import unittest
 
+from jsonschema import Draft202012Validator
+
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
@@ -11,26 +13,34 @@ sys.path.insert(0, str(SRC))
 
 from openapi_to_rust_facade import (  # noqa: E402
     OpenApiIndex,
-    OpenApiToRustAdapter,
     RawIr,
+    RustFacadeRuntime,
     __version__,
     compile_facade,
 )
+
+
+def load_raw(name: str) -> RawIr:
+    value = json.loads((FIXTURES / name / "raw-ir.json").read_text())
+    schema = json.loads((SRC / "openapi_to_rust_facade" / "raw-ir.schema.json").read_text())
+    Draft202012Validator(schema).validate(value)
+    return RawIr.from_dict(value)
 
 
 def compile_fixture(name: str):
     root = FIXTURES / name
     document = json.loads((root / "openapi.json").read_text())
     policy = json.loads((root / "policy.json").read_text())
-    raw = OpenApiToRustAdapter.parse(
-        (root / "types.rs").read_bytes(),
-        (root / "client.rs").read_bytes(),
-    )
+    raw = load_raw(name)
     ir, files = compile_facade(OpenApiIndex(document), raw, policy)
     return ir, files, raw
 
 
-class StandalonePackageTests(unittest.TestCase):
+class StandaloneCompilerTests(unittest.TestCase):
+    def test_importing_core_does_not_import_adapter_runtime(self):
+        self.assertNotIn("tree_sitter", sys.modules)
+        self.assertNotIn("tree_sitter_rust", sys.modules)
+
     def test_menagerie_is_an_independent_fixture(self):
         ir, files, raw = compile_fixture("menagerie")
         self.assertEqual(ir.client_name, "Menagerie")
@@ -64,6 +74,44 @@ class StandalonePackageTests(unittest.TestCase):
             "pub async fn download(&self, book_id: impl AsRef<str>) -> Result<BinaryStream, SdkError>",
             resource,
         )
+        self.assertIn("chunk.map_err(Into::into)", resource)
+
+    def test_binding_paths_are_data_not_compiler_constants(self):
+        raw = load_raw("menagerie")
+        self.assertEqual(
+            raw.qualified_type("Vec<AnimalUnion>"),
+            "Vec<crate::generated::types::AnimalUnion>",
+        )
+        custom = raw.to_dict()
+        custom["binding"]["client"]["type_path"] = "crate::wire::Client"
+        custom["binding"]["type_preludes"] = ["crate::wire::models::*"]
+        custom["symbol_paths"] = {
+            name: path.replace("crate::generated::types", "crate::wire::models")
+            for name, path in custom["symbol_paths"].items()
+        }
+        document = json.loads((FIXTURES / "menagerie" / "openapi.json").read_text())
+        policy = json.loads((FIXTURES / "menagerie" / "policy.json").read_text())
+        _, files = compile_facade(OpenApiIndex(document), RawIr.from_dict(custom), policy)
+        self.assertIn("use crate::wire::Client;", files["mod.rs"])
+        self.assertIn("use crate::wire::models::*;", files["facade_types.rs"])
+        self.assertNotIn("crate::generated", "".join(files.values()))
+
+    def test_runtime_support_paths_are_explicit(self):
+        raw = load_raw("menagerie")
+        document = json.loads((FIXTURES / "menagerie" / "openapi.json").read_text())
+        policy = json.loads((FIXTURES / "menagerie" / "policy.json").read_text())
+        runtime = RustFacadeRuntime(
+            error_type="FacadeError",
+            error_module="support",
+            error_exports=("FacadeError",),
+            sse_module="crate::events",
+            sse_function="decode_json",
+            generated_marker="// generated fixture\n",
+        )
+        _, files = compile_facade(OpenApiIndex(document), raw, policy, runtime=runtime)
+        self.assertTrue(files["mod.rs"].startswith("// generated fixture\n"))
+        self.assertIn("pub mod support;", files["mod.rs"])
+        self.assertIn("pub use support::{FacadeError};", files["mod.rs"])
 
     def test_scalar_enum_is_lowered_from_wire_provenance(self):
         document = {
@@ -74,14 +122,28 @@ class StandalonePackageTests(unittest.TestCase):
                 "type": "string", "enum": ["shared_global", "private"],
             }}},
         }
-        types = b'''pub enum ResourceVisibility {
-    #[serde(rename = "shared_global")]
-    SharedGlobal,
-    #[serde(rename = "private")]
-    Private,
-}
-'''
-        raw = OpenApiToRustAdapter.parse(types, b"")
+        raw = RawIr.from_dict({
+            "schema_version": 2,
+            "structs": {},
+            "enums": {"ResourceVisibility": [
+                {"name": "SharedGlobal", "payload": None, "wire_name": "shared_global"},
+                {"name": "Private", "payload": None, "wire_name": "private"},
+            ]},
+            "aliases": {},
+            "operations": {},
+            "symbol_paths": {
+                "ResourceVisibility": "crate::raw::ResourceVisibility",
+            },
+            "binding": {
+                "client": {
+                    "type_path": "crate::raw::Client",
+                    "constructor": "new",
+                    "api_key_builder": "with_api_key",
+                    "base_url_builder": "with_base_url",
+                },
+                "type_preludes": ["crate::raw::*"],
+            },
+        })
         policy = {
             "schema_version": 2,
             "client": {"name": "EnumClient"},
@@ -104,27 +166,29 @@ class StandalonePackageTests(unittest.TestCase):
                 _, second, _ = compile_fixture(name)
                 self.assertEqual(first, second)
 
-    def test_package_metadata_pins_runtime_and_backend_contracts(self):
+    def test_package_metadata_separates_core_and_adapter_dependencies(self):
         project = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]
         self.assertEqual(project["version"], __version__)
         self.assertEqual(
             set(project["dependencies"]),
-            {
-                "ruamel.yaml==0.18.6",
-                "tree-sitter==0.25.2",
-                "tree-sitter-rust==0.24.0",
-                "jsonschema==4.23.0",
-            },
+            {"ruamel.yaml==0.18.6", "jsonschema==4.23.0"},
+        )
+        self.assertEqual(
+            set(project["optional-dependencies"]["openapi-to-rust"]),
+            {"tree-sitter==0.25.2", "tree-sitter-rust==0.24.0"},
         )
         compatibility = json.loads((ROOT / "COMPATIBILITY.json").read_text())
         self.assertEqual(compatibility["package_version"], __version__)
-        self.assertEqual(compatibility["raw_ir_schema_version"], 1)
+        self.assertEqual(compatibility["raw_ir_schema_version"], 2)
         self.assertEqual(compatibility["backend"]["name"], "openapi-to-rust")
-        self.assertEqual(compatibility["backend"]["version"], "0.16.0")
-        self.assertEqual(
-            compatibility["backend"]["commit"],
-            "2af34b86ca9f38c35787f13ec5841989efcf4b99",
-        )
+
+    def test_compiler_core_contains_no_backend_layout_or_parser_dependency(self):
+        root = SRC / "openapi_to_rust_facade"
+        forbidden = ("crate::generated", "HttpClient", "tree_sitter")
+        for path in root.glob("*.py"):
+            source = path.read_text()
+            for needle in forbidden:
+                self.assertNotIn(needle, source, f"{needle} leaked into {path.name}")
 
     def test_generic_package_and_fixtures_contain_no_product_backend(self):
         forbidden = ("mistralai", "ChatCompletionRequest", "OCRRequest")
