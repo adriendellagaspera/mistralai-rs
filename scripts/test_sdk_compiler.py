@@ -6,7 +6,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "codegen"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
-import sdk_codegen as legacy_frontend
+import sdk_codegen as compatibility
 import sdk_compiler
 import sdk_frontend
 from test_sdk_facade import CLIENT, TYPES, manifest, openapi_document
@@ -26,20 +26,10 @@ class CompilerBoundaryTests(unittest.TestCase):
         self.assertNotIn("coverage.json", files)
         self.assertNotIn("api-surface.json", files)
 
-    def test_extracted_frontend_matches_legacy_frontend_ir(self):
-        document = openapi_document()
-        policy = manifest()
-        extracted = sdk_frontend.build_ir(
-            sdk_frontend.OpenApiIndex(document),
-            sdk_frontend.RustIndex(TYPES.encode(), CLIENT.encode()),
-            policy,
-        )
-        legacy = legacy_frontend.build_ir(
-            legacy_frontend.OpenApiIndex(document),
-            legacy_frontend.RustIndex(TYPES.encode(), CLIENT.encode()),
-            policy,
-        )
-        self.assertEqual(extracted, legacy)
+    def test_compatibility_frontend_reexports_extracted_frontend(self):
+        self.assertIs(compatibility.build_ir, sdk_frontend.build_ir)
+        self.assertIs(compatibility.OpenApiIndex, sdk_frontend.OpenApiIndex)
+        self.assertIs(compatibility.RustIndex, sdk_frontend.RustIndex)
 
     def test_compiler_dependency_graph_excludes_projection_and_audit_tooling(self):
         sources = [
@@ -54,6 +44,8 @@ class CompilerBoundaryTests(unittest.TestCase):
                 "from sdk_contracts",
                 "import sdk_pipeline",
                 "from sdk_pipeline",
+                "import sdk_codegen",
+                "from sdk_codegen",
                 "coverage_inventory(",
                 "public_surface(",
             ):
