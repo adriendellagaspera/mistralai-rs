@@ -1,20 +1,31 @@
-"""Run the extracted package's own tests inside the pinned codegen environment."""
+"""Run the extracted package tests in a fresh interpreter."""
 
-import importlib.util
 from pathlib import Path
+import subprocess
 import sys
+import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGE = ROOT / "tools/openapi-to-rust-facade"
-sys.path.insert(0, str(PACKAGE / "src"))
 
-spec = importlib.util.spec_from_file_location(
-    "openapi_to_rust_facade_standalone_tests",
-    PACKAGE / "tests/test_standalone.py",
-)
-if spec is None or spec.loader is None:
-    raise RuntimeError("cannot load standalone facade package tests")
-module = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(module)
 
-StandalonePackageTests = module.StandalonePackageTests
+class ExtractedFacadePackageTests(unittest.TestCase):
+    def test_standalone_suite(self):
+        subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "unittest",
+                "discover",
+                "-s",
+                str(PACKAGE / "tests"),
+                "-p",
+                "test_*.py",
+            ],
+            cwd=PACKAGE,
+            check=True,
+        )
+
+
+if __name__ == "__main__":
+    unittest.main()
