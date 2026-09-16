@@ -185,6 +185,42 @@ class AutoProjectionTests(unittest.TestCase):
             "SafeMode": {"name": "Safe", "adapter": "SafeModeParams"},
         }, variants)
 
+    def test_projects_generated_map_wrapper_without_leaking_raw_struct(self):
+        api = FakeOpenApi()
+        api.schemas["CreateThing"]["properties"]["metadata"] = {
+            "type": "object", "additionalProperties": True,
+        }
+        fields = {
+            "CreateThing": (
+                SimpleNamespace(name="name", type="String"),
+                SimpleNamespace(name="enabled", type="Option<bool>"),
+                SimpleNamespace(name="metadata", type="Option<CreateThingMetadata>"),
+            ),
+            "CreateThingMetadata": (
+                SimpleNamespace(
+                    name="additional_properties",
+                    type="std::collections::BTreeMap<String, serde_json::Value>",
+                ),
+            ),
+        }
+        rust = SimpleNamespace(
+            structs=set(fields), aliases={}, enums={},
+            symbol_modules={name: "types" for name in fields},
+            fields=lambda name: fields[name],
+        )
+        expanded, report = sdk_autoproject.expand_manifest(
+            api, manifest(),
+            {"operations": {"create_thing": ["things.create"]}},
+            raw_coverage("create_thing"), rust,
+        )
+        self.assertEqual(1, report["added_count"])
+        request = expanded["models"]["CreateThingParams"]
+        self.assertEqual({"metadata": "CreateThingMetadataMap"}, request["adapters"])
+        self.assertEqual(
+            {"root": "CreateThing", "path": ["metadata"]},
+            expanded["models"]["CreateThingMetadataMap"]["map"],
+        )
+
     def test_projects_safe_map_alias_without_leaking_generated_alias_name(self):
         api = FakeOpenApi()
         api.schemas["CreateThing"]["properties"]["metadata"] = {

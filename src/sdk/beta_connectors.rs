@@ -165,6 +165,7 @@ impl ListWorkspaceCredentialsBetaConnectorsRequest {
         self
     }
 }
+
 #[derive(Clone, Copy)]
 pub struct BetaConnectors<'a> {
     raw: &'a HttpClient,
@@ -174,6 +175,25 @@ impl<'a> BetaConnectors<'a> {
     pub(crate) fn new(raw: &'a HttpClient) -> Self {
         Self { raw }
     }
+    pub async fn call_tool(
+        &self,
+        tool_name: impl AsRef<str>,
+        connector_id_or_name: impl AsRef<str>,
+        credentials_name: Option<String>,
+        request: MCPToolCallRequestParams,
+    ) -> Result<MCPToolCallResponseView, SdkError> {
+        self.raw
+            .connector_call_tool_v1(
+                tool_name.as_ref(),
+                connector_id_or_name.as_ref(),
+                credentials_name,
+                request.into_raw(),
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
     pub async fn delete_organization_credentials(
         &self,
         credentials_name: impl AsRef<str>,
@@ -320,6 +340,18 @@ impl<'a> BetaConnectors<'a> {
                 request.auth_type.as_deref(),
                 request.fetch_default,
             )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn update(
+        &self,
+        connector_id: impl AsRef<str>,
+        request: ConnectorMCPUpdateParams,
+    ) -> Result<ConnectorView, SdkError> {
+        self.raw
+            .connector_update_v1(connector_id.as_ref(), request.into_raw())
             .await
             .map(Into::into)
             .map_err(Into::into)

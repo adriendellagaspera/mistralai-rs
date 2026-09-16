@@ -113,6 +113,21 @@ impl<'a> BetaObservabilityJudges<'a> {
             .map_err(Into::into)
     }
 
+    pub async fn judge_conversation(
+        &self,
+        judge_id: impl AsRef<str>,
+        request: JudgeConversationRequestParams,
+    ) -> Result<JudgeOutputView, SdkError> {
+        self.raw
+            .judge_conversation_v1_observability_judges_judge_id_live_judging_post(
+                judge_id.as_ref(),
+                request.into_raw(),
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
     pub async fn update(
         &self,
         judge_id: impl AsRef<str>,

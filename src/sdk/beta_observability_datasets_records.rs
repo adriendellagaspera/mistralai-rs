@@ -52,4 +52,12 @@ impl<'a> BetaObservabilityDatasetsRecords<'a> {
     ) -> Result<JudgeOutputView, SdkError> {
         self.raw.judge_dataset_record_v1_observability_dataset_records_dataset_record_id_live_judging_post(dataset_record_id.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
     }
+
+    pub async fn update_properties(
+        &self,
+        dataset_record_id: impl AsRef<str>,
+        request: PutDatasetRecordPropertiesInSchemaParams,
+    ) -> Result<(), SdkError> {
+        self.raw.update_dataset_record_properties_v1_observability_dataset_records_dataset_record_id_properties_put(dataset_record_id.as_ref(), request.into_raw()).await.map_err(Into::into)
+    }
 }

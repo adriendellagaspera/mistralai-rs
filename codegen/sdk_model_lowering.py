@@ -11,7 +11,7 @@ from rust_types import RustType, parse_type
 from sdk_ir import (AccessorKind, AliasModelSpec, ArgumentKind, ArgumentSpec,
                     CollectIntoValue, ConstructorSpec, EnumValue, FactorySpec,
                     FacadeIr, IntoModelValue, IntoStringValue, LiteralValue,
-                    MapIntoValue, ModelSpec, RequestPolicy, ResolvedAccessor,
+                    MapIntoValue, MapModelSpec, MapPolicy, ModelSpec, RequestPolicy, ResolvedAccessor,
                     SetterSpec, SimpleUnionBranchSpec, SimpleUnionModelSpec,
                     SimpleUnionPolicy, SomeValue, StructFieldValue, StructValue,
                     TypeAliasPolicy, UnionBranchSpec, UnionModelSpec, UnionPolicy,
@@ -377,6 +377,60 @@ def _public_alias_type(syntax: RustType, raw_index,
     return syntax.spelling
 
 
+def _unwrap_nullable_schema(schema):
+    branches = schema.get("anyOf", [])
+    non_null = [branch for branch in branches if branch.get("type") != "null"]
+    return non_null[0] if len(non_null) == 1 and len(non_null) != len(branches) else schema
+
+
+def _schema_at(openapi, root: str, path: tuple[str, ...]):
+    schema = openapi.schema(root)
+    for segment in path:
+        schema = _unwrap_nullable_schema(schema)
+        schema = (schema.get("items", {}) if segment == "items"
+                  else schema.get("properties", {}).get(segment, {}))
+    return _unwrap_nullable_schema(schema)
+
+
+def _resolve_map(model: ModelSpec, openapi, raw_index) -> MapModelSpec:
+    assert isinstance(model.config, MapPolicy)
+    schema = _schema_at(openapi, model.config.root, model.config.path)
+    additional = schema.get("additionalProperties")
+    if schema.get("type") != "object" or not additional:
+        raise ModelLoweringError(
+            f"map policy {model.name} does not resolve to additionalProperties"
+        )
+    fields = raw_index.fields(model.raw)
+    if len(fields) != 1 or fields[0].name.removeprefix("r#") != "additional_properties":
+        raise ModelLoweringError(
+            f"raw map wrapper {model.raw} must contain only additional_properties"
+        )
+    field = fields[0]
+    mapping = parse_type(field.type)
+    if mapping.constructor != "std::collections::BTreeMap" or len(mapping.arguments) != 2:
+        raise ModelLoweringError(
+            f"raw map wrapper {model.raw}.{field.name} is not a BTreeMap"
+        )
+    key, value = mapping.arguments
+    if key.spelling != "String":
+        raise ModelLoweringError(f"raw map wrapper {model.raw} has non-String keys")
+    effective = _expand_alias(value, raw_index)
+    if effective.spelling != "serde_json::Value":
+        if additional is True or not isinstance(additional, dict):
+            raise ModelLoweringError(
+                f"raw map value drift for {model.raw}: {effective.spelling}"
+            )
+        additional = _unwrap_nullable_schema(additional)
+        expected = {
+            "string": "String", "integer": "i64", "number": "f64", "boolean": "bool",
+        }.get(additional.get("type"))
+        if expected != effective.spelling:
+            raise ModelLoweringError(
+                f"raw map value drift for {model.raw}: {effective.spelling} != {expected}"
+            )
+    return MapModelSpec(_public_alias_type(mapping, raw_index), field.name)
+
+
 def _resolve_model(model: ModelSpec, openapi, raw_index):
     if isinstance(model.config, UnionPolicy):
         return _resolve_union(model, openapi, raw_index)
@@ -386,6 +440,8 @@ def _resolve_model(model: ModelSpec, openapi, raw_index):
         return AliasModelSpec(
             _public_alias_type(raw_index.aliases[model.raw], raw_index, (model.raw,))
         )
+    if isinstance(model.config, MapPolicy):
+        return _resolve_map(model, openapi, raw_index)
     if isinstance(model.config, ViewPolicy):
         return _resolve_view(model, raw_index)
     return _resolve_wrapper(model, openapi, raw_index)

@@ -141,4 +141,21 @@ impl<'a> BetaLibrariesDocuments<'a> {
             .await
             .map_err(Into::into)
     }
+
+    pub async fn libraries_documents_update_v1(
+        &self,
+        library_id: impl AsRef<str>,
+        document_id: impl AsRef<str>,
+        request: DocumentUpdateInParams,
+    ) -> Result<DocumentOutView, SdkError> {
+        self.raw
+            .libraries_documents_update_v1(
+                library_id.as_ref(),
+                document_id.as_ref(),
+                request.into_raw(),
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
 }
