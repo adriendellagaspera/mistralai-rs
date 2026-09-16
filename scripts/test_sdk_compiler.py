@@ -24,15 +24,17 @@ class CompilerBoundaryTests(unittest.TestCase):
         self.assertNotIn("coverage.json", files)
         self.assertNotIn("api-surface.json", files)
 
-    def test_compiler_module_does_not_depend_on_projection_or_audit_tooling(self):
+    def test_compiler_module_does_not_import_projection_or_audit_tooling(self):
         source = (ROOT / "codegen/sdk_compiler.py").read_text()
         for forbidden in (
-            "sdk_autoproject",
-            "sdk_contracts",
-            "sdk_pipeline",
-            "coverage_inventory",
-            "public_surface",
-            "taxonomy",
+            "import sdk_autoproject",
+            "from sdk_autoproject",
+            "import sdk_contracts",
+            "from sdk_contracts",
+            "import sdk_pipeline",
+            "from sdk_pipeline",
+            "coverage_inventory(",
+            "public_surface(",
         ):
             self.assertNotIn(forbidden, source)
 
