@@ -20,6 +20,19 @@ class OpenApiTests(unittest.TestCase):
         self.assertFalse(schema["additionalProperties"])
         self.assertEqual(schema["properties"]["dry_run"], {"type": "boolean", "enum": [False]})
 
+    def test_object_schema_intersects_compatible_literal_refinement(self):
+        schema = self.openapi.object_schema("NonStreamingCommand")
+        self.assertEqual(
+            schema["properties"]["stream"],
+            {"type": "boolean", "enum": [False], "default": False},
+        )
+
+    def test_object_schema_rejects_empty_literal_intersection(self):
+        with self.assertRaisesRegex(
+            GenerationError, "conflicting OpenAPI property ImpossibleCommand.mode"
+        ):
+            self.openapi.object_schema("ImpossibleCommand")
+
     def test_object_schema_rejects_conflicting_allof_properties(self):
         with self.assertRaisesRegex(GenerationError, "conflicting OpenAPI property Conflict.value"):
             self.openapi.object_schema("Conflict")

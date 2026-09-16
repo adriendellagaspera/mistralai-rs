@@ -25,6 +25,15 @@ _BINDINGS_VALIDATOR = Draft202012Validator(
         .read_text()
     )
 )
+_SCHEMA_ANNOTATIONS = {
+    "deprecated",
+    "description",
+    "example",
+    "examples",
+    "readOnly",
+    "title",
+    "writeOnly",
+}
 
 
 def _component_ref(ref: Any) -> str | None:
@@ -33,6 +42,63 @@ def _component_ref(ref: Any) -> str | None:
         return None
     name = ref[len(prefix) :]
     return name or None
+
+
+def _literal_values(schema: dict[str, Any]) -> list[Any] | None:
+    if "const" in schema:
+        return [schema["const"]]
+    values = schema.get("enum")
+    return values if isinstance(values, list) else None
+
+
+def _json_value_key(value: Any) -> str:
+    return json.dumps(value, sort_keys=True, separators=(",", ":"))
+
+
+def _intersect_property_schema(
+    left: dict[str, Any], right: dict[str, Any], *, context: str
+) -> dict[str, Any]:
+    if left == right:
+        return deepcopy(left)
+
+    ignored = _SCHEMA_ANNOTATIONS | {"const", "default", "enum"}
+    left_constraints = {key: value for key, value in left.items() if key not in ignored}
+    right_constraints = {key: value for key, value in right.items() if key not in ignored}
+    if left_constraints != right_constraints:
+        raise GenerationError(f"conflicting OpenAPI property {context} across allOf")
+
+    left_values = _literal_values(left)
+    right_values = _literal_values(right)
+    if left_values is None and right_values is None:
+        values = None
+    elif left_values is None:
+        values = list(right_values or [])
+    elif right_values is None:
+        values = list(left_values)
+    else:
+        right_keys = {_json_value_key(value) for value in right_values}
+        values = [value for value in left_values if _json_value_key(value) in right_keys]
+        if not values:
+            raise GenerationError(f"conflicting OpenAPI property {context} across allOf")
+
+    result = deepcopy(left_constraints)
+    for source in (left, right):
+        for key in _SCHEMA_ANNOTATIONS:
+            if key in source:
+                result[key] = deepcopy(source[key])
+    if values is not None:
+        result["enum"] = deepcopy(values)
+        allowed = {_json_value_key(value) for value in values}
+        for source in (right, left):
+            if "default" in source and _json_value_key(source["default"]) in allowed:
+                result["default"] = deepcopy(source["default"])
+                break
+    else:
+        if "default" in right:
+            result["default"] = deepcopy(right["default"])
+        elif "default" in left:
+            result["default"] = deepcopy(left["default"])
+    return result
 
 
 def _merge_object_shapes(
@@ -45,11 +111,12 @@ def _merge_object_shapes(
 
     for part in parts:
         for name, schema in part.get("properties", {}).items():
-            if name in properties and properties[name] != schema:
-                raise GenerationError(
-                    f"conflicting OpenAPI property {context}.{name} across allOf"
+            if name in properties:
+                properties[name] = _intersect_property_schema(
+                    properties[name], schema, context=f"{context}.{name}"
                 )
-            properties[name] = deepcopy(schema)
+            else:
+                properties[name] = deepcopy(schema)
         for name in part.get("required", []):
             if name not in required:
                 required.append(name)
@@ -84,9 +151,10 @@ class OpenApi(OpenApiIndex):
 
         The result contains the effective properties, required fields and
         ``additionalProperties`` constraint. Composition is deliberately
-        conservative: incompatible property definitions, incompatible open-
-        object constraints, recursive references and incomplete required fields
-        fail closed with :class:`GenerationError`.
+        conservative: compatible literal refinements are intersected, while
+        incompatible property definitions, incompatible open-object constraints,
+        recursive references and incomplete required fields fail closed with
+        :class:`GenerationError`.
         """
 
         def resolve(schema: dict[str, Any], stack: tuple[str, ...]) -> dict[str, Any]:
