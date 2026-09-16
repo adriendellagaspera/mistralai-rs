@@ -174,7 +174,7 @@ def main():
     python = tooling_python(lock)
     run(python, ROOT / "scripts/run_codegen_tests.py")
     if args.command == "probe":
-        run(python, ROOT / "scripts/probe_sdk_coverage.py")
+        run(python, ROOT / "tooling/quality/probe.py")
         return
     # Preserve relative paths from the checked-in config; never modify its options.
     with tempfile.TemporaryDirectory(prefix=".codegen-", dir=ROOT) as temp:
