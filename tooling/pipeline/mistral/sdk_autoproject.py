@@ -458,6 +458,27 @@ def _omittable_singleton(schema: dict[str, Any], raw_type: str, schemas: dict[st
     return False
 
 
+def _expand_raw_alias(syntax: Type, rust: Any, seen: tuple[str, ...] = ()) -> Type | None:
+    if syntax.spelling not in rust.aliases:
+        return syntax
+    if syntax.spelling in seen:
+        return None
+    return _expand_raw_alias(
+        rust.aliases[syntax.spelling], rust, (*seen, syntax.spelling)
+    )
+
+
+def _primitive_union_payload(schema: dict[str, Any]) -> str | None:
+    if "$ref" in schema or "enum" in schema or "const" in schema or "format" in schema:
+        return None
+    return {
+        "string": "String",
+        "integer": "i64",
+        "number": "f64",
+        "boolean": "bool",
+    }.get(schema.get("type"))
+
+
 def _ensure_union_model(models: dict[str, Any], schemas: dict[str, Any], schema: dict[str, Any],
                         raw: str, rust: Any, resolving: tuple[str, ...]) -> tuple[str | None, str | None]:
     existing = _existing_model_by_raw(models, raw, False)
@@ -465,14 +486,27 @@ def _ensure_union_model(models: dict[str, Any], schemas: dict[str, Any], schema:
         return existing, None
     branches = schema.get("oneOf", []) or schema.get("anyOf", [])
     non_null = [branch for branch in branches if branch.get("type") != "null"]
-    references = [_schema_ref(branch) for branch in non_null]
-    if len(non_null) < 2 or any(reference is None for reference in references) or raw not in rust.enums:
+    if len(non_null) < 2 or raw not in rust.enums:
         return None, "request_model_projection"
     variants = rust.enums[raw]
     if any(variant.payload is None for variant in variants):
         return None, "request_model_projection"
     by_payload = {variant.payload: variant.name for variant in variants}
-    if len(by_payload) != len(variants) or set(by_payload) != set(references):
+    if len(by_payload) != len(variants):
+        return None, "request_model_projection"
+
+    expected: list[tuple[dict[str, Any], str, str | None]] = []
+    references: list[str] = []
+    for branch in non_null:
+        reference = _schema_ref(branch)
+        payload = reference or _primitive_union_payload(branch)
+        if payload is None:
+            return None, "request_model_projection"
+        expected.append((branch, payload, reference))
+        if reference is not None:
+            references.append(reference)
+    payloads = [payload for _, payload, _ in expected]
+    if len(set(payloads)) != len(payloads) or set(payloads) != set(by_payload):
         return None, "request_model_projection"
 
     discriminator = schema.get("discriminator", {})
@@ -482,20 +516,27 @@ def _ensure_union_model(models: dict[str, Any], schemas: dict[str, Any], schema:
         for tag, value in mapping.items()
         if isinstance(value, str)
     }
-    if mapping and set(tags_by_ref) != set(references):
+    if mapping and (len(references) != len(expected) or set(tags_by_ref) != set(references)):
         return None, "request_model_projection"
 
     facade_variants: dict[str, Any] = {}
     seen_public: set[str] = set()
-    for reference in references:
-        adapter, reason = _ensure_request_model(models, schemas, reference, rust, resolving)
-        if reason or adapter is None:
-            return None, reason or "request_model_projection"
-        public = _pascal(tags_by_ref.get(reference, reference).lower() if reference in tags_by_ref else reference)
+    for branch, payload, reference in expected:
+        adapter = None
+        if reference is not None:
+            adapter, reason = _request_field_adapter(
+                models, schemas, branch, payload, rust, resolving, reference, ()
+            )
+            if reason:
+                return None, reason
+        label = tags_by_ref.get(reference, reference) if reference is not None else branch.get("type")
+        public = _pascal(str(label).lower() if reference in tags_by_ref else str(label))
         if not public or public in seen_public:
             return None, "request_model_projection"
         seen_public.add(public)
-        facade_variants[by_payload[reference]] = {"name": public, "adapter": adapter}
+        facade_variants[by_payload[payload]] = (
+            {"name": public, "adapter": adapter} if adapter else public
+        )
 
     name = _union_name(raw)
     if name in models and models[name].get("raw", name) != raw:
@@ -510,7 +551,8 @@ def _request_field_adapter(models: dict[str, Any], schemas: dict[str, Any], sche
     schema, _ = _nullable(schema)
     syntax = _strip_options(parse_type(raw_type))
     if schema.get("type") == "array":
-        inner = syntax.unary("Vec")
+        expanded = _expand_raw_alias(syntax, rust)
+        inner = expanded.unary("Vec") if expanded is not None else None
         if inner is None:
             return None, "request_model_projection"
         return _request_field_adapter(models, schemas, schema.get("items", {}), inner.spelling, rust, resolving, root, (*path, "items"))
@@ -521,6 +563,14 @@ def _request_field_adapter(models: dict[str, Any], schemas: dict[str, Any], sche
     reference = _schema_ref(schema)
     if reference:
         target = schemas.get(reference, {})
+        if target.get("oneOf") or target.get("anyOf"):
+            if syntax.spelling != reference:
+                return None, "request_model_projection"
+            return _ensure_union_model(models, schemas, target, syntax.spelling, rust, resolving)
+        if target.get("type") == "array":
+            return _request_field_adapter(
+                models, schemas, target, syntax.spelling, rust, resolving, reference, ()
+            )
         if target.get("type") == "string" and target.get("enum"):
             return _ensure_scalar_enum_model(
                 models, target, syntax.spelling, rust, reference, ()

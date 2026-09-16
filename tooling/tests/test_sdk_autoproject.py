@@ -235,6 +235,96 @@ class AutoProjectionTests(unittest.TestCase):
         self.assertEqual({"tool": "ToolParams"}, expanded["models"]["CreateThingParams"]["adapters"])
         self.assertEqual(["name"], expanded["models"]["ToolParams"]["constructor"])
 
+    def test_projects_mixed_primitive_and_referenced_request_unions(self):
+        api = FakeOpenApi()
+        api.schemas.update({
+            "CreateThing": {
+                "type": "object", "required": ["input"],
+                "properties": {
+                    "input": {"$ref": "#/components/schemas/InputChoice"},
+                    "version": {
+                        "anyOf": [
+                            {"type": "string"},
+                            {"type": "integer"},
+                            {"type": "null"},
+                        ]
+                    },
+                },
+            },
+            "InputChoice": {
+                "anyOf": [
+                    {"type": "string"},
+                    {"$ref": "#/components/schemas/InputEntries"},
+                ]
+            },
+            "InputEntries": {
+                "type": "array",
+                "items": {
+                    "oneOf": [
+                        {"$ref": "#/components/schemas/TextInput"},
+                        {"$ref": "#/components/schemas/NumberInput"},
+                    ]
+                },
+            },
+            "TextInput": {
+                "type": "object", "required": ["text"],
+                "properties": {"text": {"type": "string"}},
+            },
+            "NumberInput": {
+                "type": "object", "required": ["value"],
+                "properties": {"value": {"type": "integer"}},
+            },
+        })
+        fields = {
+            "CreateThing": (
+                SimpleNamespace(name="input", type="InputChoice"),
+                SimpleNamespace(name="version", type="Option<Option<VersionChoice>>"),
+            ),
+            "TextInput": (SimpleNamespace(name="text", type="String"),),
+            "NumberInput": (SimpleNamespace(name="value", type="i64"),),
+        }
+        enums = {
+            "InputChoice": (
+                SimpleNamespace(name="String", payload="String"),
+                SimpleNamespace(name="InputEntries", payload="InputEntries"),
+            ),
+            "InputEntryUnion": (
+                SimpleNamespace(name="TextInput", payload="TextInput"),
+                SimpleNamespace(name="NumberInput", payload="NumberInput"),
+            ),
+            "VersionChoice": (
+                SimpleNamespace(name="String", payload="String"),
+                SimpleNamespace(name="Integer", payload="i64"),
+            ),
+        }
+        aliases = {"InputEntries": parse_type("Vec<InputEntryUnion>")}
+        rust = SimpleNamespace(
+            structs=set(fields), aliases=aliases, enums=enums,
+            symbol_paths={name: "types" for name in (*fields, *enums, *aliases)},
+            fields=lambda name: fields[name],
+        )
+        expanded, report = sdk_autoproject.expand_manifest(
+            api, manifest(), {"operations": {"create_thing": ["things.create"]}},
+            raw_coverage("create_thing"), rust,
+        )
+        self.assertEqual(1, report["added_count"])
+        request = expanded["models"]["CreateThingParams"]
+        self.assertEqual(
+            {"input": "InputChoiceValue", "version": "VersionChoiceValue"},
+            request["adapters"],
+        )
+        self.assertEqual(
+            {
+                "String": "String",
+                "InputEntries": {"name": "InputEntries", "adapter": "InputEntryUnionValue"},
+            },
+            expanded["models"]["InputChoiceValue"]["simple_union"]["variants"],
+        )
+        self.assertEqual(
+            {"String": "String", "Integer": "Integer"},
+            expanded["models"]["VersionChoiceValue"]["simple_union"]["variants"],
+        )
+
     def test_projects_discriminated_request_union_without_raw_type_leaks(self):
         api = FakeOpenApi()
         api.schemas.update({
