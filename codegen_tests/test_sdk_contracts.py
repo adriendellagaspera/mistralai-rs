@@ -3,7 +3,7 @@ from pathlib import Path
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "codegen"))
+sys.path.insert(0, str(ROOT / "codegen" / "mistral"))
 
 from sdk_contracts import compare_surface, public_surface
 

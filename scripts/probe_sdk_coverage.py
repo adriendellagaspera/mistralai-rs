@@ -1,8 +1,7 @@
 """Compile disposable projections for unmapped operation candidates.
 
-This validates generic compiler capabilities, not public naming or ergonomics.
-No additional resource is committed or exposed by the SDK. Run with the pinned
-codegen Python environment after cargo dependencies have been fetched.
+This validates the pinned compiler capabilities against Mistral's contracts; it
+is repository audit tooling, not part of the generic compiler package.
 """
 
 import hashlib
@@ -18,14 +17,15 @@ from openapi_to_rust_bindings import read_bindings
 from rust_sdk_compiler import GenerationError, OpenApi, Policy, compile, lower
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "codegen"))
-from sdk_autoproject import expand_manifest
-from sdk_contracts import coverage_inventory, public_surface
+sys.path.insert(0, str(ROOT / "codegen" / "mistral"))
+from sdk_autoproject import expand_manifest  # noqa: E402
+from sdk_contracts import coverage_inventory, public_surface  # noqa: E402
+from sdk_pipeline import RUNTIME  # noqa: E402
 
 
-def probes(openapi, raw, configured):
-    ir = lower(openapi, raw, Policy.from_dict(configured))
-    inventory = coverage_inventory(openapi, raw, ir)
+def probes(openapi, bindings, configured):
+    ir = lower(openapi, bindings, Policy.from_dict(configured))
+    inventory = coverage_inventory(openapi, bindings, ir)
     modules, rejected = {}, {}
     for index, (operation_id, entry) in enumerate(inventory.items()):
         if entry["status"] != "candidate_unverified":
@@ -70,8 +70,13 @@ def probes(openapi, raw, configured):
                     }
                 },
             }
-            compilation = compile(openapi, raw, Policy.from_dict(overlay))
-            files = dict(compilation.files)
+            result = compile(
+                openapi,
+                bindings,
+                Policy.from_dict(overlay),
+                runtime=RUNTIME,
+            )
+            files = dict(result.files)
             public_surface(files)
             model_source = files["facade_types.rs"]
             resource_source = files["resource.rs"]
@@ -87,16 +92,16 @@ def probes(openapi, raw, configured):
 
 def main():
     openapi = OpenApi.load(ROOT / "spec/openapi.yaml")
-    raw = read_bindings(ROOT / "src/generated")
+    bindings = read_bindings(ROOT / "src/generated")
     configured = json.loads((ROOT / "codegen/sdk-semantics.json").read_text())
     configured, _ = expand_manifest(
         openapi,
         configured,
         json.loads((ROOT / "codegen/sdk-taxonomy.json").read_text()),
         json.loads((ROOT / "src/generated/coverage.json").read_text()),
-        raw,
+        bindings,
     )
-    modules, rejected = probes(openapi, raw, configured)
+    modules, rejected = probes(openapi, bindings, configured)
     report = {
         "generated_candidates": sorted(modules),
         "rejected_candidates": rejected,
@@ -116,11 +121,16 @@ def main():
         raise SystemExit(
             f"coverage probe drift requires review: expected {baseline}, got {actual}"
         )
+
     dependencies = tomllib.loads((ROOT / "Cargo.toml").read_text())["dependencies"]
 
     def dependency_version(name):
-        configured = dependencies[name]
-        return configured if isinstance(configured, str) else configured["version"]
+        configured_dependency = dependencies[name]
+        return (
+            configured_dependency
+            if isinstance(configured_dependency, str)
+            else configured_dependency["version"]
+        )
 
     with tempfile.TemporaryDirectory(prefix="sdk-coverage-probe-") as directory:
         path = Path(directory)

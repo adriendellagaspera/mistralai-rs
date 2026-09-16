@@ -41,7 +41,7 @@ Generic compiler behavior belongs in `rust-sdk-compiler` and should be demonstra
 
 Do not edit `src/generated/` or generated files in `src/sdk/` by hand. Prefer generator configuration, then a narrowly scoped source patch or explicit preprocessing for raw generation. Source patches must apply with `git apply --check` to the pinned generator commit and have their SHA-256 updated in `codegen.lock`. Rustfmt remains the only post-generation Rust transform.
 
-`codegen/SDK_CODEGEN.md` documents the compiler boundary, policy ownership and drift rules. The active Mistral semantic policy is `codegen/sdk-semantics.json`. Preserve the vendored official spec exactly; preprocessing operates on a temporary generation copy and fails closed when its expected source shape changes.
+`codegen/README.md` maps the repository-owned generation files. The active Mistral semantic policy is `codegen/sdk-semantics.json`; generic compiler and adapter contracts live with their packages and tests. Preserve the vendored official spec exactly; preprocessing operates on a temporary generation copy and fails closed when its expected source shape changes.
 
 ## Tests and live requests
 

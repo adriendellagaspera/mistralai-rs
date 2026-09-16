@@ -1,10 +1,12 @@
-"""Compatibility CLI for the semantic SDK compiler.
+"""Stable CLI for the repository-owned Mistral facade generation layer."""
 
-The pipeline validates source contracts before lowering them to immutable facade
-IR. Rust rendering consumes only that resolved IR for operations and resources.
-"""
+from pathlib import Path
+import sys
 
-from sdk_pipeline import GENERATED, GenerationError, generate, main
+MISTRAL_CODEGEN = Path(__file__).with_name("mistral")
+sys.path.insert(0, str(MISTRAL_CODEGEN))
+
+from sdk_pipeline import GENERATED, GenerationError, generate, main  # noqa: E402
 
 __all__ = ["GENERATED", "GenerationError", "generate", "main"]
 
