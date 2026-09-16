@@ -33,6 +33,15 @@ class SidecarLoadingTests(unittest.TestCase):
             with self.assertRaises(ParseError):
                 read_bindings(root)
 
+    def test_schema_invalid_sidecar_fails_closed(self):
+        value = json.loads((FIXTURES / "menagerie" / "rust-bindings.json").read_text())
+        value["unexpected"] = True
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            root.joinpath("rust-bindings.json").write_text(json.dumps(value))
+            with self.assertRaises(ParseError):
+                read_bindings(root)
+
     def test_legacy_generated_sources_remain_supported(self):
         fixture = FIXTURES / "library"
         with tempfile.TemporaryDirectory() as directory:
