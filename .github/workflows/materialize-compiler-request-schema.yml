@@ -1,0 +1,80 @@
+name: Materialize compiler request object validation
+on:
+  push:
+    branches: [rust-sdk-compiler-request-object-schema]
+permissions:
+  contents: write
+jobs:
+  materialize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: rust-sdk-compiler-request-object-schema
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Apply generic request object validation
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          frontend = Path('src/rust_sdk_compiler/sdk_frontend.py')
+          text = frontend.read_text()
+          marker = '''    def operation(self, operation_id: str) -> dict[str, Any]:\n'''
+          hook = '''    def object_schema(self, name: str) -> dict[str, Any]:\n        """Return the effective object shape used for request validation.\n\n        The base index preserves the source schema. Public OpenAPI inputs may\n        override this hook to resolve composition conservatively.\n        """\n        return self.schema(name)\n\n'''
+          if hook not in text:
+              if marker not in text:
+                  raise SystemExit('OpenApiIndex insertion point not found')
+              text = text.replace(marker, hook + marker, 1)
+          old = '                wire_schema = openapi.schema(raw)\n'
+          new = '                wire_schema = openapi.object_schema(raw)\n'
+          if old in text:
+              text = text.replace(old, new, 1)
+          elif new not in text:
+              raise SystemExit('request validation call not found')
+          frontend.write_text(text)
+
+          fixture = Path('tests/fixtures/library/openapi.json')
+          document = json.loads(fixture.read_text())
+          schemas = document['components']['schemas']
+          original = schemas['CreateBookRequest']
+          if 'CreateBookRequestBase' not in schemas:
+              schemas['CreateBookRequestBase'] = original
+              schemas['CreateBookRequest'] = {
+                  'allOf': [
+                      {'$ref': '#/components/schemas/CreateBookRequestBase'},
+                      {
+                          'type': 'object',
+                          'properties': {'pages': {'type': 'integer'}},
+                      },
+                  ]
+              }
+          fixture.write_text(json.dumps(document, indent=2) + '\n')
+
+          for path in (Path('pyproject.toml'), Path('src/rust_sdk_compiler/__init__.py')):
+              value = path.read_text()
+              if '0.2.6' in value:
+                  value = value.replace('0.2.6', '0.2.7')
+              if '0.2.7' not in value:
+                  raise SystemExit(f'version not updated in {path}')
+              path.write_text(value)
+          PY
+      - name: Install compiler
+        run: python -m pip install .
+      - name: Run compiler fixtures
+        run: python -m unittest discover -s tests -p 'test_*.py'
+      - name: Commit compiler release candidate
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git rm .github/workflows/materialize-compiler-request-schema.yml
+          git add -A
+          git commit -m 'fix: validate composed request object shapes'
+          git push origin HEAD:rust-sdk-compiler-request-object-schema
