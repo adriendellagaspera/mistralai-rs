@@ -40,6 +40,21 @@ class BindingsPackageTests(unittest.TestCase):
                 self.assertEqual(actual, expected)
                 self.assertEqual(read_bindings(root), expected)
 
+    def test_generated_serde_rename_is_preserved(self):
+        bindings = parse_bindings(
+            '''
+pub enum State {
+    #[serde(rename = "in-progress")]
+    InProgress,
+}
+''',
+            "",
+        )
+        self.assertEqual(
+            bindings.to_dict()["enums"]["State"][0]["wire_name"],
+            "in-progress",
+        )
+
     def test_package_does_not_import_compiler_internals(self):
         source = (SRC / "openapi_to_rust_bindings" / "parser.py").read_text()
         self.assertNotIn("rust_sdk_compiler.sdk_", source)
