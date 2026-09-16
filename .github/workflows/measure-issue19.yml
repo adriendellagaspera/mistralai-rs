@@ -1,0 +1,43 @@
+name: Measure issue 19
+on:
+  push:
+    branches: [issue-19-composite-request-projection]
+permissions:
+  contents: read
+jobs:
+  measure:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pinned Rust toolchain
+        run: rustup show
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            .tools
+            target
+          key: sdk-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'codegen.lock') }}
+      - name: Prepare pinned codegen environment
+        run: python3 scripts/codegen.py check
+      - name: Print automatic projection report
+        run: |
+          PYTHON=$(find .tools -path '*/bin/python' -type f | head -1)
+          "$PYTHON" - <<'PY'
+          import json, sys
+          from pathlib import Path
+          ROOT = Path.cwd()
+          sys.path.insert(0, str(ROOT / 'codegen'))
+          import sdk_codegen as compiler
+          openapi = compiler.OpenApiIndex.load(ROOT / 'spec/openapi.yaml')
+          rust = compiler.RustIndex.load(ROOT / 'src/generated')
+          manifest = json.loads((ROOT / 'codegen/sdk-semantics.json').read_text())
+          taxonomy = json.loads((ROOT / 'codegen/sdk-taxonomy.json').read_text())
+          raw = json.loads((ROOT / 'src/generated/coverage.json').read_text())
+          _, report = compiler.expand_manifest(openapi, manifest, taxonomy, raw, rust)
+          print('AUTO_REPORT_START')
+          print(json.dumps(report, indent=2, sort_keys=True))
+          print('AUTO_REPORT_END')
+          PY
