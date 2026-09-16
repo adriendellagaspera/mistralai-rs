@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
   "package_name": "rust-sdk-compiler",
-  "package_version": "0.2.3",
+  "package_version": "0.2.4",
   "bindings_schema_version": 2
 }

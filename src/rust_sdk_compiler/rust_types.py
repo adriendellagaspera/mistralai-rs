@@ -13,13 +13,13 @@ from functools import lru_cache
 
 
 @dataclass(frozen=True)
-class RustType:
+class Type:
     kind: str
     spelling: str
     constructor: str | None = None
-    arguments: tuple["RustType", ...] = ()
+    arguments: tuple["Type", ...] = ()
 
-    def unary(self, constructor: str) -> "RustType | None":
+    def unary(self, constructor: str) -> "Type | None":
         if (
             self.kind == "generic_type"
             and self.constructor == constructor
@@ -27,6 +27,10 @@ class RustType:
         ):
             return self.arguments[0]
         return None
+
+
+# Private compatibility name for compiler modules written before Type became public.
+RustType = Type
 
 
 def _validate_type_spelling(value: str) -> None:
@@ -156,20 +160,19 @@ def _outer_generic(spelling: str) -> tuple[str, str] | None:
         return None
     constructor = spelling[:first].strip()
     if not constructor or any(char.isspace() for char in constructor):
-        # `impl Trait<T>`, `dyn Trait<T>`, references, etc. are opaque leaves.
         return None
     return constructor, spelling[first + 1 : -1]
 
 
 @lru_cache(maxsize=4096)
-def parse_type(spelling: str) -> RustType:
+def parse_type(spelling: str) -> Type:
     spelling = spelling.strip()
     if not spelling:
         raise ValueError("empty Rust type")
     _validate_type_spelling(spelling)
     generic = _outer_generic(spelling)
     if generic is None:
-        return RustType("opaque_type", spelling)
+        return Type("opaque_type", spelling)
     constructor, arguments = generic
     parsed = tuple(parse_type(argument) for argument in _split_arguments(arguments))
-    return RustType("generic_type", spelling, constructor, parsed)
+    return Type("generic_type", spelling, constructor, parsed)
