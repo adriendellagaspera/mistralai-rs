@@ -7,7 +7,9 @@
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": {"$ref": "#/components/schemas/CreateBookRequest"}
+              "schema": {
+                "$ref": "#/components/schemas/CreateBookRequest"
+              }
             }
           }
         },
@@ -15,7 +17,9 @@
           "200": {
             "content": {
               "application/json": {
-                "schema": {"$ref": "#/components/schemas/BookResponse"}
+                "schema": {
+                  "$ref": "#/components/schemas/BookResponse"
+                }
               }
             }
           }
@@ -24,13 +28,22 @@
       "get": {
         "operationId": "list_books",
         "parameters": [
-          {"name": "limit", "in": "query", "required": false, "schema": {"type": "integer"}}
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
         ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
-                "schema": {"$ref": "#/components/schemas/BookList"}
+                "schema": {
+                  "$ref": "#/components/schemas/BookList"
+                }
               }
             }
           }
@@ -39,12 +52,21 @@
     },
     "/catalog/books/{book_id}": {
       "parameters": [
-        {"name": "book_id", "in": "path", "required": true, "schema": {"type": "string"}}
+        {
+          "name": "book_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
       ],
       "delete": {
         "operationId": "delete_book",
         "responses": {
-          "204": {"description": "No Content"}
+          "204": {
+            "description": "No Content"
+          }
         }
       }
     },
@@ -52,13 +74,23 @@
       "get": {
         "operationId": "download_book",
         "parameters": [
-          {"name": "book_id", "in": "path", "required": true, "schema": {"type": "string"}}
+          {
+            "name": "book_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "responses": {
           "200": {
             "content": {
               "application/octet-stream": {
-                "schema": {"type": "string", "format": "binary"}
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
               }
             }
           }
@@ -69,28 +101,60 @@
   "components": {
     "schemas": {
       "CreateBookRequest": {
-        "type": "object",
-        "required": ["title"],
-        "properties": {
-          "title": {"type": "string"},
-          "pages": {"type": "integer"}
-        }
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CreateBookRequestBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "pages": {
+                "type": "integer"
+              }
+            }
+          }
+        ]
       },
       "BookResponse": {
         "type": "object",
-        "required": ["id", "title"],
+        "required": [
+          "id",
+          "title"
+        ],
         "properties": {
-          "id": {"type": "string"},
-          "title": {"type": "string"}
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
         }
       },
       "BookList": {
         "type": "object",
-        "required": ["items"],
+        "required": [
+          "items"
+        ],
         "properties": {
           "items": {
             "type": "array",
-            "items": {"$ref": "#/components/schemas/BookResponse"}
+            "items": {
+              "$ref": "#/components/schemas/BookResponse"
+            }
+          }
+        }
+      },
+      "CreateBookRequestBase": {
+        "type": "object",
+        "required": [
+          "title"
+        ],
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "pages": {
+            "type": "integer"
           }
         }
       }

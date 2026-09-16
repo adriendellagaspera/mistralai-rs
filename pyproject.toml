@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rust-sdk-compiler"
-version = "0.2.6"
+version = "0.2.7"
 description = "Deterministic compiler for idiomatic Rust SDK surfaces from OpenAPI, normalized bindings, and explicit policy"
 readme = "README.md"
 requires-python = ">=3.11"

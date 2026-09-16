@@ -1,0 +1,38 @@
+Metadata-Version: 2.2
+Name: rust-sdk-compiler
+Version: 0.2.7
+Summary: Deterministic compiler for idiomatic Rust SDK surfaces from OpenAPI, normalized bindings, and explicit policy
+License: MIT OR Apache-2.0
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+License-File: LICENSE-APACHE
+License-File: LICENSE-MIT
+Requires-Dist: ruamel.yaml==0.18.6
+Requires-Dist: jsonschema==4.23.0
+
+# rust-sdk-compiler
+
+`rust-sdk-compiler` deterministically compiles an idiomatic Rust SDK surface from four explicit inputs:
+
+- `OpenApi`: the HTTP/wire contract;
+- `Bindings`: the Rust types and callable operations that actually exist;
+- `Policy`: the public SDK shape to expose;
+- `Runtime`: consumer-owned support conventions such as error and streaming paths.
+
+The compiler is backend-neutral. It does not parse generator output, know `openapi-to-rust`, or depend on tree-sitter. Generator-specific compatibility packages only need to produce `Bindings`.
+
+```python
+from rust_sdk_compiler import Bindings, OpenApi, Policy, Runtime, compile
+
+openapi = OpenApi.load("openapi.yaml")
+bindings = Bindings.from_dict(...)
+policy = Policy.from_dict(...)
+
+compilation = compile(openapi, bindings, policy, runtime=Runtime())
+compilation.ir
+compilation.files
+```
+
+`lower(openapi, bindings, policy)` stops after semantic lowering and returns the resolved SDK IR without rendering Rust files.
+
+The versioned `rust-bindings.schema.json` sidecar is the stable interchange contract for backend-specific producers. The compiler fails closed on unsupported or ambiguous source shapes.
