@@ -1,4 +1,4 @@
-"""Orchestrate semantic validation, operation lowering, and Rust emission."""
+"""Orchestrate semantic validation, lowering, and pure Rust emission."""
 
 import argparse
 import json
@@ -8,7 +8,7 @@ import sdk_codegen as frontend
 import sdk_emit
 from sdk_autoproject import expand_manifest
 from sdk_contracts import coverage_inventory, public_surface
-from sdk_ir import BinaryResponse, SseResponse
+from sdk_model_lowering import resolve_models
 from sdk_operation_lowering import resolve_operations
 
 
@@ -33,33 +33,17 @@ def generate(raw: Path, target: Path, manifest_path: Path, openapi_path: Path | 
     if taxonomy_path is not None:
         taxonomy = json.loads(taxonomy_path.read_text())
         raw_coverage = json.loads((raw / "coverage.json").read_text())
-        manifest, projection_report = expand_manifest(openapi, manifest, taxonomy, raw_coverage)
-    ir = resolve_operations(frontend.build_ir(openapi, rust, manifest), rust)
+        manifest, projection_report = expand_manifest(
+            openapi, manifest, taxonomy, raw_coverage, rust
+        )
+    ir = frontend.build_ir(openapi, rust, manifest)
+    try:
+        ir = resolve_models(resolve_operations(ir, rust), openapi, rust)
+        files = sdk_emit.emit(ir)
+    except ValueError as error:
+        raise GenerationError(str(error)) from error
     target.mkdir(parents=True, exist_ok=True)
 
-    model_source = GENERATED + "use std::pin::Pin;\nuse futures_util::Stream;\nuse super::SdkError;\nuse crate::generated::types::*;\n\n"
-    model_source += "\n\n".join(frontend._emit_model(model, openapi, rust) for model in ir.models)
-    aliases = []
-    if any(isinstance(operation.response_projection, BinaryResponse)
-           for resource in ir.resources for operation in resource.operations):
-        aliases.append(
-            "pub type BinaryStream = Pin<Box<dyn Stream<Item = Result<bytes::Bytes, SdkError>> + Send + 'static>>;"
-        )
-    for resource in ir.resources:
-        for operation in resource.operations:
-            if isinstance(operation.response_projection, SseResponse):
-                stream = operation.response_projection.stream
-                aliases.append(
-                    f"pub type {stream.type} = Pin<Box<dyn Stream<Item = Result<{stream.wrapper}, SdkError>> + Send + 'static>>;"
-                )
-    if aliases:
-        model_source += "\n\n" + "\n".join(aliases) + "\n"
-    files = {"facade_types.rs": model_source, "mod.rs": sdk_emit.emit_mod(ir)}
-    for resource in ir.resources:
-        filename = f"{resource.module}.rs"
-        if filename in files or filename == "error.rs":
-            raise GenerationError(f"resource collides with reserved output {filename}")
-        files[filename] = sdk_emit.emit_resource(resource, ir.resources)
     try:
         surface = public_surface(files)
     except ValueError as error:

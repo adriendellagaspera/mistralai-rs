@@ -1,9 +1,11 @@
 """Immutable policy and facade IR for the semantic SDK compiler.
 
 Only the frontend handles JSON dictionaries. Policy objects capture deliberate
-product semantics; resolved facade objects capture the complete operation shape
+product semantics; resolved facade objects capture the complete public/raw shape
 selected during lowering before Rust emission.
 """
+from __future__ import annotations
+
 from dataclasses import dataclass
 from enum import StrEnum
 
@@ -154,11 +156,180 @@ class SseResponse:
 ResponseProjection = JsonResponse | EmptyResponse | BinaryResponse | SseResponse
 
 
+class ArgumentKind(StrEnum):
+    EXACT = "exact"
+    INTO_STRING = "into_string"
+    INTO_MODEL = "into_model"
+    INTO_ITER_MODEL = "into_iter_model"
+
+
+@dataclass(frozen=True)
+class ArgumentSpec:
+    name: str
+    kind: ArgumentKind
+    type: str
+
+
+@dataclass(frozen=True)
+class VariableValue:
+    name: str
+
+
+@dataclass(frozen=True)
+class IntoStringValue:
+    name: str
+
+
+@dataclass(frozen=True)
+class IntoModelValue:
+    name: str
+    adapter: str
+
+
+@dataclass(frozen=True)
+class CollectIntoValue:
+    name: str
+
+
+@dataclass(frozen=True)
+class MapIntoValue:
+    name: str
+    depth: int
+
+
+@dataclass(frozen=True)
+class SomeValue:
+    value: ValueSpec
+    depth: int = 1
+
+
+@dataclass(frozen=True)
+class EnumValue:
+    type: str
+    variant: str
+    value: ValueSpec
+
+
+@dataclass(frozen=True)
+class StructFieldValue:
+    name: str
+    value: ValueSpec
+    shorthand: bool = False
+
+
+@dataclass(frozen=True)
+class StructValue:
+    type: str
+    fields: tuple[StructFieldValue, ...]
+
+
+@dataclass(frozen=True)
+class LiteralValue:
+    value: str
+
+
+ValueSpec = (VariableValue | IntoStringValue | IntoModelValue | CollectIntoValue |
+             MapIntoValue | SomeValue | EnumValue | StructValue | LiteralValue)
+
+
+@dataclass(frozen=True)
+class ConstructorSpec:
+    arguments: tuple[ArgumentSpec, ...]
+    value: StructValue
+
+
+@dataclass(frozen=True)
+class FactorySpec:
+    name: str
+    arguments: tuple[ArgumentSpec, ...]
+    value: StructValue
+
+
+@dataclass(frozen=True)
+class SetterSpec:
+    name: str
+    raw_field: str
+    argument: ArgumentSpec
+    value: ValueSpec
+    null_name: str | None
+
+
+@dataclass(frozen=True)
+class WrapperModelSpec:
+    constructor: ConstructorSpec | None
+    factories: tuple[FactorySpec, ...]
+    setters: tuple[SetterSpec, ...]
+    default: bool
+
+
+@dataclass(frozen=True)
+class UnionBranchSpec:
+    public_name: str
+    constructor_name: str
+    public_type: str
+    argument: ArgumentSpec
+    raw_payload: str
+    raw_value: ValueSpec
+
+
+@dataclass(frozen=True)
+class UnionTargetSpec:
+    raw: str
+    variants: tuple[tuple[str, str], ...]
+
+
+@dataclass(frozen=True)
+class UnionModelSpec:
+    branches: tuple[UnionBranchSpec, ...]
+    targets: tuple[UnionTargetSpec, ...]
+
+
+@dataclass(frozen=True)
+class SimpleUnionBranchSpec:
+    raw_name: str
+    public_name: str
+    public_type: str
+    adapt_depth: int | None
+
+
+@dataclass(frozen=True)
+class SimpleUnionModelSpec:
+    branches: tuple[SimpleUnionBranchSpec, ...]
+    bidirectional: bool
+
+
+@dataclass(frozen=True)
+class ResolvedAccessor:
+    name: str
+    kind: AccessorKind
+    path: tuple[str, ...]
+    return_type: str
+    wrapper: str | None = None
+    enum_type: str | None = None
+    enum_variant: str | None = None
+
+
+@dataclass(frozen=True)
+class ViewModelSpec:
+    borrowed: bool
+    accessors: tuple[ResolvedAccessor, ...]
+
+
+@dataclass(frozen=True)
+class AliasModelSpec:
+    public_type: str
+
+
+ModelRenderSpec = (WrapperModelSpec | UnionModelSpec | SimpleUnionModelSpec |
+                   ViewModelSpec | AliasModelSpec)
+
+
 @dataclass(frozen=True)
 class ModelSpec:
     name: str
     raw: str
     config: ModelPolicy
+    render: ModelRenderSpec | None = None
 
 
 @dataclass(frozen=True)
