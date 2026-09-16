@@ -3,6 +3,6 @@
 from .parser import ParseError, parse_bindings
 from .reader import read_bindings
 
-__version__ = "0.2.1"
+__version__ = "0.2.2"
 
 __all__ = ["ParseError", "parse_bindings", "read_bindings"]
