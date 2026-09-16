@@ -58,8 +58,8 @@ class CoverageTests(unittest.TestCase):
                 coverage.inventory(spec, spec, broken)
 
     def test_generator_patch_is_authenticated(self):
-        lock = json.loads((ROOT / "codegen.lock").read_text())
-        digest = hashlib.sha256((ROOT / "codegen/patches/generator.patch").read_bytes()).hexdigest()
+        lock = json.loads((ROOT / "tooling/sources/lock.json").read_text())
+        digest = hashlib.sha256((ROOT / "tooling/pipeline/openapi-to-rust.patch").read_bytes()).hexdigest()
         self.assertEqual(digest, lock["generator_patch_sha256"])
 
     def test_inventory_tracks_exact_binary_stream_companions(self):
