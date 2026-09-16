@@ -21,6 +21,10 @@ def run(*args, cwd=ROOT):
     subprocess.run([str(arg) for arg in args], cwd=cwd, check=True)
 
 
+def output(*args, cwd=ROOT):
+    return subprocess.check_output([str(arg) for arg in args], cwd=cwd, text=True).strip()
+
+
 def verify_spec(data, lock):
     actual = hashlib.sha256(data).hexdigest()
     if actual != lock["spec_sha256"]:
@@ -59,21 +63,54 @@ def generator(lock):
             run("git", "apply", patch, cwd=source)
             run("cargo", f"+{lock['rust_toolchain']}", "install", "--locked",
                 "--path", source, "--root", install)
-    output = subprocess.check_output([str(executable), "--version"], text=True).strip()
-    if output != f"openapi-to-rust {version}":
-        raise ValueError(f"Unexpected generator: {output}")
+    actual = output(executable, "--version")
+    if actual != f"openapi-to-rust {version}":
+        raise ValueError(f"Unexpected generator: {actual}")
     return executable
 
 
+def facade_tool_source(lock):
+    commit = lock["facade_tool_commit"]
+    source = ROOT / ".tools" / f"openapi-to-rust-facade-{commit}"
+    if not (source / ".git").exists():
+        if source.exists():
+            shutil.rmtree(source)
+        run("git", "init", source)
+        run(
+            "git", "fetch", "--depth=1",
+            f"https://github.com/{lock['facade_tool_repository']}.git",
+            commit,
+            cwd=source,
+        )
+        run("git", "checkout", "--detach", "FETCH_HEAD", cwd=source)
+    actual_commit = output("git", "rev-parse", "HEAD", cwd=source)
+    if actual_commit != commit:
+        raise ValueError(f"Facade tool commit mismatch: expected {commit}, got {actual_commit}")
+    actual_tree = output("git", "rev-parse", "HEAD^{tree}", cwd=source)
+    if actual_tree != lock["facade_tool_tree_sha"]:
+        raise ValueError(
+            f"Facade tool tree mismatch: expected {lock['facade_tool_tree_sha']}, got {actual_tree}"
+        )
+    return source
+
+
 def tooling_python(lock):
-    versions = "-".join((lock["ruamel_yaml_version"], lock["tree_sitter_version"], lock["tree_sitter_rust_version"], lock["jsonschema_version"]))
+    versions = "-".join((
+        lock["ruamel_yaml_version"],
+        lock["tree_sitter_version"],
+        lock["tree_sitter_rust_version"],
+        lock["jsonschema_version"],
+        lock["facade_tool_commit"],
+    ))
     environment = ROOT / ".tools" / f"python-sdk-codegen-{versions}"
     python = environment / "bin/python"
     if not python.exists():
         run(sys.executable, "-m", "venv", environment)
     try:
-        version = subprocess.check_output(
-            [str(python), "-c", "import ruamel.yaml, tree_sitter, tree_sitter_rust, jsonschema; print(ruamel.yaml.__version__)"], text=True).strip()
+        version = output(
+            python, "-c",
+            "import ruamel.yaml, tree_sitter, tree_sitter_rust, jsonschema; print(ruamel.yaml.__version__)",
+        )
     except subprocess.CalledProcessError:
         version = None
     if version != lock["ruamel_yaml_version"]:
@@ -82,6 +119,16 @@ def tooling_python(lock):
             f"tree-sitter=={lock['tree_sitter_version']}",
             f"tree-sitter-rust=={lock['tree_sitter_rust_version']}",
             f"jsonschema=={lock['jsonschema_version']}")
+    source = facade_tool_source(lock)
+    try:
+        facade_version = output(
+            python, "-c",
+            "import openapi_to_rust_facade; print(openapi_to_rust_facade.__version__)",
+        )
+    except subprocess.CalledProcessError:
+        facade_version = None
+    if facade_version != lock["facade_tool_version"]:
+        run(python, "-m", "pip", "install", "--no-deps", source)
     return python
 
 
@@ -96,7 +143,7 @@ def main():
     verify_spec((ROOT / "spec/openapi.yaml").read_bytes(), lock)
     executable = generator(lock)
     python = tooling_python(lock)
-    run(python, "-m", "unittest", "discover", "-s", ROOT / "scripts", "-p", "test_*.py")
+    run(python, ROOT / "scripts/run_codegen_tests.py")
     if args.command == "probe":
         run(python, ROOT / "scripts/probe_sdk_coverage.py")
         return

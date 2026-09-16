@@ -4,7 +4,7 @@ import argparse
 import json
 from pathlib import Path
 
-import sdk_compiler
+from openapi_to_rust_facade import sdk_compiler
 from sdk_autoproject import expand_manifest
 from sdk_contracts import coverage_inventory, public_surface
 
