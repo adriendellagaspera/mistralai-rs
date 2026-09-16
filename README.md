@@ -13,7 +13,7 @@ OpenAPI remains the wire-contract authority. `RawIr` describes the generated Rus
 
 ## Compatibility
 
-Version `0.1.0` is validated against `openapi-to-rust` `0.16.0`, repository `gpu-cli/openapi-to-rust`, commit `2af34b86ca9f38c35787f13ec5841989efcf4b99`. The exact machine-readable contract is also recorded in `COMPATIBILITY.json`.
+Version `0.1.1` is validated against `openapi-to-rust` `0.16.0`, repository `gpu-cli/openapi-to-rust`, commit `2af34b86ca9f38c35787f13ec5841989efcf4b99`. The exact machine-readable contract is also recorded in `COMPATIBILITY.json`.
 
 The adapter currently parses `types.rs` and `client.rs`. `RawIr` is serializable through `to_dict()` / `from_dict()`, and `raw-ir.schema.json` defines the candidate sidecar an upstream generator could emit to remove source reparsing later.
 
@@ -31,7 +31,7 @@ The compiler does not discover product taxonomy, track API coverage, or perform 
 
 ## Validation
 
-The standalone test suite contains two unrelated fixtures. Menagerie exercises discriminated request unions and wrapper projection. Library exercises nested resources, JSON bodies, optional parameters, empty success responses, and binary success streams. Running the same fixture twice must produce byte-identical source maps.
+The standalone test suite contains two unrelated fixtures plus focused primitive tests. Menagerie exercises discriminated request unions and wrapper projection. Library exercises nested resources, JSON bodies, optional parameters, empty success responses, and binary success streams. The scalar-enum test verifies that exact wire values carried by raw enum provenance lower into a public facade enum without generated-type leakage. Running the same fixture twice must produce byte-identical source maps.
 
 ## Provenance and license
 
