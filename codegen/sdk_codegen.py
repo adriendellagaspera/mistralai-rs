@@ -1,14 +1,17 @@
 """Compatibility surface for the extracted facade compiler.
 
-New code should import :mod:`sdk_frontend`, :mod:`sdk_compiler`, or
-:mod:`sdk_pipeline` directly. This module keeps historical imports working while
-routing all generation and emission through the extracted implementation.
+New code should import :mod:`openapi_to_rust_facade` or :mod:`sdk_pipeline`
+directly. This module keeps historical test/import entry points working while
+routing all compilation and emission through the pinned external package.
 """
 
 from __future__ import annotations
 
 from pathlib import Path
 
+# Bootstrap historical module aliases (`sdk_ir`, `sdk_emit`, ...) from the
+# installed facade package before importing the legacy compatibility names below.
+import openapi_to_rust_facade  # noqa: F401
 import sdk_emit
 import sdk_frontend as frontend
 from sdk_frontend import *  # noqa: F401,F403 - deliberate compatibility re-export
