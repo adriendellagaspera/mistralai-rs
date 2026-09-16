@@ -126,13 +126,14 @@ On first use, `scripts/codegen.py` installs the pinned tools into `.tools/`. It 
 | `codegen.lock` | Immutable source/toolchain provenance |
 | `spec/` | Unmodified official OpenAPI and upstream licensing |
 | `codegen/` | Mistral-specific raw-generator config/patches, semantic policy, projection and generation orchestration |
+| `codegen_tests/` | Repository-owned code-generation integration/policy tests |
 | `scripts/` | Acquisition, isolated generation, validation and update automation |
 | `src/generated/` | Committed raw generated Rust and raw operation inventory |
 | `src/sdk/` | Committed idiomatic SDK surface plus Mistral-owned stable error runtime |
 | `src/lib.rs`, `src/streaming.rs` | Public exports and Mistral-owned stream support |
 | `tests/`, `examples/` | Offline behavior tests and opt-in examples |
 
-See [`codegen/SDK_CODEGEN.md`](codegen/SDK_CODEGEN.md) for compiler boundaries, ownership and drift policy. The active Mistral semantic policy is [`codegen/sdk-semantics.json`](codegen/sdk-semantics.json).
+See [`codegen/README.md`](codegen/README.md) for the ownership map. The active Mistral semantic policy is [`codegen/sdk-semantics.json`](codegen/sdk-semantics.json).
 
 ## Automation
 
@@ -140,7 +141,7 @@ CI validates deterministic generation, formatting, compilation, Clippy with warn
 
 The scheduled **Update Mistral OpenAPI SDK** workflow checks the official specification and SDK evidence, regenerates and validates a candidate, then opens or updates a review PR. It never automatically merges or publishes an update.
 
-A separate compatibility workflow tracks `openapi-to-rust` evolution at the `openapi-to-rust -> Bindings` boundary. Raw generated-source changes are diagnostic; compatibility is determined by the normalized versioned `Bindings` contract.
+`openapi-to-rust-bindings` owns compatibility tracking against `openapi-to-rust`; this repository consumes reviewed immutable package and generator revisions rather than maintaining that generic compatibility workflow locally.
 
 ## License and attribution
 

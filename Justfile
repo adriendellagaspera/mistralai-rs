@@ -8,4 +8,4 @@ update-spec:
     python3 scripts/update_spec.py
 
 test-codegen:
-    python3 -m unittest discover -s scripts -p 'test_*.py'
+    python3 scripts/run_codegen_tests.py
