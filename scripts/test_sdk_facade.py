@@ -110,6 +110,38 @@ class GenericSdkCompilerTests(unittest.TestCase):
             emitted,
         )
 
+    def test_generated_map_wrapper_emits_public_map_newtype(self):
+        document = openapi_document()
+        document["components"]["schemas"]["CreateThing"] = {
+            "type": "object",
+            "properties": {"metadata": {"type": "object", "additionalProperties": True}},
+        }
+        source = TYPES + "\npub struct MetadataMapRaw { pub additional_properties: std::collections::BTreeMap<String, serde_json::Value> }\n"
+        rust = sdk_codegen.RustIndex(source.encode(), CLIENT.encode())
+        model = sdk_codegen.ModelSpec(
+            "MetadataMap", "MetadataMapRaw",
+            sdk_codegen.model_policy({"map": {"root": "CreateThing", "path": ["metadata"]}}),
+        )
+        emitted = sdk_codegen._emit_model(model, sdk_codegen.OpenApiIndex(document), rust)
+        self.assertIn("pub struct MetadataMap { values: std::collections::BTreeMap<String, serde_json::Value> }", emitted)
+        self.assertIn("impl From<std::collections::BTreeMap<String, serde_json::Value>> for MetadataMap", emitted)
+        self.assertIn("additional_properties: value.values", emitted)
+
+    def test_generated_map_wrapper_value_drift_fails_closed(self):
+        document = openapi_document()
+        document["components"]["schemas"]["CreateThing"] = {
+            "type": "object",
+            "properties": {"metadata": {"type": "object", "additionalProperties": True}},
+        }
+        source = TYPES + "\npub struct MetadataMapRaw { pub additional_properties: std::collections::BTreeMap<String, String> }\n"
+        rust = sdk_codegen.RustIndex(source.encode(), CLIENT.encode())
+        model = sdk_codegen.ModelSpec(
+            "MetadataMap", "MetadataMapRaw",
+            sdk_codegen.model_policy({"map": {"root": "CreateThing", "path": ["metadata"]}}),
+        )
+        with self.assertRaisesRegex(sdk_codegen.GenerationError, "map value drift"):
+            sdk_codegen._emit_model(model, sdk_codegen.OpenApiIndex(document), rust)
+
     def test_unrelated_api_uses_the_same_generic_emitters(self):
         target = self.generate()
         types = (target / "facade_types.rs").read_text()

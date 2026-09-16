@@ -51,6 +51,12 @@ class TypeAliasPolicy:
 
 
 @dataclass(frozen=True)
+class MapPolicy:
+    root: str
+    path: tuple[str, ...]
+
+
+@dataclass(frozen=True)
 class RequestPolicy:
     constructor: tuple[str, ...]
     exclude: tuple[str, ...]
@@ -64,7 +70,7 @@ class ViewPolicy:
     accessors: tuple[tuple[str, Accessor], ...]
 
 
-ModelPolicy = UnionPolicy | SimpleUnionPolicy | TypeAliasPolicy | RequestPolicy | ViewPolicy
+ModelPolicy = UnionPolicy | SimpleUnionPolicy | TypeAliasPolicy | MapPolicy | RequestPolicy | ViewPolicy
 
 
 @dataclass(frozen=True)
@@ -229,6 +235,9 @@ def model_policy(config: dict) -> ModelPolicy:
         ), config["simple_union"].get("bidirectional", False))
     if config.get("type_alias"):
         return TypeAliasPolicy()
+    if "map" in config:
+        mapping = config["map"]
+        return MapPolicy(mapping["root"], tuple(mapping.get("path", ())))
     if "accessors" in config:
         return ViewPolicy(config.get("borrowed", True), tuple(
             (name, Accessor(AccessorKind(value["kind"]), tuple(value["path"]), value.get("wrapper")))

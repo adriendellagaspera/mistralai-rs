@@ -233,7 +233,7 @@
     "connector_call_tool_v1": {
       "method": "post",
       "path": "/v1/connectors/{connector_id_or_name}/tools/{tool_name}/call",
-      "status": "capability_gap",
+      "status": "mapped",
       "review_reasons": [
         "composite_body_and_parameters"
       ]
@@ -343,7 +343,7 @@
     "connector_update_v1": {
       "method": "patch",
       "path": "/v1/connectors/{connector_id}#id",
-      "status": "capability_gap",
+      "status": "mapped",
       "review_reasons": [
         "composite_body_and_parameters"
       ]
@@ -876,7 +876,7 @@
     "judge_conversation_v1_observability_judges__judge_id__live_judging_post": {
       "method": "post",
       "path": "/v1/observability/judges/{judge_id}/live-judging",
-      "status": "capability_gap",
+      "status": "mapped",
       "review_reasons": [
         "composite_body_and_parameters",
         "raw_symbol_mapping"
@@ -954,7 +954,7 @@
     "libraries_documents_update_v1": {
       "method": "put",
       "path": "/v1/libraries/{library_id}/documents/{document_id}",
-      "status": "capability_gap",
+      "status": "mapped",
       "review_reasons": [
         "composite_body_and_parameters"
       ]
@@ -1185,7 +1185,7 @@
     "update_dataset_record_properties_v1_observability_dataset_records__dataset_record_id__properties_put": {
       "method": "put",
       "path": "/v1/observability/dataset-records/{dataset_record_id}/properties",
-      "status": "capability_gap",
+      "status": "mapped",
       "review_reasons": [
         "composite_body_and_parameters",
         "raw_symbol_mapping"
@@ -1333,6 +1333,7 @@
     },
     "beta_connectors": {
       "operations": [
+        "connector_call_tool_v1",
         "connector_delete_organization_credentials_v1",
         "connector_delete_user_credentials_v1",
         "connector_delete_v1",
@@ -1342,7 +1343,8 @@
         "connector_list_organization_credentials_v1",
         "connector_list_user_credentials_v1",
         "connector_list_v1",
-        "connector_list_workspace_credentials_v1"
+        "connector_list_workspace_credentials_v1",
+        "connector_update_v1"
       ]
     },
     "beta_observability": {
@@ -1370,6 +1372,7 @@
         "delete_judge_v1_observability_judges__judge_id__delete",
         "get_judge_by_id_v1_observability_judges__judge_id__get",
         "get_judges_v1_observability_judges_get",
+        "judge_conversation_v1_observability_judges__judge_id__live_judging_post",
         "update_judge_v1_observability_judges__judge_id__put"
       ]
     },
@@ -1390,7 +1393,8 @@
         "delete_dataset_record_v1_observability_dataset_records__dataset_record_id__delete",
         "delete_dataset_records_v1_observability_dataset_records_bulk_delete_post",
         "get_dataset_record_v1_observability_dataset_records__dataset_record_id__get",
-        "judge_dataset_record_v1_observability_dataset_records__dataset_record_id__live_judging_post"
+        "judge_dataset_record_v1_observability_dataset_records__dataset_record_id__live_judging_post",
+        "update_dataset_record_properties_v1_observability_dataset_records__dataset_record_id__properties_put"
       ]
     },
     "workflows_deployments": {
@@ -1447,7 +1451,8 @@
         "libraries_documents_get_text_content_v1",
         "libraries_documents_get_v1",
         "libraries_documents_list_v1",
-        "libraries_documents_reprocess_v1"
+        "libraries_documents_reprocess_v1",
+        "libraries_documents_update_v1"
       ]
     },
     "beta_libraries_accesses": {
@@ -1986,6 +1991,18 @@
         "metadata"
       ]
     },
+    "MCPToolCallRequestArgumentsMap": {
+      "raw": "MCPToolCallRequestArguments",
+      "fields": [
+        "additional_properties"
+      ]
+    },
+    "MCPToolCallRequestParams": {
+      "raw": "MCPToolCallRequest",
+      "fields": [
+        "arguments"
+      ]
+    },
     "ConnectorView": {
       "raw": "Connector",
       "fields": [
@@ -2024,6 +2041,45 @@
       "fields": [
         "items",
         "pagination"
+      ]
+    },
+    "AuthDataParams": {
+      "raw": "AuthData",
+      "fields": [
+        "client_id",
+        "client_secret"
+      ]
+    },
+    "ConnectorMCPUpdateConnectionConfigMap": {
+      "raw": "ConnectorMCPUpdateConnectionConfig",
+      "fields": [
+        "additional_properties"
+      ]
+    },
+    "ConnectorMCPUpdateConnectionSecretsMap": {
+      "raw": "ConnectorMCPUpdateConnectionSecrets",
+      "fields": [
+        "additional_properties"
+      ]
+    },
+    "ConnectorMCPUpdateHeadersMap": {
+      "raw": "ConnectorMCPUpdateHeaders",
+      "fields": [
+        "additional_properties"
+      ]
+    },
+    "ConnectorMCPUpdateParams": {
+      "raw": "ConnectorMCPUpdate",
+      "fields": [
+        "auth_data",
+        "connection_config",
+        "connection_secrets",
+        "description",
+        "headers",
+        "icon_url",
+        "name",
+        "server",
+        "system_prompt"
       ]
     },
     "DatasetRecordView": {
@@ -2387,6 +2443,25 @@
         "answer"
       ]
     },
+    "JudgeConversationRequestMessagesItemMap": {
+      "raw": "JudgeConversationRequestMessagesItem",
+      "fields": [
+        "additional_properties"
+      ]
+    },
+    "JudgeConversationRequestPropertiesMap": {
+      "raw": "JudgeConversationRequestProperties",
+      "fields": [
+        "additional_properties"
+      ]
+    },
+    "JudgeConversationRequestParams": {
+      "raw": "JudgeConversationRequest",
+      "fields": [
+        "messages",
+        "properties"
+      ]
+    },
     "PostDatasetRecordJudgingInSchemaParams": {
       "raw": "PostDatasetRecordJudgingInSchema",
       "fields": [
@@ -2466,6 +2541,19 @@
       "fields": [
         "data",
         "pagination"
+      ]
+    },
+    "DocumentUpdateInAttributesMap": {
+      "raw": "DocumentUpdateInAttributes",
+      "fields": [
+        "additional_properties"
+      ]
+    },
+    "DocumentUpdateInParams": {
+      "raw": "DocumentUpdateIn",
+      "fields": [
+        "attributes",
+        "name"
       ]
     },
     "ListLibraryOutView": {
@@ -2573,6 +2661,18 @@
         "workflow"
       ]
     },
+    "PutDatasetRecordPropertiesInSchemaPropertiesMap": {
+      "raw": "PutDatasetRecordPropertiesInSchemaProperties",
+      "fields": [
+        "additional_properties"
+      ]
+    },
+    "PutDatasetRecordPropertiesInSchemaParams": {
+      "raw": "PutDatasetRecordPropertiesInSchema",
+      "fields": [
+        "properties"
+      ]
+    },
     "PatchDatasetInSchemaParams": {
       "raw": "PatchDatasetInSchema",
       "fields": [
@@ -2629,9 +2729,9 @@
   },
   "automatic_projection": {
     "schema_version": 1,
-    "added_count": 85,
-    "rejected_count": 70,
-    "report_sha256": "afa6551228d201f6d3dc55aa29e22b2e88b434b80c8782fdce372542bdb5cdbe",
+    "added_count": 90,
+    "rejected_count": 65,
+    "report_sha256": "adf265d502e646c8f003e5fcd4b1021bff2ca3c0329bb5a00203849da34ee8e7",
     "added": [
       "agents_api_v1_agents_create_or_update_alias",
       "agents_api_v1_agents_delete",
@@ -2647,6 +2747,7 @@
       "batch_cancel_workflow_executions_v1_workflows_executions_cancel_post",
       "batch_terminate_workflow_executions_v1_workflows_executions_terminate_post",
       "cancel_workflow_execution_v1_workflows_executions__execution_id__cancel_post",
+      "connector_call_tool_v1",
       "connector_delete_organization_credentials_v1",
       "connector_delete_user_credentials_v1",
       "connector_delete_v1",
@@ -2657,6 +2758,7 @@
       "connector_list_user_credentials_v1",
       "connector_list_v1",
       "connector_list_workspace_credentials_v1",
+      "connector_update_v1",
       "create_dataset_v1_observability_datasets_post",
       "create_judge_v1_observability_judges_post",
       "create_voice_v1_audio_voices_post",
@@ -2691,6 +2793,7 @@
       "jobs_api_routes_batch_cancel_batch_job",
       "jobs_api_routes_batch_get_batch_job",
       "jobs_api_routes_batch_get_batch_jobs",
+      "judge_conversation_v1_observability_judges__judge_id__live_judging_post",
       "judge_dataset_record_v1_observability_dataset_records__dataset_record_id__live_judging_post",
       "libraries_create_v1",
       "libraries_delete_v1",
@@ -2700,6 +2803,7 @@
       "libraries_documents_get_v1",
       "libraries_documents_list_v1",
       "libraries_documents_reprocess_v1",
+      "libraries_documents_update_v1",
       "libraries_get_v1",
       "libraries_list_v1",
       "libraries_share_list_v1",
@@ -2714,6 +2818,7 @@
       "terminate_workflow_execution_v1_workflows_executions__execution_id__terminate_post",
       "unarchive_workflow_v1_workflows__workflow_identifier__unarchive_put",
       "unschedule_workflow_v1_workflows_schedules__schedule_id__delete",
+      "update_dataset_record_properties_v1_observability_dataset_records__dataset_record_id__properties_put",
       "update_dataset_v1_observability_datasets__dataset_id__patch",
       "update_judge_v1_observability_judges__judge_id__put",
       "update_voice_v1_audio_voices__voice_id__patch",
@@ -2736,14 +2841,12 @@
       "agents_completion_v1_agents_completions_post": "taxonomy_alias_ambiguity",
       "audio_api_v1_transcriptions_post": "request_media_projection",
       "audio_api_v1_transcriptions_post_stream": "non_json_success",
-      "connector_call_tool_v1": "request_model_projection",
       "connector_create_or_update_organization_credentials_v1": "missing_official_taxonomy",
       "connector_create_or_update_user_credentials_v1": "missing_official_taxonomy",
       "connector_create_or_update_workspace_credentials_v1": "missing_official_taxonomy",
       "connector_create_v1": "request_model_projection",
       "connector_get_authentication_methods_v1": "inline_or_unresolved_response",
       "connector_list_tools_v1": "inline_or_unresolved_response",
-      "connector_update_v1": "request_model_projection",
       "create_campaign_v1_observability_campaigns_post": "missing_official_taxonomy",
       "create_dataset_record_v1_observability_datasets__dataset_id__records_post": "request_model_projection",
       "delete_campaign_v1_observability_campaigns__campaign_id__delete": "missing_official_taxonomy",
@@ -2773,10 +2876,8 @@
       "jobs_api_routes_fine_tuning_get_fine_tuning_jobs": "missing_official_taxonomy",
       "jobs_api_routes_fine_tuning_start_fine_tuning_job": "missing_official_taxonomy",
       "judge_chat_completion_event_v1_observability_chat_completion_events__event_id__live_judging_post": "missing_official_taxonomy",
-      "judge_conversation_v1_observability_judges__judge_id__live_judging_post": "request_model_projection",
       "libraries_documents_get_extracted_text_signed_url_v1": "inline_or_unresolved_response",
       "libraries_documents_get_signed_url_v1": "inline_or_unresolved_response",
-      "libraries_documents_update_v1": "request_model_projection",
       "libraries_documents_upload_v1": "multiple_success_contracts",
       "libraries_share_create_v1": "request_model_projection",
       "libraries_share_delete_v1": "request_model_projection",
@@ -2788,7 +2889,6 @@
       "speech_v1_audio_speech_post": "multiple_success_media",
       "stream_v1_workflows_executions__execution_id__stream_get": "non_json_success",
       "update_dataset_record_payload_v1_observability_dataset_records__dataset_record_id__payload_put": "request_model_projection",
-      "update_dataset_record_properties_v1_observability_dataset_records__dataset_record_id__properties_put": "request_model_projection",
       "update_workflow_execution_v1_workflows_executions__execution_id__updates_post": "request_model_projection"
     }
   }

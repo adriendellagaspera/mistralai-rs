@@ -33,7 +33,7 @@ def generate(raw: Path, target: Path, manifest_path: Path, openapi_path: Path | 
     if taxonomy_path is not None:
         taxonomy = json.loads(taxonomy_path.read_text())
         raw_coverage = json.loads((raw / "coverage.json").read_text())
-        manifest, projection_report = expand_manifest(openapi, manifest, taxonomy, raw_coverage)
+        manifest, projection_report = expand_manifest(openapi, manifest, taxonomy, raw_coverage, rust)
     ir = resolve_operations(frontend.build_ir(openapi, rust, manifest), rust)
     target.mkdir(parents=True, exist_ok=True)
 

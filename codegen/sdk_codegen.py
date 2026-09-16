@@ -22,7 +22,7 @@ from jsonschema import Draft202012Validator
 from sdk_contracts import public_surface, coverage_inventory
 from sdk_autoproject import expand_manifest
 import sdk_ir as resolved_ir
-from sdk_ir import (Accessor, ModelPolicy, RequestPolicy, SimpleUnionPolicy, TypeAliasPolicy,
+from sdk_ir import (Accessor, MapPolicy, ModelPolicy, RequestPolicy, SimpleUnionPolicy, TypeAliasPolicy,
                     UnionPolicy, ViewPolicy, StreamPolicy, model_policy, stream_policy)
 
 
@@ -258,13 +258,17 @@ class OpenApiIndex:
             return payloads == {variant.payload for variant in rust.variants(raw)}
         return False
 
-    def union(self, root: str, path: Iterable[str]) -> tuple[str, dict[str, str]]:
+    def schema_at(self, root: str, path: Iterable[str]) -> dict[str, Any]:
         schema = self.schema(root)
         for segment in path:
             schema = schema.get("items", {}) if segment == "items" else schema.get("properties", {}).get(segment, {})
             non_null = [part for part in schema.get("anyOf", []) if part.get("type") != "null"]
-            if len(non_null) == 1:
+            if len(non_null) == 1 and len(non_null) != len(schema.get("anyOf", [])):
                 schema = non_null[0]
+        return schema
+
+    def union(self, root: str, path: Iterable[str]) -> tuple[str, dict[str, str]]:
+        schema = self.schema_at(root, path)
         discriminator = schema.get("discriminator", {})
         mapping = {tag: ref.rsplit("/", 1)[-1]
                    for tag, ref in discriminator.get("mapping", {}).items()}
@@ -393,7 +397,7 @@ def build_ir(openapi: OpenApiIndex, rust: RustIndex, manifest: dict[str, Any]) -
         raise GenerationError("unsupported SDK semantic manifest version")
     models = []
     for name, config in manifest.get("models", {}).items():
-        _validate_keys(config, {"raw", "constructor", "exclude", "adapters", "union", "simple_union", "union_factory", "accessors", "borrowed"}, f"model {name}")
+        _validate_keys(config, {"raw", "constructor", "exclude", "adapters", "union", "simple_union", "type_alias", "map", "union_factory", "accessors", "borrowed"}, f"model {name}")
         raw = config.get("raw", name)
         if "union" in config:
             union = config["union"]
@@ -415,6 +419,12 @@ def build_ir(openapi: OpenApiIndex, rust: RustIndex, manifest: dict[str, Any]) -
                     f"raw union {raw} variant drift: missing={sorted(actual - configured)}, "
                     f"extra={sorted(configured - actual)}"
                 )
+        elif config.get("type_alias"):
+            if raw not in rust.aliases:
+                raise GenerationError(f"raw type alias {raw} not found")
+            _public_alias_type(rust.aliases[raw], rust, (raw,))
+        elif "map" in config:
+            _map_contract(ModelSpec(name, raw, model_policy(config)), openapi, rust)
         else:
             # Empty response views may deliberately encapsulate an inline raw
             # enum. Accessor-bearing views still require a struct.
@@ -1022,6 +1032,64 @@ def _emit_type_alias(model: ModelSpec, rust: RustIndex) -> str:
     return f"pub type {model.name} = {_public_alias_type(rust.aliases[model.raw], rust, (model.raw,))};"
 
 
+def _map_contract(model: ModelSpec, openapi: OpenApiIndex, rust: RustIndex) -> str:
+    assert isinstance(model.config, MapPolicy)
+    schema = openapi.schema_at(model.config.root, model.config.path)
+    if schema.get("type") != "object" or schema.get("properties") or not schema.get("additionalProperties"):
+        raise GenerationError(
+            f"map policy {model.name} does not point to an additionalProperties object"
+        )
+    fields = rust.fields(model.raw)
+    if len(fields) != 1 or fields[0].name.removeprefix("r#") != "additional_properties":
+        raise GenerationError(f"raw map wrapper drift for {model.raw}")
+    mapping = fields[0].syntax
+    if mapping.constructor != "std::collections::BTreeMap" or len(mapping.arguments) != 2:
+        raise GenerationError(f"raw map wrapper {model.raw} is not a BTreeMap")
+    key, value = mapping.arguments
+    if key.spelling != "String":
+        raise GenerationError(f"raw map wrapper {model.raw} does not use String keys")
+    additional = schema["additionalProperties"]
+    if additional is True:
+        compatible = value.spelling == "serde_json::Value"
+    elif value.spelling == "serde_json::Value":
+        compatible = isinstance(additional, dict)
+    elif isinstance(additional, dict):
+        non_null = [part for part in additional.get("anyOf", []) if part.get("type") != "null"]
+        normalized = non_null[0] if len(non_null) == 1 and len(non_null) != len(additional.get("anyOf", [])) else additional
+        expected = {"string": "String", "integer": "i64", "number": "f64", "boolean": "bool"}.get(normalized.get("type"))
+        compatible = expected == value.spelling
+    else:
+        compatible = False
+    if not compatible:
+        raise GenerationError(
+            f"OpenAPI/raw map value drift for {model.raw}: {value.spelling}"
+        )
+    value_type = _public_alias_type(value, rust)
+    return f"std::collections::BTreeMap<String, {value_type}>"
+
+
+def _emit_map(model: ModelSpec, openapi: OpenApiIndex, rust: RustIndex) -> str:
+    assert isinstance(model.config, MapPolicy)
+    map_type = _map_contract(model, openapi, rust)
+    return (
+        f"#[derive(Debug, Clone, Default)]\npub struct {model.name} {{ values: {map_type} }}\n\n"
+        f"impl {model.name} {{\n"
+        f"    pub fn new(values: {map_type}) -> Self {{ Self {{ values }} }}\n"
+        f"    pub fn as_map(&self) -> &{map_type} {{ &self.values }}\n"
+        f"    pub fn into_map(self) -> {map_type} {{ self.values }}\n"
+        f"}}\n\n"
+        f"impl From<{map_type}> for {model.name} {{\n"
+        f"    fn from(values: {map_type}) -> Self {{ Self {{ values }} }}\n"
+        f"}}\n\n"
+        f"impl From<{model.raw}> for {model.name} {{\n"
+        f"    fn from(value: {model.raw}) -> Self {{ Self {{ values: value.additional_properties }} }}\n"
+        f"}}\n\n"
+        f"impl From<{model.name}> for {model.raw} {{\n"
+        f"    fn from(value: {model.name}) -> Self {{ Self {{ additional_properties: value.values }} }}\n"
+        f"}}"
+    )
+
+
 def _emit_model(model: ModelSpec, openapi: OpenApiIndex, rust: RustIndex) -> str:
     if isinstance(model.config, UnionPolicy):
         return _emit_union(model, openapi, rust)
@@ -1029,6 +1097,8 @@ def _emit_model(model: ModelSpec, openapi: OpenApiIndex, rust: RustIndex) -> str
         return _emit_simple_union(model, rust)
     if isinstance(model.config, TypeAliasPolicy):
         return _emit_type_alias(model, rust)
+    if isinstance(model.config, MapPolicy):
+        return _emit_map(model, openapi, rust)
     if isinstance(model.config, ViewPolicy):
         return _emit_view(model, rust)
     return _emit_wrapper(model, openapi, rust)
