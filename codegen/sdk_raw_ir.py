@@ -4,13 +4,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from types import MappingProxyType
-from typing import Mapping
+from typing import Any, Mapping
 
 from rust_types import RustType, parse_type
 
 
 class RawIrError(ValueError):
-    """The raw binding contract is missing or ambiguous."""
+    """The raw binding contract is missing, ambiguous, or malformed."""
 
 
 @dataclass(frozen=True)
@@ -74,6 +74,78 @@ class RawIr:
             tuple(sorted(operations.items())),
             tuple(sorted(symbol_modules.items())),
         )
+
+    @classmethod
+    def from_dict(cls, value: Mapping[str, Any]) -> "RawIr":
+        """Load the candidate machine-readable sidecar representation."""
+        if value.get("schema_version") != 1:
+            raise RawIrError("unsupported raw IR sidecar version")
+        try:
+            structs = {
+                name: tuple(RawField(field["name"], parse_type(field["type"]))
+                            for field in fields)
+                for name, fields in value["structs"].items()
+            }
+            enums = {
+                name: tuple(RawVariant(variant["name"], variant.get("payload"))
+                            for variant in variants)
+                for name, variants in value["enums"].items()
+            }
+            aliases = {
+                name: parse_type(type_name)
+                for name, type_name in value["aliases"].items()
+            }
+            operations = {
+                name: RawOperation(
+                    operation["name"],
+                    tuple(RawParameter(parameter["name"], parse_type(parameter["type"]))
+                          for parameter in operation["parameters"]),
+                    operation["return_type"],
+                    operation["success_type"],
+                )
+                for name, operation in value["operations"].items()
+            }
+            symbol_modules = {
+                name: module for name, module in value["symbol_modules"].items()
+            }
+        except (KeyError, TypeError, AttributeError, ValueError) as error:
+            raise RawIrError("malformed raw IR sidecar") from error
+        return cls.from_parts(
+            structs=structs,
+            enums=enums,
+            aliases=aliases,
+            operations=operations,
+            symbol_modules=symbol_modules,
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        """Return the deterministic candidate sidecar representation."""
+        return {
+            "schema_version": 1,
+            "structs": {
+                name: [{"name": field.name, "type": field.type} for field in fields]
+                for name, fields in self._structs
+            },
+            "enums": {
+                name: [{"name": variant.name, "payload": variant.payload}
+                       for variant in variants]
+                for name, variants in self._enums
+            },
+            "aliases": {name: syntax.spelling for name, syntax in self._aliases},
+            "operations": {
+                name: {
+                    "name": operation.name,
+                    "parameters": [
+                        {"name": parameter.name, "type": parameter.type}
+                        for parameter in operation.parameters
+                    ],
+                    "return_type": operation.return_type,
+                    "success_type": operation.success_type,
+                }
+                for name, operation in self._operations
+            },
+            "symbol_modules": dict(self._symbol_modules),
+        }
 
     @property
     def structs(self) -> Mapping[str, tuple[RawField, ...]]:

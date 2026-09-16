@@ -7,6 +7,8 @@ routing all generation and emission through the extracted implementation.
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import sdk_emit
 import sdk_frontend as frontend
 from sdk_frontend import *  # noqa: F401,F403 - deliberate compatibility re-export
@@ -28,8 +30,10 @@ from sdk_ir import (
     stream_policy,
 )
 from sdk_model_lowering import resolve_models
+from sdk_openapi_to_rust import OpenApiToRustAdapter
 from sdk_operation_lowering import resolve_operations
 from sdk_pipeline import generate, main
+from sdk_raw_ir import RawIr
 
 
 # Explicit aliases document the legacy plan types intentionally retained here.
@@ -38,6 +42,23 @@ OperationSpec = frontend.OperationSpec
 ResourceSpec = frontend.ResourceSpec
 SdkIr = frontend.SdkIr
 _resolved_ir = frontend._resolved_ir
+
+
+class RustIndex:
+    """Deprecated raw-index compatibility constructor backed by the canonical adapter."""
+
+    def __new__(cls, types_source: bytes, client_source: bytes) -> RawIr:
+        try:
+            return OpenApiToRustAdapter.parse(types_source, client_source)
+        except ValueError as error:
+            raise GenerationError(str(error)) from error
+
+    @classmethod
+    def load(cls, raw: Path) -> RawIr:
+        try:
+            return OpenApiToRustAdapter.load(raw)
+        except ValueError as error:
+            raise GenerationError(str(error)) from error
 
 
 def _legacy_request(operation: OperationSpec, raw) -> object:
@@ -61,7 +82,7 @@ def _legacy_response(operation: OperationSpec, raw_type: str):
     raise GenerationError(f"operation {operation.operation_id} needs a response projection")
 
 
-def _resolved_operation(operation: OperationSpec, rust: RustIndex) -> ResolvedOperationSpec:
+def _resolved_operation(operation: OperationSpec, rust: RawIr) -> ResolvedOperationSpec:
     raw = rust.operation(operation.raw_method)
     signature = RawSignature(
         tuple(RawParameter(parameter.name, parameter.type) for parameter in raw.parameters),
@@ -79,7 +100,7 @@ def _resolved_operation(operation: OperationSpec, rust: RustIndex) -> ResolvedOp
 
 
 def _resolved_resources(
-    resources: tuple[ResourceSpec, ...], rust: RustIndex
+    resources: tuple[ResourceSpec, ...], rust: RawIr
 ) -> tuple[ResolvedResourceSpec, ...]:
     return tuple(
         ResolvedResourceSpec(
@@ -92,7 +113,7 @@ def _resolved_resources(
     )
 
 
-def _emit_model(model: ModelSpec, openapi: OpenApiIndex, rust: RustIndex) -> str:
+def _emit_model(model: ModelSpec, openapi: OpenApiIndex, rust: RawIr) -> str:
     """Compatibility adapter for historical renderer-focused tests."""
     ir = FacadeIr(
         "Client",
@@ -105,7 +126,7 @@ def _emit_model(model: ModelSpec, openapi: OpenApiIndex, rust: RustIndex) -> str
 
 def _emit_resource(
     resource: ResourceSpec,
-    rust: RustIndex,
+    rust: RawIr,
     resources: tuple[ResourceSpec, ...],
 ) -> str:
     """Compatibility adapter that still exercises the canonical operation lowering."""
