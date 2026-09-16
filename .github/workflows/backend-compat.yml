@@ -1,0 +1,145 @@
+name: Backend compatibility
+
+on:
+  push:
+    paths:
+      - .github/workflows/backend-compat.yml
+      - scripts/check_backend_compat.py
+      - COMPATIBILITY.json
+      - tests/fixtures/**
+  pull_request:
+    paths:
+      - .github/workflows/backend-compat.yml
+      - scripts/check_backend_compat.py
+      - COMPATIBILITY.json
+      - tests/fixtures/**
+  schedule:
+    - cron: '47 4 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: backend-compat-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  compatibility:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Resolve backend revisions
+        id: backend
+        run: |
+          baseline="$(python3 -c 'import json; print(json.load(open("COMPATIBILITY.json"))["backend"]["commit"])')"
+          candidate="$(git ls-remote https://github.com/gpu-cli/openapi-to-rust.git refs/heads/main | awk '{print $1}')"
+          test -n "$candidate"
+          echo "baseline=$baseline" >> "$GITHUB_OUTPUT"
+          echo "candidate=$candidate" >> "$GITHUB_OUTPUT"
+          if [ "$baseline" = "$candidate" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install package
+        run: python -m pip install .
+
+      - name: Run package tests
+        run: python -m unittest discover -s tests -p 'test_*.py'
+
+      - uses: actions/cache@v4
+        if: steps.backend.outputs.changed == 'true'
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            .tools/openapi-to-rust-backends
+          key: openapi-to-rust-bindings-${{ runner.os }}-${{ steps.backend.outputs.baseline }}-${{ steps.backend.outputs.candidate }}
+          restore-keys: |
+            openapi-to-rust-bindings-${{ runner.os }}-
+
+      - name: Build baseline and candidate generators
+        if: steps.backend.outputs.changed == 'true'
+        run: |
+          build_generator() {
+            commit="$1"
+            install="$PWD/.tools/openapi-to-rust-backends/$commit"
+            binary="$install/bin/openapi-to-rust"
+            if [ ! -x "$binary" ]; then
+              source="$RUNNER_TEMP/openapi-to-rust-$commit"
+              rm -rf "$source"
+              git init "$source"
+              git -C "$source" fetch --depth=1 https://github.com/gpu-cli/openapi-to-rust.git "$commit"
+              git -C "$source" checkout --detach FETCH_HEAD
+              cargo install --locked --path "$source" --root "$install"
+            fi
+          }
+          build_generator '${{ steps.backend.outputs.baseline }}'
+          build_generator '${{ steps.backend.outputs.candidate }}'
+
+      - name: Compare normalized Bindings
+        if: steps.backend.outputs.changed == 'true'
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          extra=()
+          if [ "$REPOSITORY" = 'adriendellagaspera/openapi-to-rust-bindings' ] && \
+             { [ "$EVENT_NAME" = 'schedule' ] || [ "$EVENT_NAME" = 'workflow_dispatch' ]; }; then
+            extra+=(--update-compatibility)
+          fi
+          python scripts/check_backend_compat.py \
+            --baseline-generator ".tools/openapi-to-rust-backends/${{ steps.backend.outputs.baseline }}/bin/openapi-to-rust" \
+            --candidate-generator ".tools/openapi-to-rust-backends/${{ steps.backend.outputs.candidate }}/bin/openapi-to-rust" \
+            --candidate-commit '${{ steps.backend.outputs.candidate }}' \
+            --report "$RUNNER_TEMP/backend-compat.md" \
+            "${extra[@]}"
+
+      - name: Publish compatibility summary
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/backend-compat.md" ]; then
+            cat "$RUNNER_TEMP/backend-compat.md" >> "$GITHUB_STEP_SUMMARY"
+          elif [ '${{ steps.backend.outputs.changed }}' = 'false' ]; then
+            echo 'The pinned backend already matches upstream main.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Create or update reviewed backend-sync PR
+        if: >-
+          steps.backend.outputs.changed == 'true' &&
+          (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') &&
+          github.repository == 'adriendellagaspera/openapi-to-rust-bindings'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          BASE: ${{ github.event.repository.default_branch }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git checkout -B automation/openapi-to-rust-sync
+          git add COMPATIBILITY.json
+          if git diff --cached --quiet; then
+            echo 'No compatibility metadata changed.'
+            exit 0
+          fi
+          version="$(python3 -c 'import json; print(json.load(open("COMPATIBILITY.json"))["backend"]["version"])')"
+          git commit -m "chore: validate openapi-to-rust $version"
+          git push --force origin HEAD:automation/openapi-to-rust-sync
+          pr="$(gh pr list --repo "$REPO" --base "$BASE" --head automation/openapi-to-rust-sync --state open --json number --jq '.[0].number // empty')"
+          title="chore: validate openapi-to-rust $version"
+          if [ -n "$pr" ]; then
+            gh pr edit "$pr" --repo "$REPO" --title "$title" --body-file "$RUNNER_TEMP/backend-compat.md"
+          else
+            gh pr create --repo "$REPO" --base "$BASE" --head automation/openapi-to-rust-sync --title "$title" --body-file "$RUNNER_TEMP/backend-compat.md"
+          fi
