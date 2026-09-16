@@ -111,6 +111,16 @@ def field_failures(schema, raw_type, schemas, rust, resolving):
     return {f"inline_{target_shape(schema)}"}
 
 
+def describe_symbol(name, rust):
+    if name in rust.aliases:
+        return f"alias={rust.aliases[name].spelling}"
+    if name in rust.structs:
+        return "struct=" + ",".join(f"{f.name}:{f.type}" for f in rust.fields(name))
+    if name in rust.enums:
+        return "enum=" + ",".join(f"{v.name}:{v.payload}" for v in rust.variants(name))
+    return "leaf"
+
+
 def main():
     openapi = OpenApiIndex.load(ROOT / "spec/openapi.yaml")
     rust = RustIndex.load(ROOT / "src/generated")
@@ -139,7 +149,13 @@ def main():
         print(f"  request={request_raw} raw_method={raw_method} body_params={body_params}")
         print(f"  failures={','.join(sorted(failures))}")
         if request_raw in rust.structs:
+            raw_fields = {f.name.removeprefix('r#'): f for f in rust.fields(request_raw)}
             print("  fields=" + ", ".join(f"{f.name}:{f.type}" for f in rust.fields(request_raw)))
+            for field_name, field_schema in openapi.schemas.get(request_raw, {}).get("properties", {}).items():
+                normalized, _ = _nullable(field_schema)
+                if normalized.get("type") == "object" and normalized.get("additionalProperties") and field_name in raw_fields:
+                    symbol = strip_options(raw_fields[field_name].type).spelling
+                    print(f"  INLINE_MAP {field_name} raw={symbol} {describe_symbol(symbol, rust)} schema={json.dumps(normalized.get('additionalProperties'), sort_keys=True)}")
     print("COUNTS")
     for reason, count in counts.most_common():
         print(f"  {count:2d} {reason}: {', '.join(by_reason[reason])}")
