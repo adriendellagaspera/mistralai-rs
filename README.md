@@ -132,7 +132,7 @@ On first use, `scripts/codegen.py` installs the pinned tools into `.tools/`. It 
 | `src/lib.rs`, `src/streaming.rs` | Public exports and Mistral-owned stream support |
 | `tests/`, `examples/` | Offline behavior tests and opt-in examples |
 
-See [`codegen/SDK_CODEGEN.md`](codegen/SDK_CODEGEN.md) for compiler boundaries and drift policy, and [`codegen/SDK_SEMANTICS.md`](codegen/SDK_SEMANTICS.md) for the Mistral semantic policy.
+See [`codegen/SDK_CODEGEN.md`](codegen/SDK_CODEGEN.md) for compiler boundaries, ownership and drift policy. The active Mistral semantic policy is [`codegen/sdk-semantics.json`](codegen/sdk-semantics.json).
 
 ## Automation
 
