@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Rust bindings IR consumed by openapi-to-rust-facade",
+  "title": "Rust bindings consumed by rust-sdk-compiler",
   "type": "object",
   "additionalProperties": false,
   "required": [
