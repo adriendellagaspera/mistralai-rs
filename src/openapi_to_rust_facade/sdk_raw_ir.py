@@ -92,9 +92,8 @@ class RawIr:
         symbol_paths: Mapping[str, str],
         binding: RawBindingLayout,
     ) -> "RawIr":
-        unknown_paths = sorted(
-            set(structs) | set(enums) | set(aliases) - set(symbol_paths)
-        )
+        declared = set(structs) | set(enums) | set(aliases)
+        unknown_paths = sorted(declared - set(symbol_paths))
         if unknown_paths:
             raise RawIrError(f"missing Rust symbol paths: {unknown_paths}")
         return cls(
