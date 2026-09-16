@@ -16,6 +16,7 @@ from sdk_model_lowering import resolve_models
 from sdk_operation_lowering import resolve_operations
 
 
+GENERATED = frontend.GENERATED
 GenerationError = frontend.GenerationError
 OpenApiIndex = frontend.OpenApiIndex
 RustIndex = frontend.RustIndex
