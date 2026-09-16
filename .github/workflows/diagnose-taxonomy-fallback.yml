@@ -1,0 +1,12 @@
+name: Diagnose taxonomy fallback
+on:
+  push:
+    branches: [issue-23-taxonomy-fallback]
+permissions:
+  contents: read
+jobs:
+  diagnose:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 scripts/_diagnose_taxonomy_fallback.py
