@@ -5,8 +5,8 @@ from types import SimpleNamespace
 
 from rust_types import parse_type
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "codegen"))
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "tooling" / "pipeline" / "mistral"))
 import sdk_autoproject
 
 

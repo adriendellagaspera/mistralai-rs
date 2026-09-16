@@ -24,11 +24,11 @@ jobs:
             ~/.cargo/git
             .tools
             target
-          key: sdk-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'codegen.lock') }}
-      - name: Check generation, formatting, compilation, linting and tests
-        run: bash scripts/validate.sh
+          key: sdk-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'tooling/sources/lock.json') }}
+      - name: Validate tracked sources, generation and Rust SDK
+        run: bash tooling/quality/validate.sh
       - name: Review generated public API changes
         if: github.event_name == 'pull_request'
         env:
           SDK_API_BASE: ${{ github.event.pull_request.base.sha }}
-        run: python scripts/check_sdk_api.py --base "$SDK_API_BASE" --rustdoc
+        run: python3 tooling/quality/api_surface.py --base "$SDK_API_BASE" --rustdoc

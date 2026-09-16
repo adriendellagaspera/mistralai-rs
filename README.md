@@ -61,7 +61,7 @@ Mistral runtime conventions --------------------------> Runtime
                                                         src/sdk
 ```
 
-`rust-sdk-compiler` is a separately versioned, backend-neutral Rust SDK compiler. `openapi-to-rust-bindings` is the separately versioned compatibility package that normalizes the current raw generator output into the compiler's `Bindings` contract. Both are pinned independently in `codegen.lock`; neither implementation is copied into this repository.
+`rust-sdk-compiler` is a separately versioned, backend-neutral Rust SDK compiler. `openapi-to-rust-bindings` is the separately versioned compatibility package that normalizes the current raw generator output into the compiler's `Bindings` contract. Both are pinned independently in `tooling/sources/lock.json`; neither implementation is copied into this repository.
 
 `mistralai-rs` owns only Mistral-specific concerns around that generic toolchain: product taxonomy, semantic policy, auto-projection, runtime support, source tracking, coverage and public-API review gates.
 
@@ -104,10 +104,10 @@ Prerequisites: Git, Rustup, Python 3.11+ with `venv`, and [Just](https://github.
 ```sh
 just generate
 just check-generated
-bash scripts/validate.sh
+just validate
 ```
 
-`codegen.lock` pins:
+`tooling/sources/lock.json` pins:
 
 - the official Mistral OpenAPI source commit and content hash;
 - `openapi-to-rust` plus the reviewed local generator patch hash;
@@ -115,7 +115,7 @@ bash scripts/validate.sh
 - `openapi-to-rust-bindings` by version, commit and Git tree;
 - Rust and Python tooling versions used by generation.
 
-On first use, `scripts/codegen.py` installs the pinned tools into `.tools/`. It verifies their immutable revisions before use. Generation reads the vendored specification; it does not fetch a newer spec implicitly.
+On first use, `tooling/pipeline/build.py` installs the pinned tools into `.tools/`. It verifies their immutable revisions before use. Generation reads the vendored specification; it does not fetch a newer spec implicitly.
 
 `just check-generated` regenerates raw bindings and the idiomatic SDK into fresh temporary directories, runs the raw generator's own check, formats with the pinned Rust toolchain and compares the complete file sets byte-for-byte. No timestamps enter generated output.
 
@@ -123,17 +123,16 @@ On first use, `scripts/codegen.py` installs the pinned tools into `.tools/`. It 
 
 | Location | Purpose |
 | --- | --- |
-| `codegen.lock` | Immutable source/toolchain provenance |
-| `spec/` | Unmodified official OpenAPI and upstream licensing |
-| `codegen/` | Mistral-specific raw-generator config/patches, semantic policy, projection and generation orchestration |
-| `codegen_tests/` | Repository-owned code-generation integration/policy tests |
-| `scripts/` | Acquisition, isolated generation, validation and update automation |
+| `tooling/sources/` | Immutable OpenAPI/Python/TypeScript source tracking, vendored OpenAPI and derived taxonomy |
+| `tooling/pipeline/` | Mistral adaptation and orchestration across openapi-to-rust, Bindings and rust-sdk-compiler |
+| `tooling/quality/` | Determinism, coverage, semver/public API review and update reporting |
+| `tooling/tests/` | Sidecar integration/policy tests |
 | `src/generated/` | Committed raw generated Rust and raw operation inventory |
 | `src/sdk/` | Committed idiomatic SDK surface plus Mistral-owned stable error runtime |
 | `src/lib.rs`, `src/streaming.rs` | Public exports and Mistral-owned stream support |
 | `tests/`, `examples/` | Offline behavior tests and opt-in examples |
 
-See [`codegen/README.md`](codegen/README.md) for the ownership map. The active Mistral semantic policy is [`codegen/sdk-semantics.json`](codegen/sdk-semantics.json).
+See [`tooling/README.md`](tooling/README.md) for the ownership map. The active Mistral semantic policy is [`tooling/pipeline/semantics.json`](tooling/pipeline/semantics.json).
 
 ## Automation
 
@@ -145,4 +144,4 @@ The scheduled **Update Mistral OpenAPI SDK** workflow checks the official specif
 
 ## License and attribution
 
-Original project contributions are **MIT OR Apache-2.0**. The official specification retains its **Apache-2.0** terms and generator-derived material retains applicable upstream notices. See [NOTICE](NOTICE), [LICENSE-MIT](LICENSE-MIT), [LICENSE-APACHE](LICENSE-APACHE), [spec/LICENSE](spec/LICENSE) and [codegen/GENERATOR-LICENSE](codegen/GENERATOR-LICENSE).
+Original project contributions are **MIT OR Apache-2.0**. The official specification retains its **Apache-2.0** terms and generator-derived material retains applicable upstream notices. See [NOTICE](NOTICE), [LICENSE-MIT](LICENSE-MIT), [LICENSE-APACHE](LICENSE-APACHE), [tooling/sources/openapi/LICENSE](tooling/sources/openapi/LICENSE) and [tooling/licenses/openapi-to-rust-MIT.txt](tooling/licenses/openapi-to-rust-MIT.txt).

@@ -5,15 +5,15 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-import codegen
-import update_spec
+import build as codegen
+import openapi as update_spec
 import preprocess
 
 
 class ProvenanceTests(unittest.TestCase):
     def test_vendored_spec_matches_lock(self):
-        lock = json.loads((codegen.ROOT / "codegen.lock").read_text())
-        codegen.verify_spec((codegen.ROOT / "spec/openapi.yaml").read_bytes(), lock)
+        lock = json.loads((codegen.ROOT / "tooling/sources/lock.json").read_text())
+        codegen.verify_spec((codegen.ROOT / "tooling/sources/openapi/openapi.yaml").read_bytes(), lock)
         with self.assertRaises(ValueError):
             codegen.verify_spec(b"corrupted", lock)
 
@@ -42,7 +42,7 @@ class UpdateTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
-        (self.root / "spec").mkdir()
+        (self.root / "tooling/sources/openapi").mkdir(parents=True)
         self.old_spec = b"openapi: 3.1.0\ninfo: {}\n"
         self.lock = {
             "upstream_repository": "mistralai/platform-docs-public",
@@ -53,8 +53,8 @@ class UpdateTests(unittest.TestCase):
             "generator": "openapi-to-rust", "generator_version": "0.16.0",
             "rust_toolchain": "1.94.0",
         }
-        (self.root / "codegen.lock").write_text(json.dumps(self.lock) + "\n")
-        (self.root / "spec/openapi.yaml").write_bytes(self.old_spec)
+        (self.root / "tooling/sources/lock.json").write_text(json.dumps(self.lock) + "\n")
+        (self.root / "tooling/sources/openapi/openapi.yaml").write_bytes(self.old_spec)
         self.addCleanup(patch.stopall)
         patch.object(update_spec, "ROOT", self.root).start()
 
@@ -81,7 +81,7 @@ class UpdateTests(unittest.TestCase):
             json.dumps([{"sha": "b" * 40}]).encode(), new_spec, new_spec, b"license",
         ]), patch.object(update_spec, "optional_notice", return_value=None):
             update_spec.main()
-        lock = json.loads((self.root / "codegen.lock").read_text())
+        lock = json.loads((self.root / "tooling/sources/lock.json").read_text())
         self.assertEqual(lock["upstream_commit"], "b" * 40)
         codegen.verify_spec(new_spec, lock)
         report = (self.root / "update-report.md").read_text()

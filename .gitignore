@@ -1,6 +1,6 @@
 /target/
 /.tools/
-/.codegen-*/
+/.tooling-build-*/
 /update-report.md
 __pycache__/
 *.pyc
