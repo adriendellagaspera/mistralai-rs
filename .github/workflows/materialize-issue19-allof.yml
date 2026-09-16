@@ -1,0 +1,124 @@
+name: Materialize issue 19 allOf projection
+on:
+  push:
+    branches: [issue-19-allof-request-projection]
+permissions:
+  contents: write
+jobs:
+  materialize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: issue-19-allof-request-projection
+          fetch-depth: 0
+      - name: Apply generic composed-request projection
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          projection = Path('tooling/pipeline/mistral/sdk_autoproject.py')
+          text = projection.read_text()
+          old = 'from rust_types import RustType, parse_type'
+          new = 'from rust_sdk_compiler import GenerationError, Type, parse_type'
+          if old not in text:
+              raise SystemExit('rust type bridge import not found')
+          text = text.replace(old, new).replace('RustType', 'Type')
+
+          old_singleton = '''def _omittable_singleton_enum(schema: dict[str, Any], raw_type: str, schemas: dict[str, Any], rust: Any) -> bool:\n    schema, _ = _nullable(schema)\n    reference = _schema_ref(schema)\n    target = schemas.get(reference, {}) if reference else schema\n    values = target.get("enum")\n    singleton = (isinstance(values, list) and len(values) == 1) or "const" in target\n    if not singleton:\n        return False\n    syntax = _strip_options(parse_type(raw_type))\n    return syntax.spelling in rust.enums and len(rust.enums[syntax.spelling]) == 1\n'''
+          new_singleton = '''def _omittable_singleton(schema: dict[str, Any], raw_type: str, schemas: dict[str, Any], rust: Any) -> bool:\n    schema, _ = _nullable(schema)\n    reference = _schema_ref(schema)\n    target = schemas.get(reference, {}) if reference else schema\n    values = target.get("enum")\n    singleton = (isinstance(values, list) and len(values) == 1) or "const" in target\n    if not singleton:\n        return False\n    parsed = parse_type(raw_type)\n    syntax = _strip_options(parsed)\n    if syntax.spelling in rust.enums:\n        return len(rust.enums[syntax.spelling]) == 1\n    if parsed.unary("Option") is None:\n        return False\n    literal = target.get("const") if "const" in target else values[0]\n    if isinstance(literal, bool):\n        return syntax.spelling == "bool"\n    if isinstance(literal, str):\n        return syntax.spelling == "String"\n    if isinstance(literal, int):\n        return syntax.spelling in {"i8", "i16", "i32", "i64", "isize", "u8", "u16", "u32", "u64", "usize"}\n    if isinstance(literal, float):\n        return syntax.spelling in {"f32", "f64"}\n    return False\n'''
+          if old_singleton not in text:
+              raise SystemExit('singleton helper not found')
+          text = text.replace(old_singleton, new_singleton)
+          text = text.replace('_omittable_singleton_enum(', '_omittable_singleton(')
+
+          needle = '    fallback_resources, fallback_prefixes = _fallback_context(openapi, taxonomy)\n\n'
+          insertion = '''    fallback_resources, fallback_prefixes = _fallback_context(openapi, taxonomy)\n    request_schemas = dict(openapi.schemas)\n    for schema_name, schema in sorted(openapi.schemas.items()):\n        if not schema.get("allOf"):\n            continue\n        try:\n            request_schemas[schema_name] = openapi.object_schema(schema_name)\n        except GenerationError:\n            # Non-object or contradictory compositions remain unprojectable and\n            # are rejected by the existing request-model checks below.\n            pass\n\n'''
+          if needle not in text:
+              raise SystemExit('expand_manifest insertion point not found')
+          text = text.replace(needle, insertion, 1)
+          old_call = '_ensure_request_model(models, openapi.schemas, request_raw, rust)'
+          if old_call not in text:
+              raise SystemExit('request-model call not found')
+          text = text.replace(old_call, '_ensure_request_model(models, request_schemas, request_raw, rust)', 1)
+          projection.write_text(text)
+
+          tests = Path('tooling/tests/test_sdk_autoproject.py')
+          text = tests.read_text()
+          old = 'from rust_types import parse_type'
+          new = 'from rust_sdk_compiler import OpenApi, parse_type'
+          if old not in text:
+              raise SystemExit('test bridge import not found')
+          text = text.replace(old, new, 1)
+          marker = '    def test_projects_named_scalar_enum_without_raw_type_leak(self):\n'
+          test = '''    def test_projects_composed_request_and_omits_optional_singleton_scalar(self):\n        api = OpenApi({\n            "openapi": "3.1.0",\n            "info": {"title": "fixture", "version": "1"},\n            "paths": {\n                "/things": {\n                    "post": {\n                        "operationId": "create_thing",\n                        "requestBody": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/CreateThing"}}}},\n                        "responses": {"200": {"content": {"application/json": {"schema": {"$ref": "#/components/schemas/Thing"}}}}},\n                    }\n                }\n            },\n            "components": {"schemas": {\n                "Thing": {"type": "object", "properties": {"id": {"type": "string"}}},\n                "CreateThingBase": {\n                    "type": "object",\n                    "additionalProperties": False,\n                    "properties": {"name": {"type": "string"}},\n                    "required": ["name"],\n                },\n                "CreateThing": {\n                    "allOf": [\n                        {"$ref": "#/components/schemas/CreateThingBase"},\n                        {"type": "object", "properties": {"stream": {"type": "boolean", "enum": [False]}}},\n                    ]\n                },\n            }},\n        })\n        fields = {"CreateThing": (\n            SimpleNamespace(name="name", type="String"),\n            SimpleNamespace(name="stream", type="Option<bool>"),\n        )}\n        rust = SimpleNamespace(\n            structs=set(fields), aliases={}, enums={},\n            symbol_paths={"CreateThing": "types"},\n            fields=lambda name: fields[name],\n        )\n        expanded, report = sdk_autoproject.expand_manifest(\n            api, manifest(),\n            {"operations": {"create_thing": ["things.create"]}},\n            raw_coverage("create_thing"), rust,\n        )\n        self.assertEqual(1, report["added_count"])\n        request = expanded["models"]["CreateThingParams"]\n        self.assertEqual(["name"], request["constructor"])\n        self.assertEqual(["stream"], request["exclude"])\n\n'''
+          if marker not in text:
+              raise SystemExit('test insertion point not found')
+          text = text.replace(marker, test + marker, 1)
+          tests.write_text(text)
+          PY
+          git rm tooling/pipeline/mistral/rust_types.py
+      - name: Regenerate pinned SDK
+        run: python3 tooling/pipeline/build.py generate
+      - name: Refresh reviewed probe baseline
+        run: |
+          set -euo pipefail
+          PYTHON=$(find .tools -path '*/bin/python' | grep 'python-sdk-tooling' | head -1)
+          "$PYTHON" - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+          import sys
+
+          from openapi_to_rust_bindings import read_bindings
+          from rust_sdk_compiler import OpenApi
+
+          ROOT = Path.cwd()
+          sys.path.insert(0, str(ROOT / 'tooling/pipeline/mistral'))
+          sys.path.insert(0, str(ROOT / 'tooling/quality'))
+          from sdk_autoproject import expand_manifest
+          from probe import probes
+
+          openapi = OpenApi.load(ROOT / 'tooling/sources/openapi/openapi.yaml')
+          bindings = read_bindings(ROOT / 'src/generated')
+          configured = json.loads((ROOT / 'tooling/pipeline/semantics.json').read_text())
+          configured, _ = expand_manifest(
+              openapi,
+              configured,
+              json.loads((ROOT / 'tooling/sources/taxonomy.json').read_text()),
+              json.loads((ROOT / 'src/generated/coverage.json').read_text()),
+              bindings,
+          )
+          modules, rejected = probes(openapi, bindings, configured)
+          report = {
+              'generated_candidates': sorted(modules),
+              'rejected_candidates': rejected,
+          }
+          digest = hashlib.sha256(
+              json.dumps(report, sort_keys=True, separators=(',', ':')).encode()
+          ).hexdigest()
+          baseline = {
+              'schema_version': 1,
+              'generated_candidates': len(modules),
+              'rejected_candidates': len(rejected),
+              'report_sha256': digest,
+          }
+          (ROOT / 'tooling/quality/probe-baseline.json').write_text(
+              json.dumps(baseline, indent=2) + '\n'
+          )
+          print(json.dumps(report, indent=2))
+          print('BASELINE=' + json.dumps(baseline, sort_keys=True))
+          PY
+      - name: Validate full consumer gate
+        run: bash tooling/quality/validate.sh
+      - name: Commit materialized consumer
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -A
+          git commit -m 'feat: project composed request objects generically'
+          git push origin HEAD:issue-19-allof-request-projection
