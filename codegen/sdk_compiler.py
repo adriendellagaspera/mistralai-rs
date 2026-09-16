@@ -9,8 +9,8 @@ from __future__ import annotations
 
 from typing import Any
 
-import sdk_codegen as frontend
 import sdk_emit
+import sdk_frontend as frontend
 from sdk_ir import FacadeIr
 from sdk_model_lowering import resolve_models
 from sdk_operation_lowering import resolve_operations

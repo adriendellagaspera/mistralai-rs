@@ -10,6 +10,7 @@ sys.path.insert(0, str(ROOT / "codegen"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 import sdk_codegen
+import sdk_compiler
 import sdk_emit
 import sdk_model_lowering
 import sdk_pipeline
@@ -60,7 +61,7 @@ class ResolvedEmissionTests(unittest.TestCase):
 
             with patch.object(sdk_pipeline, "expand_manifest", side_effect=project):
                 sdk_pipeline.generate(raw, root / "sdk", overlay, openapi, taxonomy)
-            self.assertIsInstance(seen["rust"], sdk_codegen.RustIndex)
+            self.assertIsInstance(seen["rust"], sdk_compiler.RustIndex)
             self.assertIn("adopt", seen["rust"].operations)
 
     def test_map_policy_lowers_to_source_agnostic_render_spec(self):
