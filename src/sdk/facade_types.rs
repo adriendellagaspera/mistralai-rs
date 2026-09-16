@@ -2447,6 +2447,306 @@ impl Default for MCPToolCallRequestParams {
 }
 
 #[derive(Debug, Clone)]
+pub struct MessageResponseView {
+    raw: MessageResponse,
+}
+
+impl MessageResponseView {
+    pub fn message(&self) -> &str {
+        &self.raw.message
+    }
+    pub fn raw(&self) -> &MessageResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> MessageResponse {
+        self.raw
+    }
+}
+
+impl From<MessageResponse> for MessageResponseView {
+    fn from(raw: MessageResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<MessageResponseView> for MessageResponse {
+    fn from(value: MessageResponseView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct ConnectionCredentialsHeadersMap {
+    values: std::collections::BTreeMap<String, String>,
+}
+
+impl ConnectionCredentialsHeadersMap {
+    pub fn new(values: std::collections::BTreeMap<String, String>) -> Self {
+        Self { values }
+    }
+    pub fn as_map(&self) -> &std::collections::BTreeMap<String, String> {
+        &self.values
+    }
+    pub fn into_map(self) -> std::collections::BTreeMap<String, String> {
+        self.values
+    }
+}
+
+impl From<std::collections::BTreeMap<String, String>> for ConnectionCredentialsHeadersMap {
+    fn from(values: std::collections::BTreeMap<String, String>) -> Self {
+        Self { values }
+    }
+}
+
+impl From<ConnectionCredentialsHeaders> for ConnectionCredentialsHeadersMap {
+    fn from(value: ConnectionCredentialsHeaders) -> Self {
+        Self {
+            values: value.additional_properties,
+        }
+    }
+}
+
+impl From<ConnectionCredentialsHeadersMap> for ConnectionCredentialsHeaders {
+    fn from(value: ConnectionCredentialsHeadersMap) -> Self {
+        Self {
+            additional_properties: value.values,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct OAuth2TokenParams {
+    raw: OAuth2Token,
+}
+
+impl OAuth2TokenParams {
+    pub fn new(access_token: impl Into<String>) -> Self {
+        Self {
+            raw: OAuth2Token {
+                access_token: access_token.into(),
+                expires_at: None,
+                expires_in: None,
+                refresh_token: None,
+                scope: None,
+                token_type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn expires_at(mut self, expires_at: chrono::DateTime<chrono::Utc>) -> Self {
+        self.raw.expires_at = Some(Some(expires_at));
+        self
+    }
+
+    #[must_use]
+    pub fn expires_at_null(mut self) -> Self {
+        self.raw.expires_at = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn expires_in(mut self, expires_in: i64) -> Self {
+        self.raw.expires_in = Some(Some(expires_in));
+        self
+    }
+
+    #[must_use]
+    pub fn expires_in_null(mut self) -> Self {
+        self.raw.expires_in = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn refresh_token(mut self, refresh_token: impl Into<String>) -> Self {
+        self.raw.refresh_token = Some(Some(refresh_token.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn refresh_token_null(mut self) -> Self {
+        self.raw.refresh_token = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn scope(mut self, scope: impl Into<String>) -> Self {
+        self.raw.scope = Some(Some(scope.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn scope_null(mut self) -> Self {
+        self.raw.scope = Some(None);
+        self
+    }
+    pub fn from_raw(raw: OAuth2Token) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &OAuth2Token {
+        &self.raw
+    }
+    pub fn into_raw(self) -> OAuth2Token {
+        self.raw
+    }
+}
+
+impl From<OAuth2Token> for OAuth2TokenParams {
+    fn from(raw: OAuth2Token) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<OAuth2TokenParams> for OAuth2Token {
+    fn from(value: OAuth2TokenParams) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ConnectionCredentialsParams {
+    raw: ConnectionCredentials,
+}
+
+impl ConnectionCredentialsParams {
+    pub fn new() -> Self {
+        Self {
+            raw: ConnectionCredentials {
+                bearer_token: None,
+                headers: None,
+                oauth: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn bearer_token(mut self, bearer_token: impl Into<String>) -> Self {
+        self.raw.bearer_token = Some(Some(bearer_token.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn bearer_token_null(mut self) -> Self {
+        self.raw.bearer_token = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn headers(mut self, headers: impl Into<ConnectionCredentialsHeadersMap>) -> Self {
+        self.raw.headers = Some(Some(
+            Into::<ConnectionCredentialsHeadersMap>::into(headers).into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn headers_null(mut self) -> Self {
+        self.raw.headers = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn oauth(mut self, oauth: impl Into<OAuth2TokenParams>) -> Self {
+        self.raw.oauth = Some(Some(Into::<OAuth2TokenParams>::into(oauth).into()));
+        self
+    }
+
+    #[must_use]
+    pub fn oauth_null(mut self) -> Self {
+        self.raw.oauth = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ConnectionCredentials) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ConnectionCredentials {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ConnectionCredentials {
+        self.raw
+    }
+}
+
+impl From<ConnectionCredentials> for ConnectionCredentialsParams {
+    fn from(raw: ConnectionCredentials) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ConnectionCredentialsParams> for ConnectionCredentials {
+    fn from(value: ConnectionCredentialsParams) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for ConnectionCredentialsParams {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CredentialsCreateOrUpdateParams {
+    raw: CredentialsCreateOrUpdate,
+}
+
+impl CredentialsCreateOrUpdateParams {
+    pub fn new(name: impl Into<String>) -> Self {
+        Self {
+            raw: CredentialsCreateOrUpdate {
+                credentials: None,
+                is_default: None,
+                name: name.into(),
+            },
+        }
+    }
+    #[must_use]
+    pub fn credentials(mut self, credentials: impl Into<ConnectionCredentialsParams>) -> Self {
+        self.raw.credentials = Some(Some(
+            Into::<ConnectionCredentialsParams>::into(credentials).into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn credentials_null(mut self) -> Self {
+        self.raw.credentials = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn is_default(mut self, is_default: bool) -> Self {
+        self.raw.is_default = Some(Some(is_default));
+        self
+    }
+
+    #[must_use]
+    pub fn is_default_null(mut self) -> Self {
+        self.raw.is_default = Some(None);
+        self
+    }
+    pub fn from_raw(raw: CredentialsCreateOrUpdate) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &CredentialsCreateOrUpdate {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CredentialsCreateOrUpdate {
+        self.raw
+    }
+}
+
+impl From<CredentialsCreateOrUpdate> for CredentialsCreateOrUpdateParams {
+    fn from(raw: CredentialsCreateOrUpdate) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CredentialsCreateOrUpdateParams> for CredentialsCreateOrUpdate {
+    fn from(value: CredentialsCreateOrUpdateParams) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct ConnectorView {
     raw: Connector,
 }
@@ -2668,35 +2968,6 @@ impl From<ConnectorMCPCreate> for ConnectorMCPCreateParams {
 
 impl From<ConnectorMCPCreateParams> for ConnectorMCPCreate {
     fn from(value: ConnectorMCPCreateParams) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct MessageResponseView {
-    raw: MessageResponse,
-}
-
-impl MessageResponseView {
-    pub fn message(&self) -> &str {
-        &self.raw.message
-    }
-    pub fn raw(&self) -> &MessageResponse {
-        &self.raw
-    }
-    pub fn into_raw(self) -> MessageResponse {
-        self.raw
-    }
-}
-
-impl From<MessageResponse> for MessageResponseView {
-    fn from(raw: MessageResponse) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<MessageResponseView> for MessageResponse {
-    fn from(value: MessageResponseView) -> Self {
         value.into_raw()
     }
 }
@@ -3072,6 +3343,41 @@ impl From<ConnectorMCPUpdateParams> for ConnectorMCPUpdate {
 impl Default for ConnectorMCPUpdateParams {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CampaignPreviewView {
+    raw: CampaignPreview,
+}
+
+impl CampaignPreviewView {
+    pub fn description(&self) -> &str {
+        &self.raw.description
+    }
+    pub fn max_nb_events(&self) -> i64 {
+        self.raw.max_nb_events
+    }
+    pub fn name(&self) -> &str {
+        &self.raw.name
+    }
+    pub fn raw(&self) -> &CampaignPreview {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CampaignPreview {
+        self.raw
+    }
+}
+
+impl From<CampaignPreview> for CampaignPreviewView {
+    fn from(raw: CampaignPreview) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CampaignPreviewView> for CampaignPreview {
+    fn from(value: CampaignPreviewView) -> Self {
+        value.into_raw()
     }
 }
 
@@ -3675,6 +3981,255 @@ impl From<UploadFileOutView> for UploadFileOut {
 }
 
 #[derive(Debug, Clone)]
+pub struct CampaignSelectedEventsView {
+    raw: CampaignSelectedEvents,
+}
+
+impl CampaignSelectedEventsView {
+    pub fn raw(&self) -> &CampaignSelectedEvents {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CampaignSelectedEvents {
+        self.raw
+    }
+}
+
+impl From<CampaignSelectedEvents> for CampaignSelectedEventsView {
+    fn from(raw: CampaignSelectedEvents) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CampaignSelectedEventsView> for CampaignSelectedEvents {
+    fn from(value: CampaignSelectedEventsView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CampaignStatusView {
+    raw: CampaignStatus,
+}
+
+impl CampaignStatusView {
+    pub fn raw(&self) -> &CampaignStatus {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CampaignStatus {
+        self.raw
+    }
+}
+
+impl From<CampaignStatus> for CampaignStatusView {
+    fn from(raw: CampaignStatus) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CampaignStatusView> for CampaignStatus {
+    fn from(value: CampaignStatusView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CampaignPreviewsView {
+    raw: CampaignPreviews,
+}
+
+impl CampaignPreviewsView {
+    pub fn raw(&self) -> &CampaignPreviews {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CampaignPreviews {
+        self.raw
+    }
+}
+
+impl From<CampaignPreviews> for CampaignPreviewsView {
+    fn from(raw: CampaignPreviews) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CampaignPreviewsView> for CampaignPreviews {
+    fn from(value: CampaignPreviewsView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ChatCompletionEventIdsView {
+    raw: ChatCompletionEventIds,
+}
+
+impl ChatCompletionEventIdsView {
+    pub fn raw(&self) -> &ChatCompletionEventIds {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ChatCompletionEventIds {
+        self.raw
+    }
+}
+
+impl From<ChatCompletionEventIds> for ChatCompletionEventIdsView {
+    fn from(raw: ChatCompletionEventIds) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ChatCompletionEventIdsView> for ChatCompletionEventIds {
+    fn from(value: ChatCompletionEventIdsView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ChatCompletionEventView {
+    raw: ChatCompletionEvent,
+}
+
+impl ChatCompletionEventView {
+    pub fn correlation_id(&self) -> &str {
+        &self.raw.correlation_id
+    }
+    pub fn event_id(&self) -> &str {
+        &self.raw.event_id
+    }
+    pub fn nb_input_tokens(&self) -> i64 {
+        self.raw.nb_input_tokens
+    }
+    pub fn nb_messages(&self) -> i64 {
+        self.raw.nb_messages
+    }
+    pub fn nb_output_tokens(&self) -> i64 {
+        self.raw.nb_output_tokens
+    }
+    pub fn raw(&self) -> &ChatCompletionEvent {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ChatCompletionEvent {
+        self.raw
+    }
+}
+
+impl From<ChatCompletionEvent> for ChatCompletionEventView {
+    fn from(raw: ChatCompletionEvent) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ChatCompletionEventView> for ChatCompletionEvent {
+    fn from(value: ChatCompletionEventView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ChatCompletionEventsView {
+    raw: ChatCompletionEvents,
+}
+
+impl ChatCompletionEventsView {
+    pub fn raw(&self) -> &ChatCompletionEvents {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ChatCompletionEvents {
+        self.raw
+    }
+}
+
+impl From<ChatCompletionEvents> for ChatCompletionEventsView {
+    fn from(raw: ChatCompletionEvents) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ChatCompletionEventsView> for ChatCompletionEvents {
+    fn from(value: ChatCompletionEventsView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct FieldOptionCountsView {
+    raw: FieldOptionCounts,
+}
+
+impl FieldOptionCountsView {
+    pub fn raw(&self) -> &FieldOptionCounts {
+        &self.raw
+    }
+    pub fn into_raw(self) -> FieldOptionCounts {
+        self.raw
+    }
+}
+
+impl From<FieldOptionCounts> for FieldOptionCountsView {
+    fn from(raw: FieldOptionCounts) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<FieldOptionCountsView> for FieldOptionCounts {
+    fn from(value: FieldOptionCountsView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ChatCompletionFieldOptionsView {
+    raw: ChatCompletionFieldOptions,
+}
+
+impl ChatCompletionFieldOptionsView {
+    pub fn raw(&self) -> &ChatCompletionFieldOptions {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ChatCompletionFieldOptions {
+        self.raw
+    }
+}
+
+impl From<ChatCompletionFieldOptions> for ChatCompletionFieldOptionsView {
+    fn from(raw: ChatCompletionFieldOptions) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ChatCompletionFieldOptionsView> for ChatCompletionFieldOptions {
+    fn from(value: ChatCompletionFieldOptionsView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ChatCompletionFieldsView {
+    raw: ChatCompletionFields,
+}
+
+impl ChatCompletionFieldsView {
+    pub fn raw(&self) -> &ChatCompletionFields {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ChatCompletionFields {
+        self.raw
+    }
+}
+
+impl From<ChatCompletionFields> for ChatCompletionFieldsView {
+    fn from(raw: ChatCompletionFields) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ChatCompletionFieldsView> for ChatCompletionFields {
+    fn from(value: ChatCompletionFieldsView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct DatasetPreviewView {
     raw: DatasetPreview,
 }
@@ -3925,6 +4480,41 @@ impl From<WorkflowScheduleListResponse> for WorkflowScheduleListResponseView {
 
 impl From<WorkflowScheduleListResponseView> for WorkflowScheduleListResponse {
     fn from(value: WorkflowScheduleListResponseView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct WorkerInfoView {
+    raw: WorkerInfo,
+}
+
+impl WorkerInfoView {
+    pub fn namespace(&self) -> &str {
+        &self.raw.namespace
+    }
+    pub fn scheduler_url(&self) -> &str {
+        &self.raw.scheduler_url
+    }
+    pub fn tls(&self) -> Option<bool> {
+        self.raw.tls
+    }
+    pub fn raw(&self) -> &WorkerInfo {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkerInfo {
+        self.raw
+    }
+}
+
+impl From<WorkerInfo> for WorkerInfoView {
+    fn from(raw: WorkerInfo) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<WorkerInfoView> for WorkerInfo {
+    fn from(value: WorkerInfoView) -> Self {
         value.into_raw()
     }
 }
@@ -4509,6 +5099,35 @@ impl From<BatchJobsOutView> for BatchJobsOut {
 }
 
 #[derive(Debug, Clone)]
+pub struct JobsOutView {
+    raw: JobsOut,
+}
+
+impl JobsOutView {
+    pub fn total(&self) -> i64 {
+        self.raw.total
+    }
+    pub fn raw(&self) -> &JobsOut {
+        &self.raw
+    }
+    pub fn into_raw(self) -> JobsOut {
+        self.raw
+    }
+}
+
+impl From<JobsOut> for JobsOutView {
+    fn from(raw: JobsOut) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<JobsOutView> for JobsOut {
+    fn from(value: JobsOutView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct JudgeOutputView {
     raw: JudgeOutput,
 }
@@ -4533,6 +5152,42 @@ impl From<JudgeOutput> for JudgeOutputView {
 
 impl From<JudgeOutputView> for JudgeOutput {
     fn from(value: JudgeOutputView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct PostChatCompletionEventJudgingInSchemaParams {
+    raw: PostChatCompletionEventJudgingInSchema,
+}
+
+impl PostChatCompletionEventJudgingInSchemaParams {
+    pub fn new(judge_definition: impl Into<PostJudgeInSchemaParams>) -> Self {
+        Self {
+            raw: PostChatCompletionEventJudgingInSchema {
+                judge_definition: Into::<PostJudgeInSchemaParams>::into(judge_definition).into(),
+            },
+        }
+    }
+    pub fn from_raw(raw: PostChatCompletionEventJudgingInSchema) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &PostChatCompletionEventJudgingInSchema {
+        &self.raw
+    }
+    pub fn into_raw(self) -> PostChatCompletionEventJudgingInSchema {
+        self.raw
+    }
+}
+
+impl From<PostChatCompletionEventJudgingInSchema> for PostChatCompletionEventJudgingInSchemaParams {
+    fn from(raw: PostChatCompletionEventJudgingInSchema) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<PostChatCompletionEventJudgingInSchemaParams> for PostChatCompletionEventJudgingInSchema {
+    fn from(value: PostChatCompletionEventJudgingInSchemaParams) -> Self {
         value.into_raw()
     }
 }
@@ -5367,6 +6022,40 @@ impl From<VoiceListResponseView> for VoiceListResponse {
 }
 
 #[derive(Debug, Clone)]
+pub struct PostDatasetImportFromCampaignInSchemaParams {
+    raw: PostDatasetImportFromCampaignInSchema,
+}
+
+impl PostDatasetImportFromCampaignInSchemaParams {
+    pub fn new(campaign_id: uuid::Uuid) -> Self {
+        Self {
+            raw: PostDatasetImportFromCampaignInSchema { campaign_id },
+        }
+    }
+    pub fn from_raw(raw: PostDatasetImportFromCampaignInSchema) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &PostDatasetImportFromCampaignInSchema {
+        &self.raw
+    }
+    pub fn into_raw(self) -> PostDatasetImportFromCampaignInSchema {
+        self.raw
+    }
+}
+
+impl From<PostDatasetImportFromCampaignInSchema> for PostDatasetImportFromCampaignInSchemaParams {
+    fn from(raw: PostDatasetImportFromCampaignInSchema) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<PostDatasetImportFromCampaignInSchemaParams> for PostDatasetImportFromCampaignInSchema {
+    fn from(value: PostDatasetImportFromCampaignInSchemaParams) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct PostDatasetImportFromDatasetInSchemaParams {
     raw: PostDatasetImportFromDatasetInSchema,
 }
@@ -5396,6 +6085,42 @@ impl From<PostDatasetImportFromDatasetInSchema> for PostDatasetImportFromDataset
 
 impl From<PostDatasetImportFromDatasetInSchemaParams> for PostDatasetImportFromDatasetInSchema {
     fn from(value: PostDatasetImportFromDatasetInSchemaParams) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct PostDatasetImportFromExplorerInSchemaParams {
+    raw: PostDatasetImportFromExplorerInSchema,
+}
+
+impl PostDatasetImportFromExplorerInSchemaParams {
+    pub fn new(completion_event_ids: Vec<String>) -> Self {
+        Self {
+            raw: PostDatasetImportFromExplorerInSchema {
+                completion_event_ids,
+            },
+        }
+    }
+    pub fn from_raw(raw: PostDatasetImportFromExplorerInSchema) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &PostDatasetImportFromExplorerInSchema {
+        &self.raw
+    }
+    pub fn into_raw(self) -> PostDatasetImportFromExplorerInSchema {
+        self.raw
+    }
+}
+
+impl From<PostDatasetImportFromExplorerInSchema> for PostDatasetImportFromExplorerInSchemaParams {
+    fn from(raw: PostDatasetImportFromExplorerInSchema) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<PostDatasetImportFromExplorerInSchemaParams> for PostDatasetImportFromExplorerInSchema {
+    fn from(value: PostDatasetImportFromExplorerInSchemaParams) -> Self {
         value.into_raw()
     }
 }

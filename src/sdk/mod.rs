@@ -11,11 +11,16 @@ mod beta_libraries;
 mod beta_libraries_accesses;
 mod beta_libraries_documents;
 mod beta_observability;
+mod beta_observability_campaigns;
+mod beta_observability_chat_completion_events;
+mod beta_observability_chat_completion_events_fields;
 mod beta_observability_datasets;
 mod beta_observability_datasets_records;
 mod beta_observability_judges;
 pub mod chat;
 pub mod classifiers;
+pub mod deprecated;
+mod deprecated_fine_tuning;
 pub mod embeddings;
 pub mod error;
 mod facade_types;
@@ -30,6 +35,7 @@ mod workflows_executions;
 mod workflows_metrics;
 mod workflows_runs;
 mod workflows_schedules;
+mod workflows_workers;
 
 pub use audio::Audio;
 pub use audio_voices::AudioVoices;
@@ -43,32 +49,41 @@ pub use beta_libraries::BetaLibraries;
 pub use beta_libraries_accesses::BetaLibrariesAccesses;
 pub use beta_libraries_documents::BetaLibrariesDocuments;
 pub use beta_observability::BetaObservability;
+pub use beta_observability_campaigns::BetaObservabilityCampaigns;
+pub use beta_observability_chat_completion_events::BetaObservabilityChatCompletionEvents;
+pub use beta_observability_chat_completion_events_fields::BetaObservabilityChatCompletionEventsFields;
 pub use beta_observability_datasets::BetaObservabilityDatasets;
 pub use beta_observability_datasets_records::BetaObservabilityDatasetsRecords;
 pub use beta_observability_judges::BetaObservabilityJudges;
 pub use chat::Chat;
 pub use classifiers::Classifiers;
+pub use deprecated::Deprecated;
+pub use deprecated_fine_tuning::DeprecatedFineTuning;
 pub use embeddings::Embeddings;
 pub use error::{ApiError, SdkError, TransportError, TransportErrorKind};
 pub use facade_types::{
     AgentAliasResponseView, AgentListPageView, AgentView, ApiEndpointValue, ArchiveModelResponse,
     AuthDataParams, AuthUrlResponseView, BaseModel, BatchExecutionBodyParams,
     BatchExecutionResponseView, BatchJobInMetadataMap, BatchJobInParams, BatchJobOutView,
-    BatchJobsOutView, BatchRequestBodyMap, BatchRequestParams, BinaryStream,
-    ChatClassificationInput, ChatClassificationParams, ChatModerationInput, ChatModerationParams,
-    ChatRequest, ChatResponse, ChatStream, ChatStreamChunk, ClassificationInput,
-    ClassificationParams, ClassificationResult, ClassificationResultSet, ClassifierConversation,
-    ClassifierFineTunedModel, CompletionFineTunedModel, ConnectorMCPCreateHeadersMap,
-    ConnectorMCPCreateParams, ConnectorMCPUpdateConnectionConfigMap,
+    BatchJobsOutView, BatchRequestBodyMap, BatchRequestParams, BinaryStream, CampaignPreviewView,
+    CampaignPreviewsView, CampaignSelectedEventsView, CampaignStatusView, ChatClassificationInput,
+    ChatClassificationParams, ChatCompletionEventIdsView, ChatCompletionEventView,
+    ChatCompletionEventsView, ChatCompletionFieldOptionsView, ChatCompletionFieldsView,
+    ChatModerationInput, ChatModerationParams, ChatRequest, ChatResponse, ChatStream,
+    ChatStreamChunk, ClassificationInput, ClassificationParams, ClassificationResult,
+    ClassificationResultSet, ClassifierConversation, ClassifierFineTunedModel,
+    CompletionFineTunedModel, ConnectionCredentialsHeadersMap, ConnectionCredentialsParams,
+    ConnectorMCPCreateHeadersMap, ConnectorMCPCreateParams, ConnectorMCPUpdateConnectionConfigMap,
     ConnectorMCPUpdateConnectionSecretsMap, ConnectorMCPUpdateHeadersMap, ConnectorMCPUpdateParams,
     ConnectorView, ConversationHistoryView, ConversationMessagesView, ConversationResponseView,
-    CredentialsResponseView, DatasetExportView, DatasetImportTaskView, DatasetImportTasksView,
-    DatasetPreviewView, DatasetPreviewsView, DatasetRecordView, DatasetRecordsView, DatasetView,
-    DeleteDatasetRecordsInSchemaParams, DeleteModelResponse, DeletedFile,
-    DeploymentDetailResponseView, DeploymentListResponseView, DocumentOutView,
-    DocumentTextContentView, DocumentUpdateInAttributesMap, DocumentUpdateInParams, Embedding,
-    EmbeddingInput, EmbeddingParams, EmbeddingResult, EntityTypeValue, FileDetails, FileInfo,
-    FileList, FileSignedUrl, FimRequest, FimResponse, FimStream, FimStreamChunk, FineTunedModel,
+    CredentialsCreateOrUpdateParams, CredentialsResponseView, DatasetExportView,
+    DatasetImportTaskView, DatasetImportTasksView, DatasetPreviewView, DatasetPreviewsView,
+    DatasetRecordView, DatasetRecordsView, DatasetView, DeleteDatasetRecordsInSchemaParams,
+    DeleteModelResponse, DeletedFile, DeploymentDetailResponseView, DeploymentListResponseView,
+    DocumentOutView, DocumentTextContentView, DocumentUpdateInAttributesMap,
+    DocumentUpdateInParams, Embedding, EmbeddingInput, EmbeddingParams, EmbeddingResult,
+    EntityTypeValue, FieldOptionCountsView, FileDetails, FileInfo, FileList, FileSignedUrl,
+    FimRequest, FimResponse, FimStream, FimStreamChunk, FineTunedModel, JobsOutView,
     JudgeClassificationOutputOptionParams, JudgeClassificationOutputParams,
     JudgeConversationRequestMessagesItemMap, JudgeConversationRequestParams,
     JudgeConversationRequestPropertiesMap, JudgeOutputView, JudgePreviewView, JudgePreviewsView,
@@ -76,8 +91,10 @@ pub use facade_types::{
     ListDocumentOutView, ListLibraryOutView, ListSharingOutView, ListWorkflowEventResponseView,
     MCPToolCallRequestArgumentsMap, MCPToolCallRequestParams, MCPToolCallResponseView, Message,
     MessageResponseView, ModelListResponse, ModelResponse, ModerationResult, ModerationResultSet,
-    OcrPage, OcrRequest, OcrResponse, PaginatedConnectorsView, PatchDatasetInSchemaParams,
-    PostDatasetImportFromDatasetInSchemaParams, PostDatasetImportFromFileInSchemaParams,
+    OAuth2TokenParams, OcrPage, OcrRequest, OcrResponse, PaginatedConnectorsView,
+    PatchDatasetInSchemaParams, PostChatCompletionEventJudgingInSchemaParams,
+    PostDatasetImportFromCampaignInSchemaParams, PostDatasetImportFromDatasetInSchemaParams,
+    PostDatasetImportFromExplorerInSchemaParams, PostDatasetImportFromFileInSchemaParams,
     PostDatasetImportFromPlaygroundInSchemaParams, PostDatasetInSchemaParams,
     PostDatasetRecordJudgingInSchemaParams, PostJudgeInSchemaOutputValue, PostJudgeInSchemaParams,
     ProcessingStatusOutView, PutDatasetRecordPropertiesInSchemaParams,
@@ -87,12 +104,13 @@ pub use facade_types::{
     SignalWorkflowResponseView, StopSequences, TranscriptionResponseView, UnarchiveModelResponse,
     UpdateModelRequest, UpdateModelResponse, UpdateWorkflowResponseView, UploadFileOutView,
     VoiceCreateRequestParams, VoiceListResponseView, VoiceResponseView, VoiceUpdateRequestParams,
-    WorkflowArchiveResponseView, WorkflowExecutionListResponseView, WorkflowExecutionResponseView,
-    WorkflowExecutionTraceEventsResponseView, WorkflowExecutionTraceOTelResponseView,
-    WorkflowExecutionTraceSummaryResponseView, WorkflowGetResponseView, WorkflowMetricsView,
-    WorkflowRegistrationGetResponseView, WorkflowRegistrationListResponseView,
-    WorkflowScheduleListResponseView, WorkflowScheduleResponseView, WorkflowUnarchiveResponseView,
-    WorkflowUpdateRequestParams, WorkflowUpdateResponseView,
+    WorkerInfoView, WorkflowArchiveResponseView, WorkflowExecutionListResponseView,
+    WorkflowExecutionResponseView, WorkflowExecutionTraceEventsResponseView,
+    WorkflowExecutionTraceOTelResponseView, WorkflowExecutionTraceSummaryResponseView,
+    WorkflowGetResponseView, WorkflowMetricsView, WorkflowRegistrationGetResponseView,
+    WorkflowRegistrationListResponseView, WorkflowScheduleListResponseView,
+    WorkflowScheduleResponseView, WorkflowUnarchiveResponseView, WorkflowUpdateRequestParams,
+    WorkflowUpdateResponseView,
 };
 pub use files::Files;
 pub use fim::Fim;
@@ -105,6 +123,7 @@ pub use workflows_executions::WorkflowsExecutions;
 pub use workflows_metrics::WorkflowsMetrics;
 pub use workflows_runs::WorkflowsRuns;
 pub use workflows_schedules::WorkflowsSchedules;
+pub use workflows_workers::WorkflowsWorkers;
 
 use crate::generated::client::HttpClient;
 
@@ -156,6 +175,9 @@ impl Mistral {
     }
     pub fn batch(&self) -> Batch<'_> {
         Batch::new(&self.raw)
+    }
+    pub fn deprecated(&self) -> Deprecated<'_> {
+        Deprecated::new(&self.raw)
     }
     pub fn raw(&self) -> &HttpClient {
         &self.raw

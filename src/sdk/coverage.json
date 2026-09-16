@@ -231,19 +231,19 @@
     "connector_create_or_update_organization_credentials_v1": {
       "method": "post",
       "path": "/v1/connectors/{connector_id_or_name}/organization/credentials",
-      "status": "candidate_unverified",
+      "status": "mapped",
       "review_reasons": []
     },
     "connector_create_or_update_user_credentials_v1": {
       "method": "post",
       "path": "/v1/connectors/{connector_id_or_name}/user/credentials",
-      "status": "candidate_unverified",
+      "status": "mapped",
       "review_reasons": []
     },
     "connector_create_or_update_workspace_credentials_v1": {
       "method": "post",
       "path": "/v1/connectors/{connector_id_or_name}/workspace/credentials",
-      "status": "candidate_unverified",
+      "status": "mapped",
       "review_reasons": []
     },
     "connector_create_v1": {
@@ -365,7 +365,7 @@
     "delete_campaign_v1_observability_campaigns__campaign_id__delete": {
       "method": "delete",
       "path": "/v1/observability/campaigns/{campaign_id}",
-      "status": "capability_gap",
+      "status": "mapped",
       "review_reasons": [
         "raw_symbol_mapping"
       ]
@@ -496,7 +496,7 @@
     "get_campaign_by_id_v1_observability_campaigns__campaign_id__get": {
       "method": "get",
       "path": "/v1/observability/campaigns/{campaign_id}",
-      "status": "capability_gap",
+      "status": "mapped",
       "review_reasons": [
         "raw_symbol_mapping"
       ]
@@ -504,7 +504,7 @@
     "get_campaign_selected_events_v1_observability_campaigns__campaign_id__selected_events_get": {
       "method": "get",
       "path": "/v1/observability/campaigns/{campaign_id}/selected-events",
-      "status": "capability_gap",
+      "status": "mapped",
       "review_reasons": [
         "raw_symbol_mapping"
       ]
@@ -512,7 +512,7 @@
     "get_campaign_status_by_id_v1_observability_campaigns__campaign_id__status_get": {
       "method": "get",
       "path": "/v1/observability/campaigns/{campaign_id}/status",
-      "status": "capability_gap",
+      "status": "mapped",
       "review_reasons": [
         "raw_symbol_mapping"
       ]
@@ -520,7 +520,7 @@
     "get_campaigns_v1_observability_campaigns_get": {
       "method": "get",
       "path": "/v1/observability/campaigns",
-      "status": "candidate_unverified",
+      "status": "mapped",
       "review_reasons": []
     },
     "get_chat_completion_event_ids_v1_observability_chat_completion_events_search_ids_post": {
@@ -532,7 +532,7 @@
     "get_chat_completion_event_v1_observability_chat_completion_events__event_id__get": {
       "method": "get",
       "path": "/v1/observability/chat-completion-events/{event_id}",
-      "status": "capability_gap",
+      "status": "mapped",
       "review_reasons": [
         "raw_symbol_mapping"
       ]
@@ -554,7 +554,7 @@
     "get_chat_completion_field_options_v1_observability_chat_completion_fields__field_name__options_get": {
       "method": "get",
       "path": "/v1/observability/chat-completion-fields/{field_name}/options",
-      "status": "capability_gap",
+      "status": "mapped",
       "review_reasons": [
         "raw_symbol_mapping"
       ]
@@ -562,7 +562,7 @@
     "get_chat_completion_fields_v1_observability_chat_completion_fields_get": {
       "method": "get",
       "path": "/v1/observability/chat-completion-fields",
-      "status": "candidate_unverified",
+      "status": "mapped",
       "review_reasons": []
     },
     "get_dataset_by_id_v1_observability_datasets__dataset_id__get": {
@@ -658,7 +658,7 @@
     "get_similar_chat_completion_events_v1_observability_chat_completion_events__event_id__similar_events_get": {
       "method": "get",
       "path": "/v1/observability/chat-completion-events/{event_id}/similar-events",
-      "status": "capability_gap",
+      "status": "mapped",
       "review_reasons": [
         "raw_symbol_mapping"
       ]
@@ -691,7 +691,7 @@
     "get_worker_info_v1_workflows_workers_whoami_get": {
       "method": "get",
       "path": "/v1/workflows/workers/whoami",
-      "status": "candidate_unverified",
+      "status": "mapped",
       "review_reasons": []
     },
     "get_workflow_events_v1_workflows_events_list_get": {
@@ -815,7 +815,7 @@
     "jobs_api_routes_fine_tuning_get_fine_tuning_jobs": {
       "method": "get",
       "path": "/v1/fine_tuning/jobs",
-      "status": "candidate_unverified",
+      "status": "mapped",
       "review_reasons": []
     },
     "jobs_api_routes_fine_tuning_start_fine_tuning_job": {
@@ -839,7 +839,7 @@
     "judge_chat_completion_event_v1_observability_chat_completion_events__event_id__live_judging_post": {
       "method": "post",
       "path": "/v1/observability/chat-completion-events/{event_id}/live-judging",
-      "status": "capability_gap",
+      "status": "mapped",
       "review_reasons": [
         "raw_symbol_mapping"
       ]
@@ -1011,7 +1011,7 @@
     "post_dataset_records_from_campaign_v1_observability_datasets__dataset_id__imports_from_campaign_post": {
       "method": "post",
       "path": "/v1/observability/datasets/{dataset_id}/imports/from-campaign",
-      "status": "capability_gap",
+      "status": "mapped",
       "review_reasons": [
         "raw_symbol_mapping"
       ]
@@ -1027,7 +1027,7 @@
     "post_dataset_records_from_explorer_v1_observability_datasets__dataset_id__imports_from_explorer_post": {
       "method": "post",
       "path": "/v1/observability/datasets/{dataset_id}/imports/from-explorer",
-      "status": "capability_gap",
+      "status": "mapped",
       "review_reasons": [
         "raw_symbol_mapping"
       ]
@@ -1279,6 +1279,9 @@
     "beta_connectors": {
       "operations": [
         "connector_call_tool_v1",
+        "connector_create_or_update_organization_credentials_v1",
+        "connector_create_or_update_user_credentials_v1",
+        "connector_create_or_update_workspace_credentials_v1",
         "connector_create_v1",
         "connector_delete_organization_credentials_v1",
         "connector_delete_user_credentials_v1",
@@ -1306,7 +1309,9 @@
         "get_dataset_import_tasks_v1_observability_datasets__dataset_id__tasks_get",
         "get_dataset_records_v1_observability_datasets__dataset_id__records_get",
         "get_datasets_v1_observability_datasets_get",
+        "post_dataset_records_from_campaign_v1_observability_datasets__dataset_id__imports_from_campaign_post",
         "post_dataset_records_from_dataset_v1_observability_datasets__dataset_id__imports_from_dataset_post",
+        "post_dataset_records_from_explorer_v1_observability_datasets__dataset_id__imports_from_explorer_post",
         "post_dataset_records_from_file_v1_observability_datasets__dataset_id__imports_from_file_post",
         "post_dataset_records_from_playground_v1_observability_datasets__dataset_id__imports_from_playground_post",
         "update_dataset_v1_observability_datasets__dataset_id__patch"
@@ -1334,6 +1339,15 @@
         "update_voice_v1_audio_voices__voice_id__patch"
       ]
     },
+    "beta_observability_campaigns": {
+      "operations": [
+        "delete_campaign_v1_observability_campaigns__campaign_id__delete",
+        "get_campaign_by_id_v1_observability_campaigns__campaign_id__get",
+        "get_campaign_selected_events_v1_observability_campaigns__campaign_id__selected_events_get",
+        "get_campaign_status_by_id_v1_observability_campaigns__campaign_id__status_get",
+        "get_campaigns_v1_observability_campaigns_get"
+      ]
+    },
     "beta_observability_datasets_records": {
       "operations": [
         "delete_dataset_record_v1_observability_dataset_records__dataset_record_id__delete",
@@ -1341,6 +1355,19 @@
         "get_dataset_record_v1_observability_dataset_records__dataset_record_id__get",
         "judge_dataset_record_v1_observability_dataset_records__dataset_record_id__live_judging_post",
         "update_dataset_record_properties_v1_observability_dataset_records__dataset_record_id__properties_put"
+      ]
+    },
+    "beta_observability_chat_completion_events": {
+      "operations": [
+        "get_chat_completion_event_v1_observability_chat_completion_events__event_id__get",
+        "get_similar_chat_completion_events_v1_observability_chat_completion_events__event_id__similar_events_get",
+        "judge_chat_completion_event_v1_observability_chat_completion_events__event_id__live_judging_post"
+      ]
+    },
+    "beta_observability_chat_completion_events_fields": {
+      "operations": [
+        "get_chat_completion_field_options_v1_observability_chat_completion_fields__field_name__options_get",
+        "get_chat_completion_fields_v1_observability_chat_completion_fields_get"
       ]
     },
     "workflows_deployments": {
@@ -1359,6 +1386,11 @@
       "operations": [
         "get_schedules_v1_workflows_schedules_get",
         "unschedule_workflow_v1_workflows_schedules__schedule_id__delete"
+      ]
+    },
+    "workflows_workers": {
+      "operations": [
+        "get_worker_info_v1_workflows_workers_whoami_get"
       ]
     },
     "workflows_events": {
@@ -1380,6 +1412,14 @@
         "jobs_api_routes_batch_create_batch_job",
         "jobs_api_routes_batch_get_batch_job",
         "jobs_api_routes_batch_get_batch_jobs"
+      ]
+    },
+    "deprecated": {
+      "operations": []
+    },
+    "deprecated_fine_tuning": {
+      "operations": [
+        "jobs_api_routes_fine_tuning_get_fine_tuning_jobs"
       ]
     },
     "beta_libraries": {
@@ -1951,6 +1991,45 @@
         "arguments"
       ]
     },
+    "MessageResponseView": {
+      "raw": "MessageResponse",
+      "fields": [
+        "message"
+      ]
+    },
+    "ConnectionCredentialsHeadersMap": {
+      "raw": "ConnectionCredentialsHeaders",
+      "fields": [
+        "additional_properties"
+      ]
+    },
+    "OAuth2TokenParams": {
+      "raw": "OAuth2Token",
+      "fields": [
+        "access_token",
+        "expires_at",
+        "expires_in",
+        "refresh_token",
+        "scope",
+        "token_type"
+      ]
+    },
+    "ConnectionCredentialsParams": {
+      "raw": "ConnectionCredentials",
+      "fields": [
+        "bearer_token",
+        "headers",
+        "oauth"
+      ]
+    },
+    "CredentialsCreateOrUpdateParams": {
+      "raw": "CredentialsCreateOrUpdate",
+      "fields": [
+        "credentials",
+        "is_default",
+        "name"
+      ]
+    },
     "ConnectorView": {
       "raw": "Connector",
       "fields": [
@@ -1992,12 +2071,6 @@
         "server",
         "system_prompt",
         "visibility"
-      ]
-    },
-    "MessageResponseView": {
-      "raw": "MessageResponse",
-      "fields": [
-        "message"
       ]
     },
     "AuthUrlResponseView": {
@@ -2051,6 +2124,22 @@
         "name",
         "server",
         "system_prompt"
+      ]
+    },
+    "CampaignPreviewView": {
+      "raw": "CampaignPreview",
+      "fields": [
+        "created_at",
+        "deleted_at",
+        "description",
+        "id",
+        "judge",
+        "max_nb_events",
+        "name",
+        "owner_id",
+        "search_params",
+        "updated_at",
+        "workspace_id"
       ]
     },
     "DatasetRecordView": {
@@ -2206,6 +2295,71 @@
         "visibility"
       ]
     },
+    "CampaignSelectedEventsView": {
+      "raw": "CampaignSelectedEvents",
+      "fields": [
+        "completion_events"
+      ]
+    },
+    "CampaignStatusView": {
+      "raw": "CampaignStatus",
+      "fields": [
+        "status"
+      ]
+    },
+    "CampaignPreviewsView": {
+      "raw": "CampaignPreviews",
+      "fields": [
+        "campaigns"
+      ]
+    },
+    "ChatCompletionEventIdsView": {
+      "raw": "ChatCompletionEventIds",
+      "fields": [
+        "completion_event_ids"
+      ]
+    },
+    "ChatCompletionEventView": {
+      "raw": "ChatCompletionEvent",
+      "fields": [
+        "chat_transcription_events",
+        "correlation_id",
+        "created_at",
+        "enabled_tools",
+        "event_id",
+        "extra_fields",
+        "nb_input_tokens",
+        "nb_messages",
+        "nb_output_tokens",
+        "request_messages",
+        "response_messages"
+      ]
+    },
+    "ChatCompletionEventsView": {
+      "raw": "ChatCompletionEvents",
+      "fields": [
+        "completion_events"
+      ]
+    },
+    "FieldOptionCountsView": {
+      "raw": "FieldOptionCounts",
+      "fields": [
+        "counts"
+      ]
+    },
+    "ChatCompletionFieldOptionsView": {
+      "raw": "ChatCompletionFieldOptions",
+      "fields": [
+        "options"
+      ]
+    },
+    "ChatCompletionFieldsView": {
+      "raw": "ChatCompletionFields",
+      "fields": [
+        "field_definitions",
+        "field_groups"
+      ]
+    },
     "DatasetPreviewView": {
       "raw": "DatasetPreview",
       "fields": [
@@ -2287,6 +2441,14 @@
       "raw": "WorkflowScheduleListResponse",
       "fields": [
         "schedules"
+      ]
+    },
+    "WorkerInfoView": {
+      "raw": "WorkerInfo",
+      "fields": [
+        "namespace",
+        "scheduler_url",
+        "tls"
       ]
     },
     "ListWorkflowEventResponseView": {
@@ -2442,11 +2604,25 @@
         "total"
       ]
     },
+    "JobsOutView": {
+      "raw": "JobsOut",
+      "fields": [
+        "data",
+        "object",
+        "total"
+      ]
+    },
     "JudgeOutputView": {
       "raw": "JudgeOutput",
       "fields": [
         "analysis",
         "answer"
+      ]
+    },
+    "PostChatCompletionEventJudgingInSchemaParams": {
+      "raw": "PostChatCompletionEventJudgingInSchema",
+      "fields": [
+        "judge_definition"
       ]
     },
     "JudgeConversationRequestMessagesItemMap": {
@@ -2632,10 +2808,22 @@
         "total_pages"
       ]
     },
+    "PostDatasetImportFromCampaignInSchemaParams": {
+      "raw": "PostDatasetImportFromCampaignInSchema",
+      "fields": [
+        "campaign_id"
+      ]
+    },
     "PostDatasetImportFromDatasetInSchemaParams": {
       "raw": "PostDatasetImportFromDatasetInSchema",
       "fields": [
         "dataset_record_ids"
+      ]
+    },
+    "PostDatasetImportFromExplorerInSchemaParams": {
+      "raw": "PostDatasetImportFromExplorerInSchema",
+      "fields": [
+        "completion_event_ids"
       ]
     },
     "PostDatasetImportFromFileInSchemaParams": {
@@ -2752,9 +2940,9 @@
   },
   "automatic_projection": {
     "schema_version": 1,
-    "added_count": 93,
-    "rejected_count": 62,
-    "report_sha256": "ecf077c2c9ca2c034cc2de55cda04acabb9c48ea5ef2e3b30a6f0849be06c7de",
+    "added_count": 110,
+    "rejected_count": 45,
+    "report_sha256": "09a3fefec8fa380baf100ea9c8788c9106db9c1689248decf2824e3f9853dfe7",
     "added": [
       "agents_api_v1_agents_create_or_update_alias",
       "agents_api_v1_agents_delete",
@@ -2771,6 +2959,9 @@
       "batch_terminate_workflow_executions_v1_workflows_executions_terminate_post",
       "cancel_workflow_execution_v1_workflows_executions__execution_id__cancel_post",
       "connector_call_tool_v1",
+      "connector_create_or_update_organization_credentials_v1",
+      "connector_create_or_update_user_credentials_v1",
+      "connector_create_or_update_workspace_credentials_v1",
       "connector_create_v1",
       "connector_delete_organization_credentials_v1",
       "connector_delete_user_credentials_v1",
@@ -2786,6 +2977,7 @@
       "create_dataset_v1_observability_datasets_post",
       "create_judge_v1_observability_judges_post",
       "create_voice_v1_audio_voices_post",
+      "delete_campaign_v1_observability_campaigns__campaign_id__delete",
       "delete_dataset_record_v1_observability_dataset_records__dataset_record_id__delete",
       "delete_dataset_records_v1_observability_dataset_records_bulk_delete_post",
       "delete_dataset_v1_observability_datasets__dataset_id__delete",
@@ -2793,6 +2985,13 @@
       "delete_voice_v1_audio_voices__voice_id__delete",
       "export_dataset_to_jsonl_v1_observability_datasets__dataset_id__exports_to_jsonl_get",
       "files_api_routes_download_file",
+      "get_campaign_by_id_v1_observability_campaigns__campaign_id__get",
+      "get_campaign_selected_events_v1_observability_campaigns__campaign_id__selected_events_get",
+      "get_campaign_status_by_id_v1_observability_campaigns__campaign_id__status_get",
+      "get_campaigns_v1_observability_campaigns_get",
+      "get_chat_completion_event_v1_observability_chat_completion_events__event_id__get",
+      "get_chat_completion_field_options_v1_observability_chat_completion_fields__field_name__options_get",
+      "get_chat_completion_fields_v1_observability_chat_completion_fields_get",
       "get_dataset_by_id_v1_observability_datasets__dataset_id__get",
       "get_dataset_import_task_v1_observability_datasets__dataset_id__tasks__task_id__get",
       "get_dataset_import_tasks_v1_observability_datasets__dataset_id__tasks_get",
@@ -2804,7 +3003,9 @@
       "get_judges_v1_observability_judges_get",
       "get_run_v1_workflows_runs__run_id__get",
       "get_schedules_v1_workflows_schedules_get",
+      "get_similar_chat_completion_events_v1_observability_chat_completion_events__event_id__similar_events_get",
       "get_voice_v1_audio_voices__voice_id__get",
+      "get_worker_info_v1_workflows_workers_whoami_get",
       "get_workflow_events_v1_workflows_events_list_get",
       "get_workflow_execution_trace_events",
       "get_workflow_execution_trace_otel",
@@ -2818,6 +3019,8 @@
       "jobs_api_routes_batch_create_batch_job",
       "jobs_api_routes_batch_get_batch_job",
       "jobs_api_routes_batch_get_batch_jobs",
+      "jobs_api_routes_fine_tuning_get_fine_tuning_jobs",
+      "judge_chat_completion_event_v1_observability_chat_completion_events__event_id__live_judging_post",
       "judge_conversation_v1_observability_judges__judge_id__live_judging_post",
       "judge_dataset_record_v1_observability_dataset_records__dataset_record_id__live_judging_post",
       "libraries_create_v1",
@@ -2837,7 +3040,9 @@
       "list_deployments_v1_workflows_deployments_get",
       "list_runs_v1_workflows_runs_get",
       "list_voices_v1_audio_voices_get",
+      "post_dataset_records_from_campaign_v1_observability_datasets__dataset_id__imports_from_campaign_post",
       "post_dataset_records_from_dataset_v1_observability_datasets__dataset_id__imports_from_dataset_post",
+      "post_dataset_records_from_explorer_v1_observability_datasets__dataset_id__imports_from_explorer_post",
       "post_dataset_records_from_file_v1_observability_datasets__dataset_id__imports_from_file_post",
       "post_dataset_records_from_playground_v1_observability_datasets__dataset_id__imports_from_playground_post",
       "reset_workflow_v1_workflows_executions__execution_id__reset_post",
@@ -2864,48 +3069,31 @@
       "agents_api_v1_conversations_restart_stream": "non_json_success",
       "agents_api_v1_conversations_start": "request_model_projection",
       "agents_api_v1_conversations_start_stream": "non_json_success",
-      "agents_completion_v1_agents_completions_post": "taxonomy_alias_ambiguity",
+      "agents_completion_v1_agents_completions_post": "request_model_projection",
       "audio_api_v1_transcriptions_post": "request_media_projection",
       "audio_api_v1_transcriptions_post_stream": "non_json_success",
-      "connector_create_or_update_organization_credentials_v1": "missing_official_taxonomy",
-      "connector_create_or_update_user_credentials_v1": "missing_official_taxonomy",
-      "connector_create_or_update_workspace_credentials_v1": "missing_official_taxonomy",
       "connector_get_authentication_methods_v1": "inline_or_unresolved_response",
       "connector_list_tools_v1": "inline_or_unresolved_response",
-      "create_campaign_v1_observability_campaigns_post": "missing_official_taxonomy",
+      "create_campaign_v1_observability_campaigns_post": "request_model_projection",
       "create_dataset_record_v1_observability_datasets__dataset_id__records_post": "request_model_projection",
-      "delete_campaign_v1_observability_campaigns__campaign_id__delete": "missing_official_taxonomy",
       "execute_workflow_registration_v1_workflows_registrations__workflow_registration_id__execute_post": "inline_or_unresolved_response",
       "execute_workflow_v1_workflows__workflow_identifier__execute_post": "inline_or_unresolved_response",
       "files_api_routes_upload_file": "request_media_projection",
-      "get_campaign_by_id_v1_observability_campaigns__campaign_id__get": "missing_official_taxonomy",
-      "get_campaign_selected_events_v1_observability_campaigns__campaign_id__selected_events_get": "missing_official_taxonomy",
-      "get_campaign_status_by_id_v1_observability_campaigns__campaign_id__status_get": "missing_official_taxonomy",
-      "get_campaigns_v1_observability_campaigns_get": "missing_official_taxonomy",
-      "get_chat_completion_event_ids_v1_observability_chat_completion_events_search_ids_post": "missing_official_taxonomy",
-      "get_chat_completion_event_v1_observability_chat_completion_events__event_id__get": "missing_official_taxonomy",
-      "get_chat_completion_events_v1_observability_chat_completion_events_search_post": "missing_official_taxonomy",
-      "get_chat_completion_field_options_counts_v1_observability_chat_completion_fields__field_name__options_counts_post": "missing_official_taxonomy",
-      "get_chat_completion_field_options_v1_observability_chat_completion_fields__field_name__options_get": "missing_official_taxonomy",
-      "get_chat_completion_fields_v1_observability_chat_completion_fields_get": "missing_official_taxonomy",
+      "get_chat_completion_event_ids_v1_observability_chat_completion_events_search_ids_post": "request_model_projection",
+      "get_chat_completion_events_v1_observability_chat_completion_events_search_post": "request_model_projection",
+      "get_chat_completion_field_options_counts_v1_observability_chat_completion_fields__field_name__options_counts_post": "request_model_projection",
       "get_run_history_v1_workflows_runs__run_id__history_get": "inline_or_unresolved_response",
-      "get_similar_chat_completion_events_v1_observability_chat_completion_events__event_id__similar_events_get": "missing_official_taxonomy",
       "get_stream_events_v1_workflows_events_stream_get": "non_json_success",
       "get_voice_sample_audio_v1_audio_voices__voice_id__sample_get": "official_binary_transport_mismatch",
-      "get_worker_info_v1_workflows_workers_whoami_get": "missing_official_taxonomy",
       "get_workflow_execution_history_v1_workflows_executions__execution_id__history_get": "inline_or_unresolved_response",
-      "jobs_api_routes_fine_tuning_cancel_fine_tuning_job": "missing_official_taxonomy",
-      "jobs_api_routes_fine_tuning_create_fine_tuning_job": "missing_official_taxonomy",
-      "jobs_api_routes_fine_tuning_get_fine_tuning_job": "missing_official_taxonomy",
-      "jobs_api_routes_fine_tuning_get_fine_tuning_jobs": "missing_official_taxonomy",
-      "jobs_api_routes_fine_tuning_start_fine_tuning_job": "missing_official_taxonomy",
-      "judge_chat_completion_event_v1_observability_chat_completion_events__event_id__live_judging_post": "missing_official_taxonomy",
+      "jobs_api_routes_fine_tuning_cancel_fine_tuning_job": "inline_or_unresolved_response",
+      "jobs_api_routes_fine_tuning_create_fine_tuning_job": "inline_or_unresolved_response",
+      "jobs_api_routes_fine_tuning_get_fine_tuning_job": "inline_or_unresolved_response",
+      "jobs_api_routes_fine_tuning_start_fine_tuning_job": "inline_or_unresolved_response",
       "libraries_documents_get_extracted_text_signed_url_v1": "inline_or_unresolved_response",
       "libraries_documents_get_signed_url_v1": "inline_or_unresolved_response",
       "libraries_documents_upload_v1": "multiple_success_contracts",
       "libraries_share_delete_v1": "request_model_projection",
-      "post_dataset_records_from_campaign_v1_observability_datasets__dataset_id__imports_from_campaign_post": "missing_official_taxonomy",
-      "post_dataset_records_from_explorer_v1_observability_datasets__dataset_id__imports_from_explorer_post": "missing_official_taxonomy",
       "query_workflow_execution_v1_workflows_executions__execution_id__queries_post": "request_model_projection",
       "schedule_workflow_v1_workflows_schedules_post": "request_model_projection",
       "signal_workflow_execution_v1_workflows_executions__execution_id__signals_post": "request_model_projection",
