@@ -3,6 +3,7 @@ from pathlib import Path
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "codegen"))
@@ -35,6 +36,31 @@ class ResolvedEmissionTests(unittest.TestCase):
             legacy_files = {path.name: path.read_bytes() for path in legacy.iterdir()}
             resolved_files = {path.name: path.read_bytes() for path in resolved.iterdir()}
             self.assertEqual(legacy_files, resolved_files)
+
+    def test_pipeline_passes_raw_index_to_automatic_projection(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            raw = root / "raw"
+            raw.mkdir()
+            (raw / "types.rs").write_text(TYPES)
+            (raw / "client.rs").write_text(CLIENT)
+            (raw / "coverage.json").write_text(json.dumps({"operations": []}))
+            openapi = root / "openapi.json"
+            overlay = root / "overlay.json"
+            taxonomy = root / "taxonomy.json"
+            openapi.write_text(json.dumps(openapi_document()))
+            overlay.write_text(json.dumps(manifest()))
+            taxonomy.write_text(json.dumps({"operations": {}}))
+            seen = {}
+
+            def project(openapi_index, current, taxonomy_ir, raw_coverage, rust_index):
+                seen["rust"] = rust_index
+                return current, None
+
+            with patch.object(sdk_pipeline, "expand_manifest", side_effect=project):
+                sdk_pipeline.generate(raw, root / "sdk", overlay, openapi, taxonomy)
+            self.assertIsInstance(seen["rust"], sdk_codegen.RustIndex)
+            self.assertIn("adopt", seen["rust"].operations)
 
     def test_renderer_emits_hand_built_ir_without_source_contracts(self):
         model = ModelSpec(
