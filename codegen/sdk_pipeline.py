@@ -35,11 +35,14 @@ def generate(raw: Path, target: Path, manifest_path: Path, openapi_path: Path | 
         raw_coverage = json.loads((raw / "coverage.json").read_text())
         manifest, projection_report = expand_manifest(openapi, manifest, taxonomy, raw_coverage)
     ir = frontend.build_ir(openapi, rust, manifest)
-    ir = resolve_models(resolve_operations(ir, rust), openapi, rust)
+    try:
+        ir = resolve_models(resolve_operations(ir, rust), openapi, rust)
+        files = sdk_emit.emit(ir)
+    except ValueError as error:
+        raise GenerationError(str(error)) from error
     target.mkdir(parents=True, exist_ok=True)
 
     try:
-        files = sdk_emit.emit(ir)
         surface = public_surface(files)
     except ValueError as error:
         raise GenerationError(str(error)) from error
