@@ -4,10 +4,8 @@ from __future__ import annotations
 
 import sys as _sys
 
-# The extracted v0.1.0 keeps the already-proven module graph byte-identical.
-# Register package-local modules under their historical absolute names while
-# consumers migrate to the package API. This compatibility bootstrap disappears
-# once imports are made package-relative in a later package-only cleanup.
+# Keep the already-proven module graph byte-identical while consumers migrate to
+# the package API. These aliases can disappear once imports are package-relative.
 from . import rust_types as _rust_types
 from . import rust_symbols as _rust_symbols
 
@@ -46,7 +44,7 @@ compile_ir = _sdk_compiler.compile_ir
 compile_facade = _sdk_compiler.compile_facade
 load_raw_ir = _sdk_compiler.load_raw_ir
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 __all__ = [
     "GenerationError",
