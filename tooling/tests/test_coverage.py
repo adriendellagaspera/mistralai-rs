@@ -5,8 +5,9 @@ from pathlib import Path
 import sys
 import unittest
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "codegen"))
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "tooling" / "quality"))
+sys.path.insert(0, str(ROOT / "tooling" / "pipeline"))
 import coverage
 import preprocess
 

@@ -10,11 +10,11 @@ import json
 from pathlib import Path
 from typing import Any
 
-import sdk_taxonomy
+import taxonomy as sdk_taxonomy
 
-ROOT = Path(__file__).resolve().parents[1]
-LOCK_PATH = ROOT / "codegen.lock"
-OUTPUT_PATH = ROOT / "codegen/sdk-taxonomy.json"
+ROOT = Path(__file__).resolve().parents[2]
+LOCK_PATH = ROOT / "tooling/sources/lock.json"
+OUTPUT_PATH = ROOT / "tooling/sources/taxonomy.json"
 
 
 def normalized_paths(records: list[dict[str, Any]]) -> list[str]:

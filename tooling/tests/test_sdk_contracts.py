@@ -3,8 +3,8 @@ from pathlib import Path
 from types import SimpleNamespace
 import unittest
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "codegen" / "mistral"))
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "tooling" / "pipeline" / "mistral"))
 
 from sdk_contracts import compare_surface, coverage_inventory, public_surface
 

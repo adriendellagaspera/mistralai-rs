@@ -1,6 +1,6 @@
 [generator]
-spec_path = "../spec/openapi.codegen.yaml"
-output_dir = "../src/generated"
+spec_path = "../sources/openapi/openapi.codegen.yaml"
+output_dir = "../../src/generated"
 module_name = "mistralai"
 
 [features]

@@ -16,8 +16,8 @@ import tomllib
 from openapi_to_rust_bindings import read_bindings
 from rust_sdk_compiler import GenerationError, OpenApi, Policy, compile, lower
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "codegen" / "mistral"))
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "tooling" / "pipeline" / "mistral"))
 from sdk_autoproject import expand_manifest  # noqa: E402
 from sdk_contracts import coverage_inventory, public_surface  # noqa: E402
 from sdk_pipeline import RUNTIME  # noqa: E402
@@ -93,11 +93,11 @@ def probes(openapi, bindings, configured):
 def main():
     openapi = OpenApi.load(ROOT / "tooling/sources/openapi/openapi.yaml")
     bindings = read_bindings(ROOT / "src/generated")
-    configured = json.loads((ROOT / "codegen/sdk-semantics.json").read_text())
+    configured = json.loads((ROOT / "tooling/pipeline/semantics.json").read_text())
     configured, _ = expand_manifest(
         openapi,
         configured,
-        json.loads((ROOT / "codegen/sdk-taxonomy.json").read_text()),
+        json.loads((ROOT / "tooling/sources/taxonomy.json").read_text()),
         json.loads((ROOT / "src/generated/coverage.json").read_text()),
         bindings,
     )
@@ -110,7 +110,7 @@ def main():
     digest = hashlib.sha256(
         json.dumps(report, sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
-    baseline = json.loads((ROOT / "codegen/sdk-probe-baseline.json").read_text())
+    baseline = json.loads((ROOT / "tooling/quality/probe-baseline.json").read_text())
     actual = {
         "schema_version": 1,
         "generated_candidates": len(modules),

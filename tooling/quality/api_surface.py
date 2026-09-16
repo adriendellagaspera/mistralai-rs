@@ -10,8 +10,8 @@ from pathlib import Path
 import subprocess
 import sys
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "codegen" / "mistral"))
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "tooling" / "pipeline" / "mistral"))
 
 
 def main():
@@ -50,7 +50,7 @@ def main():
             "Generated public API changed: explicit compatibility review required."
         )
     if args.rustdoc:
-        version = json.loads((ROOT / "codegen.lock").read_text())[
+        version = json.loads((ROOT / "tooling/sources/lock.json").read_text())[
             "cargo_semver_checks_version"
         ]
         install = ROOT / ".tools" / f"cargo-semver-checks-{version}"

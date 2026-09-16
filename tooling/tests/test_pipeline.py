@@ -5,15 +5,15 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-import codegen
-import update_spec
+import build as codegen
+import openapi as update_spec
 import preprocess
 
 
 class ProvenanceTests(unittest.TestCase):
     def test_vendored_spec_matches_lock(self):
-        lock = json.loads((codegen.ROOT / "codegen.lock").read_text())
-        codegen.verify_spec((codegen.ROOT / "spec/openapi.yaml").read_bytes(), lock)
+        lock = json.loads((codegen.ROOT / "tooling/sources/lock.json").read_text())
+        codegen.verify_spec((codegen.ROOT / "tooling/sources/openapi/openapi.yaml").read_bytes(), lock)
         with self.assertRaises(ValueError):
             codegen.verify_spec(b"corrupted", lock)
 

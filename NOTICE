@@ -4,19 +4,19 @@ Copyright 2026 Adrien Della Gaspera and contributors.
 The original contributions to this repository are available under MIT OR
 Apache-2.0. Third-party materials retain their original license obligations:
 
-spec/openapi.yaml is an unmodified copy of Mistral AI's official OpenAPI
-specification from mistralai/platform-docs-public. See codegen.lock for the
-immutable source commit and SHA-256, and spec/LICENSE for Apache-2.0 terms.
+tooling/sources/openapi/openapi.yaml is an unmodified copy of Mistral AI's official OpenAPI
+specification from mistralai/platform-docs-public. See tooling/sources/lock.json for the
+immutable source commit and SHA-256, and tooling/sources/openapi/LICENSE for Apache-2.0 terms.
 Any upstream NOTICE is retained at spec/NOTICE when present.
 
 src/generated/ is a mechanical Rust translation of that specification,
 produced with openapi-to-rust and formatted with rustfmt. It is not the
-original specification. See codegen.lock and codegen/openapi-to-rust.toml
+original specification. See tooling/sources/lock.json and tooling/pipeline/openapi-to-rust.toml
 for the generator version and operation selection. Preserve the upstream
 Apache-2.0 license and attribution when redistributing these materials.
 
 openapi-to-rust is Copyright (c) 2025 James Lalonde, licensed under MIT.
-Its license is retained in codegen/GENERATOR-LICENSE, including for any
+Its license is retained in tooling/licenses/openapi-to-rust-MIT.txt, including for any
 substantial generated runtime/template material.
 
 This project is not affiliated with, endorsed by, or supported by Mistral AI.

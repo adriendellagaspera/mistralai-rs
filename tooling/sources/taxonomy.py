@@ -15,10 +15,10 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
-ROOT = Path(__file__).resolve().parents[1]
-LOCK_PATH = ROOT / "codegen.lock"
+ROOT = Path(__file__).resolve().parents[2]
+LOCK_PATH = ROOT / "tooling/sources/lock.json"
 COVERAGE_PATH = ROOT / "src/generated/coverage.json"
-OUTPUT_PATH = ROOT / "codegen/sdk-taxonomy.json"
+OUTPUT_PATH = ROOT / "tooling/sources/taxonomy.json"
 
 
 def run(*args: object, cwd: Path = ROOT, capture: bool = False) -> str:
@@ -546,7 +546,7 @@ def main() -> None:
     )
     missing = [key for key in required if key not in lock]
     if missing:
-        raise ValueError(f"Missing codegen lock keys: {', '.join(missing)}")
+        raise ValueError(f"Missing source lock keys: {', '.join(missing)}")
     if args.command == "pin-latest":
         pin_latest(lock)
         return

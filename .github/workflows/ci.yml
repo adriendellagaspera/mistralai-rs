@@ -1,48 +1,34 @@
 name: CI
 on:
+  push:
   pull_request:
 permissions:
-  contents: write
+  contents: read
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
-  restructure:
-    if: github.head_ref == 'cleanup/sdk-only-no-codegen'
+  validate:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: cleanup/sdk-only-no-codegen
           fetch-depth: 0
       - name: Install pinned Rust toolchain
         run: rustup show
-      - name: Run one-shot restructure
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          import textwrap
-          source = Path('.github/workflows/restructure-tooling-bootstrap.yml').read_text()
-          block = textwrap.dedent(source.split('        run: |\n', 1)[1])
-          needle = '          chmod +x tooling/quality/validate.sh\n'
-          fix = r'''          python3 - <<'PYFIX'
-          from pathlib import Path
-
-          p = Path('tooling/tests/test_coverage.py')
-          text = p.read_text()
-          text = text.replace('ROOT / "codegen.lock"', 'ROOT / "tooling/sources/lock.json"')
-          text = text.replace('ROOT / "codegen/patches/generator.patch"', 'ROOT / "tooling/pipeline/openapi-to-rust.patch"')
-          p.write_text(text)
-
-          p = Path('tooling/tests/test_pipeline.py')
-          text = p.read_text()
-          text = text.replace('(self.root / "spec").mkdir()', '(self.root / "tooling/sources/openapi").mkdir(parents=True)')
-          text = text.replace('self.root / "codegen.lock"', 'self.root / "tooling/sources/lock.json"')
-          text = text.replace('self.root / "spec/openapi.yaml"', 'self.root / "tooling/sources/openapi/openapi.yaml"')
-          p.write_text(text)
-          PYFIX
-'''
-          if needle not in block:
-              raise SystemExit('bootstrap insertion point missing')
-          block = block.replace(needle, fix + needle)
-          Path('/tmp/restructure-tooling.sh').write_text(block)
-          PY
-          bash /tmp/restructure-tooling.sh
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            .tools
+            target
+          key: sdk-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'tooling/sources/lock.json') }}
+      - name: Validate tracked sources, generation and Rust SDK
+        run: bash tooling/quality/validate.sh
+      - name: Review generated public API changes
+        if: github.event_name == 'pull_request'
+        env:
+          SDK_API_BASE: ${{ github.event.pull_request.base.sha }}
+        run: python3 tooling/quality/api_surface.py --base "$SDK_API_BASE" --rustdoc

@@ -8,7 +8,7 @@ import re
 import urllib.error
 import urllib.request
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 
 
 def fetch(url, *, api=False):
@@ -52,7 +52,7 @@ def optional_notice(repository, commit):
 
 
 def main():
-    lock_path = ROOT / "codegen.lock"
+    lock_path = ROOT / "tooling/sources/lock.json"
     old = json.loads(lock_path.read_text())
     repo, path = old["upstream_repository"], old["upstream_spec_path"]
     published_url = old["published_spec_url"]
@@ -75,9 +75,9 @@ def main():
     # Download attribution before changing the checkout. Fail on network errors.
     license_text = fetch(f"https://raw.githubusercontent.com/{repo}/{commit}/LICENSE")
     notice = optional_notice(repo, commit)
-    (ROOT / "spec/openapi.yaml").write_bytes(spec)
-    (ROOT / "spec/LICENSE").write_bytes(license_text)
-    notice_path = ROOT / "spec/NOTICE"
+    (ROOT / "tooling/sources/openapi/openapi.yaml").write_bytes(spec)
+    (ROOT / "tooling/sources/openapi/LICENSE").write_bytes(license_text)
+    notice_path = ROOT / "tooling/sources/openapi/NOTICE"
     if notice is None:
         notice_path.unlink(missing_ok=True)
     else:

@@ -6,7 +6,7 @@
   "spec_sha256": "60f5e92dcc4cae89a1c1eec614c409a1ce9da37f1e856d2868ff6734474f5859",
   "generator": "openapi-to-rust",
   "generator_version": "0.16.0",
-  "generator_config": "codegen/openapi-to-rust.toml",
+  "generator_config": "tooling/pipeline/openapi-to-rust.toml",
   "rust_toolchain": "1.94.0",
   "generator_repository": "gpu-cli/openapi-to-rust",
   "generator_commit": "2af34b86ca9f38c35787f13ec5841989efcf4b99",

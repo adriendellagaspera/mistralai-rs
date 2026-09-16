@@ -1,25 +1,25 @@
 # Development
 
-Install Git, Rustup, Python 3.11+ with `venv`, and Just. Run commands from the repository root. Linux and macOS are the intended codegen environments; consumers need only Rust.
+Install Git, Rustup, Python 3.11+ with `venv`, and Just. Run commands from the repository root. Linux and macOS are the intended tooling environments; consumers need only Rust.
 
 ```sh
 just generate
 just check-generated
-bash scripts/validate.sh
+just validate
 ```
 
-Without Just, use `python3 scripts/codegen.py generate` and `python3 scripts/codegen.py check`. No xtask is needed. Codegen creates an isolated Python environment under `.tools/`; no global Python package installation is required.
+Without Just, use `python3 tooling/pipeline/build.py generate` and `python3 tooling/pipeline/build.py check`. No xtask is needed. Codegen creates an isolated Python environment under `.tools/`; no global Python package installation is required.
 
-`codegen.lock` pins the Rust toolchain, raw generator source commit and patch hash, `rust-sdk-compiler`, `openapi-to-rust-bindings`, their Git trees, and Python dependencies. `scripts/codegen.py` verifies those immutable inputs before generation. The raw generator is built with its committed lockfile; the two Python tools are installed from their exact pinned commits. `Cargo.lock` pins this SDK's validation dependencies.
+`tooling/sources/lock.json` pins the Rust toolchain, raw generator source commit and patch hash, `rust-sdk-compiler`, `openapi-to-rust-bindings`, their Git trees, and Python dependencies. `tooling/pipeline/build.py` verifies those immutable inputs before generation. The raw generator is built with its committed lockfile; the two Python tools are installed from their exact pinned commits. `Cargo.lock` pins this SDK's validation dependencies.
 
 ## Updating the source specification
 
 ```sh
 just update-spec
 just generate
-bash scripts/validate.sh
-python3 scripts/update_report.py
-git diff -- spec codegen.lock src/generated src/sdk
+just validate
+python3 tooling/quality/report.py
+git diff -- tooling/sources src/generated src/sdk
 ```
 
 `update-spec` resolves the most recent commit touching `openapi.yaml`, fetches the spec at that immutable SHA, and only changes the checkout if its SHA-256 differs. It downloads upstream licensing at the same revision. Optional `GH_TOKEN` raises the GitHub API rate limit; no secret is required. A failed download does not replace the pinned spec. No endpoint credential is used.
@@ -41,13 +41,13 @@ Generic compiler behavior belongs in `rust-sdk-compiler` and should be demonstra
 
 Do not edit `src/generated/` or generated files in `src/sdk/` by hand. Prefer generator configuration, then a narrowly scoped source patch or explicit preprocessing for raw generation. Source patches must apply with `git apply --check` to the pinned generator commit and have their SHA-256 updated in `codegen.lock`. Rustfmt remains the only post-generation Rust transform.
 
-`codegen/README.md` maps the repository-owned generation files. The active Mistral semantic policy is `codegen/sdk-semantics.json`; generic compiler and adapter contracts live with their packages and tests. Preserve the vendored official spec exactly; preprocessing operates on a temporary generation copy and fails closed when its expected source shape changes.
+`tooling/README.md` maps the repository-owned sidecar. The active Mistral semantic policy is `tooling/pipeline/semantics.json`; generic compiler and adapter contracts live with their packages and tests. Preserve the vendored official spec exactly; preprocessing operates on a temporary generation copy and fails closed when its expected source shape changes.
 
 ## Tests and live requests
 
 Normal tests use fixtures and local HTTP servers and require no API key or external API connection. Both chat examples are compiled in CI but never run. To make a live request explicitly, set `MISTRAL_API_KEY` and run `cargo run --example chat`. Do not commit credentials or live response dumps.
 
-`scripts/validate.sh` checks deterministic regeneration, formatting, compilation, Clippy with warnings denied, Rust tests/docs, coverage probes and public API evolution. Do not weaken a failing gate merely to advance generated output; fix the owning boundary instead.
+`tooling/quality/validate.sh` checks deterministic regeneration, formatting, compilation, Clippy with warnings denied, Rust tests/docs, coverage probes and public API evolution. Do not weaken a failing gate merely to advance generated output; fix the owning boundary instead.
 
 ## Automation failures
 

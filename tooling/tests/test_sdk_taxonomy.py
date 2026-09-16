@@ -3,10 +3,10 @@ import unittest
 from pathlib import Path
 import sys
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "scripts"))
-import sdk_taxonomy
-import sdk_taxonomy_inventory
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "tooling" / "sources"))
+import taxonomy as sdk_taxonomy
+import taxonomy_inventory as sdk_taxonomy_inventory
 
 
 class TaxonomyTests(unittest.TestCase):
