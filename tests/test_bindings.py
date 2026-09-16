@@ -65,13 +65,14 @@ pub enum State {
         project = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]
         self.assertEqual(project["name"], "openapi-to-rust-bindings")
         self.assertEqual(project["version"], package.__version__)
-        self.assertIn("rust-sdk-compiler @ git+https://github.com/adriendellagaspera/mistralai-rs.git@1bed0ed0b05eeeb0ca9d9b937d62c729cb7234aa", project["dependencies"])
+        self.assertIn("rust-sdk-compiler @ git+https://github.com/adriendellagaspera/mistralai-rs.git@fe1bef526d19b3e1613cd05a027ebc0f5875535c", project["dependencies"])
         compatibility = json.loads((ROOT / "COMPATIBILITY.json").read_text())
         self.assertEqual(compatibility["package_version"], package.__version__)
         self.assertEqual(compatibility["bindings_schema_version"], 2)
+        self.assertEqual(compatibility["sidecar"], "rust-bindings.json")
         self.assertEqual(
             compatibility["compiler"]["commit"],
-            "1bed0ed0b05eeeb0ca9d9b937d62c729cb7234aa",
+            "fe1bef526d19b3e1613cd05a027ebc0f5875535c",
         )
         self.assertEqual(
             compatibility["backend"]["commit"],
