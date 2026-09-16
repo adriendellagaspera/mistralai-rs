@@ -10,6 +10,7 @@ sys.path.insert(0, str(ROOT / "codegen"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 import sdk_codegen
+import sdk_compiler
 import sdk_emit
 import sdk_pipeline
 from sdk_ir import (AliasModelSpec, EmptyResponse, FacadeIr, ModelSpec, NoRequest,
@@ -59,7 +60,7 @@ class ResolvedEmissionTests(unittest.TestCase):
 
             with patch.object(sdk_pipeline, "expand_manifest", side_effect=project):
                 sdk_pipeline.generate(raw, root / "sdk", overlay, openapi, taxonomy)
-            self.assertIsInstance(seen["rust"], sdk_codegen.RustIndex)
+            self.assertIsInstance(seen["rust"], sdk_compiler.RustIndex)
             self.assertIn("adopt", seen["rust"].operations)
 
     def test_renderer_emits_hand_built_ir_without_source_contracts(self):
