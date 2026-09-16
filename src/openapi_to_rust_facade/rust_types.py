@@ -1,13 +1,15 @@
-"""Structural Rust type inspection at the raw-binding boundary.
+"""Small structural parser for normalized Rust type spellings.
 
-Unknown syntax is retained as an opaque leaf, never interpreted using string
-slicing. Generic consumers must explicitly recognize a constructor and arity.
+This parser intentionally understands only the generic structure the compiler
+needs (`Option<T>`, `Vec<T>`, `Result<T, E>`, qualified generic types, etc.).
+Everything else is retained as an opaque leaf. Parsing generated Rust source is
+an adapter concern; the compiler must not depend on a Rust syntax-tree parser.
 """
+
+from __future__ import annotations
+
 from dataclasses import dataclass
 from functools import lru_cache
-
-from tree_sitter import Language, Parser
-import tree_sitter_rust
 
 
 @dataclass(frozen=True)
@@ -18,30 +20,115 @@ class RustType:
     arguments: tuple["RustType", ...] = ()
 
     def unary(self, constructor: str) -> "RustType | None":
-        if self.kind == "generic_type" and self.constructor == constructor and len(self.arguments) == 1:
+        if (
+            self.kind == "generic_type"
+            and self.constructor == constructor
+            and len(self.arguments) == 1
+        ):
             return self.arguments[0]
         return None
 
 
+def _split_arguments(value: str) -> tuple[str, ...]:
+    parts: list[str] = []
+    start = 0
+    angles = parentheses = brackets = braces = 0
+    in_string = False
+    escaped = False
+    for index, char in enumerate(value):
+        if in_string:
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == '"':
+                in_string = False
+            continue
+        if char == '"':
+            in_string = True
+        elif char == "<":
+            angles += 1
+        elif char == ">":
+            angles -= 1
+        elif char == "(":
+            parentheses += 1
+        elif char == ")":
+            parentheses -= 1
+        elif char == "[":
+            brackets += 1
+        elif char == "]":
+            brackets -= 1
+        elif char == "{":
+            braces += 1
+        elif char == "}":
+            braces -= 1
+        elif (
+            char == ","
+            and angles == parentheses == brackets == braces == 0
+        ):
+            part = value[start:index].strip()
+            if not part:
+                raise ValueError("empty Rust generic argument")
+            parts.append(part)
+            start = index + 1
+        if min(angles, parentheses, brackets, braces) < 0:
+            raise ValueError("unbalanced Rust type delimiters")
+    if in_string or any((angles, parentheses, brackets, braces)):
+        raise ValueError("unbalanced Rust type delimiters")
+    final = value[start:].strip()
+    if not final:
+        raise ValueError("empty Rust generic argument")
+    parts.append(final)
+    return tuple(parts)
+
+
+def _outer_generic(spelling: str) -> tuple[str, str] | None:
+    """Return `(constructor, arguments)` when `<...>` spans the whole type."""
+    depth = 0
+    first = None
+    in_string = False
+    escaped = False
+    for index, char in enumerate(spelling):
+        if in_string:
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == '"':
+                in_string = False
+            continue
+        if char == '"':
+            in_string = True
+            continue
+        if char == "<":
+            if depth == 0:
+                first = index
+            depth += 1
+        elif char == ">":
+            depth -= 1
+            if depth < 0:
+                raise ValueError("unbalanced Rust generic delimiters")
+            if depth == 0 and index != len(spelling) - 1:
+                return None
+    if depth != 0 or in_string:
+        raise ValueError("unbalanced Rust generic delimiters")
+    if first is None:
+        return None
+    constructor = spelling[:first].strip()
+    if not constructor or any(char.isspace() for char in constructor):
+        # `impl Trait<T>`, `dyn Trait<T>`, references, etc. are opaque leaves.
+        return None
+    return constructor, spelling[first + 1 : -1]
+
+
 @lru_cache(maxsize=4096)
 def parse_type(spelling: str) -> RustType:
-    source = f"type Inspected = {spelling};".encode()
-    root = Parser(Language(tree_sitter_rust.language())).parse(source).root_node
-    if root.has_error or len(root.named_children) != 1:
-        raise ValueError(f"invalid Rust type: {spelling!r}")
-    node = root.named_children[0].child_by_field_name("type")
-    if node is None:
-        raise ValueError(f"missing Rust type: {spelling!r}")
-
-    def convert(node):
-        text = source[node.start_byte:node.end_byte].decode()
-        if node.type == "generic_type":
-            name = node.child_by_field_name("type")
-            args = node.child_by_field_name("type_arguments")
-            if args is None:
-                args = next(child for child in node.named_children if child.type == "type_arguments")
-            return RustType(node.type, text, source[name.start_byte:name.end_byte].decode(),
-                            tuple(convert(child) for child in args.named_children))
-        return RustType(node.type, text)
-
-    return convert(node)
+    spelling = spelling.strip()
+    if not spelling:
+        raise ValueError("empty Rust type")
+    generic = _outer_generic(spelling)
+    if generic is None:
+        return RustType("opaque_type", spelling)
+    constructor, arguments = generic
+    parsed = tuple(parse_type(argument) for argument in _split_arguments(arguments))
+    return RustType("generic_type", spelling, constructor, parsed)
