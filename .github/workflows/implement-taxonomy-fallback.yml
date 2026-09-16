@@ -82,8 +82,9 @@ jobs:
           )
           print(f"AUTO_COVERAGE={report['added_count']}/{report['rejected_count']}")
           print('REASONS=' + json.dumps(Counter(report['rejected'].values()), sort_keys=True))
+          taxonomy_ops = json.loads((ROOT / 'codegen/sdk-taxonomy.json').read_text()).get('operations', {})
           for operation_id in report['added']:
-              if not json.loads((ROOT / 'codegen/sdk-taxonomy.json').read_text()).get('operations', {}).get(operation_id):
+              if not taxonomy_ops.get(operation_id):
                   print('FALLBACK_ADDED=' + operation_id)
           PY
       - name: Commit clean implementation
