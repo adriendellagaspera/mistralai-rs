@@ -9,6 +9,7 @@ from jsonschema import Draft202012Validator
 
 import rust_sdk_compiler as package
 from rust_sdk_compiler import Bindings, OpenApi, Policy, Runtime, compile, lower
+from rust_sdk_compiler.rust_types import parse_type
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
@@ -67,6 +68,13 @@ class StandaloneCompilerTests(unittest.TestCase):
             for needle in forbidden:
                 self.assertNotIn(needle, source, f"{needle} leaked into {path.name}")
         self.assertFalse((root / "adapters").exists())
+
+    def test_structural_type_parser_rejects_statement_suffixes(self):
+        parsed = parse_type("Option < Vec < Result<String, Error> > >")
+        self.assertEqual(parsed.unary("Option").unary("Vec").constructor, "Result")
+        self.assertEqual(parse_type("[u8; 32]").spelling, "[u8; 32]")
+        with self.assertRaises(ValueError):
+            parse_type("Option<String> ; fn injected() {}")
 
     def test_menagerie_compiles_through_public_api(self):
         compilation, bindings = compile_fixture("menagerie")
