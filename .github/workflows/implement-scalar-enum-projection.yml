@@ -19,6 +19,54 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git merge --no-edit origin/main
+      - name: Normalize schema patch helper
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('scripts/_issue19_scalar_enum_patch.py')
+          text = path.read_text()
+          start = text.index('# Semantic overlay schema. Keep formatting localized.')
+          end = text.index('# Automatic projection.')
+          block = '''# Semantic overlay schema. Keep formatting localized.
+          replace(
+              "codegen/sdk-semantics.schema.json",
+              '    "map": {"type": "object", "additionalProperties": false, "required": ["root", "path"], "properties": {\\n      "root": {"$ref": "#/$defs/identifier"}, "path": {"$ref": "#/$defs/schema_path"}\\n    }},',
+              '    "map": {"type": "object", "additionalProperties": false, "required": ["root", "path"], "properties": {\\n      "root": {"$ref": "#/$defs/identifier"}, "path": {"$ref": "#/$defs/schema_path"}\\n    }},\\n    "scalar_enum": {"type": "object", "additionalProperties": false, "required": ["root", "path"], "properties": {\\n      "root": {"$ref": "#/$defs/identifier"}, "path": {"$ref": "#/$defs/schema_path"}\\n    }},',
+          )
+          replace(
+              "codegen/sdk-semantics.schema.json",
+              '"simple_union": {"$ref": "#/$defs/simple_union"}, "type_alias": {"const": true}, "map": {"$ref": "#/$defs/map"}, "union_factory"',
+              '"simple_union": {"$ref": "#/$defs/simple_union"}, "type_alias": {"const": true}, "map": {"$ref": "#/$defs/map"}, "scalar_enum": {"$ref": "#/$defs/scalar_enum"}, "union_factory"',
+          )
+          schema_path = ROOT / "codegen/sdk-semantics.schema.json"
+          lines = schema_path.read_text().splitlines()
+          output = []
+          inserted = False
+          for line in lines:
+              is_policy = line.startswith('      {"required": [') and '"not": {"anyOf": [' in line
+              if is_policy:
+                  line = line.replace(
+                      '"not": {"anyOf": [',
+                      '"not": {"anyOf": [{"required": ["scalar_enum"]}, ',
+                      1,
+                  )
+              output.append(line)
+              if line.startswith('      {"required": ["map"]'):
+                  output.append(
+                      '      {"required": ["scalar_enum"], "not": {"anyOf": '
+                      '[{"required": ["union"]}, {"required": ["simple_union"]}, '
+                      '{"required": ["type_alias"]}, {"required": ["map"]}, '
+                      '{"required": ["constructor"]}, {"required": ["union_factory"]}, '
+                      '{"required": ["accessors"]}]}},'
+                  )
+                  inserted = True
+          if not inserted:
+              raise SystemExit("scalar enum schema insertion point not found")
+          schema_path.write_text("\\n".join(output) + "\\n")
+
+          '''
+          path.write_text(text[:start] + block + text[end:])
+          PY
       - name: Apply generic scalar enum primitive
         run: python3 scripts/_issue19_scalar_enum_patch.py
       - name: Install pinned Rust toolchain
