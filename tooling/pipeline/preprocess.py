@@ -3,6 +3,15 @@
 from pathlib import Path
 
 
+def load_published(source: bytes):
+    """Parse and validate the authenticated published document without mutating it."""
+    from ruamel.yaml import YAML
+
+    spec = YAML(typ="safe", pure=True).load(source)
+    assert_overlay_assumptions(spec)
+    return spec
+
+
 def assert_overlay_assumptions(spec) -> None:
     """Fail closed if contradictions targeted by the repository Overlay drift."""
     schemas = spec["components"]["schemas"]
@@ -35,18 +44,31 @@ def assert_overlay_assumptions(spec) -> None:
 
 def preprocess(source: bytes) -> bytes:
     """Validate the authenticated published document without mutating it."""
-    from ruamel.yaml import YAML
-
-    spec = YAML(typ="safe", pure=True).load(source)
-    assert_overlay_assumptions(spec)
+    load_published(source)
     return source
 
 
-def main(source: str) -> None:
-    preprocess(Path(source).read_bytes())
+def path_inventory(source: bytes) -> list[str]:
+    """Return the published path keys after the same fail-closed validation."""
+    spec = load_published(source)
+    return sorted(spec["paths"])
+
+
+def main(source: str, *, print_paths: bool = False) -> None:
+    import json
+
+    data = Path(source).read_bytes()
+    if print_paths:
+        print(json.dumps(path_inventory(data), separators=(",", ":")))
+    else:
+        preprocess(data)
 
 
 if __name__ == "__main__":
-    import sys
+    import argparse
 
-    main(*sys.argv[1:])
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("source")
+    parser.add_argument("--print-paths", action="store_true")
+    args = parser.parse_args()
+    main(args.source, print_paths=args.print_paths)
