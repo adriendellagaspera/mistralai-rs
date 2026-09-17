@@ -17,75 +17,48 @@ jobs:
         run: |
           set -euo pipefail
           python3 -m venv .diag-venv
-          .diag-venv/bin/pip install -q \
-            ruamel.yaml==0.18.6 tree-sitter==0.25.2 tree-sitter-rust==0.24.0 jsonschema==4.23.0
+          .diag-venv/bin/pip install -q ruamel.yaml==0.18.6 tree-sitter==0.25.2 tree-sitter-rust==0.24.0 jsonschema==4.23.0
           git clone -q https://github.com/adriendellagaspera/mistralai-rs.git /tmp/bindings
           git -C /tmp/bindings checkout -q 394600cee5c3955b51c545c05986814f7a7ddd1c
           .diag-venv/bin/pip install -q --no-deps /tmp/bindings
           git clone -q https://github.com/adriendellagaspera/mistralai-rs.git /tmp/compiler
           git -C /tmp/compiler checkout -q 87300dfcb69ad8a86deb09c3ffeccd6c62e803bf
           .diag-venv/bin/pip install -q --no-deps /tmp/compiler
-          .diag-venv/bin/python -c 'from rust_sdk_compiler import Type, __version__; print("compiler", __version__, Type)'
-      - name: Diagnose request fields
+      - name: Print unresolved union shapes
         run: |
-          set -euo pipefail
           .diag-venv/bin/python - <<'PY'
-          import pprint, sys
+          import pprint
           from pathlib import Path
           from openapi_to_rust_bindings import read_bindings
           from rust_sdk_compiler import OpenApi
-          ROOT = Path.cwd()
-          sys.path.insert(0, str(ROOT / 'tooling/pipeline/mistral'))
-          import sdk_autoproject as a
+          root = Path.cwd()
+          api = OpenApi.load(root / 'tooling/sources/openapi/openapi.yaml')
+          rust = read_bindings(root / 'src/generated')
 
-          api = OpenApi.load(ROOT / 'tooling/sources/openapi/openapi.yaml')
-          rust = read_bindings(ROOT / 'src/generated')
-          schemas = dict(api.schemas)
-          normalization_errors = {}
-          for name, schema in list(api.schemas.items()):
-              if schema.get('allOf'):
-                  try:
-                      schemas[name] = api.object_schema(name)
-                  except Exception as exc:
-                      normalization_errors[name] = str(exc)
+          print('\nSCHEMA CompletionArgs.stop')
+          pprint.pp(api.schemas['CompletionArgs']['properties']['stop'])
+          print('\nENUM CompletionArgsStop')
+          for variant in rust.enums.get('CompletionArgsStop', ()):
+              print(variant)
+          print('ALIAS CompletionArgsStop', rust.aliases.get('CompletionArgsStop'))
 
-          def inspect_model(raw):
-              schema = schemas[raw]
-              fields = {f.name.removeprefix('r#'): f for f in rust.fields(raw)}
-              print(f'\nMODEL {raw}')
-              print('schema_fields=', sorted(schema.get('properties', {})))
-              print('raw_fields=', sorted(fields))
-              print('required=', sorted(schema.get('required', [])))
-              required = set(schema.get('required', []))
-              for field, fs in sorted(schema.get('properties', {}).items()):
-                  if field not in fields:
-                      print('FIELD', field, 'MISSING_RAW')
-                      continue
-                  if field not in required and a._omittable_singleton(fs, fields[field].type, schemas, rust):
-                      print('FIELD', field, fields[field].type, 'OMIT_SINGLETON')
-                      continue
-                  models = {}
-                  adapter, reason = a._request_field_adapter(
-                      models, schemas, fs, fields[field].type, rust, (raw,), raw, (field,)
-                  )
-                  print('FIELD', field, 'raw=', fields[field].type,
-                        'adapter=', adapter, 'reason=', reason,
-                        'models=', sorted(models))
-              models = {}
-              result, reason = a._ensure_request_model(models, schemas, raw, rust)
-              print('RESULT', raw, 'adapter=', result, 'reason=', reason,
-                    'models=', sorted(models))
+          print('\nSCHEMA ConversationInputs')
+          pprint.pp(api.schemas['ConversationInputs'])
+          print('\nENUM ConversationInputs')
+          for variant in rust.enums.get('ConversationInputs', ()):
+              print(variant)
+          print('ALIAS ConversationInputs', rust.aliases.get('ConversationInputs'))
 
-          for raw in ['CompletionArgs','ConversationAppendRequest','ConversationRestartRequest']:
-              inspect_model(raw)
-
-          print('\nCONVERSATION REQUEST NORMALIZATION')
-          for raw in ['ConversationRequestBase','ConversationRequest','ConversationStreamRequest']:
-              print(raw, 'error=', normalization_errors.get(raw))
-              schema = api.schemas.get(raw, {})
-              if raw == 'ConversationRequestBase':
-                  print('stream=', schema.get('properties', {}).get('stream'))
-              else:
-                  print('allOf=')
-                  pprint.pp(schema.get('allOf'))
+          refs = []
+          for branch in api.schemas['ConversationInputs'].get('anyOf', []):
+              ref = branch.get('$ref')
+              if ref:
+                  refs.append(ref.rsplit('/', 1)[-1])
+          for ref in refs:
+              print('\nREF', ref)
+              pprint.pp(api.schemas.get(ref))
+              print('ALIAS', rust.aliases.get(ref))
+              print('ENUM')
+              for variant in rust.enums.get(ref, ()):
+                  print(variant)
           PY
