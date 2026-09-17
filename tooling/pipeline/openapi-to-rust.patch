@@ -1,52 +1,7 @@
 diff --git a/src/client_generator.rs b/src/client_generator.rs
-index 20a1d04..0be0b48 100644
 --- a/src/client_generator.rs
 +++ b/src/client_generator.rs
-@@ -172,6 +172,7 @@ struct BodyFieldPlan {
- #[derive(Clone, Copy)]
- enum MultipartClientFieldKind {
-     RawBytes,
-+    RepeatedText,
-     Base64,
-     Base64UrlUnpadded,
-     Text,
-@@ -257,6 +258,7 @@ impl CodeGenerator {
-                 api_key: Option<String>,
-                 http_client: ClientWithMiddleware,
-                 custom_headers: BTreeMap<String, String>,
-+                upload_filename: String,
-                 max_response_body_bytes: usize,
-             }
- 
-@@ -426,6 +428,7 @@ impl CodeGenerator {
-                         api_key: None,
-                         http_client,
-                         custom_headers: BTreeMap::new(),
-+                        upload_filename: "upload".to_string(),
-                         max_response_body_bytes: #max_response_body_bytes,
-                     }
-                 }
-@@ -451,6 +454,7 @@ impl CodeGenerator {
-                         api_key: None,
-                         http_client,
-                         custom_headers: BTreeMap::new(),
-+                        upload_filename: "upload".to_string(),
-                         max_response_body_bytes: #max_response_body_bytes,
-                     }
-                 }
-@@ -470,6 +474,11 @@ impl CodeGenerator {
-             }
- 
-             /// Set the API key for authentication
-+            pub fn with_upload_filename(mut self, filename: impl Into<String>) -> Self {
-+                self.upload_filename = filename.into();
-+                self
-+            }
-+
-             pub fn with_api_key(mut self, api_key: impl Into<String>) -> Self {
-                 self.api_key = Some(api_key.into());
-                 self
-@@ -1263,7 +1272,7 @@ impl CodeGenerator {
+@@ -1645,7 +1645,7 @@ impl CodeGenerator {
                  let mut chosen = base.clone();
                  let mut suffix = 2;
                  while !used.insert(chosen.clone()) {
@@ -55,63 +10,15 @@ index 20a1d04..0be0b48 100644
                      suffix += 1;
                  }
                  chosen
-@@ -1414,6 +1423,7 @@ impl CodeGenerator {
-         let path = &op.path;
-         let request_param = self.generate_request_param(op);
-         let request_body = self.generate_request_body(op, analysis);
-+        let stream_parameter = self.generate_stream_parameter(op, analysis);
+@@ -1881,6 +1881,7 @@ impl CodeGenerator {
+             request_param
+         };
+         let request_body = self.generate_request_body(op, analysis, with_multipart_filenames);
++        let stream_parameter = self.generate_stream_parameter(op, analysis, call_shape);
          let query_params = self.generate_query_params(op);
          let header_params = self.generate_header_params(op);
          let cookie_params = self.generate_cookie_params(op);
-@@ -1421,6 +1431,11 @@ impl CodeGenerator {
-         let success = self.get_success_response(analysis, op);
-         let response_type = self.get_response_type(analysis, op);
-         let op_error_type = self.op_error_type_token(op);
-+        let binary_stream_error_handling = if matches!(success.body, ClientSuccessBody::Binary) {
-+            Some(self.generate_binary_stream_error_handling(op, success.clone()))
-+        } else {
-+            None
-+        };
-         let accept = success.accept;
-         let error_handling = self.generate_error_handling(op, success);
-         let (custom_headers, accept_header) = if let Some(media_type) = accept {
-@@ -1449,6 +1464,35 @@ impl CodeGenerator {
-         let url_construction = self.generate_url_construction(path, op);
-         let doc_comment = self.generate_operation_doc_comment(op);
- 
-+        let binary_stream_method = if let Some(binary_error_handling) = binary_stream_error_handling {
-+            let stream_method_name = format_ident!("{}_stream", method_name);
-+            quote! {
-+                /// Stream the binary response body without buffering it in memory.
-+                pub async fn #stream_method_name(
-+                    &self,
-+                    #request_param
-+                ) -> Result<
-+                    futures_util::stream::BoxStream<'static, Result<bytes::Bytes, reqwest::Error>>,
-+                    ApiOpError<#op_error_type>,
-+                > {
-+                    #url_construction
-+                    let mut req = #http_method_call;
-+                    #stream_parameter
-+                    #request_body
-+                    #query_params
-+                    #header_params
-+                    #cookie_params
-+                    #auth_application
-+                    #custom_headers
-+                    #accept_header
-+                    let response = req.send().await?;
-+                    #binary_error_handling
-+                }
-+            }
-+        } else {
-+            TokenStream::new()
-+        };
-+
-         quote! {
-             #doc_comment
-             pub async fn #method_name(
-@@ -1458,6 +1502,7 @@ impl CodeGenerator {
+@@ -1947,6 +1948,7 @@ impl CodeGenerator {
                  #url_construction
  
                  let mut req = #http_method_call;
@@ -119,20 +26,22 @@ index 20a1d04..0be0b48 100644
                  #request_body
  
                  #query_params
-@@ -1478,9 +1523,42 @@ impl CodeGenerator {
-                 let response = req.send().await?;
-                 #error_handling
-             }
-+
-+            #binary_stream_method
+@@ -1964,6 +1966,47 @@ impl CodeGenerator {
          }
      }
  
-+    // Keep a declared boolean stream parameter aligned with the method's
-+    // response contract, including absent/defaulted and nullable fields.
-+    fn generate_stream_parameter(&self, op: &OperationInfo, analysis: &SchemaAnalysis) -> TokenStream {
++    // Keep a declared boolean stream parameter aligned with the planned
++    // response representation until the generic request discriminator lands.
++    fn generate_stream_parameter(
++        &self,
++        op: &OperationInfo,
++        analysis: &SchemaAnalysis,
++        call_shape: &ClientCallShapePlan,
++    ) -> TokenStream {
 +        use crate::analysis::{RequestBodyContent, SchemaType};
-+        if !op.request_body_required { return TokenStream::new(); }
++        if !op.request_body_required {
++            return TokenStream::new();
++        }
 +        let name = match op.request_body.as_ref() {
 +            Some(RequestBodyContent::Json { schema_name, .. })
 +            | Some(RequestBodyContent::Multipart { schema_name, .. }) => schema_name,
@@ -141,17 +50,35 @@ index 20a1d04..0be0b48 100644
 +        let Some((resolved_name, schema)) = self.resolve_reference_schema(name, analysis) else {
 +            return TokenStream::new();
 +        };
-+        let SchemaType::Object { properties, required, .. } = &schema.schema_type else {
++        let SchemaType::Object {
++            properties,
++            required,
++            ..
++        } = &schema.schema_type
++        else {
 +            return TokenStream::new();
 +        };
-+        let Some(property) = properties.get("stream") else { return TokenStream::new(); };
-+        if !matches!(&property.schema_type, SchemaType::Primitive { rust_type, .. } if rust_type == "bool") {
++        let Some(property) = properties.get("stream") else {
++            return TokenStream::new();
++        };
++        if !matches!(&property.schema_type, SchemaType::Primitive { rust_type, .. } if rust_type == "bool")
++        {
 +            return TokenStream::new();
 +        }
-+        let value = self.get_success_response(analysis, op).accept == Some("text/event-stream");
-+        let value = if self.property_is_tri_state(resolved_name, "stream", property, required.contains("stream")) {
++        let value = matches!(
++            &call_shape.representation,
++            ClientResponseRepresentation::EventStream { .. }
++        );
++        let value = if self.property_is_tri_state(
++            resolved_name,
++            "stream",
++            property,
++            required.contains("stream"),
++        ) {
 +            quote! { Some(Some(#value)) }
-+        } else if !required.contains("stream") || self.property_is_nullable(resolved_name, "stream", property) {
++        } else if !required.contains("stream")
++            || self.property_is_nullable(resolved_name, "stream", property)
++        {
 +            quote! { Some(#value) }
 +        } else {
 +            quote! { #value }
@@ -162,135 +89,7 @@ index 20a1d04..0be0b48 100644
      /// T3: emit the auth-token application based on the configured AuthConfig.
      /// Default (no config) is Bearer on Authorization. ApiKey emits a custom
      /// header. Custom honors header_value_prefix.
-@@ -2535,6 +2613,12 @@ impl CodeGenerator {
-         analysis: &'a SchemaAnalysis,
-         visited: &mut std::collections::HashSet<String>,
-     ) -> Option<&'a serde_json::Value> {
-+        if let Some(variants) = schema.get("anyOf").and_then(serde_json::Value::as_array) {
-+            let non_null: Vec<_> = variants.iter().filter(|v| v.get("type").and_then(serde_json::Value::as_str) != Some("null")).collect();
-+            if non_null.len() == 1 {
-+                return Self::resolve_multipart_wire_schema(non_null[0], analysis, visited);
-+            }
-+        }
-         let Some(reference) = schema.get("$ref").and_then(serde_json::Value::as_str) else {
-             return Some(schema);
-         };
-@@ -2574,6 +2658,12 @@ impl CodeGenerator {
-                     Some(MultipartClientFieldKind::Text)
-                 }
-             }
-+            crate::analysis::SchemaType::Array { item_type } => {
-+                match Self::multipart_client_field_kind(item_type, analysis, visited) {
-+                    Some(MultipartClientFieldKind::Text) => Some(MultipartClientFieldKind::RepeatedText),
-+                    _ => None,
-+                }
-+            }
-             crate::analysis::SchemaType::StringEnum { .. }
-             | crate::analysis::SchemaType::ExtensibleEnum { .. } => {
-                 Some(MultipartClientFieldKind::Text)
-@@ -2695,7 +2785,7 @@ impl CodeGenerator {
-                 MultipartClientFieldKind::RawBytes => quote! {
-                     form = form.part(
-                         #wire_name,
--                        reqwest::multipart::Part::bytes(value.to_vec()),
-+                        reqwest::multipart::Part::bytes(value.to_vec()).file_name(self.upload_filename.clone()),
-                     );
-                 },
-                 MultipartClientFieldKind::Base64 => quote! {
-@@ -2712,6 +2802,11 @@ impl CodeGenerator {
-                         base64::engine::general_purpose::URL_SAFE_NO_PAD.encode(value),
-                     );
-                 },
-+                MultipartClientFieldKind::RepeatedText => quote! {
-+                    for item in value {
-+                        form = form.text(#wire_name, item.to_string());
-+                    }
-+                },
-                 MultipartClientFieldKind::Text => quote! {
-                     form = form.text(#wire_name, value.to_string());
-                 },
-@@ -3046,7 +3141,7 @@ impl CodeGenerator {
-             ClientSuccessBody::Text => quote! { String },
-             ClientSuccessBody::Binary => quote! { bytes::Bytes },
-             ClientSuccessBody::EventStream => {
--                quote! { impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>> }
-+                quote! { futures_util::stream::BoxStream<'static, Result<bytes::Bytes, reqwest::Error>> }
-             }
-             ClientSuccessBody::Empty => quote! { () },
-         }
-@@ -3093,6 +3188,61 @@ impl CodeGenerator {
-         op.supports_streaming
-     }
- 
-+    fn generate_binary_stream_error_handling(
-+        &self,
-+        op: &OperationInfo,
-+        success: ClientSuccessSelection<'_>,
-+    ) -> TokenStream {
-+        let op_error_type = self.op_error_type_token(op);
-+        let success_status_guard = Self::success_status_guard(&success.statuses);
-+        let selected_status = if success.statuses.is_empty() {
-+            "any declared 2xx response".to_string()
-+        } else {
-+            success.statuses.join(", ")
-+        };
-+        let error_match_arms = self.generate_error_match_arms(op);
-+        quote! {
-+            let status = response.status();
-+            let status_code = status.as_u16();
-+            let headers = response.headers().clone();
-+            if #success_status_guard {
-+                Ok(Box::pin(response.bytes_stream()))
-+            } else {
-+                if status.is_success() {
-+                    return Err(ApiOpError::Api(ApiError {
-+                        status: status_code,
-+                        headers,
-+                        body: String::new(),
-+                        raw_body: Vec::new(),
-+                        typed: None,
-+                        parse_error: Some(format!(
-+                            "unexpected successful status {}; generated return type selects `{}`; live response body was not buffered",
-+                            status_code,
-+                            #selected_status,
-+                        )),
-+                    }));
-+                }
-+                let body_bytes = __read_bounded_response_body(
-+                    response,
-+                    self.max_response_body_bytes,
-+                ).await?;
-+                let raw_body = body_bytes;
-+                let body_text = String::from_utf8_lossy(&raw_body).into_owned();
-+                let typed: Option<#op_error_type>;
-+                let parse_error: Option<String>;
-+                #error_match_arms
-+                Err(ApiOpError::Api(ApiError {
-+                    status: status_code,
-+                    headers,
-+                    body: body_text,
-+                    raw_body,
-+                    typed,
-+                    parse_error,
-+                }))
-+            }
-+        }
-+    }
-+
-     /// Generate error handling.
-     ///
-     /// Buffers non-streaming responses once, retaining both exact bytes and a
-@@ -3156,7 +3306,7 @@ impl CodeGenerator {
-                 let headers = response.headers().clone();
- 
-                 if #success_status_guard {
--                    Ok(response.bytes_stream())
-+                    Ok(Box::pin(response.bytes_stream()))
-                 } else {
-                     if status.is_success() {
-                         return Err(ApiOpError::Api(ApiError {
 diff --git a/src/generator.rs b/src/generator.rs
-index e8f89b0..7b0292b 100644
 --- a/src/generator.rs
 +++ b/src/generator.rs
 @@ -2274,7 +2274,8 @@ impl CodeGenerator {
