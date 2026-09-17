@@ -21,34 +21,35 @@ def fixture():
         "operationId": "sample", "responses": {"200": {"content": {
             "application/json": {}, "audio/wav": {}}}}}}
     return {"paths": paths, "components": {"schemas": {
+        "ChatCompletionResponse": {"allOf": [
+            {"$ref": "#/components/schemas/ChatCompletionResponseBase"},
+            {"type": "object", "properties": {"choices": {}}, "required": ["id", "data", "choices"]},
+        ]},
         "SharingDelete": {"properties": {"share_with_uuid": {}}, "required": ["share_with_uuid", "level"]},
         "WorkflowListResponse": {"properties": {"workflows": {}, "next_cursor": {}}, "required": ["beta.workflows", "next_cursor"]},
     }}}
 
 
 class CoverageTests(unittest.TestCase):
-    def test_preprocessing_is_narrow_and_preserves_original_media(self):
+    def test_published_validation_is_narrow_and_preserves_input(self):
         original = fixture()
-        prepared = copy.deepcopy(original)
-        preprocess.transform(prepared)
-        self.assertEqual(len(prepared["paths"]), len(original["paths"]) + 4)
-        for path, operation in original["paths"].items():
-            self.assertEqual(prepared["paths"][path], operation)
-        self.assertEqual(prepared["paths"]["/v1/chat/completions#stream"]["post"]["responses"]["200"]["content"],
-                         {"text/event-stream": {}})
-        self.assertEqual(prepared["components"]["schemas"]["WorkflowListResponse"]["required"],
-                         ["next_cursor", "workflows"])
+        published = copy.deepcopy(original)
+        preprocess.assert_overlay_assumptions(published)
+        self.assertEqual(published, original)
+        self.assertEqual(len(published["paths"]), len(original["paths"]))
+        self.assertFalse(any("#" in path for path in published["paths"]))
 
-    def test_upstream_repairs_and_new_aliases_require_review(self):
+    def test_overlay_assumption_drift_requires_review(self):
         for mutation in [
             lambda s: s["components"]["schemas"]["SharingDelete"]["properties"].update(level={}),
-            lambda s: s["paths"].update({"/v1/chat/completions#stream": {}}),
-            lambda s: s["paths"]["/v1/chat/completions"]["post"]["responses"]["200"]["content"].pop("text/event-stream"),
+            lambda s: s["components"]["schemas"]["SharingDelete"]["required"].remove("level"),
+            lambda s: s["components"]["schemas"]["WorkflowListResponse"]["required"].remove("beta.workflows"),
+            lambda s: s["components"]["schemas"]["ChatCompletionResponse"]["allOf"][1]["required"].remove("data"),
         ]:
             spec = fixture()
             mutation(spec)
             with self.assertRaises(ValueError):
-                preprocess.transform(spec)
+                preprocess.assert_overlay_assumptions(spec)
 
     def test_inventory_rejects_missing_operations_and_runtime_stubs(self):
         spec = {"paths": {"/v1/test": {"get": {"operationId": "get_test"}}}}
