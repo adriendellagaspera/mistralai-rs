@@ -1,0 +1,78 @@
+name: Refresh issue 67 patch
+
+on:
+  push:
+    branches: [issue-67-openapi-overlays]
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: issue-67-openapi-overlays
+      - name: Rebuild reduced patch from pinned generator
+        run: |
+          repo="$PWD"
+          git clone --filter=blob:none https://github.com/adriendellagaspera/openapi-to-rust.git /tmp/openapi-to-rust
+          cd /tmp/openapi-to-rust
+          git checkout --detach e13969c7300f89e2d6ce7f591295db1dd1bb0748
+          python3 - <<'PY'
+          from pathlib import Path
+
+          client = Path('src/client_generator.rs')
+          text = client.read_text()
+
+          old = '                    chosen = format!("{base}_{suffix}");'
+          new = '                    chosen = format!("{base}{suffix}");'
+          assert text.count(old) == 1
+          text = text.replace(old, new, 1)
+
+          old = '''        let request_body = self.generate_request_body(op, analysis, with_multipart_filenames);\n        let query_params = self.generate_query_params(op);'''
+          new = '''        let request_body = self.generate_request_body(op, analysis, with_multipart_filenames);\n        let stream_parameter = self.generate_stream_parameter(op, analysis, call_shape);\n        let query_params = self.generate_query_params(op);'''
+          assert text.count(old) == 1
+          text = text.replace(old, new, 1)
+
+          old = '''                let mut req = #http_method_call;\n                #request_body\n\n                #query_params'''
+          new = '''                let mut req = #http_method_call;\n                #stream_parameter\n                #request_body\n\n                #query_params'''
+          assert text.count(old) == 1
+          text = text.replace(old, new, 1)
+
+          marker = '''    /// T3: emit the auth-token application based on the configured AuthConfig.\n'''
+          assert text.count(marker) == 1
+          helper = '''    // Keep a declared boolean stream parameter aligned with the planned\n    // response representation until the generic request discriminator lands.\n    fn generate_stream_parameter(\n        &self,\n        op: &OperationInfo,\n        analysis: &SchemaAnalysis,\n        call_shape: &ClientCallShapePlan,\n    ) -> TokenStream {\n        use crate::analysis::{RequestBodyContent, SchemaType};\n        if !op.request_body_required {\n            return TokenStream::new();\n        }\n        let name = match op.request_body.as_ref() {\n            Some(RequestBodyContent::Json { schema_name, .. })\n            | Some(RequestBodyContent::Multipart { schema_name, .. }) => schema_name,\n            _ => return TokenStream::new(),\n        };\n        let Some((resolved_name, schema)) = self.resolve_reference_schema(name, analysis) else {\n            return TokenStream::new();\n        };\n        let SchemaType::Object {\n            properties,\n            required,\n            ..\n        } = &schema.schema_type\n        else {\n            return TokenStream::new();\n        };\n        let Some(property) = properties.get("stream") else {\n            return TokenStream::new();\n        };\n        if !matches!(&property.schema_type, SchemaType::Primitive { rust_type, .. } if rust_type == "bool")\n        {\n            return TokenStream::new();\n        }\n        let value = matches!(\n            &call_shape.representation,\n            ClientResponseRepresentation::EventStream { .. }\n        );\n        let value = if self.property_is_tri_state(\n            resolved_name,\n            "stream",\n            property,\n            required.contains("stream"),\n        ) {\n            quote! { Some(Some(#value)) }\n        } else if !required.contains("stream")\n            || self.property_is_nullable(resolved_name, "stream", property)\n        {\n            quote! { Some(#value) }\n        } else {\n            quote! { #value }\n        };\n        quote! { let mut request = request; request.stream = #value; }\n    }\n\n'''
+          text = text.replace(marker, helper + marker, 1)
+          client.write_text(text)
+
+          generator = Path('src/generator.rs')
+          text = generator.read_text()
+          old = '''                    let sanitized_desc = self.sanitize_doc_comment(desc);\n                    quote! { #[doc = #sanitized_desc] }'''
+          new = '''                    let sanitized_desc = self.sanitize_doc_comment(desc);\n                    let lines: Vec<_> = sanitized_desc.lines().collect();\n                    quote! { #(#[doc = #lines])* }'''
+          assert text.count(old) == 1
+          generator.write_text(text.replace(old, new, 1))
+          PY
+          cargo fmt --all
+          git diff -- src/client_generator.rs src/generator.rs > "$repo/tooling/pipeline/openapi-to-rust.patch"
+          cd "$repo"
+          python3 - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          patch = Path('tooling/pipeline/openapi-to-rust.patch').read_bytes()
+          path = Path('tooling/sources/lock.json')
+          lock = json.loads(path.read_text())
+          lock['generator_patch_sha256'] = hashlib.sha256(patch).hexdigest()
+          path.write_text(json.dumps(lock, indent=2) + '\n')
+          PY
+          rm .github/workflows/refresh-issue-67-patch.yml
+          rm -f .github/workflows/digest-issue-67.yml
+      - name: Commit refreshed patch
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -A
+          git commit -m "build: regenerate reduced generator patch"
+          git push origin HEAD:issue-67-openapi-overlays
