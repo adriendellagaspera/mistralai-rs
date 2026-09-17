@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 
 from openapi_to_rust_bindings import read_bindings
-from rust_sdk_compiler import GenerationError, OpenApi, Policy, Runtime, compile
+from rust_sdk_generator import GenerationError, OpenApi, Policy, Runtime, compile
 from sdk_autoproject import expand_manifest
 from sdk_contracts import coverage_inventory, public_surface
 

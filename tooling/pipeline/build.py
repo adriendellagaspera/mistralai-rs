@@ -106,7 +106,8 @@ def tool_source(lock, prefix):
         raise ValueError(
             f"{name} tree mismatch: expected {expected_tree}, got {actual_tree}"
         )
-    return source
+    subdirectory = lock.get(f"{prefix}_tool_subdirectory")
+    return source / subdirectory if subdirectory else source
 
 
 def tooling_python(lock):
@@ -140,7 +141,7 @@ def tooling_python(lock):
     try:
         compiler_version = output(
             python, "-c",
-            "import rust_sdk_compiler; print(rust_sdk_compiler.__version__)",
+            "import rust_sdk_generator; print(rust_sdk_generator.__version__)",
         )
     except subprocess.CalledProcessError:
         compiler_version = None
