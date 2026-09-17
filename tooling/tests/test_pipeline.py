@@ -22,19 +22,67 @@ class ProvenanceTests(unittest.TestCase):
                                             {"a": b"y", "added": b""}),
                          ["a", "added", "deleted"])
 
-    def test_preprocessing_removes_only_undefined_required_data(self):
-        prefix, suffix = b"openapi: 3.1.0\n", b"    NextSchema: {}\n"
-        source = prefix + preprocess.CHAT_RESPONSE_REQUIRED + suffix
-        result = preprocess.preprocess(source)
-        self.assertEqual(
-            result,
-            prefix + preprocess.CHAT_RESPONSE_REQUIRED_FIXED + suffix,
-        )
-        self.assertNotIn(b"        - data\n", result)
+    @staticmethod
+    def published_shape_fixture():
+        def operation(operation_id, media):
+            return {
+                "operationId": operation_id,
+                "responses": {"200": {"content": {name: {} for name in media}}},
+            }
 
-    def test_preprocessing_fails_closed_when_upstream_shape_changes(self):
-        with self.assertRaises(ValueError):
-            preprocess.preprocess(b"openapi: 3.1.0\n")
+        return {
+            "openapi": "3.1.0",
+            "components": {
+                "schemas": {
+                    "ChatCompletionResponse": {
+                        "allOf": [
+                            {"$ref": "#/components/schemas/ChatCompletionResponseBase"},
+                            {
+                                "type": "object",
+                                "properties": {"choices": {}},
+                                "required": ["id", "data", "choices"],
+                            },
+                        ]
+                    },
+                    "SharingDelete": {"properties": {}, "required": ["level"]},
+                    "WorkflowListResponse": {
+                        "properties": {"workflows": {}},
+                        "required": ["beta.workflows"],
+                    },
+                }
+            },
+            "paths": {
+                "/v1/chat/completions": {
+                    "post": operation("chat", ["application/json", "text/event-stream"])
+                },
+                "/v1/fim/completions": {
+                    "post": operation("fim", ["application/json", "text/event-stream"])
+                },
+                "/v1/audio/speech": {
+                    "post": operation("speech", ["application/json", "text/event-stream"])
+                },
+                "/v1/audio/voices/{voice_id}/sample": {
+                    "get": operation("voice_sample", ["application/json", "audio/wav"])
+                },
+            },
+        }
+
+    def test_preprocessing_keeps_contract_repairs_declarative(self):
+        source = self.published_shape_fixture()
+        result = json.loads(preprocess.preprocess(json.dumps(source).encode()))
+        schemas = result["components"]["schemas"]
+        self.assertIn("data", schemas["ChatCompletionResponse"]["allOf"][1]["required"])
+        self.assertIn("level", schemas["SharingDelete"]["required"])
+        self.assertIn("beta.workflows", schemas["WorkflowListResponse"]["required"])
+        self.assertNotIn("workflows", schemas["WorkflowListResponse"]["required"])
+        self.assertIn("/v1/chat/completions#stream", result["paths"])
+        self.assertIn("/v1/audio/voices/{voice_id}/sample#wav", result["paths"])
+
+    def test_preprocessing_fails_closed_when_overlay_target_changes(self):
+        source = self.published_shape_fixture()
+        source["components"]["schemas"]["SharingDelete"]["required"].remove("level")
+        with self.assertRaisesRegex(ValueError, "SharingDelete.level"):
+            preprocess.preprocess(json.dumps(source).encode())
 
 
 class UpdateTests(unittest.TestCase):
