@@ -1,0 +1,64 @@
+name: Dependency Audit
+
+on:
+  pull_request:
+    paths:
+      - Cargo.toml
+      - Cargo.lock
+      - deny.toml
+      - .github/workflows/dependency-audit.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dependency-audit-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cargo-deny:
+    name: cargo-deny
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install cargo-deny 0.20.2
+        run: |
+          mkdir -p /tmp/cargo-deny-install
+          curl -fsSLo /tmp/cargo-deny.tar.gz \
+            https://github.com/EmbarkStudios/cargo-deny/releases/download/0.20.2/cargo-deny-0.20.2-x86_64-unknown-linux-musl.tar.gz
+          echo '9f12ed4c49936e09b48bf862b595cde2fe64fcbd9d74dfacac6131ca824c8d5f  /tmp/cargo-deny.tar.gz' | sha256sum --check -
+          tar -xzf /tmp/cargo-deny.tar.gz -C /tmp/cargo-deny-install
+          find /tmp/cargo-deny-install -type f -name cargo-deny -perm -111 -print -quit > /tmp/cargo-deny-path
+          test -s /tmp/cargo-deny-path
+      - name: Check advisories, licenses, bans and sources
+        run: |
+          binary="$(cat /tmp/cargo-deny-path)"
+          "$binary" --version
+          "$binary" check
+
+  cargo-shear:
+    name: cargo-shear
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install cargo-shear 1.13.4
+        run: |
+          mkdir -p /tmp/cargo-shear-install
+          curl -fsSLo /tmp/cargo-shear.tar.gz \
+            https://github.com/Boshen/cargo-shear/releases/download/v1.13.4/cargo-shear-x86_64-unknown-linux-gnu.tar.gz
+          echo 'b52ad836fb99fb3881862d71bd965b9937b55da363f775d71d846244e580a50c  /tmp/cargo-shear.tar.gz' | sha256sum --check -
+          tar -xzf /tmp/cargo-shear.tar.gz -C /tmp/cargo-shear-install
+          find /tmp/cargo-shear-install -type f -name cargo-shear -perm -111 -print -quit > /tmp/cargo-shear-path
+          test -s /tmp/cargo-shear-path
+      - name: Check dependency usage
+        run: |
+          binary="$(cat /tmp/cargo-shear-path)"
+          "$binary" --version
+          "$binary" --deny-warnings
