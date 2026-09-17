@@ -55,11 +55,40 @@ def _json_value_key(value: Any) -> str:
     return json.dumps(value, sort_keys=True, separators=(",", ":"))
 
 
+def _nullable_property_inner(schema: dict[str, Any]) -> dict[str, Any] | None:
+    branches = schema.get("anyOf")
+    allowed = _SCHEMA_ANNOTATIONS | {"anyOf", "default"}
+    if (
+        not isinstance(branches, list)
+        or len(branches) != 2
+        or any(key not in allowed for key in schema)
+    ):
+        return None
+    nulls = [branch for branch in branches if branch == {"type": "null"}]
+    values = [branch for branch in branches if branch != {"type": "null"}]
+    if len(nulls) != 1 or len(values) != 1 or not isinstance(values[0], dict):
+        return None
+    inner = deepcopy(values[0])
+    for key in _SCHEMA_ANNOTATIONS:
+        if key in schema and key not in inner:
+            inner[key] = deepcopy(schema[key])
+    if schema.get("default") is not None and "default" not in inner:
+        inner["default"] = deepcopy(schema["default"])
+    return inner
+
+
 def _intersect_property_schema(
     left: dict[str, Any], right: dict[str, Any], *, context: str
 ) -> dict[str, Any]:
     if left == right:
         return deepcopy(left)
+
+    left_inner = _nullable_property_inner(left)
+    right_inner = _nullable_property_inner(right)
+    if left_inner is not None and right_inner is None:
+        return _intersect_property_schema(left_inner, right, context=context)
+    if right_inner is not None and left_inner is None:
+        return _intersect_property_schema(left, right_inner, context=context)
 
     ignored = _SCHEMA_ANNOTATIONS | {"const", "default", "enum"}
     left_constraints = {key: value for key, value in left.items() if key not in ignored}

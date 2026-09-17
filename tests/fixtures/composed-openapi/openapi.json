@@ -53,6 +53,29 @@
           }
         ]
       },
+      "NullableStreamingCommandBase": {
+        "type": "object",
+        "properties": {
+          "stream": {"anyOf": [{"type": "boolean"}, {"type": "null"}], "default": null}
+        }
+      },
+      "NonStreamingNullableCommand": {
+        "allOf": [
+          {"$ref": "#/components/schemas/NullableStreamingCommandBase"},
+          {
+            "type": "object",
+            "properties": {
+              "stream": {"type": "boolean", "enum": [false], "default": false}
+            }
+          }
+        ]
+      },
+      "InvalidNullableRefinement": {
+        "allOf": [
+          {"$ref": "#/components/schemas/NullableStreamingCommandBase"},
+          {"type": "object", "properties": {"stream": {"type": "string", "enum": ["never"]}}}
+        ]
+      },
       "ImpossibleCommand": {
         "allOf": [
           {"type": "object", "properties": {"mode": {"type": "string", "enum": ["a"]}}},
