@@ -24,12 +24,6 @@ class ProvenanceTests(unittest.TestCase):
 
     @staticmethod
     def published_shape_fixture():
-        def operation(operation_id, media):
-            return {
-                "operationId": operation_id,
-                "responses": {"200": {"content": {name: {} for name in media}}},
-            }
-
         return {
             "openapi": "3.1.0",
             "components": {
@@ -52,31 +46,16 @@ class ProvenanceTests(unittest.TestCase):
                 }
             },
             "paths": {
-                "/v1/chat/completions": {
-                    "post": operation("chat", ["application/json", "text/event-stream"])
-                },
-                "/v1/fim/completions": {
-                    "post": operation("fim", ["application/json", "text/event-stream"])
-                },
-                "/v1/audio/speech": {
-                    "post": operation("speech", ["application/json", "text/event-stream"])
-                },
-                "/v1/audio/voices/{voice_id}/sample": {
-                    "get": operation("voice_sample", ["application/json", "audio/wav"])
-                },
+                "/v1/chat/completions": {},
+                "/v1/audio/voices/{voice_id}/sample": {},
             },
         }
 
-    def test_preprocessing_keeps_contract_repairs_declarative(self):
-        source = self.published_shape_fixture()
-        result = json.loads(preprocess.preprocess(json.dumps(source).encode()))
-        schemas = result["components"]["schemas"]
-        self.assertIn("data", schemas["ChatCompletionResponse"]["allOf"][1]["required"])
-        self.assertIn("level", schemas["SharingDelete"]["required"])
-        self.assertIn("beta.workflows", schemas["WorkflowListResponse"]["required"])
-        self.assertNotIn("workflows", schemas["WorkflowListResponse"]["required"])
-        self.assertIn("/v1/chat/completions#stream", result["paths"])
-        self.assertIn("/v1/audio/voices/{voice_id}/sample#wav", result["paths"])
+    def test_preprocessing_only_asserts_and_preserves_published_bytes(self):
+        source = (json.dumps(self.published_shape_fixture(), indent=2) + "\n").encode()
+        self.assertEqual(preprocess.preprocess(source), source)
+        self.assertNotIn(b"#stream", source)
+        self.assertNotIn(b"#wav", source)
 
     def test_preprocessing_fails_closed_when_overlay_target_changes(self):
         source = self.published_shape_fixture()
@@ -98,7 +77,7 @@ class UpdateTests(unittest.TestCase):
             "published_spec_url": "https://docs.mistral.ai/openapi.yaml",
             "upstream_commit": "a" * 40,
             "spec_sha256": hashlib.sha256(self.old_spec).hexdigest(),
-            "generator": "openapi-to-rust", "generator_version": "0.16.0",
+            "generator": "openapi-to-rust", "generator_version": "0.17.0",
             "rust_toolchain": "1.94.0",
         }
         (self.root / "tooling/sources/lock.json").write_text(json.dumps(self.lock) + "\n")
