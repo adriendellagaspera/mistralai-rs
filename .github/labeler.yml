@@ -1,0 +1,29 @@
+A-sdk:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/**"
+          - "tests/**"
+          - "Cargo.toml"
+          - "Cargo.lock"
+          - "rust-toolchain.toml"
+
+A-codegen:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "tooling/pipeline/**"
+          - "tooling/sources/**"
+          - "tooling/tests/**"
+
+A-ci:
+  - changed-files:
+      - any-glob-to-any-file:
+          - ".github/**"
+          - "tooling/quality/**"
+          - "AGENTS.md"
+          - "CLAUDE.md"
+          - "Justfile"
+
+A-docs:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "**/*.md"

@@ -1,0 +1,35 @@
+name: Bug report
+description: Report a reproducible SDK, generation, or tooling defect
+title: "fix: "
+labels: ["C-bug"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What is wrong, and what behavior did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: reproducer
+    attributes:
+      label: Minimal reproducer
+      description: Prefer exact commands, a fixture, or the smallest generated/API example.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - SDK / runtime
+        - Mistral codegen / policy
+        - source tracking / provenance
+        - CI / repository policy
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Relevant output, generated diff, traceback, or failing assertion.

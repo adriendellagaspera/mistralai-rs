@@ -3,17 +3,28 @@
 //! The primary API is resource-oriented and intentionally hides mechanical
 //! OpenAPI naming. The complete generated API remains available through `raw`.
 
-// openapi-to-rust 0.16.0 emits these mechanical style patterns.
-// Keep exceptions scoped to generated code; no compiler/correctness lint is
-// disabled here. Evidence and removal criteria: codegen/EVALUATION.md.
+#![forbid(unsafe_code)]
+#![warn(
+    missing_docs,
+    clippy::allow_attributes_without_reason,
+    clippy::missing_errors_doc,
+    clippy::missing_panics_doc
+)]
+
 #[allow(
+    missing_docs,
+    rustdoc::broken_intra_doc_links,
+    clippy::allow_attributes_without_reason,
     clippy::double_must_use,
     clippy::nonminimal_bool,
     clippy::redundant_field_names,
     clippy::too_many_arguments,
     clippy::match_single_binding,
     clippy::collapsible_if,
-    clippy::empty_docs
+    clippy::empty_docs,
+    clippy::missing_errors_doc,
+    clippy::missing_panics_doc,
+    reason = "openapi-to-rust output is generated and kept behind this module boundary"
 )]
 mod generated;
 
@@ -23,6 +34,14 @@ pub mod raw {
     pub use client::HttpClient as Client;
 }
 
+#[allow(
+    missing_docs,
+    rustdoc::broken_intra_doc_links,
+    clippy::allow_attributes_without_reason,
+    clippy::missing_errors_doc,
+    clippy::missing_panics_doc,
+    reason = "the idiomatic SDK facade is generated and validated by generation/API gates"
+)]
 mod sdk;
 pub mod streaming;
 
