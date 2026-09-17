@@ -1,0 +1,206 @@
+name: Materialize issue 19 simple array unions v2
+on:
+  push:
+    branches: [issue-19-allof-request-projection]
+permissions:
+  contents: write
+jobs:
+  materialize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: issue-19-allof-request-projection
+          fetch-depth: 0
+      - name: Install pinned Rust toolchain
+        run: rustup show
+      - name: Apply compiler pin and simple-array union projection
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          lock_path = Path("tooling/sources/lock.json")
+          lock = json.loads(lock_path.read_text())
+          lock["compiler_tool_version"] = "0.2.8"
+          lock["compiler_tool_commit"] = "da67081e85b34859232b5b60451de72f44b0fb7e"
+          lock["compiler_tool_tree_sha"] = "0af56d0e8f82de0b2433d3a6181890994c52abf7"
+          lock_path.write_text(json.dumps(lock, indent=2) + "\n")
+
+          path = Path("tooling/pipeline/mistral/sdk_autoproject.py")
+          text = path.read_text()
+          start = text.index("def _primitive_union_payload(")
+          end = text.index("\ndef _request_field_adapter(", start)
+          replacement = '''def _primitive_union_payload(schema: dict[str, Any]) -> str | None:
+              if "$ref" in schema or "enum" in schema or "const" in schema or "format" in schema:
+                  return None
+              return {
+                  "string": "String",
+                  "integer": "i64",
+                  "number": "f64",
+                  "boolean": "bool",
+              }.get(schema.get("type"))
+
+
+          def _union_branch_matches(schema: dict[str, Any], payload: str, rust: Any) -> bool:
+              reference = _schema_ref(schema)
+              if reference is not None:
+                  return payload == reference
+              syntax = _expand_raw_alias(parse_type(payload), rust)
+              if syntax is None:
+                  return False
+              primitive = _primitive_union_payload(schema)
+              if primitive is not None:
+                  return syntax.spelling == primitive
+              if schema.get("type") != "array":
+                  return False
+              inner = syntax.unary("Vec")
+              if inner is None:
+                  return False
+              item = _primitive_union_payload(schema.get("items", {}))
+              if item is None:
+                  return False
+              expanded_inner = _expand_raw_alias(inner, rust)
+              return expanded_inner is not None and expanded_inner.spelling == item
+
+
+          def _ensure_union_model(models: dict[str, Any], schemas: dict[str, Any], schema: dict[str, Any],
+                                  raw: str, rust: Any, resolving: tuple[str, ...]) -> tuple[str | None, str | None]:
+              existing = _existing_model_by_raw(models, raw, False)
+              if existing:
+                  return existing, None
+              branches = schema.get("oneOf", []) or schema.get("anyOf", [])
+              non_null = [branch for branch in branches if branch.get("type") != "null"]
+              if len(non_null) < 2 or raw not in rust.enums:
+                  return None, "request_model_projection"
+              variants = rust.enums[raw]
+              if any(variant.payload is None for variant in variants):
+                  return None, "request_model_projection"
+
+              expected: list[tuple[dict[str, Any], Any, str | None]] = []
+              used: set[str] = set()
+              references: list[str] = []
+              for branch in non_null:
+                  matches = [
+                      variant for variant in variants
+                      if variant.name not in used
+                      and _union_branch_matches(branch, variant.payload, rust)
+                  ]
+                  if len(matches) != 1:
+                      return None, "request_model_projection"
+                  variant = matches[0]
+                  used.add(variant.name)
+                  reference = _schema_ref(branch)
+                  expected.append((branch, variant, reference))
+                  if reference is not None:
+                      references.append(reference)
+              if len(used) != len(variants):
+                  return None, "request_model_projection"
+
+              discriminator = schema.get("discriminator", {})
+              mapping = discriminator.get("mapping", {}) if isinstance(discriminator, dict) else {}
+              tags_by_ref = {
+                  value.rsplit("/", 1)[-1]: tag
+                  for tag, value in mapping.items()
+                  if isinstance(value, str)
+              }
+              if mapping and (len(references) != len(expected) or set(tags_by_ref) != set(references)):
+                  return None, "request_model_projection"
+
+              facade_variants: dict[str, Any] = {}
+              seen_public: set[str] = set()
+              for branch, variant, reference in expected:
+                  adapter = None
+                  if reference is not None:
+                      adapter, reason = _request_field_adapter(
+                          models, schemas, branch, variant.payload, rust, resolving, reference, ()
+                      )
+                      if reason:
+                          return None, reason
+                  label = tags_by_ref.get(reference, reference) if reference is not None else branch.get("type")
+                  public = _pascal(str(label).lower() if reference in tags_by_ref else str(label))
+                  if not public or public in seen_public:
+                      return None, "request_model_projection"
+                  seen_public.add(public)
+                  facade_variants[variant.name] = (
+                      {"name": public, "adapter": adapter} if adapter else public
+                  )
+
+              name = _union_name(raw)
+              if name in models and models[name].get("raw", name) != raw:
+                  return None, "request_model_projection"
+              models[name] = {"raw": raw, "simple_union": {"variants": facade_variants}}
+              return name, None
+
+          '''
+          replacement = "\n".join(line[10:] if line.startswith("          ") else line for line in replacement.splitlines()) + "\n"
+          path.write_text(text[:start] + replacement + text[end + 1:])
+
+          tests = Path("tooling/tests/test_sdk_autoproject.py")
+          text = tests.read_text()
+          anchor = "    def test_projects_discriminated_request_union_without_raw_type_leaks(self):\n"
+          insertion = '''    def test_projects_inline_simple_array_request_union(self):
+              api = FakeOpenApi()
+              api.schemas.update({
+                  "CreateThing": {
+                      "type": "object", "required": ["stop"],
+                      "properties": {"stop": {"$ref": "#/components/schemas/StopChoice"}},
+                  },
+                  "StopChoice": {
+                      "anyOf": [
+                          {"type": "string"},
+                          {"type": "array", "items": {"type": "string"}},
+                          {"type": "null"},
+                      ]
+                  },
+              })
+              fields = {"CreateThing": (SimpleNamespace(name="stop", type="StopChoice"),)}
+              enums = {
+                  "StopChoice": (
+                      SimpleNamespace(name="String", payload="String"),
+                      SimpleNamespace(name="StringArray", payload="StopStringArray"),
+                  ),
+              }
+              aliases = {"StopStringArray": parse_type("Vec<String>")}
+              rust = SimpleNamespace(
+                  structs=set(fields), aliases=aliases, enums=enums,
+                  symbol_paths={name: "types" for name in (*fields, *enums, *aliases)},
+                  fields=lambda name: fields[name],
+              )
+              expanded, report = sdk_autoproject.expand_manifest(
+                  api, manifest(), {"operations": {"create_thing": ["things.create"]}},
+                  raw_coverage("create_thing"), rust,
+              )
+              self.assertEqual(1, report["added_count"])
+              self.assertEqual(
+                  {"stop": "StopChoiceValue"},
+                  expanded["models"]["CreateThingParams"]["adapters"],
+              )
+              self.assertEqual(
+                  {"String": "String", "StringArray": "Array"},
+                  expanded["models"]["StopChoiceValue"]["simple_union"]["variants"],
+              )
+
+          '''
+          insertion = "\n".join(line[10:] if line.startswith("          ") else line for line in insertion.splitlines()) + "\n"
+          if anchor not in text:
+              raise SystemExit("test insertion anchor not found")
+          tests.write_text(text.replace(anchor, insertion + anchor, 1))
+          PY
+      - name: Regenerate and validate consumer
+        run: |
+          set -euo pipefail
+          python3 tooling/pipeline/build.py generate
+          bash tooling/quality/validate.sh
+      - name: Commit materialized consumer
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git rm -f .github/workflows/diagnose-issue19.yml .github/workflows/materialize-issue19-simple-array-unions-v2.yml
+          git add tooling/pipeline/mistral/sdk_autoproject.py tooling/sources/lock.json tooling/tests/test_sdk_autoproject.py src/generated src/sdk
+          git commit -m 'feat: project simple array request unions'
+          git push origin HEAD:issue-19-allof-request-projection
