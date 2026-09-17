@@ -55,13 +55,13 @@ Mistral semantic policy ------------------------------> Policy
 Mistral runtime conventions --------------------------> Runtime
                                                            |
                                                            v
-                                                    rust-sdk-compiler
+                                                    rust-sdk-generator
                                                            |
                                                            v
                                                         src/sdk
 ```
 
-`rust-sdk-compiler` is a separately versioned, backend-neutral Rust SDK compiler. `openapi-to-rust-bindings` is the separately versioned compatibility package that normalizes the current raw generator output into the compiler's `Bindings` contract. Both are pinned independently in `tooling/sources/lock.json`; neither implementation is copied into this repository.
+`rust-sdk-generator` is a separately versioned, backend-neutral Rust SDK compiler. `openapi-to-rust-bindings` is the separately versioned compatibility package that normalizes the current raw generator output into the compiler's `Bindings` contract. Both are pinned independently in `tooling/sources/lock.json`; neither implementation is copied into this repository.
 
 `mistralai-rs` owns only Mistral-specific concerns around that generic toolchain: product taxonomy, semantic policy, auto-projection, runtime support, source tracking, coverage and public-API review gates.
 
@@ -111,7 +111,7 @@ just validate
 
 - the official Mistral OpenAPI source commit and content hash;
 - `openapi-to-rust` plus the reviewed local generator patch hash;
-- `rust-sdk-compiler` by version, commit and Git tree;
+- `rust-sdk-generator` by version, commit and Git tree;
 - `openapi-to-rust-bindings` by version, commit and Git tree;
 - Rust and Python tooling versions used by generation.
 
@@ -124,7 +124,7 @@ On first use, `tooling/pipeline/build.py` installs the pinned tools into `.tools
 | Location | Purpose |
 | --- | --- |
 | `tooling/sources/` | Immutable OpenAPI/Python/TypeScript source tracking, vendored OpenAPI and derived taxonomy |
-| `tooling/pipeline/` | Mistral adaptation and orchestration across openapi-to-rust, Bindings and rust-sdk-compiler |
+| `tooling/pipeline/` | Mistral adaptation and orchestration across openapi-to-rust, Bindings and rust-sdk-generator |
 | `tooling/quality/` | Determinism, coverage, semver/public API review and update reporting |
 | `tooling/tests/` | Sidecar integration/policy tests |
 | `src/generated/` | Committed raw generated Rust and raw operation inventory |

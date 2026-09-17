@@ -14,7 +14,7 @@ import tempfile
 import tomllib
 
 from openapi_to_rust_bindings import read_bindings
-from rust_sdk_compiler import GenerationError, OpenApi, Policy, compile, lower
+from rust_sdk_generator import GenerationError, OpenApi, Policy, compile, lower
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tooling" / "pipeline" / "mistral"))

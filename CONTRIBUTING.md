@@ -10,7 +10,7 @@ just validate
 
 Without Just, use `python3 tooling/pipeline/build.py generate` and `python3 tooling/pipeline/build.py check`. No xtask is needed. Codegen creates an isolated Python environment under `.tools/`; no global Python package installation is required.
 
-`tooling/sources/lock.json` pins the Rust toolchain, raw generator source commit and patch hash, `rust-sdk-compiler`, `openapi-to-rust-bindings`, their Git trees, and Python dependencies. `tooling/pipeline/build.py` verifies those immutable inputs before generation. The raw generator is built with its committed lockfile; the two Python tools are installed from their exact pinned commits. `Cargo.lock` pins this SDK's validation dependencies.
+`tooling/sources/lock.json` pins the Rust toolchain, raw generator source commit and patch hash, `rust-sdk-generator`, `openapi-to-rust-bindings`, their Git trees, and Python dependencies. `tooling/pipeline/build.py` verifies those immutable inputs before generation. The raw generator is built with its committed lockfile; the two Python tools are installed from their exact pinned commits. `Cargo.lock` pins this SDK's validation dependencies.
 
 ## Updating the source specification
 
@@ -34,10 +34,10 @@ The generation boundaries are deliberate:
 
 - `openapi-to-rust` owns raw Rust generation;
 - `openapi-to-rust-bindings` normalizes that generated Rust into `Bindings`;
-- `rust-sdk-compiler` compiles `OpenApi + Bindings + Policy + Runtime` into deterministic Rust SDK files;
+- `rust-sdk-generator` compiles `OpenApi + Bindings + Policy + Runtime` into deterministic Rust SDK files;
 - this repository owns Mistral taxonomy, auto-projection policy, runtime integration, coverage and API-review gates.
 
-Generic compiler behavior belongs in `rust-sdk-compiler` and should be demonstrated with a non-Mistral fixture. A raw-generator compatibility fix belongs in `openapi-to-rust-bindings` when it only concerns the shape produced by `openapi-to-rust`. Mistral-specific naming or projection decisions stay here.
+Generic compiler behavior belongs in `rust-sdk-generator` and should be demonstrated with a non-Mistral fixture. A raw-generator compatibility fix belongs in `openapi-to-rust-bindings` when it only concerns the shape produced by `openapi-to-rust`. Mistral-specific naming or projection decisions stay here.
 
 Do not edit `src/generated/` or generated files in `src/sdk/` by hand. Prefer generator configuration, then a narrowly scoped source patch or explicit preprocessing for raw generation. Source patches must apply with `git apply --check` to the pinned generator commit and have their SHA-256 updated in `codegen.lock`. Rustfmt remains the only post-generation Rust transform.
 
