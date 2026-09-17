@@ -31,12 +31,9 @@ def verify_spec(data, lock):
         raise ValueError(f"Spec SHA-256 mismatch: expected {lock['spec_sha256']}, got {actual}")
 
 
-def verify_overlaid_openapi(data, published):
+def verify_overlaid_openapi(data, published_paths):
     """Assert that the Overlay made only the declared contract repairs."""
-    from ruamel.yaml import YAML
-
     spec = json.loads(data)
-    published_spec = YAML(typ="safe", pure=True).load(published)
     schemas = spec["components"]["schemas"]
     chat = schemas["ChatCompletionResponse"]["allOf"][1]
     if "data" in chat.get("required", []):
@@ -48,7 +45,7 @@ def verify_overlaid_openapi(data, published):
     required = workflows.get("required", [])
     if "beta.workflows" in required or "workflows" not in required:
         raise ValueError("OpenAPI Overlay did not repair WorkflowListResponse.workflows")
-    published_paths = set(published_spec["paths"])
+    published_paths = set(published_paths)
     overlaid_paths = set(spec["paths"])
     if overlaid_paths != published_paths:
         added = sorted(overlaid_paths - published_paths)
@@ -213,12 +210,18 @@ def main():
         published_path = work / "tooling/sources/openapi/openapi.yaml"
         overlaid_path = work / "tooling/sources/openapi/openapi.overlaid.json"
         run(python, work / "tooling/pipeline/preprocess.py", published_path)
+        published_paths = json.loads(output(
+            python,
+            work / "tooling/pipeline/preprocess.py",
+            published_path,
+            "--print-paths",
+        ))
         if published_path.read_bytes() != published:
             raise ValueError("Published OpenAPI changed while validating Overlay assumptions")
         config = work / lock["generator_config"]
         run(executable, "generate", "--config", config)
         first_overlaid = overlaid_path.read_bytes()
-        verify_overlaid_openapi(first_overlaid, published)
+        verify_overlaid_openapi(first_overlaid, published_paths)
         # A second materialization must be byte-identical, not merely equivalent JSON.
         run(executable, "generate", "--config", config)
         if overlaid_path.read_bytes() != first_overlaid:
