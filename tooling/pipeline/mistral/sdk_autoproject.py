@@ -479,6 +479,28 @@ def _primitive_union_payload(schema: dict[str, Any]) -> str | None:
     }.get(schema.get("type"))
 
 
+def _union_branch_matches(schema: dict[str, Any], payload: str, rust: Any) -> bool:
+    reference = _schema_ref(schema)
+    if reference is not None:
+        return payload == reference
+    syntax = _expand_raw_alias(parse_type(payload), rust)
+    if syntax is None:
+        return False
+    primitive = _primitive_union_payload(schema)
+    if primitive is not None:
+        return syntax.spelling == primitive
+    if schema.get("type") != "array":
+        return False
+    inner = syntax.unary("Vec")
+    if inner is None:
+        return False
+    item = _primitive_union_payload(schema.get("items", {}))
+    if item is None:
+        return False
+    expanded_inner = _expand_raw_alias(inner, rust)
+    return expanded_inner is not None and expanded_inner.spelling == item
+
+
 def _ensure_union_model(models: dict[str, Any], schemas: dict[str, Any], schema: dict[str, Any],
                         raw: str, rust: Any, resolving: tuple[str, ...]) -> tuple[str | None, str | None]:
     existing = _existing_model_by_raw(models, raw, False)
@@ -491,22 +513,25 @@ def _ensure_union_model(models: dict[str, Any], schemas: dict[str, Any], schema:
     variants = rust.enums[raw]
     if any(variant.payload is None for variant in variants):
         return None, "request_model_projection"
-    by_payload = {variant.payload: variant.name for variant in variants}
-    if len(by_payload) != len(variants):
-        return None, "request_model_projection"
 
-    expected: list[tuple[dict[str, Any], str, str | None]] = []
+    expected: list[tuple[dict[str, Any], Any, str | None]] = []
+    used: set[str] = set()
     references: list[str] = []
     for branch in non_null:
-        reference = _schema_ref(branch)
-        payload = reference or _primitive_union_payload(branch)
-        if payload is None:
+        matches = [
+            variant for variant in variants
+            if variant.name not in used
+            and _union_branch_matches(branch, variant.payload, rust)
+        ]
+        if len(matches) != 1:
             return None, "request_model_projection"
-        expected.append((branch, payload, reference))
+        variant = matches[0]
+        used.add(variant.name)
+        reference = _schema_ref(branch)
+        expected.append((branch, variant, reference))
         if reference is not None:
             references.append(reference)
-    payloads = [payload for _, payload, _ in expected]
-    if len(set(payloads)) != len(payloads) or set(payloads) != set(by_payload):
+    if len(used) != len(variants):
         return None, "request_model_projection"
 
     discriminator = schema.get("discriminator", {})
@@ -521,11 +546,11 @@ def _ensure_union_model(models: dict[str, Any], schemas: dict[str, Any], schema:
 
     facade_variants: dict[str, Any] = {}
     seen_public: set[str] = set()
-    for branch, payload, reference in expected:
+    for branch, variant, reference in expected:
         adapter = None
         if reference is not None:
             adapter, reason = _request_field_adapter(
-                models, schemas, branch, payload, rust, resolving, reference, ()
+                models, schemas, branch, variant.payload, rust, resolving, reference, ()
             )
             if reason:
                 return None, reason
@@ -534,7 +559,7 @@ def _ensure_union_model(models: dict[str, Any], schemas: dict[str, Any], schema:
         if not public or public in seen_public:
             return None, "request_model_projection"
         seen_public.add(public)
-        facade_variants[by_payload[payload]] = (
+        facade_variants[variant.name] = (
             {"name": public, "adapter": adapter} if adapter else public
         )
 
@@ -543,7 +568,6 @@ def _ensure_union_model(models: dict[str, Any], schemas: dict[str, Any], schema:
         return None, "request_model_projection"
     models[name] = {"raw": raw, "simple_union": {"variants": facade_variants}}
     return name, None
-
 
 def _request_field_adapter(models: dict[str, Any], schemas: dict[str, Any], schema: dict[str, Any],
                            raw_type: str, rust: Any, resolving: tuple[str, ...],

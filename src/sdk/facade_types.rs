@@ -2072,6 +2072,2008 @@ impl From<AgentView> for Agent {
 }
 
 #[derive(Debug, Clone)]
+pub struct PredictionParams {
+    raw: Prediction,
+}
+
+impl PredictionParams {
+    pub fn new() -> Self {
+        Self {
+            raw: Prediction {
+                content: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn content(mut self, content: impl Into<String>) -> Self {
+        self.raw.content = Some(content.into());
+        self
+    }
+    pub fn from_raw(raw: Prediction) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &Prediction {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Prediction {
+        self.raw
+    }
+}
+
+impl From<Prediction> for PredictionParams {
+    fn from(raw: Prediction) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<PredictionParams> for Prediction {
+    fn from(value: PredictionParams) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for PredictionParams {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[non_exhaustive]
+pub enum CompletionArgsReasoningEffortValue {
+    High,
+    None,
+}
+
+impl From<CompletionArgsReasoningEffortValue> for CompletionArgsReasoningEffort {
+    fn from(value: CompletionArgsReasoningEffortValue) -> Self {
+        match value {
+            CompletionArgsReasoningEffortValue::High => Self::High,
+            CompletionArgsReasoningEffortValue::None => Self::None,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct JsonSchemaSchemaMap {
+    values: std::collections::BTreeMap<String, serde_json::Value>,
+}
+
+impl JsonSchemaSchemaMap {
+    pub fn new(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
+        Self { values }
+    }
+    pub fn as_map(&self) -> &std::collections::BTreeMap<String, serde_json::Value> {
+        &self.values
+    }
+    pub fn into_map(self) -> std::collections::BTreeMap<String, serde_json::Value> {
+        self.values
+    }
+}
+
+impl From<std::collections::BTreeMap<String, serde_json::Value>> for JsonSchemaSchemaMap {
+    fn from(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
+        Self { values }
+    }
+}
+
+impl From<JsonSchemaSchema> for JsonSchemaSchemaMap {
+    fn from(value: JsonSchemaSchema) -> Self {
+        Self {
+            values: value.additional_properties,
+        }
+    }
+}
+
+impl From<JsonSchemaSchemaMap> for JsonSchemaSchema {
+    fn from(value: JsonSchemaSchemaMap) -> Self {
+        Self {
+            additional_properties: value.values,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct JsonSchemaParams {
+    raw: JsonSchema,
+}
+
+impl JsonSchemaParams {
+    pub fn new(name: impl Into<String>, schema: impl Into<JsonSchemaSchemaMap>) -> Self {
+        Self {
+            raw: JsonSchema {
+                description: None,
+                name: name.into(),
+                schema: Into::<JsonSchemaSchemaMap>::into(schema).into(),
+                strict: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.raw.description = Some(Some(description.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn description_null(mut self) -> Self {
+        self.raw.description = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn strict(mut self, strict: bool) -> Self {
+        self.raw.strict = Some(strict);
+        self
+    }
+    pub fn from_raw(raw: JsonSchema) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &JsonSchema {
+        &self.raw
+    }
+    pub fn into_raw(self) -> JsonSchema {
+        self.raw
+    }
+}
+
+impl From<JsonSchema> for JsonSchemaParams {
+    fn from(raw: JsonSchema) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<JsonSchemaParams> for JsonSchema {
+    fn from(value: JsonSchemaParams) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[non_exhaustive]
+pub enum ResponseFormatsValue {
+    Text,
+    JsonObject,
+    JsonSchema,
+}
+
+impl From<ResponseFormatsValue> for ResponseFormats {
+    fn from(value: ResponseFormatsValue) -> Self {
+        match value {
+            ResponseFormatsValue::Text => Self::Text,
+            ResponseFormatsValue::JsonObject => Self::JsonObject,
+            ResponseFormatsValue::JsonSchema => Self::JsonSchema,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ResponseFormatParams {
+    raw: ResponseFormat,
+}
+
+impl ResponseFormatParams {
+    pub fn new() -> Self {
+        Self {
+            raw: ResponseFormat {
+                json_schema: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn json_schema(mut self, json_schema: impl Into<JsonSchemaParams>) -> Self {
+        self.raw.json_schema = Some(Some(Into::<JsonSchemaParams>::into(json_schema).into()));
+        self
+    }
+
+    #[must_use]
+    pub fn json_schema_null(mut self) -> Self {
+        self.raw.json_schema = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: impl Into<ResponseFormatsValue>) -> Self {
+        self.raw.r#type = Some(Into::<ResponseFormatsValue>::into(r#type).into());
+        self
+    }
+    pub fn from_raw(raw: ResponseFormat) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ResponseFormat {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ResponseFormat {
+        self.raw
+    }
+}
+
+impl From<ResponseFormat> for ResponseFormatParams {
+    fn from(raw: ResponseFormat) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ResponseFormatParams> for ResponseFormat {
+    fn from(value: ResponseFormatParams) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for ResponseFormatParams {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub enum CompletionArgsStopValue {
+    String(String),
+    Array(Vec<String>),
+}
+
+impl From<String> for CompletionArgsStopValue {
+    fn from(value: String) -> Self {
+        Self::String(value)
+    }
+}
+
+impl From<&str> for CompletionArgsStopValue {
+    fn from(value: &str) -> Self {
+        Self::String(value.into())
+    }
+}
+
+impl From<Vec<String>> for CompletionArgsStopValue {
+    fn from(value: Vec<String>) -> Self {
+        Self::Array(value)
+    }
+}
+
+impl From<CompletionArgsStopValue> for CompletionArgsStop {
+    fn from(value: CompletionArgsStopValue) -> Self {
+        match value {
+            CompletionArgsStopValue::String(value) => Self::String(value),
+            CompletionArgsStopValue::Array(value) => Self::CompletionArgsStopStringArray(value),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[non_exhaustive]
+pub enum ToolChoiceEnumValue {
+    Auto,
+    None,
+    Any,
+    Required,
+}
+
+impl From<ToolChoiceEnumValue> for ToolChoiceEnum {
+    fn from(value: ToolChoiceEnumValue) -> Self {
+        match value {
+            ToolChoiceEnumValue::Auto => Self::Auto,
+            ToolChoiceEnumValue::None => Self::None,
+            ToolChoiceEnumValue::Any => Self::Any,
+            ToolChoiceEnumValue::Required => Self::Required,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CompletionArgsParams {
+    raw: CompletionArgs,
+}
+
+impl CompletionArgsParams {
+    pub fn new() -> Self {
+        Self {
+            raw: CompletionArgs {
+                frequency_penalty: None,
+                max_tokens: None,
+                prediction: None,
+                presence_penalty: None,
+                random_seed: None,
+                reasoning_effort: None,
+                response_format: None,
+                stop: None,
+                temperature: None,
+                tool_choice: None,
+                top_p: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn frequency_penalty(mut self, frequency_penalty: f64) -> Self {
+        self.raw.frequency_penalty = Some(Some(frequency_penalty));
+        self
+    }
+
+    #[must_use]
+    pub fn frequency_penalty_null(mut self) -> Self {
+        self.raw.frequency_penalty = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn max_tokens(mut self, max_tokens: i64) -> Self {
+        self.raw.max_tokens = Some(Some(max_tokens));
+        self
+    }
+
+    #[must_use]
+    pub fn max_tokens_null(mut self) -> Self {
+        self.raw.max_tokens = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn prediction(mut self, prediction: impl Into<PredictionParams>) -> Self {
+        self.raw.prediction = Some(Some(Into::<PredictionParams>::into(prediction).into()));
+        self
+    }
+
+    #[must_use]
+    pub fn prediction_null(mut self) -> Self {
+        self.raw.prediction = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn presence_penalty(mut self, presence_penalty: f64) -> Self {
+        self.raw.presence_penalty = Some(Some(presence_penalty));
+        self
+    }
+
+    #[must_use]
+    pub fn presence_penalty_null(mut self) -> Self {
+        self.raw.presence_penalty = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn random_seed(mut self, random_seed: i64) -> Self {
+        self.raw.random_seed = Some(Some(random_seed));
+        self
+    }
+
+    #[must_use]
+    pub fn random_seed_null(mut self) -> Self {
+        self.raw.random_seed = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn reasoning_effort(
+        mut self,
+        reasoning_effort: impl Into<CompletionArgsReasoningEffortValue>,
+    ) -> Self {
+        self.raw.reasoning_effort = Some(Some(
+            Into::<CompletionArgsReasoningEffortValue>::into(reasoning_effort).into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn reasoning_effort_null(mut self) -> Self {
+        self.raw.reasoning_effort = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn response_format(mut self, response_format: impl Into<ResponseFormatParams>) -> Self {
+        self.raw.response_format = Some(Some(
+            Into::<ResponseFormatParams>::into(response_format).into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn response_format_null(mut self) -> Self {
+        self.raw.response_format = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn stop(mut self, stop: impl Into<CompletionArgsStopValue>) -> Self {
+        self.raw.stop = Some(Some(Into::<CompletionArgsStopValue>::into(stop).into()));
+        self
+    }
+
+    #[must_use]
+    pub fn stop_null(mut self) -> Self {
+        self.raw.stop = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn temperature(mut self, temperature: f64) -> Self {
+        self.raw.temperature = Some(Some(temperature));
+        self
+    }
+
+    #[must_use]
+    pub fn temperature_null(mut self) -> Self {
+        self.raw.temperature = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn tool_choice(mut self, tool_choice: impl Into<ToolChoiceEnumValue>) -> Self {
+        self.raw.tool_choice = Some(Into::<ToolChoiceEnumValue>::into(tool_choice).into());
+        self
+    }
+
+    #[must_use]
+    pub fn top_p(mut self, top_p: f64) -> Self {
+        self.raw.top_p = Some(Some(top_p));
+        self
+    }
+
+    #[must_use]
+    pub fn top_p_null(mut self) -> Self {
+        self.raw.top_p = Some(None);
+        self
+    }
+    pub fn from_raw(raw: CompletionArgs) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &CompletionArgs {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CompletionArgs {
+        self.raw
+    }
+}
+
+impl From<CompletionArgs> for CompletionArgsParams {
+    fn from(raw: CompletionArgs) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CompletionArgsParams> for CompletionArgs {
+    fn from(value: CompletionArgsParams) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for CompletionArgsParams {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[non_exhaustive]
+pub enum ModerationLLMActionValue {
+    None,
+    Block,
+}
+
+impl From<ModerationLLMActionValue> for ModerationLLMAction {
+    fn from(value: ModerationLLMActionValue) -> Self {
+        match value {
+            ModerationLLMActionValue::None => Self::None,
+            ModerationLLMActionValue::Block => Self::Block,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ModerationLLMV1CategoryThresholdsParams {
+    raw: ModerationLLMV1CategoryThresholds,
+}
+
+impl ModerationLLMV1CategoryThresholdsParams {
+    pub fn new() -> Self {
+        Self {
+            raw: ModerationLLMV1CategoryThresholds {
+                dangerous_and_criminal_content: None,
+                financial: None,
+                hate_and_discrimination: None,
+                health: None,
+                law: None,
+                pii: None,
+                selfharm: None,
+                sexual: None,
+                violence_and_threats: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn dangerous_and_criminal_content(mut self, dangerous_and_criminal_content: f64) -> Self {
+        self.raw.dangerous_and_criminal_content = Some(Some(dangerous_and_criminal_content));
+        self
+    }
+
+    #[must_use]
+    pub fn dangerous_and_criminal_content_null(mut self) -> Self {
+        self.raw.dangerous_and_criminal_content = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn financial(mut self, financial: f64) -> Self {
+        self.raw.financial = Some(Some(financial));
+        self
+    }
+
+    #[must_use]
+    pub fn financial_null(mut self) -> Self {
+        self.raw.financial = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn hate_and_discrimination(mut self, hate_and_discrimination: f64) -> Self {
+        self.raw.hate_and_discrimination = Some(Some(hate_and_discrimination));
+        self
+    }
+
+    #[must_use]
+    pub fn hate_and_discrimination_null(mut self) -> Self {
+        self.raw.hate_and_discrimination = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn health(mut self, health: f64) -> Self {
+        self.raw.health = Some(Some(health));
+        self
+    }
+
+    #[must_use]
+    pub fn health_null(mut self) -> Self {
+        self.raw.health = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn law(mut self, law: f64) -> Self {
+        self.raw.law = Some(Some(law));
+        self
+    }
+
+    #[must_use]
+    pub fn law_null(mut self) -> Self {
+        self.raw.law = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn pii(mut self, pii: f64) -> Self {
+        self.raw.pii = Some(Some(pii));
+        self
+    }
+
+    #[must_use]
+    pub fn pii_null(mut self) -> Self {
+        self.raw.pii = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn selfharm(mut self, selfharm: f64) -> Self {
+        self.raw.selfharm = Some(Some(selfharm));
+        self
+    }
+
+    #[must_use]
+    pub fn selfharm_null(mut self) -> Self {
+        self.raw.selfharm = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn sexual(mut self, sexual: f64) -> Self {
+        self.raw.sexual = Some(Some(sexual));
+        self
+    }
+
+    #[must_use]
+    pub fn sexual_null(mut self) -> Self {
+        self.raw.sexual = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn violence_and_threats(mut self, violence_and_threats: f64) -> Self {
+        self.raw.violence_and_threats = Some(Some(violence_and_threats));
+        self
+    }
+
+    #[must_use]
+    pub fn violence_and_threats_null(mut self) -> Self {
+        self.raw.violence_and_threats = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ModerationLLMV1CategoryThresholds) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ModerationLLMV1CategoryThresholds {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ModerationLLMV1CategoryThresholds {
+        self.raw
+    }
+}
+
+impl From<ModerationLLMV1CategoryThresholds> for ModerationLLMV1CategoryThresholdsParams {
+    fn from(raw: ModerationLLMV1CategoryThresholds) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ModerationLLMV1CategoryThresholdsParams> for ModerationLLMV1CategoryThresholds {
+    fn from(value: ModerationLLMV1CategoryThresholdsParams) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for ModerationLLMV1CategoryThresholdsParams {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ModerationLLMV1ConfigParams {
+    raw: ModerationLLMV1Config,
+}
+
+impl ModerationLLMV1ConfigParams {
+    pub fn new() -> Self {
+        Self {
+            raw: ModerationLLMV1Config {
+                action: None,
+                custom_category_thresholds: None,
+                ignore_other_categories: None,
+                model_name: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn action(mut self, action: impl Into<ModerationLLMActionValue>) -> Self {
+        self.raw.action = Some(Into::<ModerationLLMActionValue>::into(action).into());
+        self
+    }
+
+    #[must_use]
+    pub fn custom_category_thresholds(
+        mut self,
+        custom_category_thresholds: impl Into<ModerationLLMV1CategoryThresholdsParams>,
+    ) -> Self {
+        self.raw.custom_category_thresholds = Some(Some(
+            Into::<ModerationLLMV1CategoryThresholdsParams>::into(custom_category_thresholds)
+                .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn custom_category_thresholds_null(mut self) -> Self {
+        self.raw.custom_category_thresholds = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn ignore_other_categories(mut self, ignore_other_categories: bool) -> Self {
+        self.raw.ignore_other_categories = Some(ignore_other_categories);
+        self
+    }
+
+    #[must_use]
+    pub fn model_name(mut self, model_name: impl Into<String>) -> Self {
+        self.raw.model_name = Some(model_name.into());
+        self
+    }
+    pub fn from_raw(raw: ModerationLLMV1Config) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ModerationLLMV1Config {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ModerationLLMV1Config {
+        self.raw
+    }
+}
+
+impl From<ModerationLLMV1Config> for ModerationLLMV1ConfigParams {
+    fn from(raw: ModerationLLMV1Config) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ModerationLLMV1ConfigParams> for ModerationLLMV1Config {
+    fn from(value: ModerationLLMV1ConfigParams) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for ModerationLLMV1ConfigParams {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ModerationLLMV2CategoryThresholdsParams {
+    raw: ModerationLLMV2CategoryThresholds,
+}
+
+impl ModerationLLMV2CategoryThresholdsParams {
+    pub fn new() -> Self {
+        Self {
+            raw: ModerationLLMV2CategoryThresholds {
+                criminal: None,
+                dangerous: None,
+                financial: None,
+                hate_and_discrimination: None,
+                health: None,
+                jailbreaking: None,
+                law: None,
+                pii: None,
+                selfharm: None,
+                sexual: None,
+                violence_and_threats: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn criminal(mut self, criminal: f64) -> Self {
+        self.raw.criminal = Some(Some(criminal));
+        self
+    }
+
+    #[must_use]
+    pub fn criminal_null(mut self) -> Self {
+        self.raw.criminal = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn dangerous(mut self, dangerous: f64) -> Self {
+        self.raw.dangerous = Some(Some(dangerous));
+        self
+    }
+
+    #[must_use]
+    pub fn dangerous_null(mut self) -> Self {
+        self.raw.dangerous = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn financial(mut self, financial: f64) -> Self {
+        self.raw.financial = Some(Some(financial));
+        self
+    }
+
+    #[must_use]
+    pub fn financial_null(mut self) -> Self {
+        self.raw.financial = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn hate_and_discrimination(mut self, hate_and_discrimination: f64) -> Self {
+        self.raw.hate_and_discrimination = Some(Some(hate_and_discrimination));
+        self
+    }
+
+    #[must_use]
+    pub fn hate_and_discrimination_null(mut self) -> Self {
+        self.raw.hate_and_discrimination = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn health(mut self, health: f64) -> Self {
+        self.raw.health = Some(Some(health));
+        self
+    }
+
+    #[must_use]
+    pub fn health_null(mut self) -> Self {
+        self.raw.health = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn jailbreaking(mut self, jailbreaking: f64) -> Self {
+        self.raw.jailbreaking = Some(Some(jailbreaking));
+        self
+    }
+
+    #[must_use]
+    pub fn jailbreaking_null(mut self) -> Self {
+        self.raw.jailbreaking = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn law(mut self, law: f64) -> Self {
+        self.raw.law = Some(Some(law));
+        self
+    }
+
+    #[must_use]
+    pub fn law_null(mut self) -> Self {
+        self.raw.law = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn pii(mut self, pii: f64) -> Self {
+        self.raw.pii = Some(Some(pii));
+        self
+    }
+
+    #[must_use]
+    pub fn pii_null(mut self) -> Self {
+        self.raw.pii = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn selfharm(mut self, selfharm: f64) -> Self {
+        self.raw.selfharm = Some(Some(selfharm));
+        self
+    }
+
+    #[must_use]
+    pub fn selfharm_null(mut self) -> Self {
+        self.raw.selfharm = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn sexual(mut self, sexual: f64) -> Self {
+        self.raw.sexual = Some(Some(sexual));
+        self
+    }
+
+    #[must_use]
+    pub fn sexual_null(mut self) -> Self {
+        self.raw.sexual = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn violence_and_threats(mut self, violence_and_threats: f64) -> Self {
+        self.raw.violence_and_threats = Some(Some(violence_and_threats));
+        self
+    }
+
+    #[must_use]
+    pub fn violence_and_threats_null(mut self) -> Self {
+        self.raw.violence_and_threats = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ModerationLLMV2CategoryThresholds) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ModerationLLMV2CategoryThresholds {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ModerationLLMV2CategoryThresholds {
+        self.raw
+    }
+}
+
+impl From<ModerationLLMV2CategoryThresholds> for ModerationLLMV2CategoryThresholdsParams {
+    fn from(raw: ModerationLLMV2CategoryThresholds) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ModerationLLMV2CategoryThresholdsParams> for ModerationLLMV2CategoryThresholds {
+    fn from(value: ModerationLLMV2CategoryThresholdsParams) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for ModerationLLMV2CategoryThresholdsParams {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ModerationLLMV2ConfigParams {
+    raw: ModerationLLMV2Config,
+}
+
+impl ModerationLLMV2ConfigParams {
+    pub fn new() -> Self {
+        Self {
+            raw: ModerationLLMV2Config {
+                action: None,
+                custom_category_thresholds: None,
+                ignore_other_categories: None,
+                model_name: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn action(mut self, action: impl Into<ModerationLLMActionValue>) -> Self {
+        self.raw.action = Some(Into::<ModerationLLMActionValue>::into(action).into());
+        self
+    }
+
+    #[must_use]
+    pub fn custom_category_thresholds(
+        mut self,
+        custom_category_thresholds: impl Into<ModerationLLMV2CategoryThresholdsParams>,
+    ) -> Self {
+        self.raw.custom_category_thresholds = Some(Some(
+            Into::<ModerationLLMV2CategoryThresholdsParams>::into(custom_category_thresholds)
+                .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn custom_category_thresholds_null(mut self) -> Self {
+        self.raw.custom_category_thresholds = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn ignore_other_categories(mut self, ignore_other_categories: bool) -> Self {
+        self.raw.ignore_other_categories = Some(ignore_other_categories);
+        self
+    }
+
+    #[must_use]
+    pub fn model_name(mut self, model_name: impl Into<String>) -> Self {
+        self.raw.model_name = Some(model_name.into());
+        self
+    }
+    pub fn from_raw(raw: ModerationLLMV2Config) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ModerationLLMV2Config {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ModerationLLMV2Config {
+        self.raw
+    }
+}
+
+impl From<ModerationLLMV2Config> for ModerationLLMV2ConfigParams {
+    fn from(raw: ModerationLLMV2Config) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ModerationLLMV2ConfigParams> for ModerationLLMV2Config {
+    fn from(value: ModerationLLMV2ConfigParams) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for ModerationLLMV2ConfigParams {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GuardrailConfigParams {
+    raw: GuardrailConfig,
+}
+
+impl GuardrailConfigParams {
+    pub fn new() -> Self {
+        Self {
+            raw: GuardrailConfig {
+                block_on_error: None,
+                moderation_llm_v1: None,
+                moderation_llm_v2: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn block_on_error(mut self, block_on_error: bool) -> Self {
+        self.raw.block_on_error = Some(block_on_error);
+        self
+    }
+
+    #[must_use]
+    pub fn moderation_llm_v1(
+        mut self,
+        moderation_llm_v1: impl Into<ModerationLLMV1ConfigParams>,
+    ) -> Self {
+        self.raw.moderation_llm_v1 = Some(Some(
+            Into::<ModerationLLMV1ConfigParams>::into(moderation_llm_v1).into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn moderation_llm_v1_null(mut self) -> Self {
+        self.raw.moderation_llm_v1 = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn moderation_llm_v2(
+        mut self,
+        moderation_llm_v2: impl Into<ModerationLLMV2ConfigParams>,
+    ) -> Self {
+        self.raw.moderation_llm_v2 = Some(Some(
+            Into::<ModerationLLMV2ConfigParams>::into(moderation_llm_v2).into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn moderation_llm_v2_null(mut self) -> Self {
+        self.raw.moderation_llm_v2 = Some(None);
+        self
+    }
+    pub fn from_raw(raw: GuardrailConfig) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &GuardrailConfig {
+        &self.raw
+    }
+    pub fn into_raw(self) -> GuardrailConfig {
+        self.raw
+    }
+}
+
+impl From<GuardrailConfig> for GuardrailConfigParams {
+    fn from(raw: GuardrailConfig) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GuardrailConfigParams> for GuardrailConfig {
+    fn from(value: GuardrailConfigParams) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for GuardrailConfigParams {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct MetadataDictMap {
+    values: std::collections::BTreeMap<String, serde_json::Value>,
+}
+
+impl MetadataDictMap {
+    pub fn new(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
+        Self { values }
+    }
+    pub fn as_map(&self) -> &std::collections::BTreeMap<String, serde_json::Value> {
+        &self.values
+    }
+    pub fn into_map(self) -> std::collections::BTreeMap<String, serde_json::Value> {
+        self.values
+    }
+}
+
+impl From<std::collections::BTreeMap<String, serde_json::Value>> for MetadataDictMap {
+    fn from(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
+        Self { values }
+    }
+}
+
+impl From<MetadataDict> for MetadataDictMap {
+    fn from(value: MetadataDict) -> Self {
+        Self {
+            values: value.additional_properties,
+        }
+    }
+}
+
+impl From<MetadataDictMap> for MetadataDict {
+    fn from(value: MetadataDictMap) -> Self {
+        Self {
+            additional_properties: value.values,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct FunctionParametersMap {
+    values: std::collections::BTreeMap<String, serde_json::Value>,
+}
+
+impl FunctionParametersMap {
+    pub fn new(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
+        Self { values }
+    }
+    pub fn as_map(&self) -> &std::collections::BTreeMap<String, serde_json::Value> {
+        &self.values
+    }
+    pub fn into_map(self) -> std::collections::BTreeMap<String, serde_json::Value> {
+        self.values
+    }
+}
+
+impl From<std::collections::BTreeMap<String, serde_json::Value>> for FunctionParametersMap {
+    fn from(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
+        Self { values }
+    }
+}
+
+impl From<FunctionParameters> for FunctionParametersMap {
+    fn from(value: FunctionParameters) -> Self {
+        Self {
+            values: value.additional_properties,
+        }
+    }
+}
+
+impl From<FunctionParametersMap> for FunctionParameters {
+    fn from(value: FunctionParametersMap) -> Self {
+        Self {
+            additional_properties: value.values,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct FunctionParams {
+    raw: Function,
+}
+
+impl FunctionParams {
+    pub fn new(name: impl Into<String>, parameters: impl Into<FunctionParametersMap>) -> Self {
+        Self {
+            raw: Function {
+                description: None,
+                name: name.into(),
+                parameters: Into::<FunctionParametersMap>::into(parameters).into(),
+                strict: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.raw.description = Some(description.into());
+        self
+    }
+
+    #[must_use]
+    pub fn strict(mut self, strict: bool) -> Self {
+        self.raw.strict = Some(strict);
+        self
+    }
+    pub fn from_raw(raw: Function) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &Function {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Function {
+        self.raw
+    }
+}
+
+impl From<Function> for FunctionParams {
+    fn from(raw: Function) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<FunctionParams> for Function {
+    fn from(value: FunctionParams) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct FunctionToolParams {
+    raw: FunctionTool,
+}
+
+impl FunctionToolParams {
+    pub fn new(function: impl Into<FunctionParams>) -> Self {
+        Self {
+            raw: FunctionTool {
+                function: Into::<FunctionParams>::into(function).into(),
+                r#type: None,
+            },
+        }
+    }
+    pub fn from_raw(raw: FunctionTool) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &FunctionTool {
+        &self.raw
+    }
+    pub fn into_raw(self) -> FunctionTool {
+        self.raw
+    }
+}
+
+impl From<FunctionTool> for FunctionToolParams {
+    fn from(raw: FunctionTool) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<FunctionToolParams> for FunctionTool {
+    fn from(value: FunctionToolParams) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ToolConfigurationParams {
+    raw: ToolConfiguration,
+}
+
+impl ToolConfigurationParams {
+    pub fn new() -> Self {
+        Self {
+            raw: ToolConfiguration {
+                exclude: None,
+                include: None,
+                requires_confirmation: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn exclude(mut self, exclude: Vec<String>) -> Self {
+        self.raw.exclude = Some(Some(exclude));
+        self
+    }
+
+    #[must_use]
+    pub fn exclude_null(mut self) -> Self {
+        self.raw.exclude = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn include(mut self, include: Vec<String>) -> Self {
+        self.raw.include = Some(Some(include));
+        self
+    }
+
+    #[must_use]
+    pub fn include_null(mut self) -> Self {
+        self.raw.include = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation(mut self, requires_confirmation: Vec<String>) -> Self {
+        self.raw.requires_confirmation = Some(Some(requires_confirmation));
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation_null(mut self) -> Self {
+        self.raw.requires_confirmation = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ToolConfiguration {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ToolConfiguration {
+        self.raw
+    }
+}
+
+impl From<ToolConfiguration> for ToolConfigurationParams {
+    fn from(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ToolConfigurationParams> for ToolConfiguration {
+    fn from(value: ToolConfigurationParams) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for ToolConfigurationParams {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct WebSearchToolParams {
+    raw: WebSearchTool,
+}
+
+impl WebSearchToolParams {
+    pub fn new() -> Self {
+        Self {
+            raw: WebSearchTool {
+                tool_configuration: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn tool_configuration(
+        mut self,
+        tool_configuration: impl Into<ToolConfigurationParams>,
+    ) -> Self {
+        self.raw.tool_configuration = Some(Some(
+            Into::<ToolConfigurationParams>::into(tool_configuration).into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn tool_configuration_null(mut self) -> Self {
+        self.raw.tool_configuration = Some(None);
+        self
+    }
+    pub fn from_raw(raw: WebSearchTool) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &WebSearchTool {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WebSearchTool {
+        self.raw
+    }
+}
+
+impl From<WebSearchTool> for WebSearchToolParams {
+    fn from(raw: WebSearchTool) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<WebSearchToolParams> for WebSearchTool {
+    fn from(value: WebSearchToolParams) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for WebSearchToolParams {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct WebSearchPremiumToolParams {
+    raw: WebSearchPremiumTool,
+}
+
+impl WebSearchPremiumToolParams {
+    pub fn new() -> Self {
+        Self {
+            raw: WebSearchPremiumTool {
+                tool_configuration: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn tool_configuration(
+        mut self,
+        tool_configuration: impl Into<ToolConfigurationParams>,
+    ) -> Self {
+        self.raw.tool_configuration = Some(Some(
+            Into::<ToolConfigurationParams>::into(tool_configuration).into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn tool_configuration_null(mut self) -> Self {
+        self.raw.tool_configuration = Some(None);
+        self
+    }
+    pub fn from_raw(raw: WebSearchPremiumTool) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &WebSearchPremiumTool {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WebSearchPremiumTool {
+        self.raw
+    }
+}
+
+impl From<WebSearchPremiumTool> for WebSearchPremiumToolParams {
+    fn from(raw: WebSearchPremiumTool) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<WebSearchPremiumToolParams> for WebSearchPremiumTool {
+    fn from(value: WebSearchPremiumToolParams) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for WebSearchPremiumToolParams {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CodeInterpreterToolParams {
+    raw: CodeInterpreterTool,
+}
+
+impl CodeInterpreterToolParams {
+    pub fn new() -> Self {
+        Self {
+            raw: CodeInterpreterTool {
+                tool_configuration: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn tool_configuration(
+        mut self,
+        tool_configuration: impl Into<ToolConfigurationParams>,
+    ) -> Self {
+        self.raw.tool_configuration = Some(Some(
+            Into::<ToolConfigurationParams>::into(tool_configuration).into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn tool_configuration_null(mut self) -> Self {
+        self.raw.tool_configuration = Some(None);
+        self
+    }
+    pub fn from_raw(raw: CodeInterpreterTool) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &CodeInterpreterTool {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CodeInterpreterTool {
+        self.raw
+    }
+}
+
+impl From<CodeInterpreterTool> for CodeInterpreterToolParams {
+    fn from(raw: CodeInterpreterTool) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CodeInterpreterToolParams> for CodeInterpreterTool {
+    fn from(value: CodeInterpreterToolParams) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for CodeInterpreterToolParams {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ImageGenerationToolParams {
+    raw: ImageGenerationTool,
+}
+
+impl ImageGenerationToolParams {
+    pub fn new() -> Self {
+        Self {
+            raw: ImageGenerationTool {
+                tool_configuration: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn tool_configuration(
+        mut self,
+        tool_configuration: impl Into<ToolConfigurationParams>,
+    ) -> Self {
+        self.raw.tool_configuration = Some(Some(
+            Into::<ToolConfigurationParams>::into(tool_configuration).into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn tool_configuration_null(mut self) -> Self {
+        self.raw.tool_configuration = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ImageGenerationTool) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ImageGenerationTool {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ImageGenerationTool {
+        self.raw
+    }
+}
+
+impl From<ImageGenerationTool> for ImageGenerationToolParams {
+    fn from(raw: ImageGenerationTool) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ImageGenerationToolParams> for ImageGenerationTool {
+    fn from(value: ImageGenerationToolParams) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for ImageGenerationToolParams {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DocumentLibraryToolParams {
+    raw: DocumentLibraryTool,
+}
+
+impl DocumentLibraryToolParams {
+    pub fn new(library_ids: Vec<String>) -> Self {
+        Self {
+            raw: DocumentLibraryTool {
+                library_ids,
+                tool_configuration: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn tool_configuration(
+        mut self,
+        tool_configuration: impl Into<ToolConfigurationParams>,
+    ) -> Self {
+        self.raw.tool_configuration = Some(Some(
+            Into::<ToolConfigurationParams>::into(tool_configuration).into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn tool_configuration_null(mut self) -> Self {
+        self.raw.tool_configuration = Some(None);
+        self
+    }
+    pub fn from_raw(raw: DocumentLibraryTool) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &DocumentLibraryTool {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DocumentLibraryTool {
+        self.raw
+    }
+}
+
+impl From<DocumentLibraryTool> for DocumentLibraryToolParams {
+    fn from(raw: DocumentLibraryTool) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<DocumentLibraryToolParams> for DocumentLibraryTool {
+    fn from(value: DocumentLibraryToolParams) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct OAuth2TokenAuthParams {
+    raw: OAuth2TokenAuth,
+}
+
+impl OAuth2TokenAuthParams {
+    pub fn new(value: impl Into<String>) -> Self {
+        Self {
+            raw: OAuth2TokenAuth {
+                r#type: None,
+                value: value.into(),
+            },
+        }
+    }
+    pub fn from_raw(raw: OAuth2TokenAuth) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &OAuth2TokenAuth {
+        &self.raw
+    }
+    pub fn into_raw(self) -> OAuth2TokenAuth {
+        self.raw
+    }
+}
+
+impl From<OAuth2TokenAuth> for OAuth2TokenAuthParams {
+    fn from(raw: OAuth2TokenAuth) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<OAuth2TokenAuthParams> for OAuth2TokenAuth {
+    fn from(value: OAuth2TokenAuthParams) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct APIKeyAuthParams {
+    raw: APIKeyAuth,
+}
+
+impl APIKeyAuthParams {
+    pub fn new(value: impl Into<String>) -> Self {
+        Self {
+            raw: APIKeyAuth {
+                r#type: None,
+                value: value.into(),
+            },
+        }
+    }
+    pub fn from_raw(raw: APIKeyAuth) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &APIKeyAuth {
+        &self.raw
+    }
+    pub fn into_raw(self) -> APIKeyAuth {
+        self.raw
+    }
+}
+
+impl From<APIKeyAuth> for APIKeyAuthParams {
+    fn from(raw: APIKeyAuth) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<APIKeyAuthParams> for APIKeyAuth {
+    fn from(value: APIKeyAuthParams) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub enum CustomConnectorAuthorizationInlineValue {
+    Oauth2Token(OAuth2TokenAuthParams),
+    ApiKey(APIKeyAuthParams),
+}
+
+impl From<OAuth2TokenAuthParams> for CustomConnectorAuthorizationInlineValue {
+    fn from(value: OAuth2TokenAuthParams) -> Self {
+        Self::Oauth2Token(value)
+    }
+}
+
+impl From<APIKeyAuthParams> for CustomConnectorAuthorizationInlineValue {
+    fn from(value: APIKeyAuthParams) -> Self {
+        Self::ApiKey(value)
+    }
+}
+
+impl From<CustomConnectorAuthorizationInlineValue> for CustomConnectorAuthorizationInline {
+    fn from(value: CustomConnectorAuthorizationInlineValue) -> Self {
+        match value {
+            CustomConnectorAuthorizationInlineValue::Oauth2Token(value) => {
+                Self::OAuth2TokenAuth(value.into())
+            }
+            CustomConnectorAuthorizationInlineValue::ApiKey(value) => {
+                Self::APIKeyAuth(value.into())
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CustomConnectorParams {
+    raw: CustomConnector,
+}
+
+impl CustomConnectorParams {
+    pub fn new(connector_id: impl Into<String>) -> Self {
+        Self {
+            raw: CustomConnector {
+                authorization: None,
+                connector_id: connector_id.into(),
+                tool_configuration: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn authorization(
+        mut self,
+        authorization: impl Into<CustomConnectorAuthorizationInlineValue>,
+    ) -> Self {
+        self.raw.authorization = Some(Some(
+            Into::<CustomConnectorAuthorizationInlineValue>::into(authorization).into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn authorization_null(mut self) -> Self {
+        self.raw.authorization = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn tool_configuration(
+        mut self,
+        tool_configuration: impl Into<ToolConfigurationParams>,
+    ) -> Self {
+        self.raw.tool_configuration = Some(Some(
+            Into::<ToolConfigurationParams>::into(tool_configuration).into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn tool_configuration_null(mut self) -> Self {
+        self.raw.tool_configuration = Some(None);
+        self
+    }
+    pub fn from_raw(raw: CustomConnector) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &CustomConnector {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CustomConnector {
+        self.raw
+    }
+}
+
+impl From<CustomConnector> for CustomConnectorParams {
+    fn from(raw: CustomConnector) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CustomConnectorParams> for CustomConnector {
+    fn from(value: CustomConnectorParams) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub enum AgentCreationRequestToolsItemUnionValue {
+    Function(FunctionToolParams),
+    WebSearch(WebSearchToolParams),
+    WebSearchPremium(WebSearchPremiumToolParams),
+    CodeInterpreter(CodeInterpreterToolParams),
+    ImageGeneration(ImageGenerationToolParams),
+    DocumentLibrary(DocumentLibraryToolParams),
+    Connector(CustomConnectorParams),
+}
+
+impl From<FunctionToolParams> for AgentCreationRequestToolsItemUnionValue {
+    fn from(value: FunctionToolParams) -> Self {
+        Self::Function(value)
+    }
+}
+
+impl From<WebSearchToolParams> for AgentCreationRequestToolsItemUnionValue {
+    fn from(value: WebSearchToolParams) -> Self {
+        Self::WebSearch(value)
+    }
+}
+
+impl From<WebSearchPremiumToolParams> for AgentCreationRequestToolsItemUnionValue {
+    fn from(value: WebSearchPremiumToolParams) -> Self {
+        Self::WebSearchPremium(value)
+    }
+}
+
+impl From<CodeInterpreterToolParams> for AgentCreationRequestToolsItemUnionValue {
+    fn from(value: CodeInterpreterToolParams) -> Self {
+        Self::CodeInterpreter(value)
+    }
+}
+
+impl From<ImageGenerationToolParams> for AgentCreationRequestToolsItemUnionValue {
+    fn from(value: ImageGenerationToolParams) -> Self {
+        Self::ImageGeneration(value)
+    }
+}
+
+impl From<DocumentLibraryToolParams> for AgentCreationRequestToolsItemUnionValue {
+    fn from(value: DocumentLibraryToolParams) -> Self {
+        Self::DocumentLibrary(value)
+    }
+}
+
+impl From<CustomConnectorParams> for AgentCreationRequestToolsItemUnionValue {
+    fn from(value: CustomConnectorParams) -> Self {
+        Self::Connector(value)
+    }
+}
+
+impl From<AgentCreationRequestToolsItemUnionValue> for AgentCreationRequestToolsItemUnion {
+    fn from(value: AgentCreationRequestToolsItemUnionValue) -> Self {
+        match value {
+            AgentCreationRequestToolsItemUnionValue::Function(value) => {
+                Self::FunctionTool(value.into())
+            }
+            AgentCreationRequestToolsItemUnionValue::WebSearch(value) => {
+                Self::WebSearchTool(value.into())
+            }
+            AgentCreationRequestToolsItemUnionValue::WebSearchPremium(value) => {
+                Self::WebSearchPremiumTool(value.into())
+            }
+            AgentCreationRequestToolsItemUnionValue::CodeInterpreter(value) => {
+                Self::CodeInterpreterTool(value.into())
+            }
+            AgentCreationRequestToolsItemUnionValue::ImageGeneration(value) => {
+                Self::ImageGenerationTool(value.into())
+            }
+            AgentCreationRequestToolsItemUnionValue::DocumentLibrary(value) => {
+                Self::DocumentLibraryTool(value.into())
+            }
+            AgentCreationRequestToolsItemUnionValue::Connector(value) => {
+                Self::CustomConnector(value.into())
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct AgentCreationRequestParams {
+    raw: AgentCreationRequest,
+}
+
+impl AgentCreationRequestParams {
+    pub fn new(model: impl Into<String>, name: impl Into<String>) -> Self {
+        Self {
+            raw: AgentCreationRequest {
+                completion_args: None,
+                description: None,
+                guardrails: None,
+                handoffs: None,
+                instructions: None,
+                metadata: None,
+                model: model.into(),
+                name: name.into(),
+                tools: None,
+                version_message: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn completion_args(mut self, completion_args: impl Into<CompletionArgsParams>) -> Self {
+        self.raw.completion_args = Some(Into::<CompletionArgsParams>::into(completion_args).into());
+        self
+    }
+
+    #[must_use]
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.raw.description = Some(Some(description.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn description_null(mut self) -> Self {
+        self.raw.description = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn guardrails(
+        mut self,
+        guardrails: impl IntoIterator<Item = GuardrailConfigParams>,
+    ) -> Self {
+        self.raw.guardrails = Some(Some(guardrails.into_iter().map(Into::into).collect()));
+        self
+    }
+
+    #[must_use]
+    pub fn guardrails_null(mut self) -> Self {
+        self.raw.guardrails = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn handoffs(mut self, handoffs: Vec<String>) -> Self {
+        self.raw.handoffs = Some(Some(handoffs));
+        self
+    }
+
+    #[must_use]
+    pub fn handoffs_null(mut self) -> Self {
+        self.raw.handoffs = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn instructions(mut self, instructions: impl Into<String>) -> Self {
+        self.raw.instructions = Some(Some(instructions.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn instructions_null(mut self) -> Self {
+        self.raw.instructions = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn metadata(mut self, metadata: impl Into<MetadataDictMap>) -> Self {
+        self.raw.metadata = Some(Some(Into::<MetadataDictMap>::into(metadata).into()));
+        self
+    }
+
+    #[must_use]
+    pub fn metadata_null(mut self) -> Self {
+        self.raw.metadata = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn tools(
+        mut self,
+        tools: impl IntoIterator<Item = AgentCreationRequestToolsItemUnionValue>,
+    ) -> Self {
+        self.raw.tools = Some(tools.into_iter().map(Into::into).collect());
+        self
+    }
+
+    #[must_use]
+    pub fn version_message(mut self, version_message: impl Into<String>) -> Self {
+        self.raw.version_message = Some(Some(version_message.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn version_message_null(mut self) -> Self {
+        self.raw.version_message = Some(None);
+        self
+    }
+    pub fn from_raw(raw: AgentCreationRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &AgentCreationRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AgentCreationRequest {
+        self.raw
+    }
+}
+
+impl From<AgentCreationRequest> for AgentCreationRequestParams {
+    fn from(raw: AgentCreationRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<AgentCreationRequestParams> for AgentCreationRequest {
+    fn from(value: AgentCreationRequestParams) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct AgentAliasResponseView {
     raw: AgentAliasResponse,
 }
@@ -2126,6 +4128,265 @@ impl From<AgentListPage> for AgentListPageView {
 impl From<AgentListPageView> for AgentListPage {
     fn from(value: AgentListPageView) -> Self {
         value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub enum AgentUpdateRequestToolsItemUnionValue {
+    Function(FunctionToolParams),
+    WebSearch(WebSearchToolParams),
+    WebSearchPremium(WebSearchPremiumToolParams),
+    CodeInterpreter(CodeInterpreterToolParams),
+    ImageGeneration(ImageGenerationToolParams),
+    DocumentLibrary(DocumentLibraryToolParams),
+    Connector(CustomConnectorParams),
+}
+
+impl From<FunctionToolParams> for AgentUpdateRequestToolsItemUnionValue {
+    fn from(value: FunctionToolParams) -> Self {
+        Self::Function(value)
+    }
+}
+
+impl From<WebSearchToolParams> for AgentUpdateRequestToolsItemUnionValue {
+    fn from(value: WebSearchToolParams) -> Self {
+        Self::WebSearch(value)
+    }
+}
+
+impl From<WebSearchPremiumToolParams> for AgentUpdateRequestToolsItemUnionValue {
+    fn from(value: WebSearchPremiumToolParams) -> Self {
+        Self::WebSearchPremium(value)
+    }
+}
+
+impl From<CodeInterpreterToolParams> for AgentUpdateRequestToolsItemUnionValue {
+    fn from(value: CodeInterpreterToolParams) -> Self {
+        Self::CodeInterpreter(value)
+    }
+}
+
+impl From<ImageGenerationToolParams> for AgentUpdateRequestToolsItemUnionValue {
+    fn from(value: ImageGenerationToolParams) -> Self {
+        Self::ImageGeneration(value)
+    }
+}
+
+impl From<DocumentLibraryToolParams> for AgentUpdateRequestToolsItemUnionValue {
+    fn from(value: DocumentLibraryToolParams) -> Self {
+        Self::DocumentLibrary(value)
+    }
+}
+
+impl From<CustomConnectorParams> for AgentUpdateRequestToolsItemUnionValue {
+    fn from(value: CustomConnectorParams) -> Self {
+        Self::Connector(value)
+    }
+}
+
+impl From<AgentUpdateRequestToolsItemUnionValue> for AgentUpdateRequestToolsItemUnion {
+    fn from(value: AgentUpdateRequestToolsItemUnionValue) -> Self {
+        match value {
+            AgentUpdateRequestToolsItemUnionValue::Function(value) => {
+                Self::FunctionTool(value.into())
+            }
+            AgentUpdateRequestToolsItemUnionValue::WebSearch(value) => {
+                Self::WebSearchTool(value.into())
+            }
+            AgentUpdateRequestToolsItemUnionValue::WebSearchPremium(value) => {
+                Self::WebSearchPremiumTool(value.into())
+            }
+            AgentUpdateRequestToolsItemUnionValue::CodeInterpreter(value) => {
+                Self::CodeInterpreterTool(value.into())
+            }
+            AgentUpdateRequestToolsItemUnionValue::ImageGeneration(value) => {
+                Self::ImageGenerationTool(value.into())
+            }
+            AgentUpdateRequestToolsItemUnionValue::DocumentLibrary(value) => {
+                Self::DocumentLibraryTool(value.into())
+            }
+            AgentUpdateRequestToolsItemUnionValue::Connector(value) => {
+                Self::CustomConnector(value.into())
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct AgentUpdateRequestParams {
+    raw: AgentUpdateRequest,
+}
+
+impl AgentUpdateRequestParams {
+    pub fn new() -> Self {
+        Self {
+            raw: AgentUpdateRequest {
+                completion_args: None,
+                deployment_chat: None,
+                description: None,
+                guardrails: None,
+                handoffs: None,
+                instructions: None,
+                metadata: None,
+                model: None,
+                name: None,
+                tools: None,
+                version_message: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn completion_args(mut self, completion_args: impl Into<CompletionArgsParams>) -> Self {
+        self.raw.completion_args = Some(Into::<CompletionArgsParams>::into(completion_args).into());
+        self
+    }
+
+    #[must_use]
+    pub fn deployment_chat(mut self, deployment_chat: bool) -> Self {
+        self.raw.deployment_chat = Some(Some(deployment_chat));
+        self
+    }
+
+    #[must_use]
+    pub fn deployment_chat_null(mut self) -> Self {
+        self.raw.deployment_chat = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.raw.description = Some(Some(description.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn description_null(mut self) -> Self {
+        self.raw.description = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn guardrails(
+        mut self,
+        guardrails: impl IntoIterator<Item = GuardrailConfigParams>,
+    ) -> Self {
+        self.raw.guardrails = Some(Some(guardrails.into_iter().map(Into::into).collect()));
+        self
+    }
+
+    #[must_use]
+    pub fn guardrails_null(mut self) -> Self {
+        self.raw.guardrails = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn handoffs(mut self, handoffs: Vec<String>) -> Self {
+        self.raw.handoffs = Some(Some(handoffs));
+        self
+    }
+
+    #[must_use]
+    pub fn handoffs_null(mut self) -> Self {
+        self.raw.handoffs = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn instructions(mut self, instructions: impl Into<String>) -> Self {
+        self.raw.instructions = Some(Some(instructions.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn instructions_null(mut self) -> Self {
+        self.raw.instructions = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn metadata(mut self, metadata: impl Into<MetadataDictMap>) -> Self {
+        self.raw.metadata = Some(Some(Into::<MetadataDictMap>::into(metadata).into()));
+        self
+    }
+
+    #[must_use]
+    pub fn metadata_null(mut self) -> Self {
+        self.raw.metadata = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn model(mut self, model: impl Into<String>) -> Self {
+        self.raw.model = Some(Some(model.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn model_null(mut self) -> Self {
+        self.raw.model = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn name(mut self, name: impl Into<String>) -> Self {
+        self.raw.name = Some(Some(name.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn name_null(mut self) -> Self {
+        self.raw.name = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn tools(
+        mut self,
+        tools: impl IntoIterator<Item = AgentUpdateRequestToolsItemUnionValue>,
+    ) -> Self {
+        self.raw.tools = Some(tools.into_iter().map(Into::into).collect());
+        self
+    }
+
+    #[must_use]
+    pub fn version_message(mut self, version_message: impl Into<String>) -> Self {
+        self.raw.version_message = Some(Some(version_message.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn version_message_null(mut self) -> Self {
+        self.raw.version_message = Some(None);
+        self
+    }
+    pub fn from_raw(raw: AgentUpdateRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &AgentUpdateRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AgentUpdateRequest {
+        self.raw
+    }
+}
+
+impl From<AgentUpdateRequest> for AgentUpdateRequestParams {
+    fn from(raw: AgentUpdateRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<AgentUpdateRequestParams> for AgentUpdateRequest {
+    fn from(value: AgentUpdateRequestParams) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for AgentUpdateRequestParams {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

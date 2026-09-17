@@ -96,6 +96,14 @@ impl<'a> BetaAgents<'a> {
     pub(crate) fn new(raw: &'a HttpClient) -> Self {
         Self { raw }
     }
+    pub async fn create(&self, request: AgentCreationRequestParams) -> Result<AgentView, SdkError> {
+        self.raw
+            .agents_api_v1_agents_create(request.into_raw())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
     pub async fn create_version_alias(
         &self,
         agent_id: impl AsRef<str>,
@@ -179,6 +187,18 @@ impl<'a> BetaAgents<'a> {
                 request.metadata.as_deref(),
                 request.page_token.as_deref(),
             )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn update(
+        &self,
+        agent_id: impl AsRef<str>,
+        request: AgentUpdateRequestParams,
+    ) -> Result<AgentView, SdkError> {
+        self.raw
+            .agents_api_v1_agents_update(agent_id.as_ref(), request.into_raw())
             .await
             .map(Into::into)
             .map_err(Into::into)

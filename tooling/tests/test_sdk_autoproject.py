@@ -325,6 +325,48 @@ class AutoProjectionTests(unittest.TestCase):
             expanded["models"]["VersionChoiceValue"]["simple_union"]["variants"],
         )
 
+    def test_projects_inline_simple_array_request_union(self):
+        api = FakeOpenApi()
+        api.schemas.update({
+            "CreateThing": {
+                "type": "object", "required": ["stop"],
+                "properties": {"stop": {"$ref": "#/components/schemas/StopChoice"}},
+            },
+            "StopChoice": {
+                "anyOf": [
+                    {"type": "string"},
+                    {"type": "array", "items": {"type": "string"}},
+                    {"type": "null"},
+                ]
+            },
+        })
+        fields = {"CreateThing": (SimpleNamespace(name="stop", type="StopChoice"),)}
+        enums = {
+            "StopChoice": (
+                SimpleNamespace(name="String", payload="String"),
+                SimpleNamespace(name="StringArray", payload="StopStringArray"),
+            ),
+        }
+        aliases = {"StopStringArray": parse_type("Vec<String>")}
+        rust = SimpleNamespace(
+            structs=set(fields), aliases=aliases, enums=enums,
+            symbol_paths={name: "types" for name in (*fields, *enums, *aliases)},
+            fields=lambda name: fields[name],
+        )
+        expanded, report = sdk_autoproject.expand_manifest(
+            api, manifest(), {"operations": {"create_thing": ["things.create"]}},
+            raw_coverage("create_thing"), rust,
+        )
+        self.assertEqual(1, report["added_count"])
+        self.assertEqual(
+            {"stop": "StopChoiceValue"},
+            expanded["models"]["CreateThingParams"]["adapters"],
+        )
+        self.assertEqual(
+            {"String": "String", "StringArray": "Array"},
+            expanded["models"]["StopChoiceValue"]["simple_union"]["variants"],
+        )
+
     def test_projects_discriminated_request_union_without_raw_type_leaks(self):
         api = FakeOpenApi()
         api.schemas.update({

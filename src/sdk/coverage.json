@@ -4,7 +4,7 @@
     "agents_api_v1_agents_create": {
       "method": "post",
       "path": "/v1/agents",
-      "status": "candidate_unverified",
+      "status": "mapped",
       "review_reasons": []
     },
     "agents_api_v1_agents_create_or_update_alias": {
@@ -64,7 +64,7 @@
     "agents_api_v1_agents_update": {
       "method": "patch",
       "path": "/v1/agents/{agent_id}",
-      "status": "candidate_unverified",
+      "status": "mapped",
       "review_reasons": []
     },
     "agents_api_v1_agents_update_version": {
@@ -1237,12 +1237,14 @@
     },
     "beta_agents": {
       "operations": [
+        "agents_api_v1_agents_create",
         "agents_api_v1_agents_create_or_update_alias",
         "agents_api_v1_agents_delete",
         "agents_api_v1_agents_delete_alias",
         "agents_api_v1_agents_get",
         "agents_api_v1_agents_get_version",
         "agents_api_v1_agents_list_pages",
+        "agents_api_v1_agents_update",
         "agents_api_v1_agents_update_version"
       ]
     },
@@ -1900,6 +1902,245 @@
         "versions"
       ]
     },
+    "PredictionParams": {
+      "raw": "Prediction",
+      "fields": [
+        "content",
+        "r#type"
+      ]
+    },
+    "CompletionArgsReasoningEffortValue": {
+      "raw": "CompletionArgsReasoningEffort",
+      "fields": []
+    },
+    "JsonSchemaSchemaMap": {
+      "raw": "JsonSchemaSchema",
+      "fields": [
+        "additional_properties"
+      ]
+    },
+    "JsonSchemaParams": {
+      "raw": "JsonSchema",
+      "fields": [
+        "description",
+        "name",
+        "schema",
+        "strict"
+      ]
+    },
+    "ResponseFormatsValue": {
+      "raw": "ResponseFormats",
+      "fields": []
+    },
+    "ResponseFormatParams": {
+      "raw": "ResponseFormat",
+      "fields": [
+        "json_schema",
+        "r#type"
+      ]
+    },
+    "CompletionArgsStopValue": {
+      "raw": "CompletionArgsStop",
+      "fields": []
+    },
+    "ToolChoiceEnumValue": {
+      "raw": "ToolChoiceEnum",
+      "fields": []
+    },
+    "CompletionArgsParams": {
+      "raw": "CompletionArgs",
+      "fields": [
+        "frequency_penalty",
+        "max_tokens",
+        "prediction",
+        "presence_penalty",
+        "random_seed",
+        "reasoning_effort",
+        "response_format",
+        "stop",
+        "temperature",
+        "tool_choice",
+        "top_p"
+      ]
+    },
+    "ModerationLLMActionValue": {
+      "raw": "ModerationLLMAction",
+      "fields": []
+    },
+    "ModerationLLMV1CategoryThresholdsParams": {
+      "raw": "ModerationLLMV1CategoryThresholds",
+      "fields": [
+        "dangerous_and_criminal_content",
+        "financial",
+        "hate_and_discrimination",
+        "health",
+        "law",
+        "pii",
+        "selfharm",
+        "sexual",
+        "violence_and_threats"
+      ]
+    },
+    "ModerationLLMV1ConfigParams": {
+      "raw": "ModerationLLMV1Config",
+      "fields": [
+        "action",
+        "custom_category_thresholds",
+        "ignore_other_categories",
+        "model_name"
+      ]
+    },
+    "ModerationLLMV2CategoryThresholdsParams": {
+      "raw": "ModerationLLMV2CategoryThresholds",
+      "fields": [
+        "criminal",
+        "dangerous",
+        "financial",
+        "hate_and_discrimination",
+        "health",
+        "jailbreaking",
+        "law",
+        "pii",
+        "selfharm",
+        "sexual",
+        "violence_and_threats"
+      ]
+    },
+    "ModerationLLMV2ConfigParams": {
+      "raw": "ModerationLLMV2Config",
+      "fields": [
+        "action",
+        "custom_category_thresholds",
+        "ignore_other_categories",
+        "model_name"
+      ]
+    },
+    "GuardrailConfigParams": {
+      "raw": "GuardrailConfig",
+      "fields": [
+        "block_on_error",
+        "moderation_llm_v1",
+        "moderation_llm_v2"
+      ]
+    },
+    "MetadataDictMap": {
+      "raw": "MetadataDict",
+      "fields": [
+        "additional_properties"
+      ]
+    },
+    "FunctionParametersMap": {
+      "raw": "FunctionParameters",
+      "fields": [
+        "additional_properties"
+      ]
+    },
+    "FunctionParams": {
+      "raw": "Function",
+      "fields": [
+        "description",
+        "name",
+        "parameters",
+        "strict"
+      ]
+    },
+    "FunctionToolParams": {
+      "raw": "FunctionTool",
+      "fields": [
+        "function",
+        "r#type"
+      ]
+    },
+    "ToolConfigurationParams": {
+      "raw": "ToolConfiguration",
+      "fields": [
+        "exclude",
+        "include",
+        "requires_confirmation"
+      ]
+    },
+    "WebSearchToolParams": {
+      "raw": "WebSearchTool",
+      "fields": [
+        "r#type",
+        "tool_configuration"
+      ]
+    },
+    "WebSearchPremiumToolParams": {
+      "raw": "WebSearchPremiumTool",
+      "fields": [
+        "r#type",
+        "tool_configuration"
+      ]
+    },
+    "CodeInterpreterToolParams": {
+      "raw": "CodeInterpreterTool",
+      "fields": [
+        "r#type",
+        "tool_configuration"
+      ]
+    },
+    "ImageGenerationToolParams": {
+      "raw": "ImageGenerationTool",
+      "fields": [
+        "r#type",
+        "tool_configuration"
+      ]
+    },
+    "DocumentLibraryToolParams": {
+      "raw": "DocumentLibraryTool",
+      "fields": [
+        "library_ids",
+        "r#type",
+        "tool_configuration"
+      ]
+    },
+    "OAuth2TokenAuthParams": {
+      "raw": "OAuth2TokenAuth",
+      "fields": [
+        "r#type",
+        "value"
+      ]
+    },
+    "APIKeyAuthParams": {
+      "raw": "APIKeyAuth",
+      "fields": [
+        "r#type",
+        "value"
+      ]
+    },
+    "CustomConnectorAuthorizationInlineValue": {
+      "raw": "CustomConnectorAuthorizationInline",
+      "fields": []
+    },
+    "CustomConnectorParams": {
+      "raw": "CustomConnector",
+      "fields": [
+        "authorization",
+        "connector_id",
+        "r#type",
+        "tool_configuration"
+      ]
+    },
+    "AgentCreationRequestToolsItemUnionValue": {
+      "raw": "AgentCreationRequestToolsItemUnion",
+      "fields": []
+    },
+    "AgentCreationRequestParams": {
+      "raw": "AgentCreationRequest",
+      "fields": [
+        "completion_args",
+        "description",
+        "guardrails",
+        "handoffs",
+        "instructions",
+        "metadata",
+        "model",
+        "name",
+        "tools",
+        "version_message"
+      ]
+    },
     "AgentAliasResponseView": {
       "raw": "AgentAliasResponse",
       "fields": [
@@ -1915,6 +2156,26 @@
         "data",
         "next_page_token",
         "object"
+      ]
+    },
+    "AgentUpdateRequestToolsItemUnionValue": {
+      "raw": "AgentUpdateRequestToolsItemUnion",
+      "fields": []
+    },
+    "AgentUpdateRequestParams": {
+      "raw": "AgentUpdateRequest",
+      "fields": [
+        "completion_args",
+        "deployment_chat",
+        "description",
+        "guardrails",
+        "handoffs",
+        "instructions",
+        "metadata",
+        "model",
+        "name",
+        "tools",
+        "version_message"
       ]
     },
     "ConversationResponseView": {
@@ -2940,16 +3201,18 @@
   },
   "automatic_projection": {
     "schema_version": 1,
-    "added_count": 110,
-    "rejected_count": 45,
-    "report_sha256": "09a3fefec8fa380baf100ea9c8788c9106db9c1689248decf2824e3f9853dfe7",
+    "added_count": 112,
+    "rejected_count": 43,
+    "report_sha256": "dfb91263ce2f57a164f8a75bb0d78bb0b9a82da3b6dd2b2770ba165b45aa18e4",
     "added": [
+      "agents_api_v1_agents_create",
       "agents_api_v1_agents_create_or_update_alias",
       "agents_api_v1_agents_delete",
       "agents_api_v1_agents_delete_alias",
       "agents_api_v1_agents_get",
       "agents_api_v1_agents_get_version",
       "agents_api_v1_agents_list_pages",
+      "agents_api_v1_agents_update",
       "agents_api_v1_agents_update_version",
       "agents_api_v1_conversations_delete",
       "agents_api_v1_conversations_history",
@@ -3056,11 +3319,9 @@
       "update_workflow_v1_workflows__workflow_identifier__put"
     ],
     "rejected": {
-      "agents_api_v1_agents_create": "request_model_projection",
       "agents_api_v1_agents_list": "inline_or_unresolved_response",
       "agents_api_v1_agents_list_version_aliases": "inline_or_unresolved_response",
       "agents_api_v1_agents_list_versions": "inline_or_unresolved_response",
-      "agents_api_v1_agents_update": "request_model_projection",
       "agents_api_v1_conversations_append": "request_model_projection",
       "agents_api_v1_conversations_append_stream": "non_json_success",
       "agents_api_v1_conversations_get": "inline_or_unresolved_response",
