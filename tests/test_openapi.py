@@ -27,6 +27,19 @@ class OpenApiTests(unittest.TestCase):
             {"type": "boolean", "enum": [False], "default": False},
         )
 
+    def test_object_schema_intersects_nullable_non_null_refinement(self):
+        schema = self.openapi.object_schema("NonStreamingNullableCommand")
+        self.assertEqual(
+            schema["properties"]["stream"],
+            {"type": "boolean", "enum": [False], "default": False},
+        )
+
+    def test_object_schema_rejects_incompatible_nullable_refinement(self):
+        with self.assertRaisesRegex(
+            GenerationError, "conflicting OpenAPI property InvalidNullableRefinement.stream"
+        ):
+            self.openapi.object_schema("InvalidNullableRefinement")
+
     def test_object_schema_rejects_empty_literal_intersection(self):
         with self.assertRaisesRegex(
             GenerationError, "conflicting OpenAPI property ImpossibleCommand.mode"
