@@ -17,6 +17,8 @@ jobs:
           ref: issue-67-openapi-overlays
       - name: Install pinned Rust toolchain
         run: rustup show
+      - name: Show patch digest
+        run: sha256sum tooling/pipeline/openapi-to-rust.patch
       - name: Generate SDK
         run: python3 tooling/pipeline/build.py generate
       - name: Remove one-shot workflow
