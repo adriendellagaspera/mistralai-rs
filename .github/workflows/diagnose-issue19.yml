@@ -24,7 +24,7 @@ jobs:
           git clone -q https://github.com/adriendellagaspera/mistralai-rs.git /tmp/compiler
           git -C /tmp/compiler checkout -q b6127d1325f276a733599ee651c7761f7ff3129b
           .diag-venv/bin/pip install -q --no-deps /tmp/compiler
-      - name: Pinpoint nested request unions
+      - name: Pinpoint FunctionCallEntry fields
         run: |
           .diag-venv/bin/python - <<'PY'
           import pprint, sys
@@ -43,39 +43,33 @@ jobs:
                       schemas[name] = api.object_schema(name)
                   except Exception:
                       pass
-
-          for name in ['CompletionArgsStop', 'CompletionArgsStopStringArray', 'InputEntries', 'InputEntriesItemUnion']:
-              print('\nSCHEMA', name)
-              pprint.pp(api.schemas.get(name))
-              print('ALIAS', rust.aliases.get(name))
-              print('ENUM')
-              for variant in rust.enums.get(name, ()):
-                  print(variant)
-
-          stop = api.schemas['CompletionArgsStop']
-          print('\nSTOP BRANCH ADAPTERS')
-          for branch in stop.get('anyOf', stop.get('oneOf', [])):
-              if branch.get('type') == 'null':
-                  continue
-              ref = a._schema_ref(branch)
-              payload = ref or a._primitive_union_payload(branch)
-              print('branch=', branch, 'ref=', ref, 'payload=', payload)
-
-          print('\nINPUT ENTRY BRANCH ADAPTERS')
-          item_schema = api.schemas['InputEntries']['items']
-          by_payload = {v.payload: v.name for v in rust.enums['InputEntriesItemUnion']}
-          for branch in item_schema.get('anyOf', item_schema.get('oneOf', [])):
-              ref = a._schema_ref(branch)
-              print('\nbranch', ref, 'raw_variant=', by_payload.get(ref))
+          raw = 'FunctionCallEntry'
+          schema = schemas[raw]
+          fields = {f.name.removeprefix('r#'): f for f in rust.fields(raw)}
+          required = set(schema.get('required', []))
+          print('required=', sorted(required))
+          for field, fs in sorted(schema.get('properties', {}).items()):
               models = {}
               adapter, reason = a._request_field_adapter(
-                  models, schemas, branch, ref, rust, ('InputEntriesItemUnion',),
-                  'InputEntriesItemUnion', (ref,)
+                  models, schemas, fs, fields[field].type, rust, (raw,), raw, (field,)
               )
+              print('\nFIELD', field, 'raw=', fields[field].type, 'required=', field in required)
+              pprint.pp(fs)
               print('adapter=', adapter, 'reason=', reason, 'models=', sorted(models))
-              if ref in rust.structs:
-                  fields = {f.name.removeprefix('r#'): f for f in rust.fields(ref)}
-                  schema = schemas.get(ref, {})
-                  print('schema_fields=', sorted(schema.get('properties', {})))
-                  print('raw_fields=', sorted(fields))
+          print('\nREFERENCED SHAPES')
+          refs = set()
+          def collect(node):
+              if isinstance(node, dict):
+                  ref = node.get('$ref')
+                  if ref:
+                      refs.add(ref.rsplit('/', 1)[-1])
+                  for value in node.values(): collect(value)
+              elif isinstance(node, list):
+                  for value in node: collect(value)
+          collect(schema)
+          for ref in sorted(refs):
+              print('\nREF', ref)
+              pprint.pp(api.schemas.get(ref))
+              print('alias=', rust.aliases.get(ref))
+              print('enum=', rust.enums.get(ref))
           PY
