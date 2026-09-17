@@ -56,10 +56,13 @@ jobs:
       - name: Validate standalone compiler
         run: |
           set -euo pipefail
-          python3 -m build --wheel >/dev/null 2>&1 || python3 -m pip wheel -q --no-deps . -w /tmp/wheels
+          rm -rf /tmp/wheels /tmp/compiler-test
+          mkdir -p /tmp/wheels
+          python3 -m pip wheel -q --no-deps . -w /tmp/wheels
           python3 -m venv /tmp/compiler-test
-          WHEEL=$(find dist /tmp/wheels -name 'rust_sdk_compiler-*.whl' 2>/dev/null | head -1)
+          WHEEL=$(find /tmp/wheels -name 'rust_sdk_compiler-*.whl' | head -1)
           /tmp/compiler-test/bin/pip install -q "$WHEEL"
+          /tmp/compiler-test/bin/pip install -q ruamel.yaml==0.18.6 jsonschema==4.23.0
           /tmp/compiler-test/bin/python -m unittest discover -s tests -v
       - name: Commit materialized compiler
         run: |
