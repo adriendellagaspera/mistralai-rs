@@ -1,7 +1,8 @@
 diff --git a/src/client_generator.rs b/src/client_generator.rs
+index 7491098..4b460f0 100644
 --- a/src/client_generator.rs
 +++ b/src/client_generator.rs
-@@ -1645,7 +1645,7 @@ impl CodeGenerator {
+@@ -1682,7 +1682,7 @@ impl CodeGenerator {
                  let mut chosen = base.clone();
                  let mut suffix = 2;
                  while !used.insert(chosen.clone()) {
@@ -10,7 +11,7 @@ diff --git a/src/client_generator.rs b/src/client_generator.rs
                      suffix += 1;
                  }
                  chosen
-@@ -1881,6 +1881,7 @@ impl CodeGenerator {
+@@ -1884,6 +1884,7 @@ impl CodeGenerator {
              request_param
          };
          let request_body = self.generate_request_body(op, analysis, with_multipart_filenames);
@@ -18,7 +19,7 @@ diff --git a/src/client_generator.rs b/src/client_generator.rs
          let query_params = self.generate_query_params(op);
          let header_params = self.generate_header_params(op);
          let cookie_params = self.generate_cookie_params(op);
-@@ -1947,6 +1948,7 @@ impl CodeGenerator {
+@@ -1948,6 +1949,7 @@ impl CodeGenerator {
                  #url_construction
  
                  let mut req = #http_method_call;
@@ -26,7 +27,7 @@ diff --git a/src/client_generator.rs b/src/client_generator.rs
                  #request_body
  
                  #query_params
-@@ -1964,6 +1966,47 @@ impl CodeGenerator {
+@@ -1963,6 +1965,62 @@ impl CodeGenerator {
          }
      }
  
@@ -90,9 +91,10 @@ diff --git a/src/client_generator.rs b/src/client_generator.rs
      /// Default (no config) is Bearer on Authorization. ApiKey emits a custom
      /// header. Custom honors header_value_prefix.
 diff --git a/src/generator.rs b/src/generator.rs
+index 8356ca7..837ea35 100644
 --- a/src/generator.rs
 +++ b/src/generator.rs
-@@ -2274,7 +2274,8 @@ impl CodeGenerator {
+@@ -2278,7 +2278,8 @@ impl CodeGenerator {
  
                  let doc_comment = if let Some(desc) = &property.description {
                      let sanitized_desc = self.sanitize_doc_comment(desc);
