@@ -32,7 +32,7 @@ def verify_spec(data, lock):
 
 
 def verify_overlaid_openapi(data):
-    """Assert that the materialized Overlay made exactly our contract repairs."""
+    """Assert that the materialized Overlay made our declared contract repairs."""
     spec = json.loads(data)
     schemas = spec["components"]["schemas"]
     chat = schemas["ChatCompletionResponse"]["allOf"][1]
@@ -45,6 +45,9 @@ def verify_overlaid_openapi(data):
     required = workflows.get("required", [])
     if "beta.workflows" in required or "workflows" not in required:
         raise ValueError("OpenAPI Overlay did not repair WorkflowListResponse.workflows")
+    synthetic = sorted(path for path in spec["paths"] if "#" in path)
+    if synthetic:
+        raise ValueError("Overlaid OpenAPI contains synthetic path fragments: " + ", ".join(synthetic))
 
 
 def ensure_rust_toolchain(toolchain):
@@ -200,11 +203,10 @@ def main():
         shutil.copytree(ROOT / "tooling" / "sources" / "openapi", work / "tooling" / "sources" / "openapi")
         shutil.copytree(ROOT / "tooling" / "pipeline", work / "tooling" / "pipeline")
         published_path = work / "tooling/sources/openapi/openapi.yaml"
-        preprocessed_path = work / "tooling/sources/openapi/openapi.codegen.yaml"
         overlaid_path = work / "tooling/sources/openapi/openapi.overlaid.json"
-        run(python, work / "tooling/pipeline/preprocess.py", published_path, preprocessed_path)
+        run(python, work / "tooling/pipeline/preprocess.py", published_path)
         if published_path.read_bytes() != published:
-            raise ValueError("Published OpenAPI changed while preparing generator input")
+            raise ValueError("Published OpenAPI changed while validating Overlay assumptions")
         config = work / lock["generator_config"]
         run(executable, "generate", "--config", config)
         first_overlaid = overlaid_path.read_bytes()
