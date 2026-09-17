@@ -1,34 +1,187 @@
 name: CI
+
 on:
   push:
+    branches: [main]
   pull_request:
+
 permissions:
   contents: read
+
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
+
 jobs:
-  validate:
+  policy:
+    name: policy
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Validate agent and action-pin contracts
+        run: python3 tooling/quality/agent_contract.py
+      - name: Validate pull-request title
+        if: github.event_name == 'pull_request'
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: python3 tooling/quality/pr_title.py "$PR_TITLE"
+      - name: Install actionlint 1.7.12
+        run: |
+          curl -fsSLo /tmp/actionlint.tar.gz \
+            https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz
+          echo '8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8  /tmp/actionlint.tar.gz' | sha256sum --check -
+          tar -xzf /tmp/actionlint.tar.gz -C /tmp actionlint
+          /tmp/actionlint
+      - name: Audit GitHub Actions security
+        uses: zizmorcore/zizmor-action@3dc1ecc9bcb9e94e9b2c709687979e1298497054 # v0.6.2
+        with:
+          version: 1.29.0
+          persona: auditor
+          online-audits: false
+          advanced-security: false
+          annotations: true
+
+  format:
+    name: format
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install pinned Rust toolchain
+        run: rustup show
+      - run: cargo fmt --all --check
+
+  lint:
+    name: lint
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install pinned Rust toolchain
+        run: rustup show
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        with:
+          shared-key: ci
+          save-if: ${{ github.job == 'test' && github.ref == 'refs/heads/main' }}
+      - run: cargo clippy --locked --all-targets -- -D warnings
+
+  tooling:
+    name: tooling
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: python3 tooling/tests/run.py
+
+  generation:
+    name: generation
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: 0
+          persist-credentials: false
       - name: Install pinned Rust toolchain
         run: rustup show
-      - uses: actions/cache@v4
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            .tools
-            target
-          key: sdk-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'tooling/sources/lock.json') }}
-      - name: Validate tracked sources, generation and Rust SDK
-        run: bash tooling/quality/validate.sh
+          path: .tools
+          key: tools-generation-${{ runner.os }}-${{ hashFiles('tooling/sources/lock.json') }}
+      - name: Verify deterministic generation and source inventories
+        run: |
+          python3 tooling/pipeline/build.py check
+          python3 tooling/sources/taxonomy_inventory.py check
+          python3 tooling/pipeline/build.py probe
+
+  test:
+    name: test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install pinned Rust toolchain
+        run: rustup show
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        with:
+          shared-key: ci
+          save-if: ${{ github.job == 'test' && github.ref == 'refs/heads/main' }}
+      - run: cargo test --locked --all-targets
+
+  docs:
+    name: docs
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      RUSTDOCFLAGS: -D warnings
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install pinned Rust toolchain
+        run: rustup show
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        with:
+          shared-key: ci
+          save-if: ${{ github.job == 'test' && github.ref == 'refs/heads/main' }}
+      - run: cargo test --locked --doc
+      - run: cargo doc --locked --no-deps
+
+  api:
+    name: api
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: API review is pull-request scoped
+        if: github.event_name != 'pull_request'
+        run: echo 'No PR base to compare on push.'
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: github.event_name == 'pull_request'
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Install pinned Rust toolchain
+        if: github.event_name == 'pull_request'
+        run: rustup show
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: github.event_name == 'pull_request'
+        with:
+          path: .tools
+          key: tools-api-${{ runner.os }}-${{ hashFiles('tooling/sources/lock.json') }}
       - name: Review generated public API changes
         if: github.event_name == 'pull_request'
         env:
           SDK_API_BASE: ${{ github.event.pull_request.base.sha }}
         run: python3 tooling/quality/api_surface.py --base "$SDK_API_BASE" --rustdoc
+
+  gate:
+    name: gate
+    if: always()
+    needs: [policy, format, lint, tooling, generation, test, docs, api]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Require every CI contract
+        env:
+          POLICY: ${{ needs.policy.result }}
+          FORMAT: ${{ needs.format.result }}
+          LINT: ${{ needs.lint.result }}
+          TOOLING: ${{ needs.tooling.result }}
+          GENERATION: ${{ needs.generation.result }}
+          TEST: ${{ needs.test.result }}
+          DOCS: ${{ needs.docs.result }}
+          API: ${{ needs.api.result }}
+        run: |
+          for result in "$POLICY" "$FORMAT" "$LINT" "$TOOLING" "$GENERATION" "$TEST" "$DOCS" "$API"; do
+            test "$result" = success
+          done

@@ -1,22 +1,29 @@
 name: Update Mistral SDK Sources
+
 on:
   schedule:
     - cron: '23 3 * * *'
   workflow_dispatch:
-permissions:
-  contents: write
-  pull-requests: write
+
+permissions: {}
+
 concurrency:
   group: update-mistral-sources
   cancel-in-progress: false
+
 jobs:
   update:
+    name: update
     runs-on: ubuntu-24.04
     timeout-minutes: 30
+    permissions:
+      contents: write # Create/update the stable automation branch.
+      pull-requests: write # Create/update the single source-update PR.
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: main
+          persist-credentials: false
       - name: Advance OpenAPI and official SDK source pins
         id: upstream
         env:
@@ -32,7 +39,7 @@ jobs:
       - name: Install pinned Rust toolchain
         if: steps.upstream.outputs.changed == 'true'
         run: rustup show
-      - uses: actions/cache@v4
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         if: steps.upstream.outputs.changed == 'true'
         with:
           path: |
@@ -59,7 +66,7 @@ jobs:
           cat update-report.md >> "$GITHUB_STEP_SUMMARY"
       - name: Create or update the single SDK update PR
         if: steps.upstream.outputs.changed == 'true'
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
           token: ${{ github.token }}
           branch: automation/update-mistral-sources

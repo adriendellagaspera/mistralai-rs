@@ -11,34 +11,53 @@ use serde::de::DeserializeOwned;
 /// Maximum buffered SSE event, including field names and line delimiters.
 pub const MAX_EVENT_BYTES: usize = 1024 * 1024;
 
+/// Errors produced while decoding an SSE byte stream or its JSON payload.
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
+    /// The underlying byte stream returned a transport error.
     #[error("SSE transport: {0}")]
     Transport(String),
+    /// One buffered SSE event exceeded [`MAX_EVENT_BYTES`].
     #[error("SSE event exceeds {MAX_EVENT_BYTES} bytes")]
     EventTooLarge,
+    /// An SSE field contained invalid UTF-8.
     #[error("Invalid UTF-8 in SSE event: {0}")]
     Utf8(#[from] std::str::Utf8Error),
+    /// The `data:` payload could not be decoded as the requested JSON type.
     #[error("Invalid SSE JSON: {0}")]
     Json(#[from] serde_json::Error),
 }
 
+/// One decoded Server-Sent Event.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Event<T> {
+    /// SSE event type, defaulting to `message` when the field is omitted.
     pub event: String,
+    /// Decoded or raw `data:` payload.
     pub data: T,
+    /// Last event ID supplied by the stream, or an empty string when absent.
     pub id: String,
+    /// Optional SSE reconnection delay in milliseconds.
     pub retry: Option<u64>,
 }
 
 impl Event<String> {
     /// Decode only the JSON in the SSE `data:` field (e.g. `CompletionChunk`).
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Json`] when the payload is not valid JSON for `T`.
     pub fn json<T: DeserializeOwned>(&self) -> Result<T, Error> {
         Ok(serde_json::from_str(&self.data)?)
     }
 
     /// Decode a schema describing `{event, data, id, retry}`, such as
     /// `ConversationEvents`, `SpeechStreamEvents`, or `CompletionEvent`.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Json`] when either the event data or the requested
+    /// envelope type cannot be decoded from JSON.
     pub fn envelope<T: DeserializeOwned>(&self) -> Result<T, Error> {
         let mut value = serde_json::json!({"event": self.event,
             "data": serde_json::from_str::<serde_json::Value>(&self.data)?});
