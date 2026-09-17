@@ -13,6 +13,7 @@
 
 #[allow(
     missing_docs,
+    rustdoc::broken_intra_doc_links,
     clippy::allow_attributes_without_reason,
     clippy::double_must_use,
     clippy::nonminimal_bool,
@@ -35,6 +36,7 @@ pub mod raw {
 
 #[allow(
     missing_docs,
+    rustdoc::broken_intra_doc_links,
     clippy::allow_attributes_without_reason,
     clippy::missing_errors_doc,
     clippy::missing_panics_doc,

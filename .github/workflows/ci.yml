@@ -69,18 +69,22 @@ jobs:
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
           shared-key: ci
-          save-if: ${{ github.job == 'test' && github.ref == 'refs/heads/main' }}
+          save-if: ${{ github.ref == 'refs/heads/main' }}
       - run: cargo clippy --locked --all-targets -- -D warnings
 
   tooling:
     name: tooling
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - run: python3 tooling/tests/run.py
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .tools
+          key: tools-python-${{ runner.os }}-${{ hashFiles('tooling/sources/lock.json') }}
+      - run: python3 tooling/tests/run_pinned.py
 
   generation:
     name: generation
@@ -94,8 +98,13 @@ jobs:
         run: rustup show
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          path: .tools
-          key: tools-generation-${{ runner.os }}-${{ hashFiles('tooling/sources/lock.json') }}
+          path: |
+            .tools
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: tools-generation-${{ runner.os }}-${{ hashFiles('tooling/sources/lock.json', 'Cargo.lock') }}
+      - name: Prime locked Cargo dependencies for the offline probe
+        run: cargo fetch --locked
       - name: Verify deterministic generation and source inventories
         run: |
           python3 tooling/pipeline/build.py check
@@ -115,7 +124,7 @@ jobs:
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
           shared-key: ci
-          save-if: ${{ github.job == 'test' && github.ref == 'refs/heads/main' }}
+          save-if: ${{ github.ref == 'refs/heads/main' }}
       - run: cargo test --locked --all-targets
 
   docs:
@@ -133,7 +142,7 @@ jobs:
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
           shared-key: ci
-          save-if: ${{ github.job == 'test' && github.ref == 'refs/heads/main' }}
+          save-if: ${{ github.ref == 'refs/heads/main' }}
       - run: cargo test --locked --doc
       - run: cargo doc --locked --no-deps
 

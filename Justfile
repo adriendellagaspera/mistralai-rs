@@ -4,6 +4,7 @@ generate:
 check-generated:
     python3 tooling/pipeline/build.py check
     python3 tooling/sources/taxonomy_inventory.py check
+    cargo fetch --locked
     python3 tooling/pipeline/build.py probe
 
 sync-openapi:
@@ -25,7 +26,7 @@ lint:
     cargo clippy --locked --all-targets -- -D warnings
 
 test-tooling:
-    python3 tooling/tests/run.py
+    python3 tooling/tests/run_pinned.py
 
 test:
     cargo test --locked --all-targets
