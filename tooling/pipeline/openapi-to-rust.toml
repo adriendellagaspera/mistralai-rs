@@ -1,5 +1,5 @@
 [generator]
-spec_path = "../sources/openapi/openapi.codegen.yaml"
+spec_path = "../sources/openapi/openapi.yaml"
 overlays = ["mistral.openapi.overlay.yaml"]
 overlay_output = "../sources/openapi/openapi.overlaid.json"
 output_dir = "../../src/generated"
