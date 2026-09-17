@@ -22,43 +22,60 @@ jobs:
           git -C /tmp/bindings checkout -q 394600cee5c3955b51c545c05986814f7a7ddd1c
           .diag-venv/bin/pip install -q --no-deps /tmp/bindings
           git clone -q https://github.com/adriendellagaspera/mistralai-rs.git /tmp/compiler
-          git -C /tmp/compiler checkout -q 87300dfcb69ad8a86deb09c3ffeccd6c62e803bf
+          git -C /tmp/compiler checkout -q b6127d1325f276a733599ee651c7761f7ff3129b
           .diag-venv/bin/pip install -q --no-deps /tmp/compiler
-      - name: Print unresolved union shapes
+      - name: Pinpoint nested request unions
         run: |
           .diag-venv/bin/python - <<'PY'
-          import pprint
+          import pprint, sys
           from pathlib import Path
           from openapi_to_rust_bindings import read_bindings
           from rust_sdk_compiler import OpenApi
           root = Path.cwd()
+          sys.path.insert(0, str(root / 'tooling/pipeline/mistral'))
+          import sdk_autoproject as a
           api = OpenApi.load(root / 'tooling/sources/openapi/openapi.yaml')
           rust = read_bindings(root / 'src/generated')
+          schemas = dict(api.schemas)
+          for name, schema in list(api.schemas.items()):
+              if schema.get('allOf'):
+                  try:
+                      schemas[name] = api.object_schema(name)
+                  except Exception:
+                      pass
 
-          print('\nSCHEMA CompletionArgs.stop')
-          pprint.pp(api.schemas['CompletionArgs']['properties']['stop'])
-          print('\nENUM CompletionArgsStop')
-          for variant in rust.enums.get('CompletionArgsStop', ()):
-              print(variant)
-          print('ALIAS CompletionArgsStop', rust.aliases.get('CompletionArgsStop'))
-
-          print('\nSCHEMA ConversationInputs')
-          pprint.pp(api.schemas['ConversationInputs'])
-          print('\nENUM ConversationInputs')
-          for variant in rust.enums.get('ConversationInputs', ()):
-              print(variant)
-          print('ALIAS ConversationInputs', rust.aliases.get('ConversationInputs'))
-
-          refs = []
-          for branch in api.schemas['ConversationInputs'].get('anyOf', []):
-              ref = branch.get('$ref')
-              if ref:
-                  refs.append(ref.rsplit('/', 1)[-1])
-          for ref in refs:
-              print('\nREF', ref)
-              pprint.pp(api.schemas.get(ref))
-              print('ALIAS', rust.aliases.get(ref))
+          for name in ['CompletionArgsStop', 'CompletionArgsStopStringArray', 'InputEntries', 'InputEntriesItemUnion']:
+              print('\nSCHEMA', name)
+              pprint.pp(api.schemas.get(name))
+              print('ALIAS', rust.aliases.get(name))
               print('ENUM')
-              for variant in rust.enums.get(ref, ()):
+              for variant in rust.enums.get(name, ()):
                   print(variant)
+
+          stop = api.schemas['CompletionArgsStop']
+          print('\nSTOP BRANCH ADAPTERS')
+          for branch in stop.get('anyOf', stop.get('oneOf', [])):
+              if branch.get('type') == 'null':
+                  continue
+              ref = a._schema_ref(branch)
+              payload = ref or a._primitive_union_payload(branch)
+              print('branch=', branch, 'ref=', ref, 'payload=', payload)
+
+          print('\nINPUT ENTRY BRANCH ADAPTERS')
+          item_schema = api.schemas['InputEntries']['items']
+          by_payload = {v.payload: v.name for v in rust.enums['InputEntriesItemUnion']}
+          for branch in item_schema.get('anyOf', item_schema.get('oneOf', [])):
+              ref = a._schema_ref(branch)
+              print('\nbranch', ref, 'raw_variant=', by_payload.get(ref))
+              models = {}
+              adapter, reason = a._request_field_adapter(
+                  models, schemas, branch, ref, rust, ('InputEntriesItemUnion',),
+                  'InputEntriesItemUnion', (ref,)
+              )
+              print('adapter=', adapter, 'reason=', reason, 'models=', sorted(models))
+              if ref in rust.structs:
+                  fields = {f.name.removeprefix('r#'): f for f in rust.fields(ref)}
+                  schema = schemas.get(ref, {})
+                  print('schema_fields=', sorted(schema.get('properties', {})))
+                  print('raw_fields=', sorted(fields))
           PY
