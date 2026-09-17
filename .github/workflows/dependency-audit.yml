@@ -17,6 +17,36 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  refresh-rustls-lock:
+    name: refresh-rustls-lock
+    if: >-
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.head.sha == '9dcaa2f4e57d3fc40a9c451f6759aa3ae7a9a1b4'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write # One-shot same-repository lockfile regeneration; removed after it pushes.
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ci/evaluate-dependency-audits
+          persist-credentials: false
+      - name: Regenerate the rustls lock entry with Cargo
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cargo update -p rustls --precise 0.23.45
+          git diff --check
+          git diff --exit-code -- Cargo.toml
+          git diff --quiet -- Cargo.lock && { echo 'Cargo.lock did not change'; exit 1; }
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add Cargo.lock
+          git commit -m 'fix: update rustls for RUSTSEC-2026-0285'
+          gh auth setup-git
+          git push origin HEAD:refs/heads/ci/evaluate-dependency-audits
+
   cargo-deny:
     name: cargo-deny
     runs-on: ubuntu-24.04
