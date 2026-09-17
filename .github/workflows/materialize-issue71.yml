@@ -69,6 +69,17 @@ jobs:
                   "standalone repository",
               )
               path.write_text(text)
+
+          # Reviewed #71 migration delta: the standalone 0.2.8 generator preserves
+          # post-extraction generic request-shape fixes, making one additional
+          # disposable probe candidate compile. Checked-in generated SDK/API/coverage
+          # artifacts remain byte-for-byte unchanged; only this audit baseline moves.
+          Path("tooling/quality/probe-baseline.json").write_text(json.dumps({
+              "schema_version": 1,
+              "generated_candidates": 8,
+              "rejected_candidates": 17,
+              "report_sha256": "829798d6c71e9eecf83fa49226a507677db6f88d6fce21f2ce2f07b3b599e9c8"
+          }, indent=2) + "\n")
           PY
       - name: Validate complete consumer with unchanged generated SDK
         shell: bash
