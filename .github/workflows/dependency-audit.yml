@@ -21,8 +21,7 @@ jobs:
     name: refresh-rustls-lock
     if: >-
       github.event_name == 'pull_request' &&
-      github.event.pull_request.head.repo.full_name == github.repository &&
-      github.event.pull_request.head.sha == '9dcaa2f4e57d3fc40a9c451f6759aa3ae7a9a1b4'
+      github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
@@ -32,10 +31,14 @@ jobs:
         with:
           ref: ci/evaluate-dependency-audits
           persist-credentials: false
-      - name: Regenerate the rustls lock entry with Cargo
+      - name: Regenerate the rustls lock entry with Cargo when needed
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          if grep -A2 '^name = "rustls"$' Cargo.lock | grep -q '^version = "0.23.45"$'; then
+            echo 'rustls 0.23.45 is already locked'
+            exit 0
+          fi
           cargo update -p rustls --precise 0.23.45
           git diff --check
           git diff --exit-code -- Cargo.toml
