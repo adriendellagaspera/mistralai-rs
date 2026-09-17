@@ -372,7 +372,7 @@ def build_ir(
             if config.get("accessors") or raw not in rust.enums:
                 rust.fields(raw)
             if "constructor" in config or "union_factory" in config:
-                wire_schema = openapi.schema(raw)
+                wire_schema = openapi.object_schema(raw)
                 wire_fields = set(wire_schema.get("properties", {}))
                 raw_fields = {
                     field.name.removeprefix("r#") for field in rust.fields(raw)
@@ -478,7 +478,7 @@ def build_ir(
                 for field, value in item.get("request_overrides", {}).items():
                     syntax = request_fields[field].syntax
                     inner = syntax.unary("Option")
-                    wire_field = openapi.schema(model.raw).get("properties", {}).get(
+                    wire_field = openapi.object_schema(model.raw).get("properties", {}).get(
                         field, {}
                     )
                     if (

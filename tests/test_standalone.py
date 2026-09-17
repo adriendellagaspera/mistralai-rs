@@ -106,6 +106,29 @@ class StandaloneCompilerTests(unittest.TestCase):
         self.assertIn("pub async fn adopt(&self, request: Adoption)", compilation.files["zoo.rs"])
         self.assertEqual(Bindings.from_dict(bindings.to_dict()), bindings)
 
+    def test_composed_request_uses_effective_object_contract(self):
+        root = FIXTURES / "library"
+        document = json.loads((root / "openapi.json").read_text())
+        schemas = document["components"]["schemas"]
+        request = schemas["CreateBookRequest"]
+        schemas["CreateBookRequestBase"] = request
+        schemas["CreateBookRequest"] = {
+            "allOf": [
+                {"$ref": "#/components/schemas/CreateBookRequestBase"},
+                {
+                    "type": "object",
+                    "properties": {"pages": {"type": "integer"}},
+                },
+            ]
+        }
+        openapi = OpenApi(document)
+        policy = Policy.from_dict(json.loads((root / "policy.json").read_text()))
+        compilation = compile(openapi, load_bindings("library"), policy)
+        self.assertIn(
+            "pub async fn create(&self, request: NewBook)",
+            compilation.files["catalog_books.rs"],
+        )
+
     def test_library_exercises_transport_primitives(self):
         compilation, _ = compile_fixture("library")
         self.assertEqual(compilation.ir.client_name, "LibraryClient")
