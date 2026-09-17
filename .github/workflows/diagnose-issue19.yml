@@ -1,0 +1,55 @@
+name: Diagnose issue 19 request gaps
+on:
+  push:
+    branches: [issue-19-allof-request-projection]
+permissions:
+  contents: read
+jobs:
+  diagnose:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: issue-19-allof-request-projection
+      - name: Bootstrap tooling
+        run: python3 tooling/tests/run.py
+      - name: Diagnose request fields
+        run: |
+          set -euo pipefail
+          PYTHON=$(find .tools -path '*/bin/python' | grep 'python-sdk-tooling' | head -1)
+          "$PYTHON" - <<'PY'
+          import json, sys
+          from pathlib import Path
+          from openapi_to_rust_bindings import read_bindings
+          from rust_sdk_compiler import OpenApi
+          ROOT = Path.cwd()
+          sys.path.insert(0, str(ROOT / 'tooling/pipeline/mistral'))
+          import sdk_autoproject as a
+          api = OpenApi.load(ROOT / 'tooling/sources/openapi/openapi.yaml')
+          rust = read_bindings(ROOT / 'src/generated')
+          schemas = dict(api.schemas)
+          for name, schema in list(api.schemas.items()):
+              if schema.get('allOf'):
+                  try:
+                      schemas[name] = api.object_schema(name)
+                  except Exception as exc:
+                      print(f'NORMALIZE {name}: {exc}')
+          for raw in ['ConversationAppendRequest','ConversationRestartRequest','ConversationRequest']:
+              schema = schemas[raw]
+              fields = {f.name.removeprefix('r#'): f for f in rust.fields(raw)}
+              print(f'\nMODEL {raw}')
+              print('schema_fields=', sorted(schema.get('properties', {})))
+              print('raw_fields=', sorted(fields))
+              models = {}
+              for field, fs in sorted(schema.get('properties', {}).items()):
+                  if field not in fields:
+                      print(field, 'MISSING_RAW')
+                      continue
+                  if field not in set(schema.get('required', [])) and a._omittable_singleton(fs, fields[field].type, schemas, rust):
+                      print(field, fields[field].type, 'OMIT_SINGLETON')
+                      continue
+                  adapter, reason = a._request_field_adapter(models, schemas, fs, fields[field].type, rust, (raw,), raw, (field,))
+                  print(field, fields[field].type, 'adapter=', adapter, 'reason=', reason)
+          PY
