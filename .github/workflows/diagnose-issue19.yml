@@ -24,7 +24,7 @@ jobs:
           git clone -q https://github.com/adriendellagaspera/mistralai-rs.git /tmp/compiler
           git -C /tmp/compiler checkout -q b6127d1325f276a733599ee651c7761f7ff3129b
           .diag-venv/bin/pip install -q --no-deps /tmp/compiler
-      - name: Pinpoint FunctionCallEntry fields
+      - name: Inspect open-object payload
         run: |
           .diag-venv/bin/python - <<'PY'
           import pprint, sys
@@ -36,40 +36,15 @@ jobs:
           import sdk_autoproject as a
           api = OpenApi.load(root / 'tooling/sources/openapi/openapi.yaml')
           rust = read_bindings(root / 'src/generated')
-          schemas = dict(api.schemas)
-          for name, schema in list(api.schemas.items()):
-              if schema.get('allOf'):
-                  try:
-                      schemas[name] = api.object_schema(name)
-                  except Exception:
-                      pass
-          raw = 'FunctionCallEntry'
-          schema = schemas[raw]
-          fields = {f.name.removeprefix('r#'): f for f in rust.fields(raw)}
-          required = set(schema.get('required', []))
-          print('required=', sorted(required))
-          for field, fs in sorted(schema.get('properties', {}).items()):
-              models = {}
-              adapter, reason = a._request_field_adapter(
-                  models, schemas, fs, fields[field].type, rust, (raw,), raw, (field,)
-              )
-              print('\nFIELD', field, 'raw=', fields[field].type, 'required=', field in required)
-              pprint.pp(fs)
-              print('adapter=', adapter, 'reason=', reason, 'models=', sorted(models))
-          print('\nREFERENCED SHAPES')
-          refs = set()
-          def collect(node):
-              if isinstance(node, dict):
-                  ref = node.get('$ref')
-                  if ref:
-                      refs.add(ref.rsplit('/', 1)[-1])
-                  for value in node.values(): collect(value)
-              elif isinstance(node, list):
-                  for value in node: collect(value)
-          collect(schema)
-          for ref in sorted(refs):
-              print('\nREF', ref)
-              pprint.pp(api.schemas.get(ref))
-              print('alias=', rust.aliases.get(ref))
-              print('enum=', rust.enums.get(ref))
+          name = 'FunctionCallEntryArgumentsVariant'
+          print('struct?', name in rust.structs)
+          print('alias=', rust.aliases.get(name))
+          print('enum=', rust.enums.get(name))
+          if name in rust.structs:
+              print('fields=', rust.fields(name))
+          schema = {'type': 'object', 'additionalProperties': True}
+          print('generated_map_wrapper=', a._generated_map_wrapper(schema, name, rust))
+          models = {}
+          print('ensure_map=', a._ensure_map_model(models, schema, name, rust, name, ()))
+          print('models=', models)
           PY
