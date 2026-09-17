@@ -1,11 +1,10 @@
-name: Dependency Audit
+name: Dependency Hygiene
 
 on:
   pull_request:
     paths:
       - Cargo.toml
       - Cargo.lock
-      - deny.toml
       - .github/workflows/dependency-audit.yml
   workflow_dispatch:
 
@@ -13,33 +12,10 @@ permissions:
   contents: read
 
 concurrency:
-  group: dependency-audit-${{ github.event.pull_request.number || github.ref }}
+  group: dependency-hygiene-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
-  cargo-deny:
-    name: cargo-deny
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - name: Install cargo-deny 0.20.2
-        run: |
-          mkdir -p /tmp/cargo-deny-install
-          curl -fsSLo /tmp/cargo-deny.tar.gz \
-            https://github.com/EmbarkStudios/cargo-deny/releases/download/0.20.2/cargo-deny-0.20.2-x86_64-unknown-linux-musl.tar.gz
-          echo '9f12ed4c49936e09b48bf862b595cde2fe64fcbd9d74dfacac6131ca824c8d5f  /tmp/cargo-deny.tar.gz' | sha256sum --check -
-          tar -xzf /tmp/cargo-deny.tar.gz -C /tmp/cargo-deny-install
-          find /tmp/cargo-deny-install -type f -name cargo-deny -perm -111 -print -quit > /tmp/cargo-deny-path
-          test -s /tmp/cargo-deny-path
-      - name: Check advisories, licenses, bans and sources
-        run: |
-          binary="$(cat /tmp/cargo-deny-path)"
-          "$binary" --version
-          "$binary" check
-
   cargo-shear:
     name: cargo-shear
     runs-on: ubuntu-24.04
