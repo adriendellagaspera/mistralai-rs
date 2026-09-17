@@ -13,14 +13,23 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: issue-19-allof-request-projection
-      - name: Bootstrap tooling
-        run: python3 tooling/tests/run.py
+      - name: Bootstrap focused tooling
+        run: |
+          set -euo pipefail
+          python3 -m venv .diag-venv
+          .diag-venv/bin/pip install -q \
+            ruamel.yaml==0.18.6 tree-sitter==0.25.2 tree-sitter-rust==0.24.0 jsonschema==4.23.0
+          git clone -q https://github.com/adriendellagaspera/mistralai-rs.git /tmp/compiler
+          git -C /tmp/compiler checkout -q 87300dfcb69ad8a86deb09c3ffeccd6c62e803bf
+          .diag-venv/bin/pip install -q /tmp/compiler
+          git clone -q https://github.com/adriendellagaspera/mistralai-rs.git /tmp/bindings
+          git -C /tmp/bindings checkout -q 394600cee5c3955b51c545c05986814f7a7ddd1c
+          .diag-venv/bin/pip install -q /tmp/bindings
       - name: Diagnose request fields
         run: |
           set -euo pipefail
-          PYTHON=$(find .tools -path '*/bin/python' | grep 'python-sdk-tooling' | head -1)
-          "$PYTHON" - <<'PY'
-          import json, sys
+          .diag-venv/bin/python - <<'PY'
+          import sys
           from pathlib import Path
           from openapi_to_rust_bindings import read_bindings
           from rust_sdk_compiler import OpenApi
@@ -43,13 +52,16 @@ jobs:
               print('schema_fields=', sorted(schema.get('properties', {})))
               print('raw_fields=', sorted(fields))
               models = {}
+              required = set(schema.get('required', []))
               for field, fs in sorted(schema.get('properties', {}).items()):
                   if field not in fields:
                       print(field, 'MISSING_RAW')
                       continue
-                  if field not in set(schema.get('required', [])) and a._omittable_singleton(fs, fields[field].type, schemas, rust):
+                  if field not in required and a._omittable_singleton(fs, fields[field].type, schemas, rust):
                       print(field, fields[field].type, 'OMIT_SINGLETON')
                       continue
-                  adapter, reason = a._request_field_adapter(models, schemas, fs, fields[field].type, rust, (raw,), raw, (field,))
+                  adapter, reason = a._request_field_adapter(
+                      models, schemas, fs, fields[field].type, rust, (raw,), raw, (field,)
+                  )
                   print(field, fields[field].type, 'adapter=', adapter, 'reason=', reason)
           PY
