@@ -31,9 +31,12 @@ def verify_spec(data, lock):
         raise ValueError(f"Spec SHA-256 mismatch: expected {lock['spec_sha256']}, got {actual}")
 
 
-def verify_overlaid_openapi(data):
-    """Assert that the materialized Overlay made our declared contract repairs."""
+def verify_overlaid_openapi(data, published):
+    """Assert that the Overlay made only the declared contract repairs."""
+    from ruamel.yaml import YAML
+
     spec = json.loads(data)
+    published_spec = YAML(typ="safe", pure=True).load(published)
     schemas = spec["components"]["schemas"]
     chat = schemas["ChatCompletionResponse"]["allOf"][1]
     if "data" in chat.get("required", []):
@@ -45,9 +48,14 @@ def verify_overlaid_openapi(data):
     required = workflows.get("required", [])
     if "beta.workflows" in required or "workflows" not in required:
         raise ValueError("OpenAPI Overlay did not repair WorkflowListResponse.workflows")
-    synthetic = sorted(path for path in spec["paths"] if "#" in path)
-    if synthetic:
-        raise ValueError("Overlaid OpenAPI contains synthetic path fragments: " + ", ".join(synthetic))
+    published_paths = set(published_spec["paths"])
+    overlaid_paths = set(spec["paths"])
+    if overlaid_paths != published_paths:
+        added = sorted(overlaid_paths - published_paths)
+        removed = sorted(published_paths - overlaid_paths)
+        raise ValueError(
+            f"OpenAPI Overlay changed published path inventory: added={added}, removed={removed}"
+        )
 
 
 def ensure_rust_toolchain(toolchain):
@@ -210,7 +218,7 @@ def main():
         config = work / lock["generator_config"]
         run(executable, "generate", "--config", config)
         first_overlaid = overlaid_path.read_bytes()
-        verify_overlaid_openapi(first_overlaid)
+        verify_overlaid_openapi(first_overlaid, published)
         # A second materialization must be byte-identical, not merely equivalent JSON.
         run(executable, "generate", "--config", config)
         if overlaid_path.read_bytes() != first_overlaid:
