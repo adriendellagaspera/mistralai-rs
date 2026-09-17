@@ -1,0 +1,92 @@
+name: Materialize issue 71
+on:
+  push:
+    branches: [issue-71-standalone-tools]
+permissions:
+  contents: write
+jobs:
+  materialize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: issue-71-standalone-tools
+          fetch-depth: 0
+      - name: Migrate immutable generic tool pins
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+
+          commit = "678be2751976162ca5df8fdb012d5113a55d8dcc"
+          tree = "d0b8f6a562300c3052ec355c8f673dfed7ca009f"
+          lock_path = Path("tooling/sources/lock.json")
+          lock = json.loads(lock_path.read_text())
+          lock.update({
+              "compiler_tool": "rust-sdk-generator",
+              "compiler_tool_version": "0.2.8",
+              "compiler_tool_repository": "adriendellagaspera/rust-sdk-generator",
+              "compiler_tool_commit": commit,
+              "compiler_tool_tree_sha": tree,
+              "bindings_tool": "openapi-to-rust-bindings",
+              "bindings_tool_version": "0.2.2",
+              "bindings_tool_repository": "adriendellagaspera/rust-sdk-generator",
+              "bindings_tool_commit": commit,
+              "bindings_tool_tree_sha": tree,
+              "bindings_tool_subdirectory": "openapi-to-rust-bindings",
+          })
+          lock_path.write_text(json.dumps(lock, indent=2) + "\n")
+
+          build_path = Path("tooling/pipeline/build.py")
+          build = build_path.read_text()
+          old = '''    return source\n\n\ndef tooling_python(lock):\n'''
+          new = '''    subdirectory = lock.get(f"{prefix}_tool_subdirectory")\n    return source / subdirectory if subdirectory else source\n\n\ndef tooling_python(lock):\n'''
+          if old not in build:
+              raise SystemExit("tool_source return seam changed")
+          build = build.replace(old, new, 1)
+          build = build.replace(
+              '"import rust_sdk_compiler; print(rust_sdk_compiler.__version__)",',
+              '"import rust_sdk_generator; print(rust_sdk_generator.__version__)",',
+          )
+          build_path.write_text(build)
+
+          for root in (Path("tooling"),):
+              for path in root.rglob("*.py"):
+                  text = path.read_text()
+                  text = text.replace("rust_sdk_compiler", "rust_sdk_generator")
+                  text = text.replace("rust-sdk-compiler", "rust-sdk-generator")
+                  path.write_text(text)
+          for path in [Path("README.md"), Path("CONTRIBUTING.md"), *Path("tooling").rglob("*.md")]:
+              if not path.exists():
+                  continue
+              text = path.read_text().replace("rust-sdk-compiler", "rust-sdk-generator")
+              text = text.replace(
+                  "historical source trees to the standalone repository",
+                  "standalone repository",
+              )
+              path.write_text(text)
+          PY
+      - name: Validate complete consumer with unchanged generated SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash tooling/quality/validate.sh
+          git diff --exit-code -- src/generated src/sdk
+          if grep -R -n --exclude-dir=.tools --exclude-dir=.git 'rust_sdk_compiler\|rust-sdk-compiler' tooling README.md CONTRIBUTING.md; then
+            echo 'historical compiler package reference remains in active consumer files' >&2
+            exit 1
+          fi
+      - name: Commit behavior-neutral migration
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add tooling README.md CONTRIBUTING.md
+          git diff --cached --quiet && exit 0
+          git commit -m "refactor: consume standalone sdk generator tools"
+          git push origin HEAD:issue-71-standalone-tools
