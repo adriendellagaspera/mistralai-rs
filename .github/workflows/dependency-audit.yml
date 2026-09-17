@@ -1,0 +1,40 @@
+name: Dependency Hygiene
+
+on:
+  pull_request:
+    paths:
+      - Cargo.toml
+      - Cargo.lock
+      - .github/workflows/dependency-audit.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dependency-hygiene-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cargo-shear:
+    name: cargo-shear
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install cargo-shear 1.13.4
+        run: |
+          mkdir -p /tmp/cargo-shear-install
+          curl -fsSLo /tmp/cargo-shear.tar.gz \
+            https://github.com/Boshen/cargo-shear/releases/download/v1.13.4/cargo-shear-x86_64-unknown-linux-gnu.tar.gz
+          echo 'b52ad836fb99fb3881862d71bd965b9937b55da363f775d71d846244e580a50c  /tmp/cargo-shear.tar.gz' | sha256sum --check -
+          tar -xzf /tmp/cargo-shear.tar.gz -C /tmp/cargo-shear-install
+          find /tmp/cargo-shear-install -type f -name cargo-shear -perm -111 -print -quit > /tmp/cargo-shear-path
+          test -s /tmp/cargo-shear-path
+      - name: Check dependency usage
+        run: |
+          binary="$(cat /tmp/cargo-shear-path)"
+          "$binary" --version
+          "$binary" --deny-warnings

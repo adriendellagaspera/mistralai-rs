@@ -29,8 +29,8 @@ just docs
 just validate
 ```
 
-API compatibility against a PR base additionally runs in CI because it needs the
-base revision.
+API compatibility and the pinned dependency-security audit additionally run in CI;
+the API check needs the PR base revision and the dependency audit owns its tool pin.
 
 ## Gated invariants
 
@@ -42,6 +42,7 @@ base revision.
 - [generation] Files under `src/generated/` and generated `src/sdk/` output MUST NOT be edited by hand; change an owning input/tool and regenerate.
 - [generation] Mistral OpenAPI, official-SDK taxonomy and generator inputs MUST remain pinned and reproducible through `tooling/sources/lock.json` and the build pipeline.
 - [lint] Handwritten Rust MUST remain free of `unsafe`; lint exceptions MUST carry an explicit reason, with generated-code exceptions scoped at module boundaries.
+- [dependencies] Locked Rust dependencies MUST pass the advisory, license, source and TLS-backend policy in `deny.toml`.
 - [docs] Handwritten public Rust API MUST have rustdoc that builds warning-free; fallible public helpers MUST document their error contract.
 - [tooling] Repository-owned Python build/source/quality behavior MUST have its tooling test suite executed in CI.
 - [api] Changes to the committed public SDK surface MUST pass the repository API compatibility review against the PR base.
