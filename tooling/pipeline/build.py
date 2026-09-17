@@ -31,6 +31,22 @@ def verify_spec(data, lock):
         raise ValueError(f"Spec SHA-256 mismatch: expected {lock['spec_sha256']}, got {actual}")
 
 
+def verify_overlaid_openapi(data):
+    """Assert that the materialized Overlay made exactly our contract repairs."""
+    spec = json.loads(data)
+    schemas = spec["components"]["schemas"]
+    chat = schemas["ChatCompletionResponse"]["allOf"][1]
+    if "data" in chat.get("required", []):
+        raise ValueError("OpenAPI Overlay did not remove ChatCompletionResponse.data")
+    sharing = schemas["SharingDelete"]
+    if "level" in sharing.get("required", []):
+        raise ValueError("OpenAPI Overlay did not remove SharingDelete.level")
+    workflows = schemas["WorkflowListResponse"]
+    required = workflows.get("required", [])
+    if "beta.workflows" in required or "workflows" not in required:
+        raise ValueError("OpenAPI Overlay did not repair WorkflowListResponse.workflows")
+
+
 def ensure_rust_toolchain(toolchain):
     config = toolchain["toolchain"]
     args = [
@@ -168,9 +184,10 @@ def main():
     lock = json.loads((ROOT / "tooling/sources/lock.json").read_text())
     toolchain = tomllib.loads((ROOT / "rust-toolchain.toml").read_text())
     if toolchain["toolchain"]["channel"] != lock["rust_toolchain"]:
-        raise ValueError("rust-toolchain.toml and codegen.lock disagree")
+        raise ValueError("rust-toolchain.toml and tooling/sources/lock.json disagree")
     ensure_rust_toolchain(toolchain)
-    verify_spec((ROOT / "tooling/sources/openapi/openapi.yaml").read_bytes(), lock)
+    published = (ROOT / "tooling/sources/openapi/openapi.yaml").read_bytes()
+    verify_spec(published, lock)
     executable = generator(lock)
     python = tooling_python(lock)
     run(python, ROOT / "tooling/tests/run.py")
@@ -182,15 +199,32 @@ def main():
         work = Path(temp)
         shutil.copytree(ROOT / "tooling" / "sources" / "openapi", work / "tooling" / "sources" / "openapi")
         shutil.copytree(ROOT / "tooling" / "pipeline", work / "tooling" / "pipeline")
-        run(python, work / "tooling/pipeline/preprocess.py",
-            work / "tooling/sources/openapi/openapi.yaml", work / "tooling/sources/openapi/openapi.codegen.yaml")
+        published_path = work / "tooling/sources/openapi/openapi.yaml"
+        preprocessed_path = work / "tooling/sources/openapi/openapi.codegen.yaml"
+        overlaid_path = work / "tooling/sources/openapi/openapi.overlaid.json"
+        run(python, work / "tooling/pipeline/preprocess.py", published_path, preprocessed_path)
+        if published_path.read_bytes() != published:
+            raise ValueError("Published OpenAPI changed while preparing generator input")
         config = work / lock["generator_config"]
         run(executable, "generate", "--config", config)
-        # The generator's own check runs in a second process, before rustfmt.
+        first_overlaid = overlaid_path.read_bytes()
+        verify_overlaid_openapi(first_overlaid)
+        # A second materialization must be byte-identical, not merely equivalent JSON.
+        run(executable, "generate", "--config", config)
+        if overlaid_path.read_bytes() != first_overlaid:
+            raise ValueError("Overlaid OpenAPI materialization is not deterministic")
+        # The generator's own check runs in a new process and includes overlay inputs/output.
         run(executable, "generate", "--config", config, "--check")
+        before_dry_run = overlaid_path.read_bytes()
+        run(executable, "generate", "--config", config, "--dry-run")
+        if overlaid_path.read_bytes() != before_dry_run:
+            raise ValueError("Generator dry-run mutated the materialized overlaid OpenAPI")
+        if published_path.read_bytes() != published:
+            raise ValueError("Published OpenAPI changed during generation")
+        verify_spec((ROOT / "tooling/sources/openapi/openapi.yaml").read_bytes(), lock)
         generated = work / "src/generated"
-        run(python, ROOT / "tooling/quality/coverage.py", work / "tooling/sources/openapi/openapi.yaml",
-            work / "tooling/sources/openapi/openapi.codegen.yaml", generated)
+        run(python, ROOT / "tooling/quality/coverage.py", published_path,
+            overlaid_path, generated)
         for path in sorted(generated.rglob("*.rs")):
             run("rustup", "run", lock["rust_toolchain"], "rustfmt",
                 "--edition", "2024", "--config", "skip_children=true", path)
@@ -199,12 +233,12 @@ def main():
             if target.exists():
                 shutil.rmtree(target)
             shutil.copytree(generated, target)
-            print("Generated raw bindings from verified, pinned OpenAPI source.")
+            print("Generated raw bindings from verified published + overlaid OpenAPI.")
             return
         facade = work / "src/sdk"
         run(python, work / "tooling/pipeline/compile_sdk.py", generated, facade,
             "--manifest", work / "tooling/pipeline/semantics.json",
-            "--openapi", work / "tooling/sources/openapi/openapi.yaml",
+            "--openapi", overlaid_path,
             "--taxonomy", ROOT / "tooling/sources/taxonomy.json")
         for path in sorted(facade.rglob("*.rs")):
             run("rustup", "run", lock["rust_toolchain"], "rustfmt",
@@ -220,7 +254,7 @@ def main():
                     path.unlink()
             for path in facade.iterdir():
                 shutil.copy2(path, facade_target / path.name)
-            print("Generated raw bindings and semantic SDK facade from verified, pinned spec.")
+            print("Generated raw bindings and semantic SDK facade from the same overlaid OpenAPI.")
         else:
             old, new = snapshot(target), snapshot(generated)
             changed = differences(old, new)
