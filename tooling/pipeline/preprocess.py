@@ -1,69 +1,43 @@
-"""Minimal deterministic fixes for contradictions in the upstream spec."""
+"""Temporary call-shape aliases that are still blocked on mistralai-rs#31."""
 
 from pathlib import Path
 
 
-CHAT_RESPONSE_REQUIRED = b"""    ChatCompletionResponse:
-      allOf:
-      - $ref: '#/components/schemas/ChatCompletionResponseBase'
-      - type: object
-        title: ChatCompletionResponse
-        properties:
-          choices:
-            type: array
-            items:
-              $ref: '#/components/schemas/ChatCompletionChoice'
-        required:
-        - id
-        - object
-        - data
-        - model
-        - usage
-        - created
-        - choices
-"""
+def assert_overlay_assumptions(spec) -> None:
+    """Fail closed if the published contradictions targeted by our Overlay drift."""
+    schemas = spec["components"]["schemas"]
 
-CHAT_RESPONSE_REQUIRED_FIXED = CHAT_RESPONSE_REQUIRED.replace(b"        - data\n", b"")
+    chat = schemas["ChatCompletionResponse"]
+    all_of = chat.get("allOf")
+    if not isinstance(all_of, list) or len(all_of) < 2:
+        raise ValueError("Review Overlay target for ChatCompletionResponse")
+    chat_extension = all_of[1]
+    chat_required = chat_extension.get("required", [])
+    chat_properties = chat_extension.get("properties", {})
+    if "data" not in chat_required or "data" in chat_properties:
+        raise ValueError("Review Overlay repair for ChatCompletionResponse.data")
 
+    sharing = schemas["SharingDelete"]
+    if "level" not in sharing.get("required", []) or "level" in sharing.get("properties", {}):
+        raise ValueError("Review Overlay repair for SharingDelete.level")
 
-def preprocess(source: bytes) -> bytes:
-    """Return generator input without modifying the authenticated source spec."""
-    count = source.count(CHAT_RESPONSE_REQUIRED)
-    if count != 1:
-        raise ValueError(
-            "Expected exactly one known ChatCompletionResponse contradiction; "
-            f"found {count}. Review the upstream schema before regenerating."
-        )
-    return source.replace(CHAT_RESPONSE_REQUIRED, CHAT_RESPONSE_REQUIRED_FIXED)
+    workflows = schemas["WorkflowListResponse"]
+    required = workflows.get("required", [])
+    properties = workflows.get("properties", {})
+    if (
+        "beta.workflows" not in required
+        or "beta.workflows" in properties
+        or "workflows" not in properties
+        or "workflows" in required
+    ):
+        raise ValueError("Review Overlay repair for WorkflowListResponse.workflows")
 
 
-def main(source: str, destination: str) -> None:
-    import json
-    from ruamel.yaml import YAML
-
-    spec = YAML(typ="safe", pure=True).load(preprocess(Path(source).read_bytes()))
-    transform(spec)
-    # JSON is valid YAML and avoids emitter/version-dependent YAML formatting.
-    Path(destination).write_text(json.dumps(spec, sort_keys=True, indent=2) + "\n")
-
-
-def transform(spec):
-    """Explicit repairs and alternate media methods; original document stays intact."""
+def transform(spec) -> None:
+    """Add only the legacy media aliases that #31 has not replaced yet."""
     import copy
 
-    schemas = spec["components"]["schemas"]
-    for name, invalid, replacement in [
-        ("SharingDelete", "level", None),
-        ("WorkflowListResponse", "beta.workflows", "workflows"),
-    ]:
-        schema = schemas[name]
-        if invalid not in schema["required"] or invalid in schema["properties"]:
-            raise ValueError(f"Review upstream required-field repair for {name}")
-        schema["required"].remove(invalid)
-        if replacement:
-            if replacement not in schema["properties"]:
-                raise ValueError(f"Missing replacement {name}.{replacement}")
-            schema["required"].append(replacement)
+    assert_overlay_assumptions(spec)
 
     for path in ["/v1/chat/completions", "/v1/fim/completions", "/v1/audio/speech"]:
         operation = spec["paths"][path]["post"]
@@ -73,15 +47,15 @@ def transform(spec):
         stream = copy.deepcopy(operation)
         stream["operationId"] += "_stream"
         stream["responses"]["200"]["content"] = {
-            "text/event-stream": content["text/event-stream"]}
-        # Match upstream's #stream aliases: the generator strips URL fragments.
+            "text/event-stream": content["text/event-stream"]
+        }
+        # Temporary: the generator strips URL fragments. Delete these aliases
+        # as soon as #31 owns request discriminators and binding metadata.
         alias = path + "#stream"
         if alias in spec["paths"]:
             raise ValueError(f"Upstream now supplies {alias}; remove local alias")
         spec["paths"][alias] = {"post": stream}
 
-    # This endpoint serves WAV. Keep the upstream JSON variant and add a binary
-    # method instead of trying to JSON-decode audio or dropping a declared media.
     path = "/v1/audio/voices/{voice_id}/sample"
     operation = copy.deepcopy(spec["paths"][path]["get"])
     content = operation["responses"]["200"]["content"]
@@ -89,10 +63,30 @@ def transform(spec):
         raise ValueError("Review voice sample response media")
     operation["operationId"] += "_wav"
     operation["responses"]["200"]["content"] = {
-        "audio/wav": {"schema": {"type": "string", "format": "binary"}}}
-    spec["paths"][path + "#wav"] = {"get": operation}
+        "audio/wav": {"schema": {"type": "string", "format": "binary"}}
+    }
+    alias = path + "#wav"
+    if alias in spec["paths"]:
+        raise ValueError(f"Upstream now supplies {alias}; remove local alias")
+    spec["paths"][alias] = {"get": operation}
+
+
+def preprocess(source: bytes) -> bytes:
+    """Return temporary generator input without mutating contract corrections."""
+    import json
+    from ruamel.yaml import YAML
+
+    spec = YAML(typ="safe", pure=True).load(source)
+    transform(spec)
+    # JSON is valid YAML and avoids emitter/version-dependent YAML formatting.
+    return (json.dumps(spec, sort_keys=True, indent=2) + "\n").encode()
+
+
+def main(source: str, destination: str) -> None:
+    Path(destination).write_bytes(preprocess(Path(source).read_bytes()))
 
 
 if __name__ == "__main__":
     import sys
+
     main(*sys.argv[1:])
