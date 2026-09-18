@@ -130,6 +130,8 @@ jobs:
         run: |
           python3 tooling/pipeline/build.py check
           python3 tooling/sources/taxonomy_inventory.py check
+      - name: Probe canonical derive path
+        run: python3 sdk-build/build.py probe
 
   test:
     name: test
