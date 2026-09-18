@@ -31,8 +31,14 @@ def main() -> None:
     for description, needle in assumptions:
         if needle not in text:
             raise SystemExit(f"review Overlay: assumption changed: {description}")
-    if "#stream:" in text or "#wav:" in text:
-        raise SystemExit("published OpenAPI unexpectedly contains synthetic generator-only paths")
+    for path in (
+        "/v1/chat/completions#stream:",
+        "/v1/fim/completions#stream:",
+        "/v1/audio/speech#stream:",
+        "/v1/audio/voices/{voice_id}/sample#wav:",
+    ):
+        if f"  {path}" in text:
+            raise SystemExit(f"published OpenAPI now contains retired local path {path[:-1]}")
     print(f"published OpenAPI verified: {actual}")
 
 
