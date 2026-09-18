@@ -9,7 +9,7 @@
   "generator_config": "tooling/pipeline/openapi-to-rust.toml",
   "rust_toolchain": "1.94.0",
   "generator_repository": "adriendellagaspera/openapi-to-rust",
-  "generator_commit": "f7060dc7fef6c2dfd73b65713e8fa2d9a1c4a0eb",
+  "generator_commit": "60441a884bc431b53da9a2d916e72a8766d1a9cb",
   "compiler_tool": "rust-sdk-generator",
   "compiler_tool_version": "0.2.8",
   "compiler_tool_repository": "adriendellagaspera/rust-sdk-generator",
