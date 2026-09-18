@@ -9,6 +9,7 @@ from unittest.mock import patch
 import build as codegen
 import openapi as update_spec
 import preprocess
+import sdk_pipeline
 
 
 class ProvenanceTests(unittest.TestCase):
@@ -268,6 +269,30 @@ value = true
         }
         self.assertEqual(actual, expected)
 
+
+    def test_canonical_bindings_view_uses_source_operation_identity(self):
+        value = {
+            "schema_version": 3,
+            "structs": {},
+            "enums": {},
+            "aliases": {},
+            "symbol_paths": {},
+            "operations": {
+                "render_stream_2": {
+                    "metadata": {
+                        "source_operation": {
+                            "operation_id": "render",
+                            "method": "POST",
+                            "path": "/render",
+                        }
+                    }
+                }
+            },
+            "binding": {},
+        }
+        bindings = sdk_pipeline.CanonicalBindings(value)
+        self.assertEqual(bindings.operations, {"render"})
+        self.assertNotIn("render_stream_2", bindings.operations)
 
 class UpdateTests(unittest.TestCase):
     def setUp(self):
