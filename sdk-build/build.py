@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter
+import difflib
 import hashlib
 import json
 from pathlib import Path
@@ -183,6 +184,24 @@ def verify_raw_baseline(generated: Path, overlaid: Path) -> None:
             if normalized_manifest(before, operation_paths) != normalized_manifest(after, operation_paths):
                 raise ValueError("binding manifest drifted beyond exact source-operation path repair")
         elif before.replace(old_marker, new_marker) != after:
+            normalized_before = before.replace(old_marker, new_marker)
+            try:
+                before_text = normalized_before.decode()
+                after_text = after.decode()
+            except UnicodeDecodeError:
+                before_text = after_text = ""
+            if before_text or after_text:
+                print(
+                    "".join(
+                        difflib.unified_diff(
+                            before_text.splitlines(keepends=True),
+                            after_text.splitlines(keepends=True),
+                            fromfile=f"baseline/{name}",
+                            tofile=f"sdk-build/{name}",
+                            n=3,
+                        )
+                    )
+                )
             raise ValueError(f"raw output drifted beyond source provenance marker: {name}")
         if before != after:
             changed.append(name)
