@@ -30,5 +30,11 @@
   "tree_sitter_rust_version": "0.24.0",
   "jsonschema_version": "4.23.0",
   "cargo_semver_checks_version": "0.50.0",
-  "bindings_tool_subdirectory": "openapi-to-rust-bindings"
+  "bindings_tool_subdirectory": "openapi-to-rust-bindings",
+  "bindings_adapter_tool": "openapi-to-rust-bindings",
+  "bindings_adapter_tool_version": "0.2.2",
+  "bindings_adapter_tool_repository": "adriendellagaspera/rust-sdk-generator",
+  "bindings_adapter_tool_commit": "f454a3d63aded1c6244ea8537a6794407ee0c715",
+  "bindings_adapter_tool_tree_sha": "ef951c62207246428ef26c170956e0c8cb6c4bf7",
+  "bindings_adapter_tool_subdirectory": "openapi-to-rust-bindings"
 }
