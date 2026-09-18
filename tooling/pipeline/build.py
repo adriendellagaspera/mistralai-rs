@@ -287,13 +287,28 @@ def main():
         for path in sorted(generated.rglob("*.rs")):
             run("rustup", "run", lock["rust_toolchain"], "rustfmt",
                 "--edition", "2024", "--config", "skip_children=true", path)
+        target = ROOT / "src/generated"
         if args.command == "raw":
-            target = ROOT / "src/generated"
             if target.exists():
                 shutil.rmtree(target)
             shutil.copytree(generated, target)
             print("Generated raw bindings from verified published + overlaid OpenAPI.")
             return
+        if args.command == "check":
+            committed_raw, regenerated_raw = snapshot(target), snapshot(generated)
+            raw_changed = differences(committed_raw, regenerated_raw)
+            for name in raw_changed:
+                print("".join(difflib.unified_diff(
+                    committed_raw.get(name, b"").decode().splitlines(keepends=True),
+                    regenerated_raw.get(name, b"").decode().splitlines(keepends=True),
+                    fromfile=f"committed/{name}",
+                    tofile=f"regenerated/{name}",
+                )))
+            if raw_changed:
+                raise SystemExit(
+                    "Generated raw bindings are stale: " + ", ".join(raw_changed)
+                )
+            print("Generated raw bindings match byte-for-byte (including file set).")
         facade = work / "src/sdk"
         run(python, work / "tooling/pipeline/compile_sdk.py", generated, facade,
             "--manifest", work / "tooling/pipeline/semantics.json",
@@ -302,7 +317,6 @@ def main():
         for path in sorted(facade.rglob("*.rs")):
             run("rustup", "run", lock["rust_toolchain"], "rustfmt",
                 "--edition", "2024", "--config", "skip_children=true", path)
-        target = ROOT / "src/generated"
         facade_target = ROOT / "src/sdk"
         if args.command == "generate":
             if target.exists():
@@ -315,15 +329,6 @@ def main():
                 shutil.copy2(path, facade_target / path.name)
             print("Generated raw bindings and semantic SDK facade from the same overlaid OpenAPI.")
         else:
-            old, new = snapshot(target), snapshot(generated)
-            changed = differences(old, new)
-            for name in changed:
-                print("".join(difflib.unified_diff(
-                    old.get(name, b"").decode().splitlines(keepends=True),
-                    new.get(name, b"").decode().splitlines(keepends=True),
-                    fromfile=f"committed/{name}", tofile=f"regenerated/{name}")))
-            if changed:
-                raise SystemExit("Generated SDK is stale: " + ", ".join(changed))
             expected_facade = snapshot(facade)
             committed_facade = {
                 path.name: path.read_bytes() for path in facade_target.iterdir()
@@ -341,7 +346,7 @@ def main():
                 )))
             if facade_changed:
                 raise SystemExit("Generated facade is stale: " + ", ".join(facade_changed))
-            print("Generated raw bindings and facade match byte-for-byte (including file set).")
+            print("Generated facade matches byte-for-byte (including file set).")
 
 
 if __name__ == "__main__":
