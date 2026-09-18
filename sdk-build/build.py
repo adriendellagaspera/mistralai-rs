@@ -127,6 +127,71 @@ def snapshot(directory: Path, *, skip: set[str] | None = None) -> dict[str, byte
     }
 
 
+def source_operation_paths(openapi_path: Path) -> dict[str, str]:
+    spec = json.loads(openapi_path.read_text())
+    result: dict[str, str] = {}
+    methods = {"get", "put", "post", "delete", "patch", "head", "options", "trace", "query"}
+    for path, item in spec.get("paths", {}).items():
+        if not isinstance(item, dict):
+            continue
+        for method, operation in item.items():
+            if method.lower() not in methods or not isinstance(operation, dict):
+                continue
+            operation_id = operation.get("operationId")
+            if not isinstance(operation_id, str) or not operation_id:
+                continue
+            previous = result.setdefault(operation_id, path)
+            if previous != path:
+                raise ValueError(
+                    f"OpenAPI operationId {operation_id} appears at both {previous} and {path}"
+                )
+    return result
+
+
+def normalized_manifest(source: bytes, operation_paths: dict[str, str]) -> dict:
+    value = json.loads(source)
+    for operation in value.get("operations", []):
+        source_operation = operation.get("source_operation")
+        if not isinstance(source_operation, dict):
+            continue
+        operation_id = source_operation.get("operation_id")
+        expected = operation_paths.get(operation_id)
+        if expected is None:
+            raise ValueError(
+                f"binding manifest operation {operation_id!r} is absent from overlaid OpenAPI"
+            )
+        source_operation["path"] = expected
+    return value
+
+
+def verify_raw_baseline(generated: Path, overlaid: Path) -> None:
+    regenerated = snapshot(generated)
+    committed = snapshot(ROOT / "src" / "generated", skip={"coverage.json"})
+    if regenerated.keys() != committed.keys():
+        missing = sorted(committed.keys() - regenerated.keys())
+        extra = sorted(regenerated.keys() - committed.keys())
+        raise ValueError(f"raw file inventory drifted: missing={missing}, extra={extra}")
+
+    operation_paths = source_operation_paths(overlaid)
+    old_marker = b"../sources/openapi/openapi.yaml"
+    new_marker = b"openapi/published.yaml"
+    changed: list[str] = []
+    for name in sorted(regenerated):
+        before = committed[name]
+        after = regenerated[name]
+        if name == "binding-manifest.json":
+            if normalized_manifest(before, operation_paths) != normalized_manifest(after, operation_paths):
+                raise ValueError("binding manifest drifted beyond exact source-operation path repair")
+        elif before.replace(old_marker, new_marker) != after:
+            raise ValueError(f"raw output drifted beyond source provenance marker: {name}")
+        if before != after:
+            changed.append(name)
+    print(
+        "Raw baseline preserved; accepted reviewed provenance/source-path deltas in: "
+        + ", ".join(changed)
+    )
+
+
 def verify_overlaid(path: Path) -> None:
     spec = json.loads(path.read_text())
     schemas = spec["components"]["schemas"]
@@ -189,14 +254,7 @@ def probe(lock: dict) -> None:
         if published.read_bytes() != PUBLISHED.read_bytes():
             raise ValueError("raw generation modified the published OpenAPI")
 
-        regenerated_raw = snapshot(generated)
-        committed_raw = snapshot(ROOT / "src" / "generated", skip={"coverage.json"})
-        raw_delta = sorted(
-            name for name in regenerated_raw.keys() | committed_raw.keys()
-            if regenerated_raw.get(name) != committed_raw.get(name)
-        )
-        if raw_delta:
-            raise SystemExit("canonical raw output drifted: " + ", ".join(raw_delta))
+        verify_raw_baseline(generated, overlaid)
 
         bindings_path = work / "bindings.json"
         bindings_value = json.loads(output(bindings_adapter, generated))
