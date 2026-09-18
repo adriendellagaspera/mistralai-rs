@@ -14,7 +14,7 @@ impl<'a> BetaObservabilityChatCompletionEventsFields<'a> {
     pub async fn get_chat_completion_field_options(
         &self,
         field_name: impl AsRef<str>,
-        operator: GetChatCompletionFieldOptionsV1ObservabilityChatCompletionFieldsFieldNameOptionsGetOperator,
+        operator: crate::generated::client::GetChatCompletionFieldOptionsV1ObservabilityChatCompletionFieldsFieldNameOptionsGetOperator,
     ) -> Result<ChatCompletionFieldOptionsView, SdkError> {
         self.raw.get_chat_completion_field_options_v1_observability_chat_completion_fields_field_name_options_get(field_name.as_ref(), operator).await.map(Into::into).map_err(Into::into)
     }

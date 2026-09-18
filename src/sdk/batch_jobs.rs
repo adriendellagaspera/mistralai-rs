@@ -31,7 +31,7 @@ pub struct ListBatchJobsRequest {
     created_after: Option<String>,
     created_by_me: Option<bool>,
     status: Option<String>,
-    order_by: Option<JobsApiRoutesBatchGetBatchJobsOrderBy>,
+    order_by: Option<crate::generated::client::JobsApiRoutesBatchGetBatchJobsOrderBy>,
 }
 impl ListBatchJobsRequest {
     pub fn new() -> Self {
@@ -88,7 +88,7 @@ impl ListBatchJobsRequest {
         self
     }
     #[must_use]
-    pub fn order_by(mut self, order_by: JobsApiRoutesBatchGetBatchJobsOrderBy) -> Self {
+    pub fn order_by(mut self, order_by: crate::generated::client::JobsApiRoutesBatchGetBatchJobsOrderBy) -> Self {
         self.order_by = Some(order_by);
         self
     }

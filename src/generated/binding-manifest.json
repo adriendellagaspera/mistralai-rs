@@ -13900,6 +13900,120 @@
         "wire_name": "function"
       }
     ],
+    "GetChatCompletionFieldOptionsV1ObservabilityChatCompletionFieldsFieldNameOptionsGetOperator": [
+      {
+        "name": "Lt",
+        "payload": null,
+        "wire_name": "lt"
+      },
+      {
+        "name": "Lte",
+        "payload": null,
+        "wire_name": "lte"
+      },
+      {
+        "name": "Gt",
+        "payload": null,
+        "wire_name": "gt"
+      },
+      {
+        "name": "Gte",
+        "payload": null,
+        "wire_name": "gte"
+      },
+      {
+        "name": "Startswith",
+        "payload": null,
+        "wire_name": "startswith"
+      },
+      {
+        "name": "Istartswith",
+        "payload": null,
+        "wire_name": "istartswith"
+      },
+      {
+        "name": "Endswith",
+        "payload": null,
+        "wire_name": "endswith"
+      },
+      {
+        "name": "Iendswith",
+        "payload": null,
+        "wire_name": "iendswith"
+      },
+      {
+        "name": "Contains",
+        "payload": null,
+        "wire_name": "contains"
+      },
+      {
+        "name": "Icontains",
+        "payload": null,
+        "wire_name": "icontains"
+      },
+      {
+        "name": "Matches",
+        "payload": null,
+        "wire_name": "matches"
+      },
+      {
+        "name": "Notcontains",
+        "payload": null,
+        "wire_name": "notcontains"
+      },
+      {
+        "name": "Inotcontains",
+        "payload": null,
+        "wire_name": "inotcontains"
+      },
+      {
+        "name": "Eq",
+        "payload": null,
+        "wire_name": "eq"
+      },
+      {
+        "name": "Neq",
+        "payload": null,
+        "wire_name": "neq"
+      },
+      {
+        "name": "Isnull",
+        "payload": null,
+        "wire_name": "isnull"
+      },
+      {
+        "name": "Includes",
+        "payload": null,
+        "wire_name": "includes"
+      },
+      {
+        "name": "Excludes",
+        "payload": null,
+        "wire_name": "excludes"
+      },
+      {
+        "name": "LenEq",
+        "payload": null,
+        "wire_name": "len_eq"
+      }
+    ],
+    "GetStreamEventsV1WorkflowsEventsStreamGetScope": [
+      {
+        "name": "Activity",
+        "payload": null,
+        "wire_name": "activity"
+      },
+      {
+        "name": "Workflow",
+        "payload": null,
+        "wire_name": "workflow"
+      },
+      {
+        "name": "Value",
+        "payload": null,
+        "wire_name": "*"
+      }
+    ],
     "GithubRepositoryInType": [
       {
         "name": "Github",
@@ -14092,6 +14206,18 @@
         "name": "ClassifierTrainingParametersIn",
         "payload": "ClassifierTrainingParametersIn",
         "wire_name": null
+      }
+    ],
+    "JobsApiRoutesBatchGetBatchJobsOrderBy": [
+      {
+        "name": "Created",
+        "payload": null,
+        "wire_name": "created"
+      },
+      {
+        "name": "Created2",
+        "payload": null,
+        "wire_name": "-created"
       }
     ],
     "JobsApiRoutesFineTuningCancelFineTuningJobResponse": [
@@ -16813,7 +16939,9 @@
     "FunctionToolType": "types::FunctionToolType",
     "GetChatCompletionEventIdsInSchema": "types::GetChatCompletionEventIdsInSchema",
     "GetChatCompletionEventsInSchema": "types::GetChatCompletionEventsInSchema",
+    "GetChatCompletionFieldOptionsV1ObservabilityChatCompletionFieldsFieldNameOptionsGetOperator": "client::GetChatCompletionFieldOptionsV1ObservabilityChatCompletionFieldsFieldNameOptionsGetOperator",
     "GetRunHistoryV1WorkflowsRunsRunIdHistoryGetResponse": "types::GetRunHistoryV1WorkflowsRunsRunIdHistoryGetResponse",
+    "GetStreamEventsV1WorkflowsEventsStreamGetScope": "client::GetStreamEventsV1WorkflowsEventsStreamGetScope",
     "GetVoiceSampleAudioV1AudioVoicesVoiceIdSampleGetResponse": "types::GetVoiceSampleAudioV1AudioVoicesVoiceIdSampleGetResponse",
     "GetWorkflowExecutionHistoryV1WorkflowsExecutionsExecutionIdHistoryGetResponse": "types::GetWorkflowExecutionHistoryV1WorkflowsExecutionsExecutionIdHistoryGetResponse",
     "GithubRepositoryIn": "types::GithubRepositoryIn",
@@ -16860,6 +16988,7 @@
     "JobIn": "types::JobIn",
     "JobInHyperparameters": "types::JobInHyperparameters",
     "JobMetadataOut": "types::JobMetadataOut",
+    "JobsApiRoutesBatchGetBatchJobsOrderBy": "client::JobsApiRoutesBatchGetBatchJobsOrderBy",
     "JobsApiRoutesFineTuningCancelFineTuningJobResponse": "types::JobsApiRoutesFineTuningCancelFineTuningJobResponse",
     "JobsApiRoutesFineTuningCreateFineTuningJobResponse": "types::JobsApiRoutesFineTuningCreateFineTuningJobResponse",
     "JobsApiRoutesFineTuningCreateFineTuningJobResponseInlineVariant": "types::JobsApiRoutesFineTuningCreateFineTuningJobResponseInlineVariant",
