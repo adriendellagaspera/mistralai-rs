@@ -55,7 +55,7 @@ def verify_overlaid_openapi(data, published_paths):
         )
 
 
-def verify_binding_manifest(path, coverage_path):
+def verify_binding_manifest(path, coverage_path, config_path):
     manifest = json.loads(path.read_text())
     if manifest.get("schema") != "openapi-to-rust.binding-manifest":
         raise ValueError("Unexpected binding manifest schema")
@@ -95,6 +95,78 @@ def verify_binding_manifest(path, coverage_path):
             raise ValueError("Binding manifest operation lacks semantic identity")
         if "rust_method_name" not in operation or "return_type" not in operation:
             raise ValueError("Binding manifest operation lacks emitted binding identity")
+
+    config = tomllib.loads(config_path.read_text())
+    configured = {
+        (
+            rule["operation"],
+            rule["transport"],
+            rule["media_type"],
+            rule["field"],
+            rule["value"],
+        )
+        for rule in config.get("client", {}).get("request_discriminators", [])
+    }
+    operation_ids = {
+        operation["source_operation"]["operation_id"]: operation["source_operation"]
+        for operation in operations
+        if operation.get("kind") == "call_shape"
+    }
+    expected = set()
+    for operation_id, transport, media_type, field, value in configured:
+        source = operation_ids.get(operation_id)
+        if source is None:
+            raise ValueError(
+                f"Configured request discriminator operation missing from manifest: {operation_id}"
+            )
+        expected.add(
+            (
+                source["operation_id"],
+                source["method"],
+                source["path"],
+                transport,
+                media_type,
+                field,
+                value,
+            )
+        )
+
+    transport_by_representation = {
+        "json": "buffered",
+        "text": "buffered",
+        "binary_buffered": "buffered",
+        "event_stream": "event_stream",
+        "binary_stream": "binary_stream",
+    }
+    actual = set()
+    for index, operation in enumerate(operations):
+        if operation.get("kind") != "call_shape":
+            continue
+        representation = operation["representation"]
+        transport = transport_by_representation.get(representation.get("kind"))
+        for discriminator in operation.get("request_discriminators", []):
+            if transport is None:
+                raise ValueError(
+                    f"Manifest discriminator operation {index} has unsupported representation"
+                )
+            actual.add(
+                (
+                    operation["source_operation"]["operation_id"],
+                    operation["source_operation"]["method"],
+                    operation["source_operation"]["path"],
+                    transport,
+                    representation.get("media_type"),
+                    discriminator["wire_name"],
+                    discriminator["value"],
+                )
+            )
+    if actual != expected:
+        missing = sorted(expected - actual, key=repr)
+        extra = sorted(actual - expected, key=repr)
+        raise ValueError(
+            "Binding manifest request discriminator drifted: "
+            f"missing={missing}, extra={extra}"
+        )
 
 
 def ensure_rust_toolchain(toolchain):
@@ -283,6 +355,7 @@ def main():
         verify_binding_manifest(
             generated / "binding-manifest.json",
             generated / "coverage.json",
+            config,
         )
         for path in sorted(generated.rglob("*.rs")):
             run("rustup", "run", lock["rust_toolchain"], "rustfmt",
