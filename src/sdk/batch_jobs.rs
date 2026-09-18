@@ -88,7 +88,10 @@ impl ListBatchJobsRequest {
         self
     }
     #[must_use]
-    pub fn order_by(mut self, order_by: crate::generated::client::JobsApiRoutesBatchGetBatchJobsOrderBy) -> Self {
+    pub fn order_by(
+        mut self,
+        order_by: crate::generated::client::JobsApiRoutesBatchGetBatchJobsOrderBy,
+    ) -> Self {
         self.order_by = Some(order_by);
         self
     }
