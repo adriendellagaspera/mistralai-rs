@@ -89,7 +89,7 @@ def main(source, prepared, directory):
     original = YAML(typ="safe", pure=True).load(Path(source).read_text())
     spec = json.loads(Path(prepared).read_text())
     client = (Path(directory) / "client.rs").read_text()
-    report = inventory(original, spec, client)
+    report = inventory(original, spec, client, MISTRAL_ADDITIVE_METHODS)
     (Path(directory) / "coverage.json").write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
 
 
