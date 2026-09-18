@@ -21,3 +21,45 @@ header_name = "Authorization"
 
 [client]
 prune_models = false
+
+[[client.request_discriminators]]
+operation = "chat_completion_v1_chat_completions_post"
+transport = "buffered"
+media_type = "application/json"
+field = "stream"
+value = false
+
+[[client.request_discriminators]]
+operation = "chat_completion_v1_chat_completions_post"
+transport = "event_stream"
+media_type = "text/event-stream"
+field = "stream"
+value = true
+
+[[client.request_discriminators]]
+operation = "fim_completion_v1_fim_completions_post"
+transport = "buffered"
+media_type = "application/json"
+field = "stream"
+value = false
+
+[[client.request_discriminators]]
+operation = "fim_completion_v1_fim_completions_post"
+transport = "event_stream"
+media_type = "text/event-stream"
+field = "stream"
+value = true
+
+[[client.request_discriminators]]
+operation = "speech_v1_audio_speech_post"
+transport = "buffered"
+media_type = "application/json"
+field = "stream"
+value = false
+
+[[client.request_discriminators]]
+operation = "speech_v1_audio_speech_post"
+transport = "event_stream"
+media_type = "text/event-stream"
+field = "stream"
+value = true
