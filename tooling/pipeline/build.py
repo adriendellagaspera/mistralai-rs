@@ -104,6 +104,62 @@ def generator(lock):
     return executable
 
 
+def bindings_adapter(lock):
+    name = lock["bindings_adapter_tool"]
+    version = lock["bindings_adapter_tool_version"]
+    commit = lock["bindings_adapter_tool_commit"]
+    source = ROOT / ".tools" / f"{name}-source-{commit}"
+    if not (source / ".git").exists():
+        if source.exists():
+            shutil.rmtree(source)
+        run("git", "init", source)
+        run(
+            "git", "fetch", "--depth=1",
+            f"https://github.com/{lock['bindings_adapter_tool_repository']}.git",
+            commit,
+            cwd=source,
+        )
+        run("git", "checkout", "--detach", "FETCH_HEAD", cwd=source)
+    actual_commit = output("git", "rev-parse", "HEAD", cwd=source)
+    if actual_commit != commit:
+        raise ValueError(
+            f"{name} commit mismatch: expected {commit}, got {actual_commit}"
+        )
+    actual_tree = output("git", "rev-parse", "HEAD^{tree}", cwd=source)
+    expected_tree = lock["bindings_adapter_tool_tree_sha"]
+    if actual_tree != expected_tree:
+        raise ValueError(
+            f"{name} tree mismatch: expected {expected_tree}, got {actual_tree}"
+        )
+    install = ROOT / ".tools" / f"{name}-{commit}"
+    executable = install / "bin" / name
+    if not executable.exists():
+        package = source / lock["bindings_adapter_tool_subdirectory"]
+        run(
+            "cargo", f"+{lock['rust_toolchain']}", "install", "--locked",
+            "--path", package, "--root", install,
+        )
+    actual = output(executable, "--version")
+    if actual != f"{name} {version}":
+        raise ValueError(f"Unexpected bindings adapter: {actual}")
+    return executable
+
+
+def materialize_bindings_sidecar(adapter, generated):
+    sidecar = generated / "rust-bindings.json"
+    with sidecar.open("wb") as handle:
+        subprocess.run(
+            [str(adapter), str(generated)],
+            cwd=ROOT,
+            check=True,
+            stdout=handle,
+        )
+    value = json.loads(sidecar.read_text())
+    if not isinstance(value, dict) or value.get("schema_version") != 2:
+        raise ValueError("Bindings adapter did not emit Bindings v2")
+    return sidecar
+
+
 def tool_source(lock, prefix):
     name = lock[f"{prefix}_tool"]
     commit = lock[f"{prefix}_tool_commit"]
@@ -249,10 +305,15 @@ def main():
             print("Generated raw bindings from verified published + overlaid OpenAPI.")
             return
         facade = work / "src/sdk"
-        run(python, work / "tooling/pipeline/compile_sdk.py", generated, facade,
-            "--manifest", work / "tooling/pipeline/semantics.json",
-            "--openapi", overlaid_path,
-            "--taxonomy", ROOT / "tooling/sources/taxonomy.json")
+        adapter = bindings_adapter(lock)
+        sidecar = materialize_bindings_sidecar(adapter, generated)
+        try:
+            run(python, work / "tooling/pipeline/compile_sdk.py", generated, facade,
+                "--manifest", work / "tooling/pipeline/semantics.json",
+                "--openapi", overlaid_path,
+                "--taxonomy", ROOT / "tooling/sources/taxonomy.json")
+        finally:
+            sidecar.unlink(missing_ok=True)
         for path in sorted(facade.rglob("*.rs")):
             run("rustup", "run", lock["rust_toolchain"], "rustfmt",
                 "--edition", "2024", "--config", "skip_children=true", path)
