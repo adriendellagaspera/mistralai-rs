@@ -2565,6 +2565,13 @@ impl HttpClient {
             )
         );
         let mut req = self.http_client.post(request_url);
+        let mut request = request;
+        {
+            let __request_discriminator_value: bool =
+                serde_json::from_value(serde_json::Value::Bool(false))
+                    .map_err(HttpError::serialization_error)?;
+            request.stream = Some(__request_discriminator_value);
+        }
         req = req
             .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
             .header("content-type", "application/json");
@@ -2659,6 +2666,13 @@ impl HttpClient {
             )
         );
         let mut req = self.http_client.post(request_url);
+        let mut request = request;
+        {
+            let __request_discriminator_value: bool =
+                serde_json::from_value(serde_json::Value::Bool(true))
+                    .map_err(HttpError::serialization_error)?;
+            request.stream = Some(__request_discriminator_value);
+        }
         req = req
             .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
             .header("content-type", "application/json");
@@ -3186,6 +3200,13 @@ impl HttpClient {
             )
         );
         let mut req = self.http_client.post(request_url);
+        let mut request = request;
+        {
+            let __request_discriminator_value: bool =
+                serde_json::from_value(serde_json::Value::Bool(false))
+                    .map_err(HttpError::serialization_error)?;
+            request.stream = Some(__request_discriminator_value);
+        }
         req = req
             .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
             .header("content-type", "application/json");
@@ -3280,6 +3301,13 @@ impl HttpClient {
             )
         );
         let mut req = self.http_client.post(request_url);
+        let mut request = request;
+        {
+            let __request_discriminator_value: bool =
+                serde_json::from_value(serde_json::Value::Bool(true))
+                    .map_err(HttpError::serialization_error)?;
+            request.stream = Some(__request_discriminator_value);
+        }
         req = req
             .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
             .header("content-type", "application/json");
@@ -3355,6 +3383,13 @@ impl HttpClient {
     ) -> Result<ConversationResponse, ApiOpError<AgentsApiV1ConversationsStartApiError>> {
         let request_url = format!("{}{}", self.base_url, "/v1/conversations");
         let mut req = self.http_client.post(request_url);
+        let mut request = request;
+        {
+            let __request_discriminator_value: bool =
+                serde_json::from_value(serde_json::Value::Bool(false))
+                    .map_err(HttpError::serialization_error)?;
+            request.stream = Some(__request_discriminator_value);
+        }
         req = req
             .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
             .header("content-type", "application/json");
@@ -3441,6 +3476,13 @@ impl HttpClient {
     {
         let request_url = format!("{}{}", self.base_url, "/v1/conversations");
         let mut req = self.http_client.post(request_url);
+        let mut request = request;
+        {
+            let __request_discriminator_value: bool =
+                serde_json::from_value(serde_json::Value::Bool(true))
+                    .map_err(HttpError::serialization_error)?;
+            request.stream = Some(__request_discriminator_value);
+        }
         req = req
             .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
             .header("content-type", "application/json");
@@ -3515,6 +3557,13 @@ impl HttpClient {
     {
         let request_url = format!("{}{}", self.base_url, "/v1/agents/completions");
         let mut req = self.http_client.post(request_url);
+        let mut request = request;
+        {
+            let __request_discriminator_value: bool =
+                serde_json::from_value(serde_json::Value::Bool(false))
+                    .map_err(HttpError::serialization_error)?;
+            request.stream = Some(__request_discriminator_value);
+        }
         req = req
             .body(serde_json::to_vec(&request).map_err(HttpError::serialization_error)?)
             .header("content-type", "application/json");
@@ -3693,6 +3742,13 @@ impl HttpClient {
     ) -> Result<TranscriptionResponse, ApiOpError<serde_json::Value>> {
         let request_url = format!("{}{}", self.base_url, "/v1/audio/transcriptions");
         let mut req = self.http_client.post(request_url);
+        let mut request = request;
+        {
+            let __request_discriminator_value: bool =
+                serde_json::from_value(serde_json::Value::Bool(false))
+                    .map_err(HttpError::serialization_error)?;
+            request.stream = Some(__request_discriminator_value);
+        }
         let mut form = reqwest::multipart::Form::new();
         if let Some(value) = &request.context_bias {
             for item in value {
@@ -3806,6 +3862,13 @@ impl HttpClient {
     ) -> Result<TranscriptionResponse, ApiOpError<serde_json::Value>> {
         let request_url = format!("{}{}", self.base_url, "/v1/audio/transcriptions");
         let mut req = self.http_client.post(request_url);
+        let mut request = request;
+        {
+            let __request_discriminator_value: bool =
+                serde_json::from_value(serde_json::Value::Bool(false))
+                    .map_err(HttpError::serialization_error)?;
+            request.stream = Some(__request_discriminator_value);
+        }
         let mut form = reqwest::multipart::Form::new();
         if let Some(value) = &request.context_bias {
             for item in value {
@@ -3926,6 +3989,13 @@ impl HttpClient {
     ) -> Result<HttpResponseByteStream, ApiOpError<serde_json::Value>> {
         let request_url = format!("{}{}", self.base_url, "/v1/audio/transcriptions");
         let mut req = self.http_client.post(request_url);
+        let mut request = request;
+        {
+            let __request_discriminator_value: bool =
+                serde_json::from_value(serde_json::Value::Bool(true))
+                    .map_err(HttpError::serialization_error)?;
+            request.stream = Some(__request_discriminator_value);
+        }
         let mut form = reqwest::multipart::Form::new();
         if let Some(value) = &request.context_bias {
             for item in value {
@@ -4031,6 +4101,13 @@ impl HttpClient {
     ) -> Result<HttpResponseByteStream, ApiOpError<serde_json::Value>> {
         let request_url = format!("{}{}", self.base_url, "/v1/audio/transcriptions");
         let mut req = self.http_client.post(request_url);
+        let mut request = request;
+        {
+            let __request_discriminator_value: bool =
+                serde_json::from_value(serde_json::Value::Bool(true))
+                    .map_err(HttpError::serialization_error)?;
+            request.stream = Some(__request_discriminator_value);
+        }
         let mut form = reqwest::multipart::Form::new();
         if let Some(value) = &request.context_bias {
             for item in value {
