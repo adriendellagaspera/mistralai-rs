@@ -1,5 +1,5 @@
 {
-  "generated_methods": 179,
+  "generated_methods": 183,
   "operations": [
     {
       "method": "POST",
@@ -409,19 +409,6 @@
         "chat"
       ],
       "upstream": true
-    },
-    {
-      "method": "POST",
-      "operation_id": "chat_completion_v1_chat_completions_post_stream",
-      "path": "/v1/chat/completions",
-      "rust_method": "chat_completion_v1_chat_completions_post_stream",
-      "success_media": [
-        "text/event-stream"
-      ],
-      "tags": [
-        "chat"
-      ],
-      "upstream": false
     },
     {
       "method": "POST",
@@ -975,19 +962,6 @@
       "upstream": true
     },
     {
-      "method": "POST",
-      "operation_id": "fim_completion_v1_fim_completions_post_stream",
-      "path": "/v1/fim/completions",
-      "rust_method": "fim_completion_v1_fim_completions_post_stream",
-      "success_media": [
-        "text/event-stream"
-      ],
-      "tags": [
-        "fim"
-      ],
-      "upstream": false
-    },
-    {
       "method": "GET",
       "operation_id": "get_campaign_by_id_v1_observability_campaigns__campaign_id__get",
       "path": "/v1/observability/campaigns/{campaign_id}",
@@ -1312,20 +1286,6 @@
         "audio.voices"
       ],
       "upstream": true
-    },
-    {
-      "binary_stream_method": "get_voice_sample_audio_v1_audio_voices_voice_id_sample_get_wav_stream",
-      "method": "GET",
-      "operation_id": "get_voice_sample_audio_v1_audio_voices__voice_id__sample_get_wav",
-      "path": "/v1/audio/voices/{voice_id}/sample",
-      "rust_method": "get_voice_sample_audio_v1_audio_voices_voice_id_sample_get_wav",
-      "success_media": [
-        "audio/wav"
-      ],
-      "tags": [
-        "audio.voices"
-      ],
-      "upstream": false
     },
     {
       "method": "GET",
@@ -2127,19 +2087,6 @@
         "audio.speech"
       ],
       "upstream": true
-    },
-    {
-      "method": "POST",
-      "operation_id": "speech_v1_audio_speech_post_stream",
-      "path": "/v1/audio/speech",
-      "rust_method": "speech_v1_audio_speech_post_stream",
-      "success_media": [
-        "text/event-stream"
-      ],
-      "tags": [
-        "audio.speech"
-      ],
-      "upstream": false
     },
     {
       "method": "GET",
