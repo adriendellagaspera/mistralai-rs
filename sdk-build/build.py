@@ -139,8 +139,20 @@ def verify_overlaid(path: Path) -> None:
     if "beta.workflows" in required or "workflows" not in required:
         raise ValueError("Overlay did not repair WorkflowListResponse.workflows")
     paths = spec["paths"]
-    if any("#stream" in path or "#wav" in path for path in paths):
-        raise ValueError("Overlay introduced a synthetic generator-only path")
+    expected_upstream_variants = {
+        "/v1/conversations#stream",
+        "/v1/conversations/{conversation_id}#stream",
+        "/v1/conversations/{conversation_id}/restart#stream",
+        "/v1/audio/transcriptions#stream",
+    }
+    actual_upstream_variants = {
+        path for path in paths if "#stream" in path or "#wav" in path
+    }
+    if actual_upstream_variants != expected_upstream_variants:
+        raise ValueError(
+            "Overlay changed published representation-specific path inventory: "
+            f"{sorted(actual_upstream_variants)}"
+        )
 
 
 def write_json(path: Path, value: object) -> None:
