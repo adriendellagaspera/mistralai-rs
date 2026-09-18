@@ -1,0 +1,17 @@
+overlay: 1.1.0
+info:
+  title: Mistral Rust SDK contract corrections
+  version: "1"
+actions:
+  - target: "$['components']['schemas']['ChatCompletionResponse']['allOf'][1]['required'][?@ == 'data']"
+    description: ChatCompletionResponse does not declare a data property.
+    remove: true
+  - target: "$['components']['schemas']['SharingDelete']['required'][?@ == 'level']"
+    description: SharingDelete does not declare a level property.
+    remove: true
+  - target: "$['components']['schemas']['WorkflowListResponse']['required'][?@ == 'beta.workflows']"
+    description: WorkflowListResponse declares workflows rather than beta.workflows.
+    remove: true
+  - target: "$['components']['schemas']['WorkflowListResponse']['required']"
+    description: Require the declared workflows property.
+    update: workflows
