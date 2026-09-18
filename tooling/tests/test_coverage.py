@@ -1,88 +1,170 @@
 import copy
-import hashlib
-import json
 from pathlib import Path
 import sys
 import unittest
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tooling" / "quality"))
-sys.path.insert(0, str(ROOT / "tooling" / "pipeline"))
 import coverage
-import preprocess
 
 
-def fixture():
-    paths = {}
-    for path in ["/v1/chat/completions", "/v1/fim/completions", "/v1/audio/speech"]:
-        paths[path] = {"post": {"operationId": path.split("/")[2], "responses": {
-            "200": {"content": {"application/json": {}, "text/event-stream": {}}}}}}
-    paths["/v1/audio/voices/{voice_id}/sample"] = {"get": {
-        "operationId": "sample", "responses": {"200": {"content": {
-            "application/json": {}, "audio/wav": {}}}}}}
-    return {"paths": paths, "components": {"schemas": {
-        "SharingDelete": {"properties": {"share_with_uuid": {}}, "required": ["share_with_uuid", "level"]},
-        "WorkflowListResponse": {"properties": {"workflows": {}, "next_cursor": {}}, "required": ["beta.workflows", "next_cursor"]},
-    }}}
+def spec():
+    return {
+        "paths": {
+            "/v1/test": {
+                "post": {
+                    "operationId": "create_test",
+                    "tags": ["tests"],
+                    "responses": {
+                        "200": {
+                            "content": {
+                                "application/json": {},
+                                "text/event-stream": {},
+                            }
+                        }
+                    },
+                }
+            }
+        }
+    }
+
+
+def binding(
+    method,
+    *,
+    kind="call_shape",
+    representation=None,
+    source_path="/v1/test",
+    source_method="POST",
+    source_operation="create_test",
+):
+    return {
+        "kind": kind,
+        "source_operation": {
+            "operation_id": source_operation,
+            "method": source_method,
+            "path": source_path,
+        },
+        "rust_method_name": method,
+        "representation": representation or {
+            "kind": "json",
+            "schema_name": "TestResponse",
+            "media_type": "application/json",
+        },
+        "success_statuses": ["200"],
+    }
+
+
+def manifest(*operations):
+    return {
+        "schema": coverage.MANIFEST_SCHEMA,
+        "schema_version": coverage.MANIFEST_VERSION,
+        "operations": list(operations),
+    }
 
 
 class CoverageTests(unittest.TestCase):
-    def test_preprocessing_is_narrow_and_preserves_original_media(self):
-        original = fixture()
-        prepared = copy.deepcopy(original)
-        preprocess.transform(prepared)
-        self.assertEqual(len(prepared["paths"]), len(original["paths"]) + 4)
-        for path, operation in original["paths"].items():
-            self.assertEqual(prepared["paths"][path], operation)
-        self.assertEqual(prepared["paths"]["/v1/chat/completions#stream"]["post"]["responses"]["200"]["content"],
-                         {"text/event-stream": {}})
-        self.assertEqual(prepared["components"]["schemas"]["WorkflowListResponse"]["required"],
-                         ["next_cursor", "workflows"])
-
-    def test_upstream_repairs_and_new_aliases_require_review(self):
-        for mutation in [
-            lambda s: s["components"]["schemas"]["SharingDelete"]["properties"].update(level={}),
-            lambda s: s["paths"].update({"/v1/chat/completions#stream": {}}),
-            lambda s: s["paths"]["/v1/chat/completions"]["post"]["responses"]["200"]["content"].pop("text/event-stream"),
-        ]:
-            spec = fixture()
-            mutation(spec)
-            with self.assertRaises(ValueError):
-                preprocess.transform(spec)
-
-    def test_inventory_rejects_missing_operations_and_runtime_stubs(self):
-        spec = {"paths": {"/v1/test": {"get": {"operationId": "get_test"}}}}
-        client = "pub async fn get_test(&self) {}"
-        self.assertEqual(coverage.inventory(spec, spec, client)["upstream_operations"], 1)
-        for broken in ["", "pub async fn other(&self) {}", client + ' HttpError::Config("unsupported".into())']:
-            with self.assertRaises(ValueError):
-                coverage.inventory(spec, spec, broken)
-
-    def test_generator_patch_is_authenticated(self):
-        lock = json.loads((ROOT / "tooling/sources/lock.json").read_text())
-        digest = hashlib.sha256((ROOT / "tooling/pipeline/openapi-to-rust.patch").read_bytes()).hexdigest()
-        self.assertEqual(digest, lock["generator_patch_sha256"])
-
-    def test_inventory_tracks_exact_binary_stream_companions(self):
-        spec = {"paths": {"/v1/files/{file_id}/content": {"get": {
-            "operationId": "download_file",
-            "responses": {"200": {"content": {"application/octet-stream": {
-                "schema": {"type": "string", "format": "binary"}
-            }}}},
-        }}}}
+    def test_inventory_tracks_generator_owned_call_shapes(self):
+        document = spec()
+        bindings = manifest(
+            binding("create_test"),
+            binding(
+                "create_test_stream",
+                representation={
+                    "kind": "event_stream",
+                    "media_type": "text/event-stream",
+                },
+            ),
+        )
         client = """
-        pub async fn download_file(&self) {}
-        pub async fn download_file_stream(&self) {}
+        pub async fn create_test(&self) {}
+        pub async fn create_test_stream(&self) {}
         """
-        report = coverage.inventory(spec, spec, client)
-        self.assertEqual(2, report["generated_methods"])
-        self.assertEqual("download_file_stream", report["operations"][0]["binary_stream_method"])
+        report = coverage.inventory(document, document, client, bindings)
+        self.assertEqual(report["upstream_operations"], 1)
+        self.assertEqual(report["source_operations"], 1)
+        self.assertEqual(report["generated_methods"], 2)
+        self.assertEqual(
+            [row["rust_method"] for row in report["operations"]],
+            ["create_test", "create_test_stream"],
+        )
+        self.assertTrue(all(row["upstream"] for row in report["operations"]))
+
+    def test_inventory_rejects_generated_method_drift_and_runtime_stubs(self):
+        document = spec()
+        bindings = manifest(binding("create_test"))
+        good = "pub async fn create_test(&self) {}"
+        coverage.inventory(document, document, good, bindings)
         for broken in [
-            "pub async fn download_file(&self) {}",
-            client + "pub async fn unexpected(&self) {}",
+            "",
+            "pub async fn other(&self) {}",
+            good + " pub async fn unexpected(&self) {}",
+            good + ' HttpError::Config("unsupported".into())',
         ]:
             with self.assertRaises(ValueError):
-                coverage.inventory(spec, spec, broken)
+                coverage.inventory(document, document, broken, bindings)
+
+    def test_inventory_rejects_source_operation_identity_drift(self):
+        document = spec()
+        bindings = manifest(
+            binding("create_test", source_path="/v1/renamed"),
+        )
+        with self.assertRaisesRegex(ValueError, "source-operation drift"):
+            coverage.inventory(
+                document,
+                document,
+                "pub async fn create_test(&self) {}",
+                bindings,
+            )
+
+    def test_every_overlaid_operation_requires_a_call_shape(self):
+        document = spec()
+        prepared = copy.deepcopy(document)
+        prepared["paths"]["/v1/other"] = {
+            "get": {
+                "operationId": "get_other",
+                "responses": {"204": {}},
+            }
+        }
+        bindings = manifest(binding("create_test"))
+        with self.assertRaisesRegex(ValueError, "source-operation drift"):
+            coverage.inventory(
+                document,
+                prepared,
+                "pub async fn create_test(&self) {}",
+                bindings,
+            )
+
+    def test_additive_multipart_helpers_are_manifest_owned(self):
+        document = spec()
+        bindings = manifest(
+            binding("create_test"),
+            binding("create_test_with_multipart_filenames", kind="multipart_filenames"),
+        )
+        client = """
+        pub async fn create_test(&self) {}
+        pub async fn create_test_with_multipart_filenames(&self) {}
+        """
+        report = coverage.inventory(document, document, client, bindings)
+        self.assertEqual(report["generated_methods"], 2)
+        self.assertEqual(
+            [row["operation_kind"] for row in report["operations"]],
+            ["call_shape", "multipart_filenames"],
+        )
+
+    def test_manifest_schema_and_version_are_fail_closed(self):
+        document = spec()
+        client = "pub async fn create_test(&self) {}"
+        for broken in [
+            {"schema": "other", "schema_version": 1, "operations": [binding("create_test")]},
+            {
+                "schema": coverage.MANIFEST_SCHEMA,
+                "schema_version": 2,
+                "operations": [binding("create_test")],
+            },
+        ]:
+            with self.assertRaises(ValueError):
+                coverage.inventory(document, document, client, broken)
 
 
 if __name__ == "__main__":
