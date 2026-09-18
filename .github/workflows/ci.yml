@@ -130,6 +130,7 @@ jobs:
         run: |
           python3 tooling/pipeline/build.py check
           python3 tooling/sources/taxonomy_inventory.py check
+          python3 sdk-build/build.py probe
 
   test:
     name: test
