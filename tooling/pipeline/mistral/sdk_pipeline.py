@@ -64,7 +64,15 @@ class CanonicalBindings:
             for name, variants in value.get("enums", {}).items()
         }
         self.symbol_paths = value.get("symbol_paths", {})
-        self.operations = value.get("operations", {})
+        self.operation_bindings = value.get("operations", {})
+        self.operations = {
+            metadata["source_operation"]["operation_id"]
+            for operation in self.operation_bindings.values()
+            if isinstance(operation, dict)
+            and isinstance((metadata := operation.get("metadata")), dict)
+            and isinstance(metadata.get("source_operation"), dict)
+            and isinstance(metadata["source_operation"].get("operation_id"), str)
+        }
 
     @classmethod
     def load(cls, path: Path) -> "CanonicalBindings":
