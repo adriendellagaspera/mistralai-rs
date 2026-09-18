@@ -53,6 +53,7 @@ def inventory(original, spec, client, additive_methods=()):
     expected = {rust_method(op["operationId"]) for _, _, op in operations(spec)}
     expected |= {method for _, _, op in operations(spec)
                  if (method := binary_stream_method(op)) is not None}
+    expected |= set(additive_methods)
     actual = set(methods)
     if actual != expected:
         missing = sorted(expected - actual)
