@@ -99,12 +99,55 @@ class CoverageTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 coverage.manifest_methods(invalid)
 
+    def test_manifest_binary_stream_identity_is_explicit_and_fail_closed(self):
+        manifest = {
+            "operations": [
+                {
+                    "kind": "call_shape",
+                    "rust_method_name": "download_file_stream",
+                    "source_operation": {
+                        "method": "GET",
+                        "path": "/v1/files/{file_id}/content",
+                        "operation_id": "download_file",
+                    },
+                    "representation": {
+                        "kind": "binary_stream",
+                        "media_type": "application/octet-stream",
+                        "wildcard": False,
+                    },
+                },
+                {
+                    "kind": "call_shape",
+                    "rust_method_name": "download_file",
+                    "source_operation": {
+                        "method": "GET",
+                        "path": "/v1/files/{file_id}/content",
+                        "operation_id": "download_file",
+                    },
+                    "representation": {
+                        "kind": "binary_buffered",
+                        "media_type": "application/octet-stream",
+                        "wildcard": False,
+                    },
+                },
+            ]
+        }
+        key = ("GET", "/v1/files/{file_id}/content", "download_file")
+        self.assertEqual(
+            coverage.manifest_binary_streams(manifest),
+            {key: "download_file_stream"},
+        )
+        duplicate = copy.deepcopy(manifest)
+        duplicate["operations"].append(copy.deepcopy(duplicate["operations"][0]))
+        with self.assertRaisesRegex(ValueError, "multiple binary streams"):
+            coverage.manifest_binary_streams(duplicate)
+
     def test_generator_patch_is_authenticated(self):
         lock = json.loads((ROOT / "tooling/sources/lock.json").read_text())
         digest = hashlib.sha256((ROOT / "tooling/pipeline/openapi-to-rust.patch").read_bytes()).hexdigest()
         self.assertEqual(digest, lock["generator_patch_sha256"])
 
-    def test_inventory_tracks_exact_binary_stream_companions(self):
+    def test_inventory_tracks_manifest_owned_binary_stream_companions(self):
         spec = {"paths": {"/v1/files/{file_id}/content": {"get": {
             "operationId": "download_file",
             "responses": {"200": {"content": {"application/octet-stream": {
@@ -115,7 +158,12 @@ class CoverageTests(unittest.TestCase):
         pub async fn download_file(&self) {}
         pub async fn download_file_stream(&self) {}
         """
-        report = coverage.inventory(spec, spec, client)
+        expected = {"download_file", "download_file_stream"}
+        streams = {
+            ("GET", "/v1/files/{file_id}/content", "download_file"):
+                "download_file_stream"
+        }
+        report = coverage.inventory(spec, spec, client, expected, streams)
         self.assertEqual(2, report["generated_methods"])
         self.assertEqual("download_file_stream", report["operations"][0]["binary_stream_method"])
         for broken in [
@@ -123,7 +171,7 @@ class CoverageTests(unittest.TestCase):
             client + "pub async fn unexpected(&self) {}",
         ]:
             with self.assertRaises(ValueError):
-                coverage.inventory(spec, spec, broken)
+                coverage.inventory(spec, spec, broken, expected, streams)
 
 
 if __name__ == "__main__":
