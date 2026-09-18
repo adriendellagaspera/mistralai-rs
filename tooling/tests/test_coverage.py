@@ -117,6 +117,19 @@ class CoverageTests(unittest.TestCase):
                 bindings,
             )
 
+    def test_openapi_path_fragments_are_not_part_of_wire_identity(self):
+        document = spec()
+        operation = document["paths"].pop("/v1/test")
+        document["paths"]["/v1/test#stream"] = operation
+        bindings = manifest(binding("create_test", source_path="/v1/test"))
+        report = coverage.inventory(
+            document,
+            document,
+            "pub async fn create_test(&self) {}",
+            bindings,
+        )
+        self.assertEqual(report["operations"][0]["path"], "/v1/test")
+
     def test_every_overlaid_operation_requires_a_call_shape(self):
         document = spec()
         prepared = copy.deepcopy(document)
