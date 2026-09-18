@@ -28,6 +28,8 @@ class ProvenanceTests(unittest.TestCase):
             root = Path(directory)
             manifest = root / "binding-manifest.json"
             coverage = root / "coverage.json"
+            config = root / "openapi-to-rust.toml"
+            config.write_text("")
             manifest.write_text(json.dumps({
                 "schema": "openapi-to-rust.binding-manifest",
                 "schema_version": 1,
@@ -52,12 +54,66 @@ class ProvenanceTests(unittest.TestCase):
                     "upstream": True,
                 }],
             }))
-            codegen.verify_binding_manifest(manifest, coverage)
+            codegen.verify_binding_manifest(manifest, coverage, config)
             value = json.loads(coverage.read_text())
             value["operations"][0]["operation_id"] = "other"
             coverage.write_text(json.dumps(value))
             with self.assertRaisesRegex(ValueError, "source-operation inventory drifted"):
-                codegen.verify_binding_manifest(manifest, coverage)
+                codegen.verify_binding_manifest(manifest, coverage, config)
+
+    def test_binding_manifest_discriminator_identity_must_match_config(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            manifest = root / "binding-manifest.json"
+            coverage = root / "coverage.json"
+            config = root / "openapi-to-rust.toml"
+            manifest.write_text(json.dumps({
+                "schema": "openapi-to-rust.binding-manifest",
+                "schema_version": 1,
+                "generator": {"name": "openapi-to-rust", "version": "0.17.0"},
+                "operations": [{
+                    "kind": "call_shape",
+                    "source_operation": {
+                        "method": "POST",
+                        "path": "/v1/items",
+                        "operation_id": "create_item",
+                    },
+                    "rust_method_name": "create_item_stream",
+                    "return_type": "Result<HttpResponseByteStream, Error>",
+                    "representation": {
+                        "kind": "event_stream",
+                        "media_type": "text/event-stream",
+                    },
+                    "request_discriminators": [{
+                        "wire_name": "stream",
+                        "value": True,
+                    }],
+                }],
+            }))
+            coverage.write_text(json.dumps({
+                "operations": [{
+                    "method": "POST",
+                    "path": "/v1/items",
+                    "operation_id": "create_item",
+                    "upstream": True,
+                }],
+            }))
+            config.write_text(
+                """
+[client]
+[[client.request_discriminators]]
+operation = "create_item"
+transport = "event_stream"
+media_type = "text/event-stream"
+field = "stream"
+value = true
+"""
+            )
+            codegen.verify_binding_manifest(manifest, coverage, config)
+
+            config.write_text(config.read_text().replace("value = true", "value = false"))
+            with self.assertRaisesRegex(ValueError, "request discriminator drifted"):
+                codegen.verify_binding_manifest(manifest, coverage, config)
 
     def test_generator_config_emits_binding_manifest(self):
         config = tomllib.loads(
