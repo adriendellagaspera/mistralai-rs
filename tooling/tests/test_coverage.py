@@ -1,5 +1,4 @@
 import copy
-import hashlib
 import json
 from pathlib import Path
 import sys
@@ -142,10 +141,12 @@ class CoverageTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "multiple binary streams"):
             coverage.manifest_binary_streams(duplicate)
 
-    def test_generator_patch_is_authenticated(self):
+    def test_generator_is_pinned_without_local_patch(self):
         lock = json.loads((ROOT / "tooling/sources/lock.json").read_text())
-        digest = hashlib.sha256((ROOT / "tooling/pipeline/openapi-to-rust.patch").read_bytes()).hexdigest()
-        self.assertEqual(digest, lock["generator_patch_sha256"])
+        self.assertNotIn("generator_patch_sha256", lock)
+        self.assertFalse((ROOT / "tooling/pipeline/openapi-to-rust.patch").exists())
+        self.assertEqual(lock["generator_repository"], "adriendellagaspera/openapi-to-rust")
+        self.assertRegex(lock["generator_commit"], r"^[0-9a-f]{40}$")
 
     def test_inventory_tracks_manifest_owned_binary_stream_companions(self):
         spec = {"paths": {"/v1/files/{file_id}/content": {"get": {
