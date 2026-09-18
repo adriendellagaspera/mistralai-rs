@@ -155,9 +155,7 @@
       "method": "put",
       "path": "/v1/workflows/{workflow_identifier}/archive",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "audio_api_v1_transcriptions_post": {
       "method": "post",
@@ -194,9 +192,7 @@
       "method": "post",
       "path": "/v1/workflows/executions/{execution_id}/cancel",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "chat_classifications_v1_chat_classifications_post": {
       "method": "post",
@@ -339,10 +335,8 @@
     "create_dataset_record_v1_observability_datasets__dataset_id__records_post": {
       "method": "post",
       "path": "/v1/observability/datasets/{dataset_id}/records",
-      "status": "capability_gap",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "status": "candidate_unverified",
+      "review_reasons": []
     },
     "create_dataset_v1_observability_datasets_post": {
       "method": "post",
@@ -366,17 +360,13 @@
       "method": "delete",
       "path": "/v1/observability/campaigns/{campaign_id}",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "delete_dataset_record_v1_observability_dataset_records__dataset_record_id__delete": {
       "method": "delete",
       "path": "/v1/observability/dataset-records/{dataset_record_id}",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "delete_dataset_records_v1_observability_dataset_records_bulk_delete_post": {
       "method": "post",
@@ -388,33 +378,25 @@
       "method": "delete",
       "path": "/v1/observability/datasets/{dataset_id}",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "delete_judge_v1_observability_judges__judge_id__delete": {
       "method": "delete",
       "path": "/v1/observability/judges/{judge_id}",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "delete_model_v1_models__model_id__delete": {
       "method": "delete",
       "path": "/v1/models/{model_id}",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "delete_voice_v1_audio_voices__voice_id__delete": {
       "method": "delete",
       "path": "/v1/audio/voices/{voice_id}",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "embeddings_v1_embeddings_post": {
       "method": "post",
@@ -425,26 +407,20 @@
     "execute_workflow_registration_v1_workflows_registrations__workflow_registration_id__execute_post": {
       "method": "post",
       "path": "/v1/workflows/registrations/{workflow_registration_id}/execute",
-      "status": "capability_gap",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "status": "candidate_unverified",
+      "review_reasons": []
     },
     "execute_workflow_v1_workflows__workflow_identifier__execute_post": {
       "method": "post",
       "path": "/v1/workflows/{workflow_identifier}/execute",
-      "status": "capability_gap",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "status": "candidate_unverified",
+      "review_reasons": []
     },
     "export_dataset_to_jsonl_v1_observability_datasets__dataset_id__exports_to_jsonl_get": {
       "method": "get",
       "path": "/v1/observability/datasets/{dataset_id}/exports/to-jsonl",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "files_api_routes_delete_file": {
       "method": "delete",
@@ -497,25 +473,19 @@
       "method": "get",
       "path": "/v1/observability/campaigns/{campaign_id}",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "get_campaign_selected_events_v1_observability_campaigns__campaign_id__selected_events_get": {
       "method": "get",
       "path": "/v1/observability/campaigns/{campaign_id}/selected-events",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "get_campaign_status_by_id_v1_observability_campaigns__campaign_id__status_get": {
       "method": "get",
       "path": "/v1/observability/campaigns/{campaign_id}/status",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "get_campaigns_v1_observability_campaigns_get": {
       "method": "get",
@@ -533,9 +503,7 @@
       "method": "get",
       "path": "/v1/observability/chat-completion-events/{event_id}",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "get_chat_completion_events_v1_observability_chat_completion_events_search_post": {
       "method": "post",
@@ -546,18 +514,14 @@
     "get_chat_completion_field_options_counts_v1_observability_chat_completion_fields__field_name__options_counts_post": {
       "method": "post",
       "path": "/v1/observability/chat-completion-fields/{field_name}/options-counts",
-      "status": "capability_gap",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "status": "candidate_unverified",
+      "review_reasons": []
     },
     "get_chat_completion_field_options_v1_observability_chat_completion_fields__field_name__options_get": {
       "method": "get",
       "path": "/v1/observability/chat-completion-fields/{field_name}/options",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "get_chat_completion_fields_v1_observability_chat_completion_fields_get": {
       "method": "get",
@@ -569,41 +533,31 @@
       "method": "get",
       "path": "/v1/observability/datasets/{dataset_id}",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "get_dataset_import_task_v1_observability_datasets__dataset_id__tasks__task_id__get": {
       "method": "get",
       "path": "/v1/observability/datasets/{dataset_id}/tasks/{task_id}",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "get_dataset_import_tasks_v1_observability_datasets__dataset_id__tasks_get": {
       "method": "get",
       "path": "/v1/observability/datasets/{dataset_id}/tasks",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "get_dataset_record_v1_observability_dataset_records__dataset_record_id__get": {
       "method": "get",
       "path": "/v1/observability/dataset-records/{dataset_record_id}",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "get_dataset_records_v1_observability_datasets__dataset_id__records_get": {
       "method": "get",
       "path": "/v1/observability/datasets/{dataset_id}/records",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "get_datasets_v1_observability_datasets_get": {
       "method": "get",
@@ -615,17 +569,13 @@
       "method": "get",
       "path": "/v1/workflows/deployments/{name}",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "get_judge_by_id_v1_observability_judges__judge_id__get": {
       "method": "get",
       "path": "/v1/observability/judges/{judge_id}",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "get_judges_v1_observability_judges_get": {
       "method": "get",
@@ -636,18 +586,14 @@
     "get_run_history_v1_workflows_runs__run_id__history_get": {
       "method": "get",
       "path": "/v1/workflows/runs/{run_id}/history",
-      "status": "capability_gap",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "status": "candidate_unverified",
+      "review_reasons": []
     },
     "get_run_v1_workflows_runs__run_id__get": {
       "method": "get",
       "path": "/v1/workflows/runs/{run_id}",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "get_schedules_v1_workflows_schedules_get": {
       "method": "get",
@@ -659,9 +605,7 @@
       "method": "get",
       "path": "/v1/observability/chat-completion-events/{event_id}/similar-events",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "get_stream_events_v1_workflows_events_stream_get": {
       "method": "get",
@@ -675,18 +619,14 @@
     "get_voice_sample_audio_v1_audio_voices__voice_id__sample_get": {
       "method": "get",
       "path": "/v1/audio/voices/{voice_id}/sample",
-      "status": "capability_gap",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "status": "candidate_unverified",
+      "review_reasons": []
     },
     "get_voice_v1_audio_voices__voice_id__get": {
       "method": "get",
       "path": "/v1/audio/voices/{voice_id}",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "get_worker_info_v1_workflows_workers_whoami_get": {
       "method": "get",
@@ -703,10 +643,8 @@
     "get_workflow_execution_history_v1_workflows_executions__execution_id__history_get": {
       "method": "get",
       "path": "/v1/workflows/executions/{execution_id}/history",
-      "status": "capability_gap",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "status": "candidate_unverified",
+      "review_reasons": []
     },
     "get_workflow_execution_trace_events": {
       "method": "get",
@@ -730,25 +668,19 @@
       "method": "get",
       "path": "/v1/workflows/executions/{execution_id}",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "get_workflow_metrics_v1_workflows__workflow_name__metrics_get": {
       "method": "get",
       "path": "/v1/workflows/{workflow_name}/metrics",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "get_workflow_registration_v1_workflows_registrations__workflow_registration_id__get": {
       "method": "get",
       "path": "/v1/workflows/registrations/{workflow_registration_id}",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "get_workflow_registrations_v1_workflows_registrations_get": {
       "method": "get",
@@ -760,9 +692,7 @@
       "method": "get",
       "path": "/v1/workflows/{workflow_identifier}",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "jobs_api_routes_batch_cancel_batch_job": {
       "method": "post",
@@ -840,25 +770,19 @@
       "method": "post",
       "path": "/v1/observability/chat-completion-events/{event_id}/live-judging",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "judge_conversation_v1_observability_judges__judge_id__live_judging_post": {
       "method": "post",
       "path": "/v1/observability/judges/{judge_id}/live-judging",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "judge_dataset_record_v1_observability_dataset_records__dataset_record_id__live_judging_post": {
       "method": "post",
       "path": "/v1/observability/dataset-records/{dataset_record_id}/live-judging",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "libraries_create_v1": {
       "method": "post",
@@ -957,7 +881,7 @@
     "libraries_share_delete_v1": {
       "method": "delete",
       "path": "/v1/libraries/{library_id}/share",
-      "status": "candidate_unverified",
+      "status": "mapped",
       "review_reasons": []
     },
     "libraries_share_list_v1": {
@@ -1012,65 +936,49 @@
       "method": "post",
       "path": "/v1/observability/datasets/{dataset_id}/imports/from-campaign",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "post_dataset_records_from_dataset_v1_observability_datasets__dataset_id__imports_from_dataset_post": {
       "method": "post",
       "path": "/v1/observability/datasets/{dataset_id}/imports/from-dataset",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "post_dataset_records_from_explorer_v1_observability_datasets__dataset_id__imports_from_explorer_post": {
       "method": "post",
       "path": "/v1/observability/datasets/{dataset_id}/imports/from-explorer",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "post_dataset_records_from_file_v1_observability_datasets__dataset_id__imports_from_file_post": {
       "method": "post",
       "path": "/v1/observability/datasets/{dataset_id}/imports/from-file",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "post_dataset_records_from_playground_v1_observability_datasets__dataset_id__imports_from_playground_post": {
       "method": "post",
       "path": "/v1/observability/datasets/{dataset_id}/imports/from-playground",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "query_workflow_execution_v1_workflows_executions__execution_id__queries_post": {
       "method": "post",
       "path": "/v1/workflows/executions/{execution_id}/queries",
-      "status": "capability_gap",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "status": "candidate_unverified",
+      "review_reasons": []
     },
     "reset_workflow_v1_workflows_executions__execution_id__reset_post": {
       "method": "post",
       "path": "/v1/workflows/executions/{execution_id}/reset",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "retrieve_model_v1_models__model_id__get": {
       "method": "get",
       "path": "/v1/models/{model_id}",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "schedule_workflow_v1_workflows_schedules_post": {
       "method": "post",
@@ -1081,10 +989,8 @@
     "signal_workflow_execution_v1_workflows_executions__execution_id__signals_post": {
       "method": "post",
       "path": "/v1/workflows/executions/{execution_id}/signals",
-      "status": "capability_gap",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "status": "candidate_unverified",
+      "review_reasons": []
     },
     "speech_v1_audio_speech_post": {
       "method": "post",
@@ -1097,89 +1003,68 @@
       "path": "/v1/workflows/executions/{execution_id}/stream",
       "status": "capability_gap",
       "review_reasons": [
-        "non_json_success",
-        "raw_symbol_mapping"
+        "non_json_success"
       ]
     },
     "terminate_workflow_execution_v1_workflows_executions__execution_id__terminate_post": {
       "method": "post",
       "path": "/v1/workflows/executions/{execution_id}/terminate",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "unarchive_workflow_v1_workflows__workflow_identifier__unarchive_put": {
       "method": "put",
       "path": "/v1/workflows/{workflow_identifier}/unarchive",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "unschedule_workflow_v1_workflows_schedules__schedule_id__delete": {
       "method": "delete",
       "path": "/v1/workflows/schedules/{schedule_id}",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "update_dataset_record_payload_v1_observability_dataset_records__dataset_record_id__payload_put": {
       "method": "put",
       "path": "/v1/observability/dataset-records/{dataset_record_id}/payload",
-      "status": "capability_gap",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "status": "candidate_unverified",
+      "review_reasons": []
     },
     "update_dataset_record_properties_v1_observability_dataset_records__dataset_record_id__properties_put": {
       "method": "put",
       "path": "/v1/observability/dataset-records/{dataset_record_id}/properties",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "update_dataset_v1_observability_datasets__dataset_id__patch": {
       "method": "patch",
       "path": "/v1/observability/datasets/{dataset_id}",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "update_judge_v1_observability_judges__judge_id__put": {
       "method": "put",
       "path": "/v1/observability/judges/{judge_id}",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "update_voice_v1_audio_voices__voice_id__patch": {
       "method": "patch",
       "path": "/v1/audio/voices/{voice_id}",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     },
     "update_workflow_execution_v1_workflows_executions__execution_id__updates_post": {
       "method": "post",
       "path": "/v1/workflows/executions/{execution_id}/updates",
-      "status": "capability_gap",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "status": "candidate_unverified",
+      "review_reasons": []
     },
     "update_workflow_v1_workflows__workflow_identifier__put": {
       "method": "put",
       "path": "/v1/workflows/{workflow_identifier}",
       "status": "mapped",
-      "review_reasons": [
-        "raw_symbol_mapping"
-      ]
+      "review_reasons": []
     }
   },
   "resources": {
@@ -1445,6 +1330,7 @@
     "beta_libraries_accesses": {
       "operations": [
         "libraries_share_create_v1",
+        "libraries_share_delete_v1",
         "libraries_share_list_v1"
       ]
     }
@@ -2772,6 +2658,14 @@
         "share_with_uuid"
       ]
     },
+    "SharingDeleteParams": {
+      "raw": "SharingDelete",
+      "fields": [
+        "org_id",
+        "share_with_type",
+        "share_with_uuid"
+      ]
+    },
     "ListSharingOutView": {
       "raw": "ListSharingOut",
       "fields": [
@@ -2940,9 +2834,9 @@
   },
   "automatic_projection": {
     "schema_version": 1,
-    "added_count": 110,
-    "rejected_count": 45,
-    "report_sha256": "09a3fefec8fa380baf100ea9c8788c9106db9c1689248decf2824e3f9853dfe7",
+    "added_count": 111,
+    "rejected_count": 44,
+    "report_sha256": "596f90be75af54eebd28c7595912495b78b2ae90a289d7fcc0a51b9cd76b29f5",
     "added": [
       "agents_api_v1_agents_create_or_update_alias",
       "agents_api_v1_agents_delete",
@@ -3035,6 +2929,7 @@
       "libraries_get_v1",
       "libraries_list_v1",
       "libraries_share_create_v1",
+      "libraries_share_delete_v1",
       "libraries_share_list_v1",
       "libraries_update_v1",
       "list_deployments_v1_workflows_deployments_get",
@@ -3093,7 +2988,6 @@
       "libraries_documents_get_extracted_text_signed_url_v1": "inline_or_unresolved_response",
       "libraries_documents_get_signed_url_v1": "inline_or_unresolved_response",
       "libraries_documents_upload_v1": "multiple_success_contracts",
-      "libraries_share_delete_v1": "request_model_projection",
       "query_workflow_execution_v1_workflows_executions__execution_id__queries_post": "request_model_projection",
       "schedule_workflow_v1_workflows_schedules_post": "request_model_projection",
       "signal_workflow_execution_v1_workflows_executions__execution_id__signals_post": "request_model_projection",
