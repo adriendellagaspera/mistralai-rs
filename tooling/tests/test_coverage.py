@@ -1,5 +1,4 @@
 import copy
-import hashlib
 import json
 from pathlib import Path
 import sys
@@ -21,34 +20,35 @@ def fixture():
         "operationId": "sample", "responses": {"200": {"content": {
             "application/json": {}, "audio/wav": {}}}}}}
     return {"paths": paths, "components": {"schemas": {
+        "ChatCompletionResponse": {"allOf": [
+            {"$ref": "#/components/schemas/ChatCompletionResponseBase"},
+            {"type": "object", "properties": {"choices": {}}, "required": ["id", "data", "choices"]},
+        ]},
         "SharingDelete": {"properties": {"share_with_uuid": {}}, "required": ["share_with_uuid", "level"]},
         "WorkflowListResponse": {"properties": {"workflows": {}, "next_cursor": {}}, "required": ["beta.workflows", "next_cursor"]},
     }}}
 
 
 class CoverageTests(unittest.TestCase):
-    def test_preprocessing_is_narrow_and_preserves_original_media(self):
+    def test_published_validation_is_narrow_and_preserves_input(self):
         original = fixture()
-        prepared = copy.deepcopy(original)
-        preprocess.transform(prepared)
-        self.assertEqual(len(prepared["paths"]), len(original["paths"]) + 4)
-        for path, operation in original["paths"].items():
-            self.assertEqual(prepared["paths"][path], operation)
-        self.assertEqual(prepared["paths"]["/v1/chat/completions#stream"]["post"]["responses"]["200"]["content"],
-                         {"text/event-stream": {}})
-        self.assertEqual(prepared["components"]["schemas"]["WorkflowListResponse"]["required"],
-                         ["next_cursor", "workflows"])
+        published = copy.deepcopy(original)
+        preprocess.assert_overlay_assumptions(published)
+        self.assertEqual(published, original)
+        self.assertEqual(len(published["paths"]), len(original["paths"]))
+        self.assertFalse(any("#" in path for path in published["paths"]))
 
-    def test_upstream_repairs_and_new_aliases_require_review(self):
+    def test_overlay_assumption_drift_requires_review(self):
         for mutation in [
             lambda s: s["components"]["schemas"]["SharingDelete"]["properties"].update(level={}),
-            lambda s: s["paths"].update({"/v1/chat/completions#stream": {}}),
-            lambda s: s["paths"]["/v1/chat/completions"]["post"]["responses"]["200"]["content"].pop("text/event-stream"),
+            lambda s: s["components"]["schemas"]["SharingDelete"]["required"].remove("level"),
+            lambda s: s["components"]["schemas"]["WorkflowListResponse"]["required"].remove("beta.workflows"),
+            lambda s: s["components"]["schemas"]["ChatCompletionResponse"]["allOf"][1]["required"].remove("data"),
         ]:
             spec = fixture()
             mutation(spec)
             with self.assertRaises(ValueError):
-                preprocess.transform(spec)
+                preprocess.assert_overlay_assumptions(spec)
 
     def test_inventory_rejects_missing_operations_and_runtime_stubs(self):
         spec = {"paths": {"/v1/test": {"get": {"operationId": "get_test"}}}}
@@ -58,12 +58,97 @@ class CoverageTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 coverage.inventory(spec, spec, broken)
 
-    def test_generator_patch_is_authenticated(self):
-        lock = json.loads((ROOT / "tooling/sources/lock.json").read_text())
-        digest = hashlib.sha256((ROOT / "tooling/pipeline/openapi-to-rust.patch").read_bytes()).hexdigest()
-        self.assertEqual(digest, lock["generator_patch_sha256"])
+    def test_inventory_uses_exact_generator_manifest_method_set(self):
+        spec = {"paths": {"/v1/test": {"get": {"operationId": "get_test"}}}}
+        client = """
+        pub async fn get_test(&self) {}
+        pub async fn generated_helper(&self) {}
+        """
+        expected = {"get_test", "generated_helper"}
+        report = coverage.inventory(spec, spec, client, expected)
+        self.assertEqual(2, report["generated_methods"])
+        with self.assertRaises(ValueError):
+            coverage.inventory(spec, spec, client)
+        with self.assertRaises(ValueError):
+            coverage.inventory(spec, spec, client, expected | {"missing_helper"})
 
-    def test_inventory_tracks_exact_binary_stream_companions(self):
+    def test_manifest_method_inventory_is_fail_closed(self):
+        manifest = {
+            "operations": [
+                {"rust_method_name": "get_test"},
+                {"rust_method_name": "generated_helper"},
+            ]
+        }
+        self.assertEqual(
+            coverage.manifest_methods(manifest),
+            {"get_test", "generated_helper"},
+        )
+        for invalid in [
+            {},
+            {"operations": []},
+            {"operations": [None]},
+            {"operations": [{}]},
+            {
+                "operations": [
+                    {"rust_method_name": "duplicate"},
+                    {"rust_method_name": "duplicate"},
+                ]
+            },
+        ]:
+            with self.assertRaises(ValueError):
+                coverage.manifest_methods(invalid)
+
+    def test_manifest_binary_stream_identity_is_explicit_and_fail_closed(self):
+        manifest = {
+            "operations": [
+                {
+                    "kind": "call_shape",
+                    "rust_method_name": "download_file_stream",
+                    "source_operation": {
+                        "method": "GET",
+                        "path": "/v1/files/{file_id}/content",
+                        "operation_id": "download_file",
+                    },
+                    "representation": {
+                        "kind": "binary_stream",
+                        "media_type": "application/octet-stream",
+                        "wildcard": False,
+                    },
+                },
+                {
+                    "kind": "call_shape",
+                    "rust_method_name": "download_file",
+                    "source_operation": {
+                        "method": "GET",
+                        "path": "/v1/files/{file_id}/content",
+                        "operation_id": "download_file",
+                    },
+                    "representation": {
+                        "kind": "binary_buffered",
+                        "media_type": "application/octet-stream",
+                        "wildcard": False,
+                    },
+                },
+            ]
+        }
+        key = ("GET", "/v1/files/{file_id}/content", "download_file")
+        self.assertEqual(
+            coverage.manifest_binary_streams(manifest),
+            {key: "download_file_stream"},
+        )
+        duplicate = copy.deepcopy(manifest)
+        duplicate["operations"].append(copy.deepcopy(duplicate["operations"][0]))
+        with self.assertRaisesRegex(ValueError, "multiple binary streams"):
+            coverage.manifest_binary_streams(duplicate)
+
+    def test_generator_is_pinned_without_local_patch(self):
+        lock = json.loads((ROOT / "tooling/sources/lock.json").read_text())
+        self.assertNotIn("generator_patch_sha256", lock)
+        self.assertFalse((ROOT / "tooling/pipeline/openapi-to-rust.patch").exists())
+        self.assertEqual(lock["generator_repository"], "adriendellagaspera/openapi-to-rust")
+        self.assertRegex(lock["generator_commit"], r"^[0-9a-f]{40}$")
+
+    def test_inventory_tracks_manifest_owned_binary_stream_companions(self):
         spec = {"paths": {"/v1/files/{file_id}/content": {"get": {
             "operationId": "download_file",
             "responses": {"200": {"content": {"application/octet-stream": {
@@ -74,7 +159,12 @@ class CoverageTests(unittest.TestCase):
         pub async fn download_file(&self) {}
         pub async fn download_file_stream(&self) {}
         """
-        report = coverage.inventory(spec, spec, client)
+        expected = {"download_file", "download_file_stream"}
+        streams = {
+            ("GET", "/v1/files/{file_id}/content", "download_file"):
+                "download_file_stream"
+        }
+        report = coverage.inventory(spec, spec, client, expected, streams)
         self.assertEqual(2, report["generated_methods"])
         self.assertEqual("download_file_stream", report["operations"][0]["binary_stream_method"])
         for broken in [
@@ -82,7 +172,7 @@ class CoverageTests(unittest.TestCase):
             client + "pub async fn unexpected(&self) {}",
         ]:
             with self.assertRaises(ValueError):
-                coverage.inventory(spec, spec, broken)
+                coverage.inventory(spec, spec, broken, expected, streams)
 
 
 if __name__ == "__main__":

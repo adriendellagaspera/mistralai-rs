@@ -100,7 +100,7 @@ pub use facade_types::{
     ProcessingStatusOutView, PutDatasetRecordPropertiesInSchemaParams,
     PutDatasetRecordPropertiesInSchemaPropertiesMap, PutJudgeInSchemaOutputValue,
     PutJudgeInSchemaParams, QueryWorkflowResponseView, ResetInvocationBodyParams,
-    ResourceVisibilityValue, ShareEnumValue, SharingInParams, SharingOutView,
+    ResourceVisibilityValue, ShareEnumValue, SharingDeleteParams, SharingInParams, SharingOutView,
     SignalWorkflowResponseView, StopSequences, TranscriptionResponseView, UnarchiveModelResponse,
     UpdateModelRequest, UpdateModelResponse, UpdateWorkflowResponseView, UploadFileOutView,
     VoiceCreateRequestParams, VoiceListResponseView, VoiceResponseView, VoiceUpdateRequestParams,

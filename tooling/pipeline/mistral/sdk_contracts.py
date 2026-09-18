@@ -93,8 +93,19 @@ def compare_surface(before: dict[str, str], after: dict[str, str]) -> dict:
             "removed": removed, "changed": changed, "added": added}
 
 
-def coverage_inventory(openapi, rust, ir) -> dict:
-    mapped = {op.operation_id for resource in ir.resources for op in resource.operations}
+def coverage_inventory(openapi, rust, definition) -> dict:
+    if isinstance(definition, dict):
+        mapped = {
+            operation["operation_id"]
+            for resource in definition.get("resources", {}).values()
+            for operation in resource.get("operations", {}).values()
+        }
+    else:
+        mapped = {
+            op.operation_id
+            for resource in definition.resources
+            for op in resource.operations
+        }
     inventory = {}
     for operation_id, operation in sorted(openapi.operations.items()):
         reasons = []

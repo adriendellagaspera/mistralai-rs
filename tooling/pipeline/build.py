@@ -31,6 +31,144 @@ def verify_spec(data, lock):
         raise ValueError(f"Spec SHA-256 mismatch: expected {lock['spec_sha256']}, got {actual}")
 
 
+def verify_overlaid_openapi(data, published_paths):
+    """Assert that the Overlay made only the declared contract repairs."""
+    spec = json.loads(data)
+    schemas = spec["components"]["schemas"]
+    chat = schemas["ChatCompletionResponse"]["allOf"][1]
+    if "data" in chat.get("required", []):
+        raise ValueError("OpenAPI Overlay did not remove ChatCompletionResponse.data")
+    sharing = schemas["SharingDelete"]
+    if "level" in sharing.get("required", []):
+        raise ValueError("OpenAPI Overlay did not remove SharingDelete.level")
+    workflows = schemas["WorkflowListResponse"]
+    required = workflows.get("required", [])
+    if "beta.workflows" in required or "workflows" not in required:
+        raise ValueError("OpenAPI Overlay did not repair WorkflowListResponse.workflows")
+    published_paths = set(published_paths)
+    overlaid_paths = set(spec["paths"])
+    if overlaid_paths != published_paths:
+        added = sorted(overlaid_paths - published_paths)
+        removed = sorted(published_paths - overlaid_paths)
+        raise ValueError(
+            f"OpenAPI Overlay changed published path inventory: added={added}, removed={removed}"
+        )
+
+
+def verify_binding_manifest(path, coverage_path, config_path):
+    manifest = json.loads(path.read_text())
+    if manifest.get("schema") != "openapi-to-rust.binding-manifest":
+        raise ValueError("Unexpected binding manifest schema")
+    if manifest.get("schema_version") != 1:
+        raise ValueError("Unexpected binding manifest schema version")
+    generator = manifest.get("generator", {})
+    if generator.get("name") != "openapi-to-rust":
+        raise ValueError("Unexpected binding manifest generator")
+    operations = manifest.get("operations")
+    if not isinstance(operations, list) or not operations:
+        raise ValueError("Binding manifest has no operations")
+    coverage = json.loads(coverage_path.read_text())
+    expected = {
+        (operation["method"], operation["path"], operation["operation_id"])
+        for operation in coverage["operations"]
+        if operation.get("upstream")
+    }
+    actual = {
+        (
+            operation["source_operation"]["method"],
+            operation["source_operation"]["path"],
+            operation["source_operation"]["operation_id"],
+        )
+        for operation in operations
+        if operation.get("kind") == "call_shape"
+    }
+    if actual != expected:
+        missing = sorted(expected - actual)
+        extra = sorted(actual - expected)
+        raise ValueError(
+            f"Binding manifest source-operation inventory drifted: missing={missing}, extra={extra}"
+        )
+    for operation in operations:
+        source = operation.get("source_operation")
+        representation = operation.get("representation")
+        if not isinstance(source, dict) or not isinstance(representation, dict):
+            raise ValueError("Binding manifest operation lacks semantic identity")
+        if "rust_method_name" not in operation or "return_type" not in operation:
+            raise ValueError("Binding manifest operation lacks emitted binding identity")
+
+    config = tomllib.loads(config_path.read_text())
+    configured = {
+        (
+            rule["operation"],
+            rule["transport"],
+            rule["media_type"],
+            rule["field"],
+            rule["value"],
+        )
+        for rule in config.get("client", {}).get("request_discriminators", [])
+    }
+    operation_ids = {
+        operation["source_operation"]["operation_id"]: operation["source_operation"]
+        for operation in operations
+        if operation.get("kind") == "call_shape"
+    }
+    expected = set()
+    for operation_id, transport, media_type, field, value in configured:
+        source = operation_ids.get(operation_id)
+        if source is None:
+            raise ValueError(
+                f"Configured request discriminator operation missing from manifest: {operation_id}"
+            )
+        expected.add(
+            (
+                source["operation_id"],
+                source["method"],
+                source["path"],
+                transport,
+                media_type,
+                field,
+                value,
+            )
+        )
+
+    transport_by_representation = {
+        "json": "buffered",
+        "text": "buffered",
+        "binary_buffered": "buffered",
+        "event_stream": "event_stream",
+        "binary_stream": "binary_stream",
+    }
+    actual = set()
+    for index, operation in enumerate(operations):
+        if operation.get("kind") != "call_shape":
+            continue
+        representation = operation["representation"]
+        transport = transport_by_representation.get(representation.get("kind"))
+        for discriminator in operation.get("request_discriminators", []):
+            if transport is None:
+                raise ValueError(
+                    f"Manifest discriminator operation {index} has unsupported representation"
+                )
+            actual.add(
+                (
+                    operation["source_operation"]["operation_id"],
+                    operation["source_operation"]["method"],
+                    operation["source_operation"]["path"],
+                    transport,
+                    representation.get("media_type"),
+                    discriminator["wire_name"],
+                    discriminator["value"],
+                )
+            )
+    if actual != expected:
+        missing = sorted(expected - actual, key=repr)
+        extra = sorted(actual - expected, key=repr)
+        raise ValueError(
+            "Binding manifest request discriminator drifted: "
+            f"missing={missing}, extra={extra}"
+        )
+
+
 def ensure_rust_toolchain(toolchain):
     config = toolchain["toolchain"]
     args = [
@@ -56,11 +194,7 @@ def generator(lock):
     if lock["generator"] != "openapi-to-rust":
         raise ValueError("Unsupported generator")
     version = lock["generator_version"]
-    patch = ROOT / "tooling/pipeline/openapi-to-rust.patch"
-    digest = hashlib.sha256(patch.read_bytes()).hexdigest()
-    if digest != lock["generator_patch_sha256"]:
-        raise ValueError("Generator patch SHA-256 mismatch")
-    install = ROOT / ".tools" / f"openapi-to-rust-{lock['generator_commit']}-{digest}"
+    install = ROOT / ".tools" / f"openapi-to-rust-{lock['generator_commit']}"
     executable = install / "bin" / "openapi-to-rust"
     if not executable.exists():
         with tempfile.TemporaryDirectory(prefix="generator-") as temporary:
@@ -70,8 +204,6 @@ def generator(lock):
                 f"https://github.com/{lock['generator_repository']}.git",
                 lock["generator_commit"], cwd=source)
             run("git", "checkout", "--detach", "FETCH_HEAD", cwd=source)
-            run("git", "apply", "--check", patch, cwd=source)
-            run("git", "apply", patch, cwd=source)
             run("cargo", f"+{lock['rust_toolchain']}", "install", "--locked",
                 "--path", source, "--root", install)
     actual = output(executable, "--version")
@@ -116,8 +248,6 @@ def tooling_python(lock):
         lock["tree_sitter_version"],
         lock["tree_sitter_rust_version"],
         lock["jsonschema_version"],
-        lock["compiler_tool_commit"],
-        lock["bindings_tool_commit"],
     ))
     environment = ROOT / ".tools" / f"python-sdk-tooling-{versions}"
     python = environment / "bin/python"
@@ -137,79 +267,140 @@ def tooling_python(lock):
             f"tree-sitter-rust=={lock['tree_sitter_rust_version']}",
             f"jsonschema=={lock['jsonschema_version']}")
 
-    compiler_source = tool_source(lock, "compiler")
-    try:
-        compiler_version = output(
-            python, "-c",
-            "import rust_sdk_generator; print(rust_sdk_generator.__version__)",
-        )
-    except subprocess.CalledProcessError:
-        compiler_version = None
-    if compiler_version != lock["compiler_tool_version"]:
-        run(python, "-m", "pip", "install", "--no-deps", compiler_source)
-
-    bindings_source = tool_source(lock, "bindings")
-    try:
-        bindings_version = output(
-            python, "-c",
-            "import openapi_to_rust_bindings; print(openapi_to_rust_bindings.__version__)",
-        )
-    except subprocess.CalledProcessError:
-        bindings_version = None
-    if bindings_version != lock["bindings_tool_version"]:
-        run(python, "-m", "pip", "install", "--no-deps", bindings_source)
     return python
+
+
+def rust_sdk_tools(lock):
+    compiler_source = tool_source(lock, "compiler")
+    bindings_source = tool_source(lock, "bindings")
+
+    compiler_package = tomllib.loads((compiler_source / "Cargo.toml").read_text())["package"]
+    if compiler_package["version"] != lock["compiler_tool_version"]:
+        raise ValueError(
+            "rust-sdk-generator version mismatch: "
+            f"expected {lock['compiler_tool_version']}, got {compiler_package['version']}"
+        )
+    bindings_package = tomllib.loads((bindings_source / "Cargo.toml").read_text())["package"]
+    if bindings_package["version"] != lock["bindings_tool_version"]:
+        raise ValueError(
+            "openapi-to-rust-bindings version mismatch: "
+            f"expected {lock['bindings_tool_version']}, got {bindings_package['version']}"
+        )
+
+    install = ROOT / ".tools" / f"rust-sdk-tools-{lock['compiler_tool_commit']}"
+    sdk_generator = install / "bin" / "rust-sdk-generator"
+    bindings_adapter = install / "bin" / "openapi-to-rust-bindings"
+    if not sdk_generator.exists():
+        run(
+            "cargo", f"+{lock['rust_toolchain']}", "install", "--locked",
+            "--path", compiler_source, "--root", install,
+        )
+    if not bindings_adapter.exists():
+        run(
+            "cargo", f"+{lock['rust_toolchain']}", "install", "--locked",
+            "--path", bindings_source, "--root", install,
+        )
+    return sdk_generator, bindings_adapter
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=["generate", "check", "probe", "raw"])
+    parser.add_argument("command", choices=["generate", "check", "raw"])
     args = parser.parse_args()
     lock = json.loads((ROOT / "tooling/sources/lock.json").read_text())
     toolchain = tomllib.loads((ROOT / "rust-toolchain.toml").read_text())
     if toolchain["toolchain"]["channel"] != lock["rust_toolchain"]:
-        raise ValueError("rust-toolchain.toml and codegen.lock disagree")
+        raise ValueError("rust-toolchain.toml and tooling/sources/lock.json disagree")
     ensure_rust_toolchain(toolchain)
-    verify_spec((ROOT / "tooling/sources/openapi/openapi.yaml").read_bytes(), lock)
-    executable = generator(lock)
+    published = (ROOT / "tooling/sources/openapi/openapi.yaml").read_bytes()
+    verify_spec(published, lock)
     python = tooling_python(lock)
     run(python, ROOT / "tooling/tests/run.py")
-    if args.command == "probe":
-        run(python, ROOT / "tooling/quality/probe.py")
-        return
+    executable = generator(lock)
+    sdk_generator, bindings_adapter = rust_sdk_tools(lock)
     # Preserve relative paths from the checked-in config; never modify its options.
     with tempfile.TemporaryDirectory(prefix=".tooling-build-", dir=ROOT) as temp:
         work = Path(temp)
         shutil.copytree(ROOT / "tooling" / "sources" / "openapi", work / "tooling" / "sources" / "openapi")
         shutil.copytree(ROOT / "tooling" / "pipeline", work / "tooling" / "pipeline")
-        run(python, work / "tooling/pipeline/preprocess.py",
-            work / "tooling/sources/openapi/openapi.yaml", work / "tooling/sources/openapi/openapi.codegen.yaml")
+        published_path = work / "tooling/sources/openapi/openapi.yaml"
+        overlaid_path = work / "tooling/sources/openapi/openapi.overlaid.json"
+        run(python, work / "tooling/pipeline/preprocess.py", published_path)
+        published_paths = json.loads(output(
+            python,
+            work / "tooling/pipeline/preprocess.py",
+            published_path,
+            "--print-paths",
+        ))
+        if published_path.read_bytes() != published:
+            raise ValueError("Published OpenAPI changed while validating Overlay assumptions")
         config = work / lock["generator_config"]
         run(executable, "generate", "--config", config)
-        # The generator's own check runs in a second process, before rustfmt.
+        first_overlaid = overlaid_path.read_bytes()
+        verify_overlaid_openapi(first_overlaid, published_paths)
+        # A second materialization must be byte-identical, not merely equivalent JSON.
+        run(executable, "generate", "--config", config)
+        if overlaid_path.read_bytes() != first_overlaid:
+            raise ValueError("Overlaid OpenAPI materialization is not deterministic")
+        # The generator's own check runs in a new process and includes overlay inputs/output.
         run(executable, "generate", "--config", config, "--check")
+        before_dry_run = overlaid_path.read_bytes()
+        run(executable, "generate", "--config", config, "--dry-run")
+        if overlaid_path.read_bytes() != before_dry_run:
+            raise ValueError("Generator dry-run mutated the materialized overlaid OpenAPI")
+        if published_path.read_bytes() != published:
+            raise ValueError("Published OpenAPI changed during generation")
+        verify_spec((ROOT / "tooling/sources/openapi/openapi.yaml").read_bytes(), lock)
         generated = work / "src/generated"
-        run(python, ROOT / "tooling/quality/coverage.py", work / "tooling/sources/openapi/openapi.yaml",
-            work / "tooling/sources/openapi/openapi.codegen.yaml", generated)
+        run(python, ROOT / "tooling/quality/coverage.py", published_path,
+            overlaid_path, generated)
+        verify_binding_manifest(
+            generated / "binding-manifest.json",
+            generated / "coverage.json",
+            config,
+        )
         for path in sorted(generated.rglob("*.rs")):
             run("rustup", "run", lock["rust_toolchain"], "rustfmt",
                 "--edition", "2024", "--config", "skip_children=true", path)
+        target = ROOT / "src/generated"
         if args.command == "raw":
-            target = ROOT / "src/generated"
             if target.exists():
                 shutil.rmtree(target)
             shutil.copytree(generated, target)
-            print("Generated raw bindings from verified, pinned OpenAPI source.")
+            print("Generated raw bindings from verified published + overlaid OpenAPI.")
             return
+        if args.command == "check":
+            committed_raw, regenerated_raw = snapshot(target), snapshot(generated)
+            raw_changed = differences(committed_raw, regenerated_raw)
+            for name in raw_changed:
+                print("".join(difflib.unified_diff(
+                    committed_raw.get(name, b"").decode().splitlines(keepends=True),
+                    regenerated_raw.get(name, b"").decode().splitlines(keepends=True),
+                    fromfile=f"committed/{name}",
+                    tofile=f"regenerated/{name}",
+                )))
+            if raw_changed:
+                raise SystemExit(
+                    "Generated raw bindings are stale: " + ", ".join(raw_changed)
+                )
+            print("Generated raw bindings match byte-for-byte (including file set).")
+        bindings_path = work / "rust-bindings.json"
+        bindings_json = output(bindings_adapter, generated)
+        bindings_value = json.loads(bindings_json)
+        if bindings_value.get("schema_version") != 3:
+            raise ValueError("Canonical bindings adapter did not emit Bindings v3")
+        bindings_path.write_text(bindings_json + "\n")
+
         facade = work / "src/sdk"
         run(python, work / "tooling/pipeline/compile_sdk.py", generated, facade,
             "--manifest", work / "tooling/pipeline/semantics.json",
-            "--openapi", work / "tooling/sources/openapi/openapi.yaml",
+            "--bindings", bindings_path,
+            "--sdk-generator", sdk_generator,
+            "--openapi", overlaid_path,
             "--taxonomy", ROOT / "tooling/sources/taxonomy.json")
         for path in sorted(facade.rglob("*.rs")):
             run("rustup", "run", lock["rust_toolchain"], "rustfmt",
                 "--edition", "2024", "--config", "skip_children=true", path)
-        target = ROOT / "src/generated"
         facade_target = ROOT / "src/sdk"
         if args.command == "generate":
             if target.exists():
@@ -220,17 +411,8 @@ def main():
                     path.unlink()
             for path in facade.iterdir():
                 shutil.copy2(path, facade_target / path.name)
-            print("Generated raw bindings and semantic SDK facade from verified, pinned spec.")
+            print("Generated raw bindings and semantic SDK facade from the same overlaid OpenAPI.")
         else:
-            old, new = snapshot(target), snapshot(generated)
-            changed = differences(old, new)
-            for name in changed:
-                print("".join(difflib.unified_diff(
-                    old.get(name, b"").decode().splitlines(keepends=True),
-                    new.get(name, b"").decode().splitlines(keepends=True),
-                    fromfile=f"committed/{name}", tofile=f"regenerated/{name}")))
-            if changed:
-                raise SystemExit("Generated SDK is stale: " + ", ".join(changed))
             expected_facade = snapshot(facade)
             committed_facade = {
                 path.name: path.read_bytes() for path in facade_target.iterdir()
@@ -248,7 +430,7 @@ def main():
                 )))
             if facade_changed:
                 raise SystemExit("Generated facade is stale: " + ", ".join(facade_changed))
-            print("Generated raw bindings and facade match byte-for-byte (including file set).")
+            print("Generated facade matches byte-for-byte (including file set).")
 
 
 if __name__ == "__main__":

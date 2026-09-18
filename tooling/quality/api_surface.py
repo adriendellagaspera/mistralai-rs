@@ -13,6 +13,17 @@ import sys
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tooling" / "pipeline" / "mistral"))
 
+REVIEW_PATH = ROOT / "tooling" / "quality" / "api-review.json"
+
+
+def review_matches(base, report, review):
+    if review.get("base") != base:
+        return False
+    return all(
+        review.get(key) == report.get(key)
+        for key in ("removed", "changed", "added")
+    )
+
 
 def main():
     from sdk_contracts import compare_surface
@@ -46,9 +57,12 @@ def main():
     report = compare_surface(before, after)
     print(json.dumps(report, indent=2))
     if report["classification"] == "review_required":
-        raise SystemExit(
-            "Generated public API changed: explicit compatibility review required."
-        )
+        review = json.loads(REVIEW_PATH.read_text()) if REVIEW_PATH.exists() else {}
+        if not review_matches(base, report, review):
+            raise SystemExit(
+                "Generated public API changed: explicit compatibility review required."
+            )
+        print(f"Accepted reviewed public API change from {REVIEW_PATH.relative_to(ROOT)}.")
     if args.rustdoc:
         version = json.loads((ROOT / "tooling/sources/lock.json").read_text())[
             "cargo_semver_checks_version"

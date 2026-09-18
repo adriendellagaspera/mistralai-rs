@@ -95,7 +95,7 @@ while let Some(chunk) = stream.next().await {
 
 See [`examples/chat_stream.rs`](examples/chat_stream.rs) for a complete example. SSE parsing is incremental, handles `[DONE]`, bounds buffered event size, never reconnects automatically, and cancels response consumption when the stream is dropped.
 
-Multipart file fields accept `bytes::Bytes`. `with_upload_filename(...)` configures the filename sent with uploads. Audio arrays are encoded as repeated form fields, and optional absent/null parts are omitted. Binary download variants stream bytes without buffering the successful body.
+Multipart file fields accept `bytes::Bytes`. Generated multipart operations expose additive `*_with_multipart_filenames(..., &[(field, filename)])` variants so filenames are scoped to each call and binary field. Audio arrays are encoded as repeated form fields, and optional absent/null parts are omitted. Binary download variants stream bytes without buffering the successful body.
 
 ## Reproduce the SDK
 
@@ -136,7 +136,7 @@ See [`tooling/README.md`](tooling/README.md) for the ownership map. The active M
 
 ## Automation
 
-CI validates deterministic generation, formatting, compilation, Clippy with warnings denied, Rust tests/docs, coverage probes and public API evolution.
+CI validates deterministic generation, formatting, compilation, Clippy with warnings denied, Rust tests/docs, coverage inventories and public API evolution.
 
 The scheduled **Update Mistral OpenAPI SDK** workflow checks the official specification and SDK evidence, regenerates and validates a candidate, then opens or updates a review PR. It never automatically merges or publishes an update.
 

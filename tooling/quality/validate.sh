@@ -10,5 +10,3 @@ cargo clippy --locked --all-targets -- -D warnings
 cargo test --locked --all-targets
 RUSTDOCFLAGS="-D warnings" cargo test --locked --doc
 RUSTDOCFLAGS="-D warnings" cargo doc --locked --no-deps
-cargo fetch --locked
-python3 tooling/pipeline/build.py probe

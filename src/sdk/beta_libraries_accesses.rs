@@ -23,6 +23,18 @@ impl<'a> BetaLibrariesAccesses<'a> {
             .map_err(Into::into)
     }
 
+    pub async fn delete(
+        &self,
+        library_id: impl AsRef<str>,
+        request: SharingDeleteParams,
+    ) -> Result<SharingOutView, SdkError> {
+        self.raw
+            .libraries_share_delete_v1(library_id.as_ref(), request.into_raw())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
     pub async fn list(&self, library_id: impl AsRef<str>) -> Result<ListSharingOutView, SdkError> {
         self.raw
             .libraries_share_list_v1(library_id.as_ref())

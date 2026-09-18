@@ -47,7 +47,7 @@ Do not edit `src/generated/` or generated files in `src/sdk/` by hand. Prefer ge
 
 Normal tests use fixtures and local HTTP servers and require no API key or external API connection. Both chat examples are compiled in CI but never run. To make a live request explicitly, set `MISTRAL_API_KEY` and run `cargo run --example chat`. Do not commit credentials or live response dumps.
 
-`tooling/quality/validate.sh` checks deterministic regeneration, formatting, compilation, Clippy with warnings denied, Rust tests/docs, coverage probes and public API evolution. Do not weaken a failing gate merely to advance generated output; fix the owning boundary instead.
+`tooling/quality/validate.sh` checks deterministic regeneration, formatting, compilation, Clippy with warnings denied, Rust tests/docs, coverage inventories and public API evolution. Do not weaken a failing gate merely to advance generated output; fix the owning boundary instead.
 
 ## Automation failures
 
