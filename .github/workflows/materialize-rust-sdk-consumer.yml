@@ -1,0 +1,48 @@
+name: Materialize Rust SDK consumer pin
+on:
+  push:
+    branches: [issue-67-openapi-overlays]
+permissions:
+  contents: write
+jobs:
+  validate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Resolve immutable rust-sdk-generator tree
+        env:
+          SDK_COMMIT: d10bc1706a46a90431dbff8f0efb26b7031eff9c
+        run: |
+          set -euo pipefail
+          tmp="$(mktemp -d)"
+          git -C "$tmp" init
+          git -C "$tmp" remote add origin https://github.com/adriendellagaspera/rust-sdk-generator.git
+          git -C "$tmp" fetch --depth=1 origin "$SDK_COMMIT"
+          tree="$(git -C "$tmp" rev-parse FETCH_HEAD^{tree})"
+          python3 - "$SDK_COMMIT" "$tree" <<'PY'
+          import json, sys
+          from pathlib import Path
+          commit, tree = sys.argv[1:]
+          path = Path("tooling/sources/lock.json")
+          lock = json.loads(path.read_text())
+          for prefix in ("compiler", "bindings"):
+              lock[f"{prefix}_tool_commit"] = commit
+              lock[f"{prefix}_tool_tree_sha"] = tree
+          path.write_text(json.dumps(lock, indent=2) + "\n")
+          PY
+      - name: Run pinned codegen tests
+        run: python3 tooling/pipeline/build.py check
+      - name: Remove one-shot workflow
+        run: rm -f .github/workflows/materialize-rust-sdk-consumer.yml
+      - name: Commit validated consumer migration
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && exit 0
+          git commit -m "feat: consume canonical Rust SDK tooling"
+          git push origin HEAD:issue-67-openapi-overlays
