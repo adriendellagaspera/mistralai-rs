@@ -147,16 +147,16 @@ def bindings_adapter(lock):
 
 def materialize_bindings_sidecar(adapter, generated):
     sidecar = generated / "rust-bindings.json"
-    with sidecar.open("wb") as handle:
-        subprocess.run(
-            [str(adapter), str(generated)],
-            cwd=ROOT,
-            check=True,
-            stdout=handle,
-        )
-    value = json.loads(sidecar.read_text())
+    completed = subprocess.run(
+        [str(adapter), str(generated)],
+        cwd=ROOT,
+        check=True,
+        stdout=subprocess.PIPE,
+    )
+    value = json.loads(completed.stdout)
     if not isinstance(value, dict) or value.get("schema_version") != 2:
         raise ValueError("Bindings adapter did not emit Bindings v2")
+    sidecar.write_bytes(completed.stdout)
     return sidecar
 
 
