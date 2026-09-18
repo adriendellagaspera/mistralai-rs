@@ -1,15 +1,3 @@
-diff --git a/src/client_generator.rs b/src/client_generator.rs
---- a/src/client_generator.rs
-+++ b/src/client_generator.rs
-@@ -1682,7 +1682,7 @@ impl CodeGenerator {
-                 let mut chosen = base.clone();
-                 let mut suffix = 2;
-                 while !used.insert(chosen.clone()) {
--                    chosen = format!("{base}_{suffix}");
-+                    chosen = format!("{base}{suffix}");
-                     suffix += 1;
-                 }
-                 chosen
 diff --git a/src/generator.rs b/src/generator.rs
 --- a/src/generator.rs
 +++ b/src/generator.rs
