@@ -196,9 +196,9 @@ def main():
     ensure_rust_toolchain(toolchain)
     published = (ROOT / "tooling/sources/openapi/openapi.yaml").read_bytes()
     verify_spec(published, lock)
-    executable = generator(lock)
     python = tooling_python(lock)
     run(python, ROOT / "tooling/tests/run.py")
+    executable = generator(lock)
     if args.command == "probe":
         run(python, ROOT / "tooling/quality/probe.py")
         return
