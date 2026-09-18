@@ -55,6 +55,48 @@ def verify_overlaid_openapi(data, published_paths):
         )
 
 
+def verify_binding_manifest(path, coverage_path):
+    manifest = json.loads(path.read_text())
+    if manifest.get("schema") != "openapi-to-rust.binding-manifest":
+        raise ValueError("Unexpected binding manifest schema")
+    if manifest.get("schema_version") != 1:
+        raise ValueError("Unexpected binding manifest schema version")
+    generator = manifest.get("generator", {})
+    if generator.get("name") != "openapi-to-rust":
+        raise ValueError("Unexpected binding manifest generator")
+    operations = manifest.get("operations")
+    if not isinstance(operations, list) or not operations:
+        raise ValueError("Binding manifest has no operations")
+    coverage = json.loads(coverage_path.read_text())
+    expected = {
+        (operation["method"], operation["path"], operation["operation_id"])
+        for operation in coverage["operations"]
+        if operation.get("upstream")
+    }
+    actual = {
+        (
+            operation["source_operation"]["method"],
+            operation["source_operation"]["path"],
+            operation["source_operation"]["operation_id"],
+        )
+        for operation in operations
+        if operation.get("kind") == "call_shape"
+    }
+    if actual != expected:
+        missing = sorted(expected - actual)
+        extra = sorted(actual - expected)
+        raise ValueError(
+            f"Binding manifest source-operation inventory drifted: missing={missing}, extra={extra}"
+        )
+    for operation in operations:
+        source = operation.get("source_operation")
+        representation = operation.get("representation")
+        if not isinstance(source, dict) or not isinstance(representation, dict):
+            raise ValueError("Binding manifest operation lacks semantic identity")
+        if "rust_method_name" not in operation or "return_type" not in operation:
+            raise ValueError("Binding manifest operation lacks emitted binding identity")
+
+
 def ensure_rust_toolchain(toolchain):
     config = toolchain["toolchain"]
     args = [
@@ -238,6 +280,10 @@ def main():
         generated = work / "src/generated"
         run(python, ROOT / "tooling/quality/coverage.py", published_path,
             overlaid_path, generated)
+        verify_binding_manifest(
+            generated / "binding-manifest.json",
+            generated / "coverage.json",
+        )
         for path in sorted(generated.rglob("*.rs")):
             run("rustup", "run", lock["rust_toolchain"], "rustfmt",
                 "--edition", "2024", "--config", "skip_children=true", path)
