@@ -89,8 +89,10 @@ async fn transcription_multipart_preserves_file_arrays_and_null_omission() {
     let response = Client::new()
         .with_base_url(&url)
         .with_api_key("test-key")
-        .with_upload_filename("sample.wav")
-        .audio_api_v1_transcriptions_post(request)
+        .audio_api_v1_transcriptions_post_with_multipart_filenames(
+            request,
+            &[("file", "sample.wav")],
+        )
         .await
         .unwrap();
     assert_eq!(response.usage.completion_tokens, 1);
@@ -124,8 +126,10 @@ async fn file_upload_decodes_typed_response_and_sends_filename() {
     let request = FilesApiRoutesUploadFileRequest::new(Bytes::from_static(b"{}\n"));
     let response = Client::new()
         .with_base_url(&url)
-        .with_upload_filename("batch.jsonl")
-        .files_api_routes_upload_file(request)
+        .files_api_routes_upload_file_with_multipart_filenames(
+            request,
+            &[("file", "batch.jsonl")],
+        )
         .await
         .unwrap();
     assert_eq!(response.filename, "batch.jsonl");
