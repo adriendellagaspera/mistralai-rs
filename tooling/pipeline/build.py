@@ -173,6 +173,11 @@ def main():
     verify_spec((ROOT / "tooling/sources/openapi/openapi.yaml").read_bytes(), lock)
     executable = generator(lock)
     python = tooling_python(lock)
+    run(
+        python,
+        ROOT / "tooling/pipeline/check_openapi.py",
+        ROOT / "tooling/sources/openapi/openapi.yaml",
+    )
     run(python, ROOT / "tooling/tests/run.py")
     if args.command == "probe":
         run(python, ROOT / "tooling/quality/probe.py")
