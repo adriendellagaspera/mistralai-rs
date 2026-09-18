@@ -1274,6 +1274,7 @@
       "upstream": true
     },
     {
+      "binary_stream_method": "get_voice_sample_audio_v1_audio_voices_voice_id_sample_get_wav_stream",
       "method": "GET",
       "operation_id": "get_voice_sample_audio_v1_audio_voices__voice_id__sample_get",
       "path": "/v1/audio/voices/{voice_id}/sample",
