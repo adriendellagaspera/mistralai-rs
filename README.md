@@ -136,7 +136,7 @@ See [`tooling/README.md`](tooling/README.md) for the ownership map. The active M
 
 ## Automation
 
-CI validates deterministic generation, formatting, compilation, Clippy with warnings denied, Rust tests/docs, coverage probes and public API evolution.
+CI validates deterministic generation, formatting, compilation, Clippy with warnings denied, Rust tests/docs, coverage inventories and public API evolution.
 
 The scheduled **Update Mistral OpenAPI SDK** workflow checks the official specification and SDK evidence, regenerates and validates a candidate, then opens or updates a review PR. It never automatically merges or publishes an update.
 
