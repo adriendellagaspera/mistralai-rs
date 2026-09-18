@@ -2874,6 +2874,17 @@ impl From<ResourceVisibilityValue> for ResourceVisibility {
     }
 }
 
+impl From<ResourceVisibility> for ResourceVisibilityValue {
+    fn from(value: ResourceVisibility) -> Self {
+        match value {
+            ResourceVisibility::SharedGlobal => Self::SharedGlobal,
+            ResourceVisibility::SharedOrg => Self::SharedOrg,
+            ResourceVisibility::SharedWorkspace => Self::SharedWorkspace,
+            ResourceVisibility::Private => Self::Private,
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct ConnectorMCPCreateParams {
     raw: ConnectorMCPCreate,
@@ -4836,6 +4847,23 @@ impl From<ApiEndpointValue> for ApiEndpoint {
     }
 }
 
+impl From<ApiEndpoint> for ApiEndpointValue {
+    fn from(value: ApiEndpoint) -> Self {
+        match value {
+            ApiEndpoint::V1ChatCompletions => Self::V1ChatCompletions,
+            ApiEndpoint::V1Embeddings => Self::V1Embeddings,
+            ApiEndpoint::V1FimCompletions => Self::V1FimCompletions,
+            ApiEndpoint::V1Moderations => Self::V1Moderations,
+            ApiEndpoint::V1ChatModerations => Self::V1ChatModerations,
+            ApiEndpoint::V1Ocr => Self::V1Ocr,
+            ApiEndpoint::V1Classifications => Self::V1Classifications,
+            ApiEndpoint::V1ChatClassifications => Self::V1ChatClassifications,
+            ApiEndpoint::V1Conversations => Self::V1Conversations,
+            ApiEndpoint::V1AudioTranscriptions => Self::V1AudioTranscriptions,
+        }
+    }
+}
+
 #[derive(Debug, Clone, Default)]
 pub struct BatchJobInMetadataMap {
     values: std::collections::BTreeMap<String, String>,
@@ -5767,6 +5795,15 @@ impl From<ShareEnumValue> for ShareEnum {
     }
 }
 
+impl From<ShareEnum> for ShareEnumValue {
+    fn from(value: ShareEnum) -> Self {
+        match value {
+            ShareEnum::Viewer => Self::Viewer,
+            ShareEnum::Editor => Self::Editor,
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum EntityTypeValue {
@@ -5781,6 +5818,16 @@ impl From<EntityTypeValue> for EntityType {
             EntityTypeValue::User => Self::User,
             EntityTypeValue::Workspace => Self::Workspace,
             EntityTypeValue::Org => Self::Org,
+        }
+    }
+}
+
+impl From<EntityType> for EntityTypeValue {
+    fn from(value: EntityType) -> Self {
+        match value {
+            EntityType::User => Self::User,
+            EntityType::Workspace => Self::Workspace,
+            EntityType::Org => Self::Org,
         }
     }
 }
@@ -5835,6 +5882,55 @@ impl From<SharingIn> for SharingInParams {
 
 impl From<SharingInParams> for SharingIn {
     fn from(value: SharingInParams) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SharingDeleteParams {
+    raw: SharingDelete,
+}
+
+impl SharingDeleteParams {
+    pub fn new(share_with_uuid: uuid::Uuid, share_with_type: impl Into<EntityTypeValue>) -> Self {
+        Self {
+            raw: SharingDelete {
+                org_id: None,
+                share_with_type: Into::<EntityTypeValue>::into(share_with_type).into(),
+                share_with_uuid,
+            },
+        }
+    }
+    #[must_use]
+    pub fn org_id(mut self, org_id: uuid::Uuid) -> Self {
+        self.raw.org_id = Some(Some(org_id));
+        self
+    }
+
+    #[must_use]
+    pub fn org_id_null(mut self) -> Self {
+        self.raw.org_id = Some(None);
+        self
+    }
+    pub fn from_raw(raw: SharingDelete) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &SharingDelete {
+        &self.raw
+    }
+    pub fn into_raw(self) -> SharingDelete {
+        self.raw
+    }
+}
+
+impl From<SharingDelete> for SharingDeleteParams {
+    fn from(raw: SharingDelete) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<SharingDeleteParams> for SharingDelete {
+    fn from(value: SharingDeleteParams) -> Self {
         value.into_raw()
     }
 }
