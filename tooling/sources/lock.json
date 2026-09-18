@@ -10,7 +10,7 @@
   "rust_toolchain": "1.94.0",
   "generator_repository": "adriendellagaspera/openapi-to-rust",
   "generator_commit": "addb1a6c69d63cc83178dca1c9f749b03711bc54",
-  "generator_patch_sha256": "e34fea1f63c07e85b5c20b586cc641d18e554c8098445c717d865cfaa2589325",
+  "generator_patch_sha256": "08e6835ffff157c54e3580cfba229c7f4320b5bf0dbd6634e7ed425e8abed8dc",
   "compiler_tool": "rust-sdk-generator",
   "compiler_tool_version": "0.2.8",
   "compiler_tool_repository": "adriendellagaspera/rust-sdk-generator",
