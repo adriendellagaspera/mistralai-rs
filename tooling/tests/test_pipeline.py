@@ -23,6 +23,48 @@ class ProvenanceTests(unittest.TestCase):
                                             {"a": b"y", "added": b""}),
                          ["a", "added", "deleted"])
 
+    def test_binding_manifest_inventory_must_match_coverage(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            manifest = root / "binding-manifest.json"
+            coverage = root / "coverage.json"
+            manifest.write_text(json.dumps({
+                "schema": "openapi-to-rust.binding-manifest",
+                "schema_version": 1,
+                "generator": {"name": "openapi-to-rust", "version": "0.17.0"},
+                "operations": [{
+                    "kind": "call_shape",
+                    "source_operation": {
+                        "method": "GET",
+                        "path": "/v1/items",
+                        "operation_id": "list_items",
+                    },
+                    "rust_method_name": "list_items",
+                    "return_type": "HttpResult<Vec<Item>>",
+                    "representation": {"kind": "json", "media_type": "application/json", "schema_name": "ItemList"},
+                }],
+            }))
+            coverage.write_text(json.dumps({
+                "operations": [{
+                    "method": "GET",
+                    "path": "/v1/items",
+                    "operation_id": "list_items",
+                    "upstream": True,
+                }],
+            }))
+            codegen.verify_binding_manifest(manifest, coverage)
+            value = json.loads(coverage.read_text())
+            value["operations"][0]["operation_id"] = "other"
+            coverage.write_text(json.dumps(value))
+            with self.assertRaisesRegex(ValueError, "source-operation inventory drifted"):
+                codegen.verify_binding_manifest(manifest, coverage)
+
+    def test_generator_config_emits_binding_manifest(self):
+        config = tomllib.loads(
+            (codegen.ROOT / "tooling/pipeline/openapi-to-rust.toml").read_text()
+        )
+        self.assertIs(config["generator"]["binding_manifest"], True)
+
     @staticmethod
     def published_shape_fixture():
         return {
