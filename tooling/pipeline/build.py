@@ -254,8 +254,6 @@ def tooling_python(lock):
         lock["tree_sitter_version"],
         lock["tree_sitter_rust_version"],
         lock["jsonschema_version"],
-        lock["compiler_tool_commit"],
-        lock["bindings_tool_commit"],
     ))
     environment = ROOT / ".tools" / f"python-sdk-tooling-{versions}"
     python = environment / "bin/python"
@@ -275,28 +273,40 @@ def tooling_python(lock):
             f"tree-sitter-rust=={lock['tree_sitter_rust_version']}",
             f"jsonschema=={lock['jsonschema_version']}")
 
-    compiler_source = tool_source(lock, "compiler")
-    try:
-        compiler_version = output(
-            python, "-c",
-            "import rust_sdk_generator; print(rust_sdk_generator.__version__)",
-        )
-    except subprocess.CalledProcessError:
-        compiler_version = None
-    if compiler_version != lock["compiler_tool_version"]:
-        run(python, "-m", "pip", "install", "--no-deps", compiler_source)
-
-    bindings_source = tool_source(lock, "bindings")
-    try:
-        bindings_version = output(
-            python, "-c",
-            "import openapi_to_rust_bindings; print(openapi_to_rust_bindings.__version__)",
-        )
-    except subprocess.CalledProcessError:
-        bindings_version = None
-    if bindings_version != lock["bindings_tool_version"]:
-        run(python, "-m", "pip", "install", "--no-deps", bindings_source)
     return python
+
+
+def rust_sdk_tools(lock):
+    compiler_source = tool_source(lock, "compiler")
+    bindings_source = tool_source(lock, "bindings")
+
+    compiler_package = tomllib.loads((compiler_source / "Cargo.toml").read_text())["package"]
+    if compiler_package["version"] != lock["compiler_tool_version"]:
+        raise ValueError(
+            "rust-sdk-generator version mismatch: "
+            f"expected {lock['compiler_tool_version']}, got {compiler_package['version']}"
+        )
+    bindings_package = tomllib.loads((bindings_source / "Cargo.toml").read_text())["package"]
+    if bindings_package["version"] != lock["bindings_tool_version"]:
+        raise ValueError(
+            "openapi-to-rust-bindings version mismatch: "
+            f"expected {lock['bindings_tool_version']}, got {bindings_package['version']}"
+        )
+
+    install = ROOT / ".tools" / f"rust-sdk-tools-{lock['compiler_tool_commit']}"
+    sdk_generator = install / "bin" / "rust-sdk-generator"
+    bindings_adapter = install / "bin" / "openapi-to-rust-bindings"
+    if not sdk_generator.exists():
+        run(
+            "cargo", f"+{lock['rust_toolchain']}", "install", "--locked",
+            "--path", compiler_source, "--root", install,
+        )
+    if not bindings_adapter.exists():
+        run(
+            "cargo", f"+{lock['rust_toolchain']}", "install", "--locked",
+            "--path", bindings_source, "--root", install,
+        )
+    return sdk_generator, bindings_adapter
 
 
 def main():
@@ -313,6 +323,7 @@ def main():
     python = tooling_python(lock)
     run(python, ROOT / "tooling/tests/run.py")
     executable = generator(lock)
+    sdk_generator, bindings_adapter = rust_sdk_tools(lock)
     if args.command == "probe":
         run(python, ROOT / "tooling/quality/probe.py")
         return
@@ -382,9 +393,18 @@ def main():
                     "Generated raw bindings are stale: " + ", ".join(raw_changed)
                 )
             print("Generated raw bindings match byte-for-byte (including file set).")
+        bindings_path = work / "rust-bindings.json"
+        bindings_json = output(bindings_adapter, generated)
+        bindings_value = json.loads(bindings_json)
+        if bindings_value.get("schema_version") != 3:
+            raise ValueError("Canonical bindings adapter did not emit Bindings v3")
+        bindings_path.write_text(bindings_json + "\n")
+
         facade = work / "src/sdk"
         run(python, work / "tooling/pipeline/compile_sdk.py", generated, facade,
             "--manifest", work / "tooling/pipeline/semantics.json",
+            "--bindings", bindings_path,
+            "--sdk-generator", sdk_generator,
             "--openapi", overlaid_path,
             "--taxonomy", ROOT / "tooling/sources/taxonomy.json")
         for path in sorted(facade.rglob("*.rs")):
