@@ -272,6 +272,11 @@ def probe(lock: dict) -> None:
         )
         if published.read_bytes() != PUBLISHED.read_bytes():
             raise ValueError("raw generation modified the published OpenAPI")
+        for path in sorted(generated.rglob("*.rs")):
+            run(
+                "rustup", "run", lock["rust_toolchain"], "rustfmt",
+                "--edition", "2024", "--config", "skip_children=true", path,
+            )
 
         verify_raw_baseline(generated, overlaid)
 
