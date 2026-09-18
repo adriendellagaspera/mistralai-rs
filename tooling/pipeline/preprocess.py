@@ -41,6 +41,29 @@ def assert_overlay_assumptions(spec) -> None:
     ):
         raise ValueError("Review Overlay repair for WorkflowListResponse.workflows")
 
+    paths = spec["paths"]
+    for path in (
+        "/v1/chat/completions",
+        "/v1/fim/completions",
+        "/v1/audio/speech",
+    ):
+        content = paths[path]["post"]["responses"]["200"]["content"]
+        if set(content) != {"application/json", "text/event-stream"}:
+            raise ValueError(f"Review response representations for {path}")
+        if path + "#stream" in paths:
+            raise ValueError(
+                f"Published OpenAPI now supplies {path}#stream; review synthetic-path retirement"
+            )
+
+    voice_path = "/v1/audio/voices/{voice_id}/sample"
+    voice_content = paths[voice_path]["get"]["responses"]["200"]["content"]
+    if set(voice_content) != {"application/json", "audio/wav"}:
+        raise ValueError(f"Review response representations for {voice_path}")
+    if voice_path + "#wav" in paths:
+        raise ValueError(
+            f"Published OpenAPI now supplies {voice_path}#wav; review synthetic-path retirement"
+        )
+
 
 def preprocess(source: bytes) -> bytes:
     """Validate the authenticated published document without mutating it."""
