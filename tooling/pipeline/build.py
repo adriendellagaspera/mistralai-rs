@@ -194,11 +194,7 @@ def generator(lock):
     if lock["generator"] != "openapi-to-rust":
         raise ValueError("Unsupported generator")
     version = lock["generator_version"]
-    patch = ROOT / "tooling/pipeline/openapi-to-rust.patch"
-    digest = hashlib.sha256(patch.read_bytes()).hexdigest()
-    if digest != lock["generator_patch_sha256"]:
-        raise ValueError("Generator patch SHA-256 mismatch")
-    install = ROOT / ".tools" / f"openapi-to-rust-{lock['generator_commit']}-{digest}"
+    install = ROOT / ".tools" / f"openapi-to-rust-{lock['generator_commit']}"
     executable = install / "bin" / "openapi-to-rust"
     if not executable.exists():
         with tempfile.TemporaryDirectory(prefix="generator-") as temporary:
@@ -208,8 +204,6 @@ def generator(lock):
                 f"https://github.com/{lock['generator_repository']}.git",
                 lock["generator_commit"], cwd=source)
             run("git", "checkout", "--detach", "FETCH_HEAD", cwd=source)
-            run("git", "apply", "--check", patch, cwd=source)
-            run("git", "apply", patch, cwd=source)
             run("cargo", f"+{lock['rust_toolchain']}", "install", "--locked",
                 "--path", source, "--root", install)
     actual = output(executable, "--version")
