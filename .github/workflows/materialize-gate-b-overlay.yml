@@ -1,0 +1,42 @@
+name: Materialize Gate B overlay migration
+
+on:
+  push:
+    branches: [gate-b-mistral-overlay-manifest]
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+      - name: Install pinned Rust toolchain
+        run: rustup show
+      - name: Generate from pinned published OpenAPI plus overlay
+        run: python3 tooling/pipeline/build.py generate
+      - name: Verify deterministic generation
+        run: python3 tooling/pipeline/build.py check
+      - name: Run tooling tests
+        run: python3 tooling/tests/run_pinned.py
+      - name: Check Rust formatting
+        run: cargo fmt --all --check
+      - name: Compile and test
+        run: cargo test --locked --all-targets
+      - name: Remove one-shot workflow
+        if: always()
+        run: rm -f .github/workflows/materialize-gate-b-overlay.yml
+      - name: Commit generated migration
+        if: success()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && exit 0
+          git commit -m "generated: adopt overlay-backed raw generator"
+          git push origin HEAD:gate-b-mistral-overlay-manifest
