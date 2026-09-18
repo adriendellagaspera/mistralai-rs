@@ -19,8 +19,13 @@ def operations(spec):
     ]
 
 
+def wire_path(path):
+    """Return the HTTP path used by generated bindings, excluding OpenAPI-only fragments."""
+    return path.split("#", 1)[0]
+
+
 def source_identity(path, method, operation):
-    return operation["operationId"], method.upper(), path
+    return operation["operationId"], method.upper(), wire_path(path)
 
 
 def inventory(original, spec, client, manifest):
