@@ -59,18 +59,45 @@ class CoverageTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 coverage.inventory(spec, spec, broken)
 
-    def test_inventory_additive_methods_are_exact_tripwire(self):
+    def test_inventory_uses_exact_generator_manifest_method_set(self):
         spec = {"paths": {"/v1/test": {"get": {"operationId": "get_test"}}}}
         client = """
         pub async fn get_test(&self) {}
         pub async fn generated_helper(&self) {}
         """
-        report = coverage.inventory(spec, spec, client, {"generated_helper"})
+        expected = {"get_test", "generated_helper"}
+        report = coverage.inventory(spec, spec, client, expected)
         self.assertEqual(2, report["generated_methods"])
         with self.assertRaises(ValueError):
             coverage.inventory(spec, spec, client)
         with self.assertRaises(ValueError):
-            coverage.inventory(spec, spec, client, {"generated_helper", "missing_helper"})
+            coverage.inventory(spec, spec, client, expected | {"missing_helper"})
+
+    def test_manifest_method_inventory_is_fail_closed(self):
+        manifest = {
+            "operations": [
+                {"rust_method_name": "get_test"},
+                {"rust_method_name": "generated_helper"},
+            ]
+        }
+        self.assertEqual(
+            coverage.manifest_methods(manifest),
+            {"get_test", "generated_helper"},
+        )
+        for invalid in [
+            {},
+            {"operations": []},
+            {"operations": [None]},
+            {"operations": [{}]},
+            {
+                "operations": [
+                    {"rust_method_name": "duplicate"},
+                    {"rust_method_name": "duplicate"},
+                ]
+            },
+        ]:
+            with self.assertRaises(ValueError):
+                coverage.manifest_methods(invalid)
 
     def test_generator_patch_is_authenticated(self):
         lock = json.loads((ROOT / "tooling/sources/lock.json").read_text())
