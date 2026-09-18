@@ -6,8 +6,10 @@ import unittest
 from unittest.mock import patch
 
 import build as codegen
+import check_openapi
 import openapi as update_spec
 import preprocess
+from ruamel.yaml import YAML
 
 
 class ProvenanceTests(unittest.TestCase):
@@ -35,6 +37,19 @@ class ProvenanceTests(unittest.TestCase):
     def test_preprocessing_fails_closed_when_upstream_shape_changes(self):
         with self.assertRaises(ValueError):
             preprocess.preprocess(b"openapi: 3.1.0\n")
+
+    def test_overlay_assumptions_match_pinned_published_spec(self):
+        path = codegen.ROOT / "tooling/sources/openapi/openapi.yaml"
+        spec = YAML(typ="safe", pure=True).load(path.read_bytes())
+        check_openapi.validate_published(spec)
+
+    def test_overlay_assumptions_fail_closed_on_source_drift(self):
+        path = codegen.ROOT / "tooling/sources/openapi/openapi.yaml"
+        spec = YAML(typ="safe", pure=True).load(path.read_bytes())
+        required = spec["components"]["schemas"]["ChatCompletionResponse"]["allOf"][1]["required"]
+        required.remove("data")
+        with self.assertRaisesRegex(ValueError, "ChatCompletionResponse"):
+            check_openapi.validate_published(spec)
 
 
 class UpdateTests(unittest.TestCase):
