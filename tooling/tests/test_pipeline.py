@@ -2,13 +2,13 @@ import hashlib
 import json
 from pathlib import Path
 import tempfile
+import tomllib
 import unittest
 from unittest.mock import patch
 
 import build as codegen
 import check_openapi
 import openapi as update_spec
-import preprocess
 from ruamel.yaml import YAML
 
 
@@ -24,20 +24,6 @@ class ProvenanceTests(unittest.TestCase):
                                             {"a": b"y", "added": b""}),
                          ["a", "added", "deleted"])
 
-    def test_preprocessing_removes_only_undefined_required_data(self):
-        prefix, suffix = b"openapi: 3.1.0\n", b"    NextSchema: {}\n"
-        source = prefix + preprocess.CHAT_RESPONSE_REQUIRED + suffix
-        result = preprocess.preprocess(source)
-        self.assertEqual(
-            result,
-            prefix + preprocess.CHAT_RESPONSE_REQUIRED_FIXED + suffix,
-        )
-        self.assertNotIn(b"        - data\n", result)
-
-    def test_preprocessing_fails_closed_when_upstream_shape_changes(self):
-        with self.assertRaises(ValueError):
-            preprocess.preprocess(b"openapi: 3.1.0\n")
-
     def test_overlay_assumptions_match_pinned_published_spec(self):
         path = codegen.ROOT / "tooling/sources/openapi/openapi.yaml"
         spec = YAML(typ="safe", pure=True).load(path.read_bytes())
@@ -50,6 +36,157 @@ class ProvenanceTests(unittest.TestCase):
         required.remove("data")
         with self.assertRaisesRegex(ValueError, "ChatCompletionResponse"):
             check_openapi.validate_published(spec)
+
+    def test_stream_discriminator_assumptions_fail_closed_on_source_drift(self):
+        path = codegen.ROOT / "tooling/sources/openapi/openapi.yaml"
+        spec = YAML(typ="safe", pure=True).load(path.read_bytes())
+        spec["components"]["schemas"]["ChatCompletionRequest"]["properties"]["stream"]["type"] = "string"
+        with self.assertRaisesRegex(ValueError, "ChatCompletionRequest.stream"):
+            check_openapi.validate_published(spec)
+
+    def test_generator_config_owns_overlay_manifest_and_stream_discriminators(self):
+        config = tomllib.loads(
+            (codegen.ROOT / "tooling/pipeline/openapi-to-rust.toml").read_text()
+        )
+        generator = config["generator"]
+        self.assertEqual(generator["spec_path"], "../sources/openapi/openapi.yaml")
+        self.assertEqual(generator["overlays"], ["mistral.overlay.yaml"])
+        self.assertEqual(
+            generator["overlay_output"],
+            "../sources/openapi/openapi.codegen.json",
+        )
+        self.assertTrue(generator["binding_manifest"])
+
+        rules = config["client"]["request_discriminators"]
+        self.assertEqual(len(rules), 15)
+        self.assertEqual(
+            {
+                (
+                    rule["operation"],
+                    rule["transport"],
+                    rule["media_type"],
+                    rule["field"],
+                    rule["value"],
+                )
+                for rule in rules
+            },
+            {
+                (
+                    "agents_api_v1_conversations_start",
+                    "buffered",
+                    "application/json",
+                    "stream",
+                    False,
+                ),
+                (
+                    "agents_api_v1_conversations_start_stream",
+                    "event_stream",
+                    "text/event-stream",
+                    "stream",
+                    True,
+                ),
+                (
+                    "agents_api_v1_conversations_append",
+                    "buffered",
+                    "application/json",
+                    "stream",
+                    False,
+                ),
+                (
+                    "agents_api_v1_conversations_append_stream",
+                    "event_stream",
+                    "text/event-stream",
+                    "stream",
+                    True,
+                ),
+                (
+                    "agents_api_v1_conversations_restart",
+                    "buffered",
+                    "application/json",
+                    "stream",
+                    False,
+                ),
+                (
+                    "agents_api_v1_conversations_restart_stream",
+                    "event_stream",
+                    "text/event-stream",
+                    "stream",
+                    True,
+                ),
+                (
+                    "audio_api_v1_transcriptions_post",
+                    "buffered",
+                    "application/json",
+                    "stream",
+                    False,
+                ),
+                (
+                    "audio_api_v1_transcriptions_post_stream",
+                    "event_stream",
+                    "text/event-stream",
+                    "stream",
+                    True,
+                ),
+                (
+                    "chat_completion_v1_chat_completions_post",
+                    "buffered",
+                    "application/json",
+                    "stream",
+                    False,
+                ),
+                (
+                    "chat_completion_v1_chat_completions_post",
+                    "event_stream",
+                    "text/event-stream",
+                    "stream",
+                    True,
+                ),
+                (
+                    "fim_completion_v1_fim_completions_post",
+                    "buffered",
+                    "application/json",
+                    "stream",
+                    False,
+                ),
+                (
+                    "fim_completion_v1_fim_completions_post",
+                    "event_stream",
+                    "text/event-stream",
+                    "stream",
+                    True,
+                ),
+                (
+                    "speech_v1_audio_speech_post",
+                    "buffered",
+                    "application/json",
+                    "stream",
+                    False,
+                ),
+                (
+                    "speech_v1_audio_speech_post",
+                    "event_stream",
+                    "text/event-stream",
+                    "stream",
+                    True,
+                ),
+                (
+                    "agents_completion_v1_agents_completions_post",
+                    "buffered",
+                    "application/json",
+                    "stream",
+                    False,
+                ),
+            },
+        )
+
+    def test_generator_pin_uses_unpatched_generic_fork(self):
+        lock = json.loads((codegen.ROOT / "tooling/sources/lock.json").read_text())
+        self.assertEqual(
+            lock["generator_repository"],
+            "adriendellagaspera/openapi-to-rust",
+        )
+        self.assertEqual(lock["generator_version"], "0.17.0")
+        self.assertNotIn("generator_patch_sha256", lock)
 
 
 class UpdateTests(unittest.TestCase):
