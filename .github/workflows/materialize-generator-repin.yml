@@ -1,0 +1,35 @@
+name: Materialize generator repin
+on:
+  push:
+    branches: [issue-67-openapi-overlays]
+permissions:
+  contents: write
+jobs:
+  materialize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Snapshot generated Rust
+        run: |
+          find src/generated -name '*.rs' -type f -print0 | sort -z | xargs -0 sha256sum > /tmp/generated-rust.before
+      - name: Regenerate raw bindings
+        run: python3 tooling/pipeline/build.py raw
+      - name: Verify generated Rust parity
+        run: |
+          find src/generated -name '*.rs' -type f -print0 | sort -z | xargs -0 sha256sum > /tmp/generated-rust.after
+          diff -u /tmp/generated-rust.before /tmp/generated-rust.after
+      - name: Remove one-shot files
+        run: |
+          rm -f .github/workflows/materialize-generator-repin.yml
+          rm -f .github/.generator-repin-trigger
+      - name: Commit materialized metadata
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: materialize repinned generator metadata"
+          git push origin HEAD:issue-67-openapi-overlays
