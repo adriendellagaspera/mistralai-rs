@@ -23,6 +23,69 @@ header_name = "Authorization"
 prune_models = false
 
 [[client.request_discriminators]]
+operation = "agents_api_v1_conversations_append"
+transport = "buffered"
+media_type = "application/json"
+field = "stream"
+value = false
+
+[[client.request_discriminators]]
+operation = "agents_api_v1_conversations_append_stream"
+transport = "event_stream"
+media_type = "text/event-stream"
+field = "stream"
+value = true
+
+[[client.request_discriminators]]
+operation = "agents_api_v1_conversations_restart"
+transport = "buffered"
+media_type = "application/json"
+field = "stream"
+value = false
+
+[[client.request_discriminators]]
+operation = "agents_api_v1_conversations_restart_stream"
+transport = "event_stream"
+media_type = "text/event-stream"
+field = "stream"
+value = true
+
+[[client.request_discriminators]]
+operation = "agents_api_v1_conversations_start"
+transport = "buffered"
+media_type = "application/json"
+field = "stream"
+value = false
+
+[[client.request_discriminators]]
+operation = "agents_api_v1_conversations_start_stream"
+transport = "event_stream"
+media_type = "text/event-stream"
+field = "stream"
+value = true
+
+[[client.request_discriminators]]
+operation = "agents_completion_v1_agents_completions_post"
+transport = "buffered"
+media_type = "application/json"
+field = "stream"
+value = false
+
+[[client.request_discriminators]]
+operation = "audio_api_v1_transcriptions_post"
+transport = "buffered"
+media_type = "application/json"
+field = "stream"
+value = false
+
+[[client.request_discriminators]]
+operation = "audio_api_v1_transcriptions_post_stream"
+transport = "event_stream"
+media_type = "text/event-stream"
+field = "stream"
+value = true
+
+[[client.request_discriminators]]
 operation = "chat_completion_v1_chat_completions_post"
 transport = "buffered"
 media_type = "application/json"
