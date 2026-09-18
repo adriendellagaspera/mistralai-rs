@@ -65,6 +65,19 @@ class ProvenanceTests(unittest.TestCase):
         )
         self.assertIs(config["generator"]["binding_manifest"], True)
 
+    def test_enum_collision_compatibility_spelling_is_preserved(self):
+        client = (codegen.ROOT / "src/generated/client.rs").read_text()
+        self.assertIn(
+            "pub enum JobsApiRoutesBatchGetBatchJobsOrderBy {\n"
+            "    #[serde(rename = \"created\")]\n"
+            "    Created,\n"
+            "    #[serde(rename = \"-created\")]\n"
+            "    Created2,\n"
+            "}",
+            client,
+        )
+        self.assertNotIn("Created_2", client)
+
     @staticmethod
     def published_shape_fixture():
         return {
@@ -105,7 +118,6 @@ class ProvenanceTests(unittest.TestCase):
         source["components"]["schemas"]["SharingDelete"]["required"].remove("level")
         with self.assertRaisesRegex(ValueError, "SharingDelete.level"):
             preprocess.preprocess(json.dumps(source).encode())
-
 
     def test_stream_discriminator_config_preserves_existing_wire_contract(self):
         config = tomllib.loads(
