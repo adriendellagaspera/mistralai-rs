@@ -1,7 +1,7 @@
 diff --git a/src/client_generator.rs b/src/client_generator.rs
 --- a/src/client_generator.rs
 +++ b/src/client_generator.rs
-@@ -2021,7 +2021,7 @@
+@@ -1682,7 +1682,7 @@ impl CodeGenerator {
                  let mut chosen = base.clone();
                  let mut suffix = 2;
                  while !used.insert(chosen.clone()) {
@@ -13,7 +13,8 @@ diff --git a/src/client_generator.rs b/src/client_generator.rs
 diff --git a/src/generator.rs b/src/generator.rs
 --- a/src/generator.rs
 +++ b/src/generator.rs
-@@ -2280,7 +2280,8 @@
+@@ -2278,7 +2278,8 @@ impl CodeGenerator {
+ 
                  let doc_comment = if let Some(desc) = &property.description {
                      let sanitized_desc = self.sanitize_doc_comment(desc);
 -                    quote! { #[doc = #sanitized_desc] }
