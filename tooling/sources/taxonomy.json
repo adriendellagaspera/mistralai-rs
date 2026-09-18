@@ -2,28 +2,18 @@
   "cross_sdk_alias_differences": [
     {
       "common": [
-        "chat.complete"
+        "chat.complete",
+        "chat.stream"
       ],
       "operation_id": "chat_completion_v1_chat_completions_post",
       "python": [
-        "chat.complete"
+        "chat.complete",
+        "chat.stream"
       ],
       "reason": "source_specific_aliases",
       "typescript": [
         "chat.complete",
-        "chat.parse"
-      ]
-    },
-    {
-      "common": [
-        "chat.stream"
-      ],
-      "operation_id": "chat_completion_v1_chat_completions_post_stream",
-      "python": [
-        "chat.stream"
-      ],
-      "reason": "source_specific_aliases",
-      "typescript": [
+        "chat.parse",
         "chat.parse_stream",
         "chat.stream"
       ]
@@ -169,9 +159,7 @@
     ],
     "chat_completion_v1_chat_completions_post": [
       "chat.complete",
-      "chat.parse"
-    ],
-    "chat_completion_v1_chat_completions_post_stream": [
+      "chat.parse",
       "chat.parse_stream",
       "chat.stream"
     ],
@@ -287,9 +275,7 @@
       "files.upload"
     ],
     "fim_completion_v1_fim_completions_post": [
-      "fim.complete"
-    ],
-    "fim_completion_v1_fim_completions_post_stream": [
+      "fim.complete",
       "fim.stream"
     ],
     "get_dataset_by_id_v1_observability_datasets__dataset_id__get": [
@@ -547,13 +533,13 @@
   "schema_version": 3,
   "sdk_only_digest": "sha256:715205c05c7411b3b86e04228dc8e30f2284dabf5842f96de6078a3e73ece7f0",
   "summary": {
-    "cross_sdk_alias_differences": 2,
+    "cross_sdk_alias_differences": 1,
     "cross_sdk_divergences": 0,
     "openapi_only": 25,
     "python_methods": 245,
     "python_non_http_resources": 1,
     "python_unresolved": 92,
-    "raw_operations": 177,
+    "raw_operations": 173,
     "sdk_only_operations": 92,
     "typescript_methods": 246,
     "typescript_unresolved": 92,
