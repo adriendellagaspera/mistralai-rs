@@ -4,6 +4,7 @@ overlays = ["mistral.openapi.overlay.yaml"]
 overlay_output = "../sources/openapi/openapi.overlaid.json"
 output_dir = "../../src/generated"
 module_name = "mistralai"
+binding_manifest = true
 
 [features]
 enable_async_client = true
