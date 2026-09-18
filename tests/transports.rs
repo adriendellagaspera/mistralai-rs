@@ -126,10 +126,7 @@ async fn file_upload_decodes_typed_response_and_sends_filename() {
     let request = FilesApiRoutesUploadFileRequest::new(Bytes::from_static(b"{}\n"));
     let response = Client::new()
         .with_base_url(&url)
-        .files_api_routes_upload_file_with_multipart_filenames(
-            request,
-            &[("file", "batch.jsonl")],
-        )
+        .files_api_routes_upload_file_with_multipart_filenames(request, &[("file", "batch.jsonl")])
         .await
         .unwrap();
     assert_eq!(response.filename, "batch.jsonl");
