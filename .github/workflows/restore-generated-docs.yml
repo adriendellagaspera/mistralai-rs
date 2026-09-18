@@ -1,0 +1,31 @@
+name: Restore generated multiline docs
+
+on:
+  push:
+    branches: [issue-67-openapi-overlays]
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: issue-67-openapi-overlays
+      - name: Install pinned Rust toolchain
+        run: rustup show
+      - name: Generate raw bindings and manifest
+        run: python3 tooling/pipeline/build.py raw
+      - name: Remove one-shot workflow
+        run: rm .github/workflows/restore-generated-docs.yml
+      - name: Commit generated state
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -A
+          git diff --cached --quiet && exit 0
+          git commit -m "build: restore generated multiline docs"
+          git push origin HEAD:issue-67-openapi-overlays
