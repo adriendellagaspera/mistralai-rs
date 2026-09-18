@@ -1,4 +1,5 @@
 name: Materialize Rust SDK consumer pin
+# one-shot consumer validation
 on:
   push:
     branches: [issue-67-openapi-overlays]
