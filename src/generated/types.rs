@@ -3889,10 +3889,11 @@ pub struct ScheduleDefinitionOutput {
     ///Interval-based specification of times.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub intervals: Option<Vec<ScheduleInterval>>,
-    ///Jitter to apply each action.
-    ///
-    ///An action's scheduled time will be incremented by a random value between 0
-    ///and this value if present (but not past the next schedule).
+    /**Jitter to apply each action.
+
+    An action's scheduled time will be incremented by a random value between 0
+    and this value if present (but not past the next schedule).
+    */
     #[serde(
         skip_serializing_if = "Option::is_none",
         default,
@@ -3947,10 +3948,11 @@ pub struct ScheduleDefinition {
     ///Interval-based specification of times.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub intervals: Option<Vec<ScheduleInterval>>,
-    ///Jitter to apply each action.
-    ///
-    ///An action's scheduled time will be incremented by a random value between 0
-    ///and this value if present (but not past the next schedule).
+    /**Jitter to apply each action.
+
+    An action's scheduled time will be incremented by a random value between 0
+    and this value if present (but not past the next schedule).
+    */
     #[serde(
         skip_serializing_if = "Option::is_none",
         default,
