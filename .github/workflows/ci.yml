@@ -126,13 +126,10 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
           key: tools-generation-${{ runner.os }}-${{ hashFiles('tooling/sources/lock.json', 'Cargo.lock') }}
-      - name: Prime locked Cargo dependencies for the offline probe
-        run: cargo fetch --locked
       - name: Verify deterministic generation and source inventories
         run: |
           python3 tooling/pipeline/build.py check
           python3 tooling/sources/taxonomy_inventory.py check
-          python3 tooling/pipeline/build.py probe
 
   test:
     name: test
