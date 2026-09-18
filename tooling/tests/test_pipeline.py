@@ -2,6 +2,7 @@ import hashlib
 import json
 from pathlib import Path
 import tempfile
+import tomllib
 import unittest
 from unittest.mock import patch
 
@@ -62,6 +63,40 @@ class ProvenanceTests(unittest.TestCase):
         source["components"]["schemas"]["SharingDelete"]["required"].remove("level")
         with self.assertRaisesRegex(ValueError, "SharingDelete.level"):
             preprocess.preprocess(json.dumps(source).encode())
+
+
+    def test_stream_discriminator_config_preserves_existing_wire_contract(self):
+        config = tomllib.loads(
+            (codegen.ROOT / "tooling/pipeline/openapi-to-rust.toml").read_text()
+        )
+        actual = {
+            (
+                rule["operation"],
+                rule["transport"],
+                rule["media_type"],
+                rule["field"],
+                rule["value"],
+            )
+            for rule in config["client"]["request_discriminators"]
+        }
+        expected = {
+            ("agents_api_v1_conversations_append", "buffered", "application/json", "stream", False),
+            ("agents_api_v1_conversations_append_stream", "event_stream", "text/event-stream", "stream", True),
+            ("agents_api_v1_conversations_restart", "buffered", "application/json", "stream", False),
+            ("agents_api_v1_conversations_restart_stream", "event_stream", "text/event-stream", "stream", True),
+            ("agents_api_v1_conversations_start", "buffered", "application/json", "stream", False),
+            ("agents_api_v1_conversations_start_stream", "event_stream", "text/event-stream", "stream", True),
+            ("agents_completion_v1_agents_completions_post", "buffered", "application/json", "stream", False),
+            ("audio_api_v1_transcriptions_post", "buffered", "application/json", "stream", False),
+            ("audio_api_v1_transcriptions_post_stream", "event_stream", "text/event-stream", "stream", True),
+            ("chat_completion_v1_chat_completions_post", "buffered", "application/json", "stream", False),
+            ("chat_completion_v1_chat_completions_post", "event_stream", "text/event-stream", "stream", True),
+            ("fim_completion_v1_fim_completions_post", "buffered", "application/json", "stream", False),
+            ("fim_completion_v1_fim_completions_post", "event_stream", "text/event-stream", "stream", True),
+            ("speech_v1_audio_speech_post", "buffered", "application/json", "stream", False),
+            ("speech_v1_audio_speech_post", "event_stream", "text/event-stream", "stream", True),
+        }
+        self.assertEqual(actual, expected)
 
 
 class UpdateTests(unittest.TestCase):
