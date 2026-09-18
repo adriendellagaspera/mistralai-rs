@@ -7,6 +7,20 @@ import sys
 
 METHODS = {"get", "post", "put", "patch", "delete", "head", "options", "trace"}
 
+# Temporary consumer tripwire for additive methods emitted by the pinned raw generator.
+# Replace this exact allowlist with generator-owned binding metadata once #31 lands.
+MISTRAL_ADDITIVE_METHODS = frozenset({
+    "audio_api_v1_transcriptions_post_stream_with_multipart_filenames",
+    "audio_api_v1_transcriptions_post_with_multipart_filenames",
+    "chat_completion_v1_chat_completions_post_stream",
+    "files_api_routes_upload_file_with_multipart_filenames",
+    "fim_completion_v1_fim_completions_post_stream",
+    "get_voice_sample_audio_v1_audio_voices_voice_id_sample_get_wav",
+    "get_voice_sample_audio_v1_audio_voices_voice_id_sample_get_wav_stream",
+    "libraries_documents_upload_v1_with_multipart_filenames",
+    "speech_v1_audio_speech_post_stream",
+})
+
 
 def operations(spec):
     return [(path, method, op) for path, item in spec["paths"].items()
@@ -32,7 +46,7 @@ def binary_stream_method(op):
     return None
 
 
-def inventory(original, spec, client):
+def inventory(original, spec, client, additive_methods=()):
     methods = re.findall(r"pub async fn (\w+)\s*\(", client)
     if len(methods) != len(set(methods)):
         raise ValueError("Generated client contains duplicate async method names")
