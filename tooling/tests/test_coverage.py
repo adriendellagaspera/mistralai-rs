@@ -59,6 +59,19 @@ class CoverageTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 coverage.inventory(spec, spec, broken)
 
+    def test_inventory_additive_methods_are_exact_tripwire(self):
+        spec = {"paths": {"/v1/test": {"get": {"operationId": "get_test"}}}}
+        client = """
+        pub async fn get_test(&self) {}
+        pub async fn generated_helper(&self) {}
+        """
+        report = coverage.inventory(spec, spec, client, {"generated_helper"})
+        self.assertEqual(2, report["generated_methods"])
+        with self.assertRaises(ValueError):
+            coverage.inventory(spec, spec, client)
+        with self.assertRaises(ValueError):
+            coverage.inventory(spec, spec, client, {"generated_helper", "missing_helper"})
+
     def test_generator_patch_is_authenticated(self):
         lock = json.loads((ROOT / "tooling/sources/lock.json").read_text())
         digest = hashlib.sha256((ROOT / "tooling/pipeline/openapi-to-rust.patch").read_bytes()).hexdigest()
