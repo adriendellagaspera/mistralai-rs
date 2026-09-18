@@ -1,8 +1,7 @@
 diff --git a/src/client_generator.rs b/src/client_generator.rs
-index 7491098..4b460f0 100644
 --- a/src/client_generator.rs
 +++ b/src/client_generator.rs
-@@ -1682,7 +1682,7 @@ impl CodeGenerator {
+@@ -2021,7 +2021,7 @@
                  let mut chosen = base.clone();
                  let mut suffix = 2;
                  while !used.insert(chosen.clone()) {
@@ -11,91 +10,10 @@ index 7491098..4b460f0 100644
                      suffix += 1;
                  }
                  chosen
-@@ -1884,6 +1884,7 @@ impl CodeGenerator {
-             request_param
-         };
-         let request_body = self.generate_request_body(op, analysis, with_multipart_filenames);
-+        let stream_parameter = self.generate_stream_parameter(op, analysis, call_shape);
-         let query_params = self.generate_query_params(op);
-         let header_params = self.generate_header_params(op);
-         let cookie_params = self.generate_cookie_params(op);
-@@ -1948,6 +1949,7 @@ impl CodeGenerator {
-                 #url_construction
- 
-                 let mut req = #http_method_call;
-+                #stream_parameter
-                 #request_body
- 
-                 #query_params
-@@ -1963,6 +1965,62 @@ impl CodeGenerator {
-         }
-     }
- 
-+    // Keep a declared boolean stream parameter aligned with the planned
-+    // response representation until the generic request discriminator lands.
-+    fn generate_stream_parameter(
-+        &self,
-+        op: &OperationInfo,
-+        analysis: &SchemaAnalysis,
-+        call_shape: &ClientCallShapePlan,
-+    ) -> TokenStream {
-+        use crate::analysis::{RequestBodyContent, SchemaType};
-+        if !op.request_body_required {
-+            return TokenStream::new();
-+        }
-+        let name = match op.request_body.as_ref() {
-+            Some(RequestBodyContent::Json { schema_name, .. })
-+            | Some(RequestBodyContent::Multipart { schema_name, .. }) => schema_name,
-+            _ => return TokenStream::new(),
-+        };
-+        let Some((resolved_name, schema)) = self.resolve_reference_schema(name, analysis) else {
-+            return TokenStream::new();
-+        };
-+        let SchemaType::Object {
-+            properties,
-+            required,
-+            ..
-+        } = &schema.schema_type
-+        else {
-+            return TokenStream::new();
-+        };
-+        let Some(property) = properties.get("stream") else {
-+            return TokenStream::new();
-+        };
-+        if !matches!(&property.schema_type, SchemaType::Primitive { rust_type, .. } if rust_type == "bool")
-+        {
-+            return TokenStream::new();
-+        }
-+        let value = matches!(
-+            &call_shape.representation,
-+            ClientResponseRepresentation::EventStream { .. }
-+        );
-+        let value = if self.property_is_tri_state(
-+            resolved_name,
-+            "stream",
-+            property,
-+            required.contains("stream"),
-+        ) {
-+            quote! { Some(Some(#value)) }
-+        } else if !required.contains("stream")
-+            || self.property_is_nullable(resolved_name, "stream", property)
-+        {
-+            quote! { Some(#value) }
-+        } else {
-+            quote! { #value }
-+        };
-+        quote! { let mut request = request; request.stream = #value; }
-+    }
-+
-     /// T3: emit the auth-token application based on the configured AuthConfig.
-     /// Default (no config) is Bearer on Authorization. ApiKey emits a custom
-     /// header. Custom honors header_value_prefix.
 diff --git a/src/generator.rs b/src/generator.rs
-index 8356ca7..837ea35 100644
 --- a/src/generator.rs
 +++ b/src/generator.rs
-@@ -2278,7 +2278,8 @@ impl CodeGenerator {
- 
+@@ -2280,7 +2280,8 @@
                  let doc_comment = if let Some(desc) = &property.description {
                      let sanitized_desc = self.sanitize_doc_comment(desc);
 -                    quote! { #[doc = #sanitized_desc] }
