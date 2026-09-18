@@ -305,7 +305,7 @@ def rust_sdk_tools(lock):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=["generate", "check", "probe", "raw"])
+    parser.add_argument("command", choices=["generate", "check", "raw"])
     args = parser.parse_args()
     lock = json.loads((ROOT / "tooling/sources/lock.json").read_text())
     toolchain = tomllib.loads((ROOT / "rust-toolchain.toml").read_text())
@@ -318,9 +318,6 @@ def main():
     run(python, ROOT / "tooling/tests/run.py")
     executable = generator(lock)
     sdk_generator, bindings_adapter = rust_sdk_tools(lock)
-    if args.command == "probe":
-        run(python, ROOT / "tooling/quality/probe.py")
-        return
     # Preserve relative paths from the checked-in config; never modify its options.
     with tempfile.TemporaryDirectory(prefix=".tooling-build-", dir=ROOT) as temp:
         work = Path(temp)
