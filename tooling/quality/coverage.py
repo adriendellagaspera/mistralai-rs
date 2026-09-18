@@ -7,19 +7,24 @@ import sys
 
 METHODS = {"get", "post", "put", "patch", "delete", "head", "options", "trace"}
 
-# Temporary consumer tripwire for additive methods emitted by the pinned raw generator.
-# Replace this exact allowlist with generator-owned binding metadata once #31 lands.
-MISTRAL_ADDITIVE_METHODS = frozenset({
-    "audio_api_v1_transcriptions_post_stream_with_multipart_filenames",
-    "audio_api_v1_transcriptions_post_with_multipart_filenames",
-    "chat_completion_v1_chat_completions_post_stream",
-    "files_api_routes_upload_file_with_multipart_filenames",
-    "fim_completion_v1_fim_completions_post_stream",
-    "get_voice_sample_audio_v1_audio_voices_voice_id_sample_get_wav",
-    "get_voice_sample_audio_v1_audio_voices_voice_id_sample_get_wav_stream",
-    "libraries_documents_upload_v1_with_multipart_filenames",
-    "speech_v1_audio_speech_post_stream",
-})
+def manifest_methods(manifest):
+    """Return the exact public async method inventory owned by the generator manifest."""
+    operations = manifest.get("operations")
+    if not isinstance(operations, list) or not operations:
+        raise ValueError("Binding manifest has no operations")
+    methods = []
+    for index, operation in enumerate(operations):
+        if not isinstance(operation, dict):
+            raise ValueError(f"Binding manifest operation {index} is not an object")
+        method = operation.get("rust_method_name")
+        if not isinstance(method, str) or not method:
+            raise ValueError(
+                f"Binding manifest operation {index} has no rust_method_name"
+            )
+        methods.append(method)
+    if len(methods) != len(set(methods)):
+        raise ValueError("Binding manifest contains duplicate Rust method names")
+    return set(methods)
 
 
 def operations(spec):
@@ -46,14 +51,16 @@ def binary_stream_method(op):
     return None
 
 
-def inventory(original, spec, client, additive_methods=()):
+def inventory(original, spec, client, expected_methods=None):
     methods = re.findall(r"pub async fn (\w+)\s*\(", client)
     if len(methods) != len(set(methods)):
         raise ValueError("Generated client contains duplicate async method names")
-    expected = {rust_method(op["operationId"]) for _, _, op in operations(spec)}
-    expected |= {method for _, _, op in operations(spec)
-                 if (method := binary_stream_method(op)) is not None}
-    expected |= set(additive_methods)
+    if expected_methods is None:
+        expected = {rust_method(op["operationId"]) for _, _, op in operations(spec)}
+        expected |= {method for _, _, op in operations(spec)
+                     if (method := binary_stream_method(op)) is not None}
+    else:
+        expected = set(expected_methods)
     actual = set(methods)
     if actual != expected:
         missing = sorted(expected - actual)
@@ -88,9 +95,11 @@ def main(source, prepared, directory):
     from ruamel.yaml import YAML
     original = YAML(typ="safe", pure=True).load(Path(source).read_text())
     spec = json.loads(Path(prepared).read_text())
-    client = (Path(directory) / "client.rs").read_text()
-    report = inventory(original, spec, client, MISTRAL_ADDITIVE_METHODS)
-    (Path(directory) / "coverage.json").write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
+    generated = Path(directory)
+    client = (generated / "client.rs").read_text()
+    manifest = json.loads((generated / "binding-manifest.json").read_text())
+    report = inventory(original, spec, client, manifest_methods(manifest))
+    (generated / "coverage.json").write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
 
 
 if __name__ == "__main__":
