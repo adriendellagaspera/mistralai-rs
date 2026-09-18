@@ -102,8 +102,54 @@ class ProvenanceTests(unittest.TestCase):
                 }
             },
             "paths": {
-                "/v1/chat/completions": {},
-                "/v1/audio/voices/{voice_id}/sample": {},
+                "/v1/chat/completions": {
+                    "post": {
+                        "responses": {
+                            "200": {
+                                "content": {
+                                    "application/json": {},
+                                    "text/event-stream": {},
+                                }
+                            }
+                        }
+                    }
+                },
+                "/v1/fim/completions": {
+                    "post": {
+                        "responses": {
+                            "200": {
+                                "content": {
+                                    "application/json": {},
+                                    "text/event-stream": {},
+                                }
+                            }
+                        }
+                    }
+                },
+                "/v1/audio/speech": {
+                    "post": {
+                        "responses": {
+                            "200": {
+                                "content": {
+                                    "application/json": {},
+                                    "text/event-stream": {},
+                                }
+                            }
+                        }
+                    }
+                },
+                "/v1/audio/voices/{voice_id}/sample": {
+                    "get": {
+                        "responses": {
+                            "200": {
+                                "content": {
+                                    "application/json": {},
+                                    "audio/wav": {},
+                                }
+                            }
+                        }
+                    }
+                },
             },
         }
 
@@ -117,6 +163,20 @@ class ProvenanceTests(unittest.TestCase):
         source = self.published_shape_fixture()
         source["components"]["schemas"]["SharingDelete"]["required"].remove("level")
         with self.assertRaisesRegex(ValueError, "SharingDelete.level"):
+            preprocess.preprocess(json.dumps(source).encode())
+
+    def test_preprocessing_fails_closed_when_alternate_representation_changes(self):
+        source = self.published_shape_fixture()
+        del source["paths"]["/v1/chat/completions"]["post"]["responses"]["200"]["content"][
+            "text/event-stream"
+        ]
+        with self.assertRaisesRegex(ValueError, "response representations"):
+            preprocess.preprocess(json.dumps(source).encode())
+
+    def test_preprocessing_fails_closed_when_published_synthetic_alias_appears(self):
+        source = self.published_shape_fixture()
+        source["paths"]["/v1/chat/completions#stream"] = {}
+        with self.assertRaisesRegex(ValueError, "synthetic-path retirement"):
             preprocess.preprocess(json.dumps(source).encode())
 
     def test_stream_discriminator_config_preserves_existing_wire_contract(self):
