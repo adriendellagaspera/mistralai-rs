@@ -245,7 +245,24 @@ def write_json(path: Path, value: object) -> None:
     path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n")
 
 
-def probe(lock: dict) -> None:
+def require_migration_parity(
+    statuses: Counter[str],
+    facade_delta: list[str],
+) -> None:
+    """Reject a tooling/ cutover before closed-world coverage and facade parity."""
+    if statuses.get("rejected", 0):
+        raise ValueError(
+            f"Cannot replace tooling/: {statuses['rejected']} OpenAPI operations remain rejected"
+        )
+    if facade_delta:
+        raise ValueError(
+            "Cannot replace tooling/: generated SDK facade differs from the "
+            f"committed public baseline in {len(facade_delta)} files: "
+            + ", ".join(facade_delta)
+        )
+
+
+def probe(lock: dict, *, require_parity: bool = False) -> None:
     ensure_rust_toolchain(lock)
     verify_published(lock)
     raw_generator, sdk_generator, bindings_adapter = install_tools(lock)
@@ -356,6 +373,8 @@ def probe(lock: dict) -> None:
             name for name in regenerated_facade.keys() | committed_facade.keys()
             if regenerated_facade.get(name) != committed_facade.get(name)
         )
+        if require_parity:
+            require_migration_parity(statuses, facade_delta)
 
         api_inventory = json.loads(inventory.read_text())
         operation_slots = sum(
@@ -379,10 +398,15 @@ def probe(lock: dict) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=["probe"])
+    parser.add_argument(
+        "--require-parity",
+        action="store_true",
+        help="fail closed on any rejected operation or committed facade difference",
+    )
     args = parser.parse_args()
     lock = json.loads(LOCK.read_text())
     if args.command == "probe":
-        probe(lock)
+        probe(lock, require_parity=args.require_parity)
 
 
 if __name__ == "__main__":
