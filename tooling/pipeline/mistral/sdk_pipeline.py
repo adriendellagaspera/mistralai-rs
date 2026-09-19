@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 from dataclasses import dataclass
 import json
+import os
 from pathlib import Path
 import subprocess
 from typing import Any
@@ -190,6 +191,12 @@ def generate(
     runtime_path = work / "sdk-runtime.json"
     inventory_path = work / "sdk-inventory.json"
     write_json(definition_path, manifest)
+    if os.environ.get("SDK_BUILD_CAPTURE_COMPAT") == "1":
+        encoded = json.dumps(manifest, sort_keys=True, separators=(",", ":"))
+        print("COMPAT_DEFINITION_BEGIN", flush=True)
+        for index in range(0, len(encoded), 2048):
+            print("COMPAT_DEFINITION_CHUNK " + encoded[index:index + 2048], flush=True)
+        print("COMPAT_DEFINITION_END", flush=True)
     write_json(
         runtime_path,
         {
