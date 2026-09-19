@@ -131,7 +131,7 @@ jobs:
           python3 tooling/pipeline/build.py check
           python3 tooling/sources/taxonomy_inventory.py check
           python3 -m unittest discover -s sdk-build -p 'test_*.py'
-          python3 sdk-build/build.py probe
+          SDK_BUILD_EXPLAIN_PARITY=1 python3 sdk-build/build.py probe
 
   test:
     name: test
