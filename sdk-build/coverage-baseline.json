@@ -33,6 +33,9 @@
     "speech_v1_audio_speech_post"
   ],
   "approved_overridden_operations": [
-    "files_api_routes_download_file"
+    "chat_completion_v1_chat_completions_post",
+    "files_api_routes_download_file",
+    "fim_completion_v1_fim_completions_post",
+    "speech_v1_audio_speech_post"
   ]
 }
