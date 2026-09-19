@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "source": "mistralai-rs #89: sdk-build probe at generator 1f1d261f5500ada308765c9341186d871ac71833",
+  "source": "mistralai-rs #92: sdk-build probe at generator fa67dc24bc9dd8ca8f2693718c778872a13d4b9b",
   "total_operations": 173,
   "previously_rejected_operations": [
     "agents_api_v1_agents_create",
@@ -15,7 +15,6 @@
     "agents_completion_v1_agents_completions_post",
     "audio_api_v1_transcriptions_post",
     "audio_api_v1_transcriptions_post_stream",
-    "chat_classifications_v1_chat_classifications_post",
     "chat_completion_v1_chat_completions_post",
     "chat_moderations_v1_chat_moderations_post",
     "connector_list_tools_v1",
@@ -30,10 +29,8 @@
     "libraries_documents_update_v1",
     "libraries_documents_upload_v1",
     "ocr_v1_ocr_post",
-    "query_workflow_execution_v1_workflows_executions__execution_id__queries_post",
     "signal_workflow_execution_v1_workflows_executions__execution_id__signals_post",
-    "speech_v1_audio_speech_post",
-    "update_workflow_execution_v1_workflows_executions__execution_id__updates_post"
+    "speech_v1_audio_speech_post"
   ],
   "approved_overridden_operations": [
     "files_api_routes_download_file"
