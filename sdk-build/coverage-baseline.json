@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "source": "mistralai-rs #92: sdk-build probe at generator fa67dc24bc9dd8ca8f2693718c778872a13d4b9b",
+  "source": "mistralai-rs #99: sdk-build probe at generator 6fd2a8f7fc4d9f901fd8375388fbf02287350694",
   "total_operations": 173,
   "previously_rejected_operations": [
     "agents_api_v1_agents_create",
@@ -15,13 +15,11 @@
     "agents_completion_v1_agents_completions_post",
     "audio_api_v1_transcriptions_post",
     "audio_api_v1_transcriptions_post_stream",
-    "chat_completion_v1_chat_completions_post",
     "chat_moderations_v1_chat_moderations_post",
     "connector_list_tools_v1",
     "create_campaign_v1_observability_campaigns_post",
     "embeddings_v1_embeddings_post",
     "files_api_routes_upload_file",
-    "fim_completion_v1_fim_completions_post",
     "get_chat_completion_event_ids_v1_observability_chat_completion_events_search_ids_post",
     "get_chat_completion_events_v1_observability_chat_completion_events_search_post",
     "get_chat_completion_field_options_counts_v1_observability_chat_completion_fields__field_name__options_counts_post",
@@ -33,6 +31,8 @@
     "speech_v1_audio_speech_post"
   ],
   "approved_overridden_operations": [
-    "files_api_routes_download_file"
+    "chat_completion_v1_chat_completions_post",
+    "files_api_routes_download_file",
+    "fim_completion_v1_fim_completions_post"
   ]
 }
