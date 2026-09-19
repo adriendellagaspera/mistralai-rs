@@ -7,6 +7,7 @@ from collections import Counter
 import difflib
 import hashlib
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -373,6 +374,41 @@ def probe(lock: dict, *, require_parity: bool = False) -> None:
             name for name in regenerated_facade.keys() | committed_facade.keys()
             if regenerated_facade.get(name) != committed_facade.get(name)
         )
+        if os.environ.get("SDK_BUILD_EXPLAIN_PARITY") == "1":
+            for name in facade_delta:
+                old = committed_facade.get(name)
+                new = regenerated_facade.get(name)
+                if old is None or new is None:
+                    print(
+                        f"PARITY {name}: "
+                        f"{'added' if old is None else 'removed'} "
+                        f"({len(new if old is None else old)} bytes)",
+                        flush=True,
+                    )
+                    continue
+                old_lines = old.decode("utf-8").splitlines()
+                new_lines = new.decode("utf-8").splitlines()
+                changes = [
+                    (tag, a1, a2, b1, b2)
+                    for tag, a1, a2, b1, b2 in difflib.SequenceMatcher(
+                        None, old_lines, new_lines, autojunk=False
+                    ).get_opcodes()
+                    if tag != "equal"
+                ]
+                print(
+                    f"PARITY {name}: {len(old_lines)} -> {len(new_lines)} lines; "
+                    f"{len(changes)} edit blocks",
+                    flush=True,
+                )
+                for tag, a1, a2, b1, b2 in changes[:5]:
+                    print(
+                        f"  {tag} published:{a1 + 1}-{a2} generated:{b1 + 1}-{b2}",
+                        flush=True,
+                    )
+                    for line in old_lines[a1:min(a2, a1 + 4)]:
+                        print(f"    - {line[:220]}", flush=True)
+                    for line in new_lines[b1:min(b2, b1 + 4)]:
+                        print(f"    + {line[:220]}", flush=True)
         if require_parity:
             require_migration_parity(statuses, facade_delta)
 
