@@ -1,16 +1,10 @@
 {
   "schema_version": 1,
-  "source": "mistralai-rs #102: successful 165/173 probe at generator 5ea313155eb1fabed93deea9ff6edac0fcd2a84c",
+  "source": "mistralai-rs #105: CI-green 171/173 at rust-sdk-generator 0896ccc4255a000d1cc8bded9739774a7c19c078",
   "total_operations": 173,
   "previously_rejected_operations": [
     "connector_list_tools_v1",
-    "create_campaign_v1_observability_campaigns_post",
-    "get_chat_completion_event_ids_v1_observability_chat_completion_events_search_ids_post",
-    "get_chat_completion_events_v1_observability_chat_completion_events_search_post",
-    "get_chat_completion_field_options_counts_v1_observability_chat_completion_fields__field_name__options_counts_post",
-    "jobs_api_routes_fine_tuning_create_fine_tuning_job",
-    "libraries_documents_update_v1",
-    "signal_workflow_execution_v1_workflows_executions__execution_id__signals_post"
+    "libraries_documents_update_v1"
   ],
   "approved_overridden_operations": [
     "chat_completion_v1_chat_completions_post",
