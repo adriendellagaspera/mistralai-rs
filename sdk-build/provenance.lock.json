@@ -20,15 +20,15 @@
     "rust_sdk_generator": {
       "name": "rust-sdk-generator",
       "repository": "adriendellagaspera/rust-sdk-generator",
-      "commit": "085b1440958fc776581bbe1e9253e59fdea88eb6",
-      "tree_sha": "47d57142d307ec82bb7e6c7b1277f97cbbad4b42",
+      "commit": "ea24bee1c0135eabbef4709e2b3d17f0e5b0442d",
+      "tree_sha": "e7e526e8e4e5b241d2f38fd04784a548e698e43e",
       "version": "0.2.8"
     },
     "openapi_to_rust_bindings": {
       "name": "openapi-to-rust-bindings",
       "repository": "adriendellagaspera/rust-sdk-generator",
-      "commit": "085b1440958fc776581bbe1e9253e59fdea88eb6",
-      "tree_sha": "47d57142d307ec82bb7e6c7b1277f97cbbad4b42",
+      "commit": "ea24bee1c0135eabbef4709e2b3d17f0e5b0442d",
+      "tree_sha": "e7e526e8e4e5b241d2f38fd04784a548e698e43e",
       "version": "0.3.0",
       "subdirectory": "openapi-to-rust-bindings"
     }
