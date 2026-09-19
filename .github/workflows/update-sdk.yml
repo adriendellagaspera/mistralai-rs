@@ -29,9 +29,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          python3 tooling/sources/openapi.py
-          python3 tooling/sources/taxonomy.py pin-latest
-          if git diff --quiet -- tooling/sources; then
+          python3 sdk-build/openapi/update.py
+          python3 sdk-build/official-sdks/update.py pin-latest
+          if git diff --quiet -- sdk-build/openapi sdk-build/official-sdks sdk-build/provenance.lock.json; then
             echo 'changed=false' >> "$GITHUB_OUTPUT"
           else
             echo 'changed=true' >> "$GITHUB_OUTPUT"
@@ -47,22 +47,26 @@ jobs:
             ~/.cargo/git
             .tools
             target
-          key: sdk-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'tooling/sources/lock.json') }}
+          key: sdk-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'sdk-build/provenance.lock.json') }}
       - name: Regenerate raw bindings for the updated OpenAPI
         if: steps.upstream.outputs.changed == 'true'
-        run: python3 tooling/pipeline/build.py raw
+        run: python3 sdk-build/build.py raw
       - name: Reconcile official Python and TypeScript SDK surfaces
         if: steps.upstream.outputs.changed == 'true'
-        run: python3 tooling/sources/taxonomy_inventory.py update
+        run: python3 sdk-build/official-sdks/update.py update
       - name: Compile and validate the idiomatic Rust SDK
         if: steps.upstream.outputs.changed == 'true'
         run: |
-          python3 tooling/pipeline/build.py generate
-          bash tooling/quality/validate.sh
+          python3 sdk-build/build.py generate
+          python3 sdk-build/build.py check
+          python3 sdk-build/official-sdks/update.py check
+          cargo fmt --all --check
+          cargo clippy --locked --all-targets -- -D warnings
+          cargo test --locked --all-targets
       - name: Summarize source and surface changes
         if: steps.upstream.outputs.changed == 'true'
         run: |
-          python3 tooling/quality/report.py
+          python3 sdk-build/update_report.py
           cat update-report.md >> "$GITHUB_STEP_SUMMARY"
       - name: Create or update the single SDK update PR
         if: steps.upstream.outputs.changed == 'true'
@@ -72,7 +76,7 @@ jobs:
           branch=automation/update-mistral-sources
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add tooling/sources/ src/generated/ src/sdk/
+          git add sdk-build/openapi/ sdk-build/official-sdks/ sdk-build/provenance.lock.json src/generated/ src/sdk/
           git commit -m 'chore: update Mistral SDK sources'
           gh auth setup-git
           git fetch origin "+refs/heads/$branch:refs/remotes/origin/$branch" || true

@@ -9,10 +9,10 @@ executable contracts; implementation detail belongs beside the code that owns it
 - `src/generated/`: raw `openapi-to-rust` output; generated, never hand-maintained.
 - `src/sdk/`: generated idiomatic Mistral facade and committed API/coverage inventories.
 - `src/streaming.rs`: handwritten runtime integration for streaming responses.
-- `tooling/pipeline/`: Mistral build orchestration and policy inputs.
-- `tooling/sources/`: immutable upstream/tool provenance and tracked source inputs.
-- `tooling/quality/`: repository-owned quality and compatibility gates.
-- `tooling/tests/`: tests for the Mistral-specific build/tooling layer.
+- `sdk-build/build.py`: pinned, isolated canonical generation and strict facade parity.
+- `sdk-build/openapi/`: immutable upstream source, reviewed overlays and updates.
+- `sdk-build/official-sdks/`: pinned Mistral SDK surface evidence and updates.
+- `sdk-build/`: Mistral compatibility definition, coverage, API review and tests.
 
 ## Canonical local checks
 
@@ -40,11 +40,11 @@ the API check needs the PR base revision and the dependency audit owns its tool 
 - [policy] Workflows MUST NOT use `pull_request_target`.
 - [policy] Pull-request titles MUST follow the repository conventional title grammar.
 - [generation] Files under `src/generated/` and generated `src/sdk/` output MUST NOT be edited by hand; change an owning input/tool and regenerate.
-- [generation] Mistral OpenAPI, official-SDK taxonomy and generator inputs MUST remain pinned and reproducible through `tooling/sources/lock.json` and the build pipeline.
+- [generation] Mistral OpenAPI, official-SDK taxonomy and generator inputs MUST remain pinned and reproducible through `sdk-build/provenance.lock.json` and its pinned build pipeline.
 - [lint] Handwritten Rust MUST remain free of `unsafe`; lint exceptions MUST carry an explicit reason, with generated-code exceptions scoped at module boundaries.
 - [dependencies] Locked Rust dependencies MUST pass the advisory, license, source and TLS-backend policy in `deny.toml`.
 - [docs] Handwritten public Rust API MUST have rustdoc that builds warning-free; fallible public helpers MUST document their error contract.
-- [tooling] Repository-owned Python build/source/quality behavior MUST have its tooling test suite executed in CI.
+- [tooling] Repository-owned Python build/source/quality behavior MUST have its sdk-build test suite executed in CI.
 - [api] Changes to the committed public SDK surface MUST pass the repository API compatibility review against the PR base.
 - [gate] Required CI jobs MUST converge on the single `gate` conclusion job before merge.
 
