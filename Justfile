@@ -34,4 +34,12 @@ docs:
     RUSTDOCFLAGS="-D warnings" cargo doc --locked --no-deps
 
 validate:
-    bash sdk-build/validate.sh
+    python3 sdk-build/policy.py
+    python3 -m unittest discover -s sdk-build -p 'test_*.py'
+    python3 sdk-build/build.py check
+    python3 sdk-build/official-sdks/update.py check
+    cargo fmt --all --check
+    cargo clippy --locked --all-targets -- -D warnings
+    cargo test --locked --all-targets
+    RUSTDOCFLAGS="-D warnings" cargo test --locked --doc
+    RUSTDOCFLAGS="-D warnings" cargo doc --locked --no-deps
