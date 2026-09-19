@@ -20,6 +20,11 @@
         "fim.complete": "json",
         "fim.stream": "event_stream"
       }
+    },
+    "speech_v1_audio_speech_post": {
+      "response_representations": {
+        "audio.speech.complete": "json"
+      }
     }
   }
 }
