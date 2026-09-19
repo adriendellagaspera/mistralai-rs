@@ -340,6 +340,13 @@ def probe(lock: dict) -> None:
             for item in report.values()
             if item["status"] == "rejected"
         )
+        rejection_operations: dict[str, list[str]] = {}
+        for operation_id, item in report.items():
+            if item["status"] != "rejected":
+                continue
+            rejection_operations.setdefault(item["reason"]["code"], []).append(operation_id)
+        for operation_ids in rejection_operations.values():
+            operation_ids.sort()
         api_inventory = json.loads(inventory.read_text())
         operation_slots = sum(
             len(resource["operations"]) for resource in api_inventory["resources"]
@@ -347,6 +354,7 @@ def probe(lock: dict) -> None:
         print(json.dumps({
             "derivation_statuses": dict(sorted(statuses.items())),
             "rejection_reasons": dict(sorted(reasons.items())),
+            "rejection_operations": dict(sorted(rejection_operations.items())),
             "api_inventory": {
                 "client": api_inventory["client"],
                 "models": len(api_inventory["models"]),
