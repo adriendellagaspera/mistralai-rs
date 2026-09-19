@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "source": "mistralai-rs #89: sdk-build probe at generator 1f1d261f5500ada308765c9341186d871ac71833",
+  "total_operations": 173,
+  "previously_rejected_operations": [
+    "agents_api_v1_agents_create",
+    "agents_api_v1_agents_update",
+    "agents_api_v1_conversations_append",
+    "agents_api_v1_conversations_append_stream",
+    "agents_api_v1_conversations_list",
+    "agents_api_v1_conversations_restart",
+    "agents_api_v1_conversations_restart_stream",
+    "agents_api_v1_conversations_start",
+    "agents_api_v1_conversations_start_stream",
+    "agents_completion_v1_agents_completions_post",
+    "audio_api_v1_transcriptions_post",
+    "audio_api_v1_transcriptions_post_stream",
+    "chat_classifications_v1_chat_classifications_post",
+    "chat_completion_v1_chat_completions_post",
+    "chat_moderations_v1_chat_moderations_post",
+    "connector_list_tools_v1",
+    "create_campaign_v1_observability_campaigns_post",
+    "embeddings_v1_embeddings_post",
+    "files_api_routes_upload_file",
+    "fim_completion_v1_fim_completions_post",
+    "get_chat_completion_event_ids_v1_observability_chat_completion_events_search_ids_post",
+    "get_chat_completion_events_v1_observability_chat_completion_events_search_post",
+    "get_chat_completion_field_options_counts_v1_observability_chat_completion_fields__field_name__options_counts_post",
+    "jobs_api_routes_fine_tuning_create_fine_tuning_job",
+    "libraries_documents_update_v1",
+    "libraries_documents_upload_v1",
+    "ocr_v1_ocr_post",
+    "query_workflow_execution_v1_workflows_executions__execution_id__queries_post",
+    "signal_workflow_execution_v1_workflows_executions__execution_id__signals_post",
+    "speech_v1_audio_speech_post",
+    "update_workflow_execution_v1_workflows_executions__execution_id__updates_post"
+  ],
+  "approved_overridden_operations": [
+    "files_api_routes_download_file"
+  ]
+}
