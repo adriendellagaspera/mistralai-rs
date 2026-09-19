@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "source": "mistralai-rs #99: sdk-build probe at generator 6fd2a8f7fc4d9f901fd8375388fbf02287350694",
+  "source": "mistralai-rs #97: canonical Chat/FIM selections at generator 6fd2a8f7fc4d9f901fd8375388fbf02287350694",
   "total_operations": 173,
   "previously_rejected_operations": [
     "agents_api_v1_agents_create",
@@ -27,12 +27,12 @@
     "libraries_documents_update_v1",
     "libraries_documents_upload_v1",
     "ocr_v1_ocr_post",
-    "signal_workflow_execution_v1_workflows_executions__execution_id__signals_post",
-    "speech_v1_audio_speech_post"
+    "signal_workflow_execution_v1_workflows_executions__execution_id__signals_post"
   ],
   "approved_overridden_operations": [
     "chat_completion_v1_chat_completions_post",
     "files_api_routes_download_file",
-    "fim_completion_v1_fim_completions_post"
+    "fim_completion_v1_fim_completions_post",
+    "speech_v1_audio_speech_post"
   ]
 }
