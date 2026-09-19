@@ -6,6 +6,7 @@ import argparse
 from collections import Counter
 import difflib
 import hashlib
+from itertools import islice
 import json
 from pathlib import Path
 import shutil
@@ -262,7 +263,28 @@ def require_migration_parity(
         )
 
 
-def probe(lock: dict, *, require_parity: bool = False) -> None:
+
+def parity_diff_samples(
+    generated: dict[str, bytes],
+    committed: dict[str, bytes],
+    names: tuple[str, ...] = ("mod.rs", "chat.rs", "facade_types.rs", "agents.rs"),
+    max_lines: int = 64,
+) -> dict[str, list[str]]:
+    """Bounded, deterministic source-level evidence for a blocked facade cutover."""
+    samples: dict[str, list[str]] = {}
+    for name in names:
+        if generated.get(name) == committed.get(name):
+            continue
+        old = committed.get(name, b"").decode("utf-8").splitlines()
+        new = generated.get(name, b"").decode("utf-8").splitlines()
+        samples[name] = list(islice(
+            difflib.unified_diff(old, new, fromfile=f"committed/{name}",
+                                 tofile=f"generated/{name}", lineterm=""),
+            max_lines,
+        ))
+    return samples
+
+def probe(lock: dict, *, require_parity: bool = False, explain_parity: bool = False) -> None:
     ensure_rust_toolchain(lock)
     verify_published(lock)
     raw_generator, sdk_generator, bindings_adapter = install_tools(lock)
@@ -373,6 +395,12 @@ def probe(lock: dict, *, require_parity: bool = False) -> None:
             name for name in regenerated_facade.keys() | committed_facade.keys()
             if regenerated_facade.get(name) != committed_facade.get(name)
         )
+        if explain_parity:
+            print(json.dumps({
+                "facade_diff_samples": parity_diff_samples(
+                    regenerated_facade, committed_facade
+                )
+            }, indent=2, sort_keys=True), flush=True)
         if require_parity:
             require_migration_parity(statuses, facade_delta)
 
@@ -403,10 +431,19 @@ def main() -> None:
         action="store_true",
         help="fail closed on any rejected operation or committed facade difference",
     )
+    parser.add_argument(
+        "--explain-parity",
+        action="store_true",
+        help="print bounded diffs for representative committed facade files",
+    )
     args = parser.parse_args()
     lock = json.loads(LOCK.read_text())
     if args.command == "probe":
-        probe(lock, require_parity=args.require_parity)
+        probe(
+            lock,
+            require_parity=args.require_parity,
+            explain_parity=args.explain_parity,
+        )
 
 
 if __name__ == "__main__":
