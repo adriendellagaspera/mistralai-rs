@@ -1,11 +1,8 @@
 {
   "schema_version": 1,
-  "source": "mistralai-rs #105: CI-green 171/173 at rust-sdk-generator 0896ccc4255a000d1cc8bded9739774a7c19c078",
+  "source": "mistralai-rs #106: fully green 172/173 SDK probe; enforce zero further rejections",
   "total_operations": 173,
-  "previously_rejected_operations": [
-    "connector_list_tools_v1",
-    "libraries_documents_update_v1"
-  ],
+  "previously_rejected_operations": [],
   "approved_overridden_operations": [
     "chat_completion_v1_chat_completions_post",
     "files_api_routes_download_file",
