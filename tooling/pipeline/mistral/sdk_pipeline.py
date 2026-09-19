@@ -192,7 +192,7 @@ def generate(
     inventory_path = work / "sdk-inventory.json"
     write_json(definition_path, manifest)
     if os.environ.get("SDK_BUILD_CAPTURE_COMPAT") == "1":
-        encoded = json.dumps(manifest, sort_keys=True, separators=(",", ":"))
+        encoded = json.dumps(manifest, separators=(",", ":"))
         print("COMPAT_DEFINITION_BEGIN", flush=True)
         for index in range(0, len(encoded), 2048):
             print("COMPAT_DEFINITION_CHUNK " + encoded[index:index + 2048], flush=True)
