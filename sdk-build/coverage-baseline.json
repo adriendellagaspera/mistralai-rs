@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "source": "mistralai-rs #88: sdk-build probe at generator 961fd707255f6419316ad19abd4fbf31aaacce55",
+  "source": "mistralai-rs #89: sdk-build probe at generator 1f1d261f5500ada308765c9341186d871ac71833",
   "total_operations": 173,
   "previously_rejected_operations": [
     "agents_api_v1_agents_create",
@@ -20,7 +20,6 @@
     "chat_moderations_v1_chat_moderations_post",
     "connector_list_tools_v1",
     "create_campaign_v1_observability_campaigns_post",
-    "create_dataset_record_v1_observability_datasets__dataset_id__records_post",
     "embeddings_v1_embeddings_post",
     "files_api_routes_upload_file",
     "fim_completion_v1_fim_completions_post",
@@ -34,7 +33,6 @@
     "query_workflow_execution_v1_workflows_executions__execution_id__queries_post",
     "signal_workflow_execution_v1_workflows_executions__execution_id__signals_post",
     "speech_v1_audio_speech_post",
-    "update_dataset_record_payload_v1_observability_dataset_records__dataset_record_id__payload_put",
     "update_workflow_execution_v1_workflows_executions__execution_id__updates_post"
   ],
   "approved_overridden_operations": [
