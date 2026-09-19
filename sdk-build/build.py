@@ -13,6 +13,8 @@ import subprocess
 import tempfile
 import tomllib
 
+from coverage_gate import validate_coverage
+
 ROOT = Path(__file__).resolve().parents[1]
 HERE = Path(__file__).resolve().parent
 LOCK = HERE / "provenance.lock.json"
@@ -297,6 +299,8 @@ def probe(lock: dict) -> None:
         write_json(work / "derivation-report.json", derivation["report"])
 
         report = derivation["report"]["operations"]
+        coverage = json.loads((work_build / "coverage-baseline.json").read_text())
+        validate_coverage(report, coverage, source_operation_paths(overlaid))
         statuses = Counter(item["status"] for item in report.values())
         reasons = Counter(
             item["reason"]["code"]
