@@ -1,5 +1,30 @@
 {
   "schema_version": 1,
   "excluded_operations": {},
-  "operations": {}
+  "operations": {
+    "chat_completion_v1_chat_completions_post": {
+      "response_representations": {
+        "chat.complete": "json",
+        "chat.parse": "json",
+        "chat.parse_stream": "event_stream",
+        "chat.stream": "event_stream"
+      }
+    },
+    "files_api_routes_download_file": {
+      "response_representations": {
+        "files.download": "binary_buffered"
+      }
+    },
+    "fim_completion_v1_fim_completions_post": {
+      "response_representations": {
+        "fim.complete": "json",
+        "fim.stream": "event_stream"
+      }
+    },
+    "speech_v1_audio_speech_post": {
+      "response_representations": {
+        "audio.speech.complete": "json"
+      }
+    }
+  }
 }
