@@ -128,7 +128,7 @@ jobs:
           key: tools-generation-${{ runner.os }}-${{ hashFiles('tooling/sources/lock.json', 'Cargo.lock') }}
       - name: Verify deterministic generation and source inventories
         run: |
-          python3 tooling/pipeline/build.py check
+          SDK_BUILD_CAPTURE_COMPAT=1 python3 tooling/pipeline/build.py check
           python3 tooling/sources/taxonomy_inventory.py check
           python3 -m unittest discover -s sdk-build -p 'test_*.py'
           SDK_BUILD_EXPLAIN_PARITY=1 python3 sdk-build/build.py probe
