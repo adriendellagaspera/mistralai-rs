@@ -61,9 +61,9 @@ Mistral runtime conventions --------------------------> Runtime
                                                         src/sdk
 ```
 
-`rust-sdk-generator` is a separately versioned, backend-neutral Rust SDK compiler. `openapi-to-rust-bindings` is the separately versioned compatibility package that normalizes the current raw generator output into the compiler's `Bindings` contract. Both are pinned independently in `tooling/sources/lock.json`; neither implementation is copied into this repository.
+`rust-sdk-generator` is a separately versioned, backend-neutral Rust SDK compiler. `openapi-to-rust-bindings` is the separately versioned compatibility package that normalizes the current raw generator output into the compiler's `Bindings` contract. Both are pinned in `sdk-build/provenance.lock.json`; neither implementation is copied into this repository.
 
-`mistralai-rs` owns only Mistral-specific concerns around that generic toolchain: product taxonomy, semantic policy, auto-projection, runtime support, source tracking, coverage and public-API review gates.
+`mistralai-rs` owns only Mistral-specific concerns around that generic toolchain: product taxonomy, a pinned compatibility definition, runtime support, source tracking, coverage and public-API review gates.
 
 The idiomatic inventory is recorded separately in [`src/sdk/coverage.json`](src/sdk/coverage.json). Operations not yet projected idiomatically remain available through `mistralai::raw`; generation never invents endpoint behavior to fill a gap.
 
@@ -107,32 +107,32 @@ just check-generated
 just validate
 ```
 
-`tooling/sources/lock.json` pins:
+`sdk-build/provenance.lock.json` pins:
 
 - the official Mistral OpenAPI source commit and content hash;
-- `openapi-to-rust` plus the reviewed local generator patch hash;
+- `openapi-to-rust` by version, immutable commit and Git tree;
 - `rust-sdk-generator` by version, commit and Git tree;
 - `openapi-to-rust-bindings` by version, commit and Git tree;
-- Rust and Python tooling versions used by generation.
+- the Rust toolchain and the pinned API compatibility checker.
 
-On first use, `tooling/pipeline/build.py` installs the pinned tools into `.tools/`. It verifies their immutable revisions before use. Generation reads the vendored specification; it does not fetch a newer spec implicitly.
+On first use, `sdk-build/build.py` installs the pinned tools into `.tools/`. It verifies their immutable revisions before use. Generation reads the vendored specification; it does not fetch a newer spec implicitly.
 
-`just check-generated` regenerates raw bindings and the idiomatic SDK into fresh temporary directories, runs the raw generator's own check, formats with the pinned Rust toolchain and compares the complete file sets byte-for-byte. No timestamps enter generated output.
+`just check-generated` regenerates raw bindings and the idiomatic SDK into fresh temporary directories, runs the raw generator's own check, formats with the pinned Rust toolchain and verifies the raw baseline modulo reviewed source-provenance markers, and compares the public Rust SDK file set byte-for-byte. No timestamps enter generated output.
 
 ## Repository layout
 
 | Location | Purpose |
 | --- | --- |
-| `tooling/sources/` | Immutable OpenAPI/Python/TypeScript source tracking, vendored OpenAPI and derived taxonomy |
-| `tooling/pipeline/` | Mistral adaptation and orchestration across openapi-to-rust, Bindings and rust-sdk-generator |
-| `tooling/quality/` | Determinism, coverage, semver/public API review and update reporting |
-| `tooling/tests/` | Sidecar integration/policy tests |
+| `sdk-build/openapi/` | Immutable published OpenAPI, truthful overlay and source-update verification |
+| `sdk-build/official-sdks/` | Pinned Python/TypeScript public surface evidence |
+| `sdk-build/build.py` | Isolated canonical derivation, generation and parity cutover gate |
+| `sdk-build/` | Reviewed compatibility definition, coverage, API checks and tests |
 | `src/generated/` | Committed raw generated Rust and raw operation inventory |
 | `src/sdk/` | Committed idiomatic SDK surface plus Mistral-owned stable error runtime |
 | `src/lib.rs`, `src/streaming.rs` | Public exports and Mistral-owned stream support |
 | `tests/`, `examples/` | Offline behavior tests and opt-in examples |
 
-See [`tooling/README.md`](tooling/README.md) for the ownership map. The active Mistral semantic policy is [`tooling/pipeline/semantics.json`](tooling/pipeline/semantics.json).
+The current public Rust surface is pinned by [`sdk-build/compatibility-definition.json`](sdk-build/compatibility-definition.json). The canonical derivation still proves all pinned OpenAPI operations, while the compatibility definition preserves existing SDK signatures and behavior.
 
 ## Automation
 
@@ -144,4 +144,4 @@ The scheduled **Update Mistral OpenAPI SDK** workflow checks the official specif
 
 ## License and attribution
 
-Original project contributions are **MIT OR Apache-2.0**. The official specification retains its **Apache-2.0** terms and generator-derived material retains applicable upstream notices. See [NOTICE](NOTICE), [LICENSE-MIT](LICENSE-MIT), [LICENSE-APACHE](LICENSE-APACHE), [tooling/sources/openapi/LICENSE](tooling/sources/openapi/LICENSE) and [tooling/licenses/openapi-to-rust-MIT.txt](tooling/licenses/openapi-to-rust-MIT.txt).
+Original project contributions are **MIT OR Apache-2.0**. The official specification retains its **Apache-2.0** terms and generator-derived material retains applicable upstream notices. See [NOTICE](NOTICE), [LICENSE-MIT](LICENSE-MIT), [LICENSE-APACHE](LICENSE-APACHE), [sdk-build/openapi/LICENSE](sdk-build/openapi/LICENSE) and [sdk-build/openapi-to-rust-MIT.txt](sdk-build/openapi-to-rust-MIT.txt).
