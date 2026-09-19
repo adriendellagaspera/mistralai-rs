@@ -1,5 +1,11 @@
 {
   "schema_version": 1,
   "excluded_operations": {},
-  "operations": {}
+  "operations": {
+    "files_api_routes_download_file": {
+      "response_representations": {
+        "files.download": "binary_buffered"
+      }
+    }
+  }
 }
