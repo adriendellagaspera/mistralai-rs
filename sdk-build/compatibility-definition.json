@@ -30,7 +30,8 @@
       },
       "exclude": [
         "stream"
-      ]
+      ],
+      "schema": "ChatCompletionRequest"
     },
     "ChatResponse": {
       "raw": "ChatCompletionResponse",
@@ -362,7 +363,8 @@
       ],
       "adapters": {
         "stop": "StopSequences"
-      }
+      },
+      "schema": "FIMCompletionRequest"
     },
     "FimResponse": {
       "raw": "FIMCompletionResponse",
