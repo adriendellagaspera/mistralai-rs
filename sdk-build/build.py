@@ -268,6 +268,8 @@ def probe(
     *,
     require_parity: bool = False,
     compatibility_definition: Path | None = None,
+    raw_only: bool = False,
+    publish: bool = False,
 ) -> None:
     ensure_rust_toolchain(lock)
     verify_published(lock)
@@ -303,6 +305,12 @@ def probe(
                 "--edition", "2024", "--config", "skip_children=true", path,
             )
 
+        if raw_only:
+            target = ROOT / "src" / "generated"
+            shutil.rmtree(target)
+            shutil.copytree(generated, target)
+            print("Regenerated raw OpenAPI bindings from pinned sources.")
+            return
         verify_raw_baseline(generated, overlaid)
 
         bindings_path = work / "bindings.json"
@@ -448,8 +456,22 @@ def probe(
                 "compatibility_facade_delta": compatibility_delta,
             }, indent=2, sort_keys=True), flush=True)
             facade_delta = compatibility_delta
-        if require_parity:
+        if require_parity or publish:
             require_migration_parity(statuses, facade_delta)
+        if publish:
+            if compatibility_definition is None:
+                raise ValueError("Publishing requires the compatibility SDK definition")
+            # Publish only after both closed-world coverage and exact public
+            # compatibility have passed. Never publish the wider candidate.
+            raw_target = ROOT / "src" / "generated"
+            shutil.rmtree(raw_target)
+            shutil.copytree(generated, raw_target)
+            sdk_target = ROOT / "src" / "sdk"
+            for name in sorted(committed_facade.keys() - compatibility_snapshot.keys()):
+                (sdk_target / name).unlink()
+            for name, data in compatibility_snapshot.items():
+                (sdk_target / name).write_bytes(data)
+            print("Published verified raw bindings and exactly compatible SDK facade.")
 
         api_inventory = json.loads(inventory.read_text())
         operation_slots = sum(
@@ -472,7 +494,7 @@ def probe(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=["probe"])
+    parser.add_argument("command", choices=["probe", "check", "generate", "raw"])
     parser.add_argument(
         "--require-parity",
         action="store_true",
@@ -485,12 +507,16 @@ def main() -> None:
     )
     args = parser.parse_args()
     lock = json.loads(LOCK.read_text())
-    if args.command == "probe":
-        probe(
-            lock,
-            require_parity=args.require_parity,
-            compatibility_definition=args.compatibility_definition,
-        )
+    definition = args.compatibility_definition
+    if args.command in {"check", "generate"} and definition is None:
+        definition = HERE / "compatibility-definition.json"
+    probe(
+        lock,
+        require_parity=args.require_parity or args.command in {"check", "generate"},
+        compatibility_definition=definition,
+        raw_only=args.command == "raw",
+        publish=args.command == "generate",
+    )
 
 
 if __name__ == "__main__":
