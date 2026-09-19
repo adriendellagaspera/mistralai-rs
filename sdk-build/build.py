@@ -263,7 +263,12 @@ def require_migration_parity(
         )
 
 
-def probe(lock: dict, *, require_parity: bool = False) -> None:
+def probe(
+    lock: dict,
+    *,
+    require_parity: bool = False,
+    compatibility_definition: Path | None = None,
+) -> None:
     ensure_rust_toolchain(lock)
     verify_published(lock)
     raw_generator, sdk_generator, bindings_adapter = install_tools(lock)
@@ -409,6 +414,40 @@ def probe(lock: dict, *, require_parity: bool = False) -> None:
                         print(f"    - {line[:220]}", flush=True)
                     for line in new_lines[b1:min(b2, b1 + 4)]:
                         print(f"    + {line[:220]}", flush=True)
+        if compatibility_definition is not None:
+            if not compatibility_definition.is_file():
+                raise FileNotFoundError(compatibility_definition)
+            # A frozen definition is an input to the canonical compiler, never
+            # a copy of the published output. Keep JSON map insertion order.
+            compat_definition = work / "compatibility-definition.json"
+            shutil.copyfile(compatibility_definition, compat_definition)
+            compatibility_facade = work / "src" / "sdk-compatibility"
+            compatibility_inventory = work / "compatibility-inventory.json"
+            run(
+                sdk_generator, "generate",
+                "--openapi", overlaid,
+                "--bindings", bindings_path,
+                "--definition", compat_definition,
+                "--runtime", work / "runtime.json",
+                "--output", compatibility_facade,
+                "--inventory", compatibility_inventory,
+            )
+            for path in sorted(compatibility_facade.rglob("*.rs")):
+                run(
+                    "rustup", "run", lock["rust_toolchain"], "rustfmt",
+                    "--edition", "2024", "--config", "skip_children=true", path,
+                )
+            compatibility_snapshot = snapshot(compatibility_facade)
+            compatibility_delta = sorted(
+                name for name in compatibility_snapshot.keys() | committed_facade.keys()
+                if compatibility_snapshot.get(name) != committed_facade.get(name)
+            )
+            print(json.dumps({
+                "canonical_candidate_delta_count": len(facade_delta),
+                "compatibility_facade_delta_count": len(compatibility_delta),
+                "compatibility_facade_delta": compatibility_delta,
+            }, indent=2, sort_keys=True), flush=True)
+            facade_delta = compatibility_delta
         if require_parity:
             require_migration_parity(statuses, facade_delta)
 
@@ -439,10 +478,19 @@ def main() -> None:
         action="store_true",
         help="fail closed on any rejected operation or committed facade difference",
     )
+    parser.add_argument(
+        "--compatibility-definition",
+        type=Path,
+        help="generate with a reviewed frozen SDK definition and compare the published facade",
+    )
     args = parser.parse_args()
     lock = json.loads(LOCK.read_text())
     if args.command == "probe":
-        probe(lock, require_parity=args.require_parity)
+        probe(
+            lock,
+            require_parity=args.require_parity,
+            compatibility_definition=args.compatibility_definition,
+        )
 
 
 if __name__ == "__main__":
