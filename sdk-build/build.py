@@ -296,6 +296,26 @@ def probe(lock: dict) -> None:
         write_json(work / "sdk-definition.json", derivation["definition"])
         write_json(work / "derivation-report.json", derivation["report"])
 
+        report = derivation["report"]["operations"]
+        statuses = Counter(item["status"] for item in report.values())
+        reasons = Counter(
+            item["reason"]["code"]
+            for item in report.values()
+            if item["status"] == "rejected"
+        )
+        rejection_operations: dict[str, list[str]] = {}
+        for operation_id, item in report.items():
+            if item["status"] != "rejected":
+                continue
+            rejection_operations.setdefault(item["reason"]["code"], []).append(operation_id)
+        for operation_ids in rejection_operations.values():
+            operation_ids.sort()
+        print(json.dumps({
+            "derivation_statuses": dict(sorted(statuses.items())),
+            "rejection_reasons": dict(sorted(reasons.items())),
+            "rejection_operations": dict(sorted(rejection_operations.items())),
+        }, indent=2, sort_keys=True), flush=True)
+
         runtime = {
             "error_type": "SdkError",
             "error_module": "error",
@@ -333,20 +353,6 @@ def probe(lock: dict) -> None:
             if regenerated_facade.get(name) != committed_facade.get(name)
         )
 
-        report = derivation["report"]["operations"]
-        statuses = Counter(item["status"] for item in report.values())
-        reasons = Counter(
-            item["reason"]["code"]
-            for item in report.values()
-            if item["status"] == "rejected"
-        )
-        rejection_operations: dict[str, list[str]] = {}
-        for operation_id, item in report.items():
-            if item["status"] != "rejected":
-                continue
-            rejection_operations.setdefault(item["reason"]["code"], []).append(operation_id)
-        for operation_ids in rejection_operations.values():
-            operation_ids.sort()
         api_inventory = json.loads(inventory.read_text())
         operation_slots = sum(
             len(resource["operations"]) for resource in api_inventory["resources"]
