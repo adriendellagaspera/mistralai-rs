@@ -2,14 +2,6 @@
   "schema_version": 1,
   "excluded_operations": {},
   "operations": {
-    "chat_completion_v1_chat_completions_post": {
-      "response_representations": {
-        "chat.complete": "json",
-        "chat.parse": "json",
-        "chat.parse_stream": "event_stream",
-        "chat.stream": "event_stream"
-      }
-    },
     "files_api_routes_download_file": {
       "response_representations": {
         "files.download": "binary_buffered"
