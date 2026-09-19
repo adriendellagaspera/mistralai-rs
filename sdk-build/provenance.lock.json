@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "rust_toolchain": "1.94.0",
+  "cargo_semver_checks_version": "0.50.0",
+  "openapi": {
+    "repository": "mistralai/platform-docs-public",
+    "path": "openapi.yaml",
+    "published_url": "https://docs.mistral.ai/openapi.yaml",
+    "commit": "ff846cf93d91df6fe04d0a5e540ecbe1e0ecc691",
+    "sha256": "60f5e92dcc4cae89a1c1eec614c409a1ce9da37f1e856d2868ff6734474f5859"
+  },
+  "tools": {
+    "openapi_to_rust": {
+      "name": "openapi-to-rust",
+      "repository": "adriendellagaspera/openapi-to-rust",
+      "commit": "9fee7af67c05d896da86e41d326b067312120c53",
+      "version": "0.17.0",
+      "tree_sha": "f4d6a6ebc5397da591b2c9170c16af17d10eb5be"
+    },
+    "rust_sdk_generator": {
+      "name": "rust-sdk-generator",
+      "repository": "adriendellagaspera/rust-sdk-generator",
+      "commit": "ac4dc344f59466c8bcdf0dd56d422c2325b762aa",
+      "tree_sha": "122fc721876b6b9f978e8d166ad972cd3a61c818",
+      "version": "0.2.8"
+    },
+    "openapi_to_rust_bindings": {
+      "name": "openapi-to-rust-bindings",
+      "repository": "adriendellagaspera/rust-sdk-generator",
+      "commit": "ac4dc344f59466c8bcdf0dd56d422c2325b762aa",
+      "tree_sha": "122fc721876b6b9f978e8d166ad972cd3a61c818",
+      "version": "0.3.0",
+      "subdirectory": "openapi-to-rust-bindings"
+    }
+  },
+  "official_sdks": {
+    "python": {
+      "repository": "mistralai/client-python",
+      "commit": "3653cd9a5169fc151a0787232aed70eeea88e52a"
+    },
+    "typescript": {
+      "repository": "mistralai/client-ts",
+      "commit": "d8f2d2539cf00d13d429653ab891b66a3524a2a9"
+    }
+  }
+}
