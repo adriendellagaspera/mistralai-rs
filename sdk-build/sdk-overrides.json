@@ -6,6 +6,25 @@
       "response_representations": {
         "files.download": "binary_buffered"
       }
+    },
+    "chat_completion_v1_chat_completions_post": {
+      "response_representations": {
+        "chat.complete": "json",
+        "chat.parse": "json",
+        "chat.parse_stream": "event_stream",
+        "chat.stream": "event_stream"
+      }
+    },
+    "fim_completion_v1_fim_completions_post": {
+      "response_representations": {
+        "fim.complete": "json",
+        "fim.stream": "event_stream"
+      }
+    },
+    "speech_v1_audio_speech_post": {
+      "response_representations": {
+        "audio.speech.complete": "json"
+      }
     }
   }
 }
