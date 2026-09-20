@@ -34,12 +34,12 @@ def current(path: str) -> dict:
 
 
 def changed_files() -> set[str]:
-    changed = set(git("diff", "HEAD", "--name-only").splitlines())
-    changed.update(git("ls-files", "--others", "--exclude-standard").splitlines())
+    # The workflow stages candidate paths before rendering; diagnostic artifacts
+    # remain untracked and must not be considered part of the source-update PR.
+    changed = set(git("diff", "--cached", "--name-only").splitlines())
     unexpected = sorted(
         path for path in changed
         if not path.startswith(("sdk-build/", "src/generated/", "src/sdk/"))
-        and path not in {"update-report.md", "update-pr-body.md"}
     )
     if unexpected:
         raise ValueError(f"Unexpected source-update changes: {unexpected}")
