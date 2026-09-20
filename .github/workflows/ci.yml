@@ -114,7 +114,7 @@ jobs:
       - name: Test private Rust build and remaining Python checks
         run: |
           cargo test --locked --manifest-path sdk-build/Cargo.toml --all-targets
-          python3 -m unittest discover -s sdk-build -p 'test_*.py'
+          python3 -m unittest discover -s sdk-build/api-review -p 'test_*.py'
           python3 -m unittest discover -s .github/scripts -p 'test_*.py'
 
   generation:
@@ -134,10 +134,15 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
           key: tools-generation-${{ runner.os }}-${{ hashFiles('sdk-build/provenance.lock.json', 'sdk-build/Cargo.lock', 'Cargo.lock') }}
-      - name: Verify deterministic generation and source inventories
+      - name: Verify deterministic generation without Python
         run: |
-          cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- check
-          python3 sdk-build/official-sdks/update.py check
+          mkdir -p /tmp/no-python
+          printf '#!/bin/sh\\necho "Python used during SDK generation" >&2\\nexit 96\\n' > /tmp/no-python/python3
+          cp /tmp/no-python/python3 /tmp/no-python/python
+          chmod +x /tmp/no-python/python3 /tmp/no-python/python
+          PATH="/tmp/no-python:$PATH" cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- check
+      - name: Verify independently maintained official SDK source evidence
+        run: python3 sdk-build/official-sdks/update.py check
       - name: Exercise source-update sequence without advancing source pins
         run: |
           cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- raw
@@ -170,8 +175,13 @@ jobs:
           cargo fmt --manifest-path sdk-build/Cargo.toml --check
           cargo test --locked --manifest-path sdk-build/Cargo.toml --all-targets
           cargo clippy --locked --manifest-path sdk-build/Cargo.toml --all-targets -- -D warnings
-      - name: Reproduce published source and facade from clean checkout
+      - name: Reproduce published source and facade with Python unavailable
         run: |
+          mkdir -p /tmp/no-python
+          printf '#!/bin/sh\\necho "Python used during SDK generation" >&2\\nexit 96\\n' > /tmp/no-python/python3
+          cp /tmp/no-python/python3 /tmp/no-python/python
+          chmod +x /tmp/no-python/python3 /tmp/no-python/python
+          export PATH="/tmp/no-python:$PATH"
           cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- check
           git diff --exit-code -- src/generated src/sdk sdk-build/openapi/published.yaml
           cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- generate
@@ -281,7 +291,7 @@ jobs:
         if: github.event_name == 'pull_request'
         env:
           SDK_API_BASE: ${{ github.event.pull_request.base.sha }}
-        run: python3 sdk-build/check_api_compatibility.py --base "$SDK_API_BASE" --rustdoc
+        run: python3 sdk-build/api-review/check.py --base "$SDK_API_BASE" --rustdoc
 
   gate:
     name: gate
