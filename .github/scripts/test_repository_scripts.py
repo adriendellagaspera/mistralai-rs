@@ -6,11 +6,18 @@ from unittest.mock import patch
 
 import policy
 import pr_title
+import update_report
 
 
 class RepositoryScriptsTests(unittest.TestCase):
     def test_repository_policy(self):
         policy.main()
+
+    def test_update_report_resolves_repository_sources(self):
+        self.assertEqual(update_report.ROOT, policy.ROOT)
+        for path in (update_report.LOCK, update_report.SURFACE, update_report.SPEC):
+            with self.subTest(path=path):
+                self.assertTrue((update_report.ROOT / path).is_file())
 
     def test_valid_pr_titles(self):
         titles = (
