@@ -28,7 +28,7 @@ An upstream source update may require review of `sdk-build/coverage-baseline.jso
 
 ## Build boundaries
 
-The build runs the pinned `openapi-to-rust` raw generator and `openapi-to-rust-bindings` adapter, then uses the backend-neutral `rust-sdk-generator` in two independent modes. Canonical derivation must account for every source operation; generation from the reviewed historical compatibility definition must reproduce the committed public SDK exactly.
+The build runs the pinned `openapi-to-rust` raw generator and `openapi-to-rust-bindings` adapter, then uses the backend-neutral `rust-sdk-generator` in two independent modes. Canonical derivation must account for every source operation; generation from the reviewed compatibility definition must reproduce the committed public SDK exactly.
 
 The frozen compatibility definition is an explicit public API contract, not a copy of generated Rust source. It can be changed only through an intentional public API review. Generic compiler changes belong in `rust-sdk-generator`; wire-contract corrections belong in reviewed OpenAPI overlays. Do not maintain endpoint-specific generator heuristics in this repository.
 

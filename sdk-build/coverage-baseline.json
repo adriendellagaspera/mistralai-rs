@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "source": "mistralai-rs #106: fully green 172/173 SDK probe; enforce zero further rejections",
+  "source": "173-operation pinned OpenAPI baseline; reject new rejections and unreviewed overrides",
   "total_operations": 173,
   "previously_rejected_operations": [],
   "approved_overridden_operations": [
