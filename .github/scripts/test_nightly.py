@@ -26,11 +26,13 @@ class NightlyTests(unittest.TestCase):
     def test_failure_does_not_prevent_following_check(self) -> None:
         with contextlib.redirect_stdout(io.StringIO()):
             nightly.run("sources", "openapi", [sys.executable, "-c", "raise SystemExit(5)"])
-            nightly.run("sources", "official_pins", [sys.executable, "-c", "print('ok')"])
+            nightly.run("sources", "official_python", [sys.executable, "-c", "print('ok')"])
+            nightly.run("sources", "official_typescript", [sys.executable, "-c", "print('ok')"])
         entries = nightly.load("sources")["checks"]
         self.assertEqual(entries["openapi"]["status"], "FAIL")
         self.assertIn("exit 5", entries["openapi"]["detail"])
-        self.assertEqual(entries["official_pins"]["status"], "PASS")
+        self.assertEqual(entries["official_python"]["status"], "PASS")
+        self.assertEqual(entries.get("official_typescript", {}).get("status"), "PASS")
 
     def test_failure_diagnostic_includes_process_output(self) -> None:
         with contextlib.redirect_stdout(io.StringIO()):
