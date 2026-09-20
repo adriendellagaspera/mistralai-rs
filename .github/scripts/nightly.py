@@ -19,7 +19,7 @@ import time
 RESULTS = Path(".nightly/results")
 STATES = {"PASS", "FAIL", "BLOCKED", "NOT_APPLICABLE"}
 BASELINE = {
-    "sources": ("openapi", "official_pins"),
+    "sources": ("openapi", "official_python", "official_typescript"),
     "baseline-generation": ("generation", "official_surface"),
     "baseline-format": ("sdk_format", "builder_format"),
     "baseline-lint": ("sdk_clippy", "builder_clippy"),
