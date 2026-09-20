@@ -130,6 +130,14 @@ jobs:
         run: |
           python3 sdk-build/build.py check
           python3 sdk-build/official-sdks/update.py check
+      - name: Exercise source-update sequence without advancing source pins
+        run: |
+          python3 sdk-build/build.py raw
+          test -s src/generated/coverage.json
+          python3 sdk-build/official-sdks/update.py update
+          python3 sdk-build/build.py generate
+          python3 sdk-build/build.py check
+          python3 sdk-build/official-sdks/update.py check
 
   test:
     name: test
