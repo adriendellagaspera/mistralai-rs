@@ -54,7 +54,12 @@ def main() -> None:
     mirror = fetch(source["published_url"])
     digest = hashlib.sha256(spec).hexdigest()
     if spec != mirror:
-        raise ValueError("Published OpenAPI differs from the pinned upstream revision")
+        raise ValueError(
+            "Published OpenAPI differs from the pinned upstream revision: "
+            f"upstream_commit={commit}, upstream_sha256={digest}, "
+            f"published_sha256={hashlib.sha256(mirror).hexdigest()}, "
+            f"upstream_bytes={len(spec)}, published_bytes={len(mirror)}"
+        )
     if digest == source["sha256"]:
         if (HERE / "published.yaml").read_bytes() != spec:
             raise ValueError("Published OpenAPI checkout differs from its locked SHA-256")
