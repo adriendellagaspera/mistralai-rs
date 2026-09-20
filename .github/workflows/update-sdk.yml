@@ -12,109 +12,375 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  update:
-    name: update
+  sources:
+    name: Acquire independent upstream sources
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 15
     permissions:
-      contents: write # Create/update the stable automation branch.
-      pull-requests: write # Create/update the single source-update PR.
+      contents: read
+    outputs:
+      changed: ${{ steps.detect.outputs.changed }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: main
           persist-credentials: false
-      - name: Advance OpenAPI and official SDK source pins
-        id: upstream
+      - name: Advance OpenAPI and check published mirror
         env:
           GH_TOKEN: ${{ github.token }}
+        run: python3 .github/scripts/nightly.py run sources openapi -- python3 sdk-build/openapi/update.py
+      - name: Advance Python SDK independently
+        run: python3 .github/scripts/nightly.py run sources official_python -- python3 sdk-build/official-sdks/update.py pin-latest --source python
+      - name: Advance TypeScript SDK independently
+        run: python3 .github/scripts/nightly.py run sources official_typescript -- python3 sdk-build/official-sdks/update.py pin-latest --source typescript
+      - name: Detect candidate changes
+        id: detect
         run: |
-          python3 sdk-build/openapi/update.py
-          python3 sdk-build/official-sdks/update.py pin-latest
           if git diff --quiet -- sdk-build/openapi sdk-build/official-sdks sdk-build/provenance.lock.json; then
             echo 'changed=false' >> "$GITHUB_OUTPUT"
           else
             echo 'changed=true' >> "$GITHUB_OUTPUT"
           fi
+      - name: Preserve source snapshot
+        if: always()
+        run: |
+          mkdir -p .nightly
+          tar -czf .nightly/source-snapshot.tar.gz sdk-build/openapi sdk-build/official-sdks sdk-build/provenance.lock.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: nightly-sources
+          path: .nightly/source-snapshot.tar.gz
+          if-no-files-found: warn
+          retention-days: 14
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: nightly-results-sources
+          path: .nightly/results/sources.json
+          if-no-files-found: warn
+          retention-days: 14
+
+  baseline:
+    name: Baseline / ${{ matrix.variant }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [generation, format, lint, tests, docs, tooling]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Install pinned Rust toolchain
-        if: steps.upstream.outputs.changed == 'true'
+        if: matrix.variant != 'tooling'
         run: rustup show
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        if: steps.upstream.outputs.changed == 'true'
+        if: matrix.variant == 'generation'
         with:
           path: |
+            .tools
             ~/.cargo/registry
             ~/.cargo/git
-            .tools
             target
             sdk-build/target
-          key: sdk-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'sdk-build/Cargo.lock', 'sdk-build/provenance.lock.json') }}
-      - name: Regenerate raw bindings for the updated OpenAPI
-        id: raw
-        if: steps.upstream.outputs.changed == 'true'
-        continue-on-error: true
-        run: cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- raw
-      - name: Reconcile official Python and TypeScript SDK surfaces
-        id: surface
-        if: steps.raw.outcome == 'success'
-        continue-on-error: true
-        run: python3 sdk-build/official-sdks/update.py update
-      - name: Compile and validate the idiomatic Rust SDK
-        id: validation
-        if: steps.surface.outcome == 'success'
-        continue-on-error: true
-        run: |
-          cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- generate
-          cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- check
-          python3 sdk-build/official-sdks/update.py check
-          cargo fmt --all --check
-          cargo fmt --manifest-path sdk-build/Cargo.toml --check
-          cargo clippy --locked --all-targets -- -D warnings
-          cargo clippy --locked --manifest-path sdk-build/Cargo.toml --all-targets -- -D warnings
-          cargo test --locked --all-targets
-          cargo test --locked --manifest-path sdk-build/Cargo.toml --all-targets
-      - name: Summarize source and surface changes
-        if: always() && steps.upstream.outputs.changed == 'true'
+          key: nightly-baseline-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'sdk-build/Cargo.lock', 'sdk-build/provenance.lock.json') }}
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: matrix.variant == 'lint' || matrix.variant == 'tests' || matrix.variant == 'docs'
+        with:
+          path: |
+            .tools
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+            sdk-build/target
+          key: nightly-baseline-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'sdk-build/Cargo.lock', 'sdk-build/provenance.lock.json') }}
+      - name: Exercise every baseline check
         env:
-          RAW_OUTCOME: ${{ steps.raw.outcome }}
-          SURFACE_OUTCOME: ${{ steps.surface.outcome }}
-          VALIDATION_OUTCOME: ${{ steps.validation.outcome }}
+          VARIANT: ${{ matrix.variant }}
+          RUSTDOCFLAGS: -D warnings
         run: |
-          python3 .github/scripts/update_report.py
-          printf '\nValidation: raw=%s, official surface=%s, SDK=%s.\n' "$RAW_OUTCOME" "$SURFACE_OUTCOME" "$VALIDATION_OUTCOME" >> update-report.md
+          job="baseline-$VARIANT"
+          case "$VARIANT" in
+            generation)
+              python3 .github/scripts/nightly.py run "$job" generation -- cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- check
+              python3 .github/scripts/nightly.py run "$job" official_surface -- python3 sdk-build/official-sdks/update.py check
+              ;;
+            format)
+              python3 .github/scripts/nightly.py run "$job" sdk_format -- cargo fmt --all --check
+              python3 .github/scripts/nightly.py run "$job" builder_format -- cargo fmt --manifest-path sdk-build/Cargo.toml --check
+              ;;
+            lint)
+              python3 .github/scripts/nightly.py run "$job" sdk_clippy -- cargo clippy --locked --all-targets -- -D warnings
+              python3 .github/scripts/nightly.py run "$job" builder_clippy -- cargo clippy --locked --manifest-path sdk-build/Cargo.toml --all-targets -- -D warnings
+              ;;
+            tests)
+              python3 .github/scripts/nightly.py run "$job" sdk_tests -- cargo test --locked --all-targets
+              python3 .github/scripts/nightly.py run "$job" builder_tests -- cargo test --locked --manifest-path sdk-build/Cargo.toml --all-targets
+              ;;
+            docs)
+              python3 .github/scripts/nightly.py run "$job" sdk_doc_tests -- cargo test --locked --doc
+              python3 .github/scripts/nightly.py run "$job" sdk_docs -- cargo doc --locked --no-deps
+              ;;
+            tooling)
+              python3 .github/scripts/nightly.py run "$job" python_tests -- python3 -m unittest discover -s .github/scripts -p 'test_*.py'
+              python3 .github/scripts/nightly.py run "$job" sdk_build_python_tests -- python3 -m unittest discover -s sdk-build -p 'test_*.py'
+              ;;
+          esac
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: nightly-results-baseline-${{ matrix.variant }}
+          path: .nightly/results/*.json
+          if-no-files-found: warn
+          retention-days: 14
+
+  candidate:
+    name: Generate candidate from usable source pins
+    needs: sources
+    if: needs.sources.outputs.changed == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: nightly-sources
+          path: .nightly
+      - name: Restore source pins
+        run: tar -xzf .nightly/source-snapshot.tar.gz
+      - name: Install pinned Rust toolchain
+        run: rustup show
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            .tools
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+            sdk-build/target
+          key: nightly-candidate-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'sdk-build/Cargo.lock', 'sdk-build/provenance.lock.json') }}
+      - name: Regenerate raw bindings
+        run: python3 .github/scripts/nightly.py run candidate raw -- cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- raw
+      - name: Reconcile official SDKs regardless of raw generation status
+        run: python3 .github/scripts/nightly.py run candidate surface -- python3 sdk-build/official-sdks/update.py update
+      - name: Generate SDK only when prerequisites passed
+        run: |
+          if python3 .github/scripts/nightly.py ok candidate raw &&
+             python3 .github/scripts/nightly.py ok candidate surface; then
+            python3 .github/scripts/nightly.py run candidate generate -- cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- generate
+          else
+            python3 .github/scripts/nightly.py record candidate generate BLOCKED 'Raw bindings or official surface unavailable'
+          fi
+      - name: Check candidate and official surface independently
+        run: |
+          if python3 .github/scripts/nightly.py ok candidate generate; then
+            python3 .github/scripts/nightly.py run candidate check -- cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- check
+          else
+            python3 .github/scripts/nightly.py record candidate check BLOCKED 'SDK generation unavailable'
+          fi
+          if python3 .github/scripts/nightly.py ok candidate surface; then
+            python3 .github/scripts/nightly.py run candidate official_check -- python3 sdk-build/official-sdks/update.py check
+          else
+            python3 .github/scripts/nightly.py record candidate official_check BLOCKED 'Official SDK surface unavailable'
+          fi
+      - name: Preserve partial candidate and all diagnostics
+        if: always()
+        run: |
+          mkdir -p .nightly
+          tar -czf .nightly/candidate.tar.gz sdk-build/openapi sdk-build/official-sdks sdk-build/provenance.lock.json src/generated src/sdk .nightly/results/candidate.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: nightly-candidate
+          path: .nightly/candidate.tar.gz
+          if-no-files-found: warn
+          retention-days: 14
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: nightly-results-candidate
+          path: .nightly/results/candidate.json
+          if-no-files-found: warn
+          retention-days: 14
+
+  validation:
+    name: Candidate / ${{ matrix.variant }}
+    needs: [sources, candidate]
+    if: needs.sources.outputs.changed == 'true' && needs.candidate.result == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [format, lint, tests, docs, api]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: nightly-candidate
+          path: .nightly
+      - name: Restore candidate and generation status
+        run: tar -xzf .nightly/candidate.tar.gz
+      - name: Install pinned Rust toolchain
+        if: matrix.variant != 'format'
+        run: rustup show
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: matrix.variant != 'format'
+        with:
+          path: |
+            .tools
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+            sdk-build/target
+          key: nightly-candidate-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'sdk-build/Cargo.lock', 'sdk-build/provenance.lock.json') }}
+      - name: Exercise every available candidate check
+        env:
+          VARIANT: ${{ matrix.variant }}
+          SDK_API_BASE: ${{ github.sha }}
+          RUSTDOCFLAGS: -D warnings
+        run: |
+          job="candidate-$VARIANT"
+          if ! python3 .github/scripts/nightly.py ok candidate generate; then
+            case "$VARIANT" in
+              format) checks='sdk_format builder_format' ;;
+              lint) checks='sdk_clippy builder_clippy' ;;
+              tests) checks='sdk_tests builder_tests' ;;
+              docs) checks='sdk_doc_tests sdk_docs' ;;
+              api) checks='api_review' ;;
+            esac
+            for check in $checks; do
+              python3 .github/scripts/nightly.py record "$job" "$check" BLOCKED 'Candidate generation unavailable'
+            done
+            exit 0
+          fi
+          case "$VARIANT" in
+            format)
+              python3 .github/scripts/nightly.py run "$job" sdk_format -- cargo fmt --all --check
+              python3 .github/scripts/nightly.py run "$job" builder_format -- cargo fmt --manifest-path sdk-build/Cargo.toml --check
+              ;;
+            lint)
+              python3 .github/scripts/nightly.py run "$job" sdk_clippy -- cargo clippy --locked --all-targets -- -D warnings
+              python3 .github/scripts/nightly.py run "$job" builder_clippy -- cargo clippy --locked --manifest-path sdk-build/Cargo.toml --all-targets -- -D warnings
+              ;;
+            tests)
+              python3 .github/scripts/nightly.py run "$job" sdk_tests -- cargo test --locked --all-targets
+              python3 .github/scripts/nightly.py run "$job" builder_tests -- cargo test --locked --manifest-path sdk-build/Cargo.toml --all-targets
+              ;;
+            docs)
+              python3 .github/scripts/nightly.py run "$job" sdk_doc_tests -- cargo test --locked --doc
+              python3 .github/scripts/nightly.py run "$job" sdk_docs -- cargo doc --locked --no-deps
+              ;;
+            api)
+              python3 .github/scripts/nightly.py run "$job" api_review -- python3 sdk-build/check_api_compatibility.py --base "$SDK_API_BASE" --rustdoc
+              ;;
+          esac
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: nightly-results-candidate-${{ matrix.variant }}
+          path: .nightly/results/candidate-${{ matrix.variant }}.json
+          if-no-files-found: warn
+          retention-days: 14
+
+  report:
+    name: Aggregate diagnostics and publish review
+    needs: [sources, baseline, candidate, validation]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write # Commit candidate changes to the dedicated automation branch.
+      pull-requests: write # Open or update the candidate review PR.
+      actions: read # Download per-job diagnostic artifacts.
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          pattern: nightly-*
+          path: .nightly/artifacts
+          merge-multiple: true
+      - name: Collect all results and restore reviewable candidate
+        env:
+          CANDIDATE_RESULT: ${{ needs.candidate.result }}
+        run: |
+          mkdir -p .nightly/results
+          for file in .nightly/artifacts/*.json; do
+            if [ -f "$file" ]; then cp "$file" .nightly/results/; fi
+          done
+          if [ "$CANDIDATE_RESULT" = success ] && [ -f .nightly/artifacts/candidate.tar.gz ]; then
+            tar -xzf .nightly/artifacts/candidate.tar.gz
+          fi
+      - name: Publish complete check summary
+        if: always()
+        env:
+          CHANGED: ${{ needs.sources.outputs.changed }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ "$CHANGED" = true ]; then
+            python3 .github/scripts/nightly.py summary --changed --run-url "$RUN_URL" --output update-report.md
+          else
+            python3 .github/scripts/nightly.py summary --run-url "$RUN_URL" --output update-report.md
+          fi
           cat update-report.md >> "$GITHUB_STEP_SUMMARY"
-      - name: Create or update the single SDK update PR
-        if: always() && steps.upstream.outputs.changed == 'true'
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: nightly-report
+          path: update-report.md
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Open or update source review PR if candidate has changes
+        if: always() && needs.sources.outputs.changed == 'true' && needs.candidate.result == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          branch=automation/update-mistral-sources
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add sdk-build/openapi/ sdk-build/official-sdks/ sdk-build/provenance.lock.json src/generated/ src/sdk/
+          if git diff --cached --quiet; then exit 0; fi
+          branch=automation/update-mistral-sources
           git commit -m 'chore: update Mistral SDK sources'
           gh auth setup-git
           git fetch origin "+refs/heads/$branch:refs/remotes/origin/$branch" || true
           git push --force-with-lease origin "HEAD:refs/heads/$branch"
           pr_number="$(gh pr list --base main --head "$branch" --state open --json number --jq '.[0].number // empty')"
           if [ -n "$pr_number" ]; then
-            gh pr edit "$pr_number" \
-              --title 'chore: update Mistral SDK sources' \
-              --body-file update-report.md
+            gh pr edit "$pr_number" --title 'chore: update Mistral SDK sources' --body-file update-report.md
           else
-            gh pr create \
-              --base main \
-              --head "$branch" \
-              --title 'chore: update Mistral SDK sources' \
-              --body-file update-report.md
+            gh pr create --base main --head "$branch" --title 'chore: update Mistral SDK sources' --body-file update-report.md
           fi
-      - name: Fail after publishing a blocked source-update PR
-        if: always() && steps.upstream.outputs.changed == 'true'
+      - name: Fail only after all checks and publication attempts
+        if: always()
         env:
-          RAW_OUTCOME: ${{ steps.raw.outcome }}
-          SURFACE_OUTCOME: ${{ steps.surface.outcome }}
-          VALIDATION_OUTCOME: ${{ steps.validation.outcome }}
+          CHANGED: ${{ needs.sources.outputs.changed }}
+          SOURCE_RESULT: ${{ needs.sources.result }}
+          BASELINE_RESULT: ${{ needs.baseline.result }}
+          CANDIDATE_RESULT: ${{ needs.candidate.result }}
+          VALIDATION_RESULT: ${{ needs.validation.result }}
         run: |
-          test "$RAW_OUTCOME" = success
-          test "$SURFACE_OUTCOME" = success
-          test "$VALIDATION_OUTCOME" = success
+          if [ "$CHANGED" = true ]; then
+            python3 .github/scripts/nightly.py gate --changed
+          else
+            python3 .github/scripts/nightly.py gate
+          fi
+          test "$SOURCE_RESULT" = success
+          test "$BASELINE_RESULT" = success
+          if [ "$CHANGED" = true ]; then
+            test "$CANDIDATE_RESULT" = success
+            test "$VALIDATION_RESULT" = success
+          fi

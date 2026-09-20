@@ -30,9 +30,10 @@ def generate() -> dict:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=["update", "check", "pin-latest"])
+    parser.add_argument("--source", choices=("python", "typescript"))
     args = parser.parse_args()
     if args.command == "pin-latest":
-        harvest.pin_latest(harvest.load_json(LOCK))
+        harvest.pin_latest(harvest.load_json(LOCK), source=args.source)
         return
     actual = generate()
     rendered = json.dumps(actual, indent=2) + "\n"
