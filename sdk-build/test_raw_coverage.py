@@ -43,8 +43,20 @@ class RawCoverageTests(unittest.TestCase):
         self.assertEqual(result["operations"], [{
             "method": "POST", "operation_id": "echo_stream", "path": "/v1/echo",
             "success_media": ["text/event-stream"], "tags": ["test"],
-            "upstream": True, "rust_method": "echo_stream",
+            "upstream": True,
         }])
+
+    def test_multiple_representation_methods_map_to_one_source_operation(self):
+        self.fixture()
+        path = self.generated / "binding-manifest.json"
+        manifest = json.loads(path.read_text())
+        alternative = dict(manifest["operations"][0])
+        alternative["rust_method_name"] = "echo_stream_with_json"
+        manifest["operations"].append(alternative)
+        path.write_text(json.dumps(manifest))
+        coverage = raw_coverage(self.generated, self.overlaid)
+        self.assertEqual(coverage["generated_methods"], 2)
+        self.assertEqual(len(coverage["operations"]), 1)
 
     def test_missing_generated_method_fails_closed(self):
         self.fixture(bound=False)
