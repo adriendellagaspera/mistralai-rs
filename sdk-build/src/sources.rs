@@ -1,5 +1,5 @@
 //! Pinned Mistral source verification. No network access and no Python runtime.
-use crate::gates::{Result, fail, read_json};
+use crate::gates::{Result, fail};
 use serde_json::Value;
 use sha2::{Digest, Sha256};
 use std::fs;
@@ -67,6 +67,7 @@ pub(crate) fn verify_sources(root: &Path, lock: &Value) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::gates::read_json;
 
     const VALID: &str = "openapi: 3.1.0\n- data\n    SharingDelete:\n- beta.workflows\n";
 
