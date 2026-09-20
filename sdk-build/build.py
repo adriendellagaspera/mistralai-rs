@@ -188,7 +188,7 @@ def raw_coverage(generated: Path, overlaid: Path) -> dict:
         operation = binding["source_operation"]
         operation_id = operation["operation_id"]
         expected = source.get(operation_id)
-        if expected is None or (operation["method"], operation["path"]) != (
+        if expected is None or (operation["method"], operation["path"].split("#", 1)[0]) != (
             expected["method"], expected["path"]
         ):
             raise ValueError(f"Raw binding operation disagrees with OpenAPI: {operation_id}")
