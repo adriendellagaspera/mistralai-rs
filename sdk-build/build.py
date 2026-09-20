@@ -196,11 +196,11 @@ def raw_coverage(generated: Path, overlaid: Path) -> dict:
         # The taxonomy inventory tracks source operations, not Rust methods.
         emitted.add(operation_id)
 
-    if source.keys() != emitted.keys():
+    if source.keys() != emitted:
         raise ValueError(
             "Raw binding coverage disagrees with OpenAPI: "
-            f"missing={sorted(source.keys() - emitted.keys())}; "
-            f"extra={sorted(emitted.keys() - source.keys())}"
+            f"missing={sorted(source.keys() - emitted)}; "
+            f"extra={sorted(emitted - source.keys())}"
         )
     return {
         "generated_methods": len(manifest["operations"]),
