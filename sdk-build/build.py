@@ -181,7 +181,7 @@ def raw_coverage(generated: Path, overlaid: Path) -> dict:
                 "upstream": True,
             }
 
-    emitted: dict[str, dict] = {}
+    emitted: set[str] = set()
     for binding in manifest["operations"]:
         if binding.get("kind") != "call_shape":
             continue
@@ -192,10 +192,9 @@ def raw_coverage(generated: Path, overlaid: Path) -> dict:
             expected["method"], expected["path"]
         ):
             raise ValueError(f"Raw binding operation disagrees with OpenAPI: {operation_id}")
-        rust_method = binding["rust_method_name"]
-        prior = emitted.setdefault(operation_id, {"rust_method": rust_method})
-        if prior["rust_method"] != rust_method:
-            raise ValueError(f"Multiple raw methods for operation {operation_id}")
+        # A single OpenAPI operation may emit JSON, SSE and binary variants.
+        # The taxonomy inventory tracks source operations, not Rust methods.
+        emitted.add(operation_id)
 
     if source.keys() != emitted.keys():
         raise ValueError(
@@ -205,10 +204,7 @@ def raw_coverage(generated: Path, overlaid: Path) -> dict:
         )
     return {
         "generated_methods": len(manifest["operations"]),
-        "operations": [
-            {**source[operation_id], **emitted[operation_id]}
-            for operation_id in sorted(source)
-        ],
+        "operations": [source[operation_id] for operation_id in sorted(source)],
         "upstream_operations": len(source),
     }
 
