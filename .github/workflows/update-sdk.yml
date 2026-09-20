@@ -28,8 +28,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: python3 .github/scripts/nightly.py run sources openapi -- python3 sdk-build/openapi/update.py
-      - name: Advance official SDKs regardless of OpenAPI status
-        run: python3 .github/scripts/nightly.py run sources official_pins -- python3 sdk-build/official-sdks/update.py pin-latest
+      - name: Advance Python SDK independently
+        run: python3 .github/scripts/nightly.py run sources official_python -- python3 sdk-build/official-sdks/update.py pin-latest --source python
+      - name: Advance TypeScript SDK independently
+        run: python3 .github/scripts/nightly.py run sources official_typescript -- python3 sdk-build/official-sdks/update.py pin-latest --source typescript
       - name: Detect candidate changes
         id: detect
         run: |
