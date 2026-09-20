@@ -12,6 +12,7 @@ import nightly
 ROOT = Path(__file__).resolve().parents[2]
 LOCK = "sdk-build/provenance.lock.json"
 SURFACE = "sdk-build/official-sdks/surface.json"
+SPEC = "sdk-build/openapi/published.yaml"
 COVERAGE = "src/generated/coverage.json"
 
 SOURCES = (
