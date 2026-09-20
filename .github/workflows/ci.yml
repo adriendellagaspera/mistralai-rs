@@ -162,6 +162,18 @@ jobs:
           key: rust-build-${{ runner.os }}-${{ hashFiles('sdk-build/Cargo.toml', 'sdk-build/provenance.lock.json') }}
       - name: Rust orchestration unit and failure-path tests
         run: cargo test --manifest-path sdk-build/Cargo.toml --all-targets
+      - name: Export formatted Rust source and private lockfile for migration review
+        run: |
+          cargo fmt --manifest-path sdk-build/Cargo.toml
+          python3 - <<'PY'
+          import base64
+          from pathlib import Path
+          for name in ('sdk-build/Cargo.lock', 'sdk-build/src/main.rs', 'sdk-build/src/gates.rs'):
+              contents = Path(name).read_bytes()
+              print('SDK_BUILD_EXPORT_BEGIN ' + name)
+              print(base64.b64encode(contents).decode())
+              print('SDK_BUILD_EXPORT_END ' + name)
+          PY
       - name: Regenerate with Python and independently verify Rust parity
         run: |
           python3 sdk-build/build.py check
