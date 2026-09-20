@@ -1,6 +1,5 @@
-"""Fail closed on SDK operation identity or proof regressions during migration.
+"""Fail closed on Mistral SDK operation identity or coverage regressions.
 
-This guard is deliberately independent of the historical tooling pipeline.
 Coverage progress may reduce the approved rejection set but cannot turn an
 accepted operation back into a rejection or add an unreviewed override.
 """
