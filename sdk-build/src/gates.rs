@@ -266,7 +266,7 @@ pub(crate) fn require_publish_parity(counts: &BTreeMap<String, usize>, delta: &[
 
 pub(crate) fn facade_delta(actual: &BTreeMap<String, Vec<u8>>, committed: &BTreeMap<String, Vec<u8>>) -> Vec<String> {
     actual.keys().chain(committed.keys()).collect::<BTreeSet<_>>().into_iter()
-        .filter(|name| actual.get(**name) != committed.get(**name)).cloned().collect()
+        .filter(|name| actual.get(*name) != committed.get(*name)).cloned().collect()
 }
 
 pub(crate) fn committed_facade(path: &Path) -> Result<BTreeMap<String, Vec<u8>>> {
