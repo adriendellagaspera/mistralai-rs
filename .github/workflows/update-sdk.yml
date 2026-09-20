@@ -289,9 +289,9 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
-      contents: write
-      pull-requests: write
-      actions: read
+      contents: write # Commit candidate changes to the dedicated automation branch.
+      pull-requests: write # Open or update the candidate review PR.
+      actions: read # Download per-job diagnostic artifacts.
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
