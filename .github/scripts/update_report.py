@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 import subprocess
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 LOCK = "sdk-build/provenance.lock.json"
 SURFACE = "sdk-build/official-sdks/surface.json"
 SPEC = "sdk-build/openapi/published.yaml"

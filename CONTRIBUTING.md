@@ -18,9 +18,11 @@ Without Just, run `python3 sdk-build/build.py generate` and `python3 sdk-build/b
 just sync-openapi
 just sync-sdk-surface
 just validate
-python3 sdk-build/update_report.py
+python3 .github/scripts/update_report.py
 git diff -- sdk-build src/generated src/sdk
 ```
+
+`.github/scripts/` owns repository policy, PR-title checks and the scheduled-update PR report; `sdk-build/` owns only Mistral SDK construction. The [SDK-build ownership map](sdk-build/README.md) lists every input, active caller and validation command.
 
 `sdk-build/openapi/update.py` verifies the official published mirror against the immutable upstream OpenAPI and refreshes licenses. `sdk-build/official-sdks/update.py` harvests pinned Python and TypeScript public paths; neither changes the OpenAPI wire contract. Optional `GH_TOKEN` is used only for GitHub API requests.
 

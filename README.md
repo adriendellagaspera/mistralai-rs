@@ -126,7 +126,8 @@ On first use, `sdk-build/build.py` installs the pinned tools into `.tools/`. It 
 | `sdk-build/openapi/` | Immutable published OpenAPI, truthful overlay and source-update verification |
 | `sdk-build/official-sdks/` | Pinned Python/TypeScript public surface evidence |
 | `sdk-build/build.py` | Isolated canonical derivation, generation and strict public SDK parity gate |
-| `sdk-build/` | Reviewed compatibility definition, coverage, API checks and tests |
+| `sdk-build/` | Mistral sources, reviewed inputs, reproducible build, coverage and API checks; see [ownership map](sdk-build/README.md) |
+| `.github/scripts/` | Repository policy, PR-title checks and scheduled-update PR reporting |
 | `src/generated/` | Committed raw generated Rust and raw operation inventory |
 | `src/sdk/` | Committed idiomatic SDK surface plus Mistral-owned stable error runtime |
 | `src/lib.rs`, `src/streaming.rs` | Public exports and Mistral-owned stream support |

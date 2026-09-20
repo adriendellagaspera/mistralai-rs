@@ -13,6 +13,7 @@ executable contracts; implementation detail belongs beside the code that owns it
 - `sdk-build/openapi/`: immutable upstream source, reviewed overlays and updates.
 - `sdk-build/official-sdks/`: pinned Mistral SDK surface evidence and updates.
 - `sdk-build/`: Mistral compatibility definition, coverage, API review and tests.
+- `.github/scripts/`: repository policy, PR-title validation and scheduled-update PR reporting.
 
 ## Canonical local checks
 
@@ -44,14 +45,15 @@ the API check needs the PR base revision and the dependency audit owns its tool 
 - [lint] Handwritten Rust MUST remain free of `unsafe`; lint exceptions MUST carry an explicit reason, with generated-code exceptions scoped at module boundaries.
 - [dependencies] Locked Rust dependencies MUST pass the advisory, license, source and TLS-backend policy in `deny.toml`.
 - [docs] Handwritten public Rust API MUST have rustdoc that builds warning-free; fallible public helpers MUST document their error contract.
-- [tooling] Repository-owned Python build/source/quality behavior MUST have its sdk-build test suite executed in CI.
+- [tooling] Repository-owned Python SDK-build and GitHub scripts MUST have their respective test suites executed in CI.
 - [api] Changes to the actual public Rust sources MUST pass the repository API compatibility review against the PR base.
 - [gate] Required CI jobs MUST converge on the single `gate` conclusion job before merge.
 
 ## Working guidance
 
-Put a change at the narrowest owning boundary. Generic generator or
-`openapi-to-rust-bindings` behavior belongs in `rust-sdk-generator`, not here.
+Put a change at the narrowest owning boundary. Generic Rust SDK generation belongs in `rust-sdk-generator`, raw OpenAPI
+code generation in `openapi-to-rust`, and bindings adaptation in
+`openapi-to-rust-bindings`; none belongs in this consumer.
 Mistral naming/projection, source tracking, runtime integration and compatibility
 policy belong here. Preserve deterministic generated output unless the issue
 explicitly owns an output migration.
