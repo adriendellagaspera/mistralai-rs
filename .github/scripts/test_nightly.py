@@ -114,7 +114,7 @@ class UpdatePrDescriptionTests(unittest.TestCase):
     def test_reviewable_pr_body_is_distinct_from_full_check_report(self) -> None:
         body = self.body([
             {"job": "sources", "check": "openapi", "status": "FAIL",
-             "detail": "python3 update.py (exit 1)\\nTraceback...\\nValueError: upstream spec differs"},
+             "detail": "python3 update.py (exit 1)\nTraceback...\nValueError: upstream spec differs"},
             {"job": "candidate", "check": "raw", "status": "PASS", "detail": "all good"},
         ])
         self.assertIn("### Source revisions", body)
@@ -139,8 +139,8 @@ class UpdatePrDescriptionTests(unittest.TestCase):
 
     def test_diagnostic_escapes_markdown_and_bounds_output(self) -> None:
         body = self.body([{"job": "sources", "check": "openapi",
-                           "status": "FAIL", "detail": "irrelevant\\n" + "a|b" * 200}])
-        self.assertIn("a\\\\|b", body)
+                           "status": "FAIL", "detail": "irrelevant\n" + "a|b" * 200}])
+        self.assertIn("a\\|b", body)
         self.assertIn("…", body)
         self.assertNotIn("irrelevant", body)
 
