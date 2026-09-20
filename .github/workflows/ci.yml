@@ -178,8 +178,28 @@ jobs:
         run: |
           python3 sdk-build/build.py check
           cargo run --manifest-path sdk-build/Cargo.toml -- check
-      - name: Confirm checkout outputs were not modified
-        run: git diff --exit-code -- src/generated src/sdk sdk-build/openapi/published.yaml
+          git diff --exit-code -- src/generated src/sdk sdk-build/openapi/published.yaml
+      - name: Match Python and Rust published bytes, including complete file inventories
+        run: |
+          python3 sdk-build/build.py generate
+          mkdir -p /tmp/sdk-build-python
+          cp -a src/generated /tmp/sdk-build-python/generated
+          cp -a src/sdk /tmp/sdk-build-python/sdk
+          cargo run --manifest-path sdk-build/Cargo.toml -- generate
+          diff -qr /tmp/sdk-build-python/generated src/generated
+          diff -qr /tmp/sdk-build-python/sdk src/sdk
+      - name: Reject altered pinned source without checkout mutation
+        run: |
+          cp sdk-build/openapi/published.yaml /tmp/sdk-build-published.yaml
+          trap 'cp /tmp/sdk-build-published.yaml sdk-build/openapi/published.yaml' EXIT
+          printf '\\n# parity failure injection\\n' >> sdk-build/openapi/published.yaml
+          if cargo run --manifest-path sdk-build/Cargo.toml -- check; then
+            echo 'Rust builder accepted modified published OpenAPI' >&2
+            exit 1
+          fi
+          diff -qr /tmp/sdk-build-python/generated src/generated
+          diff -qr /tmp/sdk-build-python/sdk src/sdk
+          cp /tmp/sdk-build-published.yaml sdk-build/openapi/published.yaml
 
   test:
     name: test
