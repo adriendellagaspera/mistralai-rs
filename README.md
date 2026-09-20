@@ -65,7 +65,7 @@ Mistral runtime conventions --------------------------> Runtime
 
 `mistralai-rs` owns only Mistral-specific concerns around that generic toolchain: product taxonomy, a pinned compatibility definition, runtime support, source tracking, coverage and public-API review gates.
 
-The canonical idiomatic operation inventory is derived on each `sdk-build/build.py check` run and validated against `sdk-build/coverage-baseline.json`. The pinned compatibility definition preserves the currently published facade; the historical `src/sdk/coverage.json` and `src/sdk/api-surface.json` snapshots were removed because they were not regenerated and could misrepresent the published Rust. Operations not projected idiomatically remain available through `mistralai::raw`.
+The canonical idiomatic operation inventory is derived on each `cargo run --locked --manifest-path sdk-build/Cargo.toml -- check` run and validated against `sdk-build/coverage-baseline.json`. The pinned compatibility definition preserves the currently published facade; the historical `src/sdk/coverage.json` and `src/sdk/api-surface.json` snapshots were removed because they were not regenerated and could misrepresent the published Rust. Operations not projected idiomatically remain available through `mistralai::raw`.
 
 ## Streaming and binary responses
 
@@ -99,7 +99,7 @@ Multipart file fields accept `bytes::Bytes`. Generated multipart operations expo
 
 ## Reproduce the SDK
 
-Prerequisites: Git, Rustup, Python 3.11+ with `venv`, and [Just](https://github.com/casey/just).
+Prerequisites for SDK regeneration: Git, Rustup, Python 3.11+ for the narrow source check and official-SDK collectors, and [Just](https://github.com/casey/just).
 
 ```sh
 just generate
@@ -115,7 +115,7 @@ just validate
 - `openapi-to-rust-bindings` by version, commit and Git tree;
 - the Rust toolchain and the pinned API compatibility checker.
 
-On first use, `sdk-build/build.py` installs the pinned tools into `.tools/`. It verifies their immutable revisions before use. Generation reads the vendored specification; it does not fetch a newer spec implicitly.
+On first use, the private Rust build executable installs the pinned tools into `.tools/`. It verifies their immutable revisions before use. The builder has its own `sdk-build/Cargo.toml` and `sdk-build/Cargo.lock`, outside the public SDK workspace and dependency surface. Generation reads the vendored specification; it does not fetch a newer spec implicitly.
 
 `just check-generated` regenerates raw bindings and the idiomatic SDK into fresh temporary directories, runs the raw generator's own check, formats with the pinned Rust toolchain and verifies the raw baseline modulo reviewed source-provenance markers, and compares the public Rust SDK file set byte-for-byte. No timestamps enter generated output.
 
@@ -125,7 +125,7 @@ On first use, `sdk-build/build.py` installs the pinned tools into `.tools/`. It 
 | --- | --- |
 | `sdk-build/openapi/` | Immutable published OpenAPI, truthful overlay and source-update verification |
 | `sdk-build/official-sdks/` | Pinned Python/TypeScript public surface evidence |
-| `sdk-build/build.py` | Isolated canonical derivation, generation and strict public SDK parity gate |
+| `sdk-build/src/main.rs` | Private Rust CLI for isolated canonical derivation, generation and strict public SDK parity |
 | `sdk-build/` | Mistral sources, reviewed inputs, reproducible build, coverage and API checks; see [ownership map](sdk-build/README.md) |
 | `.github/scripts/` | Repository policy, PR-title checks and scheduled-update PR reporting |
 | `src/generated/` | Committed raw generated Rust and raw operation inventory |

@@ -8,9 +8,9 @@ just check-generated
 just validate
 ```
 
-Without Just, run `python3 sdk-build/build.py generate` and `python3 sdk-build/build.py check`. The build fetches and installs the pinned Rust tools under `.tools/`; it does not require global Python packages.
+Without Just, run `cargo run --locked --manifest-path sdk-build/Cargo.toml -- generate` and `cargo run --locked --manifest-path sdk-build/Cargo.toml -- check`. The private Rust build executable fetches and installs the pinned Rust CLIs under `.tools/`; it invokes Python only for the narrow Mistral published-source check. No Python package installation is needed for ordinary build/check.
 
-`sdk-build/provenance.lock.json` pins the published Mistral OpenAPI, official SDK evidence, the raw generator, the canonical Rust SDK generator, the bindings adapter, and their immutable Git revisions. `Cargo.lock` pins the SDK's runtime and test dependencies.
+`sdk-build/provenance.lock.json` pins the published Mistral OpenAPI, official SDK evidence, the raw generator, the canonical Rust SDK generator, the bindings adapter, and their immutable Git revisions. Root `Cargo.lock` pins the SDK's runtime and test dependencies; `sdk-build/Cargo.lock` independently pins the private build executable.
 
 ## Updating sources
 
@@ -38,8 +38,8 @@ Never edit `src/generated/` or generated Rust in `src/sdk/` by hand. Generated c
 
 ## Validation
 
-`just validate` runs pinned regeneration, official SDK evidence checks, formatting, Clippy, Rust tests and docs, and the sdk-build unit tests. CI also checks public API compatibility against the PR base and dependency policy. Offline tests use fixtures/local HTTP servers; live Mistral requests are explicit opt-in only.
+`just validate` runs pinned regeneration, official SDK evidence checks, formatting, Clippy, Rust tests and docs, the private Rust build tests and remaining narrow Python checks. CI also checks public API compatibility against the PR base and dependency policy. Offline tests use fixtures/local HTTP servers; live Mistral requests are explicit opt-in only.
 
 ## Automated updates
 
-The scheduled source-update workflow creates a candidate PR only after generation and validation succeed. On a source incompatibility, it fails closed instead of silently changing the public SDK. Review source pins, generated changes, coverage and semver before merging. No workflow automatically publishes a release.
+The scheduled source-update workflow creates a candidate PR for changed source pins, including a blocked PR with the failed stage recorded when generation or validation fails. On a source incompatibility, it fails closed instead of silently changing the public SDK. Review source pins, generated changes, coverage and semver before merging. No workflow automatically publishes a release.
