@@ -1,0 +1,12 @@
+[package]
+name = "mistralai-sdk-build"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.94"
+publish = false
+
+# Private build executable: never a dependency of mistralai-sdk.
+[workspace]
+
+[dependencies]
+serde_json = "=1.0.151"

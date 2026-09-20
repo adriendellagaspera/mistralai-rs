@@ -4,3 +4,5 @@
 /update-report.md
 __pycache__/
 *.pyc
+/sdk-build/target/
+/.sdk-build-probe-*/
