@@ -126,7 +126,8 @@ On first use, `sdk-build/build.py` installs the pinned tools into `.tools/`. It 
 | `sdk-build/openapi/` | Immutable published OpenAPI, truthful overlay and source-update verification |
 | `sdk-build/official-sdks/` | Pinned Python/TypeScript public surface evidence |
 | `sdk-build/build.py` | Isolated canonical derivation, generation and parity cutover gate |
-| `sdk-build/` | Reviewed compatibility definition, coverage, API checks and tests |
+| `sdk-build/` | Mistral sources, reviewed inputs, reproducible build, coverage and API checks; see [ownership map](sdk-build/README.md) |
+| `.github/scripts/` | Repository policy, PR-title checks and scheduled-update PR reporting |
 | `src/generated/` | Committed raw generated Rust and raw operation inventory |
 | `src/sdk/` | Committed idiomatic SDK surface plus Mistral-owned stable error runtime |
 | `src/lib.rs`, `src/streaming.rs` | Public exports and Mistral-owned stream support |
@@ -138,7 +139,7 @@ The current public Rust surface is pinned by [`sdk-build/compatibility-definitio
 
 CI validates deterministic generation, formatting, compilation, Clippy with warnings denied, Rust tests/docs, coverage inventories and public API evolution.
 
-The scheduled **Update Mistral OpenAPI SDK** workflow checks the official specification and SDK evidence, regenerates and validates a candidate, then opens or updates a review PR. It never automatically merges or publishes an update.
+The scheduled **Update Mistral SDK Sources** workflow checks the official specification and SDK evidence, regenerates and validates a candidate, then opens or updates a review PR. It never automatically merges or publishes an update.
 
 `openapi-to-rust-bindings` owns compatibility tracking against `openapi-to-rust`; this repository consumes reviewed immutable package and generator revisions rather than maintaining that generic compatibility workflow locally.
 
