@@ -1,68 +1,77 @@
-# SDK build ownership
+# SDK build: responsibility map
 
-`sdk-build/` owns Mistral-specific pinned inputs, orchestration, operation
-coverage, publication and public API review. It does **not** contain generic
-OpenAPI rewriting or SDK derivation logic. The private `mistralai-sdk-build`
-executable lives in `src/main.rs` with Mistral-specific gates in `src/gates.rs`.
-Its separate Cargo workspace has `publish = false` and a separate
-`Cargo.lock`; it is neither linked by nor added to the public SDK crate.
+The SDK consumer is Rust-only. The *private* build executable is a separate,
+non-published Cargo workspace (`Cargo.toml`, `Cargo.lock`). It invokes only
+pinned generic Rust CLI generators, never imports their implementations, and
+does not add dependencies to the public SDK crate.
 
-## Commands and consumers
+## The deterministic Rust build path — no Python
 
-From the repository root:
+```text
+provenance.lock.json + openapi/published.yaml
+   │ src/sources.rs: pinned byte-level SHA-256, dialect and overlay assumptions
+   ▼
+src/main.rs: resolve immutable generator commits/trees; isolate inputs
+   ▼
+pinned openapi-to-rust: overlay + raw bindings (generate twice, check, dry-run)
+   │ src/gates.rs: raw operation inventory and baseline parity
+   ▼
+pinned openapi-to-rust-bindings: normalized Bindings v3
+   ▼
+pinned rust-sdk-generator: canonical derive + 173-operation closed-world gate
+   ▼
+pinned rust-sdk-generator: frozen compatibility-definition.json
+   │ src/gates.rs: exact published facade file inventory and bytes
+   ▼
+check: no checkout mutation  |  generate: verified raw + facade publication
+```
 
-| Command | Responsibility | Consumer |
-| --- | --- | --- |
-| `cargo run --locked --manifest-path sdk-build/Cargo.toml -- raw` | Verify pinned source/tool inputs, regenerate raw bindings in an isolated workspace, publish raw outputs for an explicit source update. | `just sync-sdk-surface`, scheduled source update, CI dry run. |
-| `cargo run --locked --manifest-path sdk-build/Cargo.toml -- generate` | Derive all operations, verify baseline and public facade, safely publish compatible outputs. | `just generate`, scheduled source update, CI dry run. |
-| `cargo run --locked --manifest-path sdk-build/Cargo.toml -- check` | Verify deterministic generation and exact public facade without modifying the checkout. | `just check-generated`, `just validate`, CI. |
-| `cargo run --locked --manifest-path sdk-build/Cargo.toml -- probe` | Diagnostic canonical derivation without publication; optional `--require-parity` and `--compatibility-definition PATH`. | Explicit developer diagnostics. |
-| `cargo test --locked --manifest-path sdk-build/Cargo.toml --all-targets` | Regression tests for source-operation identities, closed-world coverage and byte-level facade parity. | `just test-tooling`, `just validate`, CI. |
+Run from the repository root (or via Just):
 
-The separate `openapi/update.py` and `official-sdks/update.py` commands
-are **source discovery and pin updates**, never implicit prerequisites that
-refresh sources during `check` or `generate`.
-
-## Ownership of remaining inputs and scripts
-
-| Path | Owner and contract |
+| Command | Scope |
 | --- | --- |
-| `provenance.lock.json` | Mistral source SHA-256, Rust toolchain and immutable tool commits/trees; consumed by the builder, collectors, API semver gate and CI cache. |
-| `openapi-to-rust.toml`, `openapi/overlays/` | Reviewed Mistral configuration and overlay; applied by pinned `openapi-to-rust`. |
-| `openapi/published.yaml`, `openapi/LICENSE` | Immutable published snapshot and source attribution. |
-| `openapi/check_published.py` | Narrow Mistral source SHA/dialect/overlay-assumption gate invoked by the Rust builder; no general orchestration. |
-| `openapi/update.py` | Explicit upstream OpenAPI discovery and source-pin updates. |
-| `official-sdks/harvest.py`, `official-sdks/update.py` | Pinned official Python/TypeScript SDK source parsing, public-path evidence and optional upstream discovery. These remain Python because parsing two other source languages in Rust would add maintenance without improving the build composition root. |
-| `official-sdks/surface.json` | Reviewed public-path evidence consumed by the generic SDK compiler. |
-| `sdk-overrides.json`, `compatibility-definition.json` | Reviewed Mistral-specific overrides and frozen public API definition, passed unchanged to the generic SDK compiler. |
-| `coverage-baseline.json`, `src/gates.rs` | Mistral-specific 173-operation closed-world gate, raw-file/identity proof and exact public facade check. |
-| `check_api_compatibility.py`, `test_api_compatibility.py`, `api-review.json` | Independent comparison of actual public Rust sources and pinned rustdoc-semver API review. |
-| `openapi-to-rust-MIT.txt` | Upstream generator license attribution; retain. |
-| `.github/scripts/` | Repository policy, PR-title validation and scheduled-source-update reporting, independent from the SDK build. |
+| `cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- check` | Full pinned build/coverage/facade parity with no Python and no checkout mutation. |
+| `cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- generate` | Same gates, then publish both validated outputs. No Python. |
+| `cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- raw` | Explicit source-update phase; publish reviewed raw bindings only. |
+| `cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- probe` | Inspect canonical derivation, optionally `--require-parity` or `--compatibility-definition PATH`. |
+| `cargo test --locked --manifest-path sdk-build/Cargo.toml --all-targets` | Source-hash, overlay-assumption, coverage, parity and publication rollback tests. |
 
-`openapi-to-rust` owns generic overlay application/raw Rust output,
-`openapi-to-rust-bindings` owns canonical Bindings v3 adaptation, and
-`rust-sdk-generator` owns generic canonical derivation and Rust facade
-emission. This repository invokes their pinned CLI contracts rather than
-copying their implementations.
+Rust source boundaries: `src/sources.rs` validates immutable Mistral
+OpenAPI **bytes** against the pin before any generation; `src/main.rs` owns
+the CLI, installed tool revisions, isolated workspace and publish transaction;
+`src/gates.rs` owns consumer-specific normalized raw inventories, operation
+coverage, overlays and exact facade comparison. No generic SDK parsing or
+compiler logic is maintained here.
 
-## Determinism and compatibility
+## Explicit source refresh and evidence — Python remains intentional
 
-`check` and `probe` use isolated workspaces. The raw generator runs twice
-with a byte-level overlaid-spec determinism assertion, plus its own `--check`
-and `--dry-run` modes. Raw bindings are formatted with pinned rustfmt;
-the exact file inventory and output are compared against committed raw files
-with **only** previously reviewed source-provenance and operation-path
-normalizations. The Mistral coverage gate proves the 173 operation identities
-with no unreviewed override or rejection. The canonical SDK derivation is
-distinct from generation using `compatibility-definition.json`: the latter
-must exactly reproduce the committed public facade before publication.
+| Directory | Artifacts and owner | When it runs |
+| --- | --- | --- |
+| `openapi/` | `published.yaml`, `overlays/` and license are pinned inputs. `update.py` discovers/downloads an upstream revision and changes the source pin explicitly. The build no longer calls a Python source checker. | `just sync-openapi` and scheduled source-update workflow, **not** routine `check`/`generate`. |
+| `official-sdks/` | `harvest.py` analyzes the official Python AST and TypeScript sources; `update.py` coordinates `pin-latest`, `update`, `check`; `surface.json` is the reviewed input read by the Rust build. | `just check-source-evidence`, explicit source refresh, `just validate` and CI's independent source-evidence step. |
+| `api-review/` | `check.py`, `test_check.py`, `review.json`: inspect actual public Rust changes against a PR base and run pinned compiler-aware semver checks. | CI's `api` job; Python test discovery in `just test-tooling`/`just validate`. Not part of deterministic generation. |
 
-The historical `tooling/pipeline/compile_sdk.py` generated-file marker and
-raw provenance-path normalization are compatibility contracts, not active
-Python dependencies. No generated Rust, source pins or public SDK dependencies
-were changed by the orchestration migration. The Python/Rust candidate was
-exercised side by side and its generated raw/public outputs compared in
-[PR #120](https://github.com/adriendellagaspera/mistralai-rs/pull/120).
-CI continues to test a clean checkout, the explicit source-update sequence,
-negative source/coverage/tool-pin cases and the independent public API gate.
+`provenance.lock.json` pins source checksum, tool revisions/trees,
+official-SDK revisions and API semver checker; `openapi-to-rust.toml`,
+`sdk-overrides.json`, `coverage-baseline.json` and
+`compatibility-definition.json` are reviewed build inputs at the root of
+`sdk-build/`. `openapi-to-rust-MIT.txt` preserves upstream attribution.
+
+## Validation boundaries
+
+`just check-generated` and `just generate` are Python-free. In contrast,
+`just validate` intentionally combines deterministic Rust regeneration with
+Python source-evidence and API-review/repository-policy tests. CI additionally
+exercises `check` and `generate` with `python` and `python3` blocked in
+`PATH`, negative source/coverage/tool-pin cases, the source-update dry run
+and independent API compatibility checks. Source discovery is *not* part of
+ordinary generation; its results are reviewed and pinned before build.
+
+`openapi-to-rust` owns generic overlay application/raw Rust emission,
+`openapi-to-rust-bindings` owns normalized bindings, and
+`rust-sdk-generator` owns generic derivation/facade generation. This repo
+supplies only Mistral-specific inputs, invariants and runtime conventions.
+The historical `tooling/pipeline/compile_sdk.py` marker in generated Rust
+is a byte-parity contract, not an active dependency. The published OpenAPI,
+operation baseline, generated bindings/facade and public Cargo dependency
+surface are unchanged by this reorganization.
