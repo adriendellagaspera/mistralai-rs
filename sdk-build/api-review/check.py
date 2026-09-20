@@ -1,7 +1,7 @@
 """Review changes to actual Rust API sources and run pinned compiler-aware semver checks.
 
 Historical JSON snapshots are not a substitute for inspecting the Rust that ships:
-all generated facade files are already byte-for-byte checked by build.py.
+all generated facade files are independently checked byte-for-byte by the Rust SDK builder.
 """
 
 from __future__ import annotations
@@ -11,8 +11,8 @@ import json
 from pathlib import Path
 import subprocess
 
-ROOT = Path(__file__).resolve().parents[1]
-REVIEW = ROOT / "sdk-build" / "api-review.json"
+ROOT = Path(__file__).resolve().parents[2]
+REVIEW = Path(__file__).resolve().parent / "review.json"
 PUBLIC_RUST_PATHS = (
     "src/lib.rs",
     "src/streaming.rs",
@@ -44,7 +44,7 @@ def require_api_review(base: str, changed_files: list[str], review: dict) -> Non
     ):
         raise SystemExit(
             "Public Rust sources changed: explicit API review must record the "
-            "exact PR base and changed Rust files in sdk-build/api-review.json"
+            "exact PR base and changed Rust files in sdk-build/api-review/review.json"
         )
 
 

@@ -3,12 +3,12 @@
 import unittest
 from unittest.mock import patch
 
-from check_api_compatibility import changed_public_rust_files, require_api_review
+from check import changed_public_rust_files, require_api_review
 
 
 class ApiReviewTests(unittest.TestCase):
     def test_real_rust_diff_is_selected_without_a_snapshot(self):
-        with patch("check_api_compatibility.command", return_value=(
+        with patch("check.command", return_value=(
             "src/sdk/chat.rs\nsrc/sdk/api-surface.json\n"
             "src/generated/client.rs\nsrc/lib.rs\n"
         )) as git:
