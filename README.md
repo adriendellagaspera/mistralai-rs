@@ -125,7 +125,7 @@ On first use, `sdk-build/build.py` installs the pinned tools into `.tools/`. It 
 | --- | --- |
 | `sdk-build/openapi/` | Immutable published OpenAPI, truthful overlay and source-update verification |
 | `sdk-build/official-sdks/` | Pinned Python/TypeScript public surface evidence |
-| `sdk-build/build.py` | Isolated canonical derivation, generation and parity cutover gate |
+| `sdk-build/build.py` | Isolated canonical derivation, generation and strict public SDK parity gate |
 | `sdk-build/` | Reviewed compatibility definition, coverage, API checks and tests |
 | `src/generated/` | Committed raw generated Rust and raw operation inventory |
 | `src/sdk/` | Committed idiomatic SDK surface plus Mistral-owned stable error runtime |

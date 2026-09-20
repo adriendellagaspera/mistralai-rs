@@ -1,4 +1,4 @@
-"""Probe the final Mistral SDK composition boundary using canonical Rust tools only."""
+"""Orchestrate and verify the Mistral SDK build using pinned Rust tools."""
 
 from __future__ import annotations
 
@@ -246,18 +246,18 @@ def write_json(path: Path, value: object) -> None:
     path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n")
 
 
-def require_migration_parity(
+def require_publish_parity(
     statuses: Counter[str],
     facade_delta: list[str],
 ) -> None:
-    """Reject a tooling/ cutover before closed-world coverage and facade parity."""
+    """Require full operation coverage and byte-identical public SDK output."""
     if statuses.get("rejected", 0):
         raise ValueError(
-            f"Cannot replace tooling/: {statuses['rejected']} OpenAPI operations remain rejected"
+            f"Cannot publish SDK: {statuses['rejected']} OpenAPI operations remain rejected"
         )
     if facade_delta:
         raise ValueError(
-            "Cannot replace tooling/: generated SDK facade differs from the "
+            "Cannot publish SDK: generated SDK facade differs from the "
             f"committed public baseline in {len(facade_delta)} files: "
             + ", ".join(facade_delta)
         )
@@ -457,7 +457,7 @@ def probe(
             }, indent=2, sort_keys=True), flush=True)
             facade_delta = compatibility_delta
         if require_parity or publish:
-            require_migration_parity(statuses, facade_delta)
+            require_publish_parity(statuses, facade_delta)
         if publish:
             if compatibility_definition is None:
                 raise ValueError("Publishing requires the compatibility SDK definition")

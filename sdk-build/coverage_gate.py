@@ -1,6 +1,6 @@
-"""Fail closed on SDK operation identity or proof regressions during migration.
+"""Fail closed on SDK operation identity or coverage regressions.
 
-This guard is deliberately independent of the historical tooling pipeline.
+This guard is independent of the raw generator and SDK compiler.
 Coverage progress may reduce the approved rejection set but cannot turn an
 accepted operation back into a rejection or add an unreviewed override.
 """
