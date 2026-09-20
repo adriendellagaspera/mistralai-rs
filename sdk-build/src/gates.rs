@@ -474,6 +474,93 @@ mod tests {
         assert!(require_publish_parity(&BTreeMap::from([("rejected".into(), 1)]), &[]).is_err());
     }
     #[test]
+    fn coverage_gates_reject_unknown_status_rejection_and_duplicate_review() {
+        let spec = json!({"paths":{"/a":{"get":{"operationId":"a"}},
+                                     "/b":{"post":{"operationId":"b"}}}});
+        let baseline = json!({"schema_version":1,"total_operations":2,
+            "previously_rejected_operations":[],"approved_overridden_operations":[]});
+        let mut report = json!({"operations":{"a":{"status":"derived"},
+                                                  "b":{"status":"derived"}}});
+        assert_eq!(validate_coverage(&report, &baseline, &spec).unwrap()["derived"], 2);
+        report["operations"]["b"]["status"] = json!("skipped");
+        assert!(validate_coverage(&report, &baseline, &spec).is_err());
+        report["operations"]["b"]["status"] = json!("rejected");
+        assert!(validate_coverage(&report, &baseline, &spec).is_err());
+        let invalid = json!({"schema_version":1,"total_operations":2,
+            "previously_rejected_operations":["a","a"],"approved_overridden_operations":[]});
+        assert!(validate_coverage(&report, &invalid, &spec).is_err());
+    }
+
+    #[test]
+    fn source_identities_and_raw_inventory_fail_closed() {
+        let duplicate = json!({"paths":{
+            "/a":{"get":{"operationId":"same"}},
+            "/b":{"post":{"operationId":"same"}}
+        }});
+        assert!(source_paths(&duplicate).is_err());
+        assert!(source_operations(&duplicate).is_err());
+        let actual = json!({"operations":[{"operation_id":"one","method":"POST","path":"/a"}]});
+        let drifted = json!({"operations":[{"operation_id":"one","method":"GET","path":"/a"}]});
+        verify_raw_coverage(&actual, &actual).unwrap();
+        assert!(verify_raw_coverage(&actual, &drifted).is_err());
+        let duplicate_inventory = json!({"operations":[
+            {"operation_id":"one","method":"POST","path":"/a"},
+            {"operation_id":"one","method":"POST","path":"/a"}
+        ]});
+        assert!(verify_raw_coverage(&duplicate_inventory, &actual).is_err());
+    }
+
+    #[test]
+    fn facade_gate_compares_entire_inventory_and_exact_bytes() {
+        let expected = BTreeMap::from([
+            ("client.rs".into(), b"original".to_vec()),
+            ("models.rs".into(), b"model".to_vec()),
+        ]);
+        assert!(facade_delta(&expected, &expected).is_empty());
+        let mut actual = expected.clone();
+        actual.insert("client.rs".into(), b"modified".to_vec());
+        actual.remove("models.rs");
+        actual.insert("extra.rs".into(), Vec::new());
+        assert_eq!(
+            facade_delta(&actual, &expected),
+            vec!["client.rs", "extra.rs", "models.rs"]
+        );
+    }
+
+    #[test]
+    fn raw_coverage_rejects_missing_binding_or_incorrect_path() {
+        let temp = std::env::temp_dir().join(format!(
+            "mistralai-sdk-build-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        fs::create_dir(&temp).unwrap();
+        let spec = json!({"paths":{"/v1/echo#stream":{"post":{
+            "operationId":"echo_stream","tags":["test"],
+            "responses":{"200":{"content":{"text/event-stream":{}}}}
+        }}}});
+        let mut manifest = json!({"operations":[]});
+        write_json(&temp.join("binding-manifest.json"), &manifest).unwrap();
+        assert!(raw_coverage(&temp, &spec).is_err());
+        manifest["operations"] = json!([{
+            "kind":"call_shape",
+            "source_operation":{"operation_id":"echo_stream",
+                "method":"POST","path":"/v1/wrong#stream"}
+        }]);
+        write_json(&temp.join("binding-manifest.json"), &manifest).unwrap();
+        assert!(raw_coverage(&temp, &spec).is_err());
+        manifest["operations"][0]["source_operation"]["path"] = json!("/v1/echo#stream");
+        write_json(&temp.join("binding-manifest.json"), &manifest).unwrap();
+        let coverage = raw_coverage(&temp, &spec).unwrap();
+        assert_eq!(coverage["upstream_operations"], 1);
+        assert_eq!(coverage["operations"][0]["path"], "/v1/echo");
+        fs::remove_dir_all(temp).unwrap();
+    }
+
+    #[test]
     fn raw_coverage_tracks_source_operations_not_variants() {
         let spec = json!({"paths":{"/x#stream":{"post":{"operationId":"a","responses":{"200":{"content":{"text/event-stream":{}}}}}}}});
         let source = source_operations(&spec).unwrap();
