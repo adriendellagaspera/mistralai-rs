@@ -506,13 +506,13 @@ def generate(lock: dict[str, Any]) -> dict[str, Any]:
     )
 
 
-def pin_latest(lock: dict[str, Any]) -> None:
-    lock["official_sdks"]["typescript"]["commit"] = latest_commit(
-        lock["official_sdks"]["typescript"]["repository"]
-    )
-    lock["official_sdks"]["python"]["commit"] = latest_commit(
-        lock["official_sdks"]["python"]["repository"]
-    )
+def pin_latest(lock: dict[str, Any], *, source: str | None = None) -> None:
+    """Pin one official SDK independently, or both for backwards compatibility."""
+    if source is not None and source not in {"python", "typescript"}:
+        raise ValueError(f"Unknown official SDK: {source}")
+    for name in (("typescript", "python") if source is None else (source,)):
+        pinned = lock["official_sdks"][name]
+        pinned["commit"] = latest_commit(pinned["repository"])
     write_json(LOCK_PATH, lock)
 
 
