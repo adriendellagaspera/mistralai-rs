@@ -481,7 +481,10 @@ mod tests {
             "previously_rejected_operations":[],"approved_overridden_operations":[]});
         let mut report = json!({"operations":{"a":{"status":"derived"},
                                                   "b":{"status":"derived"}}});
-        assert_eq!(validate_coverage(&report, &baseline, &spec).unwrap()["derived"], 2);
+        assert_eq!(
+            validate_coverage(&report, &baseline, &spec).unwrap()["derived"],
+            2
+        );
         report["operations"]["b"]["status"] = json!("skipped");
         assert!(validate_coverage(&report, &baseline, &spec).is_err());
         report["operations"]["b"]["status"] = json!("rejected");
