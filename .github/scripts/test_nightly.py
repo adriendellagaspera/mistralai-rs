@@ -137,6 +137,16 @@ class UpdatePrDescriptionTests(unittest.TestCase):
         self.assertIn("**PASS** — 1 passed, 0 failed", body)
         self.assertNotIn("Checks requiring attention:", body)
 
+    def test_candidate_file_inventory_ignores_untracked_diagnostics(self) -> None:
+        with patch.object(update_report, "git", return_value="src/generated/client.rs") as command:
+            self.assertEqual(update_report.changed_files(), {"src/generated/client.rs"})
+        command.assert_called_once_with("diff", "--cached", "--name-only")
+
+    def test_unexpected_staged_path_is_rejected(self) -> None:
+        with patch.object(update_report, "git", return_value=".github/workflows/ci.yml"):
+            with self.assertRaisesRegex(ValueError, "Unexpected source-update changes"):
+                update_report.changed_files()
+
     def test_diagnostic_escapes_markdown_and_bounds_output(self) -> None:
         body = self.body([{"job": "sources", "check": "openapi",
                            "status": "FAIL", "detail": "irrelevant\n" + "a|b" * 200}])
