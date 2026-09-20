@@ -35,7 +35,7 @@ docs:
     RUSTDOCFLAGS="-D warnings" cargo doc --locked --no-deps
 
 validate:
-    python3 sdk-build/policy.py
+    python3 .github/scripts/policy.py
     python3 -m unittest discover -s sdk-build -p 'test_*.py'
     python3 -m unittest discover -s .github/scripts -p 'test_*.py'
     python3 sdk-build/build.py check
