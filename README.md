@@ -138,7 +138,7 @@ The current public Rust surface is pinned by [`sdk-build/compatibility-definitio
 
 CI validates deterministic generation, formatting, compilation, Clippy with warnings denied, Rust tests/docs, coverage inventories and public API evolution.
 
-The scheduled **Update Mistral OpenAPI SDK** workflow checks the official specification and SDK evidence, regenerates and validates a candidate, then opens or updates a review PR. It never automatically merges or publishes an update.
+The scheduled **Update Mistral SDK Sources** workflow checks the official specification and SDK evidence, regenerates and validates a candidate, then opens or updates a review PR. If a new upstream revision needs an explicit raw-binding, coverage or facade adaptation, it still opens the source-update PR with the failed validation stage recorded and leaves the workflow red for review. It never automatically merges or publishes an update.
 
 `openapi-to-rust-bindings` owns compatibility tracking against `openapi-to-rust`; this repository consumes reviewed immutable package and generator revisions rather than maintaining that generic compatibility workflow locally.
 
