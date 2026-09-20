@@ -76,7 +76,7 @@ jobs:
         if: matrix.variant != 'tooling'
         run: rustup show
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        if: matrix.variant != 'format'
+        if: matrix.variant == 'generation'
         with:
           path: |
             .tools
@@ -84,7 +84,17 @@ jobs:
             ~/.cargo/git
             target
             sdk-build/target
-          key: nightly-baseline-${{ matrix.variant }}-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'sdk-build/Cargo.lock', 'sdk-build/provenance.lock.json') }}
+          key: nightly-baseline-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'sdk-build/Cargo.lock', 'sdk-build/provenance.lock.json') }}
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: matrix.variant == 'lint' || matrix.variant == 'tests' || matrix.variant == 'docs'
+        with:
+          path: |
+            .tools
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+            sdk-build/target
+          key: nightly-baseline-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'sdk-build/Cargo.lock', 'sdk-build/provenance.lock.json') }}
       - name: Exercise every baseline check
         env:
           VARIANT: ${{ matrix.variant }}
@@ -223,7 +233,7 @@ jobs:
       - name: Install pinned Rust toolchain
         if: matrix.variant != 'format'
         run: rustup show
-      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         if: matrix.variant != 'format'
         with:
           path: |
@@ -232,7 +242,7 @@ jobs:
             ~/.cargo/git
             target
             sdk-build/target
-          key: nightly-validation-${{ matrix.variant }}-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'sdk-build/Cargo.lock', 'sdk-build/provenance.lock.json') }}
+          key: nightly-candidate-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'sdk-build/Cargo.lock', 'sdk-build/provenance.lock.json') }}
       - name: Exercise every available candidate check
         env:
           VARIANT: ${{ matrix.variant }}
