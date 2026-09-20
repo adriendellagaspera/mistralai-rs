@@ -9,10 +9,11 @@ executable contracts; implementation detail belongs beside the code that owns it
 - `src/generated/`: raw `openapi-to-rust` output; generated, never hand-maintained.
 - `src/sdk/`: generated idiomatic Mistral facade and Mistral-owned error runtime.
 - `src/streaming.rs`: handwritten runtime integration for streaming responses.
-- `sdk-build/src/`: private Rust orchestration, pinned canonical generation and exact facade parity.
+- `sdk-build/src/main.rs`: private Rust build orchestration; `src/sources.rs`: pinned OpenAPI verification; `src/gates.rs`: coverage and exact parity.
 - `sdk-build/openapi/`: immutable upstream source, reviewed overlays and updates.
-- `sdk-build/official-sdks/`: pinned Mistral SDK surface evidence and updates.
-- `sdk-build/`: Mistral compatibility definition, coverage, API review and tests.
+- `sdk-build/official-sdks/`: pinned Mistral SDK source discovery and evidence (Python, independent of routine build).
+- `sdk-build/api-review/`: independent Python public API and compiler-aware semver review.
+- `sdk-build/`: Mistral compatibility definition, pinned provenance and coverage inputs.
 - `.github/scripts/`: repository policy, PR-title validation and scheduled-update PR reporting.
 
 ## Canonical local checks
@@ -25,6 +26,7 @@ just format
 just lint
 just test-tooling
 just check-generated
+just check-source-evidence
 just test
 just docs
 just validate

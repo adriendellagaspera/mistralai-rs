@@ -99,7 +99,7 @@ Multipart file fields accept `bytes::Bytes`. Generated multipart operations expo
 
 ## Reproduce the SDK
 
-Prerequisites for SDK regeneration: Git, Rustup, Python 3.11+ for the narrow source check and official-SDK collectors, and [Just](https://github.com/casey/just).
+Prerequisites for ordinary SDK regeneration and checks: Git, Rustup and [Just](https://github.com/casey/just). Python 3.11+ is needed only for explicit upstream source discovery, official-SDK evidence checks and independent API review.
 
 ```sh
 just generate
@@ -115,7 +115,7 @@ just validate
 - `openapi-to-rust-bindings` by version, commit and Git tree;
 - the Rust toolchain and the pinned API compatibility checker.
 
-On first use, the private Rust build executable installs the pinned tools into `.tools/`. It verifies their immutable revisions before use. The builder has its own `sdk-build/Cargo.toml` and `sdk-build/Cargo.lock`, outside the public SDK workspace and dependency surface. Generation reads the vendored specification; it does not fetch a newer spec implicitly.
+On first use, the private Rust build executable installs the pinned tools into `.tools/`. It verifies their immutable revisions and SHA-256 of the pinned OpenAPI in Rust before use. The builder has its own `sdk-build/Cargo.toml` and `sdk-build/Cargo.lock`, outside the public SDK workspace and dependency surface. `just generate` and `just check-generated` do not invoke Python; the separate `just check-source-evidence` uses the Python collector for pinned official SDKs. Generation reads the vendored specification; it does not fetch a newer spec implicitly.
 
 `just check-generated` regenerates raw bindings and the idiomatic SDK into fresh temporary directories, runs the raw generator's own check, formats with the pinned Rust toolchain and verifies the raw baseline modulo reviewed source-provenance markers, and compares the public Rust SDK file set byte-for-byte. No timestamps enter generated output.
 
@@ -123,10 +123,11 @@ On first use, the private Rust build executable installs the pinned tools into `
 
 | Location | Purpose |
 | --- | --- |
-| `sdk-build/openapi/` | Immutable published OpenAPI, truthful overlay and source-update verification |
-| `sdk-build/official-sdks/` | Pinned Python/TypeScript public surface evidence |
-| `sdk-build/src/main.rs` | Private Rust CLI for isolated canonical derivation, generation and strict public SDK parity |
-| `sdk-build/` | Mistral sources, reviewed inputs, reproducible build, coverage and API checks; see [ownership map](sdk-build/README.md) |
+| `sdk-build/openapi/` | Immutable published OpenAPI, reviewed overlays and explicit source updates (Python collector) |
+| `sdk-build/official-sdks/` | Pinned Python/TypeScript public surface evidence and Python-only discovery |
+| `sdk-build/src/main.rs`, `src/sources.rs`, `src/gates.rs` | Private Rust CLI, published-source verification and Mistral-specific coverage/parity gates |
+| `sdk-build/api-review/` | Independent public API review and compiler-aware semver checks (Python) |
+| `sdk-build/` | Pinned configuration and build workspace; see the [responsibility map](sdk-build/README.md) |
 | `.github/scripts/` | Repository policy, PR-title checks and scheduled-update PR reporting |
 | `src/generated/` | Committed raw generated Rust and raw operation inventory |
 | `src/sdk/` | Committed idiomatic SDK surface plus Mistral-owned stable error runtime |
@@ -138,6 +139,8 @@ The current public Rust surface is pinned by [`sdk-build/compatibility-definitio
 ## Automation
 
 CI validates deterministic generation, formatting, compilation, Clippy with warnings denied, Rust tests/docs and derived operation coverage. API review compares actual public Rust files to the pull-request base, requires an explicit review record for changed files, and runs pinned compiler-aware semver checks. The exact generated facade is additionally protected by the byte-for-byte generation gate.
+
+The separate `just check-source-evidence` command validates the pinned official-SDK taxonomy using Python; it is retained in CI and `just validate` but deliberately excluded from the Python-free build entry points.
 
 The scheduled **Update Mistral SDK Sources** workflow checks the official specification and SDK evidence, regenerates and validates a candidate, then opens or updates a review PR. If a new upstream revision needs an explicit raw-binding, coverage or facade adaptation, it still opens the source-update PR with the failed validation stage recorded and leaves the workflow red for review. It never automatically merges or publishes an update.
 

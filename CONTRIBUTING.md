@@ -1,6 +1,6 @@
 # Development
 
-Install Git, Rustup, Python 3.11+ and Just. Use a clean checkout and run commands from the repository root. The SDK consumer needs only Rust.
+Install Git, Rustup and Just for SDK regeneration. Python 3.11+ is required only for source harvesting, independent API review and repository-policy checks. Use a clean checkout and run commands from the repository root. The SDK consumer needs only Rust.
 
 ```sh
 just generate
@@ -8,7 +8,7 @@ just check-generated
 just validate
 ```
 
-Without Just, run `cargo run --locked --manifest-path sdk-build/Cargo.toml -- generate` and `cargo run --locked --manifest-path sdk-build/Cargo.toml -- check`. The private Rust build executable fetches and installs the pinned Rust CLIs under `.tools/`; it invokes Python only for the narrow Mistral published-source check. No Python package installation is needed for ordinary build/check.
+Without Just, run `cargo run --locked --manifest-path sdk-build/Cargo.toml -- generate` and `cargo run --locked --manifest-path sdk-build/Cargo.toml -- check`. The private Rust build executable fetches and installs the pinned Rust CLIs under `.tools/`; it verifies the pinned published-source SHA-256 and overlay assumptions directly in Rust. Neither command invokes Python.
 
 `sdk-build/provenance.lock.json` pins the published Mistral OpenAPI, official SDK evidence, the raw generator, the canonical Rust SDK generator, the bindings adapter, and their immutable Git revisions. Root `Cargo.lock` pins the SDK's runtime and test dependencies; `sdk-build/Cargo.lock` independently pins the private build executable.
 
@@ -22,9 +22,9 @@ python3 .github/scripts/update_report.py
 git diff -- sdk-build src/generated src/sdk
 ```
 
-`.github/scripts/` owns repository policy, PR-title checks and the scheduled-update PR report; `sdk-build/` owns only Mistral SDK construction. The [SDK-build ownership map](sdk-build/README.md) lists every input, active caller and validation command.
+`.github/scripts/` owns repository policy, PR-title checks and the scheduled-update PR report; `sdk-build/` owns only Mistral SDK construction. The [SDK-build responsibility map](sdk-build/README.md) separates the Rust build path, pinned source collectors and independent API review.
 
-`sdk-build/openapi/update.py` verifies the official published mirror against the immutable upstream OpenAPI and refreshes licenses. `sdk-build/official-sdks/update.py` harvests pinned Python and TypeScript public paths; neither changes the OpenAPI wire contract. Optional `GH_TOKEN` is used only for GitHub API requests.
+`sdk-build/openapi/update.py` updates the verified official published mirror and source pin, and refreshes licenses. The private Rust builder validates the pinned source checksum, dialect and reviewed overlay assumptions without Python. `sdk-build/official-sdks/update.py` harvests pinned Python and TypeScript public paths; neither changes the OpenAPI wire contract. Optional `GH_TOKEN` is used only for GitHub API requests.
 
 An upstream source update may require review of `sdk-build/coverage-baseline.json` or `sdk-build/compatibility-definition.json`. Never relax the strict compatibility gate or change public methods silently to make an update pass. Uncovered new operations remain available through `mistralai::raw` until a separately reviewed SDK surface change.
 
@@ -38,7 +38,7 @@ Never edit `src/generated/` or generated Rust in `src/sdk/` by hand. Generated c
 
 ## Validation
 
-`just validate` runs pinned regeneration, official SDK evidence checks, formatting, Clippy, Rust tests and docs, the private Rust build tests and remaining narrow Python checks. CI also checks public API compatibility against the PR base and dependency policy. Offline tests use fixtures/local HTTP servers; live Mistral requests are explicit opt-in only.
+`just generate` and `just check-generated` run without Python; `just check-source-evidence` separately validates the official SDK taxonomy using the Python collector. `just validate` deliberately includes both tracks, independent Python API-review/repository-policy tests, formatting, Clippy and Rust tests/docs. CI also checks public API compatibility against the PR base and dependency policy. Offline tests use fixtures/local HTTP servers; live Mistral requests are explicit opt-in only.
 
 ## Automated updates
 

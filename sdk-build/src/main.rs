@@ -1,4 +1,5 @@
 mod gates;
+mod sources;
 
 use gates::{
     Result, committed_facade, copy_dir, facade_delta, fail, field, raw_coverage, read_json,
@@ -86,27 +87,6 @@ fn check_toolchain(root: &Path, lock: &Value) -> Result<String> {
         )?;
     }
     Ok(version)
-}
-
-fn verify_sources(root: &Path, lock: &Value) -> Result<()> {
-    let published = root.join("sdk-build/openapi/published.yaml");
-    if !published.is_file() {
-        return fail("pinned published OpenAPI is missing");
-    }
-    // The consumer-owned source checker retains its dialect/overlay assumptions
-    // and independently verifies the pinned SHA-256, without fetching an update.
-    if field(lock, "openapi")?
-        .get("sha256")
-        .and_then(Value::as_str)
-        .is_none()
-    {
-        return fail("OpenAPI SHA-256 pin is missing");
-    }
-    run(
-        "python3",
-        vec![str_arg(&root.join("sdk-build/openapi/check_published.py"))],
-        root,
-    )
 }
 
 fn checkout_tool(root: &Path, tool: &Value) -> Result<PathBuf> {
@@ -386,7 +366,7 @@ fn parse_args() -> Result<Options> {
 fn execute(root: &Path, args: &Options) -> Result<()> {
     let lock = read_json(&root.join("sdk-build/provenance.lock.json"))?;
     let version = check_toolchain(root, &lock)?;
-    verify_sources(root, &lock)?;
+    sources::verify_sources(root, &lock)?;
     let raw = install_tool(root, &lock, "openapi_to_rust", "openapi-to-rust")?;
     let compiler = install_tool(root, &lock, "rust_sdk_generator", "rust-sdk-generator")?;
     let bindings = install_tool(
