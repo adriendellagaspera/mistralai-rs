@@ -12,6 +12,7 @@ import unittest
 from unittest.mock import patch
 
 import nightly
+import update_report
 
 
 class NightlyTests(unittest.TestCase):
@@ -82,6 +83,66 @@ class NightlyTests(unittest.TestCase):
     def test_invalid_job_id_is_rejected(self) -> None:
         with self.assertRaises(ValueError):
             nightly.result_path("../arbitrary")
+
+
+class UpdatePrDescriptionTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.before_lock = {
+            "openapi": {"repository": "mistralai/platform-docs-public", "commit": "a" * 40},
+            "official_sdks": {
+                "python": {"repository": "mistralai/client-python", "commit": "b" * 40},
+                "typescript": {"repository": "mistralai/client-ts", "commit": "c" * 40},
+            },
+        }
+        self.after_lock = json.loads(json.dumps(self.before_lock))
+        self.after_lock["official_sdks"]["python"]["commit"] = "d" * 40
+        self.before_surface = {"operations": {"one": ["old"], "gone": ["removed"]}}
+        self.after_surface = {"operations": {"one": ["new"], "added": ["fresh"]}}
+        self.before_coverage = {"generated_methods": 183}
+        self.after_coverage = {"generated_methods": 184}
+
+    def body(self, rows: list[dict], healthy: bool = False) -> str:
+        return update_report.render(
+            self.before_lock, self.after_lock,
+            self.before_surface, self.after_surface,
+            self.before_coverage, self.after_coverage,
+            {"src/generated/client.rs", "src/generated/coverage.json",
+             "src/sdk/mod.rs", "sdk-build/provenance.lock.json"},
+            rows, healthy, "https://github.com/owner/repo/actions/runs/123",
+        )
+
+    def test_reviewable_pr_body_is_distinct_from_full_check_report(self) -> None:
+        body = self.body([
+            {"job": "sources", "check": "openapi", "status": "FAIL",
+             "detail": "python3 update.py (exit 1)\\nTraceback...\\nValueError: upstream spec differs"},
+            {"job": "candidate", "check": "raw", "status": "PASS", "detail": "all good"},
+        ])
+        self.assertIn("### Source revisions", body)
+        self.assertIn("mistralai/client-python/commit/" + "d" * 40, body)
+        self.assertNotIn("mistralai/client-ts/commit/", body)
+        self.assertIn("Generated methods: **183 → 184**", body)
+        self.assertIn("(1 added, 1 removed, 1 modified)", body)
+        self.assertIn("**FAIL** — 1 passed, 1 failed", body)
+        self.assertIn("ValueError: upstream spec differs", body)
+        self.assertNotIn("Traceback", body)
+        self.assertNotIn("| Job | Check | Status | Detail |", body)
+        self.assertIn("the PR's own CI and API review run separately", body)
+        self.assertIn("https://github.com/owner/repo/actions/runs/123", body)
+
+    def test_unchanged_pins_and_healthy_nightly(self) -> None:
+        self.after_lock = self.before_lock
+        body = self.body([{"job": "candidate", "check": "generate",
+                           "status": "PASS"}], healthy=True)
+        self.assertIn("No source revision changed", body)
+        self.assertIn("**PASS** — 1 passed, 0 failed", body)
+        self.assertNotIn("Checks requiring attention:", body)
+
+    def test_diagnostic_escapes_markdown_and_bounds_output(self) -> None:
+        body = self.body([{"job": "sources", "check": "openapi",
+                           "status": "FAIL", "detail": "irrelevant\\n" + "a|b" * 200}])
+        self.assertIn("a\\\\|b", body)
+        self.assertIn("…", body)
+        self.assertNotIn("irrelevant", body)
 
 
 if __name__ == "__main__":
