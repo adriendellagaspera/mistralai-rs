@@ -140,7 +140,11 @@ fn checkout_tool(root: &Path, tool: &Value) -> Result<PathBuf> {
         return fail(format!("{name} commit mismatch"));
     }
     if let Some(tree) = tool.get("tree_sha").and_then(Value::as_str) {
-        let actual_tree = output("git", vec!["rev-parse".into(), "HEAD^{tree}".into()], &source)?;
+        let actual_tree = output(
+            "git",
+            vec!["rev-parse".into(), "HEAD^{tree}".into()],
+            &source,
+        )?;
         if actual_tree != tree {
             return fail(format!("{name} tree mismatch"));
         }
