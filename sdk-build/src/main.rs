@@ -343,8 +343,9 @@ fn publish(root: &Path, work: &Path, generated: &Path, compatible: &Path) -> Res
         rollback_directory(&raw_target, &raw_backup)?;
         return Err(error);
     }
-    fs::remove_dir_all(&raw_backup)?;
-    fs::remove_dir_all(&sdk_backup)?;
+    // Both outputs are committed; cleanup must not report failure after publication.
+    let _ = fs::remove_dir_all(&raw_backup);
+    let _ = fs::remove_dir_all(&sdk_backup);
     println!("Published verified raw bindings and exactly compatible SDK facade.");
     Ok(())
 }
