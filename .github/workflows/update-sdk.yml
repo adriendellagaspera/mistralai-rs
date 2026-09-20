@@ -376,11 +376,13 @@ jobs:
         if: always() && needs.sources.outputs.changed == 'true' && needs.candidate.result == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add sdk-build/openapi/ sdk-build/official-sdks/ sdk-build/provenance.lock.json src/generated/ src/sdk/
           if git diff --cached --quiet; then exit 0; fi
+          python3 .github/scripts/update_report.py --run-url "$RUN_URL" --output update-pr-body.md
           branch=automation/update-mistral-sources
           git commit -m 'chore: update Mistral SDK sources'
           gh auth setup-git
@@ -388,9 +390,9 @@ jobs:
           git push --force-with-lease origin "HEAD:refs/heads/$branch"
           pr_number="$(gh pr list --base main --head "$branch" --state open --json number --jq '.[0].number // empty')"
           if [ -n "$pr_number" ]; then
-            gh pr edit "$pr_number" --title 'chore: update Mistral SDK sources' --body-file update-report.md
+            gh pr edit "$pr_number" --title 'chore: update Mistral SDK sources' --body-file update-pr-body.md
           else
-            gh pr create --base main --head "$branch" --title 'chore: update Mistral SDK sources' --body-file update-report.md
+            gh pr create --base main --head "$branch" --title 'chore: update Mistral SDK sources' --body-file update-pr-body.md
           fi
       - name: Fail only after all checks and publication attempts
         if: always()
