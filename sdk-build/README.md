@@ -20,7 +20,7 @@ All paths in the first column are relative to `sdk-build/`; “keep” means the
 
 | File | Responsibility; concrete consumer | Destination |
 | --- | --- | --- |
-| `build.py` | Pinned orchestration, isolation, raw baseline, coverage and facade parity; Justfile, CI, scheduled workflow and parity tests. | Keep |
+| `build.py` | Pinned orchestration, isolation, raw coverage/baseline, SDK coverage and facade parity; Justfile, CI, scheduled workflow and parity tests. | Keep |
 | `provenance.lock.json` | Single set of pinned revisions and checksums; build, source updates, SDK harvesting, semver gate, CI cache keys. | Keep |
 | `openapi-to-rust.toml` | Mistral raw generator configuration and transport discriminators; invoked by build via pinned raw generator. | Keep |
 | `openapi-to-rust-MIT.txt` | Upstream generator license attribution; NOTICE and README. | Keep |
@@ -29,6 +29,7 @@ All paths in the first column are relative to `sdk-build/`; “keep” means the
 | `coverage-baseline.json` | Reviewed operation identities and allowed overrides; build and coverage gate. | Keep |
 | `coverage_gate.py` | Consumer-specific operation coverage regression policy; build and coverage tests. | Keep |
 | `test_coverage_gate.py` | Coverage gate unit tests; sdk-build unittest discovery. | Keep |
+| `test_raw_coverage.py` | Verifies raw operation/representation inventory generated from emitted bindings; sdk-build unittest discovery. | Keep (added on main) |
 | `test_publish_parity.py` | Public facade and full-operation parity tests; sdk-build unittest discovery. | Keep (already renamed from `test_migration_parity.py` on main) |
 | `check_api_compatibility.py` | SDK-specific API inventory and rustdoc semver review; CI `api` job. | Keep |
 | `api-review.json` | Explicit reviewed changes against a particular PR base, consulted by the API gate only when needed. | Keep |
