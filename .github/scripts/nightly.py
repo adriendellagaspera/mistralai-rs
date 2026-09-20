@@ -25,7 +25,7 @@ BASELINE = {
     "baseline-lint": ("sdk_clippy", "builder_clippy"),
     "baseline-tests": ("sdk_tests", "builder_tests"),
     "baseline-docs": ("sdk_doc_tests", "sdk_docs"),
-    "baseline-tooling": ("python_tests",),
+    "baseline-tooling": ("python_tests", "sdk_build_python_tests"),
 }
 CANDIDATE = {
     "candidate": ("raw", "surface", "generate", "check", "official_check"),
