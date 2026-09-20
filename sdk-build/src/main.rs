@@ -1,6 +1,6 @@
 mod gates;
 
-use gates::{Result, committed_facade, copy_dir, facade_delta, fail, field, raw_coverage, read_json, require_publish_parity, snapshot, source_paths, string, validate_coverage, verify_overlaid, verify_raw_baseline, verify_raw_coverage, write_json};
+use gates::{Result, committed_facade, copy_dir, facade_delta, fail, field, raw_coverage, read_json, require_publish_parity, snapshot, string, validate_coverage, verify_overlaid, verify_raw_baseline, verify_raw_coverage, write_json};
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, BTreeSet};
 use std::env;
@@ -101,9 +101,18 @@ fn install_tool(root: &Path, lock: &Value, key: &str, binary: &str) -> Result<Pa
             "--locked".into(), "--path".into(), str_arg(&source),
             "--root".into(), str_arg(&install)], root)?;
     }
-    let expected = format!("{} {}", binary, string(tool, "version")?);
-    let actual = output(&executable, vec!["--version".into()], root)?;
-    if actual != expected { return fail(format!("unexpected {binary}: expected {expected}, got {actual}")); }
+    if binary == "rust-sdk-generator" {
+        // This pinned CLI exposes --help but no --version. Its immutable commit
+        // and tree are checked above; do not invent an unsupported CLI contract.
+        let help = output(&executable, vec!["--help".into()], root)?;
+        if !help.contains("rust-sdk-generator derive") {
+            return fail("unexpected rust-sdk-generator CLI");
+        }
+    } else {
+        let expected = format!("{} {}", binary, string(tool, "version")?);
+        let actual = output(&executable, vec!["--version".into()], root)?;
+        if actual != expected { return fail(format!("unexpected {binary}: expected {expected}, got {actual}")); }
+    }
     Ok(executable)
 }
 
