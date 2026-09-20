@@ -29,7 +29,7 @@ class RawCoverageTests(unittest.TestCase):
             "operations": [{
                 "kind": "call_shape",
                 "source_operation": {
-                    "operation_id": "echo_stream", "method": "POST", "path": "/v1/echo"
+                    "operation_id": "echo_stream", "method": "POST", "path": "/v1/echo#stream"
                 },
                 "rust_method_name": "echo_stream",
             }] if bound else []
