@@ -10,7 +10,10 @@ const OVERLAY_ASSUMPTIONS: [(&str, &str); 3] = [
         "ChatCompletionResponse still requires undeclared data",
         "- data\n",
     ),
-    ("SharingDelete still requires undeclared level", "    SharingDelete:\n"),
+    (
+        "SharingDelete still requires undeclared level",
+        "    SharingDelete:\n",
+    ),
     (
         "WorkflowListResponse still carries beta.workflows typo",
         "- beta.workflows\n",
