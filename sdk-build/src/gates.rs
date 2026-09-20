@@ -127,12 +127,12 @@ pub(crate) fn source_paths(spec: &Value) -> Result<BTreeMap<String, String>> {
             else {
                 continue;
             };
-            if let Some(previous) = result.insert(id.into(), path.clone()) {
-                if previous != *path {
-                    return fail(format!(
-                        "OpenAPI operationId {id} appears at both {previous} and {path}"
-                    ));
-                }
+            if let Some(previous) = result.insert(id.into(), path.clone())
+                && previous != *path
+            {
+                return fail(format!(
+                    "OpenAPI operationId {id} appears at both {previous} and {path}"
+                ));
             }
         }
     }
