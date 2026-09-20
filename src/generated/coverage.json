@@ -5,7 +5,6 @@
       "method": "POST",
       "operation_id": "agents_api_v1_agents_create",
       "path": "/v1/agents",
-      "rust_method": "agents_api_v1_agents_create",
       "success_media": [
         "application/json"
       ],
@@ -18,7 +17,6 @@
       "method": "PUT",
       "operation_id": "agents_api_v1_agents_create_or_update_alias",
       "path": "/v1/agents/{agent_id}/aliases",
-      "rust_method": "agents_api_v1_agents_create_or_update_alias",
       "success_media": [
         "application/json"
       ],
@@ -31,7 +29,6 @@
       "method": "DELETE",
       "operation_id": "agents_api_v1_agents_delete",
       "path": "/v1/agents/{agent_id}",
-      "rust_method": "agents_api_v1_agents_delete",
       "success_media": [],
       "tags": [
         "beta.agents"
@@ -42,7 +39,6 @@
       "method": "DELETE",
       "operation_id": "agents_api_v1_agents_delete_alias",
       "path": "/v1/agents/{agent_id}/aliases",
-      "rust_method": "agents_api_v1_agents_delete_alias",
       "success_media": [],
       "tags": [
         "beta.agents"
@@ -53,7 +49,6 @@
       "method": "GET",
       "operation_id": "agents_api_v1_agents_get",
       "path": "/v1/agents/{agent_id}",
-      "rust_method": "agents_api_v1_agents_get",
       "success_media": [
         "application/json"
       ],
@@ -66,7 +61,6 @@
       "method": "GET",
       "operation_id": "agents_api_v1_agents_get_version",
       "path": "/v1/agents/{agent_id}/versions/{version}",
-      "rust_method": "agents_api_v1_agents_get_version",
       "success_media": [
         "application/json"
       ],
@@ -79,7 +73,6 @@
       "method": "GET",
       "operation_id": "agents_api_v1_agents_list",
       "path": "/v1/agents",
-      "rust_method": "agents_api_v1_agents_list",
       "success_media": [
         "application/json"
       ],
@@ -92,7 +85,6 @@
       "method": "GET",
       "operation_id": "agents_api_v1_agents_list_pages",
       "path": "/v1/agents/pages",
-      "rust_method": "agents_api_v1_agents_list_pages",
       "success_media": [
         "application/json"
       ],
@@ -105,7 +97,6 @@
       "method": "GET",
       "operation_id": "agents_api_v1_agents_list_version_aliases",
       "path": "/v1/agents/{agent_id}/aliases",
-      "rust_method": "agents_api_v1_agents_list_version_aliases",
       "success_media": [
         "application/json"
       ],
@@ -118,7 +109,6 @@
       "method": "GET",
       "operation_id": "agents_api_v1_agents_list_versions",
       "path": "/v1/agents/{agent_id}/versions",
-      "rust_method": "agents_api_v1_agents_list_versions",
       "success_media": [
         "application/json"
       ],
@@ -131,7 +121,6 @@
       "method": "PATCH",
       "operation_id": "agents_api_v1_agents_update",
       "path": "/v1/agents/{agent_id}",
-      "rust_method": "agents_api_v1_agents_update",
       "success_media": [
         "application/json"
       ],
@@ -144,7 +133,6 @@
       "method": "PATCH",
       "operation_id": "agents_api_v1_agents_update_version",
       "path": "/v1/agents/{agent_id}/version",
-      "rust_method": "agents_api_v1_agents_update_version",
       "success_media": [
         "application/json"
       ],
@@ -157,7 +145,6 @@
       "method": "POST",
       "operation_id": "agents_api_v1_conversations_append",
       "path": "/v1/conversations/{conversation_id}",
-      "rust_method": "agents_api_v1_conversations_append",
       "success_media": [
         "application/json"
       ],
@@ -170,7 +157,6 @@
       "method": "POST",
       "operation_id": "agents_api_v1_conversations_append_stream",
       "path": "/v1/conversations/{conversation_id}",
-      "rust_method": "agents_api_v1_conversations_append_stream",
       "success_media": [
         "text/event-stream"
       ],
@@ -183,7 +169,6 @@
       "method": "DELETE",
       "operation_id": "agents_api_v1_conversations_delete",
       "path": "/v1/conversations/{conversation_id}",
-      "rust_method": "agents_api_v1_conversations_delete",
       "success_media": [],
       "tags": [
         "beta.conversations"
@@ -194,7 +179,6 @@
       "method": "GET",
       "operation_id": "agents_api_v1_conversations_get",
       "path": "/v1/conversations/{conversation_id}",
-      "rust_method": "agents_api_v1_conversations_get",
       "success_media": [
         "application/json"
       ],
@@ -207,7 +191,6 @@
       "method": "GET",
       "operation_id": "agents_api_v1_conversations_history",
       "path": "/v1/conversations/{conversation_id}/history",
-      "rust_method": "agents_api_v1_conversations_history",
       "success_media": [
         "application/json"
       ],
@@ -220,7 +203,6 @@
       "method": "GET",
       "operation_id": "agents_api_v1_conversations_list",
       "path": "/v1/conversations",
-      "rust_method": "agents_api_v1_conversations_list",
       "success_media": [
         "application/json"
       ],
@@ -233,7 +215,6 @@
       "method": "GET",
       "operation_id": "agents_api_v1_conversations_messages",
       "path": "/v1/conversations/{conversation_id}/messages",
-      "rust_method": "agents_api_v1_conversations_messages",
       "success_media": [
         "application/json"
       ],
@@ -246,7 +227,6 @@
       "method": "POST",
       "operation_id": "agents_api_v1_conversations_restart",
       "path": "/v1/conversations/{conversation_id}/restart",
-      "rust_method": "agents_api_v1_conversations_restart",
       "success_media": [
         "application/json"
       ],
@@ -259,7 +239,6 @@
       "method": "POST",
       "operation_id": "agents_api_v1_conversations_restart_stream",
       "path": "/v1/conversations/{conversation_id}/restart",
-      "rust_method": "agents_api_v1_conversations_restart_stream",
       "success_media": [
         "text/event-stream"
       ],
@@ -272,7 +251,6 @@
       "method": "POST",
       "operation_id": "agents_api_v1_conversations_start",
       "path": "/v1/conversations",
-      "rust_method": "agents_api_v1_conversations_start",
       "success_media": [
         "application/json"
       ],
@@ -285,7 +263,6 @@
       "method": "POST",
       "operation_id": "agents_api_v1_conversations_start_stream",
       "path": "/v1/conversations",
-      "rust_method": "agents_api_v1_conversations_start_stream",
       "success_media": [
         "text/event-stream"
       ],
@@ -298,7 +275,6 @@
       "method": "POST",
       "operation_id": "agents_completion_v1_agents_completions_post",
       "path": "/v1/agents/completions",
-      "rust_method": "agents_completion_v1_agents_completions_post",
       "success_media": [
         "application/json"
       ],
@@ -311,7 +287,6 @@
       "method": "PUT",
       "operation_id": "archive_workflow_v1_workflows__workflow_identifier__archive_put",
       "path": "/v1/workflows/{workflow_identifier}/archive",
-      "rust_method": "archive_workflow_v1_workflows_workflow_identifier_archive_put",
       "success_media": [
         "application/json"
       ],
@@ -324,7 +299,6 @@
       "method": "POST",
       "operation_id": "audio_api_v1_transcriptions_post",
       "path": "/v1/audio/transcriptions",
-      "rust_method": "audio_api_v1_transcriptions_post",
       "success_media": [
         "application/json"
       ],
@@ -337,7 +311,6 @@
       "method": "POST",
       "operation_id": "audio_api_v1_transcriptions_post_stream",
       "path": "/v1/audio/transcriptions",
-      "rust_method": "audio_api_v1_transcriptions_post_stream",
       "success_media": [
         "text/event-stream"
       ],
@@ -350,7 +323,6 @@
       "method": "POST",
       "operation_id": "batch_cancel_workflow_executions_v1_workflows_executions_cancel_post",
       "path": "/v1/workflows/executions/cancel",
-      "rust_method": "batch_cancel_workflow_executions_v1_workflows_executions_cancel_post",
       "success_media": [
         "application/json"
       ],
@@ -363,7 +335,6 @@
       "method": "POST",
       "operation_id": "batch_terminate_workflow_executions_v1_workflows_executions_terminate_post",
       "path": "/v1/workflows/executions/terminate",
-      "rust_method": "batch_terminate_workflow_executions_v1_workflows_executions_terminate_post",
       "success_media": [
         "application/json"
       ],
@@ -376,7 +347,6 @@
       "method": "POST",
       "operation_id": "cancel_workflow_execution_v1_workflows_executions__execution_id__cancel_post",
       "path": "/v1/workflows/executions/{execution_id}/cancel",
-      "rust_method": "cancel_workflow_execution_v1_workflows_executions_execution_id_cancel_post",
       "success_media": [],
       "tags": [
         "beta.workflows.executions"
@@ -387,7 +357,6 @@
       "method": "POST",
       "operation_id": "chat_classifications_v1_chat_classifications_post",
       "path": "/v1/chat/classifications",
-      "rust_method": "chat_classifications_v1_chat_classifications_post",
       "success_media": [
         "application/json"
       ],
@@ -400,7 +369,6 @@
       "method": "POST",
       "operation_id": "chat_completion_v1_chat_completions_post",
       "path": "/v1/chat/completions",
-      "rust_method": "chat_completion_v1_chat_completions_post",
       "success_media": [
         "application/json",
         "text/event-stream"
@@ -414,7 +382,6 @@
       "method": "POST",
       "operation_id": "chat_moderations_v1_chat_moderations_post",
       "path": "/v1/chat/moderations",
-      "rust_method": "chat_moderations_v1_chat_moderations_post",
       "success_media": [
         "application/json"
       ],
@@ -427,7 +394,6 @@
       "method": "POST",
       "operation_id": "classifications_v1_classifications_post",
       "path": "/v1/classifications",
-      "rust_method": "classifications_v1_classifications_post",
       "success_media": [
         "application/json"
       ],
@@ -440,7 +406,6 @@
       "method": "POST",
       "operation_id": "connector_call_tool_v1",
       "path": "/v1/connectors/{connector_id_or_name}/tools/{tool_name}/call",
-      "rust_method": "connector_call_tool_v1",
       "success_media": [
         "application/json"
       ],
@@ -453,7 +418,6 @@
       "method": "POST",
       "operation_id": "connector_create_or_update_organization_credentials_v1",
       "path": "/v1/connectors/{connector_id_or_name}/organization/credentials",
-      "rust_method": "connector_create_or_update_organization_credentials_v1",
       "success_media": [
         "application/json"
       ],
@@ -466,7 +430,6 @@
       "method": "POST",
       "operation_id": "connector_create_or_update_user_credentials_v1",
       "path": "/v1/connectors/{connector_id_or_name}/user/credentials",
-      "rust_method": "connector_create_or_update_user_credentials_v1",
       "success_media": [
         "application/json"
       ],
@@ -479,7 +442,6 @@
       "method": "POST",
       "operation_id": "connector_create_or_update_workspace_credentials_v1",
       "path": "/v1/connectors/{connector_id_or_name}/workspace/credentials",
-      "rust_method": "connector_create_or_update_workspace_credentials_v1",
       "success_media": [
         "application/json"
       ],
@@ -492,7 +454,6 @@
       "method": "POST",
       "operation_id": "connector_create_v1",
       "path": "/v1/connectors",
-      "rust_method": "connector_create_v1",
       "success_media": [
         "application/json"
       ],
@@ -505,7 +466,6 @@
       "method": "DELETE",
       "operation_id": "connector_delete_organization_credentials_v1",
       "path": "/v1/connectors/{connector_id_or_name}/organization/credentials/{credentials_name}",
-      "rust_method": "connector_delete_organization_credentials_v1",
       "success_media": [
         "application/json"
       ],
@@ -518,7 +478,6 @@
       "method": "DELETE",
       "operation_id": "connector_delete_user_credentials_v1",
       "path": "/v1/connectors/{connector_id_or_name}/user/credentials/{credentials_name}",
-      "rust_method": "connector_delete_user_credentials_v1",
       "success_media": [
         "application/json"
       ],
@@ -531,7 +490,6 @@
       "method": "DELETE",
       "operation_id": "connector_delete_v1",
       "path": "/v1/connectors/{connector_id}",
-      "rust_method": "connector_delete_v1",
       "success_media": [
         "application/json"
       ],
@@ -544,7 +502,6 @@
       "method": "DELETE",
       "operation_id": "connector_delete_workspace_credentials_v1",
       "path": "/v1/connectors/{connector_id_or_name}/workspace/credentials/{credentials_name}",
-      "rust_method": "connector_delete_workspace_credentials_v1",
       "success_media": [
         "application/json"
       ],
@@ -557,7 +514,6 @@
       "method": "GET",
       "operation_id": "connector_get_auth_url_v1",
       "path": "/v1/connectors/{connector_id_or_name}/auth_url",
-      "rust_method": "connector_get_auth_url_v1",
       "success_media": [
         "application/json"
       ],
@@ -570,7 +526,6 @@
       "method": "GET",
       "operation_id": "connector_get_authentication_methods_v1",
       "path": "/v1/connectors/{connector_id_or_name}/authentication_methods",
-      "rust_method": "connector_get_authentication_methods_v1",
       "success_media": [
         "application/json"
       ],
@@ -583,7 +538,6 @@
       "method": "GET",
       "operation_id": "connector_get_v1",
       "path": "/v1/connectors/{connector_id_or_name}",
-      "rust_method": "connector_get_v1",
       "success_media": [
         "application/json"
       ],
@@ -596,7 +550,6 @@
       "method": "GET",
       "operation_id": "connector_list_organization_credentials_v1",
       "path": "/v1/connectors/{connector_id_or_name}/organization/credentials",
-      "rust_method": "connector_list_organization_credentials_v1",
       "success_media": [
         "application/json"
       ],
@@ -609,7 +562,6 @@
       "method": "GET",
       "operation_id": "connector_list_tools_v1",
       "path": "/v1/connectors/{connector_id_or_name}/tools",
-      "rust_method": "connector_list_tools_v1",
       "success_media": [
         "application/json"
       ],
@@ -622,7 +574,6 @@
       "method": "GET",
       "operation_id": "connector_list_user_credentials_v1",
       "path": "/v1/connectors/{connector_id_or_name}/user/credentials",
-      "rust_method": "connector_list_user_credentials_v1",
       "success_media": [
         "application/json"
       ],
@@ -635,7 +586,6 @@
       "method": "GET",
       "operation_id": "connector_list_v1",
       "path": "/v1/connectors",
-      "rust_method": "connector_list_v1",
       "success_media": [
         "application/json"
       ],
@@ -648,7 +598,6 @@
       "method": "GET",
       "operation_id": "connector_list_workspace_credentials_v1",
       "path": "/v1/connectors/{connector_id_or_name}/workspace/credentials",
-      "rust_method": "connector_list_workspace_credentials_v1",
       "success_media": [
         "application/json"
       ],
@@ -661,7 +610,6 @@
       "method": "PATCH",
       "operation_id": "connector_update_v1",
       "path": "/v1/connectors/{connector_id}",
-      "rust_method": "connector_update_v1",
       "success_media": [
         "application/json"
       ],
@@ -674,7 +622,6 @@
       "method": "POST",
       "operation_id": "create_campaign_v1_observability_campaigns_post",
       "path": "/v1/observability/campaigns",
-      "rust_method": "create_campaign_v1_observability_campaigns_post",
       "success_media": [
         "application/json"
       ],
@@ -687,7 +634,6 @@
       "method": "POST",
       "operation_id": "create_dataset_record_v1_observability_datasets__dataset_id__records_post",
       "path": "/v1/observability/datasets/{dataset_id}/records",
-      "rust_method": "create_dataset_record_v1_observability_datasets_dataset_id_records_post",
       "success_media": [
         "application/json"
       ],
@@ -700,7 +646,6 @@
       "method": "POST",
       "operation_id": "create_dataset_v1_observability_datasets_post",
       "path": "/v1/observability/datasets",
-      "rust_method": "create_dataset_v1_observability_datasets_post",
       "success_media": [
         "application/json"
       ],
@@ -713,7 +658,6 @@
       "method": "POST",
       "operation_id": "create_judge_v1_observability_judges_post",
       "path": "/v1/observability/judges",
-      "rust_method": "create_judge_v1_observability_judges_post",
       "success_media": [
         "application/json"
       ],
@@ -726,7 +670,6 @@
       "method": "POST",
       "operation_id": "create_voice_v1_audio_voices_post",
       "path": "/v1/audio/voices",
-      "rust_method": "create_voice_v1_audio_voices_post",
       "success_media": [
         "application/json"
       ],
@@ -739,7 +682,6 @@
       "method": "DELETE",
       "operation_id": "delete_campaign_v1_observability_campaigns__campaign_id__delete",
       "path": "/v1/observability/campaigns/{campaign_id}",
-      "rust_method": "delete_campaign_v1_observability_campaigns_campaign_id_delete",
       "success_media": [],
       "tags": [
         "beta.observability.campaigns"
@@ -750,7 +692,6 @@
       "method": "DELETE",
       "operation_id": "delete_dataset_record_v1_observability_dataset_records__dataset_record_id__delete",
       "path": "/v1/observability/dataset-records/{dataset_record_id}",
-      "rust_method": "delete_dataset_record_v1_observability_dataset_records_dataset_record_id_delete",
       "success_media": [],
       "tags": [
         "beta.observability.datasets.records"
@@ -761,7 +702,6 @@
       "method": "POST",
       "operation_id": "delete_dataset_records_v1_observability_dataset_records_bulk_delete_post",
       "path": "/v1/observability/dataset-records/bulk-delete",
-      "rust_method": "delete_dataset_records_v1_observability_dataset_records_bulk_delete_post",
       "success_media": [],
       "tags": [
         "beta.observability.datasets.records"
@@ -772,7 +712,6 @@
       "method": "DELETE",
       "operation_id": "delete_dataset_v1_observability_datasets__dataset_id__delete",
       "path": "/v1/observability/datasets/{dataset_id}",
-      "rust_method": "delete_dataset_v1_observability_datasets_dataset_id_delete",
       "success_media": [],
       "tags": [
         "beta.observability.datasets"
@@ -783,7 +722,6 @@
       "method": "DELETE",
       "operation_id": "delete_judge_v1_observability_judges__judge_id__delete",
       "path": "/v1/observability/judges/{judge_id}",
-      "rust_method": "delete_judge_v1_observability_judges_judge_id_delete",
       "success_media": [],
       "tags": [
         "beta.observability.judges"
@@ -794,7 +732,6 @@
       "method": "DELETE",
       "operation_id": "delete_model_v1_models__model_id__delete",
       "path": "/v1/models/{model_id}",
-      "rust_method": "delete_model_v1_models_model_id_delete",
       "success_media": [
         "application/json"
       ],
@@ -807,7 +744,6 @@
       "method": "DELETE",
       "operation_id": "delete_voice_v1_audio_voices__voice_id__delete",
       "path": "/v1/audio/voices/{voice_id}",
-      "rust_method": "delete_voice_v1_audio_voices_voice_id_delete",
       "success_media": [
         "application/json"
       ],
@@ -820,7 +756,6 @@
       "method": "POST",
       "operation_id": "embeddings_v1_embeddings_post",
       "path": "/v1/embeddings",
-      "rust_method": "embeddings_v1_embeddings_post",
       "success_media": [
         "application/json"
       ],
@@ -833,7 +768,6 @@
       "method": "POST",
       "operation_id": "execute_workflow_registration_v1_workflows_registrations__workflow_registration_id__execute_post",
       "path": "/v1/workflows/registrations/{workflow_registration_id}/execute",
-      "rust_method": "execute_workflow_registration_v1_workflows_registrations_workflow_registration_id_execute_post",
       "success_media": [
         "application/json"
       ],
@@ -846,7 +780,6 @@
       "method": "POST",
       "operation_id": "execute_workflow_v1_workflows__workflow_identifier__execute_post",
       "path": "/v1/workflows/{workflow_identifier}/execute",
-      "rust_method": "execute_workflow_v1_workflows_workflow_identifier_execute_post",
       "success_media": [
         "application/json"
       ],
@@ -859,7 +792,6 @@
       "method": "GET",
       "operation_id": "export_dataset_to_jsonl_v1_observability_datasets__dataset_id__exports_to_jsonl_get",
       "path": "/v1/observability/datasets/{dataset_id}/exports/to-jsonl",
-      "rust_method": "export_dataset_to_jsonl_v1_observability_datasets_dataset_id_exports_to_jsonl_get",
       "success_media": [
         "application/json"
       ],
@@ -872,7 +804,6 @@
       "method": "DELETE",
       "operation_id": "files_api_routes_delete_file",
       "path": "/v1/files/{file_id}",
-      "rust_method": "files_api_routes_delete_file",
       "success_media": [
         "application/json"
       ],
@@ -882,11 +813,9 @@
       "upstream": true
     },
     {
-      "binary_stream_method": "files_api_routes_download_file_stream",
       "method": "GET",
       "operation_id": "files_api_routes_download_file",
       "path": "/v1/files/{file_id}/content",
-      "rust_method": "files_api_routes_download_file",
       "success_media": [
         "application/octet-stream"
       ],
@@ -899,7 +828,6 @@
       "method": "GET",
       "operation_id": "files_api_routes_get_signed_url",
       "path": "/v1/files/{file_id}/url",
-      "rust_method": "files_api_routes_get_signed_url",
       "success_media": [
         "application/json"
       ],
@@ -912,7 +840,6 @@
       "method": "GET",
       "operation_id": "files_api_routes_list_files",
       "path": "/v1/files",
-      "rust_method": "files_api_routes_list_files",
       "success_media": [
         "application/json"
       ],
@@ -925,7 +852,6 @@
       "method": "GET",
       "operation_id": "files_api_routes_retrieve_file",
       "path": "/v1/files/{file_id}",
-      "rust_method": "files_api_routes_retrieve_file",
       "success_media": [
         "application/json"
       ],
@@ -938,7 +864,6 @@
       "method": "POST",
       "operation_id": "files_api_routes_upload_file",
       "path": "/v1/files",
-      "rust_method": "files_api_routes_upload_file",
       "success_media": [
         "application/json"
       ],
@@ -951,7 +876,6 @@
       "method": "POST",
       "operation_id": "fim_completion_v1_fim_completions_post",
       "path": "/v1/fim/completions",
-      "rust_method": "fim_completion_v1_fim_completions_post",
       "success_media": [
         "application/json",
         "text/event-stream"
@@ -965,7 +889,6 @@
       "method": "GET",
       "operation_id": "get_campaign_by_id_v1_observability_campaigns__campaign_id__get",
       "path": "/v1/observability/campaigns/{campaign_id}",
-      "rust_method": "get_campaign_by_id_v1_observability_campaigns_campaign_id_get",
       "success_media": [
         "application/json"
       ],
@@ -978,7 +901,6 @@
       "method": "GET",
       "operation_id": "get_campaign_selected_events_v1_observability_campaigns__campaign_id__selected_events_get",
       "path": "/v1/observability/campaigns/{campaign_id}/selected-events",
-      "rust_method": "get_campaign_selected_events_v1_observability_campaigns_campaign_id_selected_events_get",
       "success_media": [
         "application/json"
       ],
@@ -991,7 +913,6 @@
       "method": "GET",
       "operation_id": "get_campaign_status_by_id_v1_observability_campaigns__campaign_id__status_get",
       "path": "/v1/observability/campaigns/{campaign_id}/status",
-      "rust_method": "get_campaign_status_by_id_v1_observability_campaigns_campaign_id_status_get",
       "success_media": [
         "application/json"
       ],
@@ -1004,7 +925,6 @@
       "method": "GET",
       "operation_id": "get_campaigns_v1_observability_campaigns_get",
       "path": "/v1/observability/campaigns",
-      "rust_method": "get_campaigns_v1_observability_campaigns_get",
       "success_media": [
         "application/json"
       ],
@@ -1017,7 +937,6 @@
       "method": "POST",
       "operation_id": "get_chat_completion_event_ids_v1_observability_chat_completion_events_search_ids_post",
       "path": "/v1/observability/chat-completion-events/search-ids",
-      "rust_method": "get_chat_completion_event_ids_v1_observability_chat_completion_events_search_ids_post",
       "success_media": [
         "application/json"
       ],
@@ -1030,7 +949,6 @@
       "method": "GET",
       "operation_id": "get_chat_completion_event_v1_observability_chat_completion_events__event_id__get",
       "path": "/v1/observability/chat-completion-events/{event_id}",
-      "rust_method": "get_chat_completion_event_v1_observability_chat_completion_events_event_id_get",
       "success_media": [
         "application/json"
       ],
@@ -1043,7 +961,6 @@
       "method": "POST",
       "operation_id": "get_chat_completion_events_v1_observability_chat_completion_events_search_post",
       "path": "/v1/observability/chat-completion-events/search",
-      "rust_method": "get_chat_completion_events_v1_observability_chat_completion_events_search_post",
       "success_media": [
         "application/json"
       ],
@@ -1056,7 +973,6 @@
       "method": "POST",
       "operation_id": "get_chat_completion_field_options_counts_v1_observability_chat_completion_fields__field_name__options_counts_post",
       "path": "/v1/observability/chat-completion-fields/{field_name}/options-counts",
-      "rust_method": "get_chat_completion_field_options_counts_v1_observability_chat_completion_fields_field_name_options_counts_post",
       "success_media": [
         "application/json"
       ],
@@ -1069,7 +985,6 @@
       "method": "GET",
       "operation_id": "get_chat_completion_field_options_v1_observability_chat_completion_fields__field_name__options_get",
       "path": "/v1/observability/chat-completion-fields/{field_name}/options",
-      "rust_method": "get_chat_completion_field_options_v1_observability_chat_completion_fields_field_name_options_get",
       "success_media": [
         "application/json"
       ],
@@ -1082,7 +997,6 @@
       "method": "GET",
       "operation_id": "get_chat_completion_fields_v1_observability_chat_completion_fields_get",
       "path": "/v1/observability/chat-completion-fields",
-      "rust_method": "get_chat_completion_fields_v1_observability_chat_completion_fields_get",
       "success_media": [
         "application/json"
       ],
@@ -1095,7 +1009,6 @@
       "method": "GET",
       "operation_id": "get_dataset_by_id_v1_observability_datasets__dataset_id__get",
       "path": "/v1/observability/datasets/{dataset_id}",
-      "rust_method": "get_dataset_by_id_v1_observability_datasets_dataset_id_get",
       "success_media": [
         "application/json"
       ],
@@ -1108,7 +1021,6 @@
       "method": "GET",
       "operation_id": "get_dataset_import_task_v1_observability_datasets__dataset_id__tasks__task_id__get",
       "path": "/v1/observability/datasets/{dataset_id}/tasks/{task_id}",
-      "rust_method": "get_dataset_import_task_v1_observability_datasets_dataset_id_tasks_task_id_get",
       "success_media": [
         "application/json"
       ],
@@ -1121,7 +1033,6 @@
       "method": "GET",
       "operation_id": "get_dataset_import_tasks_v1_observability_datasets__dataset_id__tasks_get",
       "path": "/v1/observability/datasets/{dataset_id}/tasks",
-      "rust_method": "get_dataset_import_tasks_v1_observability_datasets_dataset_id_tasks_get",
       "success_media": [
         "application/json"
       ],
@@ -1134,7 +1045,6 @@
       "method": "GET",
       "operation_id": "get_dataset_record_v1_observability_dataset_records__dataset_record_id__get",
       "path": "/v1/observability/dataset-records/{dataset_record_id}",
-      "rust_method": "get_dataset_record_v1_observability_dataset_records_dataset_record_id_get",
       "success_media": [
         "application/json"
       ],
@@ -1147,7 +1057,6 @@
       "method": "GET",
       "operation_id": "get_dataset_records_v1_observability_datasets__dataset_id__records_get",
       "path": "/v1/observability/datasets/{dataset_id}/records",
-      "rust_method": "get_dataset_records_v1_observability_datasets_dataset_id_records_get",
       "success_media": [
         "application/json"
       ],
@@ -1160,7 +1069,6 @@
       "method": "GET",
       "operation_id": "get_datasets_v1_observability_datasets_get",
       "path": "/v1/observability/datasets",
-      "rust_method": "get_datasets_v1_observability_datasets_get",
       "success_media": [
         "application/json"
       ],
@@ -1173,7 +1081,6 @@
       "method": "GET",
       "operation_id": "get_deployment_v1_workflows_deployments__name__get",
       "path": "/v1/workflows/deployments/{name}",
-      "rust_method": "get_deployment_v1_workflows_deployments_name_get",
       "success_media": [
         "application/json"
       ],
@@ -1186,7 +1093,6 @@
       "method": "GET",
       "operation_id": "get_judge_by_id_v1_observability_judges__judge_id__get",
       "path": "/v1/observability/judges/{judge_id}",
-      "rust_method": "get_judge_by_id_v1_observability_judges_judge_id_get",
       "success_media": [
         "application/json"
       ],
@@ -1199,7 +1105,6 @@
       "method": "GET",
       "operation_id": "get_judges_v1_observability_judges_get",
       "path": "/v1/observability/judges",
-      "rust_method": "get_judges_v1_observability_judges_get",
       "success_media": [
         "application/json"
       ],
@@ -1212,7 +1117,6 @@
       "method": "GET",
       "operation_id": "get_run_history_v1_workflows_runs__run_id__history_get",
       "path": "/v1/workflows/runs/{run_id}/history",
-      "rust_method": "get_run_history_v1_workflows_runs_run_id_history_get",
       "success_media": [
         "application/json"
       ],
@@ -1225,7 +1129,6 @@
       "method": "GET",
       "operation_id": "get_run_v1_workflows_runs__run_id__get",
       "path": "/v1/workflows/runs/{run_id}",
-      "rust_method": "get_run_v1_workflows_runs_run_id_get",
       "success_media": [
         "application/json"
       ],
@@ -1238,7 +1141,6 @@
       "method": "GET",
       "operation_id": "get_schedules_v1_workflows_schedules_get",
       "path": "/v1/workflows/schedules",
-      "rust_method": "get_schedules_v1_workflows_schedules_get",
       "success_media": [
         "application/json"
       ],
@@ -1251,7 +1153,6 @@
       "method": "GET",
       "operation_id": "get_similar_chat_completion_events_v1_observability_chat_completion_events__event_id__similar_events_get",
       "path": "/v1/observability/chat-completion-events/{event_id}/similar-events",
-      "rust_method": "get_similar_chat_completion_events_v1_observability_chat_completion_events_event_id_similar_events_get",
       "success_media": [
         "application/json"
       ],
@@ -1264,7 +1165,6 @@
       "method": "GET",
       "operation_id": "get_stream_events_v1_workflows_events_stream_get",
       "path": "/v1/workflows/events/stream",
-      "rust_method": "get_stream_events_v1_workflows_events_stream_get",
       "success_media": [
         "text/event-stream"
       ],
@@ -1274,11 +1174,9 @@
       "upstream": true
     },
     {
-      "binary_stream_method": "get_voice_sample_audio_v1_audio_voices_voice_id_sample_get_wav_stream",
       "method": "GET",
       "operation_id": "get_voice_sample_audio_v1_audio_voices__voice_id__sample_get",
       "path": "/v1/audio/voices/{voice_id}/sample",
-      "rust_method": "get_voice_sample_audio_v1_audio_voices_voice_id_sample_get",
       "success_media": [
         "application/json",
         "audio/wav"
@@ -1292,7 +1190,6 @@
       "method": "GET",
       "operation_id": "get_voice_v1_audio_voices__voice_id__get",
       "path": "/v1/audio/voices/{voice_id}",
-      "rust_method": "get_voice_v1_audio_voices_voice_id_get",
       "success_media": [
         "application/json"
       ],
@@ -1305,7 +1202,6 @@
       "method": "GET",
       "operation_id": "get_worker_info_v1_workflows_workers_whoami_get",
       "path": "/v1/workflows/workers/whoami",
-      "rust_method": "get_worker_info_v1_workflows_workers_whoami_get",
       "success_media": [
         "application/json"
       ],
@@ -1318,7 +1214,6 @@
       "method": "GET",
       "operation_id": "get_workflow_events_v1_workflows_events_list_get",
       "path": "/v1/workflows/events/list",
-      "rust_method": "get_workflow_events_v1_workflows_events_list_get",
       "success_media": [
         "application/json"
       ],
@@ -1331,7 +1226,6 @@
       "method": "GET",
       "operation_id": "get_workflow_execution_history_v1_workflows_executions__execution_id__history_get",
       "path": "/v1/workflows/executions/{execution_id}/history",
-      "rust_method": "get_workflow_execution_history_v1_workflows_executions_execution_id_history_get",
       "success_media": [
         "application/json"
       ],
@@ -1344,7 +1238,6 @@
       "method": "GET",
       "operation_id": "get_workflow_execution_trace_events",
       "path": "/v1/workflows/executions/{execution_id}/trace/events",
-      "rust_method": "get_workflow_execution_trace_events",
       "success_media": [
         "application/json"
       ],
@@ -1357,7 +1250,6 @@
       "method": "GET",
       "operation_id": "get_workflow_execution_trace_otel",
       "path": "/v1/workflows/executions/{execution_id}/trace/otel",
-      "rust_method": "get_workflow_execution_trace_otel",
       "success_media": [
         "application/json"
       ],
@@ -1370,7 +1262,6 @@
       "method": "GET",
       "operation_id": "get_workflow_execution_trace_summary",
       "path": "/v1/workflows/executions/{execution_id}/trace/summary",
-      "rust_method": "get_workflow_execution_trace_summary",
       "success_media": [
         "application/json"
       ],
@@ -1383,7 +1274,6 @@
       "method": "GET",
       "operation_id": "get_workflow_execution_v1_workflows_executions__execution_id__get",
       "path": "/v1/workflows/executions/{execution_id}",
-      "rust_method": "get_workflow_execution_v1_workflows_executions_execution_id_get",
       "success_media": [
         "application/json"
       ],
@@ -1396,7 +1286,6 @@
       "method": "GET",
       "operation_id": "get_workflow_metrics_v1_workflows__workflow_name__metrics_get",
       "path": "/v1/workflows/{workflow_name}/metrics",
-      "rust_method": "get_workflow_metrics_v1_workflows_workflow_name_metrics_get",
       "success_media": [
         "application/json"
       ],
@@ -1409,7 +1298,6 @@
       "method": "GET",
       "operation_id": "get_workflow_registration_v1_workflows_registrations__workflow_registration_id__get",
       "path": "/v1/workflows/registrations/{workflow_registration_id}",
-      "rust_method": "get_workflow_registration_v1_workflows_registrations_workflow_registration_id_get",
       "success_media": [
         "application/json"
       ],
@@ -1422,7 +1310,6 @@
       "method": "GET",
       "operation_id": "get_workflow_registrations_v1_workflows_registrations_get",
       "path": "/v1/workflows/registrations",
-      "rust_method": "get_workflow_registrations_v1_workflows_registrations_get",
       "success_media": [
         "application/json"
       ],
@@ -1435,7 +1322,6 @@
       "method": "GET",
       "operation_id": "get_workflow_v1_workflows__workflow_identifier__get",
       "path": "/v1/workflows/{workflow_identifier}",
-      "rust_method": "get_workflow_v1_workflows_workflow_identifier_get",
       "success_media": [
         "application/json"
       ],
@@ -1448,7 +1334,6 @@
       "method": "POST",
       "operation_id": "jobs_api_routes_batch_cancel_batch_job",
       "path": "/v1/batch/jobs/{job_id}/cancel",
-      "rust_method": "jobs_api_routes_batch_cancel_batch_job",
       "success_media": [
         "application/json"
       ],
@@ -1461,7 +1346,6 @@
       "method": "POST",
       "operation_id": "jobs_api_routes_batch_create_batch_job",
       "path": "/v1/batch/jobs",
-      "rust_method": "jobs_api_routes_batch_create_batch_job",
       "success_media": [
         "application/json"
       ],
@@ -1474,7 +1358,6 @@
       "method": "GET",
       "operation_id": "jobs_api_routes_batch_get_batch_job",
       "path": "/v1/batch/jobs/{job_id}",
-      "rust_method": "jobs_api_routes_batch_get_batch_job",
       "success_media": [
         "application/json"
       ],
@@ -1487,7 +1370,6 @@
       "method": "GET",
       "operation_id": "jobs_api_routes_batch_get_batch_jobs",
       "path": "/v1/batch/jobs",
-      "rust_method": "jobs_api_routes_batch_get_batch_jobs",
       "success_media": [
         "application/json"
       ],
@@ -1500,7 +1382,6 @@
       "method": "POST",
       "operation_id": "jobs_api_routes_fine_tuning_archive_fine_tuned_model",
       "path": "/v1/fine_tuning/models/{model_id}/archive",
-      "rust_method": "jobs_api_routes_fine_tuning_archive_fine_tuned_model",
       "success_media": [
         "application/json"
       ],
@@ -1513,7 +1394,6 @@
       "method": "POST",
       "operation_id": "jobs_api_routes_fine_tuning_cancel_fine_tuning_job",
       "path": "/v1/fine_tuning/jobs/{job_id}/cancel",
-      "rust_method": "jobs_api_routes_fine_tuning_cancel_fine_tuning_job",
       "success_media": [
         "application/json"
       ],
@@ -1526,7 +1406,6 @@
       "method": "POST",
       "operation_id": "jobs_api_routes_fine_tuning_create_fine_tuning_job",
       "path": "/v1/fine_tuning/jobs",
-      "rust_method": "jobs_api_routes_fine_tuning_create_fine_tuning_job",
       "success_media": [
         "application/json"
       ],
@@ -1539,7 +1418,6 @@
       "method": "GET",
       "operation_id": "jobs_api_routes_fine_tuning_get_fine_tuning_job",
       "path": "/v1/fine_tuning/jobs/{job_id}",
-      "rust_method": "jobs_api_routes_fine_tuning_get_fine_tuning_job",
       "success_media": [
         "application/json"
       ],
@@ -1552,7 +1430,6 @@
       "method": "GET",
       "operation_id": "jobs_api_routes_fine_tuning_get_fine_tuning_jobs",
       "path": "/v1/fine_tuning/jobs",
-      "rust_method": "jobs_api_routes_fine_tuning_get_fine_tuning_jobs",
       "success_media": [
         "application/json"
       ],
@@ -1565,7 +1442,6 @@
       "method": "POST",
       "operation_id": "jobs_api_routes_fine_tuning_start_fine_tuning_job",
       "path": "/v1/fine_tuning/jobs/{job_id}/start",
-      "rust_method": "jobs_api_routes_fine_tuning_start_fine_tuning_job",
       "success_media": [
         "application/json"
       ],
@@ -1578,7 +1454,6 @@
       "method": "DELETE",
       "operation_id": "jobs_api_routes_fine_tuning_unarchive_fine_tuned_model",
       "path": "/v1/fine_tuning/models/{model_id}/archive",
-      "rust_method": "jobs_api_routes_fine_tuning_unarchive_fine_tuned_model",
       "success_media": [
         "application/json"
       ],
@@ -1591,7 +1466,6 @@
       "method": "PATCH",
       "operation_id": "jobs_api_routes_fine_tuning_update_fine_tuned_model",
       "path": "/v1/fine_tuning/models/{model_id}",
-      "rust_method": "jobs_api_routes_fine_tuning_update_fine_tuned_model",
       "success_media": [
         "application/json"
       ],
@@ -1604,7 +1478,6 @@
       "method": "POST",
       "operation_id": "judge_chat_completion_event_v1_observability_chat_completion_events__event_id__live_judging_post",
       "path": "/v1/observability/chat-completion-events/{event_id}/live-judging",
-      "rust_method": "judge_chat_completion_event_v1_observability_chat_completion_events_event_id_live_judging_post",
       "success_media": [
         "application/json"
       ],
@@ -1617,7 +1490,6 @@
       "method": "POST",
       "operation_id": "judge_conversation_v1_observability_judges__judge_id__live_judging_post",
       "path": "/v1/observability/judges/{judge_id}/live-judging",
-      "rust_method": "judge_conversation_v1_observability_judges_judge_id_live_judging_post",
       "success_media": [
         "application/json"
       ],
@@ -1630,7 +1502,6 @@
       "method": "POST",
       "operation_id": "judge_dataset_record_v1_observability_dataset_records__dataset_record_id__live_judging_post",
       "path": "/v1/observability/dataset-records/{dataset_record_id}/live-judging",
-      "rust_method": "judge_dataset_record_v1_observability_dataset_records_dataset_record_id_live_judging_post",
       "success_media": [
         "application/json"
       ],
@@ -1643,7 +1514,6 @@
       "method": "POST",
       "operation_id": "libraries_create_v1",
       "path": "/v1/libraries",
-      "rust_method": "libraries_create_v1",
       "success_media": [
         "application/json"
       ],
@@ -1656,7 +1526,6 @@
       "method": "DELETE",
       "operation_id": "libraries_delete_v1",
       "path": "/v1/libraries/{library_id}",
-      "rust_method": "libraries_delete_v1",
       "success_media": [
         "application/json"
       ],
@@ -1669,7 +1538,6 @@
       "method": "DELETE",
       "operation_id": "libraries_documents_delete_v1",
       "path": "/v1/libraries/{library_id}/documents/{document_id}",
-      "rust_method": "libraries_documents_delete_v1",
       "success_media": [],
       "tags": [
         "beta.libraries.documents"
@@ -1680,7 +1548,6 @@
       "method": "GET",
       "operation_id": "libraries_documents_get_extracted_text_signed_url_v1",
       "path": "/v1/libraries/{library_id}/documents/{document_id}/extracted-text-signed-url",
-      "rust_method": "libraries_documents_get_extracted_text_signed_url_v1",
       "success_media": [
         "application/json"
       ],
@@ -1693,7 +1560,6 @@
       "method": "GET",
       "operation_id": "libraries_documents_get_signed_url_v1",
       "path": "/v1/libraries/{library_id}/documents/{document_id}/signed-url",
-      "rust_method": "libraries_documents_get_signed_url_v1",
       "success_media": [
         "application/json"
       ],
@@ -1706,7 +1572,6 @@
       "method": "GET",
       "operation_id": "libraries_documents_get_status_v1",
       "path": "/v1/libraries/{library_id}/documents/{document_id}/status",
-      "rust_method": "libraries_documents_get_status_v1",
       "success_media": [
         "application/json"
       ],
@@ -1719,7 +1584,6 @@
       "method": "GET",
       "operation_id": "libraries_documents_get_text_content_v1",
       "path": "/v1/libraries/{library_id}/documents/{document_id}/text_content",
-      "rust_method": "libraries_documents_get_text_content_v1",
       "success_media": [
         "application/json"
       ],
@@ -1732,7 +1596,6 @@
       "method": "GET",
       "operation_id": "libraries_documents_get_v1",
       "path": "/v1/libraries/{library_id}/documents/{document_id}",
-      "rust_method": "libraries_documents_get_v1",
       "success_media": [
         "application/json"
       ],
@@ -1745,7 +1608,6 @@
       "method": "GET",
       "operation_id": "libraries_documents_list_v1",
       "path": "/v1/libraries/{library_id}/documents",
-      "rust_method": "libraries_documents_list_v1",
       "success_media": [
         "application/json"
       ],
@@ -1758,7 +1620,6 @@
       "method": "POST",
       "operation_id": "libraries_documents_reprocess_v1",
       "path": "/v1/libraries/{library_id}/documents/{document_id}/reprocess",
-      "rust_method": "libraries_documents_reprocess_v1",
       "success_media": [],
       "tags": [
         "beta.libraries.documents"
@@ -1769,7 +1630,6 @@
       "method": "PUT",
       "operation_id": "libraries_documents_update_v1",
       "path": "/v1/libraries/{library_id}/documents/{document_id}",
-      "rust_method": "libraries_documents_update_v1",
       "success_media": [
         "application/json"
       ],
@@ -1782,7 +1642,6 @@
       "method": "POST",
       "operation_id": "libraries_documents_upload_v1",
       "path": "/v1/libraries/{library_id}/documents",
-      "rust_method": "libraries_documents_upload_v1",
       "success_media": [
         "application/json"
       ],
@@ -1795,7 +1654,6 @@
       "method": "GET",
       "operation_id": "libraries_get_v1",
       "path": "/v1/libraries/{library_id}",
-      "rust_method": "libraries_get_v1",
       "success_media": [
         "application/json"
       ],
@@ -1808,7 +1666,6 @@
       "method": "GET",
       "operation_id": "libraries_list_v1",
       "path": "/v1/libraries",
-      "rust_method": "libraries_list_v1",
       "success_media": [
         "application/json"
       ],
@@ -1821,7 +1678,6 @@
       "method": "PUT",
       "operation_id": "libraries_share_create_v1",
       "path": "/v1/libraries/{library_id}/share",
-      "rust_method": "libraries_share_create_v1",
       "success_media": [
         "application/json"
       ],
@@ -1834,7 +1690,6 @@
       "method": "DELETE",
       "operation_id": "libraries_share_delete_v1",
       "path": "/v1/libraries/{library_id}/share",
-      "rust_method": "libraries_share_delete_v1",
       "success_media": [
         "application/json"
       ],
@@ -1847,7 +1702,6 @@
       "method": "GET",
       "operation_id": "libraries_share_list_v1",
       "path": "/v1/libraries/{library_id}/share",
-      "rust_method": "libraries_share_list_v1",
       "success_media": [
         "application/json"
       ],
@@ -1860,7 +1714,6 @@
       "method": "PUT",
       "operation_id": "libraries_update_v1",
       "path": "/v1/libraries/{library_id}",
-      "rust_method": "libraries_update_v1",
       "success_media": [
         "application/json"
       ],
@@ -1873,7 +1726,6 @@
       "method": "GET",
       "operation_id": "list_deployments_v1_workflows_deployments_get",
       "path": "/v1/workflows/deployments",
-      "rust_method": "list_deployments_v1_workflows_deployments_get",
       "success_media": [
         "application/json"
       ],
@@ -1886,7 +1738,6 @@
       "method": "GET",
       "operation_id": "list_models_v1_models_get",
       "path": "/v1/models",
-      "rust_method": "list_models_v1_models_get",
       "success_media": [
         "application/json"
       ],
@@ -1899,7 +1750,6 @@
       "method": "GET",
       "operation_id": "list_runs_v1_workflows_runs_get",
       "path": "/v1/workflows/runs",
-      "rust_method": "list_runs_v1_workflows_runs_get",
       "success_media": [
         "application/json"
       ],
@@ -1912,7 +1762,6 @@
       "method": "GET",
       "operation_id": "list_voices_v1_audio_voices_get",
       "path": "/v1/audio/voices",
-      "rust_method": "list_voices_v1_audio_voices_get",
       "success_media": [
         "application/json"
       ],
@@ -1925,7 +1774,6 @@
       "method": "POST",
       "operation_id": "moderations_v1_moderations_post",
       "path": "/v1/moderations",
-      "rust_method": "moderations_v1_moderations_post",
       "success_media": [
         "application/json"
       ],
@@ -1938,7 +1786,6 @@
       "method": "POST",
       "operation_id": "ocr_v1_ocr_post",
       "path": "/v1/ocr",
-      "rust_method": "ocr_v1_ocr_post",
       "success_media": [
         "application/json"
       ],
@@ -1951,7 +1798,6 @@
       "method": "POST",
       "operation_id": "post_dataset_records_from_campaign_v1_observability_datasets__dataset_id__imports_from_campaign_post",
       "path": "/v1/observability/datasets/{dataset_id}/imports/from-campaign",
-      "rust_method": "post_dataset_records_from_campaign_v1_observability_datasets_dataset_id_imports_from_campaign_post",
       "success_media": [
         "application/json"
       ],
@@ -1964,7 +1810,6 @@
       "method": "POST",
       "operation_id": "post_dataset_records_from_dataset_v1_observability_datasets__dataset_id__imports_from_dataset_post",
       "path": "/v1/observability/datasets/{dataset_id}/imports/from-dataset",
-      "rust_method": "post_dataset_records_from_dataset_v1_observability_datasets_dataset_id_imports_from_dataset_post",
       "success_media": [
         "application/json"
       ],
@@ -1977,7 +1822,6 @@
       "method": "POST",
       "operation_id": "post_dataset_records_from_explorer_v1_observability_datasets__dataset_id__imports_from_explorer_post",
       "path": "/v1/observability/datasets/{dataset_id}/imports/from-explorer",
-      "rust_method": "post_dataset_records_from_explorer_v1_observability_datasets_dataset_id_imports_from_explorer_post",
       "success_media": [
         "application/json"
       ],
@@ -1990,7 +1834,6 @@
       "method": "POST",
       "operation_id": "post_dataset_records_from_file_v1_observability_datasets__dataset_id__imports_from_file_post",
       "path": "/v1/observability/datasets/{dataset_id}/imports/from-file",
-      "rust_method": "post_dataset_records_from_file_v1_observability_datasets_dataset_id_imports_from_file_post",
       "success_media": [
         "application/json"
       ],
@@ -2003,7 +1846,6 @@
       "method": "POST",
       "operation_id": "post_dataset_records_from_playground_v1_observability_datasets__dataset_id__imports_from_playground_post",
       "path": "/v1/observability/datasets/{dataset_id}/imports/from-playground",
-      "rust_method": "post_dataset_records_from_playground_v1_observability_datasets_dataset_id_imports_from_playground_post",
       "success_media": [
         "application/json"
       ],
@@ -2016,7 +1858,6 @@
       "method": "POST",
       "operation_id": "query_workflow_execution_v1_workflows_executions__execution_id__queries_post",
       "path": "/v1/workflows/executions/{execution_id}/queries",
-      "rust_method": "query_workflow_execution_v1_workflows_executions_execution_id_queries_post",
       "success_media": [
         "application/json"
       ],
@@ -2029,7 +1870,6 @@
       "method": "POST",
       "operation_id": "reset_workflow_v1_workflows_executions__execution_id__reset_post",
       "path": "/v1/workflows/executions/{execution_id}/reset",
-      "rust_method": "reset_workflow_v1_workflows_executions_execution_id_reset_post",
       "success_media": [],
       "tags": [
         "beta.workflows.executions"
@@ -2040,7 +1880,6 @@
       "method": "GET",
       "operation_id": "retrieve_model_v1_models__model_id__get",
       "path": "/v1/models/{model_id}",
-      "rust_method": "retrieve_model_v1_models_model_id_get",
       "success_media": [
         "application/json"
       ],
@@ -2053,7 +1892,6 @@
       "method": "POST",
       "operation_id": "schedule_workflow_v1_workflows_schedules_post",
       "path": "/v1/workflows/schedules",
-      "rust_method": "schedule_workflow_v1_workflows_schedules_post",
       "success_media": [
         "application/json"
       ],
@@ -2066,7 +1904,6 @@
       "method": "POST",
       "operation_id": "signal_workflow_execution_v1_workflows_executions__execution_id__signals_post",
       "path": "/v1/workflows/executions/{execution_id}/signals",
-      "rust_method": "signal_workflow_execution_v1_workflows_executions_execution_id_signals_post",
       "success_media": [
         "application/json"
       ],
@@ -2079,7 +1916,6 @@
       "method": "POST",
       "operation_id": "speech_v1_audio_speech_post",
       "path": "/v1/audio/speech",
-      "rust_method": "speech_v1_audio_speech_post",
       "success_media": [
         "application/json",
         "text/event-stream"
@@ -2093,7 +1929,6 @@
       "method": "GET",
       "operation_id": "stream_v1_workflows_executions__execution_id__stream_get",
       "path": "/v1/workflows/executions/{execution_id}/stream",
-      "rust_method": "stream_v1_workflows_executions_execution_id_stream_get",
       "success_media": [
         "text/event-stream"
       ],
@@ -2106,7 +1941,6 @@
       "method": "POST",
       "operation_id": "terminate_workflow_execution_v1_workflows_executions__execution_id__terminate_post",
       "path": "/v1/workflows/executions/{execution_id}/terminate",
-      "rust_method": "terminate_workflow_execution_v1_workflows_executions_execution_id_terminate_post",
       "success_media": [],
       "tags": [
         "beta.workflows.executions"
@@ -2117,7 +1951,6 @@
       "method": "PUT",
       "operation_id": "unarchive_workflow_v1_workflows__workflow_identifier__unarchive_put",
       "path": "/v1/workflows/{workflow_identifier}/unarchive",
-      "rust_method": "unarchive_workflow_v1_workflows_workflow_identifier_unarchive_put",
       "success_media": [
         "application/json"
       ],
@@ -2130,7 +1963,6 @@
       "method": "DELETE",
       "operation_id": "unschedule_workflow_v1_workflows_schedules__schedule_id__delete",
       "path": "/v1/workflows/schedules/{schedule_id}",
-      "rust_method": "unschedule_workflow_v1_workflows_schedules_schedule_id_delete",
       "success_media": [],
       "tags": [
         "beta.workflows.schedules"
@@ -2141,7 +1973,6 @@
       "method": "PUT",
       "operation_id": "update_dataset_record_payload_v1_observability_dataset_records__dataset_record_id__payload_put",
       "path": "/v1/observability/dataset-records/{dataset_record_id}/payload",
-      "rust_method": "update_dataset_record_payload_v1_observability_dataset_records_dataset_record_id_payload_put",
       "success_media": [],
       "tags": [
         "beta.observability.datasets.records"
@@ -2152,7 +1983,6 @@
       "method": "PUT",
       "operation_id": "update_dataset_record_properties_v1_observability_dataset_records__dataset_record_id__properties_put",
       "path": "/v1/observability/dataset-records/{dataset_record_id}/properties",
-      "rust_method": "update_dataset_record_properties_v1_observability_dataset_records_dataset_record_id_properties_put",
       "success_media": [],
       "tags": [
         "beta.observability.datasets.records"
@@ -2163,7 +1993,6 @@
       "method": "PATCH",
       "operation_id": "update_dataset_v1_observability_datasets__dataset_id__patch",
       "path": "/v1/observability/datasets/{dataset_id}",
-      "rust_method": "update_dataset_v1_observability_datasets_dataset_id_patch",
       "success_media": [
         "application/json"
       ],
@@ -2176,7 +2005,6 @@
       "method": "PUT",
       "operation_id": "update_judge_v1_observability_judges__judge_id__put",
       "path": "/v1/observability/judges/{judge_id}",
-      "rust_method": "update_judge_v1_observability_judges_judge_id_put",
       "success_media": [],
       "tags": [
         "beta.observability.judges"
@@ -2187,7 +2015,6 @@
       "method": "PATCH",
       "operation_id": "update_voice_v1_audio_voices__voice_id__patch",
       "path": "/v1/audio/voices/{voice_id}",
-      "rust_method": "update_voice_v1_audio_voices_voice_id_patch",
       "success_media": [
         "application/json"
       ],
@@ -2200,7 +2027,6 @@
       "method": "POST",
       "operation_id": "update_workflow_execution_v1_workflows_executions__execution_id__updates_post",
       "path": "/v1/workflows/executions/{execution_id}/updates",
-      "rust_method": "update_workflow_execution_v1_workflows_executions_execution_id_updates_post",
       "success_media": [
         "application/json"
       ],
@@ -2213,7 +2039,6 @@
       "method": "PUT",
       "operation_id": "update_workflow_v1_workflows__workflow_identifier__put",
       "path": "/v1/workflows/{workflow_identifier}",
-      "rust_method": "update_workflow_v1_workflows_workflow_identifier_put",
       "success_media": [
         "application/json"
       ],

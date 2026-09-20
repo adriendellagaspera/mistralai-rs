@@ -17873,7 +17873,7 @@
       "source_operation": {
         "operation_id": "agents_api_v1_conversations_append_stream",
         "method": "POST",
-        "path": "/v1/conversations/{conversation_id}"
+        "path": "/v1/conversations/{conversation_id}#stream"
       },
       "emitted_operation_id": "agents_api_v1_conversations_append_stream",
       "rust_method_name": "agents_api_v1_conversations_append_stream",
@@ -18102,7 +18102,7 @@
       "source_operation": {
         "operation_id": "agents_api_v1_conversations_restart_stream",
         "method": "POST",
-        "path": "/v1/conversations/{conversation_id}/restart"
+        "path": "/v1/conversations/{conversation_id}/restart#stream"
       },
       "emitted_operation_id": "agents_api_v1_conversations_restart_stream",
       "rust_method_name": "agents_api_v1_conversations_restart_stream",
@@ -18191,7 +18191,7 @@
       "source_operation": {
         "operation_id": "agents_api_v1_conversations_start_stream",
         "method": "POST",
-        "path": "/v1/conversations"
+        "path": "/v1/conversations#stream"
       },
       "emitted_operation_id": "agents_api_v1_conversations_start_stream",
       "rust_method_name": "agents_api_v1_conversations_start_stream",
@@ -18341,7 +18341,7 @@
       "source_operation": {
         "operation_id": "audio_api_v1_transcriptions_post_stream",
         "method": "POST",
-        "path": "/v1/audio/transcriptions"
+        "path": "/v1/audio/transcriptions#stream"
       },
       "emitted_operation_id": "audio_api_v1_transcriptions_post_stream",
       "rust_method_name": "audio_api_v1_transcriptions_post_stream",
@@ -18387,7 +18387,7 @@
       "source_operation": {
         "operation_id": "audio_api_v1_transcriptions_post_stream",
         "method": "POST",
-        "path": "/v1/audio/transcriptions"
+        "path": "/v1/audio/transcriptions#stream"
       },
       "emitted_operation_id": "audio_api_v1_transcriptions_post_stream",
       "rust_method_name": "audio_api_v1_transcriptions_post_stream_with_multipart_filenames",
@@ -18933,7 +18933,7 @@
       "source_operation": {
         "operation_id": "connector_delete_v1",
         "method": "DELETE",
-        "path": "/v1/connectors/{connector_id}"
+        "path": "/v1/connectors/{connector_id}#id"
       },
       "emitted_operation_id": "connector_delete_v1",
       "rust_method_name": "connector_delete_v1",
@@ -19049,7 +19049,7 @@
       "source_operation": {
         "operation_id": "connector_get_v1",
         "method": "GET",
-        "path": "/v1/connectors/{connector_id_or_name}"
+        "path": "/v1/connectors/{connector_id_or_name}#idOrName"
       },
       "emitted_operation_id": "connector_get_v1",
       "rust_method_name": "connector_get_v1",
@@ -19265,7 +19265,7 @@
       "source_operation": {
         "operation_id": "connector_update_v1",
         "method": "PATCH",
-        "path": "/v1/connectors/{connector_id}"
+        "path": "/v1/connectors/{connector_id}#id"
       },
       "emitted_operation_id": "connector_update_v1",
       "rust_method_name": "connector_update_v1",
