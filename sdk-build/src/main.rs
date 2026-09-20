@@ -585,3 +585,50 @@ fn main() {
         std::process::exit(1);
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn failed_second_publication_stage_restores_checkout() {
+        let root = env::temp_dir().join(format!(
+            "mistralai-sdk-build-rollback-{}-{}",
+            std::process::id(),
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        let work = root.join("work");
+        let generated = work.join("generated");
+        let compatible = work.join("compatible");
+        let raw_target = root.join("src/generated");
+        let sdk_target = root.join("src/sdk");
+        for dir in [&work, &generated, &compatible, &raw_target, &sdk_target] {
+            fs::create_dir_all(dir).unwrap();
+        }
+        fs::write(raw_target.join("client.rs"), b"previous raw").unwrap();
+        fs::write(generated.join("client.rs"), b"candidate raw").unwrap();
+        fs::write(sdk_target.join("client.rs"), b"previous facade").unwrap();
+        fs::write(sdk_target.join("error.rs"), b"handwritten runtime").unwrap();
+        fs::write(compatible.join("client.rs"), b"candidate facade").unwrap();
+
+        // Force the SDK stage to fail after the raw stage has been installed.
+        fs::create_dir(work.join("sdk-backup")).unwrap();
+        assert!(publish(&root, &work, &generated, &compatible).is_err());
+        assert_eq!(
+            fs::read(raw_target.join("client.rs")).unwrap(),
+            b"previous raw"
+        );
+        assert_eq!(
+            fs::read(sdk_target.join("client.rs")).unwrap(),
+            b"previous facade"
+        );
+        assert_eq!(
+            fs::read(sdk_target.join("error.rs")).unwrap(),
+            b"handwritten runtime"
+        );
+        fs::remove_dir_all(root).unwrap();
+    }
+}
