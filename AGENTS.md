@@ -7,7 +7,7 @@ executable contracts; implementation detail belongs beside the code that owns it
 ## Repository map
 
 - `src/generated/`: raw `openapi-to-rust` output; generated, never hand-maintained.
-- `src/sdk/`: generated idiomatic Mistral facade and committed API/coverage inventories.
+- `src/sdk/`: generated idiomatic Mistral facade and Mistral-owned error runtime.
 - `src/streaming.rs`: handwritten runtime integration for streaming responses.
 - `sdk-build/build.py`: pinned, isolated canonical generation and strict facade parity.
 - `sdk-build/openapi/`: immutable upstream source, reviewed overlays and updates.
@@ -46,7 +46,7 @@ the API check needs the PR base revision and the dependency audit owns its tool 
 - [dependencies] Locked Rust dependencies MUST pass the advisory, license, source and TLS-backend policy in `deny.toml`.
 - [docs] Handwritten public Rust API MUST have rustdoc that builds warning-free; fallible public helpers MUST document their error contract.
 - [tooling] Repository-owned Python SDK-build and GitHub scripts MUST have their respective test suites executed in CI.
-- [api] Changes to the committed public SDK surface MUST pass the repository API compatibility review against the PR base.
+- [api] Changes to the actual public Rust sources MUST pass the repository API compatibility review against the PR base.
 - [gate] Required CI jobs MUST converge on the single `gate` conclusion job before merge.
 
 ## Working guidance

@@ -1,5 +1,6 @@
-"""Fail closed on Mistral SDK operation identity or coverage regressions.
+"""Fail closed on SDK operation identity or coverage regressions.
 
+This guard is independent of the raw generator and SDK compiler.
 Coverage progress may reduce the approved rejection set but cannot turn an
 accepted operation back into a rejection or add an unreviewed override.
 """

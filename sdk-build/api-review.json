@@ -1,26 +1,5 @@
 {
-  "base": "5de68845f73e464c827e5bc918a6bde57b46f48b",
-  "removed": [],
-  "changed": [
-    "batch_jobs.rs::ListBatchJobsRequest::order_by",
-    "beta_observability_chat_completion_events_fields.rs::BetaObservabilityChatCompletionEventsFields<'a>::get_chat_completion_field_options"
-  ],
-  "added": [
-    "beta_libraries_accesses.rs::BetaLibrariesAccesses<'a>::delete",
-    "facade_types.rs::::SharingDeleteParams",
-    "facade_types.rs::SharingDeleteParams::as_raw",
-    "facade_types.rs::SharingDeleteParams::from_raw",
-    "facade_types.rs::SharingDeleteParams::into_raw",
-    "facade_types.rs::SharingDeleteParams::new",
-    "facade_types.rs::SharingDeleteParams::org_id",
-    "facade_types.rs::SharingDeleteParams::org_id_null",
-    "facade_types.rs::attributes::SharingDeleteParams",
-    "facade_types.rs::impl::impl From<ApiEndpoint> for ApiEndpointValue",
-    "facade_types.rs::impl::impl From<EntityType> for EntityTypeValue",
-    "facade_types.rs::impl::impl From<ResourceVisibility> for ResourceVisibilityValue",
-    "facade_types.rs::impl::impl From<ShareEnum> for ShareEnumValue",
-    "facade_types.rs::impl::impl From<SharingDelete> for SharingDeleteParams",
-    "facade_types.rs::impl::impl From<SharingDeleteParams> for SharingDelete",
-    "mod.rs::reexport::pub use facade_types::SharingDeleteParams;"
-  ]
+  "schema_version": 1,
+  "base": null,
+  "changed_rust_files": []
 }

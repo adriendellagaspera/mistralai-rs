@@ -29,7 +29,7 @@ All paths in the first column are relative to `sdk-build/`; “keep” means the
 | `coverage-baseline.json` | Reviewed operation identities and allowed overrides; build and coverage gate. | Keep |
 | `coverage_gate.py` | Consumer-specific operation coverage regression policy; build and coverage tests. | Keep |
 | `test_coverage_gate.py` | Coverage gate unit tests; sdk-build unittest discovery. | Keep |
-| `test_sdk_parity.py` | Public facade and full-operation parity tests; sdk-build unittest discovery. | Rename from `test_migration_parity.py` |
+| `test_publish_parity.py` | Public facade and full-operation parity tests; sdk-build unittest discovery. | Keep (already renamed from `test_migration_parity.py` on main) |
 | `check_api_compatibility.py` | SDK-specific API inventory and rustdoc semver review; CI `api` job. | Keep |
 | `api-review.json` | Explicit reviewed changes against a particular PR base, consulted by the API gate only when needed. | Keep |
 | `openapi/published.yaml` | Exact published Mistral OpenAPI snapshot; raw generation and snapshot check. | Keep unchanged |
