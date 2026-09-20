@@ -65,7 +65,7 @@ Mistral runtime conventions --------------------------> Runtime
 
 `mistralai-rs` owns only Mistral-specific concerns around that generic toolchain: product taxonomy, a pinned compatibility definition, runtime support, source tracking, coverage and public-API review gates.
 
-The idiomatic inventory is recorded separately in [`src/sdk/coverage.json`](src/sdk/coverage.json). Operations not yet projected idiomatically remain available through `mistralai::raw`; generation never invents endpoint behavior to fill a gap.
+The canonical idiomatic operation inventory is derived on each `sdk-build/build.py check` run and validated against `sdk-build/coverage-baseline.json`. The pinned compatibility definition preserves the currently published facade; the historical `src/sdk/coverage.json` and `src/sdk/api-surface.json` snapshots were removed because they were not regenerated and could misrepresent the published Rust. Operations not projected idiomatically remain available through `mistralai::raw`.
 
 ## Streaming and binary responses
 
@@ -136,7 +136,7 @@ The current public Rust surface is pinned by [`sdk-build/compatibility-definitio
 
 ## Automation
 
-CI validates deterministic generation, formatting, compilation, Clippy with warnings denied, Rust tests/docs, coverage inventories and public API evolution.
+CI validates deterministic generation, formatting, compilation, Clippy with warnings denied, Rust tests/docs and derived operation coverage. API review compares actual public Rust files to the pull-request base, requires an explicit review record for changed files, and runs pinned compiler-aware semver checks. The exact generated facade is additionally protected by the byte-for-byte generation gate.
 
 The scheduled **Update Mistral OpenAPI SDK** workflow checks the official specification and SDK evidence, regenerates and validates a candidate, then opens or updates a review PR. It never automatically merges or publishes an update.
 
