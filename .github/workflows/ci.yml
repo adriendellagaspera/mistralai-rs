@@ -22,12 +22,12 @@ jobs:
         with:
           persist-credentials: false
       - name: Validate agent and action-pin contracts
-        run: python3 tooling/quality/agent_contract.py
+        run: python3 sdk-build/policy.py
       - name: Validate pull-request title
         if: github.event_name == 'pull_request'
         env:
           PR_TITLE: ${{ github.event.pull_request.title }}
-        run: python3 tooling/quality/pr_title.py "$PR_TITLE"
+        run: python3 sdk-build/pr_title.py "$PR_TITLE"
       - name: Install actionlint 1.7.12
         run: |
           curl -fsSLo /tmp/actionlint.tar.gz \
@@ -106,8 +106,8 @@ jobs:
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .tools
-          key: tools-python-${{ runner.os }}-${{ hashFiles('tooling/sources/lock.json') }}
-      - run: python3 tooling/tests/run_pinned.py
+          key: tools-python-${{ runner.os }}-${{ hashFiles('sdk-build/provenance.lock.json') }}
+      - run: python3 -m unittest discover -s sdk-build -p 'test_*.py'
 
   generation:
     name: generation
@@ -125,13 +125,11 @@ jobs:
             .tools
             ~/.cargo/registry
             ~/.cargo/git
-          key: tools-generation-${{ runner.os }}-${{ hashFiles('tooling/sources/lock.json', 'Cargo.lock') }}
+          key: tools-generation-${{ runner.os }}-${{ hashFiles('sdk-build/provenance.lock.json', 'Cargo.lock') }}
       - name: Verify deterministic generation and source inventories
         run: |
-          python3 -m unittest discover -s sdk-build -p 'test_*.py'
-          python3 sdk-build/build.py probe --require-parity --compatibility-definition sdk-build/compatibility-definition.json
-          python3 tooling/pipeline/build.py check
-          python3 tooling/sources/taxonomy_inventory.py check
+          python3 sdk-build/build.py check
+          python3 sdk-build/official-sdks/update.py check
 
   test:
     name: test
@@ -188,12 +186,12 @@ jobs:
         if: github.event_name == 'pull_request'
         with:
           path: .tools
-          key: tools-api-${{ runner.os }}-${{ hashFiles('tooling/sources/lock.json') }}
+          key: tools-api-${{ runner.os }}-${{ hashFiles('sdk-build/provenance.lock.json') }}
       - name: Review generated public API changes
         if: github.event_name == 'pull_request'
         env:
           SDK_API_BASE: ${{ github.event.pull_request.base.sha }}
-        run: python3 tooling/quality/api_surface.py --base "$SDK_API_BASE" --rustdoc
+        run: python3 sdk-build/check_api_compatibility.py --base "$SDK_API_BASE" --rustdoc
 
   gate:
     name: gate

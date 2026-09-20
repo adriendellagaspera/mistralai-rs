@@ -16,9 +16,8 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
-LOCK_PATH = ROOT / "tooling/sources/lock.json"
+LOCK_PATH = ROOT / "sdk-build/provenance.lock.json"
 COVERAGE_PATH = ROOT / "src/generated/coverage.json"
-OUTPUT_PATH = ROOT / "tooling/sources/taxonomy.json"
 
 
 def run(*args: object, cwd: Path = ROOT, capture: bool = False) -> str:
@@ -455,17 +454,17 @@ def build_inventory(
         "schema_version": 1,
         "provenance": {
             "protocol": {
-                "repository": lock["upstream_repository"],
-                "commit": lock["upstream_commit"],
+                "repository": lock["openapi"]["repository"],
+                "commit": lock["openapi"]["commit"],
                 "artifact": "src/generated/coverage.json",
             },
             "typescript": {
-                "repository": lock["official_typescript_sdk_repository"],
-                "commit": lock["official_typescript_sdk_commit"],
+                "repository": lock["official_sdks"]["typescript"]["repository"],
+                "commit": lock["official_sdks"]["typescript"]["commit"],
             },
             "python": {
-                "repository": lock["official_python_sdk_repository"],
-                "commit": lock["official_python_sdk_commit"],
+                "repository": lock["official_sdks"]["python"]["repository"],
+                "commit": lock["official_sdks"]["python"]["commit"],
             },
         },
         "summary": {
@@ -490,12 +489,12 @@ def build_inventory(
 
 def generate(lock: dict[str, Any]) -> dict[str, Any]:
     ts_root = checkout(
-        lock["official_typescript_sdk_repository"],
-        lock["official_typescript_sdk_commit"],
+        lock["official_sdks"]["typescript"]["repository"],
+        lock["official_sdks"]["typescript"]["commit"],
     )
     py_root = checkout(
-        lock["official_python_sdk_repository"],
-        lock["official_python_sdk_commit"],
+        lock["official_sdks"]["python"]["repository"],
+        lock["official_sdks"]["python"]["commit"],
     )
     python_records, python_non_http_resources = parse_python(py_root)
     return build_inventory(
@@ -508,58 +507,12 @@ def generate(lock: dict[str, Any]) -> dict[str, Any]:
 
 
 def pin_latest(lock: dict[str, Any]) -> None:
-    lock["official_typescript_sdk_commit"] = latest_commit(
-        lock["official_typescript_sdk_repository"]
+    lock["official_sdks"]["typescript"]["commit"] = latest_commit(
+        lock["official_sdks"]["typescript"]["repository"]
     )
-    lock["official_python_sdk_commit"] = latest_commit(
-        lock["official_python_sdk_repository"]
+    lock["official_sdks"]["python"]["commit"] = latest_commit(
+        lock["official_sdks"]["python"]["repository"]
     )
     write_json(LOCK_PATH, lock)
 
 
-def check(expected: dict[str, Any], actual: dict[str, Any]) -> None:
-    expected_text = json.dumps(expected, indent=2, sort_keys=True) + "\n"
-    actual_text = json.dumps(actual, indent=2, sort_keys=True) + "\n"
-    if expected_text == actual_text:
-        print("Official SDK taxonomy matches pinned sources byte-for-byte.")
-        return
-    print("".join(difflib.unified_diff(
-        expected_text.splitlines(keepends=True),
-        actual_text.splitlines(keepends=True),
-        fromfile="committed/sdk-taxonomy.json",
-        tofile="regenerated/sdk-taxonomy.json",
-    )))
-    raise SystemExit("Official SDK taxonomy is stale")
-
-
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=["update", "check", "pin-latest"])
-    parser.add_argument("--latest", action="store_true", help="advance official SDK pins before updating")
-    args = parser.parse_args()
-    lock = load_json(LOCK_PATH)
-    required = (
-        "official_typescript_sdk_repository",
-        "official_typescript_sdk_commit",
-        "official_python_sdk_repository",
-        "official_python_sdk_commit",
-    )
-    missing = [key for key in required if key not in lock]
-    if missing:
-        raise ValueError(f"Missing source lock keys: {', '.join(missing)}")
-    if args.command == "pin-latest":
-        pin_latest(lock)
-        return
-    if args.latest:
-        pin_latest(lock)
-        lock = load_json(LOCK_PATH)
-    actual = generate(lock)
-    if args.command == "update":
-        write_json(OUTPUT_PATH, actual)
-        print(f"Wrote {OUTPUT_PATH.relative_to(ROOT)} from pinned official SDKs.")
-    else:
-        check(load_json(OUTPUT_PATH), actual)
-
-
-if __name__ == "__main__":
-    main()
