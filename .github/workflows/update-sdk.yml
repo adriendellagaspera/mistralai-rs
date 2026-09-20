@@ -78,6 +78,7 @@ jobs:
         if: matrix.variant != 'tooling'
         run: rustup show
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        id: baseline-cache
         if: matrix.variant == 'generation'
         with:
           path: |
@@ -87,6 +88,20 @@ jobs:
             target
             sdk-build/target
           key: nightly-baseline-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'sdk-build/Cargo.lock', 'sdk-build/provenance.lock.json') }}
+          restore-keys: |
+            nightly-baseline-${{ runner.os }}-
+          restore-keys: |
+            nightly-baseline-${{ runner.os }}-
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: matrix.variant == 'generation' && steps.baseline-cache.outputs.cache-hit == ''
+        with:
+          path: |
+            .tools
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: tools-generation-${{ runner.os }}-${{ hashFiles('sdk-build/provenance.lock.json', 'sdk-build/Cargo.lock', 'Cargo.lock') }}
+          restore-keys: |
+            tools-generation-${{ runner.os }}-
       - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         if: matrix.variant == 'lint' || matrix.variant == 'tests' || matrix.variant == 'docs'
         with:
@@ -158,6 +173,7 @@ jobs:
       - name: Install pinned Rust toolchain
         run: rustup show
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        id: candidate-cache
         with:
           path: |
             .tools
@@ -166,6 +182,18 @@ jobs:
             target
             sdk-build/target
           key: nightly-candidate-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'sdk-build/Cargo.lock', 'sdk-build/provenance.lock.json') }}
+          restore-keys: |
+            nightly-candidate-${{ runner.os }}-
+      - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: steps.candidate-cache.outputs.cache-hit == ''
+        with:
+          path: |
+            .tools
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: tools-generation-${{ runner.os }}-${{ hashFiles('sdk-build/provenance.lock.json', 'sdk-build/Cargo.lock', 'Cargo.lock') }}
+          restore-keys: |
+            tools-generation-${{ runner.os }}-
       - name: Regenerate raw bindings
         run: python3 .github/scripts/nightly.py run candidate raw -- cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- raw
       - name: Reconcile official SDKs regardless of raw generation status
@@ -246,6 +274,8 @@ jobs:
             target
             sdk-build/target
           key: nightly-candidate-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'sdk-build/Cargo.lock', 'sdk-build/provenance.lock.json') }}
+          restore-keys: |
+            nightly-candidate-${{ runner.os }}-
       - name: Exercise every available candidate check
         env:
           VARIANT: ${{ matrix.variant }}
@@ -284,7 +314,7 @@ jobs:
               python3 .github/scripts/nightly.py run "$job" sdk_docs -- cargo doc --locked --no-deps
               ;;
             api)
-              python3 .github/scripts/nightly.py run "$job" api_review -- python3 sdk-build/check_api_compatibility.py --base "$SDK_API_BASE" --rustdoc
+              python3 .github/scripts/nightly.py run "$job" api_review -- python3 sdk-build/api-review/check.py --base "$SDK_API_BASE" --rustdoc
               ;;
           esac
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
