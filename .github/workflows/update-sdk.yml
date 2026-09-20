@@ -126,6 +126,7 @@ jobs:
               ;;
             tooling)
               python3 .github/scripts/nightly.py run "$job" python_tests -- python3 -m unittest discover -s .github/scripts -p 'test_*.py'
+              python3 .github/scripts/nightly.py run "$job" sdk_build_python_tests -- python3 -m unittest discover -s sdk-build -p 'test_*.py'
               ;;
           esac
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
