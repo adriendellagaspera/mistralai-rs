@@ -3,6 +3,8 @@ generate:
 
 check-generated:
     cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- check
+
+check-source-evidence:
     python3 sdk-build/official-sdks/update.py check
 
 sync-openapi:
@@ -27,7 +29,7 @@ lint:
 
 test-tooling:
     cargo test --locked --manifest-path sdk-build/Cargo.toml --all-targets
-    python3 -m unittest discover -s sdk-build -p 'test_*.py'
+    python3 -m unittest discover -s sdk-build/api-review -p 'test_*.py'
     python3 -m unittest discover -s .github/scripts -p 'test_*.py'
 
 test:
@@ -40,7 +42,7 @@ docs:
 validate:
     python3 .github/scripts/policy.py
     cargo test --locked --manifest-path sdk-build/Cargo.toml --all-targets
-    python3 -m unittest discover -s sdk-build -p 'test_*.py'
+    python3 -m unittest discover -s sdk-build/api-review -p 'test_*.py'
     python3 -m unittest discover -s .github/scripts -p 'test_*.py'
     cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- check
     python3 sdk-build/official-sdks/update.py check
