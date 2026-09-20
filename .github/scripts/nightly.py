@@ -8,6 +8,7 @@ only after the report and any review PR have been published.
 from __future__ import annotations
 
 import argparse
+from collections import deque
 from datetime import datetime, timezone
 import json
 from pathlib import Path
@@ -71,9 +72,20 @@ def run(job: str, check: str, command: list[str]) -> None:
     started = time.monotonic()
     print(f"nightly: running {job}/{check}: {command!r}", flush=True)
     try:
-        completed = subprocess.run(command, check=False)
-        status = "PASS" if completed.returncode == 0 else "FAIL"
-        detail = " ".join(command) + f" (exit {completed.returncode})"
+        tail: deque[str] = deque(maxlen=12)
+        with subprocess.Popen(
+            command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+            text=True, errors="replace", bufsize=1,
+        ) as process:
+            assert process.stdout is not None
+            for line in process.stdout:
+                print(line, end="", flush=True)
+                tail.append(line.rstrip())
+            returncode = process.wait()
+        status = "PASS" if returncode == 0 else "FAIL"
+        detail = " ".join(command) + f" (exit {returncode})"
+        if returncode:
+            detail += "\n" + "\n".join(tail)
     except OSError as error:
         status, detail = "FAIL", str(error)
     record(job, check, status, detail, time.monotonic() - started)
