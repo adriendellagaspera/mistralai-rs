@@ -49,13 +49,19 @@ jobs:
             target
           key: sdk-${{ runner.os }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock', 'sdk-build/provenance.lock.json') }}
       - name: Regenerate raw bindings for the updated OpenAPI
+        id: raw
         if: steps.upstream.outputs.changed == 'true'
+        continue-on-error: true
         run: python3 sdk-build/build.py raw
       - name: Reconcile official Python and TypeScript SDK surfaces
-        if: steps.upstream.outputs.changed == 'true'
+        id: surface
+        if: steps.raw.outcome == 'success'
+        continue-on-error: true
         run: python3 sdk-build/official-sdks/update.py update
       - name: Compile and validate the idiomatic Rust SDK
-        if: steps.upstream.outputs.changed == 'true'
+        id: validation
+        if: steps.surface.outcome == 'success'
+        continue-on-error: true
         run: |
           python3 sdk-build/build.py generate
           python3 sdk-build/build.py check
@@ -64,12 +70,18 @@ jobs:
           cargo clippy --locked --all-targets -- -D warnings
           cargo test --locked --all-targets
       - name: Summarize source and surface changes
-        if: steps.upstream.outputs.changed == 'true'
+        if: always() && steps.upstream.outputs.changed == 'true'
+        env:
+          RAW_OUTCOME: ${{ steps.raw.outcome }}
+          SURFACE_OUTCOME: ${{ steps.surface.outcome }}
+          VALIDATION_OUTCOME: ${{ steps.validation.outcome }}
         run: |
           python3 sdk-build/update_report.py
+          printf '\\nValidation: raw=%s, official surface=%s, SDK=%s.\\n' \\
+            "$RAW_OUTCOME" "$SURFACE_OUTCOME" "$VALIDATION_OUTCOME" >> update-report.md
           cat update-report.md >> "$GITHUB_STEP_SUMMARY"
       - name: Create or update the single SDK update PR
-        if: steps.upstream.outputs.changed == 'true'
+        if: always() && steps.upstream.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -93,3 +105,13 @@ jobs:
               --title 'chore: update Mistral SDK sources' \
               --body-file update-report.md
           fi
+      - name: Fail after publishing a blocked source-update PR
+        if: always() && steps.upstream.outputs.changed == 'true'
+        env:
+          RAW_OUTCOME: ${{ steps.raw.outcome }}
+          SURFACE_OUTCOME: ${{ steps.surface.outcome }}
+          VALIDATION_OUTCOME: ${{ steps.validation.outcome }}
+        run: |
+          test "$RAW_OUTCOME" = success
+          test "$SURFACE_OUTCOME" = success
+          test "$VALIDATION_OUTCOME" = success
