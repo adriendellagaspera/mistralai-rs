@@ -152,6 +152,82 @@ def source_operation_paths(openapi_path: Path) -> dict[str, str]:
     return result
 
 
+def raw_coverage(generated: Path, overlaid: Path) -> dict:
+    """Inventory the emitted raw methods against the exact overlaid OpenAPI."""
+    manifest = json.loads((generated / "binding-manifest.json").read_text())
+    spec = json.loads(overlaid.read_text())
+    source: dict[str, dict] = {}
+    for path, item in spec["paths"].items():
+        for method, operation in item.items():
+            if method.lower() not in {"get", "put", "post", "delete", "patch", "head", "options", "trace", "query"}:
+                continue
+            if not isinstance(operation, dict) or not operation.get("operationId"):
+                continue
+            operation_id = operation["operationId"]
+            if operation_id in source:
+                raise ValueError(f"Duplicate OpenAPI operation ID: {operation_id}")
+            media = sorted({
+                media_type
+                for code, response in operation.get("responses", {}).items()
+                if str(code).startswith("2") and isinstance(response, dict)
+                for media_type in response.get("content", {})
+            })
+            source[operation_id] = {
+                "method": method.upper(),
+                "operation_id": operation_id,
+                "path": path.split("#", 1)[0],
+                "success_media": media,
+                "tags": operation.get("tags", []),
+                "upstream": True,
+            }
+
+    emitted: dict[str, dict] = {}
+    for binding in manifest["operations"]:
+        if binding.get("kind") != "call_shape":
+            continue
+        operation = binding["source_operation"]
+        operation_id = operation["operation_id"]
+        expected = source.get(operation_id)
+        if expected is None or (operation["method"], operation["path"]) != (
+            expected["method"], expected["path"]
+        ):
+            raise ValueError(f"Raw binding operation disagrees with OpenAPI: {operation_id}")
+        rust_method = binding["rust_method_name"]
+        prior = emitted.setdefault(operation_id, {"rust_method": rust_method})
+        if prior["rust_method"] != rust_method:
+            raise ValueError(f"Multiple raw methods for operation {operation_id}")
+
+    if source.keys() != emitted.keys():
+        raise ValueError(
+            "Raw binding coverage disagrees with OpenAPI: "
+            f"missing={sorted(source.keys() - emitted.keys())}; "
+            f"extra={sorted(emitted.keys() - source.keys())}"
+        )
+    return {
+        "generated_methods": len(manifest["operations"]),
+        "operations": [
+            {**source[operation_id], **emitted[operation_id]}
+            for operation_id in sorted(source)
+        ],
+        "upstream_operations": len(source),
+    }
+
+
+def verify_raw_coverage(actual: dict, expected: dict) -> None:
+    """Legacy metadata can differ, but the committed operation inventory cannot."""
+    def identities(coverage: dict) -> dict[str, tuple[str, str]]:
+        result = {}
+        for operation in coverage["operations"]:
+            operation_id = operation["operation_id"]
+            if operation_id in result:
+                raise ValueError(f"Duplicate raw coverage operation: {operation_id}")
+            result[operation_id] = (operation["method"], operation["path"])
+        return result
+
+    if identities(actual) != identities(expected):
+        raise ValueError("Committed raw coverage operation identities differ from generated bindings")
+
+
 def normalized_manifest(source: bytes, operation_paths: dict[str, str]) -> dict:
     value = json.loads(source)
     for operation in value.get("operations", []):
@@ -171,6 +247,7 @@ def normalized_manifest(source: bytes, operation_paths: dict[str, str]) -> dict:
 def verify_raw_baseline(generated: Path, overlaid: Path) -> None:
     regenerated = snapshot(generated)
     committed = snapshot(ROOT / "src" / "generated", skip={"coverage.json"})
+    regenerated.pop("coverage.json", None)
     if regenerated.keys() != committed.keys():
         missing = sorted(committed.keys() - regenerated.keys())
         extra = sorted(regenerated.keys() - committed.keys())
@@ -305,6 +382,8 @@ def probe(
                 "--edition", "2024", "--config", "skip_children=true", path,
             )
 
+        coverage = raw_coverage(generated, overlaid)
+        write_json(generated / "coverage.json", coverage)
         if raw_only:
             target = ROOT / "src" / "generated"
             shutil.rmtree(target)
@@ -312,6 +391,9 @@ def probe(
             print("Regenerated raw OpenAPI bindings from pinned sources.")
             return
         verify_raw_baseline(generated, overlaid)
+        verify_raw_coverage(
+            json.loads((ROOT / "src/generated/coverage.json").read_text()), coverage
+        )
 
         bindings_path = work / "bindings.json"
         bindings_value = json.loads(output(bindings_adapter, generated))
