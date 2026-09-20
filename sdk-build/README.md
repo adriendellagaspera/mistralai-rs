@@ -32,6 +32,7 @@ All paths in the first column are relative to `sdk-build/`; “keep” means the
 | `test_raw_coverage.py` | Verifies raw operation/representation inventory generated from emitted bindings; sdk-build unittest discovery. | Keep (added on main) |
 | `test_publish_parity.py` | Public facade and full-operation parity tests; sdk-build unittest discovery. | Keep (already renamed from `test_migration_parity.py` on main) |
 | `check_api_compatibility.py` | SDK-specific API inventory and rustdoc semver review; CI `api` job. | Keep |
+| `test_api_compatibility.py` | API-review gate regression tests against actual Rust source changes; sdk-build unittest discovery. | Keep (added on main) |
 | `api-review.json` | Explicit reviewed changes against a particular PR base, consulted by the API gate only when needed. | Keep |
 | `openapi/published.yaml` | Exact published Mistral OpenAPI snapshot; raw generation and snapshot check. | Keep unchanged |
 | `openapi/LICENSE` | OpenAPI source attribution; README/NOTICE and source updater. | Keep unchanged |
