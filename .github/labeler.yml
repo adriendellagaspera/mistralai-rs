@@ -10,15 +10,13 @@ A-sdk:
 A-codegen:
   - changed-files:
       - any-glob-to-any-file:
-          - "tooling/pipeline/**"
-          - "tooling/sources/**"
-          - "tooling/tests/**"
+          - "sdk-build/**"
+          - "src/generated/**"
 
 A-ci:
   - changed-files:
       - any-glob-to-any-file:
           - ".github/**"
-          - "tooling/quality/**"
           - "AGENTS.md"
           - "CLAUDE.md"
           - "Justfile"

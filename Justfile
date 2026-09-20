@@ -15,7 +15,7 @@ sync-sdk-surface:
     python3 sdk-build/build.py generate
 
 policy:
-    python3 sdk-build/policy.py
+    python3 .github/scripts/policy.py
 
 format:
     cargo fmt --all --check
@@ -25,6 +25,7 @@ lint:
 
 test-tooling:
     python3 -m unittest discover -s sdk-build -p 'test_*.py'
+    python3 -m unittest discover -s .github/scripts -p 'test_*.py'
 
 test:
     cargo test --locked --all-targets
@@ -36,6 +37,7 @@ docs:
 validate:
     python3 sdk-build/policy.py
     python3 -m unittest discover -s sdk-build -p 'test_*.py'
+    python3 -m unittest discover -s .github/scripts -p 'test_*.py'
     python3 sdk-build/build.py check
     python3 sdk-build/official-sdks/update.py check
     cargo fmt --all --check
