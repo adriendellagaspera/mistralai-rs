@@ -75,6 +75,8 @@ contains a broader, independently updated API catalog; it is **not** a byte
 mirror of the pinned source. Expanding the SDK to the broader catalog requires
 a separately reviewed source migration and generated API update (see
 [#16](https://github.com/adriendellagaspera/mistralai-rs/issues/16)).
+The separate [public-catalog monitor](.github/workflows/monitor-public-openapi.yml) checks
+its reviewed fingerprint weekly without blocking SDK source updates.
 
 ## Streaming and binary responses
 
