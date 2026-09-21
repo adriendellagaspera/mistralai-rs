@@ -83,10 +83,14 @@ The selected migration target is staged separately at
 the immutable `mistralai/platform-docs-public/public/openapi.yaml` at
 `ff846cf93d91df6fe04d0a5e540ecbe1e0ecc691` (288 operations, SHA-256
 `86b89916f38b14d4452654938ec51ad5337c860c19db03f37d86921d639fb36f`).
-It is verified from the checkout but is **not yet a generation input**. The
-raw + idiomatic cutover remains atomic and is tracked by
-[#134](https://github.com/adriendellagaspera/mistralai-rs/issues/134) through
-#136–#138. The deployed docs catalog was observed with 296 operations; its
+It is verified from the checkout but is **not yet the published generation
+input**. `just check-candidate-raw` exercises the selected source through its
+reviewed overlay, exact 288→297 raw inventory, standalone compilation using the
+generated dependency fragment and canonical Bindings v3 identity. The
+raw + idiomatic cutover remains atomic; derivation and public compatibility are
+tracked by [#137](https://github.com/adriendellagaspera/mistralai-rs/issues/137)
+and [#138](https://github.com/adriendellagaspera/mistralai-rs/issues/138).
+The deployed docs catalog was observed with 296 operations; its
 eight additional Service Account operations remain a separate provenance gap
 under [#139](https://github.com/adriendellagaspera/mistralai-rs/issues/139).
 

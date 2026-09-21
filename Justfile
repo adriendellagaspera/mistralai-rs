@@ -4,6 +4,9 @@ generate:
 check-generated:
     cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- check
 
+check-candidate-raw:
+    cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- candidate-raw
+
 check-source-evidence:
     python3 sdk-build/official-sdks/update.py check
 

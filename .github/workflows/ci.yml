@@ -152,6 +152,33 @@ jobs:
           cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- check
           python3 sdk-build/official-sdks/update.py check
 
+  candidate-raw:
+    name: candidate-raw
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install pinned Rust toolchain
+        run: rustup show
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            .tools
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: candidate-raw-${{ runner.os }}-${{ hashFiles('sdk-build/provenance.lock.json', 'sdk-build/Cargo.lock') }}
+          restore-keys: |
+            tools-generation-${{ runner.os }}-
+      - name: Verify staged 288 raw source, compile and canonical Bindings
+        run: |
+          mkdir -p /tmp/no-python
+          printf '#!/bin/sh\necho "Python used during candidate raw validation" >&2\nexit 96\n' > /tmp/no-python/python3
+          cp /tmp/no-python/python3 /tmp/no-python/python
+          chmod +x /tmp/no-python/python3 /tmp/no-python/python
+          PATH="/tmp/no-python:$PATH" cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- candidate-raw
+
   rust-build-parity:
     name: rust-build-parity
     runs-on: ubuntu-24.04
@@ -296,7 +323,7 @@ jobs:
   gate:
     name: gate
     if: always()
-    needs: [policy, format, lint, dependencies, tooling, generation, rust-build-parity, test, docs, api]
+    needs: [policy, format, lint, dependencies, tooling, generation, candidate-raw, rust-build-parity, test, docs, api]
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
@@ -308,11 +335,12 @@ jobs:
           DEPENDENCIES: ${{ needs.dependencies.result }}
           TOOLING: ${{ needs.tooling.result }}
           GENERATION: ${{ needs.generation.result }}
+          CANDIDATE_RAW: ${{ needs.candidate-raw.result }}
           RUST_BUILD_PARITY: ${{ needs.rust-build-parity.result }}
           TEST: ${{ needs.test.result }}
           DOCS: ${{ needs.docs.result }}
           API: ${{ needs.api.result }}
         run: |
-          for result in "$POLICY" "$FORMAT" "$LINT" "$DEPENDENCIES" "$TOOLING" "$GENERATION" "$RUST_BUILD_PARITY" "$TEST" "$DOCS" "$API"; do
+          for result in "$POLICY" "$FORMAT" "$LINT" "$DEPENDENCIES" "$TOOLING" "$GENERATION" "$CANDIDATE_RAW" "$RUST_BUILD_PARITY" "$TEST" "$DOCS" "$API"; do
             test "$result" = success
           done
