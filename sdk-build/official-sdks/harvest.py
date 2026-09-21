@@ -160,13 +160,21 @@ def parse_typescript(root: Path) -> list[dict[str, Any]]:
         if class_name not in classes:
             raise ValueError(f"Unknown TypeScript SDK class {class_name}")
         path, source = classes[class_name]
-        imports = {
-            function: module
-            for function, module in re.findall(
-                r"import\s*\{\s*(\w+)\s*\}\s*from\s*[\"']\.\./funcs/([^\"']+)\.js[\"'];",
-                source,
-            )
-        }
+        imports: dict[str, str] = {}
+        for names, module in re.findall(
+            r"import\s*\{([^}]+)\}\s*from\s*[\"']\.\./funcs/([^\"']+)\.js[\"'];",
+            source,
+            re.MULTILINE,
+        ):
+            for imported in names.split(","):
+                function = imported.strip()
+                if not function:
+                    continue
+                if not re.fullmatch(r"[A-Za-z_$][\w$]*", function):
+                    raise ValueError(f"Unsupported TypeScript function import in {path}: {function}")
+                if function in imports and imports[function] != module:
+                    raise ValueError(f"Conflicting TypeScript function import in {path}: {function}")
+                imports[function] = module
         method_matches = list(re.finditer(r"^  async\s+(\w+)\s*\(", source, re.MULTILINE))
         for index, match in enumerate(method_matches):
             end = method_matches[index + 1].start() if index + 1 < len(method_matches) else len(source)
