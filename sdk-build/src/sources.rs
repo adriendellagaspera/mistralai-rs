@@ -15,8 +15,8 @@ const OVERLAY_ASSUMPTIONS: [(&str, &str); 3] = [
         "    SharingDelete:\n",
     ),
     (
-        "WorkflowListResponse still carries beta.workflows typo",
-        "- beta.workflows\n",
+        "WorkflowListResponse requires workflows and next_cursor",
+        "      title: WorkflowListResponse\n      required:\n        - workflows\n        - next_cursor\n",
     ),
 ];
 
@@ -72,7 +72,7 @@ mod tests {
     use super::*;
     use crate::gates::read_json;
 
-    const VALID: &str = "openapi: 3.1.0\n- data\n    SharingDelete:\n- beta.workflows\n";
+    const VALID: &str = "openapi: 3.1.0\n- data\n    SharingDelete:\n      title: WorkflowListResponse\n      required:\n        - workflows\n        - next_cursor\n";
 
     fn hash(source: &[u8]) -> String {
         format!("{:x}", Sha256::digest(source))
