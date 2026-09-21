@@ -68,13 +68,16 @@ Mistral runtime conventions --------------------------> Runtime
 The canonical idiomatic operation inventory is derived on each `cargo run --locked --manifest-path sdk-build/Cargo.toml -- check` run and validated against `sdk-build/coverage-baseline.json`. The pinned compatibility definition preserves the currently published facade; the historical `src/sdk/coverage.json` and `src/sdk/api-surface.json` snapshots were removed because they were not regenerated and could misrepresent the published Rust. Operations not projected idiomatically remain available through `mistralai::raw`.
 
 The source of truth for the reproducible Rust build is
-[`mistralai/platform-docs-public/openapi.yaml`](https://github.com/mistralai/platform-docs-public/blob/main/openapi.yaml),
-pinned by commit and SHA-256. The separately deployed
-[`docs.mistral.ai/openapi.yaml`](https://docs.mistral.ai/openapi.yaml)
-contains a broader, independently updated API catalog; it is **not** a byte
-mirror of the pinned source. Expanding the SDK to the broader catalog requires
-a separately reviewed source migration and generated API update (see
-[#16](https://github.com/adriendellagaspera/mistralai-rs/issues/16)).
+[`mistralai/platform-docs-public/public/openapi.yaml`](https://github.com/mistralai/platform-docs-public/blob/ff846cf93d91df6fe04d0a5e540ecbe1e0ecc691/public/openapi.yaml),
+pinned by immutable commit and SHA-256 in `sdk-build/provenance.lock.json`.
+This versioned specification contains 288 source operations. The separately
+deployed [`docs.mistral.ai/openapi.yaml`](https://docs.mistral.ai/openapi.yaml)
+was observed with 296 operations; it is a distinct, mutable catalog, **not**
+a byte mirror of the pinned source. Its eight additional Service Account
+operations reference seven absent component schemas and are tracked separately
+under [#139](https://github.com/adriendellagaspera/mistralai-rs/issues/139),
+not silently included in Tier 1. See [#134](https://github.com/adriendellagaspera/mistralai-rs/issues/134)
+for the migration's derivation and public-API compatibility work.
 The separate [public-catalog monitor](.github/workflows/monitor-public-openapi.yml) checks
 its reviewed fingerprint weekly without blocking SDK source updates.
 
