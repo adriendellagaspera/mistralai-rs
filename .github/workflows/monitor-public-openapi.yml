@@ -8,6 +8,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: monitor-public-openapi
+  cancel-in-progress: true
+
 jobs:
   public-catalog:
     name: Independently check the public API catalog
