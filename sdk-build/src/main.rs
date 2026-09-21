@@ -580,6 +580,24 @@ fn verify_candidate_derivation(
         &target.join("candidate-sdk-definition.json"),
         field(&derivation, "definition")?,
     )?;
+    let observed = json!({
+        "schema_version": 1,
+        "total_operations": operations.len(),
+        "statuses": statuses,
+        "rejections_by_reason": rejections,
+        "override_statuses": override_targets
+            .iter()
+            .map(|(id, outcome)| (id.clone(), outcome["status"].clone()))
+            .collect::<BTreeMap<_, _>>()
+    });
+    let baseline = read_json(&build.join("candidate-derivation-baseline.json"))?;
+    if observed != baseline {
+        println!("{}", serde_json::to_string_pretty(&observed)?);
+        return fail(
+            "candidate 288 derivation status/reason/override inventory drifted; review and update baseline only after proving the changed operations"
+        );
+    }
+
     println!(
         "{}",
         serde_json::to_string_pretty(&json!({
