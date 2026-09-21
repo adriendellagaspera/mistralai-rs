@@ -34,6 +34,8 @@ jobs:
         with:
           name: candidate-derivation-report
           path: |
+            sdk-build/target/candidate-bindings.json
+            sdk-build/target/candidate-overlaid.json
             sdk-build/target/candidate-derivation-report.json
             sdk-build/target/candidate-sdk-definition.json
           if-no-files-found: error
