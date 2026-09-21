@@ -1,5 +1,5 @@
 {
-  "generated_methods": 297,
+  "generated_methods": 183,
   "operations": [
     {
       "method": "POST",
@@ -279,31 +279,7 @@
         "application/json"
       ],
       "tags": [
-        "agents"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "POST",
-      "operation_id": "aggregate_spans_v1_observability_spans_aggregate_post",
-      "path": "/v1/observability/spans/aggregate",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.observability.spans"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "POST",
-      "operation_id": "aggregate_traces_v1_observability_traces_aggregate_post",
-      "path": "/v1/observability/traces/aggregate",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.observability.traces"
+        "deprecated.agents"
       ],
       "upstream": true
     },
@@ -315,7 +291,7 @@
         "application/json"
       ],
       "tags": [
-        "workflows"
+        "beta.workflows"
       ],
       "upstream": true
     },
@@ -351,7 +327,7 @@
         "application/json"
       ],
       "tags": [
-        "workflows.executions"
+        "beta.workflows.executions"
       ],
       "upstream": true
     },
@@ -363,31 +339,7 @@
         "application/json"
       ],
       "tags": [
-        "workflows.executions"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "PUT",
-      "operation_id": "bulk_archive_workflows_v1_workflows_archive_put",
-      "path": "/v1/workflows/archive",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "workflows"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "PUT",
-      "operation_id": "bulk_unarchive_workflows_v1_workflows_unarchive_put",
-      "path": "/v1/workflows/unarchive",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "workflows"
+        "beta.workflows.executions"
       ],
       "upstream": true
     },
@@ -397,7 +349,7 @@
       "path": "/v1/workflows/executions/{execution_id}/cancel",
       "success_media": [],
       "tags": [
-        "workflows.executions"
+        "beta.workflows.executions"
       ],
       "upstream": true
     },
@@ -447,18 +399,6 @@
       ],
       "tags": [
         "classifiers"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "POST",
-      "operation_id": "connector_activate_for_consumer_v1",
-      "path": "/v1/connectors/{connector_id}/{consumer_scope}/activate",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.connectors"
       ],
       "upstream": true
     },
@@ -514,30 +454,6 @@
       "method": "POST",
       "operation_id": "connector_create_v1",
       "path": "/v1/connectors",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.connectors"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "POST",
-      "operation_id": "connector_deactivate_for_consumer_v1",
-      "path": "/v1/connectors/{connector_id}/{consumer_scope}/deactivate",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.connectors"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "DELETE",
-      "operation_id": "connector_delete_all_user_credentials_v1",
-      "path": "/v1/connectors/{connector_id_or_name}/user/credentials",
       "success_media": [
         "application/json"
       ],
@@ -691,30 +607,6 @@
       "upstream": true
     },
     {
-      "method": "PUT",
-      "operation_id": "connector_share_v1",
-      "path": "/v1/connectors/{connector_id}/share",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.connectors"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "DELETE",
-      "operation_id": "connector_unshare_v1",
-      "path": "/v1/connectors/{connector_id}/share",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.connectors"
-      ],
-      "upstream": true
-    },
-    {
       "method": "PATCH",
       "operation_id": "connector_update_v1",
       "path": "/v1/connectors/{connector_id}",
@@ -759,18 +651,6 @@
       ],
       "tags": [
         "beta.observability.datasets"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "POST",
-      "operation_id": "create_deployment_v1_workflows_deployments_post",
-      "path": "/v1/workflows/deployments",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "workflows.deployments"
       ],
       "upstream": true
     },
@@ -840,18 +720,6 @@
     },
     {
       "method": "DELETE",
-      "operation_id": "delete_deployment_v1_workflows_deployments__name__delete",
-      "path": "/v1/workflows/deployments/{name}",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "workflows.deployments"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "DELETE",
       "operation_id": "delete_judge_v1_observability_judges__judge_id__delete",
       "path": "/v1/observability/judges/{judge_id}",
       "success_media": [],
@@ -904,7 +772,7 @@
         "application/json"
       ],
       "tags": [
-        "workflows"
+        "beta.workflows"
       ],
       "upstream": true
     },
@@ -916,7 +784,7 @@
         "application/json"
       ],
       "tags": [
-        "workflows"
+        "beta.workflows"
       ],
       "upstream": true
     },
@@ -1014,42 +882,6 @@
       ],
       "tags": [
         "fim"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "get_by_agent_stats_v1_admin_analytics_vibe_work_usage_by_agent_stats",
-      "path": "/v1/admin/analytics/vibe/work/usage/by_agent_stats",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.vibe-work-analytics"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "get_by_time_stats_v1_admin_analytics_vibe_work_usage_by_time_stats",
-      "path": "/v1/admin/analytics/vibe/work/usage/by_time_stats",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.vibe-work-analytics"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "get_by_user_stats_v1_admin_analytics_vibe_work_usage_by_user_stats",
-      "path": "/v1/admin/analytics/vibe/work/usage/by_user_stats",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.vibe-work-analytics"
       ],
       "upstream": true
     },
@@ -1175,18 +1007,6 @@
     },
     {
       "method": "GET",
-      "operation_id": "get_configs_v1_rag_ingestion_pipeline_configurations_get",
-      "path": "/v1/rag/ingestion_pipeline_configurations",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.rag.ingestion_pipeline_configurations"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
       "operation_id": "get_dataset_by_id_v1_observability_datasets__dataset_id__get",
       "path": "/v1/observability/datasets/{dataset_id}",
       "success_media": [
@@ -1259,37 +1079,13 @@
     },
     {
       "method": "GET",
-      "operation_id": "get_deployment_logs",
-      "path": "/v1/workflows/deployments/{name}/logs",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "workflows.deployments"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "get_deployment_summaries_v1_rag_deployments_get",
-      "path": "/v1/rag/deployments",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.rag.search_indexes"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
       "operation_id": "get_deployment_v1_workflows_deployments__name__get",
       "path": "/v1/workflows/deployments/{name}",
       "success_media": [
         "application/json"
       ],
       "tags": [
-        "workflows.deployments"
+        "beta.workflows.deployments"
       ],
       "upstream": true
     },
@@ -1319,49 +1115,13 @@
     },
     {
       "method": "GET",
-      "operation_id": "get_log_field_options_v1_observability_logs_fields__field_name__options_get",
-      "path": "/v1/observability/logs/fields/{field_name}/options",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.observability.logs"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "get_log_fields_v1_observability_logs_fields_get",
-      "path": "/v1/observability/logs/fields",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.observability.logs"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "get_organization_stats_v1_admin_analytics_vibe_code_usage_by_organization",
-      "path": "/v1/admin/analytics/vibe/code/usage/by_organization",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.vibe-code-analytics"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
       "operation_id": "get_run_history_v1_workflows_runs__run_id__history_get",
       "path": "/v1/workflows/runs/{run_id}/history",
       "success_media": [
         "application/json"
       ],
       "tags": [
-        "workflows.runs"
+        "beta.workflows.runs"
       ],
       "upstream": true
     },
@@ -1373,19 +1133,7 @@
         "application/json"
       ],
       "tags": [
-        "workflows.runs"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "get_schedule_v1_workflows_schedules__schedule_id__get",
-      "path": "/v1/workflows/schedules/{schedule_id}",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "workflows.schedules"
+        "beta.workflows.runs"
       ],
       "upstream": true
     },
@@ -1397,7 +1145,7 @@
         "application/json"
       ],
       "tags": [
-        "workflows.schedules"
+        "beta.workflows.schedules"
       ],
       "upstream": true
     },
@@ -1415,122 +1163,13 @@
     },
     {
       "method": "GET",
-      "operation_id": "get_span_by_id_v1_observability_traces__trace_id__spans__span_id__get",
-      "path": "/v1/observability/traces/{trace_id}/spans/{span_id}",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.observability.traces"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "get_span_evaluation_field_options_v1_observability_spans_evaluations_fields__field_name__options_get",
-      "path": "/v1/observability/spans/evaluations/fields/{field_name}/options",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.observability.spans"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "get_span_evaluation_fields_v1_observability_spans_evaluations_fields_get",
-      "path": "/v1/observability/spans/evaluations/fields",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.observability.spans"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "get_span_field_options_v1_observability_spans_fields__field_name__options_get",
-      "path": "/v1/observability/spans/fields/{field_name}/options",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.observability.spans"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "get_span_fields_v1_observability_spans_fields_get",
-      "path": "/v1/observability/spans/fields",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.observability.spans"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
       "operation_id": "get_stream_events_v1_workflows_events_stream_get",
       "path": "/v1/workflows/events/stream",
       "success_media": [
         "text/event-stream"
       ],
       "tags": [
-        "events",
-        "workflows.events"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "get_trace_by_id_v1_observability_traces__trace_id__get",
-      "path": "/v1/observability/traces/{trace_id}",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.observability.traces"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "get_trace_field_options_v1_observability_traces_fields__field_name__options_get",
-      "path": "/v1/observability/traces/fields/{field_name}/options",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.observability.traces"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "get_trace_fields_v1_observability_traces_fields_get",
-      "path": "/v1/observability/traces/fields",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.observability.traces"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "get_trace_spans_v1_observability_traces__trace_id__spans_get",
-      "path": "/v1/observability/traces/{trace_id}/spans",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.observability.traces"
+        "beta.workflows.events"
       ],
       "upstream": true
     },
@@ -1539,6 +1178,7 @@
       "operation_id": "get_voice_sample_audio_v1_audio_voices__voice_id__sample_get",
       "path": "/v1/audio/voices/{voice_id}/sample",
       "success_media": [
+        "application/json",
         "audio/wav"
       ],
       "tags": [
@@ -1560,14 +1200,25 @@
     },
     {
       "method": "GET",
+      "operation_id": "get_worker_info_v1_workflows_workers_whoami_get",
+      "path": "/v1/workflows/workers/whoami",
+      "success_media": [
+        "application/json"
+      ],
+      "tags": [
+        "beta.workflows.workers"
+      ],
+      "upstream": true
+    },
+    {
+      "method": "GET",
       "operation_id": "get_workflow_events_v1_workflows_events_list_get",
       "path": "/v1/workflows/events/list",
       "success_media": [
         "application/json"
       ],
       "tags": [
-        "events",
-        "workflows.events"
+        "beta.workflows.events"
       ],
       "upstream": true
     },
@@ -1579,19 +1230,7 @@
         "application/json"
       ],
       "tags": [
-        "workflows.executions"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "get_workflow_execution_logs",
-      "path": "/v1/workflows/executions/{execution_id}/logs",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "workflows.executions"
+        "beta.workflows.executions"
       ],
       "upstream": true
     },
@@ -1603,19 +1242,7 @@
         "application/json"
       ],
       "tags": [
-        "workflows.executions"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "get_workflow_execution_trace_info",
-      "path": "/v1/workflows/executions/{execution_id}/trace/info",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "workflows.executions"
+        "beta.workflows.executions"
       ],
       "upstream": true
     },
@@ -1627,7 +1254,7 @@
         "application/json"
       ],
       "tags": [
-        "workflows.executions"
+        "beta.workflows.executions"
       ],
       "upstream": true
     },
@@ -1639,7 +1266,7 @@
         "application/json"
       ],
       "tags": [
-        "workflows.executions"
+        "beta.workflows.executions"
       ],
       "upstream": true
     },
@@ -1651,7 +1278,7 @@
         "application/json"
       ],
       "tags": [
-        "workflows.executions"
+        "beta.workflows.executions"
       ],
       "upstream": true
     },
@@ -1663,7 +1290,7 @@
         "application/json"
       ],
       "tags": [
-        "workflows.metrics"
+        "beta.workflows.metrics"
       ],
       "upstream": true
     },
@@ -1675,7 +1302,7 @@
         "application/json"
       ],
       "tags": [
-        "workflows"
+        "beta.workflows"
       ],
       "upstream": true
     },
@@ -1687,7 +1314,7 @@
         "application/json"
       ],
       "tags": [
-        "workflows"
+        "beta.workflows"
       ],
       "upstream": true
     },
@@ -1699,31 +1326,7 @@
         "application/json"
       ],
       "tags": [
-        "workflows"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "get_workflows_v1_workflows_get",
-      "path": "/v1/workflows",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "workflows"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "get_workspace_stats_v1_admin_analytics_vibe_code_usage_by_workspace",
-      "path": "/v1/admin/analytics/vibe/code/usage/by_workspace",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.vibe-code-analytics"
+        "beta.workflows"
       ],
       "upstream": true
     },
@@ -1743,18 +1346,6 @@
       "method": "POST",
       "operation_id": "jobs_api_routes_batch_create_batch_job",
       "path": "/v1/batch/jobs",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "batch"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "DELETE",
-      "operation_id": "jobs_api_routes_batch_delete_batch_job",
-      "path": "/v1/batch/jobs/{job_id}",
       "success_media": [
         "application/json"
       ],
@@ -1796,6 +1387,66 @@
       ],
       "tags": [
         "models"
+      ],
+      "upstream": true
+    },
+    {
+      "method": "POST",
+      "operation_id": "jobs_api_routes_fine_tuning_cancel_fine_tuning_job",
+      "path": "/v1/fine_tuning/jobs/{job_id}/cancel",
+      "success_media": [
+        "application/json"
+      ],
+      "tags": [
+        "deprecated.fine-tuning"
+      ],
+      "upstream": true
+    },
+    {
+      "method": "POST",
+      "operation_id": "jobs_api_routes_fine_tuning_create_fine_tuning_job",
+      "path": "/v1/fine_tuning/jobs",
+      "success_media": [
+        "application/json"
+      ],
+      "tags": [
+        "deprecated.fine-tuning"
+      ],
+      "upstream": true
+    },
+    {
+      "method": "GET",
+      "operation_id": "jobs_api_routes_fine_tuning_get_fine_tuning_job",
+      "path": "/v1/fine_tuning/jobs/{job_id}",
+      "success_media": [
+        "application/json"
+      ],
+      "tags": [
+        "deprecated.fine-tuning"
+      ],
+      "upstream": true
+    },
+    {
+      "method": "GET",
+      "operation_id": "jobs_api_routes_fine_tuning_get_fine_tuning_jobs",
+      "path": "/v1/fine_tuning/jobs",
+      "success_media": [
+        "application/json"
+      ],
+      "tags": [
+        "deprecated.fine-tuning"
+      ],
+      "upstream": true
+    },
+    {
+      "method": "POST",
+      "operation_id": "jobs_api_routes_fine_tuning_start_fine_tuning_job",
+      "path": "/v1/fine_tuning/jobs/{job_id}/start",
+      "success_media": [
+        "application/json"
+      ],
+      "tags": [
+        "deprecated.fine-tuning"
       ],
       "upstream": true
     },
@@ -1966,18 +1617,6 @@
       "upstream": true
     },
     {
-      "method": "PATCH",
-      "operation_id": "libraries_documents_patch_v1",
-      "path": "/v1/libraries/{library_id}/documents/{document_id}",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.libraries.documents"
-      ],
-      "upstream": true
-    },
-    {
       "method": "POST",
       "operation_id": "libraries_documents_reprocess_v1",
       "path": "/v1/libraries/{library_id}/documents/{document_id}/reprocess",
@@ -2036,18 +1675,6 @@
       "upstream": true
     },
     {
-      "method": "PATCH",
-      "operation_id": "libraries_patch_v1",
-      "path": "/v1/libraries/{library_id}",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.libraries"
-      ],
-      "upstream": true
-    },
-    {
       "method": "PUT",
       "operation_id": "libraries_share_create_v1",
       "path": "/v1/libraries/{library_id}/share",
@@ -2097,25 +1724,13 @@
     },
     {
       "method": "GET",
-      "operation_id": "list_deployment_workers_v1_workflows_deployments__name__workers_get",
-      "path": "/v1/workflows/deployments/{name}/workers",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "workflows.deployments"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
       "operation_id": "list_deployments_v1_workflows_deployments_get",
       "path": "/v1/workflows/deployments",
       "success_media": [
         "application/json"
       ],
       "tags": [
-        "workflows.deployments"
+        "beta.workflows.deployments"
       ],
       "upstream": true
     },
@@ -2139,7 +1754,7 @@
         "application/json"
       ],
       "tags": [
-        "workflows.runs"
+        "beta.workflows.runs"
       ],
       "upstream": true
     },
@@ -2176,16 +1791,6 @@
       ],
       "tags": [
         "ocr"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "POST",
-      "operation_id": "pause_schedule_v1_workflows_schedules__schedule_id__pause_post",
-      "path": "/v1/workflows/schedules/{schedule_id}/pause",
-      "success_media": [],
-      "tags": [
-        "workflows.schedules"
       ],
       "upstream": true
     },
@@ -2251,145 +1856,13 @@
     },
     {
       "method": "POST",
-      "operation_id": "prompts_create",
-      "path": "/v2/prompts",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.prompts"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "POST",
-      "operation_id": "prompts_create_version",
-      "path": "/v2/prompts/{prompt_id}/versions",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.prompts"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "DELETE",
-      "operation_id": "prompts_delete",
-      "path": "/v2/prompts/{prompt_id}",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.prompts"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "prompts_get",
-      "path": "/v2/prompts/{prompt_id}",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.prompts"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "prompts_get_version",
-      "path": "/v2/prompts/{prompt_id}/versions/{version}",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.prompts"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "prompts_list",
-      "path": "/v2/prompts",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.prompts"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "prompts_list_versions",
-      "path": "/v2/prompts/{prompt_id}/versions",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.prompts"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "PATCH",
-      "operation_id": "prompts_update",
-      "path": "/v2/prompts/{prompt_id}",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.prompts"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "PATCH",
-      "operation_id": "prompts_update_version_metadata",
-      "path": "/v2/prompts/{prompt_id}/versions/{version}",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.prompts"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "POST",
       "operation_id": "query_workflow_execution_v1_workflows_executions__execution_id__queries_post",
       "path": "/v1/workflows/executions/{execution_id}/queries",
       "success_media": [
         "application/json"
       ],
       "tags": [
-        "workflows.executions"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "PUT",
-      "operation_id": "register_config_v1_rag_ingestion_pipeline_configurations_put",
-      "path": "/v1/rag/ingestion_pipeline_configurations",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.rag.ingestion_pipeline_configurations"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "PUT",
-      "operation_id": "register_deployment_v1_rag_deployments_put",
-      "path": "/v1/rag/deployments",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.rag.search_indexes"
+        "beta.workflows.executions"
       ],
       "upstream": true
     },
@@ -2399,29 +1872,7 @@
       "path": "/v1/workflows/executions/{execution_id}/reset",
       "success_media": [],
       "tags": [
-        "workflows.executions"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "POST",
-      "operation_id": "restart_deployment_v1_workflows_deployments__name__restart_post",
-      "path": "/v1/workflows/deployments/{name}/restart",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "workflows.deployments"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "POST",
-      "operation_id": "resume_schedule_v1_workflows_schedules__schedule_id__resume_post",
-      "path": "/v1/workflows/schedules/{schedule_id}/resume",
-      "success_media": [],
-      "tags": [
-        "workflows.schedules"
+        "beta.workflows.executions"
       ],
       "upstream": true
     },
@@ -2445,67 +1896,7 @@
         "application/json"
       ],
       "tags": [
-        "workflows.schedules"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "POST",
-      "operation_id": "search_latest_span_evaluations_v1_observability_spans_evaluations_search_latest_post",
-      "path": "/v1/observability/spans/evaluations/search/latest",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.observability.spans"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "POST",
-      "operation_id": "search_logs_v1_observability_logs_search_post",
-      "path": "/v1/observability/logs/search",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.observability.logs"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "POST",
-      "operation_id": "search_span_evaluations_v1_observability_spans_evaluations_search_post",
-      "path": "/v1/observability/spans/evaluations/search",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.observability.spans"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "POST",
-      "operation_id": "search_spans_v1_observability_spans_search_post",
-      "path": "/v1/observability/spans/search",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.observability.spans"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "POST",
-      "operation_id": "search_traces_v1_observability_traces_search_post",
-      "path": "/v1/observability/traces/search",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.observability.traces"
+        "beta.workflows.schedules"
       ],
       "upstream": true
     },
@@ -2517,115 +1908,7 @@
         "application/json"
       ],
       "tags": [
-        "workflows.executions"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "POST",
-      "operation_id": "skills_create",
-      "path": "/v2/skills",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.skills"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "POST",
-      "operation_id": "skills_create_version",
-      "path": "/v2/skills/{skill_id}/versions",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.skills"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "DELETE",
-      "operation_id": "skills_delete",
-      "path": "/v2/skills/{skill_id}",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.skills"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "skills_get",
-      "path": "/v2/skills/{skill_id}",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.skills"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "skills_get_version",
-      "path": "/v2/skills/{skill_id}/versions/{version}",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.skills"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "skills_list",
-      "path": "/v2/skills",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.skills"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "skills_list_versions",
-      "path": "/v2/skills/{skill_id}/versions",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.skills"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "PATCH",
-      "operation_id": "skills_update",
-      "path": "/v2/skills/{skill_id}",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.skills"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "PATCH",
-      "operation_id": "skills_update_version_metadata",
-      "path": "/v2/skills/{skill_id}/versions/{version}",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.skills"
+        "beta.workflows.executions"
       ],
       "upstream": true
     },
@@ -2643,42 +1926,6 @@
       "upstream": true
     },
     {
-      "method": "POST",
-      "operation_id": "start_deployment_v1_workflows_deployments__name__start_post",
-      "path": "/v1/workflows/deployments/{name}/start",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "workflows.deployments"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "POST",
-      "operation_id": "stop_deployment_v1_workflows_deployments__name__stop_post",
-      "path": "/v1/workflows/deployments/{name}/stop",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "workflows.deployments"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "stream_deployment_logs",
-      "path": "/v1/workflows/deployments/{name}/logs/stream",
-      "success_media": [
-        "text/event-stream"
-      ],
-      "tags": [
-        "workflows.deployments"
-      ],
-      "upstream": true
-    },
-    {
       "method": "GET",
       "operation_id": "stream_v1_workflows_executions__execution_id__stream_get",
       "path": "/v1/workflows/executions/{execution_id}/stream",
@@ -2686,19 +1933,7 @@
         "text/event-stream"
       ],
       "tags": [
-        "workflows.executions"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "stream_workflow_execution_logs",
-      "path": "/v1/workflows/executions/{execution_id}/logs/stream",
-      "success_media": [
-        "text/event-stream"
-      ],
-      "tags": [
-        "workflows.executions"
+        "beta.workflows.executions"
       ],
       "upstream": true
     },
@@ -2708,17 +1943,7 @@
       "path": "/v1/workflows/executions/{execution_id}/terminate",
       "success_media": [],
       "tags": [
-        "workflows.executions"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "POST",
-      "operation_id": "trigger_schedule_v1_workflows_schedules__schedule_id__trigger_post",
-      "path": "/v1/workflows/schedules/{schedule_id}/trigger",
-      "success_media": [],
-      "tags": [
-        "workflows.schedules"
+        "beta.workflows.executions"
       ],
       "upstream": true
     },
@@ -2730,19 +1955,7 @@
         "application/json"
       ],
       "tags": [
-        "workflows"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "DELETE",
-      "operation_id": "unregister_deployment_v1_rag_deployments__deployment_id__delete",
-      "path": "/v1/rag/deployments/{deployment_id}",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.rag.search_indexes"
+        "beta.workflows"
       ],
       "upstream": true
     },
@@ -2752,7 +1965,7 @@
       "path": "/v1/workflows/schedules/{schedule_id}",
       "success_media": [],
       "tags": [
-        "workflows.schedules"
+        "beta.workflows.schedules"
       ],
       "upstream": true
     },
@@ -2789,60 +2002,12 @@
       "upstream": true
     },
     {
-      "method": "PATCH",
-      "operation_id": "update_deployment_v1_workflows_deployments__name__patch",
-      "path": "/v1/workflows/deployments/{name}",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "workflows.deployments"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "PUT",
-      "operation_id": "update_index_metrics_v1_rag_deployments__deployment_id__metrics_put",
-      "path": "/v1/rag/deployments/{deployment_id}/metrics",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.rag.search_indexes"
-      ],
-      "upstream": true
-    },
-    {
       "method": "PUT",
       "operation_id": "update_judge_v1_observability_judges__judge_id__put",
       "path": "/v1/observability/judges/{judge_id}",
       "success_media": [],
       "tags": [
         "beta.observability.judges"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "PUT",
-      "operation_id": "update_run_info_v1_rag_ingestion_pipeline_configurations__id__run_info_put",
-      "path": "/v1/rag/ingestion_pipeline_configurations/{id}/run_info",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.rag.ingestion_pipeline_configurations"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "PATCH",
-      "operation_id": "update_schedule_v1_workflows_schedules__schedule_id__patch",
-      "path": "/v1/workflows/schedules/{schedule_id}",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "workflows.schedules"
       ],
       "upstream": true
     },
@@ -2866,7 +2031,7 @@
         "application/json"
       ],
       "tags": [
-        "workflows.executions"
+        "beta.workflows.executions"
       ],
       "upstream": true
     },
@@ -2878,530 +2043,10 @@
         "application/json"
       ],
       "tags": [
-        "workflows"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "users_admin_user_groups_get_group_workspace_assignments",
-      "path": "/v1/admin/user-groups/{group_uuid}/workspaces",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.user-groups"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "DELETE",
-      "operation_id": "users_admin_user_groups_remove_group_from_workspace",
-      "path": "/v1/admin/user-groups/{group_uuid}/workspaces/{workspace_uuid}",
-      "success_media": [],
-      "tags": [
-        "beta.admin.user-groups"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "PATCH",
-      "operation_id": "users_admin_user_groups_update_group_workspace_assignment",
-      "path": "/v1/admin/user-groups/{group_uuid}/workspaces/{workspace_uuid}",
-      "success_media": [],
-      "tags": [
-        "beta.admin.user-groups"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "PATCH",
-      "operation_id": "users_admin_user_groups_update_user_group_organization_role",
-      "path": "/v1/admin/user-groups/{group_uuid}/organization-role",
-      "success_media": [],
-      "tags": [
-        "beta.admin.user-groups"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "POST",
-      "operation_id": "users_api_admin_api_keys_create_api_key",
-      "path": "/v1/admin/api-keys",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.api-keys"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "DELETE",
-      "operation_id": "users_api_admin_api_keys_delete_api_key",
-      "path": "/v1/admin/api-keys/{key_id}",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.api-keys"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "users_api_admin_api_keys_get_api_keys",
-      "path": "/v1/admin/api-keys",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.api-keys"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "users_api_admin_audit_logs_get_audit_logs",
-      "path": "/v1/admin/audit-logs",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.audit-logs"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "users_api_admin_rate_limits_get_rate_limits",
-      "path": "/v1/admin/rate-limit",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.billing"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "users_api_admin_roles_get_roles",
-      "path": "/v1/admin/roles",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.users"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "users_api_admin_scim_sync_get_scim_sync_run",
-      "path": "/v1/admin/scim/sync/{run_id}",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.scim"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "POST",
-      "operation_id": "users_api_admin_scim_sync_trigger_scim_sync",
-      "path": "/v1/admin/scim/sync",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.scim"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "users_api_admin_spend_limits_get_spend_limits",
-      "path": "/v1/admin/spend-limit",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.billing"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "POST",
-      "operation_id": "users_api_admin_spend_limits_update_spend_limits",
-      "path": "/v1/admin/spend-limit",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.billing"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "users_api_admin_usage_get_usage",
-      "path": "/v1/admin/usage",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.billing"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "POST",
-      "operation_id": "users_api_admin_user_groups_assign_group_to_workspace",
-      "path": "/v1/admin/user-groups/{group_uuid}/workspaces",
-      "success_media": [],
-      "tags": [
-        "beta.admin.user-groups"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "POST",
-      "operation_id": "users_api_admin_user_groups_assign_users_to_group",
-      "path": "/v1/admin/user-groups/{group_uuid}/members",
-      "success_media": [],
-      "tags": [
-        "beta.admin.user-groups"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "POST",
-      "operation_id": "users_api_admin_user_groups_create_user_group",
-      "path": "/v1/admin/user-groups",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.user-groups"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "DELETE",
-      "operation_id": "users_api_admin_user_groups_delete_user_group",
-      "path": "/v1/admin/user-groups/{group_uuid}",
-      "success_media": [],
-      "tags": [
-        "beta.admin.user-groups"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "users_api_admin_user_groups_get_nested_groups",
-      "path": "/v1/admin/user-groups/{group_uuid}/nested",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.user-groups"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "users_api_admin_user_groups_get_user_group",
-      "path": "/v1/admin/user-groups/{group_uuid}",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.user-groups"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "users_api_admin_user_groups_get_user_group_members",
-      "path": "/v1/admin/user-groups/{group_uuid}/members",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.user-groups"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "users_api_admin_user_groups_get_user_groups",
-      "path": "/v1/admin/user-groups",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.user-groups"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "POST",
-      "operation_id": "users_api_admin_user_groups_provision_group_to_workspace",
-      "path": "/v1/admin/user-groups/provision-workspace",
-      "success_media": [],
-      "tags": [
-        "beta.admin.user-groups"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "DELETE",
-      "operation_id": "users_api_admin_user_groups_remove_users_from_group",
-      "path": "/v1/admin/user-groups/{group_uuid}/members",
-      "success_media": [],
-      "tags": [
-        "beta.admin.user-groups"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "PATCH",
-      "operation_id": "users_api_admin_user_groups_set_nested_groups",
-      "path": "/v1/admin/user-groups/{group_uuid}/nested",
-      "success_media": [],
-      "tags": [
-        "beta.admin.user-groups"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "PATCH",
-      "operation_id": "users_api_admin_user_groups_update_user_group",
-      "path": "/v1/admin/user-groups/{group_uuid}",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.user-groups"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "POST",
-      "operation_id": "users_api_admin_users_create_users",
-      "path": "/v1/admin/users",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.users"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "DELETE",
-      "operation_id": "users_api_admin_users_delete_invite",
-      "path": "/v1/admin/users-invite/{invite_uuid}",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.users"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "DELETE",
-      "operation_id": "users_api_admin_users_delete_user",
-      "path": "/v1/admin/users/{user_id}",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.users"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "users_api_admin_users_get_invite",
-      "path": "/v1/admin/users-invite",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.users"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "users_api_admin_users_get_user",
-      "path": "/v1/admin/users/{user_id}",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.users"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "users_api_admin_users_get_users",
-      "path": "/v1/admin/users",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.users"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "POST",
-      "operation_id": "users_api_admin_users_invite_users",
-      "path": "/v1/admin/users-invite",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.users"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "PATCH",
-      "operation_id": "users_api_admin_users_update_user",
-      "path": "/v1/admin/users/{user_id}",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.users"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "PATCH",
-      "operation_id": "users_api_admin_workspaces_add_or_update_users_workspaces",
-      "path": "/v1/admin/workspaces/{workspace_uuid}/users",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.workspaces"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "POST",
-      "operation_id": "users_api_admin_workspaces_add_users_workspaces",
-      "path": "/v1/admin/workspaces/{workspace_uuid}/add-users",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.workspaces"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "POST",
-      "operation_id": "users_api_admin_workspaces_create_workspace",
-      "path": "/v1/admin/workspaces",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.workspaces"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "DELETE",
-      "operation_id": "users_api_admin_workspaces_delete_workspaces",
-      "path": "/v1/admin/workspaces/{workspace_uuid}",
-      "success_media": [],
-      "tags": [
-        "beta.admin.workspaces"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "users_api_admin_workspaces_get_workspaces",
-      "path": "/v1/admin/workspaces",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.workspaces"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "DELETE",
-      "operation_id": "users_api_admin_workspaces_remove_users_workspaces",
-      "path": "/v1/admin/workspaces/{workspace_uuid}/remove-users",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.workspaces"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "PATCH",
-      "operation_id": "users_api_admin_workspaces_update_workspaces",
-      "path": "/v1/admin/workspaces/{workspace_uuid}",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.admin.workspaces"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "users_api_get_identity",
-      "path": "/v1/users/me",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.users"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "users_api_list_organizations",
-      "path": "/v1/users/me/organizations",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.users"
-      ],
-      "upstream": true
-    },
-    {
-      "method": "GET",
-      "operation_id": "users_api_list_workspaces",
-      "path": "/v1/users/me/workspaces",
-      "success_media": [
-        "application/json"
-      ],
-      "tags": [
-        "beta.users"
+        "beta.workflows"
       ],
       "upstream": true
     }
   ],
-  "upstream_operations": 288
+  "upstream_operations": 173
 }

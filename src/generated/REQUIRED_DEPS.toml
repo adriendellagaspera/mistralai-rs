@@ -4,7 +4,6 @@
 # merge it with existing dependency and feature sections.
 
 [dependencies]
-base64 = "0.22"
 bytes = { version = "1", features = ["serde"] }
 chrono = { version = "0.4", features = ["serde"] }
 futures-util = "0.3"

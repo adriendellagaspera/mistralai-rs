@@ -1,8 +1,9 @@
 {
   "schema_version": 1,
-  "base": "dc618e8c4dfbc2bc0acf1a1a4bbd1563203609a7",
+  "base": "473e05fba4c0b71a8b2ea6b6d9d1e6a711012df8",
   "changed_rust_files": [
     "src/generated/client.rs",
+    "src/generated/mod.rs",
     "src/generated/types.rs"
   ]
 }
