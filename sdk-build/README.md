@@ -57,7 +57,17 @@ official-SDK revisions and API semver checker; `openapi-to-rust.toml`,
 `compatibility-definition.json` are reviewed build inputs at the root of
 `sdk-build/`. `openapi-to-rust-MIT.txt` preserves upstream attribution.
 
-The docs-site URL `https://docs.mistral.ai/openapi.yaml` is **not** a byte mirror of\nthe versioned repository source. It serves a broader API catalog; the root\n`openapi.yaml` currently defines the explicitly pinned SDK scope. `update.py`\nnever silently switches to the docs-site catalog. See [#127](https://github.com/adriendellagaspera/mistralai-rs/issues/127)\nfor source investigation and [#16](https://github.com/adriendellagaspera/mistralai-rs/issues/16)\nfor future expansion of idiomatic API coverage.\n\n## Validation boundaries
+The docs-site URL `https://docs.mistral.ai/openapi.yaml` is **not** a byte mirror of
+the versioned repository source. It serves a broader API catalog; the root
+`openapi.yaml` currently defines the explicitly pinned SDK scope. `update.py`
+never silently switches to the docs-site catalog. See [#127](https://github.com/adriendellagaspera/mistralai-rs/issues/127)
+for source investigation and [#16](https://github.com/adriendellagaspera/mistralai-rs/issues/16)
+for future expansion of idiomatic API coverage.
+The [independent public-catalog monitor](../.github/workflows/monitor-public-openapi.yml)
+checks its reviewed fingerprint weekly. Update `openapi/public-catalog.lock.json`
+only after reviewing catalog changes; this monitor is not an SDK build input.
+
+## Validation boundaries
 
 `just check-generated` and `just generate` are Python-free. In contrast,
 `just validate` intentionally combines deterministic Rust regeneration with
