@@ -212,6 +212,7 @@ fn copy_inputs(root: &Path, work: &Path) -> Result<()> {
         "openapi-to-rust.toml",
         "sdk-overrides.json",
         "coverage-baseline.json",
+        "candidate-derivation-baseline.json",
     ] {
         fs::copy(from.join(file), to.join(file))?;
     }
@@ -594,7 +595,7 @@ fn verify_candidate_derivation(
     if observed != baseline {
         println!("{}", serde_json::to_string_pretty(&observed)?);
         return fail(
-            "candidate 288 derivation status/reason/override inventory drifted; review and update baseline only after proving the changed operations"
+            "candidate 288 derivation status/reason/override inventory drifted; review and update baseline only after proving the changed operations",
         );
     }
 
@@ -667,14 +668,7 @@ fn execute(root: &Path, args: &Options) -> Result<()> {
     }
     let compiler = install_tool(root, &lock, "rust_sdk_generator", "rust-sdk-generator")?;
     if args.command == "candidate-derive" {
-        return verify_candidate_derivation(
-            root,
-            &lock,
-            &version,
-            &raw,
-            &bindings,
-            &compiler,
-        );
+        return verify_candidate_derivation(root, &lock, &version, &raw, &bindings, &compiler);
     }
 
     let temp = Workspace::new(root)?;
