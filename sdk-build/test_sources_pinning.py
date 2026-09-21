@@ -52,5 +52,61 @@ class OfficialSourcePinTests(unittest.TestCase):
             harvest.pin_latest(self.original, source="unknown")
 
 
+class TypeScriptSurfaceTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        (self.root / "src/sdk").mkdir(parents=True)
+        (self.root / "src/funcs").mkdir()
+        (self.root / "src/sdk/sdk.ts").write_text(
+            "export class Mistral extends ClientSDK {\n"
+            "  get audio(): Audio { return new Audio(this._options); }\n"
+            "}\n"
+        )
+        (self.root / "src/sdk/audio.ts").write_text(
+            "export class Audio extends ClientSDK {\n"
+            "  get speech(): Speech { return new Speech(this._options); }\n"
+            "}\n"
+        )
+        (self.root / "src/funcs/audioSpeechComplete.ts").write_text(
+            'const path = pathToFunc("/v1/audio/speech")();\n'
+            'const request = { method: "POST" };\n'
+            'const context = { operationID: "speech_v1_audio_speech_post" };\n'
+        )
+
+    def test_multiline_multi_symbol_import_includes_speech(self) -> None:
+        (self.root / "src/sdk/speech.ts").write_text(
+            'import {\n'
+            '  audioSpeechComplete,\n'
+            '  CompleteAcceptEnum,\n'
+            '} from "../funcs/audioSpeechComplete.js";\n'
+            'export class Speech extends ClientSDK {\n'
+            '  async complete(request: SpeechRequest): Promise<Response> {\n'
+            '    return unwrapAsync(audioSpeechComplete(this, request));\n'
+            '  }\n'
+            '}\n'
+        )
+        records = harvest.parse_typescript(self.root)
+        self.assertEqual(len(records), 1)
+        self.assertEqual(records[0]["public_path"], "audio.speech.complete")
+        self.assertEqual(records[0]["http_method"], "POST")
+        self.assertEqual(records[0]["http_path"], "/v1/audio/speech")
+
+    def test_single_symbol_import_still_supported(self) -> None:
+        (self.root / "src/sdk/speech.ts").write_text(
+            'import { audioSpeechComplete } from "../funcs/audioSpeechComplete.js";\n'
+            'export class Speech extends ClientSDK {\n'
+            '  async complete(request: SpeechRequest): Promise<Response> {\n'
+            '    return unwrapAsync(audioSpeechComplete(this, request));\n'
+            '  }\n'
+            '}\n'
+        )
+        self.assertEqual(
+            [item["public_path"] for item in harvest.parse_typescript(self.root)],
+            ["audio.speech.complete"],
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
