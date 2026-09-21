@@ -78,6 +78,19 @@ a separately reviewed source migration and generated API update (see
 The separate [public-catalog monitor](.github/workflows/monitor-public-openapi.yml) checks
 its reviewed fingerprint weekly without blocking SDK source updates.
 
+The selected migration target is staged separately at
+[`sdk-build/openapi/public-288.yaml`](sdk-build/openapi/public-288.yaml):
+the immutable `mistralai/platform-docs-public/public/openapi.yaml` at
+`ff846cf93d91df6fe04d0a5e540ecbe1e0ecc691` (288 operations, SHA-256
+`86b89916f38b14d4452654938ec51ad5337c860c19db03f37d86921d639fb36f`).
+It is verified from the checkout but is **not yet a generation input**. The
+raw + idiomatic cutover remains atomic and is tracked by
+[#134](https://github.com/adriendellagaspera/mistralai-rs/issues/134) through
+#136–#138. The deployed docs catalog was observed with 296 operations; its
+eight additional Service Account operations remain a separate provenance gap
+under [#139](https://github.com/adriendellagaspera/mistralai-rs/issues/139).
+
+
 ## Streaming and binary responses
 
 The Chat facade exposes an owned typed stream:

@@ -64,6 +64,23 @@ pub(crate) fn verify_sources(root: &Path, lock: &Value) -> Result<()> {
     let source = fs::read(snapshot)?;
     let actual = verify_pinned(&source, expected_sha256)?;
     println!("pinned OpenAPI verified: {actual}");
+
+    let candidate_path = root.join("sdk-build/openapi/public-288.yaml");
+    let candidate_expected = lock["openapi_candidate"]["sha256"]
+        .as_str()
+        .ok_or("candidate OpenAPI SHA-256 pin is missing")?;
+    let candidate = fs::read(candidate_path)?;
+    let candidate_actual = format!("{:x}", Sha256::digest(&candidate));
+    if candidate_actual != candidate_expected {
+        return fail(format!(
+            "candidate OpenAPI SHA-256 mismatch: expected {candidate_expected}, got {candidate_actual}"
+        ));
+    }
+    let candidate_text = std::str::from_utf8(&candidate)?;
+    if !candidate_text.starts_with("openapi: 3.1.") {
+        return fail("candidate OpenAPI dialect changed");
+    }
+    println!("staged candidate OpenAPI verified: {candidate_actual}");
     Ok(())
 }
 

@@ -67,6 +67,15 @@ The [independent public-catalog monitor](../.github/workflows/monitor-public-ope
 checks its reviewed fingerprint weekly. Update `openapi/public-catalog.lock.json`
 only after reviewing catalog changes; this monitor is not an SDK build input.
 
+The reviewed 288-operation migration target is vendored separately as
+`openapi/public-288.yaml` and pinned under `openapi_candidate` in
+`provenance.lock.json`. `src/sources.rs` verifies its exact bytes and
+OpenAPI 3.1 dialect, but ordinary `check`/`generate` continue to use
+`openapi/published.yaml` until the raw bindings, derivation and public
+compatibility work in #136–#138 can be published atomically. The candidate is
+not advanced by `openapi/update.py`.
+
+
 ## Validation boundaries
 
 `just check-generated` and `just generate` are Python-free. In contrast,
