@@ -471,6 +471,129 @@ fn verify_candidate_raw(
     Ok(())
 }
 
+fn verify_candidate_derivation(
+    root: &Path,
+    lock: &Value,
+    version: &str,
+    raw: &Path,
+    bindings: &Path,
+    compiler: &Path,
+) -> Result<()> {
+    let temp = Workspace::new(root)?;
+    let work = &temp.0;
+    copy_inputs(root, work)?;
+    let build = work.join("sdk-build");
+    let config = candidate_config(&build)?;
+    let overlaid = build.join("openapi/overlaid-candidate.json");
+    let generated = work.join("candidate-generated");
+    run(
+        raw,
+        vec!["generate".into(), "--config".into(), str_arg(&config)],
+        root,
+    )?;
+    let spec: Value = serde_json::from_slice(&fs::read(&overlaid)?)?;
+    verify_candidate_overlaid(&spec)?;
+    format_rust(root, version, &generated)?;
+
+    let coverage = raw_coverage(&generated, &spec)?;
+    let candidate = field(lock, "openapi_candidate")?;
+    let expected_operations = candidate["operations"]
+        .as_u64()
+        .ok_or("candidate expected operation count is missing")?;
+    let expected_methods = candidate["generated_methods"]
+        .as_u64()
+        .ok_or("candidate expected generated-method count is missing")?;
+    if coverage["upstream_operations"].as_u64() != Some(expected_operations)
+        || coverage["generated_methods"].as_u64() != Some(expected_methods)
+    {
+        return fail("candidate derivation probe raw inventory drifted");
+    }
+
+    let bindings_value: Value =
+        serde_json::from_str(&output(bindings, vec![str_arg(&generated)], root)?)?;
+    verify_bindings_coverage(&bindings_value, &spec)?;
+    let bindings_path = work.join("bindings.json");
+    write_json(&bindings_path, &bindings_value)?;
+
+    let derivation: Value = serde_json::from_str(&output(
+        compiler,
+        vec![
+            "derive".into(),
+            "--openapi".into(),
+            str_arg(&overlaid),
+            "--bindings".into(),
+            str_arg(&bindings_path),
+            "--surface".into(),
+            str_arg(&build.join("official-sdks/surface.json")),
+            "--overrides".into(),
+            str_arg(&build.join("sdk-overrides.json")),
+        ],
+        root,
+    )?)?;
+    let report = field(&derivation, "report")?;
+    let operations = field(report, "operations")?
+        .as_object()
+        .ok_or("candidate derivation report operations must be an object")?;
+    if operations.len() as u64 != expected_operations {
+        return fail(format!(
+            "candidate derivation report inventory drift: {} != {expected_operations}",
+            operations.len()
+        ));
+    }
+
+    let mut statuses = BTreeMap::<String, usize>::new();
+    let mut rejections = BTreeMap::<String, Vec<String>>::new();
+    let mut override_targets = BTreeMap::<String, Value>::new();
+    let configured_overrides = read_json(&build.join("sdk-overrides.json"))?;
+    let configured = field(&configured_overrides, "operations")?
+        .as_object()
+        .ok_or("candidate overrides operations must be an object")?;
+
+    for (operation_id, outcome) in operations {
+        let status = string(outcome, "status")?;
+        *statuses.entry(status.to_owned()).or_default() += 1;
+        let reason = field(outcome, "reason")?;
+        let reason_code = string(reason, "code")?;
+        if status == "rejected" {
+            rejections
+                .entry(reason_code.to_owned())
+                .or_default()
+                .push(operation_id.clone());
+        }
+        if configured.contains_key(operation_id) {
+            override_targets.insert(
+                operation_id.clone(),
+                json!({
+                    "status": status,
+                    "reason": reason
+                }),
+            );
+        }
+    }
+
+    let target = root.join("sdk-build/target");
+    fs::create_dir_all(&target)?;
+    write_json(&target.join("candidate-bindings.json"), &bindings_value)?;
+    fs::copy(&overlaid, target.join("candidate-overlaid.json"))?;
+    write_json(&target.join("candidate-derivation-report.json"), report)?;
+    write_json(
+        &target.join("candidate-sdk-definition.json"),
+        field(&derivation, "definition")?,
+    )?;
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&json!({
+            "candidate_derivation": {
+                "statuses": statuses,
+                "rejections_by_reason": rejections,
+                "override_targets": override_targets,
+                "report": "sdk-build/target/candidate-derivation-report.json"
+            }
+        }))?
+    );
+    Ok(())
+}
+
 struct Options {
     command: String,
     require_parity: bool,
@@ -479,10 +602,10 @@ struct Options {
 
 fn parse_args() -> Result<Options> {
     let mut args = env::args().skip(1);
-    let command = args.next().ok_or("usage: mistralai-sdk-build <raw|generate|check|probe|candidate-raw> [--require-parity] [--compatibility-definition PATH]")?;
+    let command = args.next().ok_or("usage: mistralai-sdk-build <raw|generate|check|probe|candidate-raw|candidate-derive> [--require-parity] [--compatibility-definition PATH]")?;
     if !matches!(
         command.as_str(),
-        "raw" | "generate" | "check" | "probe" | "candidate-raw"
+        "raw" | "generate" | "check" | "probe" | "candidate-raw" | "candidate-derive"
     ) {
         return fail(format!("unknown command: {command}"));
     }
@@ -525,6 +648,16 @@ fn execute(root: &Path, args: &Options) -> Result<()> {
         return verify_candidate_raw(root, &lock, &version, &raw, &bindings);
     }
     let compiler = install_tool(root, &lock, "rust_sdk_generator", "rust-sdk-generator")?;
+    if args.command == "candidate-derive" {
+        return verify_candidate_derivation(
+            root,
+            &lock,
+            &version,
+            &raw,
+            &bindings,
+            &compiler,
+        );
+    }
 
     let temp = Workspace::new(root)?;
     let work = &temp.0;
