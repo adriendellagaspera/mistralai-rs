@@ -45,14 +45,14 @@ jobs:
         run: |
           mkdir -p .nightly
           tar -czf .nightly/source-snapshot.tar.gz sdk-build/openapi sdk-build/official-sdks sdk-build/provenance.lock.json
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()
         with:
           name: nightly-sources
           path: .nightly/source-snapshot.tar.gz
           if-no-files-found: warn
           retention-days: 14
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()
         with:
           name: nightly-results-sources
@@ -142,7 +142,7 @@ jobs:
               python3 .github/scripts/nightly.py run "$job" sdk_build_python_tests -- python3 -m unittest discover -s sdk-build -p 'test_*.py'
               ;;
           esac
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()
         with:
           name: nightly-results-baseline-${{ matrix.variant }}
@@ -221,14 +221,14 @@ jobs:
         run: |
           mkdir -p .nightly
           tar -czf .nightly/candidate.tar.gz sdk-build/openapi sdk-build/official-sdks sdk-build/provenance.lock.json src/generated src/sdk .nightly/results/candidate.json
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()
         with:
           name: nightly-candidate
           path: .nightly/candidate.tar.gz
           if-no-files-found: warn
           retention-days: 14
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()
         with:
           name: nightly-results-candidate
@@ -315,7 +315,7 @@ jobs:
               python3 .github/scripts/nightly.py run "$job" api_review -- python3 sdk-build/api-review/check.py --base "$SDK_API_BASE" --rustdoc
               ;;
           esac
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()
         with:
           name: nightly-results-candidate-${{ matrix.variant }}
@@ -365,7 +365,7 @@ jobs:
             python3 .github/scripts/nightly.py summary --run-url "$RUN_URL" --output update-report.md
           fi
           cat update-report.md >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()
         with:
           name: nightly-report
