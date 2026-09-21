@@ -1,4 +1,4 @@
-"""Pin an immutable upstream OpenAPI revision after verifying its published mirror."""
+"""Pin the repository OpenAPI and independently verify the reviewed public-spec fingerprint."""
 
 from __future__ import annotations
 
@@ -53,12 +53,23 @@ def main() -> None:
     spec = fetch(f"https://raw.githubusercontent.com/{repository}/{commit}/{path}")
     mirror = fetch(source["published_url"])
     digest = hashlib.sha256(spec).hexdigest()
-    if spec != mirror:
+    mirror_digest = hashlib.sha256(mirror).hexdigest()
+    reviewed_mirror_digest = source.get("published_sha256")
+    if not reviewed_mirror_digest:
+        raise ValueError("Missing reviewed published OpenAPI SHA-256 fingerprint")
+    if mirror_digest != reviewed_mirror_digest:
         raise ValueError(
-            "Published OpenAPI differs from the pinned upstream revision: "
+            "Published OpenAPI changed independently of the pinned repository source; "
+            "review the public-spec change before updating published_sha256: "
+            f"reviewed_sha256={reviewed_mirror_digest}, actual_sha256={mirror_digest}, "
             f"upstream_commit={commit}, upstream_sha256={digest}, "
-            f"published_sha256={hashlib.sha256(mirror).hexdigest()}, "
             f"upstream_bytes={len(spec)}, published_bytes={len(mirror)}"
+        )
+    if spec != mirror:
+        print(
+            "Known public-spec divergence (reviewed fingerprint): "
+            f"repository_sha256={digest}, published_sha256={mirror_digest}, "
+            f"upstream_commit={commit}; the GitHub repository remains the SDK source."
         )
     if digest == source["sha256"]:
         if (HERE / "published.yaml").read_bytes() != spec:
