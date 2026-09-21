@@ -47,9 +47,31 @@ compiler logic is maintained here.
 
 | Directory | Artifacts and owner | When it runs |
 | --- | --- | --- |
-| `openapi/` | `published.yaml`, `overlays/` and license are pinned inputs. `update.py` discovers/downloads an upstream revision and changes the source pin explicitly. The build no longer calls a Python source checker. | `just sync-openapi` and scheduled source-update workflow, **not** routine `check`/`generate`. |
+| `openapi/` | `published.yaml`, `overlays/` and license are pinned inputs. `update.py` advances the GitHub-repository OpenAPI revision and separately verifies the reviewed fingerprint of the broader public API specification. The build no longer calls a Python source checker. | `just sync-openapi` and scheduled source-update workflow, **not** routine `check`/`generate`. |
 | `official-sdks/` | `harvest.py` analyzes the official Python AST and TypeScript sources; `update.py` coordinates `pin-latest`, `update`, `check`; `surface.json` is the reviewed input read by the Rust build. | `just check-source-evidence`, explicit source refresh, `just validate` and CI's independent source-evidence step. |
 | `api-review/` | `check.py`, `test_check.py`, `review.json`: inspect actual public Rust changes against a PR base and run pinned compiler-aware semver checks. | CI's `api` job; Python test discovery in `just test-tooling`/`just validate`. Not part of deterministic generation. |
+
+### Distinct OpenAPI sources (reviewed in #127)
+
+The raw Rust SDK is generated from an immutable commit of
+`mistralai/platform-docs-public/openapi.yaml`. Its commit and SHA-256 pin
+`sdk-build/openapi/published.yaml`; Rust generation verifies those exact
+bytes offline. The public `https://docs.mistral.ai/openapi.yaml` endpoint is
+**not a byte-for-byte mirror** of that repository file: the reviewed
+2026-09-20 snapshots exposed 173 operations (repository) versus 296 (public),
+including additional admin APIs and removed legacy routes. Automatically
+substituting the broader document would change the SDK's API and must be
+reviewed as a separate migration.
+
+`provenance.lock.json.openapi.published_sha256` therefore pins the *separate*
+public document's last reviewed fingerprint. Source discovery may advance the
+GitHub-repository pin independently while the public fingerprint remains
+unchanged. A new public fingerprint fails the source-acquisition check until
+the divergence is investigated and the fingerprint is explicitly reviewed.
+Never update `published_sha256` merely to make the nightly green: inspect the
+operation/schema changes and decide whether the SDK's source policy also needs
+to change. The public endpoint remains a monitoring reference, not a second
+source of bytes for the deterministic SDK build.
 
 `provenance.lock.json` pins source checksum, tool revisions/trees,
 official-SDK revisions and API semver checker; `openapi-to-rust.toml`,
