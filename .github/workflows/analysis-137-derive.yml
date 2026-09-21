@@ -1,0 +1,40 @@
+name: Analyze 288 derivation with production overrides
+on:
+  push:
+    branches:
+      - analysis/137-override-report
+
+permissions:
+  contents: read
+
+jobs:
+  derive:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install pinned Rust toolchain
+        run: rustup show
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            .tools
+            ~/.cargo/registry
+            ~/.cargo/git
+            sdk-build/target
+          key: analysis-137-${{ runner.os }}-${{ hashFiles('sdk-build/provenance.lock.json', 'sdk-build/Cargo.lock') }}
+          restore-keys: |
+            candidate-raw-${{ runner.os }}-
+            tools-generation-${{ runner.os }}-
+      - name: Derive full 288 report with production overrides
+        run: cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- candidate-derive
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: candidate-derivation-report
+          path: |
+            sdk-build/target/candidate-derivation-report.json
+            sdk-build/target/candidate-sdk-definition.json
+          if-no-files-found: error
+          retention-days: 2
