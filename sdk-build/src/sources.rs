@@ -28,17 +28,17 @@ const RETIRED_LOCAL_PATHS: [&str; 4] = [
 ];
 
 /// Verify the pinned snapshot and all assumptions that justify reviewed overlays.
-fn verify_published(source: &[u8], expected_sha256: &str) -> Result<String> {
+fn verify_pinned(source: &[u8], expected_sha256: &str) -> Result<String> {
     // Hash the original bytes, never an OpenAPI parser's reserialization.
     let actual = format!("{:x}", Sha256::digest(source));
     if actual != expected_sha256 {
         return fail(format!(
-            "published OpenAPI SHA-256 mismatch: expected {expected_sha256}, got {actual}"
+            "pinned OpenAPI SHA-256 mismatch: expected {expected_sha256}, got {actual}"
         ));
     }
     let text = std::str::from_utf8(source)?;
     if !text.starts_with("openapi: 3.1.") {
-        return fail("published OpenAPI dialect changed");
+        return fail("pinned OpenAPI dialect changed");
     }
     for (description, needle) in OVERLAY_ASSUMPTIONS {
         if !text.contains(needle) {
@@ -48,7 +48,7 @@ fn verify_published(source: &[u8], expected_sha256: &str) -> Result<String> {
     for path in RETIRED_LOCAL_PATHS {
         if text.contains(&format!("  {path}")) {
             return fail(format!(
-                "published OpenAPI now contains retired local path {}",
+                "pinned OpenAPI now contains retired local path {}",
                 path.trim_end_matches(':')
             ));
         }
@@ -57,13 +57,13 @@ fn verify_published(source: &[u8], expected_sha256: &str) -> Result<String> {
 }
 
 pub(crate) fn verify_sources(root: &Path, lock: &Value) -> Result<()> {
-    let published = root.join("sdk-build/openapi/published.yaml");
+    let snapshot = root.join("sdk-build/openapi/published.yaml");
     let expected_sha256 = lock["openapi"]["sha256"]
         .as_str()
         .ok_or("OpenAPI SHA-256 pin is missing")?;
-    let source = fs::read(published)?;
-    let actual = verify_published(&source, expected_sha256)?;
-    println!("published OpenAPI verified: {actual}");
+    let source = fs::read(snapshot)?;
+    let actual = verify_pinned(&source, expected_sha256)?;
+    println!("pinned OpenAPI verified: {actual}");
     Ok(())
 }
 
@@ -81,10 +81,10 @@ mod tests {
     #[test]
     fn accepts_pinned_bytes_and_rejects_any_mutation() {
         let pin = hash(VALID.as_bytes());
-        assert_eq!(verify_published(VALID.as_bytes(), &pin).unwrap(), pin);
-        assert!(verify_published(format!("{VALID}# unreviewed\n").as_bytes(), &pin).is_err());
-        assert!(verify_published(VALID.as_bytes(), "not-a-sha256").is_err());
-        assert!(verify_published(b"", &hash(b"")).is_err());
+        assert_eq!(verify_pinned(VALID.as_bytes(), &pin).unwrap(), pin);
+        assert!(verify_pinned(format!("{VALID}# unreviewed\n").as_bytes(), &pin).is_err());
+        assert!(verify_pinned(VALID.as_bytes(), "not-a-sha256").is_err());
+        assert!(verify_pinned(b"", &hash(b"")).is_err());
     }
 
     #[test]
@@ -93,7 +93,7 @@ mod tests {
             VALID.replace("openapi: 3.1.", "openapi: 3.0.").into_bytes(),
             [VALID.as_bytes(), b"\xff"].concat(),
         ] {
-            assert!(verify_published(&bytes, &hash(&bytes)).is_err());
+            assert!(verify_pinned(&bytes, &hash(&bytes)).is_err());
         }
     }
 
@@ -101,7 +101,7 @@ mod tests {
     fn fails_closed_on_each_reviewed_overlay_assumption() {
         for (_, needle) in OVERLAY_ASSUMPTIONS {
             let changed = VALID.replace(needle, "");
-            assert!(verify_published(changed.as_bytes(), &hash(changed.as_bytes())).is_err());
+            assert!(verify_pinned(changed.as_bytes(), &hash(changed.as_bytes())).is_err());
         }
     }
 
@@ -109,7 +109,7 @@ mod tests {
     fn rejects_retired_local_paths_even_with_matching_hash() {
         for path in RETIRED_LOCAL_PATHS {
             let source = format!("{VALID}  {path}\n");
-            assert!(verify_published(source.as_bytes(), &hash(source.as_bytes())).is_err());
+            assert!(verify_pinned(source.as_bytes(), &hash(source.as_bytes())).is_err());
         }
     }
 
