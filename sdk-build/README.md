@@ -35,6 +35,7 @@ Run from the repository root (or via Just):
 | `cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- raw` | Explicit source-update phase; publish reviewed raw bindings only. |
 | `cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- probe` | Inspect canonical derivation, optionally `--require-parity` or `--compatibility-definition PATH`. |
 | `cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- candidate-raw` | Validate the staged 288 source: reviewed candidate overlay, 288→297 inventory, exact generated dependency fragment, standalone raw compile and canonical Bindings v3 identity. Does not publish. |
+| `cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- candidate-derive` | Derive all 288 operations with the four production overrides unchanged. Save the complete report, effective OpenAPI, Bindings and candidate definition in `sdk-build/target/`; compare exact outcomes against `candidate-derivation-baseline.json`. Does not publish, and rejected operations remain rejected. |
 | `cargo test --locked --manifest-path sdk-build/Cargo.toml --all-targets` | Source-hash, overlay-assumption, coverage, parity and publication rollback tests. |
 
 Rust source boundaries: `src/sources.rs` validates immutable Mistral
