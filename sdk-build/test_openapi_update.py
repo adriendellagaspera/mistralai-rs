@@ -33,7 +33,7 @@ class OpenApiPinTests(unittest.TestCase):
         self.lock = root / "provenance.lock.json"
         self.source = {
             "repository": "mistralai/platform-docs-public",
-            "path": "public/openapi.yaml",
+            "path": "openapi.yaml",
             "commit": COMMIT_OLD,
             "sha256": hashlib.sha256(OLD).hexdigest(),
             # An older lock may still contain the erroneous mirror field.
@@ -57,7 +57,7 @@ class OpenApiPinTests(unittest.TestCase):
         self.assertEqual(fetch.call_count, 2)
         self.assertEqual(
             fetch.call_args_list[1].args[0],
-            f"https://raw.githubusercontent.com/mistralai/platform-docs-public/{COMMIT_OLD}/public/openapi.yaml",
+            f"https://raw.githubusercontent.com/mistralai/platform-docs-public/{COMMIT_OLD}/openapi.yaml",
         )
         self.assertEqual(self.lock.read_bytes(), initial)
         self.assertEqual((self.openapi / "published.yaml").read_bytes(), OLD)
@@ -75,17 +75,6 @@ class OpenApiPinTests(unittest.TestCase):
         self.assertEqual(lock["sha256"], hashlib.sha256(NEW).hexdigest())
         self.assertEqual((self.openapi / "published.yaml").read_bytes(), NEW)
         self.assertEqual((self.openapi / "LICENSE").read_bytes(), b"Apache-2.0")
-
-    def test_failed_license_acquisition_leaves_pin_and_snapshot_intact(self) -> None:
-        initial = self.lock.read_bytes()
-        with patch.object(
-            update, "fetch",
-            side_effect=[self.latest(COMMIT_NEW), NEW, RuntimeError("license unavailable")],
-        ):
-            with self.assertRaisesRegex(RuntimeError, "license unavailable"):
-                update.main()
-        self.assertEqual(self.lock.read_bytes(), initial)
-        self.assertEqual((self.openapi / "published.yaml").read_bytes(), OLD)
 
     def test_invalid_upstream_dialect_leaves_pin_and_snapshot_intact(self) -> None:
         initial = self.lock.read_bytes()

@@ -7,3 +7,5 @@ actions:
     remove: true
   - target: "$.components.schemas.SharingDelete.required[?@ == 'level']"
     remove: true
+  - target: "$.components.schemas.WorkflowListResponse.required[?@ == 'beta.workflows']"
+    update: workflows

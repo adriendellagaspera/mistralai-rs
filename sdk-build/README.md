@@ -18,7 +18,7 @@ pinned openapi-to-rust: overlay + raw bindings (generate twice, check, dry-run)
    ▼
 pinned openapi-to-rust-bindings: normalized Bindings v3
    ▼
-pinned rust-sdk-generator: canonical derive + reviewed closed-world coverage gate
+pinned rust-sdk-generator: canonical derive + 173-operation closed-world gate
    ▼
 pinned rust-sdk-generator: frozen compatibility-definition.json
    │ src/gates.rs: exact published facade file inventory and bytes
@@ -47,7 +47,7 @@ compiler logic is maintained here.
 
 | Directory | Artifacts and owner | When it runs |
 | --- | --- | --- |
-| `openapi/` | `published.yaml`, `overlays/` and license are pinned inputs. `update.py` discovers/downloads the versioned upstream `mistralai/platform-docs-public/public/openapi.yaml` revision and changes the source pin explicitly. The build no longer calls a Python source checker. | `just sync-openapi` and scheduled source-update workflow, **not** routine `check`/`generate`. |
+| `openapi/` | `published.yaml`, `overlays/` and license are pinned inputs. `update.py` discovers/downloads the versioned upstream `mistralai/platform-docs-public/openapi.yaml` revision and changes the source pin explicitly. The build no longer calls a Python source checker. | `just sync-openapi` and scheduled source-update workflow, **not** routine `check`/`generate`. |
 | `official-sdks/` | `harvest.py` analyzes the official Python AST and TypeScript sources; `update.py` coordinates `pin-latest`, `update`, `check`; `surface.json` is the reviewed input read by the Rust build. | `just check-source-evidence`, explicit source refresh, `just validate` and CI's independent source-evidence step. |
 | `api-review/` | `check.py`, `test_check.py`, `review.json`: inspect actual public Rust changes against a PR base and run pinned compiler-aware semver checks. | CI's `api` job; Python test discovery in `just test-tooling`/`just validate`. Not part of deterministic generation. |
 
@@ -58,18 +58,23 @@ official-SDK revisions and API semver checker; `openapi-to-rust.toml`,
 `sdk-build/`. `openapi-to-rust-MIT.txt` preserves upstream attribution.
 
 The docs-site URL `https://docs.mistral.ai/openapi.yaml` is **not** a byte mirror of
-the versioned repository source. The pinned `public/openapi.yaml` contains
-288 operations; the deployed catalog was observed with 296, including eight
-Service Account operations whose seven referenced schemas were absent from
-that deployed snapshot. Those eight remain a separately tracked contract gap
-([#139](https://github.com/adriendellagaspera/mistralai-rs/issues/139));
-they are not included in the pinned Tier-1 input. `update.py` selects the
-versioned path from `provenance.lock.json`, never the docs-site URL. See
-[#134](https://github.com/adriendellagaspera/mistralai-rs/issues/134)
-for the source migration and follow-up coverage/compatibility gates.
+the versioned repository source. It serves a broader API catalog; the root
+`openapi.yaml` currently defines the explicitly pinned SDK scope. `update.py`
+never silently switches to the docs-site catalog. See [#127](https://github.com/adriendellagaspera/mistralai-rs/issues/127)
+for source investigation and [#16](https://github.com/adriendellagaspera/mistralai-rs/issues/16)
+for future expansion of idiomatic API coverage.
 The [independent public-catalog monitor](../.github/workflows/monitor-public-openapi.yml)
 checks its reviewed fingerprint weekly. Update `openapi/public-catalog.lock.json`
 only after reviewing catalog changes; this monitor is not an SDK build input.
+
+The reviewed 288-operation migration target is vendored separately as
+`openapi/public-288.yaml` and pinned under `openapi_candidate` in
+`provenance.lock.json`. `src/sources.rs` verifies its exact bytes and
+OpenAPI 3.1 dialect, but ordinary `check`/`generate` continue to use
+`openapi/published.yaml` until the raw bindings, derivation and public
+compatibility work in #136–#138 can be published atomically. The candidate is
+not advanced by `openapi/update.py`.
+
 
 ## Validation boundaries
 

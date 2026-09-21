@@ -5,9 +5,15 @@ The original contributions to this repository are available under MIT OR
 Apache-2.0. Third-party materials retain their original license obligations:
 
 sdk-build/openapi/published.yaml is an unmodified copy of Mistral AI's official OpenAPI
-specification from mistralai/platform-docs-public/public/openapi.yaml. See sdk-build/provenance.lock.json for the
+specification from mistralai/platform-docs-public. See sdk-build/provenance.lock.json for the
 immutable source commit and SHA-256, and sdk-build/openapi/LICENSE for Apache-2.0 terms.
 Any upstream NOTICE is retained at sdk-build/openapi/NOTICE when present.
+
+sdk-build/openapi/public-288.yaml is a separately staged, unmodified candidate
+from mistralai/platform-docs-public/public/openapi.yaml at the immutable revision
+recorded as openapi_candidate in sdk-build/provenance.lock.json. It is not yet
+used to generate the published Rust SDK and remains under the same Apache-2.0
+terms.
 
 src/generated/ is a mechanical Rust translation of that specification,
 produced with openapi-to-rust and formatted with rustfmt. It is not the

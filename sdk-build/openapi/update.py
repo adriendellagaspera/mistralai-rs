@@ -1,4 +1,4 @@
-"""Pin the versioned GitHub public OpenAPI source independently of the docs-site catalog."""
+"""Pin the versioned GitHub OpenAPI source independently of the docs-site catalog."""
 
 from __future__ import annotations
 
@@ -57,8 +57,8 @@ def main() -> None:
     digest = hashlib.sha256(spec).hexdigest()
     if digest == source["sha256"]:
         if (HERE / "published.yaml").read_bytes() != spec:
-            raise ValueError("Pinned versioned OpenAPI checkout differs from its locked SHA-256")
-        print(f"Pinned versioned GitHub OpenAPI unchanged: {repository}/{path}@{commit}")
+            raise ValueError("Published OpenAPI checkout differs from its locked SHA-256")
+        print("Pinned GitHub OpenAPI unchanged")
         return
     if not spec.startswith(b"openapi: 3.1."):
         raise ValueError("OpenAPI dialect changed; review required")
@@ -76,7 +76,7 @@ def main() -> None:
         notice_path.write_bytes(notice)
     source.update(commit=commit, sha256=digest)
     LOCK.write_text(json.dumps(lock, indent=2) + "\n")
-    print(f"Pinned versioned GitHub OpenAPI {repository}/{path}@{commit} ({digest}); docs-site catalog is independent")
+    print(f"Pinned GitHub OpenAPI {commit} ({digest}); docs-site catalog is independent")
 
 
 if __name__ == "__main__":
