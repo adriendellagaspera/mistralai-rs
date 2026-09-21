@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Advance OpenAPI and check published mirror
+      - name: Advance versioned OpenAPI source independently
         env:
           GH_TOKEN: ${{ github.token }}
         run: python3 .github/scripts/nightly.py run sources openapi -- python3 sdk-build/openapi/update.py

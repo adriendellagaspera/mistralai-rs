@@ -1,4 +1,4 @@
-"""Pin the repository OpenAPI and independently verify the reviewed public-spec fingerprint."""
+"""Pin the versioned GitHub OpenAPI source independently of the docs-site catalog."""
 
 from __future__ import annotations
 
@@ -51,30 +51,14 @@ def main() -> None:
     if not re.fullmatch(r"[0-9a-f]{40}", commit):
         raise ValueError("Invalid upstream OpenAPI commit")
     spec = fetch(f"https://raw.githubusercontent.com/{repository}/{commit}/{path}")
-    mirror = fetch(source["published_url"])
+    # docs.mistral.ai/openapi.yaml serves a distinct, broader catalog, not
+    # a mirror of platform-docs-public/openapi.yaml (see issue #127).
+    # Do not compare their bytes or silently switch the SDK source to it.
     digest = hashlib.sha256(spec).hexdigest()
-    mirror_digest = hashlib.sha256(mirror).hexdigest()
-    reviewed_mirror_digest = source.get("published_sha256")
-    if not reviewed_mirror_digest:
-        raise ValueError("Missing reviewed published OpenAPI SHA-256 fingerprint")
-    if mirror_digest != reviewed_mirror_digest:
-        raise ValueError(
-            "Published OpenAPI changed independently of the pinned repository source; "
-            "review the public-spec change before updating published_sha256: "
-            f"reviewed_sha256={reviewed_mirror_digest}, actual_sha256={mirror_digest}, "
-            f"upstream_commit={commit}, upstream_sha256={digest}, "
-            f"upstream_bytes={len(spec)}, published_bytes={len(mirror)}"
-        )
-    if spec != mirror:
-        print(
-            "Known public-spec divergence (reviewed fingerprint): "
-            f"repository_sha256={digest}, published_sha256={mirror_digest}, "
-            f"upstream_commit={commit}; the GitHub repository remains the SDK source."
-        )
     if digest == source["sha256"]:
         if (HERE / "published.yaml").read_bytes() != spec:
             raise ValueError("Published OpenAPI checkout differs from its locked SHA-256")
-        print("OpenAPI unchanged")
+        print("Pinned GitHub OpenAPI unchanged")
         return
     if not spec.startswith(b"openapi: 3.1."):
         raise ValueError("OpenAPI dialect changed; review required")
@@ -92,7 +76,7 @@ def main() -> None:
         notice_path.write_bytes(notice)
     source.update(commit=commit, sha256=digest)
     LOCK.write_text(json.dumps(lock, indent=2) + "\n")
-    print(f"Pinned OpenAPI {commit} ({digest}); published mirror verified")
+    print(f"Pinned GitHub OpenAPI {commit} ({digest}); docs-site catalog is independent")
 
 
 if __name__ == "__main__":

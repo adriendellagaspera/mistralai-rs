@@ -44,7 +44,7 @@ The client defaults to `https://api.mistral.ai`, does not automatically retry bi
 
 ## API layers
 
-The complete generated transport is available under `mistralai::raw`. Every operation and schema from the pinned public OpenAPI is accounted for in [`src/generated/coverage.json`](src/generated/coverage.json).
+The complete generated transport is available under `mistralai::raw`. Every operation and schema from the **pinned repository OpenAPI** is accounted for in [`src/generated/coverage.json`](src/generated/coverage.json).
 
 The primary API is a resource-oriented Rust surface compiled from four explicit inputs:
 
@@ -66,6 +66,17 @@ Mistral runtime conventions --------------------------> Runtime
 `mistralai-rs` owns only Mistral-specific concerns around that generic toolchain: product taxonomy, a pinned compatibility definition, runtime support, source tracking, coverage and public-API review gates.
 
 The canonical idiomatic operation inventory is derived on each `cargo run --locked --manifest-path sdk-build/Cargo.toml -- check` run and validated against `sdk-build/coverage-baseline.json`. The pinned compatibility definition preserves the currently published facade; the historical `src/sdk/coverage.json` and `src/sdk/api-surface.json` snapshots were removed because they were not regenerated and could misrepresent the published Rust. Operations not projected idiomatically remain available through `mistralai::raw`.
+
+The source of truth for the reproducible Rust build is
+[`mistralai/platform-docs-public/openapi.yaml`](https://github.com/mistralai/platform-docs-public/blob/main/openapi.yaml),
+pinned by commit and SHA-256. The separately deployed
+[`docs.mistral.ai/openapi.yaml`](https://docs.mistral.ai/openapi.yaml)
+contains a broader, independently updated API catalog; it is **not** a byte
+mirror of the pinned source. Expanding the SDK to the broader catalog requires
+a separately reviewed source migration and generated API update (see
+[#16](https://github.com/adriendellagaspera/mistralai-rs/issues/16)).
+The separate [public-catalog monitor](.github/workflows/monitor-public-openapi.yml) checks
+its reviewed fingerprint weekly without blocking SDK source updates.
 
 ## Streaming and binary responses
 
@@ -142,7 +153,7 @@ CI validates deterministic generation, formatting, compilation, Clippy with warn
 
 The separate `just check-source-evidence` command validates the pinned official-SDK taxonomy using Python; it is retained in CI and `just validate` but deliberately excluded from the Python-free build entry points.
 
-The scheduled **Update Mistral SDK Sources** workflow checks the official specification and SDK evidence, regenerates and validates a candidate, then opens or updates a review PR. If a new upstream revision needs an explicit raw-binding, coverage or facade adaptation, it still opens the source-update PR with the failed validation stage recorded and leaves the workflow red for review. It never automatically merges or publishes an update.
+The scheduled **Update Mistral SDK Sources** workflow checks the versioned repository OpenAPI and official SDK evidence, regenerates and validates a candidate, then opens or updates a review PR. If a new upstream revision needs an explicit raw-binding, coverage or facade adaptation, it still opens the source-update PR with the failed validation stage recorded and leaves the workflow red for review. It never automatically merges or publishes an update.
 
 `openapi-to-rust-bindings` owns compatibility tracking against `openapi-to-rust`; this repository consumes reviewed immutable package and generator revisions rather than maintaining that generic compatibility workflow locally.
 

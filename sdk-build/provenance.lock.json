@@ -5,10 +5,8 @@
   "openapi": {
     "repository": "mistralai/platform-docs-public",
     "path": "openapi.yaml",
-    "published_url": "https://docs.mistral.ai/openapi.yaml",
     "commit": "ff846cf93d91df6fe04d0a5e540ecbe1e0ecc691",
-    "sha256": "60f5e92dcc4cae89a1c1eec614c409a1ce9da37f1e856d2868ff6734474f5859",
-    "published_sha256": "4cb0b5382d4f7fe4071e6328caa765f55344615916d6fc9db2d1480460c9d41c"
+    "sha256": "60f5e92dcc4cae89a1c1eec614c409a1ce9da37f1e856d2868ff6734474f5859"
   },
   "tools": {
     "openapi_to_rust": {
