@@ -20,6 +20,21 @@ const OVERLAY_ASSUMPTIONS: [(&str, &str); 3] = [
     ),
 ];
 
+const CANDIDATE_OVERLAY_ASSUMPTIONS: [(&str, &str); 3] = [
+    (
+        "ChatCompletionResponse still requires undeclared data",
+        "- data\n",
+    ),
+    (
+        "SharingDelete still requires undeclared level",
+        "    SharingDelete:\n",
+    ),
+    (
+        "WorkflowListResponse already requires workflows and next_cursor",
+        "      title: WorkflowListResponse\n      required:\n        - workflows\n        - next_cursor\n",
+    ),
+];
+
 const RETIRED_LOCAL_PATHS: [&str; 4] = [
     "/v1/chat/completions#stream:",
     "/v1/fim/completions#stream:",
@@ -56,6 +71,38 @@ fn verify_pinned(source: &[u8], expected_sha256: &str) -> Result<String> {
     Ok(actual)
 }
 
+fn verify_candidate(source: &[u8], expected_sha256: &str) -> Result<String> {
+    let actual = format!("{:x}", Sha256::digest(source));
+    if actual != expected_sha256 {
+        return fail(format!(
+            "candidate OpenAPI SHA-256 mismatch: expected {expected_sha256}, got {actual}"
+        ));
+    }
+    let text = std::str::from_utf8(source)?;
+    if !text.starts_with("openapi: 3.1.") {
+        return fail("candidate OpenAPI dialect changed");
+    }
+    for (description, needle) in CANDIDATE_OVERLAY_ASSUMPTIONS {
+        if !text.contains(needle) {
+            return fail(format!(
+                "review candidate Overlay: assumption changed: {description}"
+            ));
+        }
+    }
+    if text.contains("- beta.workflows\n") {
+        return fail("review candidate Overlay: obsolete beta.workflows requirement returned");
+    }
+    for path in RETIRED_LOCAL_PATHS {
+        if text.contains(&format!("  {path}")) {
+            return fail(format!(
+                "candidate OpenAPI contains retired local path {}",
+                path.trim_end_matches(':')
+            ));
+        }
+    }
+    Ok(actual)
+}
+
 pub(crate) fn verify_sources(root: &Path, lock: &Value) -> Result<()> {
     let snapshot = root.join("sdk-build/openapi/published.yaml");
     let expected_sha256 = lock["openapi"]["sha256"]
@@ -70,16 +117,7 @@ pub(crate) fn verify_sources(root: &Path, lock: &Value) -> Result<()> {
         .as_str()
         .ok_or("candidate OpenAPI SHA-256 pin is missing")?;
     let candidate = fs::read(candidate_path)?;
-    let candidate_actual = format!("{:x}", Sha256::digest(&candidate));
-    if candidate_actual != candidate_expected {
-        return fail(format!(
-            "candidate OpenAPI SHA-256 mismatch: expected {candidate_expected}, got {candidate_actual}"
-        ));
-    }
-    let candidate_text = std::str::from_utf8(&candidate)?;
-    if !candidate_text.starts_with("openapi: 3.1.") {
-        return fail("candidate OpenAPI dialect changed");
-    }
+    let candidate_actual = verify_candidate(&candidate, candidate_expected)?;
     println!("staged candidate OpenAPI verified: {candidate_actual}");
     Ok(())
 }
@@ -90,6 +128,7 @@ mod tests {
     use crate::gates::read_json;
 
     const VALID: &str = "openapi: 3.1.0\n- data\n    SharingDelete:\n- beta.workflows\n";
+    const CANDIDATE_VALID: &str = "openapi: 3.1.0\n- data\n    SharingDelete:\n      title: WorkflowListResponse\n      required:\n        - workflows\n        - next_cursor\n";
 
     fn hash(source: &[u8]) -> String {
         format!("{:x}", Sha256::digest(source))
@@ -120,6 +159,21 @@ mod tests {
             let changed = VALID.replace(needle, "");
             assert!(verify_pinned(changed.as_bytes(), &hash(changed.as_bytes())).is_err());
         }
+    }
+
+    #[test]
+    fn candidate_overlay_assumptions_fail_closed() {
+        let pin = hash(CANDIDATE_VALID.as_bytes());
+        assert_eq!(
+            verify_candidate(CANDIDATE_VALID.as_bytes(), &pin).unwrap(),
+            pin
+        );
+        for (_, needle) in CANDIDATE_OVERLAY_ASSUMPTIONS {
+            let changed = CANDIDATE_VALID.replace(needle, "");
+            assert!(verify_candidate(changed.as_bytes(), &hash(changed.as_bytes())).is_err());
+        }
+        let obsolete = format!("{CANDIDATE_VALID}- beta.workflows\n");
+        assert!(verify_candidate(obsolete.as_bytes(), &hash(obsolete.as_bytes())).is_err());
     }
 
     #[test]

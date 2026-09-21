@@ -34,6 +34,7 @@ Run from the repository root (or via Just):
 | `cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- generate` | Same gates, then publish both validated outputs. No Python. |
 | `cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- raw` | Explicit source-update phase; publish reviewed raw bindings only. |
 | `cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- probe` | Inspect canonical derivation, optionally `--require-parity` or `--compatibility-definition PATH`. |
+| `cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- candidate-raw` | Validate the staged 288 source: reviewed candidate overlay, 288→297 inventory, exact generated dependency fragment, standalone raw compile and canonical Bindings v3 identity. Does not publish. |
 | `cargo test --locked --manifest-path sdk-build/Cargo.toml --all-targets` | Source-hash, overlay-assumption, coverage, parity and publication rollback tests. |
 
 Rust source boundaries: `src/sources.rs` validates immutable Mistral
@@ -69,11 +70,14 @@ only after reviewing catalog changes; this monitor is not an SDK build input.
 
 The reviewed 288-operation migration target is vendored separately as
 `openapi/public-288.yaml` and pinned under `openapi_candidate` in
-`provenance.lock.json`. `src/sources.rs` verifies its exact bytes and
-OpenAPI 3.1 dialect, but ordinary `check`/`generate` continue to use
-`openapi/published.yaml` until the raw bindings, derivation and public
-compatibility work in #136–#138 can be published atomically. The candidate is
-not advanced by `openapi/update.py`.
+`provenance.lock.json`. `src/sources.rs` verifies its exact bytes, dialect
+and overlay assumptions. `candidate-raw` applies the dedicated reviewed
+overlay, proves the 288→297 raw inventory, compiles a standalone crate using
+the generated `REQUIRED_DEPS.toml` verbatim and verifies canonical Bindings
+v3 source/transport identity. Ordinary `check`/`generate` still use
+`openapi/published.yaml`; derivation and public compatibility remain #137/#138
+and must be published atomically with the raw cutover. The candidate is not
+advanced by `openapi/update.py`.
 
 
 ## Validation boundaries

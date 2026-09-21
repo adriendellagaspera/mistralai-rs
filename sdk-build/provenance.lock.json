@@ -46,6 +46,8 @@
     "repository": "mistralai/platform-docs-public",
     "path": "public/openapi.yaml",
     "commit": "ff846cf93d91df6fe04d0a5e540ecbe1e0ecc691",
-    "sha256": "86b89916f38b14d4452654938ec51ad5337c860c19db03f37d86921d639fb36f"
+    "sha256": "86b89916f38b14d4452654938ec51ad5337c860c19db03f37d86921d639fb36f",
+    "operations": 288,
+    "generated_methods": 297
   }
 }

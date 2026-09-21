@@ -3,8 +3,9 @@ mod sources;
 
 use gates::{
     Result, committed_facade, copy_dir, facade_delta, fail, field, raw_coverage, read_json,
-    require_publish_parity, snapshot, string, validate_coverage, verify_overlaid,
-    verify_raw_baseline, verify_raw_coverage, write_json,
+    require_publish_parity, snapshot, string, validate_coverage, verify_bindings_coverage,
+    verify_candidate_overlaid, verify_overlaid, verify_raw_baseline, verify_raw_coverage,
+    write_json,
 };
 use serde_json::{Value, json};
 use std::collections::{BTreeMap, BTreeSet};
@@ -327,6 +328,149 @@ fn publish(root: &Path, work: &Path, generated: &Path, compatible: &Path) -> Res
     Ok(())
 }
 
+fn candidate_config(build: &Path) -> Result<PathBuf> {
+    let source = build.join("openapi-to-rust.toml");
+    let mut config = fs::read_to_string(&source)?;
+    for (before, after) in [
+        (
+            "spec_path = \"openapi/published.yaml\"",
+            "spec_path = \"openapi/public-288.yaml\"",
+        ),
+        (
+            "overlays = [\"openapi/overlays/rust-sdk.overlay.yaml\"]",
+            "overlays = [\"openapi/overlays/public-288.overlay.yaml\"]",
+        ),
+        (
+            "overlay_output = \"openapi/overlaid.json\"",
+            "overlay_output = \"openapi/overlaid-candidate.json\"",
+        ),
+        (
+            "output_dir = \"../src/generated\"",
+            "output_dir = \"../candidate-generated\"",
+        ),
+    ] {
+        if !config.contains(before) {
+            return fail(format!("candidate raw config anchor missing: {before}"));
+        }
+        config = config.replacen(before, after, 1);
+    }
+    let path = build.join("openapi-to-rust-candidate.toml");
+    fs::write(&path, config)?;
+    Ok(path)
+}
+
+fn compile_standalone_raw(root: &Path, version: &str, generated: &Path, work: &Path) -> Result<()> {
+    let crate_dir = work.join("candidate-raw-compile");
+    let crate_src = crate_dir.join("src");
+    fs::create_dir_all(&crate_src)?;
+    copy_dir(generated, &crate_src.join("generated"))?;
+    fs::write(
+        crate_src.join("lib.rs"),
+        "pub mod generated;\npub use generated::*;\n",
+    )?;
+    let dependencies = fs::read_to_string(generated.join("REQUIRED_DEPS.toml"))?;
+    fs::write(
+        crate_dir.join("Cargo.toml"),
+        format!(
+            "[package]\nname = \"mistralai-candidate-raw-check\"\nversion = \"0.0.0\"\nedition = \"2024\"\nrust-version = \"{version}\"\n\n[workspace]\n\n{dependencies}"
+        ),
+    )?;
+    run(
+        "cargo",
+        vec![
+            format!("+{version}"),
+            "check".into(),
+            "--manifest-path".into(),
+            str_arg(&crate_dir.join("Cargo.toml")),
+        ],
+        root,
+    )
+}
+
+fn verify_candidate_raw(
+    root: &Path,
+    lock: &Value,
+    version: &str,
+    raw: &Path,
+    bindings: &Path,
+) -> Result<()> {
+    let temp = Workspace::new(root)?;
+    let work = &temp.0;
+    copy_inputs(root, work)?;
+    let build = work.join("sdk-build");
+    let config = candidate_config(&build)?;
+    let published = build.join("openapi/public-288.yaml");
+    let overlaid = build.join("openapi/overlaid-candidate.json");
+    let generated = work.join("candidate-generated");
+    let raw_args = vec!["generate".into(), "--config".into(), str_arg(&config)];
+
+    run(raw, raw_args.clone(), root)?;
+    let first = fs::read(&overlaid)?;
+    let spec: Value = serde_json::from_slice(&first)?;
+    verify_candidate_overlaid(&spec)?;
+    run(raw, raw_args.clone(), root)?;
+    if fs::read(&overlaid)? != first {
+        return fail("candidate overlaid OpenAPI is not byte-for-byte deterministic");
+    }
+    let mut check = raw_args.clone();
+    check.push("--check".into());
+    run(raw, check, root)?;
+    let mut dry_run = raw_args;
+    dry_run.push("--dry-run".into());
+    run(raw, dry_run, root)?;
+    if fs::read(&published)? != fs::read(root.join("sdk-build/openapi/public-288.yaml"))? {
+        return fail("candidate raw generation modified the staged OpenAPI");
+    }
+
+    format_rust(root, version, &generated)?;
+    let coverage = raw_coverage(&generated, &spec)?;
+    let candidate = field(lock, "openapi_candidate")?;
+    let expected_operations = candidate["operations"]
+        .as_u64()
+        .ok_or("candidate expected operation count is missing")?;
+    let expected_methods = candidate["generated_methods"]
+        .as_u64()
+        .ok_or("candidate expected generated-method count is missing")?;
+    if coverage["upstream_operations"].as_u64() != Some(expected_operations)
+        || coverage["generated_methods"].as_u64() != Some(expected_methods)
+    {
+        return fail(format!(
+            "candidate raw inventory drift: source={}, methods={}, expected={expected_operations}/{expected_methods}",
+            coverage["upstream_operations"], coverage["generated_methods"]
+        ));
+    }
+    write_json(&generated.join("coverage.json"), &coverage)?;
+    compile_standalone_raw(root, version, &generated, work)?;
+
+    let bindings_value: Value =
+        serde_json::from_str(&output(bindings, vec![str_arg(&generated)], root)?)?;
+    let binding_report = verify_bindings_coverage(&bindings_value, &spec)?;
+    if binding_report["binding_operations"].as_u64() != Some(expected_methods) {
+        return fail(format!(
+            "candidate normalized Bindings method inventory drift: {} != {expected_methods}",
+            binding_report["binding_operations"]
+        ));
+    }
+    if binding_report["representation_path_pairs"].as_u64() != Some(4) {
+        return fail(format!(
+            "candidate representation-specific path pair inventory drift: {} != 4",
+            binding_report["representation_path_pairs"]
+        ));
+    }
+
+    println!(
+        "{}",
+        serde_json::to_string_pretty(&json!({
+            "candidate_raw": {
+                "coverage": coverage,
+                "bindings": binding_report,
+                "standalone_compile": "ok"
+            }
+        }))?
+    );
+    Ok(())
+}
+
 struct Options {
     command: String,
     require_parity: bool,
@@ -335,8 +479,11 @@ struct Options {
 
 fn parse_args() -> Result<Options> {
     let mut args = env::args().skip(1);
-    let command = args.next().ok_or("usage: mistralai-sdk-build <raw|generate|check|probe> [--require-parity] [--compatibility-definition PATH]")?;
-    if !matches!(command.as_str(), "raw" | "generate" | "check" | "probe") {
+    let command = args.next().ok_or("usage: mistralai-sdk-build <raw|generate|check|probe|candidate-raw> [--require-parity] [--compatibility-definition PATH]")?;
+    if !matches!(
+        command.as_str(),
+        "raw" | "generate" | "check" | "probe" | "candidate-raw"
+    ) {
         return fail(format!("unknown command: {command}"));
     }
     let mut require_parity = false;
@@ -368,13 +515,16 @@ fn execute(root: &Path, args: &Options) -> Result<()> {
     let version = check_toolchain(root, &lock)?;
     sources::verify_sources(root, &lock)?;
     let raw = install_tool(root, &lock, "openapi_to_rust", "openapi-to-rust")?;
-    let compiler = install_tool(root, &lock, "rust_sdk_generator", "rust-sdk-generator")?;
     let bindings = install_tool(
         root,
         &lock,
         "openapi_to_rust_bindings",
         "openapi-to-rust-bindings",
     )?;
+    if args.command == "candidate-raw" {
+        return verify_candidate_raw(root, &lock, &version, &raw, &bindings);
+    }
+    let compiler = install_tool(root, &lock, "rust_sdk_generator", "rust-sdk-generator")?;
 
     let temp = Workspace::new(root)?;
     let work = &temp.0;
