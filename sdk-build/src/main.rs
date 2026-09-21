@@ -573,6 +573,8 @@ fn verify_candidate_derivation(
 
     let target = root.join("sdk-build/target");
     fs::create_dir_all(&target)?;
+    write_json(&target.join("candidate-bindings.json"), &bindings_value)?;
+    fs::copy(&overlaid, target.join("candidate-overlaid.json"))?;
     write_json(&target.join("candidate-derivation-report.json"), report)?;
     write_json(
         &target.join("candidate-sdk-definition.json"),
