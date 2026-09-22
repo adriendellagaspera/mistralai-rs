@@ -80,6 +80,15 @@ v3 source/transport identity. Ordinary `check`/`generate` still use
 and must be published atomically with the raw cutover. The candidate is not
 advanced by `openapi/update.py`.
 
+The reviewed `candidate-derivation-baseline.json` pins the diagnostic state
+after generic response-view, redundant `anyOf` request and raw/public model
+name fixes: **259 derived, 4 overridden, 25 rejected**, with all four
+production overrides retained. A rejected operation is not silently excluded
+or publishable: the candidate report remains a fail-closed diagnostic until
+the remaining source/adapter/capability gaps under #137 have an approved
+disposition. The reviewed evidence is the isolated candidate run
+https://github.com/adriendellagaspera/mistralai-rs/actions/runs/35698046811.
+
 
 ## Validation boundaries
 
