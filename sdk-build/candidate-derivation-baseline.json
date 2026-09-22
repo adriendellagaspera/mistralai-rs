@@ -2,9 +2,9 @@
   "schema_version": 1,
   "total_operations": 288,
   "statuses": {
-    "derived": 255,
-    "overridden": 3,
-    "rejected": 30
+    "derived": 259,
+    "overridden": 4,
+    "rejected": 25
   },
   "rejections_by_reason": {
     "bindings.no_structural_match": [
@@ -26,23 +26,14 @@
       "get_stream_events_v1_workflows_events_stream_get",
       "stream_v1_workflows_executions__execution_id__stream_get"
     ],
-    "capability.public_model_name_collision": [
-      "files_api_routes_list_files",
-      "jobs_api_routes_batch_get_batch_jobs"
-    ],
     "capability.request_model_not_structurally_provable": [
       "execute_workflow_registration_v1_workflows_registrations__workflow_registration_id__execute_post",
       "execute_workflow_v1_workflows__workflow_identifier__execute_post",
       "prompts_create",
       "skills_create",
-      "speech_v1_audio_speech_post",
       "users_admin_user_groups_update_group_workspace_assignment",
       "users_api_admin_user_groups_assign_group_to_workspace",
       "users_api_admin_user_groups_provision_group_to_workspace"
-    ],
-    "capability.response_model_derivation_required": [
-      "prompts_delete",
-      "skills_delete"
     ],
     "request.inline_or_unresolved": [
       "pause_schedule_v1_workflows_schedules__schedule_id__pause_post",
@@ -56,6 +47,6 @@
     "chat_completion_v1_chat_completions_post": "overridden",
     "files_api_routes_download_file": "overridden",
     "fim_completion_v1_fim_completions_post": "overridden",
-    "speech_v1_audio_speech_post": "rejected"
+    "speech_v1_audio_speech_post": "overridden"
   }
 }
