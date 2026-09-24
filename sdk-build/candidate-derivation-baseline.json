@@ -2,9 +2,9 @@
   "schema_version": 1,
   "total_operations": 288,
   "statuses": {
-    "derived": 267,
+    "derived": 269,
     "overridden": 5,
-    "rejected": 16
+    "rejected": 14
   },
   "rejections_by_reason": {
     "bindings.no_structural_match": [
@@ -27,9 +27,7 @@
     "request.inline_or_unresolved": [
       "pause_schedule_v1_workflows_schedules__schedule_id__pause_post",
       "resume_schedule_v1_workflows_schedules__schedule_id__resume_post",
-      "trigger_schedule_v1_workflows_schedules__schedule_id__trigger_post",
-      "update_index_metrics_v1_rag_deployments__deployment_id__metrics_put",
-      "users_api_admin_users_create_users"
+      "trigger_schedule_v1_workflows_schedules__schedule_id__trigger_post"
     ]
   },
   "override_statuses": {
