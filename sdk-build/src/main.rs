@@ -470,8 +470,11 @@ fn verify_candidate_raw(
     write_json(&generated.join("coverage.json"), &coverage)?;
     compile_standalone_raw(root, version, &generated, work)?;
 
-    let bindings_value: Value =
-        serde_json::from_str(&output(bindings, vec![str_arg(&generated), str_arg(&overlaid)], root)?)?;
+    let bindings_value: Value = serde_json::from_str(&output(
+        bindings,
+        vec![str_arg(&generated), str_arg(&overlaid)],
+        root,
+    )?)?;
     let binding_report = verify_bindings_coverage(&bindings_value, &spec)?;
     if binding_report["binding_operations"].as_u64() != Some(expected_methods) {
         return fail(format!(
@@ -537,8 +540,11 @@ fn verify_candidate_derivation(
         return fail("candidate derivation probe raw inventory drifted");
     }
 
-    let bindings_value: Value =
-        serde_json::from_str(&output(bindings, vec![str_arg(&generated), str_arg(&overlaid)], root)?)?;
+    let bindings_value: Value = serde_json::from_str(&output(
+        bindings,
+        vec![str_arg(&generated), str_arg(&overlaid)],
+        root,
+    )?)?;
     verify_bindings_coverage(&bindings_value, &spec)?;
     let bindings_path = work.join("bindings.json");
     write_json(&bindings_path, &bindings_value)?;
@@ -743,8 +749,11 @@ fn execute(root: &Path, args: &Options) -> Result<()> {
     }
     normalized_coverage(root, &generated, &spec)?;
     let bindings_path = work.join("bindings.json");
-    let bindings_value: Value =
-        serde_json::from_str(&output(&bindings, vec![str_arg(&generated), str_arg(&overlaid)], root)?)?;
+    let bindings_value: Value = serde_json::from_str(&output(
+        &bindings,
+        vec![str_arg(&generated), str_arg(&overlaid)],
+        root,
+    )?)?;
     if bindings_value["schema_version"] != 3 {
         return fail("canonical bindings adapter did not emit Bindings v3");
     }
