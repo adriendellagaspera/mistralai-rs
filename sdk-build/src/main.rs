@@ -386,6 +386,24 @@ fn compile_standalone_raw(root: &Path, version: &str, generated: &Path, work: &P
             str_arg(&crate_dir.join("Cargo.toml")),
         ],
         root,
+    )?;
+    let tests = crate_dir.join("tests");
+    fs::create_dir_all(&tests)?;
+    fs::copy(
+        root.join("sdk-build/fixtures/candidate-raw-nullable.rs"),
+        tests.join("request_json.rs"),
+    )?;
+    run(
+        "cargo",
+        vec![
+            format!("+{version}"),
+            "test".into(),
+            "--manifest-path".into(),
+            str_arg(&crate_dir.join("Cargo.toml")),
+            "--test".into(),
+            "request_json".into(),
+        ],
+        root,
     )
 }
 
