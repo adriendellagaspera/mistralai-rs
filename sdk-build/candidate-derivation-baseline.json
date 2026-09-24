@@ -2,20 +2,14 @@
   "schema_version": 1,
   "total_operations": 288,
   "statuses": {
-    "derived": 259,
+    "derived": 267,
     "overridden": 5,
-    "rejected": 24
+    "rejected": 16
   },
   "rejections_by_reason": {
     "bindings.no_structural_match": [
-      "prompts_create_version",
       "prompts_list",
-      "prompts_update",
-      "prompts_update_version_metadata",
-      "skills_create_version",
       "skills_list",
-      "skills_update",
-      "skills_update_version_metadata",
       "stream_deployment_logs",
       "stream_workflow_execution_logs"
     ],
@@ -26,8 +20,6 @@
     "capability.request_model_not_structurally_provable": [
       "execute_workflow_registration_v1_workflows_registrations__workflow_registration_id__execute_post",
       "execute_workflow_v1_workflows__workflow_identifier__execute_post",
-      "prompts_create",
-      "skills_create",
       "users_admin_user_groups_update_group_workspace_assignment",
       "users_api_admin_user_groups_assign_group_to_workspace",
       "users_api_admin_user_groups_provision_group_to_workspace"
