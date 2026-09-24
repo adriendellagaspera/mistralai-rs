@@ -371,12 +371,14 @@ fn compile_standalone_raw(root: &Path, version: &str, generated: &Path, work: &P
         "pub mod generated;\npub use generated::*;\n",
     )?;
     let dependencies = fs::read_to_string(generated.join("REQUIRED_DEPS.toml"))?;
-    fs::write(
-        crate_dir.join("Cargo.toml"),
-        format!(
-            "[package]\nname = \"mistralai-candidate-raw-check\"\nversion = \"0.0.0\"\nedition = \"2024\"\nrust-version = \"{version}\"\n\n[workspace]\n\n{dependencies}"
-        ),
-    )?;
+    let mut manifest = format!(
+        "[package]\nname = \"mistralai-candidate-raw-check\"\nversion = \"0.0.0\"\nedition = \"2024\"\nrust-version = \"{version}\"\n\n[workspace]\n\n{dependencies}"
+    );
+    // Test-only runtime; the raw generator's REQUIRED_DEPS.toml stays verbatim.
+    manifest.push_str(
+        "\n[dev-dependencies]\ntokio = { version = \"1\", features = [\"macros\", \"rt-multi-thread\"] }\n",
+    );
+    fs::write(crate_dir.join("Cargo.toml"), manifest)?;
     run(
         "cargo",
         vec![
