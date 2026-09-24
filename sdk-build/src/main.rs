@@ -395,6 +395,10 @@ fn compile_standalone_raw(root: &Path, version: &str, generated: &Path, work: &P
         root.join("sdk-build/fixtures/candidate-raw-nullable.rs"),
         tests.join("request_json.rs"),
     )?;
+    fs::copy(
+        root.join("sdk-build/fixtures/candidate-raw-parameter-wire.rs"),
+        tests.join("parameter_wire.rs"),
+    )?;
     run(
         "cargo",
         vec![
@@ -404,6 +408,8 @@ fn compile_standalone_raw(root: &Path, version: &str, generated: &Path, work: &P
             str_arg(&crate_dir.join("Cargo.toml")),
             "--test".into(),
             "request_json".into(),
+            "--test".into(),
+            "parameter_wire".into(),
         ],
         root,
     )
