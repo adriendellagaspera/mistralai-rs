@@ -869,11 +869,15 @@ mod tests {
     #[test]
     fn candidate_voice_override_preserves_active_product_decisions() {
         let root = root().expect("repository root");
-        let active = read_json(&root.join("sdk-build/sdk-overrides.json")).expect("active overrides");
+        let active =
+            read_json(&root.join("sdk-build/sdk-overrides.json")).expect("active overrides");
         let candidate = read_json(&root.join("sdk-build/sdk-overrides-candidate.json"))
             .expect("candidate overrides");
         assert_eq!(candidate["schema_version"], active["schema_version"]);
-        assert_eq!(candidate["excluded_operations"], active["excluded_operations"]);
+        assert_eq!(
+            candidate["excluded_operations"],
+            active["excluded_operations"]
+        );
 
         let active_operations = active["operations"].as_object().expect("active operations");
         let candidate_operations = candidate["operations"]
@@ -884,9 +888,8 @@ mod tests {
             assert_eq!(candidate_operations.get(operation_id), Some(selection));
         }
         assert_eq!(
-            candidate_operations.get(
-                "get_voice_sample_audio_v1_audio_voices__voice_id__sample_get"
-            ),
+            candidate_operations
+                .get("get_voice_sample_audio_v1_audio_voices__voice_id__sample_get"),
             Some(&serde_json::json!({
                 "response_representations": {
                     "audio.voices.get_sample_audio": "binary_stream"
