@@ -66,27 +66,29 @@ async fn optional_nullable_schedule_none_is_absent_not_json_null() {
     for (suffix, kind) in [("pause", 0_u8), ("resume", 1), ("trigger", 2)] {
         let (url, server) = capture_one();
         let client = HttpClient::new().with_base_url(url);
-        let result = match kind {
+        match kind {
             0 => client
                 .pause_schedule_v1_workflows_schedules_schedule_id_pause_post(
                     "schedule-a",
                     None::<WorkflowSchedulePauseRequest>,
                 )
-                .await,
+                .await
+                .expect("mock 204 pause"),
             1 => client
                 .resume_schedule_v1_workflows_schedules_schedule_id_resume_post(
                     "schedule-a",
                     None::<WorkflowSchedulePauseRequest>,
                 )
-                .await,
+                .await
+                .expect("mock 204 resume"),
             _ => client
                 .trigger_schedule_v1_workflows_schedules_schedule_id_trigger_post(
                     "schedule-a",
                     None::<WorkflowScheduleTriggerRequest>,
                 )
-                .await,
-        };
-        result.expect("mock 204");
+                .await
+                .expect("mock 204 trigger"),
+        }
         let captured = server.join().expect("captured request");
         let (headers, body) = request_parts(&captured);
         assert!(
