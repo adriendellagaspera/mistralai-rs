@@ -400,6 +400,10 @@ fn compile_standalone_raw(root: &Path, version: &str, generated: &Path, work: &P
         tests.join("parameter_wire.rs"),
     )?;
     fs::copy(
+        root.join("sdk-build/fixtures/candidate-raw-optional-nullable-body.rs"),
+        tests.join("optional_nullable_body.rs"),
+    )?;
+    fs::copy(
         root.join("sdk-build/fixtures/candidate-raw-required-json-root.rs"),
         tests.join("required_json_root.rs"),
     )?;
@@ -414,6 +418,8 @@ fn compile_standalone_raw(root: &Path, version: &str, generated: &Path, work: &P
             "request_json".into(),
             "--test".into(),
             "parameter_wire".into(),
+            "--test".into(),
+            "optional_nullable_body".into(),
             "--test".into(),
             "required_json_root".into(),
         ],
