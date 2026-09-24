@@ -48,7 +48,7 @@ fn capture_one() -> (String, thread::JoinHandle<Vec<u8>>) {
         }
         socket
             .write_all(
-                b"HTTP/1.1 204 No Content\r\nContent-Length: 0\r\nConnection: close\r\n\r\n",
+                b"HTTP/1.1 422 Unprocessable Entity\r\nContent-Type: application/json\r\nContent-Length: 2\r\nConnection: close\r\n\r\n{}",
             )
             .expect("mock response");
         bytes
@@ -94,7 +94,7 @@ async fn required_top_level_array_preserves_empty_and_multiple_items() {
             .with_base_url(url)
             .users_api_admin_users_create_users(request)
             .await
-            .expect("mock 204");
+            .expect_err("mock intentionally returns HTTP 422");
         let captured = server.join().expect("captured request");
         assert_eq!(body(&captured), expected);
     }
@@ -141,7 +141,7 @@ async fn required_metrics_union_preserves_both_root_variants() {
                 request,
             )
             .await
-            .expect("mock 204");
+            .expect_err("mock intentionally returns HTTP 422");
         let captured = server.join().expect("captured request");
         assert_eq!(body(&captured), expected);
     }
