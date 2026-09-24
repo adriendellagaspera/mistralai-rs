@@ -51,7 +51,7 @@ fn capture_one_request() -> (String, thread::JoinHandle<String>) {
             let read = socket.read(&mut chunk).expect("read HTTP headers");
             assert!(read > 0, "socket closed before complete headers");
             bytes.extend_from_slice(&chunk[..read]);
-            if let Some(start) = bytes.windows(4).position(|window| window == b"\\r\\n\\r\\n") {
+            if let Some(start) = bytes.windows(4).position(|window| window == b"\r\n\r\n") {
                 break start + 4;
             }
         };
@@ -71,7 +71,7 @@ fn capture_one_request() -> (String, thread::JoinHandle<String>) {
         }
         socket
             .write_all(
-                b"HTTP/1.1 422 Unprocessable Entity\\r\\nContent-Type: application/json\\r\\nContent-Length: 2\\r\\nConnection: close\\r\\n\\r\\n{}",
+                b"HTTP/1.1 422 Unprocessable Entity\r\nContent-Type: application/json\r\nContent-Length: 2\r\nConnection: close\r\n\r\n{}",
             )
             .expect("send synthetic validation error");
         String::from_utf8(bytes).expect("UTF-8 JSON HTTP request")
@@ -116,10 +116,10 @@ async fn candidate_raw_http_preserves_optional_nullable_request_wire_values() {
         assert!(response.is_err(), "mock deliberately returns HTTP 422");
         let captured = server.join().expect("captured HTTP request");
         assert!(
-            captured.starts_with("PATCH /v2/prompts/p-test HTTP/1.1\\r\\n"),
+            captured.starts_with("PATCH /v2/prompts/p-test HTTP/1.1\r\n"),
             "unexpected generated request: {captured}"
         );
-        let (_, body) = captured.split_once("\\r\\n\\r\\n").expect("HTTP body boundary");
+        let (_, body) = captured.split_once("\r\n\r\n").expect("HTTP body boundary");
         let actual: serde_json::Value = serde_json::from_str(body).expect("valid JSON wire body");
         assert_eq!(actual, expected);
     }
