@@ -371,12 +371,14 @@ fn compile_standalone_raw(root: &Path, version: &str, generated: &Path, work: &P
         "pub mod generated;\npub use generated::*;\n",
     )?;
     let dependencies = fs::read_to_string(generated.join("REQUIRED_DEPS.toml"))?;
-    fs::write(
-        crate_dir.join("Cargo.toml"),
-        format!(
-            "[package]\nname = \"mistralai-candidate-raw-check\"\nversion = \"0.0.0\"\nedition = \"2024\"\nrust-version = \"{version}\"\n\n[workspace]\n\n{dependencies}"
-        ),
-    )?;
+    let mut manifest = format!(
+        "[package]\nname = \"mistralai-candidate-raw-check\"\nversion = \"0.0.0\"\nedition = \"2024\"\nrust-version = \"{version}\"\n\n[workspace]\n\n{dependencies}"
+    );
+    // Test-only runtime; the raw generator's REQUIRED_DEPS.toml stays verbatim.
+    manifest.push_str(
+        "\n[dev-dependencies]\ntokio = { version = \"1\", features = [\"macros\", \"rt-multi-thread\"] }\n",
+    );
+    fs::write(crate_dir.join("Cargo.toml"), manifest)?;
     run(
         "cargo",
         vec![
@@ -384,6 +386,24 @@ fn compile_standalone_raw(root: &Path, version: &str, generated: &Path, work: &P
             "check".into(),
             "--manifest-path".into(),
             str_arg(&crate_dir.join("Cargo.toml")),
+        ],
+        root,
+    )?;
+    let tests = crate_dir.join("tests");
+    fs::create_dir_all(&tests)?;
+    fs::copy(
+        root.join("sdk-build/fixtures/candidate-raw-nullable.rs"),
+        tests.join("request_json.rs"),
+    )?;
+    run(
+        "cargo",
+        vec![
+            format!("+{version}"),
+            "test".into(),
+            "--manifest-path".into(),
+            str_arg(&crate_dir.join("Cargo.toml")),
+            "--test".into(),
+            "request_json".into(),
         ],
         root,
     )
