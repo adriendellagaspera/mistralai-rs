@@ -399,6 +399,10 @@ fn compile_standalone_raw(root: &Path, version: &str, generated: &Path, work: &P
         root.join("sdk-build/fixtures/candidate-raw-parameter-wire.rs"),
         tests.join("parameter_wire.rs"),
     )?;
+    fs::copy(
+        root.join("sdk-build/fixtures/candidate-raw-required-json-root.rs"),
+        tests.join("required_json_root.rs"),
+    )?;
     run(
         "cargo",
         vec![
@@ -410,6 +414,8 @@ fn compile_standalone_raw(root: &Path, version: &str, generated: &Path, work: &P
             "request_json".into(),
             "--test".into(),
             "parameter_wire".into(),
+            "--test".into(),
+            "required_json_root".into(),
         ],
         root,
     )
