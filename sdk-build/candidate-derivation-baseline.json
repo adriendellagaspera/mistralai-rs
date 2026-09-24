@@ -3,8 +3,8 @@
   "total_operations": 288,
   "statuses": {
     "derived": 259,
-    "overridden": 4,
-    "rejected": 25
+    "overridden": 5,
+    "rejected": 24
   },
   "rejections_by_reason": {
     "bindings.no_structural_match": [
@@ -18,9 +18,6 @@
       "skills_update_version_metadata",
       "stream_deployment_logs",
       "stream_workflow_execution_logs"
-    ],
-    "bindings.source_operation_identity_required": [
-      "get_voice_sample_audio_v1_audio_voices__voice_id__sample_get"
     ],
     "capability.event_stream_payload_not_structurally_provable": [
       "get_stream_events_v1_workflows_events_stream_get",
@@ -47,6 +44,7 @@
     "chat_completion_v1_chat_completions_post": "overridden",
     "files_api_routes_download_file": "overridden",
     "fim_completion_v1_fim_completions_post": "overridden",
-    "speech_v1_audio_speech_post": "overridden"
+    "speech_v1_audio_speech_post": "overridden",
+    "get_voice_sample_audio_v1_audio_voices__voice_id__sample_get": "overridden"
   }
 }

@@ -211,6 +211,7 @@ fn copy_inputs(root: &Path, work: &Path) -> Result<()> {
     for file in [
         "openapi-to-rust.toml",
         "sdk-overrides.json",
+        "sdk-overrides-candidate.json",
         "coverage-baseline.json",
         "candidate-derivation-baseline.json",
     ] {
@@ -527,7 +528,7 @@ fn verify_candidate_derivation(
             "--surface".into(),
             str_arg(&build.join("official-sdks/surface.json")),
             "--overrides".into(),
-            str_arg(&build.join("sdk-overrides.json")),
+            str_arg(&build.join("sdk-overrides-candidate.json")),
         ],
         root,
     )?)?;
@@ -545,7 +546,7 @@ fn verify_candidate_derivation(
     let mut statuses = BTreeMap::<String, usize>::new();
     let mut rejections = BTreeMap::<String, Vec<String>>::new();
     let mut override_targets = BTreeMap::<String, Value>::new();
-    let configured_overrides = read_json(&build.join("sdk-overrides.json"))?;
+    let configured_overrides = read_json(&build.join("sdk-overrides-candidate.json"))?;
     let configured = field(&configured_overrides, "operations")?
         .as_object()
         .ok_or("candidate overrides operations must be an object")?;
@@ -864,6 +865,38 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn candidate_voice_override_preserves_active_product_decisions() {
+        let root = root().expect("repository root");
+        let active =
+            read_json(&root.join("sdk-build/sdk-overrides.json")).expect("active overrides");
+        let candidate = read_json(&root.join("sdk-build/sdk-overrides-candidate.json"))
+            .expect("candidate overrides");
+        assert_eq!(candidate["schema_version"], active["schema_version"]);
+        assert_eq!(
+            candidate["excluded_operations"],
+            active["excluded_operations"]
+        );
+
+        let active_operations = active["operations"].as_object().expect("active operations");
+        let candidate_operations = candidate["operations"]
+            .as_object()
+            .expect("candidate operations");
+        assert_eq!(candidate_operations.len(), active_operations.len() + 1);
+        for (operation_id, selection) in active_operations {
+            assert_eq!(candidate_operations.get(operation_id), Some(selection));
+        }
+        assert_eq!(
+            candidate_operations
+                .get("get_voice_sample_audio_v1_audio_voices__voice_id__sample_get"),
+            Some(&serde_json::json!({
+                "response_representations": {
+                    "audio.voices.get_sample_audio": "binary_stream"
+                }
+            }))
+        );
+    }
 
     #[test]
     fn failed_second_publication_stage_restores_checkout() {
