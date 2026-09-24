@@ -403,6 +403,10 @@ fn compile_standalone_raw(root: &Path, version: &str, generated: &Path, work: &P
         root.join("sdk-build/fixtures/candidate-raw-optional-nullable-body.rs"),
         tests.join("optional_nullable_body.rs"),
     )?;
+    fs::copy(
+        root.join("sdk-build/fixtures/candidate-raw-required-json-root.rs"),
+        tests.join("required_json_root.rs"),
+    )?;
     run(
         "cargo",
         vec![
@@ -416,6 +420,8 @@ fn compile_standalone_raw(root: &Path, version: &str, generated: &Path, work: &P
             "parameter_wire".into(),
             "--test".into(),
             "optional_nullable_body".into(),
+            "--test".into(),
+            "required_json_root".into(),
         ],
         root,
     )
