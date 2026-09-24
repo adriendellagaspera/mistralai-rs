@@ -19,8 +19,8 @@
     "rust_sdk_generator": {
       "name": "rust-sdk-generator",
       "repository": "adriendellagaspera/rust-sdk-generator",
-      "commit": "dfc0dab6e04537414b99d3bf1bf1be185e863af9",
-      "tree_sha": "7ab4ec6db5fff9113374881b32edabfca49d9591",
+      "commit": "ee3f12db6f6ffc8b3c18c5886ff4e9dad0ed74cf",
+      "tree_sha": "443e5b7726332889c8109eda58d6672379c66fa2",
       "version": "0.2.8"
     },
     "openapi_to_rust_bindings": {
