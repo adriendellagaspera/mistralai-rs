@@ -1,12 +1,8 @@
 # mistralai-rs
 
-An **unofficial**, async Rust SDK generated from Mistral AI's official OpenAPI specification. This project is not affiliated with or endorsed by Mistral AI.
+Unofficial asynchronous Rust SDK for Mistral AI, generated from a pinned OpenAPI source. This project is not affiliated with Mistral AI.
 
-The project is built around reproducible generation: the upstream specification, raw generator, generic SDK compiler and raw-binding compatibility package are all pinned to immutable revisions. Generated Rust is committed and CI verifies byte-for-byte regeneration.
-
-## Install
-
-The package is `mistralai-sdk`; its Rust library is `mistralai`. The crate is currently consumed from Git rather than crates.io:
+The package is `mistralai-sdk` and the library is `mistralai`. Install from Git:
 
 ```toml
 [dependencies]
@@ -14,9 +10,7 @@ mistralai = { package = "mistralai-sdk", git = "https://github.com/adriendellaga
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 ```
 
-Pin a Git `rev` for reproducible consumer builds.
-
-## Example
+Pin a Git `rev` for reproducible builds.
 
 ```rust,no_run
 use mistralai::{ChatRequest, Message, Mistral};
@@ -27,107 +21,24 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let response = mistral
         .chat()
         .complete(
-            ChatRequest::new(
-                "mistral-small-latest",
-                [Message::user("Say hello in French.")],
-            )
-            .max_tokens(64),
+            ChatRequest::new("mistral-small-latest", [Message::user("Say hello in French.")])
+                .max_tokens(64),
         )
         .await?;
-
     println!("{}", response.text().unwrap_or_default());
     Ok(())
 }
 ```
 
-The client defaults to `https://api.mistral.ai`, does not automatically retry billable requests, and supports `with_base_url(...)` for another compatible endpoint or local test server.
+The client defaults to `https://api.mistral.ai`. It does not automatically retry billable requests. `with_base_url(...)` selects another compatible endpoint.
 
-## API layers
+## API
 
-The complete generated transport is available under `mistralai::raw`. Every operation and schema from the **pinned repository OpenAPI** is accounted for in [`src/generated/coverage.json`](src/generated/coverage.json).
+The resource-oriented facade is in `mistralai`; the complete generated transport for the pinned source is in `mistralai::raw`. See [`src/generated/coverage.json`](src/generated/coverage.json) for raw operation coverage and [`sdk-build/compatibility-definition.json`](sdk-build/compatibility-definition.json) for the published facade. Streaming, multipart and binary download examples are in [`examples/`](examples/).
 
-The primary API is a resource-oriented Rust surface compiled from four explicit inputs:
+The published generation input is [`sdk-build/openapi/published.yaml`](sdk-build/openapi/published.yaml). The separately pinned [`public-288.yaml`](sdk-build/openapi/public-288.yaml) is a migration candidate, not the published API. The remaining work and acceptance criteria are tracked in [#134](https://github.com/adriendellagaspera/mistralai-rs/issues/134), [#137](https://github.com/adriendellagaspera/mistralai-rs/issues/137) and [#138](https://github.com/adriendellagaspera/mistralai-rs/issues/138).
 
-```text
-Mistral OpenAPI --------------------------------------> OpenApi
-openapi-to-rust -> openapi-to-rust-bindings ---------> Bindings
-Mistral semantic policy ------------------------------> Policy
-Mistral runtime conventions --------------------------> Runtime
-                                                           |
-                                                           v
-                                                    rust-sdk-generator
-                                                           |
-                                                           v
-                                                        src/sdk
-```
-
-`rust-sdk-generator` is a separately versioned, backend-neutral Rust SDK compiler. `openapi-to-rust-bindings` is the separately versioned compatibility package that normalizes the current raw generator output into the compiler's `Bindings` contract. Both are pinned in `sdk-build/provenance.lock.json`; neither implementation is copied into this repository.
-
-`mistralai-rs` owns only Mistral-specific concerns around that generic toolchain: product taxonomy, a pinned compatibility definition, runtime support, source tracking, coverage and public-API review gates.
-
-The canonical idiomatic operation inventory is derived on each `cargo run --locked --manifest-path sdk-build/Cargo.toml -- check` run and validated against `sdk-build/coverage-baseline.json`. The pinned compatibility definition preserves the currently published facade; the historical `src/sdk/coverage.json` and `src/sdk/api-surface.json` snapshots were removed because they were not regenerated and could misrepresent the published Rust. Operations not projected idiomatically remain available through `mistralai::raw`.
-
-The source of truth for the reproducible Rust build is
-[`mistralai/platform-docs-public/openapi.yaml`](https://github.com/mistralai/platform-docs-public/blob/main/openapi.yaml),
-pinned by commit and SHA-256. The separately deployed
-[`docs.mistral.ai/openapi.yaml`](https://docs.mistral.ai/openapi.yaml)
-contains a broader, independently updated API catalog; it is **not** a byte
-mirror of the pinned source. Expanding the SDK to the broader catalog requires
-a separately reviewed source migration and generated API update (see
-[#16](https://github.com/adriendellagaspera/mistralai-rs/issues/16)).
-The separate [public-catalog monitor](.github/workflows/monitor-public-openapi.yml) checks
-its reviewed fingerprint weekly without blocking SDK source updates.
-
-The selected migration target is staged separately at
-[`sdk-build/openapi/public-288.yaml`](sdk-build/openapi/public-288.yaml):
-the immutable `mistralai/platform-docs-public/public/openapi.yaml` at
-`ff846cf93d91df6fe04d0a5e540ecbe1e0ecc691` (288 operations, SHA-256
-`86b89916f38b14d4452654938ec51ad5337c860c19db03f37d86921d639fb36f`).
-It is verified from the checkout but is **not yet the published generation
-input**. `just check-candidate-raw` exercises the selected source through its
-reviewed overlay, exact 288→297 raw inventory, standalone compilation using the
-generated dependency fragment and canonical Bindings v3 identity. The
-raw + idiomatic cutover remains atomic; derivation and public compatibility are
-tracked by [#137](https://github.com/adriendellagaspera/mistralai-rs/issues/137)
-and [#138](https://github.com/adriendellagaspera/mistralai-rs/issues/138).
-The deployed docs catalog was observed with 296 operations; its
-eight additional Service Account operations remain a separate provenance gap
-under [#139](https://github.com/adriendellagaspera/mistralai-rs/issues/139).
-
-
-## Streaming and binary responses
-
-The Chat facade exposes an owned typed stream:
-
-```rust,no_run
-use futures_util::StreamExt;
-use mistralai::{ChatRequest, Message, Mistral};
-
-# async fn example(mistral: Mistral) -> Result<(), Box<dyn std::error::Error>> {
-let mut stream = mistral
-    .chat()
-    .stream(ChatRequest::new(
-        "mistral-small-latest",
-        [Message::user("Say hello in French.")],
-    ))
-    .await?;
-
-while let Some(chunk) = stream.next().await {
-    if let Some(text) = chunk?.text() {
-        print!("{text}");
-    }
-}
-# Ok(())
-# }
-```
-
-See [`examples/chat_stream.rs`](examples/chat_stream.rs) for a complete example. SSE parsing is incremental, handles `[DONE]`, bounds buffered event size, never reconnects automatically, and cancels response consumption when the stream is dropped.
-
-Multipart file fields accept `bytes::Bytes`. Generated multipart operations expose additive `*_with_multipart_filenames(..., &[(field, filename)])` variants so filenames are scoped to each call and binary field. Audio arrays are encoded as repeated form fields, and optional absent/null parts are omitted. Binary download variants stream bytes without buffering the successful body.
-
-## Reproduce the SDK
-
-Prerequisites for ordinary SDK regeneration and checks: Git, Rustup and [Just](https://github.com/casey/just). Python 3.11+ is needed only for explicit upstream source discovery, official-SDK evidence checks and independent API review.
+## Development
 
 ```sh
 just generate
@@ -135,45 +46,8 @@ just check-generated
 just validate
 ```
 
-`sdk-build/provenance.lock.json` pins:
+See [CONTRIBUTING.md](CONTRIBUTING.md) for source updates and validation, and the [build responsibility map](sdk-build/README.md) for toolchain boundaries. Generated `src/generated/` and `src/sdk/` files are checked for deterministic regeneration; edit their owning inputs instead.
 
-- the official Mistral OpenAPI source commit and content hash;
-- `openapi-to-rust` by version, immutable commit and Git tree;
-- `rust-sdk-generator` by version, commit and Git tree;
-- `openapi-to-rust-bindings` by version, commit and Git tree;
-- the Rust toolchain and the pinned API compatibility checker.
+## License
 
-On first use, the private Rust build executable installs the pinned tools into `.tools/`. It verifies their immutable revisions and SHA-256 of the pinned OpenAPI in Rust before use. The builder has its own `sdk-build/Cargo.toml` and `sdk-build/Cargo.lock`, outside the public SDK workspace and dependency surface. `just generate` and `just check-generated` do not invoke Python; the separate `just check-source-evidence` uses the Python collector for pinned official SDKs. Generation reads the vendored specification; it does not fetch a newer spec implicitly.
-
-`just check-generated` regenerates raw bindings and the idiomatic SDK into fresh temporary directories, runs the raw generator's own check, formats with the pinned Rust toolchain and verifies the raw baseline modulo reviewed source-provenance markers, and compares the public Rust SDK file set byte-for-byte. No timestamps enter generated output.
-
-## Repository layout
-
-| Location | Purpose |
-| --- | --- |
-| `sdk-build/openapi/` | Immutable published OpenAPI, reviewed overlays and explicit source updates (Python collector) |
-| `sdk-build/official-sdks/` | Pinned Python/TypeScript public surface evidence and Python-only discovery |
-| `sdk-build/src/main.rs`, `src/sources.rs`, `src/gates.rs` | Private Rust CLI, published-source verification and Mistral-specific coverage/parity gates |
-| `sdk-build/api-review/` | Independent public API review and compiler-aware semver checks (Python) |
-| `sdk-build/` | Pinned configuration and build workspace; see the [responsibility map](sdk-build/README.md) |
-| `.github/scripts/` | Repository policy, PR-title checks and scheduled-update PR reporting |
-| `src/generated/` | Committed raw generated Rust and raw operation inventory |
-| `src/sdk/` | Committed idiomatic SDK surface plus Mistral-owned stable error runtime |
-| `src/lib.rs`, `src/streaming.rs` | Public exports and Mistral-owned stream support |
-| `tests/`, `examples/` | Offline behavior tests and opt-in examples |
-
-The current public Rust surface is pinned by [`sdk-build/compatibility-definition.json`](sdk-build/compatibility-definition.json). The canonical derivation still proves all pinned OpenAPI operations, while the compatibility definition preserves existing SDK signatures and behavior.
-
-## Automation
-
-CI validates deterministic generation, formatting, compilation, Clippy with warnings denied, Rust tests/docs and derived operation coverage. API review compares actual public Rust files to the pull-request base, requires an explicit review record for changed files, and runs pinned compiler-aware semver checks. The exact generated facade is additionally protected by the byte-for-byte generation gate.
-
-The separate `just check-source-evidence` command validates the pinned official-SDK taxonomy using Python; it is retained in CI and `just validate` but deliberately excluded from the Python-free build entry points.
-
-The scheduled **Update Mistral SDK Sources** workflow checks the versioned repository OpenAPI and official SDK evidence, regenerates and validates a candidate, then opens or updates a review PR. If a new upstream revision needs an explicit raw-binding, coverage or facade adaptation, it still opens the source-update PR with the failed validation stage recorded and leaves the workflow red for review. It never automatically merges or publishes an update.
-
-`openapi-to-rust-bindings` owns compatibility tracking against `openapi-to-rust`; this repository consumes reviewed immutable package and generator revisions rather than maintaining that generic compatibility workflow locally.
-
-## License and attribution
-
-Original project contributions are **MIT OR Apache-2.0**. The official specification retains its **Apache-2.0** terms and generator-derived material retains applicable upstream notices. See [NOTICE](NOTICE), [LICENSE-MIT](LICENSE-MIT), [LICENSE-APACHE](LICENSE-APACHE), [sdk-build/openapi/LICENSE](sdk-build/openapi/LICENSE) and [sdk-build/openapi-to-rust-MIT.txt](sdk-build/openapi-to-rust-MIT.txt).
+Original contributions are MIT OR Apache-2.0. The upstream specification and generated material retain their applicable notices; see [NOTICE](NOTICE) and the license files in this repository.
