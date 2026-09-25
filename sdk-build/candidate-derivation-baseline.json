@@ -2,9 +2,9 @@
   "schema_version": 1,
   "total_operations": 288,
   "statuses": {
-    "derived": 271,
+    "derived": 274,
     "overridden": 5,
-    "rejected": 12
+    "rejected": 9
   },
   "rejections_by_reason": {
     "capability.event_stream_payload_not_structurally_provable": [
@@ -15,10 +15,7 @@
     ],
     "capability.request_model_not_structurally_provable": [
       "execute_workflow_registration_v1_workflows_registrations__workflow_registration_id__execute_post",
-      "execute_workflow_v1_workflows__workflow_identifier__execute_post",
-      "users_admin_user_groups_update_group_workspace_assignment",
-      "users_api_admin_user_groups_assign_group_to_workspace",
-      "users_api_admin_user_groups_provision_group_to_workspace"
+      "execute_workflow_v1_workflows__workflow_identifier__execute_post"
     ],
     "request.inline_or_unresolved": [
       "pause_schedule_v1_workflows_schedules__schedule_id__pause_post",
