@@ -2,17 +2,10 @@
   "schema_version": 1,
   "total_operations": 288,
   "statuses": {
-    "derived": 280,
-    "overridden": 5,
-    "rejected": 3
+    "derived": 283,
+    "overridden": 5
   },
-  "rejections_by_reason": {
-    "request.inline_or_unresolved": [
-      "pause_schedule_v1_workflows_schedules__schedule_id__pause_post",
-      "resume_schedule_v1_workflows_schedules__schedule_id__resume_post",
-      "trigger_schedule_v1_workflows_schedules__schedule_id__trigger_post"
-    ]
-  },
+  "rejections_by_reason": {},
   "override_statuses": {
     "chat_completion_v1_chat_completions_post": "overridden",
     "files_api_routes_download_file": "overridden",
