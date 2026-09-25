@@ -51,12 +51,15 @@ fn serve_sse(body: String) -> (String, thread::JoinHandle<String>) {
     (url, server)
 }
 
-async fn collect_stream(
-    mut stream: impl futures_util::Stream<Item = Result<bytes::Bytes, reqwest::Error>> + Unpin,
-) -> String {
+async fn collect_stream<S, E>(mut stream: S) -> String
+where
+    S: futures_util::Stream<Item = Result<bytes::Bytes, E>> + Unpin,
+    E: std::fmt::Debug,
+{
     let mut bytes = Vec::new();
     while let Some(chunk) = stream.next().await {
-        bytes.extend_from_slice(&chunk.expect("SSE byte chunk"));
+        let chunk = chunk.expect("SSE byte chunk");
+        bytes.extend_from_slice(&chunk);
     }
     String::from_utf8(bytes).expect("SSE body UTF-8")
 }
