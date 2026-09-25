@@ -2,20 +2,16 @@
   "schema_version": 1,
   "total_operations": 288,
   "statuses": {
-    "derived": 269,
+    "derived": 271,
     "overridden": 5,
-    "rejected": 14
+    "rejected": 12
   },
   "rejections_by_reason": {
-    "bindings.no_structural_match": [
-      "prompts_list",
-      "skills_list",
-      "stream_deployment_logs",
-      "stream_workflow_execution_logs"
-    ],
     "capability.event_stream_payload_not_structurally_provable": [
       "get_stream_events_v1_workflows_events_stream_get",
-      "stream_v1_workflows_executions__execution_id__stream_get"
+      "stream_deployment_logs",
+      "stream_v1_workflows_executions__execution_id__stream_get",
+      "stream_workflow_execution_logs"
     ],
     "capability.request_model_not_structurally_provable": [
       "execute_workflow_registration_v1_workflows_registrations__workflow_registration_id__execute_post",
