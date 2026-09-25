@@ -12,9 +12,9 @@
     "openapi_to_rust": {
       "name": "openapi-to-rust",
       "repository": "adriendellagaspera/openapi-to-rust",
-      "commit": "f60d571e7404ff64cb229a9c1a67355eb7288cb2",
+      "commit": "ea366ea8c732a12c1426ec07eac3d80a6db6b19e",
       "version": "0.17.0",
-      "tree_sha": "b36428b696c1dd2556b62b65ee64d85b097ad961"
+      "tree_sha": "0fa65cc21aa868fbd92c530267091ef3241f7b9c"
     },
     "rust_sdk_generator": {
       "name": "rust-sdk-generator",
