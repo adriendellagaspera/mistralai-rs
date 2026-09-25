@@ -376,7 +376,7 @@ fn compile_standalone_raw(root: &Path, version: &str, generated: &Path, work: &P
     );
     // Test-only runtime; the raw generator's REQUIRED_DEPS.toml stays verbatim.
     manifest.push_str(
-        "\n[dev-dependencies]\ntokio = { version = \"1\", features = [\"macros\", \"rt-multi-thread\"] }\n",
+        "\n[dev-dependencies]\ntokio = { version = \"1\", features = [\"macros\", \"rt-multi-thread\"] }\nfutures-util = \"0.3\"\nserde = { version = \"1\", features = [\"derive\"] }\nserde_json = \"1\"\nbytes = \"1\"\nreqwest = \"0.12\"\n",
     );
     fs::write(crate_dir.join("Cargo.toml"), manifest)?;
     run(
@@ -407,6 +407,10 @@ fn compile_standalone_raw(root: &Path, version: &str, generated: &Path, work: &P
         root.join("sdk-build/fixtures/candidate-raw-required-json-root.rs"),
         tests.join("required_json_root.rs"),
     )?;
+    fs::copy(
+        root.join("sdk-build/fixtures/candidate-raw-typed-sse.rs"),
+        tests.join("typed_sse.rs"),
+    )?;
     run(
         "cargo",
         vec![
@@ -422,6 +426,8 @@ fn compile_standalone_raw(root: &Path, version: &str, generated: &Path, work: &P
             "optional_nullable_body".into(),
             "--test".into(),
             "required_json_root".into(),
+            "--test".into(),
+            "typed_sse".into(),
         ],
         root,
     )
