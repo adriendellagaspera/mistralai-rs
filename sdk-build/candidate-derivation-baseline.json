@@ -2,17 +2,11 @@
   "schema_version": 1,
   "total_operations": 288,
   "statuses": {
-    "derived": 276,
+    "derived": 280,
     "overridden": 5,
-    "rejected": 7
+    "rejected": 3
   },
   "rejections_by_reason": {
-    "capability.event_stream_payload_not_structurally_provable": [
-      "get_stream_events_v1_workflows_events_stream_get",
-      "stream_deployment_logs",
-      "stream_v1_workflows_executions__execution_id__stream_get",
-      "stream_workflow_execution_logs"
-    ],
     "request.inline_or_unresolved": [
       "pause_schedule_v1_workflows_schedules__schedule_id__pause_post",
       "resume_schedule_v1_workflows_schedules__schedule_id__resume_post",
