@@ -407,6 +407,10 @@ fn compile_standalone_raw(root: &Path, version: &str, generated: &Path, work: &P
         root.join("sdk-build/fixtures/candidate-raw-required-json-root.rs"),
         tests.join("required_json_root.rs"),
     )?;
+    fs::copy(
+        root.join("sdk-build/fixtures/candidate-raw-typed-sse.rs"),
+        tests.join("typed_sse.rs"),
+    )?;
     run(
         "cargo",
         vec![
@@ -422,6 +426,8 @@ fn compile_standalone_raw(root: &Path, version: &str, generated: &Path, work: &P
             "optional_nullable_body".into(),
             "--test".into(),
             "required_json_root".into(),
+            "--test".into(),
+            "typed_sse".into(),
         ],
         root,
     )
