@@ -70,21 +70,21 @@ async fn optional_nullable_schedule_none_is_absent_not_json_null() {
             0 => client
                 .pause_schedule_v1_workflows_schedules_schedule_id_pause_post(
                     "schedule-a",
-                    None::<WorkflowSchedulePauseRequest>,
+                    None::<Option<WorkflowSchedulePauseRequest>>,
                 )
                 .await
                 .expect("mock 204 pause"),
             1 => client
                 .resume_schedule_v1_workflows_schedules_schedule_id_resume_post(
                     "schedule-a",
-                    None::<WorkflowSchedulePauseRequest>,
+                    None::<Option<WorkflowSchedulePauseRequest>>,
                 )
                 .await
                 .expect("mock 204 resume"),
             _ => client
                 .trigger_schedule_v1_workflows_schedules_schedule_id_trigger_post(
                     "schedule-a",
-                    None::<WorkflowScheduleTriggerRequest>,
+                    None::<Option<WorkflowScheduleTriggerRequest>>,
                 )
                 .await
                 .expect("mock 204 trigger"),
@@ -103,15 +103,61 @@ async fn optional_nullable_schedule_none_is_absent_not_json_null() {
 }
 
 #[tokio::test]
+async fn optional_nullable_schedule_explicit_null_emits_json_null() {
+    for (suffix, kind) in [("pause", 0_u8), ("resume", 1), ("trigger", 2)] {
+        let (url, server) = capture_one();
+        let client = HttpClient::new().with_base_url(url);
+        match kind {
+            0 => client
+                .pause_schedule_v1_workflows_schedules_schedule_id_pause_post(
+                    "schedule-a",
+                    Some(None::<WorkflowSchedulePauseRequest>),
+                )
+                .await
+                .expect("mock 204 pause"),
+            1 => client
+                .resume_schedule_v1_workflows_schedules_schedule_id_resume_post(
+                    "schedule-a",
+                    Some(None::<WorkflowSchedulePauseRequest>),
+                )
+                .await
+                .expect("mock 204 resume"),
+            _ => client
+                .trigger_schedule_v1_workflows_schedules_schedule_id_trigger_post(
+                    "schedule-a",
+                    Some(None::<WorkflowScheduleTriggerRequest>),
+                )
+                .await
+                .expect("mock 204 trigger"),
+        }
+        let captured = server.join().expect("captured request");
+        let (headers, body) = request_parts(&captured);
+        assert!(
+            headers.starts_with(&format!(
+                "POST /v1/workflows/schedules/schedule-a/{suffix} HTTP/1.1"
+            )),
+            "{headers}"
+        );
+        assert!(
+            headers.lines().any(|line| {
+                line.eq_ignore_ascii_case("content-type: application/json")
+            }),
+            "explicit null must carry JSON content type: {headers}"
+        );
+        assert_eq!(body, b"null");
+    }
+}
+
+#[tokio::test]
 async fn optional_nullable_schedule_some_emits_json_object() {
     let (url, server) = capture_one();
     HttpClient::new()
         .with_base_url(url)
         .pause_schedule_v1_workflows_schedules_schedule_id_pause_post(
             "schedule-a",
-            Some(WorkflowSchedulePauseRequest {
+            Some(Some(WorkflowSchedulePauseRequest {
                 note: Some(Some("maintenance".to_owned())),
-            }),
+            })),
         )
         .await
         .expect("mock 204");
@@ -127,7 +173,7 @@ async fn optional_nullable_schedule_some_emits_json_object() {
         .with_base_url(url)
         .trigger_schedule_v1_workflows_schedules_schedule_id_trigger_post(
             "schedule-a",
-            Some(WorkflowScheduleTriggerRequest { overlap: None }),
+            Some(Some(WorkflowScheduleTriggerRequest { overlap: None })),
         )
         .await
         .expect("mock 204");
