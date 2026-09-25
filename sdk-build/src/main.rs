@@ -350,6 +350,10 @@ fn candidate_config(build: &Path) -> Result<PathBuf> {
             "output_dir = \"../src/generated\"",
             "output_dir = \"../candidate-generated\"",
         ),
+        (
+            "binding_manifest = true\n",
+            "",
+        ),
     ] {
         if !config.contains(before) {
             return fail(format!("candidate raw config anchor missing: {before}"));
