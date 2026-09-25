@@ -376,7 +376,7 @@ fn compile_standalone_raw(root: &Path, version: &str, generated: &Path, work: &P
     );
     // Test-only runtime; the raw generator's REQUIRED_DEPS.toml stays verbatim.
     manifest.push_str(
-        "\n[dev-dependencies]\ntokio = { version = \"1\", features = [\"macros\", \"rt-multi-thread\"] }\nfutures-util = \"0.3\"\nserde = { version = \"1\", features = [\"derive\"] }\nserde_json = \"1\"\nbytes = \"1\"\nreqwest = \"0.12\"\n",
+        "\n[dev-dependencies]\ntokio = { version = \"1\", features = [\"macros\", \"rt-multi-thread\"] }\n",
     );
     fs::write(crate_dir.join("Cargo.toml"), manifest)?;
     run(
