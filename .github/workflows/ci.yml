@@ -337,6 +337,7 @@ jobs:
           save-if: ${{ github.ref == 'refs/heads/main' }}
       - run: cargo test --locked --doc
       - run: cargo doc --locked --no-deps
+      - run: cargo package --locked
 
   api:
     name: api
