@@ -1,0 +1,34 @@
+name: Regenerate canonical facade once
+
+on:
+  push:
+    branches:
+      - feat/cutover-288
+    paths:
+      - .github/workflows/regenerate-canonical-facade.yml
+
+permissions:
+  contents: write
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: feat/cutover-288
+      - name: Install pinned Rust toolchain
+        run: rustup show
+      - name: Regenerate canonical SDK
+        run: cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- generate
+      - name: Commit regenerated facade
+        run: |
+          if git diff --quiet -- src/generated src/sdk; then
+            echo "No generated drift"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/generated src/sdk
+          git commit -m "feat(sdk): regenerate facade from refreshed official evidence"
+          git push origin HEAD:feat/cutover-288
