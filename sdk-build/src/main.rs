@@ -326,7 +326,7 @@ fn publish(root: &Path, work: &Path, generated: &Path, compatible: &Path) -> Res
     // Both outputs are committed; cleanup must not report failure after publication.
     let _ = fs::remove_dir_all(&raw_backup);
     let _ = fs::remove_dir_all(&sdk_backup);
-    println!("Published verified raw bindings and exactly compatible SDK facade.");
+    println!("Published verified raw bindings and canonical SDK facade.");
     Ok(())
 }
 
@@ -334,14 +334,6 @@ fn candidate_config(build: &Path) -> Result<PathBuf> {
     let source = build.join("openapi-to-rust.toml");
     let mut config = fs::read_to_string(&source)?;
     for (before, after) in [
-        (
-            "spec_path = \"openapi/published.yaml\"",
-            "spec_path = \"openapi/public-288.yaml\"",
-        ),
-        (
-            "overlays = [\"openapi/overlays/rust-sdk.overlay.yaml\"]",
-            "overlays = [\"openapi/overlays/public-288.overlay.yaml\"]",
-        ),
         (
             "overlay_output = \"openapi/overlaid.json\"",
             "overlay_output = \"openapi/overlaid-candidate.json\"",
@@ -731,6 +723,7 @@ fn verify_candidate_raw(
 
     format_rust(root, version, &generated)?;
     let coverage = raw_coverage(&generated, &spec)?;
+    write_json(&generated.join("coverage.json"), &coverage)?;
     let candidate = field(lock, "openapi_candidate")?;
     let expected_operations = candidate["operations"]
         .as_u64()
@@ -1189,10 +1182,7 @@ fn execute(root: &Path, args: &Options) -> Result<()> {
     let committed = committed_facade(&root.join("src/sdk"))?;
     let candidate_delta = compatible_snapshot(root, &facade, &committed)?;
     let mut final_delta = candidate_delta.clone();
-    let definition_path = args.compatibility_definition.clone().or_else(|| {
-        matches!(args.command.as_str(), "check" | "generate")
-            .then(|| root.join("sdk-build/compatibility-definition.json"))
-    });
+    let definition_path = args.compatibility_definition.clone();
     let mut compatible = None;
     if let Some(source) = definition_path {
         if !source.is_file() {
@@ -1221,10 +1211,8 @@ fn execute(root: &Path, args: &Options) -> Result<()> {
         require_publish_parity(&counts, &final_delta)?;
     }
     if args.command == "generate" {
-        let compatible = compatible
-            .as_ref()
-            .ok_or("publishing requires compatibility SDK definition")?;
-        publish(root, work, &generated, compatible)?;
+        let publication = compatible.as_ref().unwrap_or(&facade);
+        publish(root, work, &generated, publication)?;
     }
     let inventory = read_json(&inventory)?;
     let resources = field(&inventory, "resources")?
