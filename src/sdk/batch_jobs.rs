@@ -127,10 +127,10 @@ impl<'a> BatchJobs<'a> {
             .map_err(Into::into)
     }
 
-    pub async fn delete_batch_job(
+    pub async fn delete(
         &self,
         job_id: impl AsRef<str>,
-    ) -> Result<DeleteBatchJobBatchJobsResponse, SdkError> {
+    ) -> Result<DeleteBatchJobsResponse, SdkError> {
         self.raw
             .jobs_api_routes_batch_delete_batch_job(job_id.as_ref())
             .await

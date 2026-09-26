@@ -243,11 +243,11 @@ impl<'a> BetaSkills<'a> {
             .map_err(Into::into)
     }
 
-    pub async fn update(
+    pub async fn update_metadata(
         &self,
         skill_id: impl AsRef<str>,
-        request: UpdateBetaSkillsRequest,
-    ) -> Result<UpdateBetaSkillsResponse, SdkError> {
+        request: UpdateMetadataBetaSkillsRequest,
+    ) -> Result<UpdateMetadataBetaSkillsResponse, SdkError> {
         self.raw
             .skills_update(skill_id.as_ref(), request.into_raw())
             .await

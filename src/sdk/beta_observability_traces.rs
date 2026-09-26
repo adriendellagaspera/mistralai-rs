@@ -3,17 +3,15 @@ use super::*;
 use crate::generated::client::HttpClient;
 
 #[derive(Debug, Clone)]
-pub struct GetSpanByIdBetaObservabilityTracesRequest {
-    trace_id: String,
-    span_id: String,
+pub struct FetchOptionsBetaObservabilityTracesRequest {
+    field_name: String,
     from: Option<String>,
     to: Option<String>,
 }
-impl GetSpanByIdBetaObservabilityTracesRequest {
-    pub fn new(trace_id: impl Into<String>, span_id: impl Into<String>) -> Self {
+impl FetchOptionsBetaObservabilityTracesRequest {
+    pub fn new(field_name: impl Into<String>) -> Self {
         Self {
-            trace_id: trace_id.into(),
-            span_id: span_id.into(),
+            field_name: field_name.into(),
             from: None,
             to: None,
         }
@@ -31,15 +29,17 @@ impl GetSpanByIdBetaObservabilityTracesRequest {
 }
 
 #[derive(Debug, Clone)]
-pub struct GetTraceFieldOptionsBetaObservabilityTracesRequest {
-    field_name: String,
+pub struct GetSpanByIdBetaObservabilityTracesRequest {
+    trace_id: String,
+    span_id: String,
     from: Option<String>,
     to: Option<String>,
 }
-impl GetTraceFieldOptionsBetaObservabilityTracesRequest {
-    pub fn new(field_name: impl Into<String>) -> Self {
+impl GetSpanByIdBetaObservabilityTracesRequest {
+    pub fn new(trace_id: impl Into<String>, span_id: impl Into<String>) -> Self {
         Self {
-            field_name: field_name.into(),
+            trace_id: trace_id.into(),
+            span_id: span_id.into(),
             from: None,
             to: None,
         }
@@ -105,14 +105,29 @@ impl<'a> BetaObservabilityTraces<'a> {
     pub(crate) fn new(raw: &'a HttpClient) -> Self {
         Self { raw }
     }
-    pub async fn aggregate_traces(
+    pub async fn aggregate(
         &self,
         from: Option<String>,
         to: Option<String>,
-        request: AggregateTracesBetaObservabilityTracesRequest,
-    ) -> Result<AggregateTracesBetaObservabilityTracesResponse, SdkError> {
+        request: AggregateBetaObservabilityTracesRequest,
+    ) -> Result<AggregateBetaObservabilityTracesResponse, SdkError> {
         self.raw
             .aggregate_traces_v1_observability_traces_aggregate_post(from, to, request.into_raw())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn fetch_options(
+        &self,
+        request: FetchOptionsBetaObservabilityTracesRequest,
+    ) -> Result<FetchOptionsBetaObservabilityTracesResponse, SdkError> {
+        self.raw
+            .get_trace_field_options_v1_observability_traces_fields_field_name_options_get(
+                request.field_name.as_str(),
+                request.from.as_deref(),
+                request.to.as_deref(),
+            )
             .await
             .map(Into::into)
             .map_err(Into::into)
@@ -145,21 +160,6 @@ impl<'a> BetaObservabilityTraces<'a> {
             .map_err(Into::into)
     }
 
-    pub async fn get_trace_field_options(
-        &self,
-        request: GetTraceFieldOptionsBetaObservabilityTracesRequest,
-    ) -> Result<GetTraceFieldOptionsBetaObservabilityTracesResponse, SdkError> {
-        self.raw
-            .get_trace_field_options_v1_observability_traces_fields_field_name_options_get(
-                request.field_name.as_str(),
-                request.from.as_deref(),
-                request.to.as_deref(),
-            )
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
-    }
-
     pub async fn get_trace_fields(
         &self,
     ) -> Result<GetTraceFieldsBetaObservabilityTracesResponse, SdkError> {
@@ -187,14 +187,14 @@ impl<'a> BetaObservabilityTraces<'a> {
             .map_err(Into::into)
     }
 
-    pub async fn search_traces(
+    pub async fn search(
         &self,
         from: Option<String>,
         to: Option<String>,
         page_size: Option<i64>,
         cursor: Option<String>,
-        request: SearchTracesBetaObservabilityTracesRequest,
-    ) -> Result<SearchTracesBetaObservabilityTracesResponse, SdkError> {
+        request: SearchBetaObservabilityTracesRequest,
+    ) -> Result<SearchBetaObservabilityTracesResponse, SdkError> {
         self.raw
             .search_traces_v1_observability_traces_search_post(
                 from,

@@ -303,18 +303,17 @@ impl From<AdminUserGroupsUpdateUserGroupOrganizationRoleBetaAdminUserGroupsReque
 }
 
 #[derive(Debug, Clone)]
-pub struct AggregateSpansBetaObservabilitySpansRequest {
+pub struct AggregateBetaObservabilitySpansRequest {
     raw: AggregationRequest,
 }
 
-impl AggregateSpansBetaObservabilitySpansRequest {
-    pub fn new(metric: impl Into<AggregateSpansBetaObservabilitySpansRequestMetric>) -> Self {
+impl AggregateBetaObservabilitySpansRequest {
+    pub fn new(metric: impl Into<AggregateBetaObservabilitySpansRequestMetric>) -> Self {
         Self {
             raw: AggregationRequest {
                 dimensions: None,
                 limit: None,
-                metric: Into::<AggregateSpansBetaObservabilitySpansRequestMetric>::into(metric)
-                    .into(),
+                metric: Into::<AggregateBetaObservabilitySpansRequestMetric>::into(metric).into(),
                 order_by: None,
                 search_expression: None,
                 time_dimension: None,
@@ -360,10 +359,10 @@ impl AggregateSpansBetaObservabilitySpansRequest {
     #[must_use]
     pub fn time_dimension(
         mut self,
-        time_dimension: impl Into<AggregateSpansBetaObservabilitySpansRequestTimeDimension>,
+        time_dimension: impl Into<AggregateBetaObservabilitySpansRequestTimeDimension>,
     ) -> Self {
         self.raw.time_dimension = Some(Some(
-            Into::<AggregateSpansBetaObservabilitySpansRequestTimeDimension>::into(time_dimension)
+            Into::<AggregateBetaObservabilitySpansRequestTimeDimension>::into(time_dimension)
                 .into(),
         ));
         self
@@ -385,24 +384,24 @@ impl AggregateSpansBetaObservabilitySpansRequest {
     }
 }
 
-impl From<AggregationRequest> for AggregateSpansBetaObservabilitySpansRequest {
+impl From<AggregationRequest> for AggregateBetaObservabilitySpansRequest {
     fn from(raw: AggregationRequest) -> Self {
         Self { raw }
     }
 }
 
-impl From<AggregateSpansBetaObservabilitySpansRequest> for AggregationRequest {
-    fn from(value: AggregateSpansBetaObservabilitySpansRequest) -> Self {
+impl From<AggregateBetaObservabilitySpansRequest> for AggregationRequest {
+    fn from(value: AggregateBetaObservabilitySpansRequest) -> Self {
         value.into_raw()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct AggregateSpansBetaObservabilitySpansRequestMetric {
+pub struct AggregateBetaObservabilitySpansRequestMetric {
     raw: MetricDefinition,
 }
 
-impl AggregateSpansBetaObservabilitySpansRequestMetric {
+impl AggregateBetaObservabilitySpansRequestMetric {
     pub fn new(measure: impl Into<String>, aggregation: MetricAggregation) -> Self {
         Self {
             raw: MetricDefinition {
@@ -422,24 +421,24 @@ impl AggregateSpansBetaObservabilitySpansRequestMetric {
     }
 }
 
-impl From<MetricDefinition> for AggregateSpansBetaObservabilitySpansRequestMetric {
+impl From<MetricDefinition> for AggregateBetaObservabilitySpansRequestMetric {
     fn from(raw: MetricDefinition) -> Self {
         Self { raw }
     }
 }
 
-impl From<AggregateSpansBetaObservabilitySpansRequestMetric> for MetricDefinition {
-    fn from(value: AggregateSpansBetaObservabilitySpansRequestMetric) -> Self {
+impl From<AggregateBetaObservabilitySpansRequestMetric> for MetricDefinition {
+    fn from(value: AggregateBetaObservabilitySpansRequestMetric) -> Self {
         value.into_raw()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct AggregateSpansBetaObservabilitySpansRequestTimeDimension {
+pub struct AggregateBetaObservabilitySpansRequestTimeDimension {
     raw: TimeDimension,
 }
 
-impl AggregateSpansBetaObservabilitySpansRequestTimeDimension {
+impl AggregateBetaObservabilitySpansRequestTimeDimension {
     pub fn new() -> Self {
         Self {
             raw: TimeDimension { granularity: None },
@@ -461,30 +460,30 @@ impl AggregateSpansBetaObservabilitySpansRequestTimeDimension {
     }
 }
 
-impl From<TimeDimension> for AggregateSpansBetaObservabilitySpansRequestTimeDimension {
+impl From<TimeDimension> for AggregateBetaObservabilitySpansRequestTimeDimension {
     fn from(raw: TimeDimension) -> Self {
         Self { raw }
     }
 }
 
-impl From<AggregateSpansBetaObservabilitySpansRequestTimeDimension> for TimeDimension {
-    fn from(value: AggregateSpansBetaObservabilitySpansRequestTimeDimension) -> Self {
+impl From<AggregateBetaObservabilitySpansRequestTimeDimension> for TimeDimension {
+    fn from(value: AggregateBetaObservabilitySpansRequestTimeDimension) -> Self {
         value.into_raw()
     }
 }
 
-impl Default for AggregateSpansBetaObservabilitySpansRequestTimeDimension {
+impl Default for AggregateBetaObservabilitySpansRequestTimeDimension {
     fn default() -> Self {
         Self::new()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct AggregateSpansBetaObservabilitySpansResponse {
+pub struct AggregateBetaObservabilitySpansResponse {
     raw: Aggregation,
 }
 
-impl AggregateSpansBetaObservabilitySpansResponse {
+impl AggregateBetaObservabilitySpansResponse {
     pub fn raw(&self) -> &Aggregation {
         &self.raw
     }
@@ -493,31 +492,30 @@ impl AggregateSpansBetaObservabilitySpansResponse {
     }
 }
 
-impl From<Aggregation> for AggregateSpansBetaObservabilitySpansResponse {
+impl From<Aggregation> for AggregateBetaObservabilitySpansResponse {
     fn from(raw: Aggregation) -> Self {
         Self { raw }
     }
 }
 
-impl From<AggregateSpansBetaObservabilitySpansResponse> for Aggregation {
-    fn from(value: AggregateSpansBetaObservabilitySpansResponse) -> Self {
+impl From<AggregateBetaObservabilitySpansResponse> for Aggregation {
+    fn from(value: AggregateBetaObservabilitySpansResponse) -> Self {
         value.into_raw()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct AggregateTracesBetaObservabilityTracesRequest {
+pub struct AggregateBetaObservabilityTracesRequest {
     raw: AggregationRequest,
 }
 
-impl AggregateTracesBetaObservabilityTracesRequest {
-    pub fn new(metric: impl Into<AggregateTracesBetaObservabilityTracesRequestMetric>) -> Self {
+impl AggregateBetaObservabilityTracesRequest {
+    pub fn new(metric: impl Into<AggregateBetaObservabilityTracesRequestMetric>) -> Self {
         Self {
             raw: AggregationRequest {
                 dimensions: None,
                 limit: None,
-                metric: Into::<AggregateTracesBetaObservabilityTracesRequestMetric>::into(metric)
-                    .into(),
+                metric: Into::<AggregateBetaObservabilityTracesRequestMetric>::into(metric).into(),
                 order_by: None,
                 search_expression: None,
                 time_dimension: None,
@@ -563,13 +561,11 @@ impl AggregateTracesBetaObservabilityTracesRequest {
     #[must_use]
     pub fn time_dimension(
         mut self,
-        time_dimension: impl Into<AggregateTracesBetaObservabilityTracesRequestTimeDimension>,
+        time_dimension: impl Into<AggregateBetaObservabilityTracesRequestTimeDimension>,
     ) -> Self {
         self.raw.time_dimension = Some(Some(
-            Into::<AggregateTracesBetaObservabilityTracesRequestTimeDimension>::into(
-                time_dimension,
-            )
-            .into(),
+            Into::<AggregateBetaObservabilityTracesRequestTimeDimension>::into(time_dimension)
+                .into(),
         ));
         self
     }
@@ -590,24 +586,24 @@ impl AggregateTracesBetaObservabilityTracesRequest {
     }
 }
 
-impl From<AggregationRequest> for AggregateTracesBetaObservabilityTracesRequest {
+impl From<AggregationRequest> for AggregateBetaObservabilityTracesRequest {
     fn from(raw: AggregationRequest) -> Self {
         Self { raw }
     }
 }
 
-impl From<AggregateTracesBetaObservabilityTracesRequest> for AggregationRequest {
-    fn from(value: AggregateTracesBetaObservabilityTracesRequest) -> Self {
+impl From<AggregateBetaObservabilityTracesRequest> for AggregationRequest {
+    fn from(value: AggregateBetaObservabilityTracesRequest) -> Self {
         value.into_raw()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct AggregateTracesBetaObservabilityTracesRequestMetric {
+pub struct AggregateBetaObservabilityTracesRequestMetric {
     raw: MetricDefinition,
 }
 
-impl AggregateTracesBetaObservabilityTracesRequestMetric {
+impl AggregateBetaObservabilityTracesRequestMetric {
     pub fn new(measure: impl Into<String>, aggregation: MetricAggregation) -> Self {
         Self {
             raw: MetricDefinition {
@@ -627,24 +623,24 @@ impl AggregateTracesBetaObservabilityTracesRequestMetric {
     }
 }
 
-impl From<MetricDefinition> for AggregateTracesBetaObservabilityTracesRequestMetric {
+impl From<MetricDefinition> for AggregateBetaObservabilityTracesRequestMetric {
     fn from(raw: MetricDefinition) -> Self {
         Self { raw }
     }
 }
 
-impl From<AggregateTracesBetaObservabilityTracesRequestMetric> for MetricDefinition {
-    fn from(value: AggregateTracesBetaObservabilityTracesRequestMetric) -> Self {
+impl From<AggregateBetaObservabilityTracesRequestMetric> for MetricDefinition {
+    fn from(value: AggregateBetaObservabilityTracesRequestMetric) -> Self {
         value.into_raw()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct AggregateTracesBetaObservabilityTracesRequestTimeDimension {
+pub struct AggregateBetaObservabilityTracesRequestTimeDimension {
     raw: TimeDimension,
 }
 
-impl AggregateTracesBetaObservabilityTracesRequestTimeDimension {
+impl AggregateBetaObservabilityTracesRequestTimeDimension {
     pub fn new() -> Self {
         Self {
             raw: TimeDimension { granularity: None },
@@ -666,30 +662,30 @@ impl AggregateTracesBetaObservabilityTracesRequestTimeDimension {
     }
 }
 
-impl From<TimeDimension> for AggregateTracesBetaObservabilityTracesRequestTimeDimension {
+impl From<TimeDimension> for AggregateBetaObservabilityTracesRequestTimeDimension {
     fn from(raw: TimeDimension) -> Self {
         Self { raw }
     }
 }
 
-impl From<AggregateTracesBetaObservabilityTracesRequestTimeDimension> for TimeDimension {
-    fn from(value: AggregateTracesBetaObservabilityTracesRequestTimeDimension) -> Self {
+impl From<AggregateBetaObservabilityTracesRequestTimeDimension> for TimeDimension {
+    fn from(value: AggregateBetaObservabilityTracesRequestTimeDimension) -> Self {
         value.into_raw()
     }
 }
 
-impl Default for AggregateTracesBetaObservabilityTracesRequestTimeDimension {
+impl Default for AggregateBetaObservabilityTracesRequestTimeDimension {
     fn default() -> Self {
         Self::new()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct AggregateTracesBetaObservabilityTracesResponse {
+pub struct AggregateBetaObservabilityTracesResponse {
     raw: Aggregation,
 }
 
-impl AggregateTracesBetaObservabilityTracesResponse {
+impl AggregateBetaObservabilityTracesResponse {
     pub fn raw(&self) -> &Aggregation {
         &self.raw
     }
@@ -698,14 +694,14 @@ impl AggregateTracesBetaObservabilityTracesResponse {
     }
 }
 
-impl From<Aggregation> for AggregateTracesBetaObservabilityTracesResponse {
+impl From<Aggregation> for AggregateBetaObservabilityTracesResponse {
     fn from(raw: Aggregation) -> Self {
         Self { raw }
     }
 }
 
-impl From<AggregateTracesBetaObservabilityTracesResponse> for Aggregation {
-    fn from(value: AggregateTracesBetaObservabilityTracesResponse) -> Self {
+impl From<AggregateBetaObservabilityTracesResponse> for Aggregation {
+    fn from(value: AggregateBetaObservabilityTracesResponse) -> Self {
         value.into_raw()
     }
 }
@@ -8137,11 +8133,11 @@ impl From<DeleteAudioVoicesResponse> for VoiceResponse {
 }
 
 #[derive(Debug, Clone)]
-pub struct DeleteBatchJobBatchJobsResponse {
+pub struct DeleteBatchJobsResponse {
     raw: DeleteBatchJobResponse,
 }
 
-impl DeleteBatchJobBatchJobsResponse {
+impl DeleteBatchJobsResponse {
     pub fn raw(&self) -> &DeleteBatchJobResponse {
         &self.raw
     }
@@ -8150,14 +8146,14 @@ impl DeleteBatchJobBatchJobsResponse {
     }
 }
 
-impl From<DeleteBatchJobResponse> for DeleteBatchJobBatchJobsResponse {
+impl From<DeleteBatchJobResponse> for DeleteBatchJobsResponse {
     fn from(raw: DeleteBatchJobResponse) -> Self {
         Self { raw }
     }
 }
 
-impl From<DeleteBatchJobBatchJobsResponse> for DeleteBatchJobResponse {
-    fn from(value: DeleteBatchJobBatchJobsResponse) -> Self {
+impl From<DeleteBatchJobsResponse> for DeleteBatchJobResponse {
+    fn from(value: DeleteBatchJobsResponse) -> Self {
         value.into_raw()
     }
 }
@@ -9135,6 +9131,114 @@ impl From<Judge> for FetchBetaObservabilityJudgesResponse {
 
 impl From<FetchBetaObservabilityJudgesResponse> for Judge {
     fn from(value: FetchBetaObservabilityJudgesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct FetchOptionsBetaObservabilityLogsResponse {
+    raw: GetLogFieldOptions,
+}
+
+impl FetchOptionsBetaObservabilityLogsResponse {
+    pub fn raw(&self) -> &GetLogFieldOptions {
+        &self.raw
+    }
+    pub fn into_raw(self) -> GetLogFieldOptions {
+        self.raw
+    }
+}
+
+impl From<GetLogFieldOptions> for FetchOptionsBetaObservabilityLogsResponse {
+    fn from(raw: GetLogFieldOptions) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<FetchOptionsBetaObservabilityLogsResponse> for GetLogFieldOptions {
+    fn from(value: FetchOptionsBetaObservabilityLogsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct FetchOptionsBetaObservabilityTracesResponse {
+    raw: GetTraceFieldOptions,
+}
+
+impl FetchOptionsBetaObservabilityTracesResponse {
+    pub fn raw(&self) -> &GetTraceFieldOptions {
+        &self.raw
+    }
+    pub fn into_raw(self) -> GetTraceFieldOptions {
+        self.raw
+    }
+}
+
+impl From<GetTraceFieldOptions> for FetchOptionsBetaObservabilityTracesResponse {
+    fn from(raw: GetTraceFieldOptions) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<FetchOptionsBetaObservabilityTracesResponse> for GetTraceFieldOptions {
+    fn from(value: FetchOptionsBetaObservabilityTracesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct FetchSpanEvalFieldOptionsBetaObservabilitySpansResponse {
+    raw: GetSpanEvaluationFieldOptions,
+}
+
+impl FetchSpanEvalFieldOptionsBetaObservabilitySpansResponse {
+    pub fn raw(&self) -> &GetSpanEvaluationFieldOptions {
+        &self.raw
+    }
+    pub fn into_raw(self) -> GetSpanEvaluationFieldOptions {
+        self.raw
+    }
+}
+
+impl From<GetSpanEvaluationFieldOptions>
+    for FetchSpanEvalFieldOptionsBetaObservabilitySpansResponse
+{
+    fn from(raw: GetSpanEvaluationFieldOptions) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<FetchSpanEvalFieldOptionsBetaObservabilitySpansResponse>
+    for GetSpanEvaluationFieldOptions
+{
+    fn from(value: FetchSpanEvalFieldOptionsBetaObservabilitySpansResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct FetchSpanFieldOptionsBetaObservabilitySpansResponse {
+    raw: GetSpanFieldOptions,
+}
+
+impl FetchSpanFieldOptionsBetaObservabilitySpansResponse {
+    pub fn raw(&self) -> &GetSpanFieldOptions {
+        &self.raw
+    }
+    pub fn into_raw(self) -> GetSpanFieldOptions {
+        self.raw
+    }
+}
+
+impl From<GetSpanFieldOptions> for FetchSpanFieldOptionsBetaObservabilitySpansResponse {
+    fn from(raw: GetSpanFieldOptions) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<FetchSpanFieldOptionsBetaObservabilitySpansResponse> for GetSpanFieldOptions {
+    fn from(value: FetchSpanFieldOptionsBetaObservabilitySpansResponse) -> Self {
         value.into_raw()
     }
 }
@@ -10118,59 +10222,6 @@ impl From<GetChatCompletionFieldsBetaObservabilityChatCompletionEventsFieldsResp
 }
 
 #[derive(Debug, Clone)]
-pub struct GetConfigsBetaRagIngestionPipelineConfigurationsResponse {
-    raw: GetConfigsV1RagIngestionPipelineConfigurationsGetResponse,
-}
-
-impl GetConfigsBetaRagIngestionPipelineConfigurationsResponse {
-    pub fn iter(
-        &self,
-    ) -> impl ExactSizeIterator<Item = GetConfigsBetaRagIngestionPipelineConfigurationsResponseItem<'_>>
-    {
-        self.raw
-            .iter()
-            .map(GetConfigsBetaRagIngestionPipelineConfigurationsResponseItem::new)
-    }
-    pub fn raw(&self) -> &GetConfigsV1RagIngestionPipelineConfigurationsGetResponse {
-        &self.raw
-    }
-    pub fn into_raw(self) -> GetConfigsV1RagIngestionPipelineConfigurationsGetResponse {
-        self.raw
-    }
-}
-
-impl From<GetConfigsV1RagIngestionPipelineConfigurationsGetResponse>
-    for GetConfigsBetaRagIngestionPipelineConfigurationsResponse
-{
-    fn from(raw: GetConfigsV1RagIngestionPipelineConfigurationsGetResponse) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<GetConfigsBetaRagIngestionPipelineConfigurationsResponse>
-    for GetConfigsV1RagIngestionPipelineConfigurationsGetResponse
-{
-    fn from(value: GetConfigsBetaRagIngestionPipelineConfigurationsResponse) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct GetConfigsBetaRagIngestionPipelineConfigurationsResponseItem<'a> {
-    raw: &'a IngestionPipelineConfiguration,
-}
-
-impl<'a> GetConfigsBetaRagIngestionPipelineConfigurationsResponseItem<'a> {
-    pub(crate) fn new(raw: &'a IngestionPipelineConfiguration) -> Self {
-        Self { raw }
-    }
-
-    pub fn raw(&self) -> &'a IngestionPipelineConfiguration {
-        self.raw
-    }
-}
-
-#[derive(Debug, Clone)]
 pub struct GetDeploymentLogsWorkflowsDeploymentsResponse {
     raw: DeploymentLogSearchResponse,
 }
@@ -10296,58 +10347,6 @@ impl From<UserIdentity> for GetIdentityBetaUsersResponse {
 
 impl From<GetIdentityBetaUsersResponse> for UserIdentity {
     fn from(value: GetIdentityBetaUsersResponse) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct GetLogFieldOptionsBetaObservabilityLogsResponse {
-    raw: GetLogFieldOptions,
-}
-
-impl GetLogFieldOptionsBetaObservabilityLogsResponse {
-    pub fn raw(&self) -> &GetLogFieldOptions {
-        &self.raw
-    }
-    pub fn into_raw(self) -> GetLogFieldOptions {
-        self.raw
-    }
-}
-
-impl From<GetLogFieldOptions> for GetLogFieldOptionsBetaObservabilityLogsResponse {
-    fn from(raw: GetLogFieldOptions) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<GetLogFieldOptionsBetaObservabilityLogsResponse> for GetLogFieldOptions {
-    fn from(value: GetLogFieldOptionsBetaObservabilityLogsResponse) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct GetLogFieldsBetaObservabilityLogsResponse {
-    raw: GetLogFields,
-}
-
-impl GetLogFieldsBetaObservabilityLogsResponse {
-    pub fn raw(&self) -> &GetLogFields {
-        &self.raw
-    }
-    pub fn into_raw(self) -> GetLogFields {
-        self.raw
-    }
-}
-
-impl From<GetLogFields> for GetLogFieldsBetaObservabilityLogsResponse {
-    fn from(raw: GetLogFields) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<GetLogFieldsBetaObservabilityLogsResponse> for GetLogFields {
-    fn from(value: GetLogFieldsBetaObservabilityLogsResponse) -> Self {
         value.into_raw()
     }
 }
@@ -10600,114 +10599,6 @@ impl From<GetSpanByIdBetaObservabilityTracesResponse> for GetSpan {
 }
 
 #[derive(Debug, Clone)]
-pub struct GetSpanEvaluationFieldOptionsBetaObservabilitySpansResponse {
-    raw: GetSpanEvaluationFieldOptions,
-}
-
-impl GetSpanEvaluationFieldOptionsBetaObservabilitySpansResponse {
-    pub fn raw(&self) -> &GetSpanEvaluationFieldOptions {
-        &self.raw
-    }
-    pub fn into_raw(self) -> GetSpanEvaluationFieldOptions {
-        self.raw
-    }
-}
-
-impl From<GetSpanEvaluationFieldOptions>
-    for GetSpanEvaluationFieldOptionsBetaObservabilitySpansResponse
-{
-    fn from(raw: GetSpanEvaluationFieldOptions) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<GetSpanEvaluationFieldOptionsBetaObservabilitySpansResponse>
-    for GetSpanEvaluationFieldOptions
-{
-    fn from(value: GetSpanEvaluationFieldOptionsBetaObservabilitySpansResponse) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct GetSpanEvaluationFieldsBetaObservabilitySpansResponse {
-    raw: GetSpanEvaluationFields,
-}
-
-impl GetSpanEvaluationFieldsBetaObservabilitySpansResponse {
-    pub fn raw(&self) -> &GetSpanEvaluationFields {
-        &self.raw
-    }
-    pub fn into_raw(self) -> GetSpanEvaluationFields {
-        self.raw
-    }
-}
-
-impl From<GetSpanEvaluationFields> for GetSpanEvaluationFieldsBetaObservabilitySpansResponse {
-    fn from(raw: GetSpanEvaluationFields) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<GetSpanEvaluationFieldsBetaObservabilitySpansResponse> for GetSpanEvaluationFields {
-    fn from(value: GetSpanEvaluationFieldsBetaObservabilitySpansResponse) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct GetSpanFieldOptionsBetaObservabilitySpansResponse {
-    raw: GetSpanFieldOptions,
-}
-
-impl GetSpanFieldOptionsBetaObservabilitySpansResponse {
-    pub fn raw(&self) -> &GetSpanFieldOptions {
-        &self.raw
-    }
-    pub fn into_raw(self) -> GetSpanFieldOptions {
-        self.raw
-    }
-}
-
-impl From<GetSpanFieldOptions> for GetSpanFieldOptionsBetaObservabilitySpansResponse {
-    fn from(raw: GetSpanFieldOptions) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<GetSpanFieldOptionsBetaObservabilitySpansResponse> for GetSpanFieldOptions {
-    fn from(value: GetSpanFieldOptionsBetaObservabilitySpansResponse) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct GetSpanFieldsBetaObservabilitySpansResponse {
-    raw: GetSpanFields,
-}
-
-impl GetSpanFieldsBetaObservabilitySpansResponse {
-    pub fn raw(&self) -> &GetSpanFields {
-        &self.raw
-    }
-    pub fn into_raw(self) -> GetSpanFields {
-        self.raw
-    }
-}
-
-impl From<GetSpanFields> for GetSpanFieldsBetaObservabilitySpansResponse {
-    fn from(raw: GetSpanFields) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<GetSpanFieldsBetaObservabilitySpansResponse> for GetSpanFields {
-    fn from(value: GetSpanFieldsBetaObservabilitySpansResponse) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
 pub struct GetStreamEventsEventsStreamItemStreamEventSseErrorData {
     raw: StreamEventSseErrorData,
 }
@@ -10849,32 +10740,6 @@ impl From<GetTrace> for GetTraceByIdBetaObservabilityTracesResponse {
 
 impl From<GetTraceByIdBetaObservabilityTracesResponse> for GetTrace {
     fn from(value: GetTraceByIdBetaObservabilityTracesResponse) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct GetTraceFieldOptionsBetaObservabilityTracesResponse {
-    raw: GetTraceFieldOptions,
-}
-
-impl GetTraceFieldOptionsBetaObservabilityTracesResponse {
-    pub fn raw(&self) -> &GetTraceFieldOptions {
-        &self.raw
-    }
-    pub fn into_raw(self) -> GetTraceFieldOptions {
-        self.raw
-    }
-}
-
-impl From<GetTraceFieldOptions> for GetTraceFieldOptionsBetaObservabilityTracesResponse {
-    fn from(raw: GetTraceFieldOptions) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<GetTraceFieldOptionsBetaObservabilityTracesResponse> for GetTraceFieldOptions {
-    fn from(value: GetTraceFieldOptionsBetaObservabilityTracesResponse) -> Self {
         value.into_raw()
     }
 }
@@ -12627,6 +12492,32 @@ impl From<ListBetaObservabilityJudgesResponse> for ListJudgesResponse {
 }
 
 #[derive(Debug, Clone)]
+pub struct ListBetaObservabilityLogsResponse {
+    raw: GetLogFields,
+}
+
+impl ListBetaObservabilityLogsResponse {
+    pub fn raw(&self) -> &GetLogFields {
+        &self.raw
+    }
+    pub fn into_raw(self) -> GetLogFields {
+        self.raw
+    }
+}
+
+impl From<GetLogFields> for ListBetaObservabilityLogsResponse {
+    fn from(raw: GetLogFields) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListBetaObservabilityLogsResponse> for GetLogFields {
+    fn from(value: ListBetaObservabilityLogsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct ListBetaPromptsResponse {
     raw: ListPromptsResponse,
 }
@@ -12649,6 +12540,59 @@ impl From<ListPromptsResponse> for ListBetaPromptsResponse {
 impl From<ListBetaPromptsResponse> for ListPromptsResponse {
     fn from(value: ListBetaPromptsResponse) -> Self {
         value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListBetaRagIngestionPipelineConfigurationsResponse {
+    raw: GetConfigsV1RagIngestionPipelineConfigurationsGetResponse,
+}
+
+impl ListBetaRagIngestionPipelineConfigurationsResponse {
+    pub fn iter(
+        &self,
+    ) -> impl ExactSizeIterator<Item = ListBetaRagIngestionPipelineConfigurationsResponseItem<'_>>
+    {
+        self.raw
+            .iter()
+            .map(ListBetaRagIngestionPipelineConfigurationsResponseItem::new)
+    }
+    pub fn raw(&self) -> &GetConfigsV1RagIngestionPipelineConfigurationsGetResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> GetConfigsV1RagIngestionPipelineConfigurationsGetResponse {
+        self.raw
+    }
+}
+
+impl From<GetConfigsV1RagIngestionPipelineConfigurationsGetResponse>
+    for ListBetaRagIngestionPipelineConfigurationsResponse
+{
+    fn from(raw: GetConfigsV1RagIngestionPipelineConfigurationsGetResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListBetaRagIngestionPipelineConfigurationsResponse>
+    for GetConfigsV1RagIngestionPipelineConfigurationsGetResponse
+{
+    fn from(value: ListBetaRagIngestionPipelineConfigurationsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct ListBetaRagIngestionPipelineConfigurationsResponseItem<'a> {
+    raw: &'a IngestionPipelineConfiguration,
+}
+
+impl<'a> ListBetaRagIngestionPipelineConfigurationsResponseItem<'a> {
+    pub(crate) fn new(raw: &'a IngestionPipelineConfiguration) -> Self {
+        Self { raw }
+    }
+
+    pub fn raw(&self) -> &'a IngestionPipelineConfiguration {
+        self.raw
     }
 }
 
@@ -12908,6 +12852,58 @@ impl From<WorkflowExecutionListResponse> for ListRunsWorkflowsRunsResponse {
 
 impl From<ListRunsWorkflowsRunsResponse> for WorkflowExecutionListResponse {
     fn from(value: ListRunsWorkflowsRunsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListSpanEvalFieldsBetaObservabilitySpansResponse {
+    raw: GetSpanEvaluationFields,
+}
+
+impl ListSpanEvalFieldsBetaObservabilitySpansResponse {
+    pub fn raw(&self) -> &GetSpanEvaluationFields {
+        &self.raw
+    }
+    pub fn into_raw(self) -> GetSpanEvaluationFields {
+        self.raw
+    }
+}
+
+impl From<GetSpanEvaluationFields> for ListSpanEvalFieldsBetaObservabilitySpansResponse {
+    fn from(raw: GetSpanEvaluationFields) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListSpanEvalFieldsBetaObservabilitySpansResponse> for GetSpanEvaluationFields {
+    fn from(value: ListSpanEvalFieldsBetaObservabilitySpansResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListSpanFieldsBetaObservabilitySpansResponse {
+    raw: GetSpanFields,
+}
+
+impl ListSpanFieldsBetaObservabilitySpansResponse {
+    pub fn raw(&self) -> &GetSpanFields {
+        &self.raw
+    }
+    pub fn into_raw(self) -> GetSpanFields {
+        self.raw
+    }
+}
+
+impl From<GetSpanFields> for ListSpanFieldsBetaObservabilitySpansResponse {
+    fn from(raw: GetSpanFields) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListSpanFieldsBetaObservabilitySpansResponse> for GetSpanFields {
+    fn from(value: ListSpanFieldsBetaObservabilitySpansResponse) -> Self {
         value.into_raw()
     }
 }
@@ -13429,191 +13425,6 @@ impl From<ParseStreamChatStreamItem> for CompletionChunk {
 }
 
 #[derive(Debug, Clone)]
-pub struct PatchBetaLibrariesDocumentsRequest {
-    raw: UpdateDocumentRequest,
-}
-
-impl PatchBetaLibrariesDocumentsRequest {
-    pub fn new() -> Self {
-        Self {
-            raw: UpdateDocumentRequest {
-                attributes: None,
-                expires_at: None,
-                name: None,
-            },
-        }
-    }
-    #[must_use]
-    pub fn attributes(mut self, attributes: UpdateDocumentRequestAttributes) -> Self {
-        self.raw.attributes = Some(Some(attributes));
-        self
-    }
-
-    #[must_use]
-    pub fn attributes_null(mut self) -> Self {
-        self.raw.attributes = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn expires_at(mut self, expires_at: chrono::DateTime<chrono::Utc>) -> Self {
-        self.raw.expires_at = Some(Some(expires_at));
-        self
-    }
-
-    #[must_use]
-    pub fn expires_at_null(mut self) -> Self {
-        self.raw.expires_at = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn name(mut self, name: impl Into<String>) -> Self {
-        self.raw.name = Some(name.into());
-        self
-    }
-    pub fn from_raw(raw: UpdateDocumentRequest) -> Self {
-        Self { raw }
-    }
-    pub fn as_raw(&self) -> &UpdateDocumentRequest {
-        &self.raw
-    }
-    pub fn into_raw(self) -> UpdateDocumentRequest {
-        self.raw
-    }
-}
-
-impl From<UpdateDocumentRequest> for PatchBetaLibrariesDocumentsRequest {
-    fn from(raw: UpdateDocumentRequest) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<PatchBetaLibrariesDocumentsRequest> for UpdateDocumentRequest {
-    fn from(value: PatchBetaLibrariesDocumentsRequest) -> Self {
-        value.into_raw()
-    }
-}
-
-impl Default for PatchBetaLibrariesDocumentsRequest {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct PatchBetaLibrariesDocumentsResponse {
-    raw: Document,
-}
-
-impl PatchBetaLibrariesDocumentsResponse {
-    pub fn raw(&self) -> &Document {
-        &self.raw
-    }
-    pub fn into_raw(self) -> Document {
-        self.raw
-    }
-}
-
-impl From<Document> for PatchBetaLibrariesDocumentsResponse {
-    fn from(raw: Document) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<PatchBetaLibrariesDocumentsResponse> for Document {
-    fn from(value: PatchBetaLibrariesDocumentsResponse) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct PatchBetaLibrariesRequest {
-    raw: UpdateLibraryRequest,
-}
-
-impl PatchBetaLibrariesRequest {
-    pub fn new() -> Self {
-        Self {
-            raw: UpdateLibraryRequest {
-                description: None,
-                name: None,
-            },
-        }
-    }
-    #[must_use]
-    pub fn description(mut self, description: impl Into<String>) -> Self {
-        self.raw.description = Some(Some(description.into()));
-        self
-    }
-
-    #[must_use]
-    pub fn description_null(mut self) -> Self {
-        self.raw.description = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn name(mut self, name: impl Into<String>) -> Self {
-        self.raw.name = Some(name.into());
-        self
-    }
-    pub fn from_raw(raw: UpdateLibraryRequest) -> Self {
-        Self { raw }
-    }
-    pub fn as_raw(&self) -> &UpdateLibraryRequest {
-        &self.raw
-    }
-    pub fn into_raw(self) -> UpdateLibraryRequest {
-        self.raw
-    }
-}
-
-impl From<UpdateLibraryRequest> for PatchBetaLibrariesRequest {
-    fn from(raw: UpdateLibraryRequest) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<PatchBetaLibrariesRequest> for UpdateLibraryRequest {
-    fn from(value: PatchBetaLibrariesRequest) -> Self {
-        value.into_raw()
-    }
-}
-
-impl Default for PatchBetaLibrariesRequest {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct PatchBetaLibrariesResponse {
-    raw: Library,
-}
-
-impl PatchBetaLibrariesResponse {
-    pub fn raw(&self) -> &Library {
-        &self.raw
-    }
-    pub fn into_raw(self) -> Library {
-        self.raw
-    }
-}
-
-impl From<Library> for PatchBetaLibrariesResponse {
-    fn from(raw: Library) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<PatchBetaLibrariesResponse> for Library {
-    fn from(value: PatchBetaLibrariesResponse) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
 pub struct PauseScheduleWorkflowsSchedulesRequest {
     raw: PauseScheduleV1WorkflowsSchedulesScheduleIdPausePostRequest,
 }
@@ -13926,11 +13737,11 @@ impl From<RateLimitsGetRateLimitsBetaAdminBillingResponse> for RateLimitsOUT {
 }
 
 #[derive(Debug, Clone)]
-pub struct RegisterConfigBetaRagIngestionPipelineConfigurationsRequest {
+pub struct RegisterBetaRagIngestionPipelineConfigurationsRequest {
     raw: CreateIngestionPipelineConfigurationRequest,
 }
 
-impl RegisterConfigBetaRagIngestionPipelineConfigurationsRequest {
+impl RegisterBetaRagIngestionPipelineConfigurationsRequest {
     pub fn new(name: impl Into<String>) -> Self {
         Self {
             raw: CreateIngestionPipelineConfigurationRequest {
@@ -13965,27 +13776,27 @@ impl RegisterConfigBetaRagIngestionPipelineConfigurationsRequest {
 }
 
 impl From<CreateIngestionPipelineConfigurationRequest>
-    for RegisterConfigBetaRagIngestionPipelineConfigurationsRequest
+    for RegisterBetaRagIngestionPipelineConfigurationsRequest
 {
     fn from(raw: CreateIngestionPipelineConfigurationRequest) -> Self {
         Self { raw }
     }
 }
 
-impl From<RegisterConfigBetaRagIngestionPipelineConfigurationsRequest>
+impl From<RegisterBetaRagIngestionPipelineConfigurationsRequest>
     for CreateIngestionPipelineConfigurationRequest
 {
-    fn from(value: RegisterConfigBetaRagIngestionPipelineConfigurationsRequest) -> Self {
+    fn from(value: RegisterBetaRagIngestionPipelineConfigurationsRequest) -> Self {
         value.into_raw()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct RegisterConfigBetaRagIngestionPipelineConfigurationsResponse {
+pub struct RegisterBetaRagIngestionPipelineConfigurationsResponse {
     raw: IngestionPipelineConfiguration,
 }
 
-impl RegisterConfigBetaRagIngestionPipelineConfigurationsResponse {
+impl RegisterBetaRagIngestionPipelineConfigurationsResponse {
     pub fn raw(&self) -> &IngestionPipelineConfiguration {
         &self.raw
     }
@@ -13995,17 +13806,17 @@ impl RegisterConfigBetaRagIngestionPipelineConfigurationsResponse {
 }
 
 impl From<IngestionPipelineConfiguration>
-    for RegisterConfigBetaRagIngestionPipelineConfigurationsResponse
+    for RegisterBetaRagIngestionPipelineConfigurationsResponse
 {
     fn from(raw: IngestionPipelineConfiguration) -> Self {
         Self { raw }
     }
 }
 
-impl From<RegisterConfigBetaRagIngestionPipelineConfigurationsResponse>
+impl From<RegisterBetaRagIngestionPipelineConfigurationsResponse>
     for IngestionPipelineConfiguration
 {
-    fn from(value: RegisterConfigBetaRagIngestionPipelineConfigurationsResponse) -> Self {
+    fn from(value: RegisterBetaRagIngestionPipelineConfigurationsResponse) -> Self {
         value.into_raw()
     }
 }
@@ -15787,6 +15598,171 @@ impl From<ScheduleWorkflowWorkflowsSchedulesResponse> for WorkflowScheduleRespon
 }
 
 #[derive(Debug, Clone)]
+pub struct SearchBetaObservabilityLogsRequest {
+    raw: LogsRequest,
+}
+
+impl SearchBetaObservabilityLogsRequest {
+    pub fn new() -> Self {
+        Self {
+            raw: LogsRequest {
+                order: None,
+                search_expression: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn order(mut self, order: LogsRequestOrder) -> Self {
+        self.raw.order = Some(order);
+        self
+    }
+
+    #[must_use]
+    pub fn search_expression(mut self, search_expression: impl Into<String>) -> Self {
+        self.raw.search_expression = Some(Some(search_expression.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn search_expression_null(mut self) -> Self {
+        self.raw.search_expression = Some(None);
+        self
+    }
+    pub fn from_raw(raw: LogsRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &LogsRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> LogsRequest {
+        self.raw
+    }
+}
+
+impl From<LogsRequest> for SearchBetaObservabilityLogsRequest {
+    fn from(raw: LogsRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<SearchBetaObservabilityLogsRequest> for LogsRequest {
+    fn from(value: SearchBetaObservabilityLogsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for SearchBetaObservabilityLogsRequest {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SearchBetaObservabilityLogsResponse {
+    raw: GetLogs,
+}
+
+impl SearchBetaObservabilityLogsResponse {
+    pub fn raw(&self) -> &GetLogs {
+        &self.raw
+    }
+    pub fn into_raw(self) -> GetLogs {
+        self.raw
+    }
+}
+
+impl From<GetLogs> for SearchBetaObservabilityLogsResponse {
+    fn from(raw: GetLogs) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<SearchBetaObservabilityLogsResponse> for GetLogs {
+    fn from(value: SearchBetaObservabilityLogsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SearchBetaObservabilityTracesRequest {
+    raw: TracesRequest,
+}
+
+impl SearchBetaObservabilityTracesRequest {
+    pub fn new() -> Self {
+        Self {
+            raw: TracesRequest {
+                search_expression: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn search_expression(mut self, search_expression: impl Into<String>) -> Self {
+        self.raw.search_expression = Some(Some(search_expression.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn search_expression_null(mut self) -> Self {
+        self.raw.search_expression = Some(None);
+        self
+    }
+    pub fn from_raw(raw: TracesRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &TracesRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> TracesRequest {
+        self.raw
+    }
+}
+
+impl From<TracesRequest> for SearchBetaObservabilityTracesRequest {
+    fn from(raw: TracesRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<SearchBetaObservabilityTracesRequest> for TracesRequest {
+    fn from(value: SearchBetaObservabilityTracesRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for SearchBetaObservabilityTracesRequest {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SearchBetaObservabilityTracesResponse {
+    raw: GetTraces,
+}
+
+impl SearchBetaObservabilityTracesResponse {
+    pub fn raw(&self) -> &GetTraces {
+        &self.raw
+    }
+    pub fn into_raw(self) -> GetTraces {
+        self.raw
+    }
+}
+
+impl From<GetTraces> for SearchBetaObservabilityTracesResponse {
+    fn from(raw: GetTraces) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<SearchBetaObservabilityTracesResponse> for GetTraces {
+    fn from(value: SearchBetaObservabilityTracesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct SearchLatestSpanEvaluationsBetaObservabilitySpansRequest {
     raw: SpanEvaluationsRequest,
 }
@@ -15861,92 +15837,6 @@ impl From<GetSpanEvaluations> for SearchLatestSpanEvaluationsBetaObservabilitySp
 
 impl From<SearchLatestSpanEvaluationsBetaObservabilitySpansResponse> for GetSpanEvaluations {
     fn from(value: SearchLatestSpanEvaluationsBetaObservabilitySpansResponse) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct SearchLogsBetaObservabilityLogsRequest {
-    raw: LogsRequest,
-}
-
-impl SearchLogsBetaObservabilityLogsRequest {
-    pub fn new() -> Self {
-        Self {
-            raw: LogsRequest {
-                order: None,
-                search_expression: None,
-            },
-        }
-    }
-    #[must_use]
-    pub fn order(mut self, order: LogsRequestOrder) -> Self {
-        self.raw.order = Some(order);
-        self
-    }
-
-    #[must_use]
-    pub fn search_expression(mut self, search_expression: impl Into<String>) -> Self {
-        self.raw.search_expression = Some(Some(search_expression.into()));
-        self
-    }
-
-    #[must_use]
-    pub fn search_expression_null(mut self) -> Self {
-        self.raw.search_expression = Some(None);
-        self
-    }
-    pub fn from_raw(raw: LogsRequest) -> Self {
-        Self { raw }
-    }
-    pub fn as_raw(&self) -> &LogsRequest {
-        &self.raw
-    }
-    pub fn into_raw(self) -> LogsRequest {
-        self.raw
-    }
-}
-
-impl From<LogsRequest> for SearchLogsBetaObservabilityLogsRequest {
-    fn from(raw: LogsRequest) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<SearchLogsBetaObservabilityLogsRequest> for LogsRequest {
-    fn from(value: SearchLogsBetaObservabilityLogsRequest) -> Self {
-        value.into_raw()
-    }
-}
-
-impl Default for SearchLogsBetaObservabilityLogsRequest {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct SearchLogsBetaObservabilityLogsResponse {
-    raw: GetLogs,
-}
-
-impl SearchLogsBetaObservabilityLogsResponse {
-    pub fn raw(&self) -> &GetLogs {
-        &self.raw
-    }
-    pub fn into_raw(self) -> GetLogs {
-        self.raw
-    }
-}
-
-impl From<GetLogs> for SearchLogsBetaObservabilityLogsResponse {
-    fn from(raw: GetLogs) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<SearchLogsBetaObservabilityLogsResponse> for GetLogs {
-    fn from(value: SearchLogsBetaObservabilityLogsResponse) -> Self {
         value.into_raw()
     }
 }
@@ -16105,85 +15995,6 @@ impl From<GetSpans> for SearchSpansBetaObservabilitySpansResponse {
 
 impl From<SearchSpansBetaObservabilitySpansResponse> for GetSpans {
     fn from(value: SearchSpansBetaObservabilitySpansResponse) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct SearchTracesBetaObservabilityTracesRequest {
-    raw: TracesRequest,
-}
-
-impl SearchTracesBetaObservabilityTracesRequest {
-    pub fn new() -> Self {
-        Self {
-            raw: TracesRequest {
-                search_expression: None,
-            },
-        }
-    }
-    #[must_use]
-    pub fn search_expression(mut self, search_expression: impl Into<String>) -> Self {
-        self.raw.search_expression = Some(Some(search_expression.into()));
-        self
-    }
-
-    #[must_use]
-    pub fn search_expression_null(mut self) -> Self {
-        self.raw.search_expression = Some(None);
-        self
-    }
-    pub fn from_raw(raw: TracesRequest) -> Self {
-        Self { raw }
-    }
-    pub fn as_raw(&self) -> &TracesRequest {
-        &self.raw
-    }
-    pub fn into_raw(self) -> TracesRequest {
-        self.raw
-    }
-}
-
-impl From<TracesRequest> for SearchTracesBetaObservabilityTracesRequest {
-    fn from(raw: TracesRequest) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<SearchTracesBetaObservabilityTracesRequest> for TracesRequest {
-    fn from(value: SearchTracesBetaObservabilityTracesRequest) -> Self {
-        value.into_raw()
-    }
-}
-
-impl Default for SearchTracesBetaObservabilityTracesRequest {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct SearchTracesBetaObservabilityTracesResponse {
-    raw: GetTraces,
-}
-
-impl SearchTracesBetaObservabilityTracesResponse {
-    pub fn raw(&self) -> &GetTraces {
-        &self.raw
-    }
-    pub fn into_raw(self) -> GetTraces {
-        self.raw
-    }
-}
-
-impl From<GetTraces> for SearchTracesBetaObservabilityTracesResponse {
-    fn from(raw: GetTraces) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<SearchTracesBetaObservabilityTracesResponse> for GetTraces {
-    fn from(value: SearchTracesBetaObservabilityTracesResponse) -> Self {
         value.into_raw()
     }
 }
@@ -23035,6 +22846,191 @@ impl From<UpdateBetaConnectorsResponse> for Connector {
 }
 
 #[derive(Debug, Clone)]
+pub struct UpdateBetaLibrariesDocumentsRequest {
+    raw: UpdateDocumentRequest,
+}
+
+impl UpdateBetaLibrariesDocumentsRequest {
+    pub fn new() -> Self {
+        Self {
+            raw: UpdateDocumentRequest {
+                attributes: None,
+                expires_at: None,
+                name: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn attributes(mut self, attributes: UpdateDocumentRequestAttributes) -> Self {
+        self.raw.attributes = Some(Some(attributes));
+        self
+    }
+
+    #[must_use]
+    pub fn attributes_null(mut self) -> Self {
+        self.raw.attributes = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn expires_at(mut self, expires_at: chrono::DateTime<chrono::Utc>) -> Self {
+        self.raw.expires_at = Some(Some(expires_at));
+        self
+    }
+
+    #[must_use]
+    pub fn expires_at_null(mut self) -> Self {
+        self.raw.expires_at = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn name(mut self, name: impl Into<String>) -> Self {
+        self.raw.name = Some(name.into());
+        self
+    }
+    pub fn from_raw(raw: UpdateDocumentRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &UpdateDocumentRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> UpdateDocumentRequest {
+        self.raw
+    }
+}
+
+impl From<UpdateDocumentRequest> for UpdateBetaLibrariesDocumentsRequest {
+    fn from(raw: UpdateDocumentRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaLibrariesDocumentsRequest> for UpdateDocumentRequest {
+    fn from(value: UpdateBetaLibrariesDocumentsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for UpdateBetaLibrariesDocumentsRequest {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateBetaLibrariesDocumentsResponse {
+    raw: Document,
+}
+
+impl UpdateBetaLibrariesDocumentsResponse {
+    pub fn raw(&self) -> &Document {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Document {
+        self.raw
+    }
+}
+
+impl From<Document> for UpdateBetaLibrariesDocumentsResponse {
+    fn from(raw: Document) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaLibrariesDocumentsResponse> for Document {
+    fn from(value: UpdateBetaLibrariesDocumentsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateBetaLibrariesRequest {
+    raw: UpdateLibraryRequest,
+}
+
+impl UpdateBetaLibrariesRequest {
+    pub fn new() -> Self {
+        Self {
+            raw: UpdateLibraryRequest {
+                description: None,
+                name: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.raw.description = Some(Some(description.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn description_null(mut self) -> Self {
+        self.raw.description = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn name(mut self, name: impl Into<String>) -> Self {
+        self.raw.name = Some(name.into());
+        self
+    }
+    pub fn from_raw(raw: UpdateLibraryRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &UpdateLibraryRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> UpdateLibraryRequest {
+        self.raw
+    }
+}
+
+impl From<UpdateLibraryRequest> for UpdateBetaLibrariesRequest {
+    fn from(raw: UpdateLibraryRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaLibrariesRequest> for UpdateLibraryRequest {
+    fn from(value: UpdateBetaLibrariesRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for UpdateBetaLibrariesRequest {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateBetaLibrariesResponse {
+    raw: Library,
+}
+
+impl UpdateBetaLibrariesResponse {
+    pub fn raw(&self) -> &Library {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Library {
+        self.raw
+    }
+}
+
+impl From<Library> for UpdateBetaLibrariesResponse {
+    fn from(raw: Library) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaLibrariesResponse> for Library {
+    fn from(value: UpdateBetaLibrariesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct UpdateBetaObservabilityDatasetsRequest {
     raw: UpdateDatasetRequest,
 }
@@ -23313,110 +23309,6 @@ impl From<UpdateBetaObservabilityJudgesRequestOutputJudgeRegressionOutput>
     for JudgeRegressionOutput
 {
     fn from(value: UpdateBetaObservabilityJudgesRequestOutputJudgeRegressionOutput) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct UpdateBetaPromptsRequest {
-    raw: PromptsUpdateRequest,
-}
-
-impl UpdateBetaPromptsRequest {
-    pub fn raw(&self) -> &PromptsUpdateRequest {
-        &self.raw
-    }
-    pub fn into_raw(self) -> PromptsUpdateRequest {
-        self.raw
-    }
-}
-
-impl From<PromptsUpdateRequest> for UpdateBetaPromptsRequest {
-    fn from(raw: PromptsUpdateRequest) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<UpdateBetaPromptsRequest> for PromptsUpdateRequest {
-    fn from(value: UpdateBetaPromptsRequest) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct UpdateBetaPromptsResponse {
-    raw: Prompt,
-}
-
-impl UpdateBetaPromptsResponse {
-    pub fn raw(&self) -> &Prompt {
-        &self.raw
-    }
-    pub fn into_raw(self) -> Prompt {
-        self.raw
-    }
-}
-
-impl From<Prompt> for UpdateBetaPromptsResponse {
-    fn from(raw: Prompt) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<UpdateBetaPromptsResponse> for Prompt {
-    fn from(value: UpdateBetaPromptsResponse) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct UpdateBetaSkillsRequest {
-    raw: SkillsUpdateRequest,
-}
-
-impl UpdateBetaSkillsRequest {
-    pub fn raw(&self) -> &SkillsUpdateRequest {
-        &self.raw
-    }
-    pub fn into_raw(self) -> SkillsUpdateRequest {
-        self.raw
-    }
-}
-
-impl From<SkillsUpdateRequest> for UpdateBetaSkillsRequest {
-    fn from(raw: SkillsUpdateRequest) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<UpdateBetaSkillsRequest> for SkillsUpdateRequest {
-    fn from(value: UpdateBetaSkillsRequest) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct UpdateBetaSkillsResponse {
-    raw: Skill,
-}
-
-impl UpdateBetaSkillsResponse {
-    pub fn raw(&self) -> &Skill {
-        &self.raw
-    }
-    pub fn into_raw(self) -> Skill {
-        self.raw
-    }
-}
-
-impl From<Skill> for UpdateBetaSkillsResponse {
-    fn from(raw: Skill) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<UpdateBetaSkillsResponse> for Skill {
-    fn from(value: UpdateBetaSkillsResponse) -> Self {
         value.into_raw()
     }
 }
@@ -23751,6 +23643,110 @@ impl From<UpdateIndexMetricsBetaRagSearchIndexesRequest>
 }
 
 pub type UpdateIndexMetricsBetaRagSearchIndexesResponse = serde_json::Value;
+
+#[derive(Debug, Clone)]
+pub struct UpdateMetadataBetaPromptsRequest {
+    raw: PromptsUpdateRequest,
+}
+
+impl UpdateMetadataBetaPromptsRequest {
+    pub fn raw(&self) -> &PromptsUpdateRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> PromptsUpdateRequest {
+        self.raw
+    }
+}
+
+impl From<PromptsUpdateRequest> for UpdateMetadataBetaPromptsRequest {
+    fn from(raw: PromptsUpdateRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateMetadataBetaPromptsRequest> for PromptsUpdateRequest {
+    fn from(value: UpdateMetadataBetaPromptsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateMetadataBetaPromptsResponse {
+    raw: Prompt,
+}
+
+impl UpdateMetadataBetaPromptsResponse {
+    pub fn raw(&self) -> &Prompt {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Prompt {
+        self.raw
+    }
+}
+
+impl From<Prompt> for UpdateMetadataBetaPromptsResponse {
+    fn from(raw: Prompt) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateMetadataBetaPromptsResponse> for Prompt {
+    fn from(value: UpdateMetadataBetaPromptsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateMetadataBetaSkillsRequest {
+    raw: SkillsUpdateRequest,
+}
+
+impl UpdateMetadataBetaSkillsRequest {
+    pub fn raw(&self) -> &SkillsUpdateRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> SkillsUpdateRequest {
+        self.raw
+    }
+}
+
+impl From<SkillsUpdateRequest> for UpdateMetadataBetaSkillsRequest {
+    fn from(raw: SkillsUpdateRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateMetadataBetaSkillsRequest> for SkillsUpdateRequest {
+    fn from(value: UpdateMetadataBetaSkillsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateMetadataBetaSkillsResponse {
+    raw: Skill,
+}
+
+impl UpdateMetadataBetaSkillsResponse {
+    pub fn raw(&self) -> &Skill {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Skill {
+        self.raw
+    }
+}
+
+impl From<Skill> for UpdateMetadataBetaSkillsResponse {
+    fn from(raw: Skill) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateMetadataBetaSkillsResponse> for Skill {
+    fn from(value: UpdateMetadataBetaSkillsResponse) -> Self {
+        value.into_raw()
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct UpdateModelsRequest {

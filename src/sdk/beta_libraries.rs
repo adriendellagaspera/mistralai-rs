@@ -134,11 +134,11 @@ impl<'a> BetaLibraries<'a> {
             .map_err(Into::into)
     }
 
-    pub async fn patch(
+    pub async fn update(
         &self,
         library_id: impl AsRef<str>,
-        request: PatchBetaLibrariesRequest,
-    ) -> Result<PatchBetaLibrariesResponse, SdkError> {
+        request: UpdateBetaLibrariesRequest,
+    ) -> Result<UpdateBetaLibrariesResponse, SdkError> {
         self.raw
             .libraries_patch_v1(library_id.as_ref(), request.into_raw())
             .await

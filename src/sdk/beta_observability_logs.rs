@@ -2,12 +2,12 @@
 use super::*;
 use crate::generated::client::HttpClient;
 #[derive(Debug, Clone)]
-pub struct GetLogFieldOptionsBetaObservabilityLogsRequest {
+pub struct FetchOptionsBetaObservabilityLogsRequest {
     field_name: String,
     from: Option<String>,
     to: Option<String>,
 }
-impl GetLogFieldOptionsBetaObservabilityLogsRequest {
+impl FetchOptionsBetaObservabilityLogsRequest {
     pub fn new(field_name: impl Into<String>) -> Self {
         Self {
             field_name: field_name.into(),
@@ -36,10 +36,10 @@ impl<'a> BetaObservabilityLogs<'a> {
     pub(crate) fn new(raw: &'a HttpClient) -> Self {
         Self { raw }
     }
-    pub async fn get_log_field_options(
+    pub async fn fetch_options(
         &self,
-        request: GetLogFieldOptionsBetaObservabilityLogsRequest,
-    ) -> Result<GetLogFieldOptionsBetaObservabilityLogsResponse, SdkError> {
+        request: FetchOptionsBetaObservabilityLogsRequest,
+    ) -> Result<FetchOptionsBetaObservabilityLogsResponse, SdkError> {
         self.raw
             .get_log_field_options_v1_observability_logs_fields_field_name_options_get(
                 request.field_name.as_str(),
@@ -51,9 +51,7 @@ impl<'a> BetaObservabilityLogs<'a> {
             .map_err(Into::into)
     }
 
-    pub async fn get_log_fields(
-        &self,
-    ) -> Result<GetLogFieldsBetaObservabilityLogsResponse, SdkError> {
+    pub async fn list(&self) -> Result<ListBetaObservabilityLogsResponse, SdkError> {
         self.raw
             .get_log_fields_v1_observability_logs_fields_get()
             .await
@@ -61,14 +59,14 @@ impl<'a> BetaObservabilityLogs<'a> {
             .map_err(Into::into)
     }
 
-    pub async fn search_logs(
+    pub async fn search(
         &self,
         from: Option<String>,
         to: Option<String>,
         page_size: Option<i64>,
         cursor: Option<String>,
-        request: SearchLogsBetaObservabilityLogsRequest,
-    ) -> Result<SearchLogsBetaObservabilityLogsResponse, SdkError> {
+        request: SearchBetaObservabilityLogsRequest,
+    ) -> Result<SearchBetaObservabilityLogsResponse, SdkError> {
         self.raw
             .search_logs_v1_observability_logs_search_post(
                 from,

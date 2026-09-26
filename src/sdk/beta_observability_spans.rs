@@ -3,12 +3,12 @@ use super::*;
 use crate::generated::client::HttpClient;
 
 #[derive(Debug, Clone)]
-pub struct GetSpanEvaluationFieldOptionsBetaObservabilitySpansRequest {
+pub struct FetchSpanEvalFieldOptionsBetaObservabilitySpansRequest {
     field_name: String,
     from: Option<String>,
     to: Option<String>,
 }
-impl GetSpanEvaluationFieldOptionsBetaObservabilitySpansRequest {
+impl FetchSpanEvalFieldOptionsBetaObservabilitySpansRequest {
     pub fn new(field_name: impl Into<String>) -> Self {
         Self {
             field_name: field_name.into(),
@@ -29,12 +29,12 @@ impl GetSpanEvaluationFieldOptionsBetaObservabilitySpansRequest {
 }
 
 #[derive(Debug, Clone)]
-pub struct GetSpanFieldOptionsBetaObservabilitySpansRequest {
+pub struct FetchSpanFieldOptionsBetaObservabilitySpansRequest {
     field_name: String,
     from: Option<String>,
     to: Option<String>,
 }
-impl GetSpanFieldOptionsBetaObservabilitySpansRequest {
+impl FetchSpanFieldOptionsBetaObservabilitySpansRequest {
     pub fn new(field_name: impl Into<String>) -> Self {
         Self {
             field_name: field_name.into(),
@@ -63,12 +63,12 @@ impl<'a> BetaObservabilitySpans<'a> {
     pub(crate) fn new(raw: &'a HttpClient) -> Self {
         Self { raw }
     }
-    pub async fn aggregate_spans(
+    pub async fn aggregate(
         &self,
         from: Option<String>,
         to: Option<String>,
-        request: AggregateSpansBetaObservabilitySpansRequest,
-    ) -> Result<AggregateSpansBetaObservabilitySpansResponse, SdkError> {
+        request: AggregateBetaObservabilitySpansRequest,
+    ) -> Result<AggregateBetaObservabilitySpansResponse, SdkError> {
         self.raw
             .aggregate_spans_v1_observability_spans_aggregate_post(from, to, request.into_raw())
             .await
@@ -76,27 +76,17 @@ impl<'a> BetaObservabilitySpans<'a> {
             .map_err(Into::into)
     }
 
-    pub async fn get_span_evaluation_field_options(
+    pub async fn fetch_span_eval_field_options(
         &self,
-        request: GetSpanEvaluationFieldOptionsBetaObservabilitySpansRequest,
-    ) -> Result<GetSpanEvaluationFieldOptionsBetaObservabilitySpansResponse, SdkError> {
+        request: FetchSpanEvalFieldOptionsBetaObservabilitySpansRequest,
+    ) -> Result<FetchSpanEvalFieldOptionsBetaObservabilitySpansResponse, SdkError> {
         self.raw.get_span_evaluation_field_options_v1_observability_spans_evaluations_fields_field_name_options_get(request.field_name.as_str(), request.from.as_deref(), request.to.as_deref()).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn get_span_evaluation_fields(
+    pub async fn fetch_span_field_options(
         &self,
-    ) -> Result<GetSpanEvaluationFieldsBetaObservabilitySpansResponse, SdkError> {
-        self.raw
-            .get_span_evaluation_fields_v1_observability_spans_evaluations_fields_get()
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
-    }
-
-    pub async fn get_span_field_options(
-        &self,
-        request: GetSpanFieldOptionsBetaObservabilitySpansRequest,
-    ) -> Result<GetSpanFieldOptionsBetaObservabilitySpansResponse, SdkError> {
+        request: FetchSpanFieldOptionsBetaObservabilitySpansRequest,
+    ) -> Result<FetchSpanFieldOptionsBetaObservabilitySpansResponse, SdkError> {
         self.raw
             .get_span_field_options_v1_observability_spans_fields_field_name_options_get(
                 request.field_name.as_str(),
@@ -108,9 +98,19 @@ impl<'a> BetaObservabilitySpans<'a> {
             .map_err(Into::into)
     }
 
-    pub async fn get_span_fields(
+    pub async fn list_span_eval_fields(
         &self,
-    ) -> Result<GetSpanFieldsBetaObservabilitySpansResponse, SdkError> {
+    ) -> Result<ListSpanEvalFieldsBetaObservabilitySpansResponse, SdkError> {
+        self.raw
+            .get_span_evaluation_fields_v1_observability_spans_evaluations_fields_get()
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn list_span_fields(
+        &self,
+    ) -> Result<ListSpanFieldsBetaObservabilitySpansResponse, SdkError> {
         self.raw
             .get_span_fields_v1_observability_spans_fields_get()
             .await

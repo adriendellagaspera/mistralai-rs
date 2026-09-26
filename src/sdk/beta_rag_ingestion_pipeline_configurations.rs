@@ -11,9 +11,9 @@ impl<'a> BetaRagIngestionPipelineConfigurations<'a> {
     pub(crate) fn new(raw: &'a HttpClient) -> Self {
         Self { raw }
     }
-    pub async fn get_configs(
+    pub async fn list(
         &self,
-    ) -> Result<GetConfigsBetaRagIngestionPipelineConfigurationsResponse, SdkError> {
+    ) -> Result<ListBetaRagIngestionPipelineConfigurationsResponse, SdkError> {
         self.raw
             .get_configs_v1_rag_ingestion_pipeline_configurations_get()
             .await
@@ -21,10 +21,10 @@ impl<'a> BetaRagIngestionPipelineConfigurations<'a> {
             .map_err(Into::into)
     }
 
-    pub async fn register_config(
+    pub async fn register(
         &self,
-        request: RegisterConfigBetaRagIngestionPipelineConfigurationsRequest,
-    ) -> Result<RegisterConfigBetaRagIngestionPipelineConfigurationsResponse, SdkError> {
+        request: RegisterBetaRagIngestionPipelineConfigurationsRequest,
+    ) -> Result<RegisterBetaRagIngestionPipelineConfigurationsResponse, SdkError> {
         self.raw
             .register_config_v1_rag_ingestion_pipeline_configurations_put(request.into_raw())
             .await

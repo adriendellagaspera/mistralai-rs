@@ -243,11 +243,11 @@ impl<'a> BetaPrompts<'a> {
             .map_err(Into::into)
     }
 
-    pub async fn update(
+    pub async fn update_metadata(
         &self,
         prompt_id: impl AsRef<str>,
-        request: UpdateBetaPromptsRequest,
-    ) -> Result<UpdateBetaPromptsResponse, SdkError> {
+        request: UpdateMetadataBetaPromptsRequest,
+    ) -> Result<UpdateMetadataBetaPromptsResponse, SdkError> {
         self.raw
             .prompts_update(prompt_id.as_ref(), request.into_raw())
             .await

@@ -179,23 +179,6 @@ impl<'a> BetaLibrariesDocuments<'a> {
             .map_err(Into::into)
     }
 
-    pub async fn patch(
-        &self,
-        library_id: impl AsRef<str>,
-        document_id: impl AsRef<str>,
-        request: PatchBetaLibrariesDocumentsRequest,
-    ) -> Result<PatchBetaLibrariesDocumentsResponse, SdkError> {
-        self.raw
-            .libraries_documents_patch_v1(
-                library_id.as_ref(),
-                document_id.as_ref(),
-                request.into_raw(),
-            )
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
-    }
-
     pub async fn reprocess(
         &self,
         library_id: impl AsRef<str>,
@@ -229,6 +212,23 @@ impl<'a> BetaLibrariesDocuments<'a> {
                 request.document_id.as_str(),
                 request.page_start.as_deref(),
                 request.page_end.as_deref(),
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn update(
+        &self,
+        library_id: impl AsRef<str>,
+        document_id: impl AsRef<str>,
+        request: UpdateBetaLibrariesDocumentsRequest,
+    ) -> Result<UpdateBetaLibrariesDocumentsResponse, SdkError> {
+        self.raw
+            .libraries_documents_patch_v1(
+                library_id.as_ref(),
+                document_id.as_ref(),
+                request.into_raw(),
             )
             .await
             .map(Into::into)
