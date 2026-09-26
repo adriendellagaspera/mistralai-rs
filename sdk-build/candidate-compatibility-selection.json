@@ -11,7 +11,11 @@
     "FimStreamChunk",
     "OcrRequest",
     "OcrResponse",
-    "OcrPage"
+    "OcrPage",
+    "EmbeddingInput",
+    "EmbeddingParams",
+    "EmbeddingResult",
+    "Embedding"
   ],
   "accessor_paths": {
     "ChatResponse.text": [
@@ -44,6 +48,9 @@
     ],
     "ocr": [
       "process"
+    ],
+    "embeddings": [
+      "create"
     ]
   }
 }
