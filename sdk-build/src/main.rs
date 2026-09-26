@@ -352,7 +352,7 @@ fn parse_args() -> Result<Options> {
         return fail(format!("unknown command: {command}"));
     }
     let mut require_parity = false;
-    while let Some(flag) = args.next() {
+    for flag in args {
         match flag.as_str() {
             "--require-parity" => require_parity = true,
             _ => return fail(format!("unknown argument: {flag}")),
