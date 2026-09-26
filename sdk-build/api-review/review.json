@@ -1,9 +1,6 @@
 {
   "schema_version": 1,
   "base": "b6441fc8b0df7fed630c311a18de090d50249d4d",
-  "allow_breaking_changes": true,
-  "release": "0.4.0",
-  "reason": "Reviewed 0.x cutover from the previous 173-operation facade to the canonical 288-operation Mistral OpenAPI surface; breaking changes are intentional and no legacy compatibility shims are carried.",
   "changed_rust_files": [
     "src/generated/client.rs",
     "src/generated/types.rs",
@@ -66,5 +63,7 @@
     "src/sdk/workflows_runs.rs",
     "src/sdk/workflows_schedules.rs",
     "src/sdk/workflows_workers.rs"
-  ]
+  ],
+  "allow_breaking_changes": true,
+  "rationale": "0.4.0 intentionally promotes the 288-operation canonical OpenAPI surface; breaking changes are reviewed and accepted for this pre-1.0 minor release."
 }
