@@ -30,7 +30,10 @@
     "ChatModerationInput",
     "ChatModerationParams",
     "ModerationResult",
-    "ModerationResultSet"
+    "ModerationResultSet",
+    "AgentView",
+    "AgentAliasResponseView",
+    "AgentListPageView"
   ],
   "accessor_paths": {
     "ChatResponse.text": [
@@ -79,6 +82,15 @@
       "classify_chat",
       "moderate",
       "moderate_chat"
+    ],
+    "beta_agents": [
+      "create_version_alias",
+      "delete",
+      "delete_version_alias",
+      "get",
+      "get_version",
+      "list_pages",
+      "update_version"
     ]
   }
 }
