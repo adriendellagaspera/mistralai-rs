@@ -68,7 +68,8 @@ fn canonical_request_builders_serialize_to_the_openapi_contract() {
 
     let classification_input: ClassificationRequestInput =
         serde_json::from_value(serde_json::json!("safe text")).unwrap();
-    let classify = ClassifyClassifiersRequest::new(classification_input.clone(), "classifier-model");
+    let classify =
+        ClassifyClassifiersRequest::new(classification_input.clone(), "classifier-model");
     let moderate =
         ModerateClassifiersRequest::new(classification_input, "mistral-moderation-latest");
     assert_eq!(
@@ -87,6 +88,7 @@ fn canonical_request_builders_serialize_to_the_openapi_contract() {
     assert_eq!(fim.prompt, "fn answer() -> ");
     assert_eq!(fim.max_tokens, Some(Some(64)));
 
-    let update = serde_json::to_value(UpdateModelsRequest::new().name("new name").into_raw()).unwrap();
+    let update =
+        serde_json::to_value(UpdateModelsRequest::new().name("new name").into_raw()).unwrap();
     assert_eq!(update, serde_json::json!({"name": "new name"}));
 }
