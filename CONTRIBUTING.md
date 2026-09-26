@@ -26,13 +26,13 @@ git diff -- sdk-build src/generated src/sdk
 
 `sdk-build/openapi/update.py` updates the verified official published mirror and source pin, and refreshes licenses. The private Rust builder validates the pinned source checksum, dialect and reviewed overlay assumptions without Python. `sdk-build/official-sdks/update.py` harvests pinned Python and TypeScript public paths; neither changes the OpenAPI wire contract. Optional `GH_TOKEN` is used only for GitHub API requests.
 
-An upstream source update may require review of `sdk-build/coverage-baseline.json` or `sdk-build/compatibility-definition.json`. Never relax the strict compatibility gate or change public methods silently to make an update pass. Uncovered new operations remain available through `mistralai::raw` until a separately reviewed SDK surface change.
+An upstream source update may require review of `sdk-build/coverage-baseline.json` and the five transport overrides in `sdk-build/sdk-overrides.json`. Never relax the strict coverage gate or change public methods silently to make an update pass. The complete canonical facade is derived from the pinned source.
 
 ## Build boundaries
 
 The build runs the pinned `openapi-to-rust` raw generator and `openapi-to-rust-bindings` adapter, then uses the backend-neutral `rust-sdk-generator` in two independent modes. Canonical derivation must account for every source operation; generation from the reviewed compatibility definition must reproduce the committed public SDK exactly.
 
-The frozen compatibility definition is an explicit public API contract, not a copy of generated Rust source. It can be changed only through an intentional public API review. Generic compiler changes belong in `rust-sdk-generator`; wire-contract corrections belong in reviewed OpenAPI overlays. Do not maintain endpoint-specific generator heuristics in this repository.
+The derived SDK definition is generated from the pinned source, not maintained as a legacy compatibility contract. Generic compiler changes belong in `rust-sdk-generator`; wire-contract corrections belong in reviewed OpenAPI overlays. Do not maintain endpoint-specific generator heuristics in this repository.
 
 Never edit `src/generated/` or generated Rust in `src/sdk/` by hand. Generated changes belong to pinned source/configuration updates and must pass determinism, coverage, exact facade parity, compilation, tests and compiler-aware semver review.
 
@@ -42,4 +42,10 @@ Never edit `src/generated/` or generated Rust in `src/sdk/` by hand. Generated c
 
 ## Automated updates
 
-The scheduled source-update workflow creates a candidate PR for changed source pins, including a blocked PR with the failed stage recorded when generation or validation fails. On a source incompatibility, it fails closed instead of silently changing the public SDK. Review source pins, generated changes, coverage and semver before merging. No workflow automatically publishes a release.
+The scheduled source-update workflow creates a candidate PR for changed source pins, including a blocked PR with the failed stage recorded when generation or validation fails. On a source incompatibility, it fails closed instead of silently changing the public SDK. Review source pins, generated changes, coverage and semver before merging.
+
+## Publishing
+
+The package name is `mistralai-sdk` and the library import is `mistralai`. The first crates.io release needs a manual upload by a crate owner: crates.io does not allow a trusted publisher to create a new crate. After the release commit passes CI, run `cargo publish --dry-run --locked` and `cargo publish --locked` from that commit using your own crates.io account. The first upload permanently reserves the name and version.
+
+Then configure the crate's GitHub trusted publisher for repository `adriendellagaspera/mistralai-rs` and workflow file `publish.yml`. Later, push a tag matching the `Cargo.toml` version (`v0.4.1`, for example) to trigger [Publish crate](.github/workflows/publish.yml). Its preflight checks the registry and package, publishes with a short-lived credential, and creates a GitHub Release. Rerunning the workflow for an already published version skips the upload.
