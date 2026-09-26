@@ -7,6 +7,7 @@ description = "Unofficial Mistral AI SDK reproducibly generated from the officia
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/adriendellagaspera/mistralai-rs"
 readme = "README.md"
+publish = ["crates-io"]
 keywords = ["mistral", "openapi", "sdk", "ai"]
 categories = ["api-bindings", "asynchronous"]
 
