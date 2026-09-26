@@ -12,6 +12,8 @@ categories = ["api-bindings", "asynchronous"]
 
 [lib]
 name = "mistralai"
+# Upstream OpenAPI descriptions are documentation, not executable Rust examples.
+doctest = false
 
 # Keep aligned with src/generated/REQUIRED_DEPS.toml.
 [dependencies]
