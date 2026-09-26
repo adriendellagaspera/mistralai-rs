@@ -1,12 +1,13 @@
 {
   "schema_version": 1,
-  "source": "173-operation pinned OpenAPI baseline; reject new rejections and unreviewed overrides",
-  "total_operations": 173,
+  "source": "288-operation pinned OpenAPI baseline; reject new rejections and unreviewed overrides",
+  "total_operations": 288,
   "previously_rejected_operations": [],
   "approved_overridden_operations": [
     "chat_completion_v1_chat_completions_post",
     "files_api_routes_download_file",
     "fim_completion_v1_fim_completions_post",
+    "get_voice_sample_audio_v1_audio_voices__voice_id__sample_get",
     "speech_v1_audio_speech_post"
   ]
 }
