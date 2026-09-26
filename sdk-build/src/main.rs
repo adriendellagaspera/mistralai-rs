@@ -612,7 +612,9 @@ fn candidate_compatibility_definition(root: &Path, derived: &Value) -> Result<Va
         let accessor = accessors
             .get_mut(accessor_name)
             .ok_or("selected accessor is missing")?;
-        let path = path.as_array().ok_or("selected accessor path must be an array")?;
+        let path = path
+            .as_array()
+            .ok_or("selected accessor path must be an array")?;
         if path.iter().any(|segment| !segment.is_string()) {
             return fail("selected accessor path must contain only strings");
         }
