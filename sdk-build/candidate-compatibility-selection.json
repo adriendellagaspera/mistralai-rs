@@ -4,10 +4,23 @@
     "Message",
     "ChatRequest",
     "ChatResponse",
-    "ChatStreamChunk"
+    "ChatStreamChunk",
+    "StopSequences",
+    "FimRequest",
+    "FimResponse",
+    "FimStreamChunk"
   ],
   "accessor_paths": {
     "ChatResponse.text": [
+      "choices",
+      "first",
+      "message",
+      "optional",
+      "content",
+      "optional",
+      "optional"
+    ],
+    "FimResponse.text": [
       "choices",
       "first",
       "message",
@@ -19,6 +32,10 @@
   },
   "operations": {
     "chat": [
+      "complete",
+      "stream"
+    ],
+    "fim": [
       "complete",
       "stream"
     ]
