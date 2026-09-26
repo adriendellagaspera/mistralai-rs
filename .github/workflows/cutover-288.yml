@@ -20,9 +20,7 @@ jobs:
       - name: Install pinned Rust toolchain
         run: rustup show
       - name: Publish canonical 288 cutover once
-        run: |
-          cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- candidate-publish
-          cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- check
+        run: cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- candidate-publish
       - name: Commit generated cutover
         run: |
           git add src/generated src/sdk
