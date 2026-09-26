@@ -952,6 +952,12 @@ fn verify_candidate_derivation(
     }
     copy_dir(&facade, &review_source)?;
 
+    if publish_outputs {
+        publish(root, work, &generated, &facade)?;
+        println!("Published canonical 288 SDK facade without legacy compatibility shims.");
+        return Ok(());
+    }
+
     let compatible_definition =
         candidate_compatibility_definition(root, field(&derivation, "definition")?)?;
     let compatible_definition_path = target.join("candidate-compatible-definition.json");
@@ -983,10 +989,6 @@ fn verify_candidate_derivation(
         fs::remove_dir_all(&compatible_review_source)?;
     }
     copy_dir(&compatible_facade, &compatible_review_source)?;
-
-    if publish_outputs {
-        publish(root, work, &generated, &compatible_facade)?;
-    }
 
     println!(
         "{}",
