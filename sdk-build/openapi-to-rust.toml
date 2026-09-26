@@ -1,6 +1,6 @@
 [generator]
 spec_path = "openapi/published.yaml"
-overlays = ["openapi/overlays/rust-sdk.overlay.yaml"]
+overlays = ["openapi/overlays/public-288.overlay.yaml"]
 overlay_output = "openapi/overlaid.json"
 output_dir = "../src/generated"
 module_name = "mistralai"
