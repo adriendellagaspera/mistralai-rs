@@ -539,9 +539,8 @@ mod tests {
         let active =
             read_json(&root.join("sdk-build/sdk-overrides.json")).expect("active overrides");
         assert_eq!(
-            active["operations"]
-                ["get_voice_sample_audio_v1_audio_voices__voice_id__sample_get"]
-                ["response_representations"]["audio.voices.get_sample_audio"],
+            active["operations"]["get_voice_sample_audio_v1_audio_voices__voice_id__sample_get"]["response_representations"]
+                ["audio.voices.get_sample_audio"],
             "binary_stream"
         );
     }
