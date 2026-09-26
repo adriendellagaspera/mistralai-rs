@@ -348,13 +348,11 @@ pub(crate) fn verify_bindings_coverage(bindings: &Value, spec: &Value) -> Result
         let method = string(origin, "method")?;
         let path = string(origin, "path")?;
         let Some(expected) = source.get(id) else {
-            return fail(format!(
-                "Bindings operation {name} has unknown source {id}"
-            ));
+            return fail(format!("Bindings operation {name} has unknown source {id}"));
         };
-        let expected_path = exact_paths.get(id).ok_or_else(|| {
-            std::io::Error::other(format!("source path missing for {id}"))
-        })?;
+        let expected_path = exact_paths
+            .get(id)
+            .ok_or_else(|| std::io::Error::other(format!("source path missing for {id}")))?;
         if expected["method"].as_str() != Some(method) || expected_path != path {
             return fail(format!(
                 "Bindings source identity drift for {name}: {method} {path}"
@@ -439,9 +437,7 @@ pub(crate) fn verify_bindings_coverage(bindings: &Value, spec: &Value) -> Result
         let buffered_id = buffered_ids[0];
 
         let stream_bindings = call_shape_metadata.get(stream_id).ok_or_else(|| {
-            std::io::Error::other(format!(
-                "stream source {stream_id} has no call shape"
-            ))
+            std::io::Error::other(format!("stream source {stream_id} has no call shape"))
         })?;
         let mut proved_stream = false;
         for metadata in stream_bindings {
@@ -460,9 +456,7 @@ pub(crate) fn verify_bindings_coverage(bindings: &Value, spec: &Value) -> Result
         }
 
         let buffered_bindings = call_shape_metadata.get(buffered_id).ok_or_else(|| {
-            std::io::Error::other(format!(
-                "buffered source {buffered_id} has no call shape"
-            ))
+            std::io::Error::other(format!("buffered source {buffered_id} has no call shape"))
         })?;
         let mut proved_buffered = false;
         for metadata in buffered_bindings {
