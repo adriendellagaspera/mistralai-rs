@@ -48,7 +48,7 @@ def require_api_review(base: str, changed_files: list[str], review: dict) -> Non
         )
 
 
-def check_rustdoc_semver(base: str) -> None:
+def check_rustdoc_semver(base: str, *, allow_breaking: bool) -> None:
     lock = json.loads((ROOT / "sdk-build" / "provenance.lock.json").read_text())
     version = lock["cargo_semver_checks_version"]
     executable = ROOT / ".tools" / f"cargo-semver-checks-{version}" / "bin" / "cargo-semver-checks"
@@ -64,11 +64,15 @@ def check_rustdoc_semver(base: str) -> None:
     ).strip()
     if actual_version != f"cargo-semver-checks {version}":
         raise ValueError(f"Unexpected semver tool version: {actual_version}")
-    subprocess.run(
+    result = subprocess.run(
         [str(executable), "semver-checks", "--baseline-rev", base],
         cwd=ROOT,
-        check=True,
+        check=False,
     )
+    if result.returncode and not allow_breaking:
+        raise SystemExit(result.returncode)
+    if result.returncode:
+        print("cargo-semver-checks reported reviewed breaking changes; allowed for this 0.x release")
 
 
 def main() -> None:
@@ -82,7 +86,7 @@ def main() -> None:
     review = json.loads(REVIEW.read_text()) if REVIEW.exists() else {}
     require_api_review(base, changed_files, review)
     if args.rustdoc:
-        check_rustdoc_semver(base)
+        check_rustdoc_semver(base, allow_breaking=bool(review.get("allow_breaking_changes")))
 
 
 if __name__ == "__main__":
