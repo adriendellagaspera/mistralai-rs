@@ -19,14 +19,14 @@ rust-sdk-generator
 src/generated + src/sdk
 ```
 
-`check` regenerates everything in isolation and requires exact parity with the checked-in raw bindings and facade. `generate` runs the same gates and atomically publishes the canonical outputs. No legacy compatibility definition is used by default.
+`check` regenerates everything in isolation and requires exact parity with the checked-in raw bindings and facade. `generate` runs the same gates and atomically publishes the canonical outputs. No legacy compatibility definition participates in the canonical build.
 
 | Command | Scope |
 | --- | --- |
 | `cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- check` | Verify pinned source, generation, coverage and public facade parity without mutating the checkout. |
 | `cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- generate` | Run the same gates and publish canonical raw + facade outputs atomically. |
 | `cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- raw` | Explicitly refresh the reviewed raw baseline before a full generation. |
-| `cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- probe` | Inspect canonical derivation; an explicit `--compatibility-definition PATH` remains diagnostic-only. |
+| `cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- probe` | Inspect canonical derivation without publishing. |
 
 The active source is `mistralai/platform-docs-public/public/openapi.yaml`, vendored as `openapi/published.yaml` and pinned in `provenance.lock.json`. Source discovery remains an explicit Python maintenance action via `openapi/update.py`; routine generation is Rust-only and network-independent apart from installing immutable pinned tools when absent.
 
