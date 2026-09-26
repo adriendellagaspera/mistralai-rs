@@ -13,7 +13,7 @@ executable contracts; implementation detail belongs beside the code that owns it
 - `sdk-build/openapi/`: immutable upstream source, reviewed overlays and updates.
 - `sdk-build/official-sdks/`: pinned Mistral SDK source discovery and evidence (Python, independent of routine build).
 - `sdk-build/api-review/`: independent Python public API and compiler-aware semver review.
-- `sdk-build/`: Mistral compatibility definition, pinned provenance and coverage inputs.
+- `sdk-build/`: Mistral transport overrides, pinned provenance and coverage inputs.
 - `.github/scripts/`: repository policy, PR-title validation and scheduled-update PR reporting.
 
 ## Canonical local checks
