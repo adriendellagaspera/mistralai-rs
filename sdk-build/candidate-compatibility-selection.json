@@ -15,7 +15,11 @@
     "EmbeddingInput",
     "EmbeddingParams",
     "EmbeddingResult",
-    "Embedding"
+    "Embedding",
+    "VoiceCreateRequestParams",
+    "VoiceUpdateRequestParams",
+    "VoiceResponseView",
+    "VoiceListResponseView"
   ],
   "accessor_paths": {
     "ChatResponse.text": [
@@ -51,6 +55,13 @@
     ],
     "embeddings": [
       "create"
+    ],
+    "audio_voices": [
+      "create",
+      "delete",
+      "get",
+      "list",
+      "update"
     ]
   }
 }
