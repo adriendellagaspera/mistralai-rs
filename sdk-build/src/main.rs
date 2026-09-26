@@ -793,7 +793,10 @@ fn verify_candidate_derivation(
         field(&derivation, "definition")?,
         &bindings_value,
     )?;
-    write_json(&target.join("candidate-compatibility-inventory.json"), &compatibility)?;
+    write_json(
+        &target.join("candidate-compatibility-inventory.json"),
+        &compatibility,
+    )?;
 
     let runtime = work.join("runtime.json");
     write_json(&runtime, &runtime_config())?;
