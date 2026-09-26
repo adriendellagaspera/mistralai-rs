@@ -822,6 +822,11 @@ fn verify_candidate_derivation(
         root,
     )?;
     compile_candidate_facade(root, version, &generated, &facade, work)?;
+    let review_source = target.join("candidate-facade-source");
+    if review_source.exists() {
+        fs::remove_dir_all(&review_source)?;
+    }
+    copy_dir(&facade, &review_source)?;
 
     println!(
         "{}",
