@@ -19,10 +19,10 @@ jobs:
           persist-credentials: true
       - name: Install pinned Rust toolchain
         run: rustup show
-      - name: Publish canonical active 288 outputs
+      - name: Publish canonical 288 cutover once
         run: |
-          cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- raw
-          cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- generate
+          cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- candidate-publish
+          cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- check
       - name: Commit generated cutover
         run: |
           git add src/generated src/sdk
