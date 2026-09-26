@@ -4,7 +4,7 @@ mod sources;
 use gates::{
     Result, committed_facade, copy_dir, facade_delta, fail, field, raw_coverage, read_json,
     require_publish_parity, snapshot, string, validate_coverage, verify_bindings_coverage,
-    verify_candidate_overlaid, verify_overlaid, verify_raw_baseline, verify_raw_coverage,
+    verify_overlaid, verify_raw_baseline, verify_raw_coverage,
     write_json,
 };
 use serde_json::{Value, json};
@@ -211,9 +211,7 @@ fn copy_inputs(root: &Path, work: &Path) -> Result<()> {
     for file in [
         "openapi-to-rust.toml",
         "sdk-overrides.json",
-        "sdk-overrides-candidate.json",
         "coverage-baseline.json",
-        "candidate-derivation-baseline.json",
     ] {
         fs::copy(from.join(file), to.join(file))?;
     }
@@ -330,101 +328,6 @@ fn publish(root: &Path, work: &Path, generated: &Path, compatible: &Path) -> Res
     Ok(())
 }
 
-fn candidate_config(build: &Path) -> Result<PathBuf> {
-    let source = build.join("openapi-to-rust.toml");
-    let mut config = fs::read_to_string(&source)?;
-    for (before, after) in [
-        (
-            "overlay_output = \"openapi/overlaid.json\"",
-            "overlay_output = \"openapi/overlaid-candidate.json\"",
-        ),
-        (
-            "output_dir = \"../src/generated\"",
-            "output_dir = \"../candidate-generated\"",
-        ),
-    ] {
-        if !config.contains(before) {
-            return fail(format!("candidate raw config anchor missing: {before}"));
-        }
-        config = config.replacen(before, after, 1);
-    }
-    let path = build.join("openapi-to-rust-candidate.toml");
-    fs::write(&path, config)?;
-    Ok(path)
-}
-
-fn compile_standalone_raw(root: &Path, version: &str, generated: &Path, work: &Path) -> Result<()> {
-    let crate_dir = work.join("candidate-raw-compile");
-    let crate_src = crate_dir.join("src");
-    fs::create_dir_all(&crate_src)?;
-    copy_dir(generated, &crate_src.join("generated"))?;
-    fs::write(
-        crate_src.join("lib.rs"),
-        "pub mod generated;\npub use generated::*;\n",
-    )?;
-    let dependencies = fs::read_to_string(generated.join("REQUIRED_DEPS.toml"))?;
-    let mut manifest = format!(
-        "[package]\nname = \"mistralai-candidate-raw-check\"\nversion = \"0.0.0\"\nedition = \"2024\"\nrust-version = \"{version}\"\n\n[workspace]\n\n{dependencies}"
-    );
-    // Test-only runtime; the raw generator's REQUIRED_DEPS.toml stays verbatim.
-    manifest.push_str(
-        "\n[dev-dependencies]\ntokio = { version = \"1\", features = [\"macros\", \"rt-multi-thread\"] }\n",
-    );
-    fs::write(crate_dir.join("Cargo.toml"), manifest)?;
-    run(
-        "cargo",
-        vec![
-            format!("+{version}"),
-            "check".into(),
-            "--manifest-path".into(),
-            str_arg(&crate_dir.join("Cargo.toml")),
-        ],
-        root,
-    )?;
-    let tests = crate_dir.join("tests");
-    fs::create_dir_all(&tests)?;
-    fs::copy(
-        root.join("sdk-build/fixtures/candidate-raw-nullable.rs"),
-        tests.join("request_json.rs"),
-    )?;
-    fs::copy(
-        root.join("sdk-build/fixtures/candidate-raw-parameter-wire.rs"),
-        tests.join("parameter_wire.rs"),
-    )?;
-    fs::copy(
-        root.join("sdk-build/fixtures/candidate-raw-optional-nullable-body.rs"),
-        tests.join("optional_nullable_body.rs"),
-    )?;
-    fs::copy(
-        root.join("sdk-build/fixtures/candidate-raw-required-json-root.rs"),
-        tests.join("required_json_root.rs"),
-    )?;
-    fs::copy(
-        root.join("sdk-build/fixtures/candidate-raw-typed-sse.rs"),
-        tests.join("typed_sse.rs"),
-    )?;
-    run(
-        "cargo",
-        vec![
-            format!("+{version}"),
-            "test".into(),
-            "--manifest-path".into(),
-            str_arg(&crate_dir.join("Cargo.toml")),
-            "--test".into(),
-            "request_json".into(),
-            "--test".into(),
-            "parameter_wire".into(),
-            "--test".into(),
-            "optional_nullable_body".into(),
-            "--test".into(),
-            "required_json_root".into(),
-            "--test".into(),
-            "typed_sse".into(),
-        ],
-        root,
-    )
-}
-
 fn runtime_config() -> Value {
     json!({
         "error_type": "SdkError",
@@ -436,611 +339,29 @@ fn runtime_config() -> Value {
     })
 }
 
-fn compile_candidate_facade(
-    root: &Path,
-    version: &str,
-    raw: &Path,
-    facade: &Path,
-    work: &Path,
-) -> Result<()> {
-    let crate_dir = work.join("candidate-facade-compile");
-    let crate_src = crate_dir.join("src");
-    fs::create_dir_all(crate_src.join("sdk"))?;
-    copy_dir(raw, &crate_src.join("generated"))?;
-    copy_dir(facade, &crate_src.join("sdk"))?;
-    for file in ["lib.rs", "streaming.rs"] {
-        fs::copy(root.join("src").join(file), crate_src.join(file))?;
-    }
-    fs::copy(
-        root.join("src/sdk/error.rs"),
-        crate_src.join("sdk/error.rs"),
-    )?;
-
-    let dependencies = fs::read_to_string(raw.join("REQUIRED_DEPS.toml"))?;
-    if !dependencies.contains("[dependencies]\n") {
-        return fail("candidate raw dependency fragment lacks [dependencies]");
-    }
-    let dependencies = if dependencies
-        .lines()
-        .any(|line| line.starts_with("async-stream = "))
-    {
-        dependencies
-    } else {
-        dependencies.replacen(
-            "[dependencies]\n",
-            "[dependencies]\nasync-stream = \"0.3\"\n",
-            1,
-        )
-    };
-    let manifest = format!(
-        "[package]\nname = \"mistralai-candidate-facade-check\"\nversion = \"0.0.0\"\nedition = \"2024\"\nrust-version = \"{version}\"\n\n[workspace]\n\n{dependencies}"
-    );
-    fs::write(crate_dir.join("Cargo.toml"), manifest)?;
-    run(
-        "cargo",
-        vec![
-            format!("+{version}"),
-            "check".into(),
-            "--lib".into(),
-            "--manifest-path".into(),
-            str_arg(&crate_dir.join("Cargo.toml")),
-        ],
-        root,
-    )
-}
-
-fn candidate_compatibility_inventory(
-    root: &Path,
-    definition: &Value,
-    bindings: &Value,
-) -> Result<Value> {
-    let published = read_json(&root.join("sdk-build/compatibility-definition.json"))?;
-    let old_resources = field(&published, "resources")?
-        .as_object()
-        .ok_or("published resources must be an object")?;
-    let new_resources = field(definition, "resources")?
-        .as_object()
-        .ok_or("candidate resources must be an object")?;
-    let new_slots: BTreeSet<_> = new_resources
-        .iter()
-        .flat_map(|(resource, value)| {
-            value["operations"]
-                .as_object()
-                .into_iter()
-                .flat_map(move |operations| operations.keys().map(move |name| (resource, name)))
-        })
-        .collect();
-    let source_ids: BTreeSet<_> = field(bindings, "operations")?
-        .as_object()
-        .ok_or("candidate bindings operations must be an object")?
-        .values()
-        .filter_map(|operation| operation["metadata"]["source_operation"]["operation_id"].as_str())
-        .collect();
-    let mut published_slots = 0;
-    let mut retained_slots = 0;
-    let mut retired = Vec::new();
-    for (resource, value) in old_resources {
-        let operations = field(value, "operations")?
-            .as_object()
-            .ok_or("published resource operations must be an object")?;
-        for (name, operation) in operations {
-            published_slots += 1;
-            retained_slots += usize::from(new_slots.contains(&(resource, name)));
-            let id = string(operation, "operation_id")?;
-            if !source_ids.contains(id) {
-                retired.push(json!({"resource": resource, "method": name, "operation_id": id}));
-            }
-        }
-    }
-    let old_models = field(&published, "models")?
-        .as_object()
-        .ok_or("published models must be an object")?;
-    let mut raw_symbols = BTreeSet::new();
-    for category in ["structs", "enums", "aliases"] {
-        raw_symbols.extend(
-            field(bindings, category)?
-                .as_object()
-                .ok_or("candidate raw symbols must be an object")?
-                .keys()
-                .map(String::as_str),
-        );
-    }
-    let missing_raw_models: BTreeMap<_, _> = old_models
-        .iter()
-        .filter_map(|(name, model)| {
-            let raw = model["raw"].as_str()?;
-            (!raw_symbols.contains(raw)).then_some((name.clone(), raw.to_owned()))
-        })
-        .collect();
-    Ok(json!({
-        "schema_version": 1,
-        "published_operation_slots": published_slots,
-        "candidate_operation_slots": new_slots.len(),
-        "retained_operation_paths": retained_slots,
-        "retired_source_operations": retired,
-        "published_models": old_models.len(),
-        "missing_published_raw_models": missing_raw_models
-    }))
-}
-
-fn candidate_compatibility_definition(root: &Path, derived: &Value) -> Result<Value> {
-    let selection = read_json(&root.join("sdk-build/candidate-compatibility-selection.json"))?;
-    if field(&selection, "schema_version")?.as_u64() != Some(1) {
-        return fail("unsupported candidate compatibility selection version");
-    }
-    let published = read_json(&root.join("sdk-build/compatibility-definition.json"))?;
-    let mut candidate = derived.clone();
-    for name in field(&selection, "models")?
-        .as_array()
-        .ok_or("selected compatibility models must be an array")?
-    {
-        let name = name
-            .as_str()
-            .ok_or("selected model name must be a string")?;
-        let model = field(field(&published, "models")?, name)?.clone();
-        let models = candidate
-            .get_mut("models")
-            .and_then(Value::as_object_mut)
-            .ok_or("candidate models must be an object")?;
-        if models.insert(name.to_owned(), model).is_some() {
-            return fail(format!(
-                "candidate compatibility model already exists: {name}"
-            ));
-        }
-    }
-    let accessor_paths = field(&selection, "accessor_paths")?
-        .as_object()
-        .ok_or("selected accessor paths must be an object")?;
-    for (qualified, path) in accessor_paths {
-        let (model_name, accessor_name) = qualified
-            .split_once('.')
-            .ok_or("selected accessor must be model.name")?;
-        let accessors = candidate
-            .get_mut("models")
-            .and_then(|models| models.get_mut(model_name))
-            .and_then(|model| model.get_mut("accessors"))
-            .and_then(Value::as_object_mut)
-            .ok_or("selected model accessors are missing")?;
-        let accessor = accessors
-            .get_mut(accessor_name)
-            .ok_or("selected accessor is missing")?;
-        let path = path
-            .as_array()
-            .ok_or("selected accessor path must be an array")?;
-        if path.iter().any(|segment| !segment.is_string()) {
-            return fail("selected accessor path must contain only strings");
-        }
-        accessor["path"] = Value::Array(path.clone());
-    }
-    let selections = field(&selection, "operations")?
-        .as_object()
-        .ok_or("selected compatibility operations must be an object")?;
-    for (resource, names) in selections {
-        for name in names
-            .as_array()
-            .ok_or("selected resource operations must be an array")?
-        {
-            let name = name
-                .as_str()
-                .ok_or("selected operation name must be a string")?;
-            let replacement = field(
-                field(
-                    field(field(&published, "resources")?, resource)?,
-                    "operations",
-                )?,
-                name,
-            )?
-            .clone();
-            let operations = candidate
-                .get_mut("resources")
-                .and_then(Value::as_object_mut)
-                .and_then(|resources| resources.get_mut(resource))
-                .and_then(|value| value.get_mut("operations"))
-                .and_then(Value::as_object_mut)
-                .ok_or("candidate resource operations must be an object")?;
-            let existing = operations
-                .get(name)
-                .ok_or("selected operation is missing in candidate")?;
-            if field(existing, "operation_id")? != field(&replacement, "operation_id")? {
-                return fail(format!("source identity drift for {resource}.{name}"));
-            }
-            operations.insert(name.to_owned(), replacement);
-        }
-    }
-    Ok(candidate)
-}
-
-fn verify_candidate_compatibility_signatures(root: &Path, facade: &Path) -> Result<()> {
-    fn signature(source: &str, name: &str) -> Result<String> {
-        let start = source
-            .find(&format!("pub async fn {name}("))
-            .ok_or_else(|| format!("public async method missing: {name}"))?;
-        let rest = &source[start..];
-        let end = rest.find('{').ok_or("public async method has no body")?;
-        Ok(rest[..end]
-            .split_whitespace()
-            .collect::<String>()
-            .replace(",)", ")"))
-    }
-
-    let selection = read_json(&root.join("sdk-build/candidate-compatibility-selection.json"))?;
-    let resources = field(&selection, "operations")?
-        .as_object()
-        .ok_or("selected compatibility operations must be an object")?;
-    for (resource, names) in resources {
-        let file = format!("{resource}.rs");
-        let published = fs::read_to_string(root.join("src/sdk").join(&file))?;
-        let candidate = fs::read_to_string(facade.join(file))?;
-        for name in names
-            .as_array()
-            .ok_or("selected resource operations must be an array")?
-        {
-            let name = name
-                .as_str()
-                .ok_or("selected operation name must be a string")?;
-            if signature(&published, name)? != signature(&candidate, name)? {
-                return fail(format!("public signature drift for {resource}.{name}"));
-            }
-        }
-    }
-    Ok(())
-}
-
-fn verify_candidate_raw(
-    root: &Path,
-    lock: &Value,
-    version: &str,
-    raw: &Path,
-    bindings: &Path,
-) -> Result<()> {
-    let temp = Workspace::new(root)?;
-    let work = &temp.0;
-    copy_inputs(root, work)?;
-    let build = work.join("sdk-build");
-    let config = candidate_config(&build)?;
-    let published = build.join("openapi/public-288.yaml");
-    let overlaid = build.join("openapi/overlaid-candidate.json");
-    let generated = work.join("candidate-generated");
-    let raw_args = vec!["generate".into(), "--config".into(), str_arg(&config)];
-
-    run(raw, raw_args.clone(), root)?;
-    let first = fs::read(&overlaid)?;
-    let spec: Value = serde_json::from_slice(&first)?;
-    verify_candidate_overlaid(&spec)?;
-    run(raw, raw_args.clone(), root)?;
-    if fs::read(&overlaid)? != first {
-        return fail("candidate overlaid OpenAPI is not byte-for-byte deterministic");
-    }
-    let mut check = raw_args.clone();
-    check.push("--check".into());
-    run(raw, check, root)?;
-    let mut dry_run = raw_args;
-    dry_run.push("--dry-run".into());
-    run(raw, dry_run, root)?;
-    if fs::read(&published)? != fs::read(root.join("sdk-build/openapi/public-288.yaml"))? {
-        return fail("candidate raw generation modified the staged OpenAPI");
-    }
-
-    format_rust(root, version, &generated)?;
-    let coverage = raw_coverage(&generated, &spec)?;
-    write_json(&generated.join("coverage.json"), &coverage)?;
-    let candidate = field(lock, "openapi_candidate")?;
-    let expected_operations = candidate["operations"]
-        .as_u64()
-        .ok_or("candidate expected operation count is missing")?;
-    let expected_methods = candidate["generated_methods"]
-        .as_u64()
-        .ok_or("candidate expected generated-method count is missing")?;
-    if coverage["upstream_operations"].as_u64() != Some(expected_operations)
-        || coverage["generated_methods"].as_u64() != Some(expected_methods)
-    {
-        return fail(format!(
-            "candidate raw inventory drift: source={}, methods={}, expected={expected_operations}/{expected_methods}",
-            coverage["upstream_operations"], coverage["generated_methods"]
-        ));
-    }
-    write_json(&generated.join("coverage.json"), &coverage)?;
-    compile_standalone_raw(root, version, &generated, work)?;
-
-    let bindings_value: Value = serde_json::from_str(&output(
-        bindings,
-        vec![str_arg(&generated), str_arg(&overlaid)],
-        root,
-    )?)?;
-    let binding_report = verify_bindings_coverage(&bindings_value, &spec)?;
-    if binding_report["binding_operations"].as_u64() != Some(expected_methods) {
-        return fail(format!(
-            "candidate normalized Bindings method inventory drift: {} != {expected_methods}",
-            binding_report["binding_operations"]
-        ));
-    }
-    if binding_report["representation_path_pairs"].as_u64() != Some(4) {
-        return fail(format!(
-            "candidate representation-specific path pair inventory drift: {} != 4",
-            binding_report["representation_path_pairs"]
-        ));
-    }
-
-    println!(
-        "{}",
-        serde_json::to_string_pretty(&json!({
-            "candidate_raw": {
-                "coverage": coverage,
-                "bindings": binding_report,
-                "standalone_compile": "ok"
-            }
-        }))?
-    );
-    Ok(())
-}
-
-fn verify_candidate_derivation(
-    root: &Path,
-    lock: &Value,
-    version: &str,
-    raw: &Path,
-    bindings: &Path,
-    compiler: &Path,
-    publish_outputs: bool,
-) -> Result<()> {
-    let temp = Workspace::new(root)?;
-    let work = &temp.0;
-    copy_inputs(root, work)?;
-    let build = work.join("sdk-build");
-    let config = candidate_config(&build)?;
-    let overlaid = build.join("openapi/overlaid-candidate.json");
-    let generated = work.join("candidate-generated");
-    run(
-        raw,
-        vec!["generate".into(), "--config".into(), str_arg(&config)],
-        root,
-    )?;
-    let spec: Value = serde_json::from_slice(&fs::read(&overlaid)?)?;
-    verify_candidate_overlaid(&spec)?;
-    format_rust(root, version, &generated)?;
-
-    let coverage = raw_coverage(&generated, &spec)?;
-    write_json(&generated.join("coverage.json"), &coverage)?;
-    let candidate = field(lock, "openapi_candidate")?;
-    let expected_operations = candidate["operations"]
-        .as_u64()
-        .ok_or("candidate expected operation count is missing")?;
-    let expected_methods = candidate["generated_methods"]
-        .as_u64()
-        .ok_or("candidate expected generated-method count is missing")?;
-    if coverage["upstream_operations"].as_u64() != Some(expected_operations)
-        || coverage["generated_methods"].as_u64() != Some(expected_methods)
-    {
-        return fail("candidate derivation probe raw inventory drifted");
-    }
-
-    let bindings_value: Value = serde_json::from_str(&output(
-        bindings,
-        vec![str_arg(&generated), str_arg(&overlaid)],
-        root,
-    )?)?;
-    verify_bindings_coverage(&bindings_value, &spec)?;
-    let bindings_path = work.join("bindings.json");
-    write_json(&bindings_path, &bindings_value)?;
-
-    let derivation: Value = serde_json::from_str(&output(
-        compiler,
-        vec![
-            "derive".into(),
-            "--openapi".into(),
-            str_arg(&overlaid),
-            "--bindings".into(),
-            str_arg(&bindings_path),
-            "--surface".into(),
-            str_arg(&build.join("official-sdks/surface.json")),
-            "--overrides".into(),
-            str_arg(&build.join("sdk-overrides-candidate.json")),
-        ],
-        root,
-    )?)?;
-    let report = field(&derivation, "report")?;
-    let operations = field(report, "operations")?
-        .as_object()
-        .ok_or("candidate derivation report operations must be an object")?;
-    if operations.len() as u64 != expected_operations {
-        return fail(format!(
-            "candidate derivation report inventory drift: {} != {expected_operations}",
-            operations.len()
-        ));
-    }
-
-    let mut statuses = BTreeMap::<String, usize>::new();
-    let mut rejections = BTreeMap::<String, Vec<String>>::new();
-    let mut override_targets = BTreeMap::<String, Value>::new();
-    let configured_overrides = read_json(&build.join("sdk-overrides-candidate.json"))?;
-    let configured = field(&configured_overrides, "operations")?
-        .as_object()
-        .ok_or("candidate overrides operations must be an object")?;
-
-    for (operation_id, outcome) in operations {
-        let status = string(outcome, "status")?;
-        *statuses.entry(status.to_owned()).or_default() += 1;
-        let reason = field(outcome, "reason")?;
-        let reason_code = string(reason, "code")?;
-        if status == "rejected" {
-            rejections
-                .entry(reason_code.to_owned())
-                .or_default()
-                .push(operation_id.clone());
-        }
-        if configured.contains_key(operation_id) {
-            override_targets.insert(
-                operation_id.clone(),
-                json!({
-                    "status": status,
-                    "reason": reason
-                }),
-            );
-        }
-    }
-
-    let target = root.join("sdk-build/target");
-    fs::create_dir_all(&target)?;
-    write_json(&target.join("candidate-bindings.json"), &bindings_value)?;
-    fs::copy(&overlaid, target.join("candidate-overlaid.json"))?;
-    write_json(&target.join("candidate-derivation-report.json"), report)?;
-    write_json(
-        &target.join("candidate-sdk-definition.json"),
-        field(&derivation, "definition")?,
-    )?;
-    let observed = json!({
-        "schema_version": 1,
-        "total_operations": operations.len(),
-        "statuses": statuses,
-        "rejections_by_reason": rejections,
-        "override_statuses": override_targets
-            .iter()
-            .map(|(id, outcome)| (id.clone(), outcome["status"].clone()))
-            .collect::<BTreeMap<_, _>>()
-    });
-    let baseline = read_json(&build.join("candidate-derivation-baseline.json"))?;
-    if observed != baseline {
-        println!("{}", serde_json::to_string_pretty(&observed)?);
-        return fail(
-            "candidate 288 derivation status/reason/override inventory drifted; review and update baseline only after proving the changed operations",
-        );
-    }
-
-    let compatibility = candidate_compatibility_inventory(
-        root,
-        field(&derivation, "definition")?,
-        &bindings_value,
-    )?;
-    write_json(
-        &target.join("candidate-compatibility-inventory.json"),
-        &compatibility,
-    )?;
-
-    let runtime = work.join("runtime.json");
-    write_json(&runtime, &runtime_config())?;
-    let facade = work.join("candidate-facade");
-    let inventory = target.join("candidate-api-inventory.json");
-    run(
-        compiler,
-        vec![
-            "generate".into(),
-            "--openapi".into(),
-            str_arg(&overlaid),
-            "--bindings".into(),
-            str_arg(&bindings_path),
-            "--definition".into(),
-            str_arg(&target.join("candidate-sdk-definition.json")),
-            "--runtime".into(),
-            str_arg(&runtime),
-            "--output".into(),
-            str_arg(&facade),
-            "--inventory".into(),
-            str_arg(&inventory),
-        ],
-        root,
-    )?;
-    format_rust(root, version, &facade)?;
-    compile_candidate_facade(root, version, &generated, &facade, work)?;
-    let review_source = target.join("candidate-facade-source");
-    if review_source.exists() {
-        fs::remove_dir_all(&review_source)?;
-    }
-    copy_dir(&facade, &review_source)?;
-
-    if publish_outputs {
-        publish(root, work, &generated, &facade)?;
-        println!("Published canonical 288 SDK facade without legacy compatibility shims.");
-        return Ok(());
-    }
-
-    let compatible_definition =
-        candidate_compatibility_definition(root, field(&derivation, "definition")?)?;
-    let compatible_definition_path = target.join("candidate-compatible-definition.json");
-    write_json(&compatible_definition_path, &compatible_definition)?;
-    let compatible_facade = work.join("candidate-compatible-facade");
-    run(
-        compiler,
-        vec![
-            "generate".into(),
-            "--openapi".into(),
-            str_arg(&overlaid),
-            "--bindings".into(),
-            str_arg(&bindings_path),
-            "--definition".into(),
-            str_arg(&compatible_definition_path),
-            "--runtime".into(),
-            str_arg(&runtime),
-            "--output".into(),
-            str_arg(&compatible_facade),
-            "--inventory".into(),
-            str_arg(&target.join("candidate-compatible-api-inventory.json")),
-        ],
-        root,
-    )?;
-    compile_candidate_facade(root, version, &generated, &compatible_facade, work)?;
-    verify_candidate_compatibility_signatures(root, &compatible_facade)?;
-    let compatible_review_source = target.join("candidate-compatible-facade-source");
-    if compatible_review_source.exists() {
-        fs::remove_dir_all(&compatible_review_source)?;
-    }
-    copy_dir(&compatible_facade, &compatible_review_source)?;
-
-    println!(
-        "{}",
-        serde_json::to_string_pretty(&json!({
-            "candidate_derivation": {
-                "statuses": statuses,
-                "rejections_by_reason": rejections,
-                "override_targets": override_targets,
-                "report": "sdk-build/target/candidate-derivation-report.json"
-            }
-        }))?
-    );
-    Ok(())
-}
-
 struct Options {
     command: String,
     require_parity: bool,
-    compatibility_definition: Option<PathBuf>,
 }
 
 fn parse_args() -> Result<Options> {
     let mut args = env::args().skip(1);
-    let command = args.next().ok_or("usage: mistralai-sdk-build <raw|generate|check|probe|candidate-raw|candidate-derive|candidate-publish> [--require-parity] [--compatibility-definition PATH]")?;
-    if !matches!(
-        command.as_str(),
-        "raw"
-            | "generate"
-            | "check"
-            | "probe"
-            | "candidate-raw"
-            | "candidate-derive"
-            | "candidate-publish"
-    ) {
+    let command = args
+        .next()
+        .ok_or("usage: mistralai-sdk-build <raw|generate|check|probe> [--require-parity]")?;
+    if !matches!(command.as_str(), "raw" | "generate" | "check" | "probe") {
         return fail(format!("unknown command: {command}"));
     }
     let mut require_parity = false;
-    let mut definition = None;
     while let Some(flag) = args.next() {
         match flag.as_str() {
             "--require-parity" => require_parity = true,
-            "--compatibility-definition" => {
-                if definition.is_some() {
-                    return fail("--compatibility-definition specified twice");
-                }
-                definition = Some(PathBuf::from(
-                    args.next()
-                        .ok_or("--compatibility-definition requires a path")?,
-                ));
-            }
             _ => return fail(format!("unknown argument: {flag}")),
         }
     }
     Ok(Options {
         command,
         require_parity,
-        compatibility_definition: definition,
     })
 }
 
@@ -1055,21 +376,7 @@ fn execute(root: &Path, args: &Options) -> Result<()> {
         "openapi_to_rust_bindings",
         "openapi-to-rust-bindings",
     )?;
-    if args.command == "candidate-raw" {
-        return verify_candidate_raw(root, &lock, &version, &raw, &bindings);
-    }
     let compiler = install_tool(root, &lock, "rust_sdk_generator", "rust-sdk-generator")?;
-    if args.command == "candidate-derive" || args.command == "candidate-publish" {
-        return verify_candidate_derivation(
-            root,
-            &lock,
-            &version,
-            &raw,
-            &bindings,
-            &compiler,
-            args.command == "candidate-publish",
-        );
-    }
 
     let temp = Workspace::new(root)?;
     let work = &temp.0;
@@ -1121,9 +428,7 @@ fn execute(root: &Path, args: &Options) -> Result<()> {
         vec![str_arg(&generated), str_arg(&overlaid)],
         root,
     )?)?;
-    if bindings_value["schema_version"] != 3 {
-        return fail("canonical bindings adapter did not emit Bindings v3");
-    }
+    verify_bindings_coverage(&bindings_value, &spec)?;
     write_json(&bindings_path, &bindings_value)?;
 
     let derivation: Value = serde_json::from_str(&output(
@@ -1182,39 +487,12 @@ fn execute(root: &Path, args: &Options) -> Result<()> {
     let inventory = work.join("api-inventory.json");
     generate(&work.join("sdk-definition.json"), &facade, &inventory)?;
     let committed = committed_facade(&root.join("src/sdk"))?;
-    let candidate_delta = compatible_snapshot(root, &facade, &committed)?;
-    let mut final_delta = candidate_delta.clone();
-    let definition_path = args.compatibility_definition.clone();
-    let mut compatible = None;
-    if let Some(source) = definition_path {
-        if !source.is_file() {
-            return fail(format!(
-                "compatibility SDK definition missing: {}",
-                source.display()
-            ));
-        }
-        let copy = work.join("compatibility-definition.json");
-        fs::copy(source, &copy)?; // never normalize map insertion order in a reviewed definition
-        let result = work.join("src/sdk-compatibility");
-        generate(&copy, &result, &work.join("compatibility-inventory.json"))?;
-        let delta = compatible_snapshot(root, &result, &committed)?;
-        println!(
-            "{}",
-            serde_json::to_string_pretty(&json!({
-                "canonical_candidate_delta_count": candidate_delta.len(),
-                "compatibility_facade_delta_count": delta.len(),
-                "compatibility_facade_delta": delta
-            }))?
-        );
-        final_delta = delta;
-        compatible = Some(result);
-    }
+    let final_delta = compatible_snapshot(root, &facade, &committed)?;
     if args.require_parity || args.command == "check" || args.command == "generate" {
         require_publish_parity(&counts, &final_delta)?;
     }
     if args.command == "generate" {
-        let publication = compatible.as_ref().unwrap_or(&facade);
-        publish(root, work, &generated, publication)?;
+        publish(root, work, &generated, &facade)?;
     }
     let inventory = read_json(&inventory)?;
     let resources = field(&inventory, "resources")?
