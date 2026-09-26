@@ -6,6 +6,17 @@
     "ChatResponse",
     "ChatStreamChunk"
   ],
+  "accessor_paths": {
+    "ChatResponse.text": [
+      "choices",
+      "first",
+      "message",
+      "optional",
+      "content",
+      "optional",
+      "optional"
+    ]
+  },
   "operations": {
     "chat": [
       "complete",

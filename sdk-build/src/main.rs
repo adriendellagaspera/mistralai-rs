@@ -582,15 +582,41 @@ fn candidate_compatibility_definition(root: &Path, derived: &Value) -> Result<Va
         .as_array()
         .ok_or("selected compatibility models must be an array")?
     {
-        let name = name.as_str().ok_or("selected model name must be a string")?;
+        let name = name
+            .as_str()
+            .ok_or("selected model name must be a string")?;
         let model = field(field(&published, "models")?, name)?.clone();
         let models = candidate
             .get_mut("models")
             .and_then(Value::as_object_mut)
             .ok_or("candidate models must be an object")?;
         if models.insert(name.to_owned(), model).is_some() {
-            return fail(format!("candidate compatibility model already exists: {name}"));
+            return fail(format!(
+                "candidate compatibility model already exists: {name}"
+            ));
         }
+    }
+    let accessor_paths = field(&selection, "accessor_paths")?
+        .as_object()
+        .ok_or("selected accessor paths must be an object")?;
+    for (qualified, path) in accessor_paths {
+        let (model_name, accessor_name) = qualified
+            .split_once('.')
+            .ok_or("selected accessor must be model.name")?;
+        let accessors = candidate
+            .get_mut("models")
+            .and_then(|models| models.get_mut(model_name))
+            .and_then(|model| model.get_mut("accessors"))
+            .and_then(Value::as_object_mut)
+            .ok_or("selected model accessors are missing")?;
+        let accessor = accessors
+            .get_mut(accessor_name)
+            .ok_or("selected accessor is missing")?;
+        let path = path.as_array().ok_or("selected accessor path must be an array")?;
+        if path.iter().any(|segment| !segment.is_string()) {
+            return fail("selected accessor path must contain only strings");
+        }
+        accessor["path"] = Value::Array(path.clone());
     }
     let selections = field(&selection, "operations")?
         .as_object()
@@ -600,9 +626,14 @@ fn candidate_compatibility_definition(root: &Path, derived: &Value) -> Result<Va
             .as_array()
             .ok_or("selected resource operations must be an array")?
         {
-            let name = name.as_str().ok_or("selected operation name must be a string")?;
+            let name = name
+                .as_str()
+                .ok_or("selected operation name must be a string")?;
             let replacement = field(
-                field(field(field(&published, "resources")?, resource)?, "operations")?,
+                field(
+                    field(field(&published, "resources")?, resource)?,
+                    "operations",
+                )?,
                 name,
             )?
             .clone();
@@ -650,7 +681,9 @@ fn verify_candidate_compatibility_signatures(root: &Path, facade: &Path) -> Resu
             .as_array()
             .ok_or("selected resource operations must be an array")?
         {
-            let name = name.as_str().ok_or("selected operation name must be a string")?;
+            let name = name
+                .as_str()
+                .ok_or("selected operation name must be a string")?;
             if signature(&published, name)? != signature(&candidate, name)? {
                 return fail(format!("public signature drift for {resource}.{name}"));
             }
