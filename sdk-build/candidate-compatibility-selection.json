@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "models": [
+    "Message",
+    "ChatRequest",
+    "ChatResponse",
+    "ChatStreamChunk"
+  ],
+  "operations": {
+    "chat": [
+      "complete",
+      "stream"
+    ]
+  }
+}
