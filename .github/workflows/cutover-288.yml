@@ -19,8 +19,10 @@ jobs:
           persist-credentials: true
       - name: Install pinned Rust toolchain
         run: rustup show
-      - name: Publish reviewed 288 candidate outputs
-        run: cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- candidate-publish
+      - name: Publish canonical active 288 outputs
+        run: |
+          cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- raw
+          cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- generate
       - name: Commit generated cutover
         run: |
           git add src/generated src/sdk
@@ -30,5 +32,5 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "feat(sdk): publish generated 288 endpoint SDK"
+          git commit -m "feat(sdk): regenerate canonical 288 endpoint SDK"
           git push origin HEAD:feat/cutover-288
