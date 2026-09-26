@@ -3,7 +3,7 @@ name: Publish crate
 on:
   push:
     tags:
-      - "v[0-9]+.[0-9]+.[0-9]+"
+      - "v*"
 
 concurrency:
   group: publish-${{ github.ref }}
@@ -37,9 +37,6 @@ jobs:
           fi
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
-      - name: Verify publishable package
-        run: cargo publish --dry-run --locked
-
       - name: Check crates.io state
         id: registry
         shell: bash
@@ -69,6 +66,10 @@ jobs:
           else
             echo "already-published=false" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Verify publishable package
+        if: steps.registry.outputs.already-published != 'true'
+        run: cargo publish --dry-run --locked
 
   publish:
     name: publish
