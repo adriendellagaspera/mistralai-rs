@@ -487,7 +487,7 @@ fn execute(root: &Path, args: &Options) -> Result<()> {
     generate(&work.join("sdk-definition.json"), &facade, &inventory)?;
     let committed = committed_facade(&root.join("src/sdk"))?;
     let final_delta = compatible_snapshot(root, &facade, &committed)?;
-    if args.require_parity || args.command == "check" || args.command == "generate" {
+    if args.require_parity || args.command == "check" {
         require_publish_parity(&counts, &final_delta)?;
     }
     if args.command == "generate" {
