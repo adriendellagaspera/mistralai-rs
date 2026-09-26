@@ -22,14 +22,7 @@ jobs:
             code="$(curl --silent --show-error --output "/tmp/$name.json" --write-out "%{http_code}" "https://crates.io/api/v1/crates/$name")"
             printf '%s %s\n' "$name" "$code"
             if [ "$code" = "200" ]; then
-              python3 - "$name" < "/tmp/$name.json" <<'PY'
-import json
-import sys
-name = sys.argv[1]
-data = json.load(sys.stdin)
-crate = data["crate"]
-print(f"  existing max_version={crate.get('max_version')} downloads={crate.get('downloads')} repository={crate.get('repository')}")
-PY
+              jq -r '"  existing max_version=" + (.crate.max_version // "?") + " repository=" + (.crate.repository // "?")' "/tmp/$name.json"
             elif [ "$code" != "404" ]; then
               cat "/tmp/$name.json"
               exit 1
