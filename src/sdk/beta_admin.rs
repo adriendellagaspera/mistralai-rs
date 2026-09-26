@@ -2,25 +2,47 @@
 use super::*;
 use crate::generated::client::HttpClient;
 #[derive(Clone, Copy)]
-pub struct BetaAdmin<'a> { raw: &'a HttpClient }
+pub struct BetaAdmin<'a> {
+    raw: &'a HttpClient,
+}
 
 impl<'a> BetaAdmin<'a> {
-    pub(crate) fn new(raw: &'a HttpClient) -> Self { Self { raw } }
-    pub fn api_keys(&self) -> BetaAdminApiKeys<'a> { BetaAdminApiKeys::new(self.raw) }
+    pub(crate) fn new(raw: &'a HttpClient) -> Self {
+        Self { raw }
+    }
+    pub fn api_keys(&self) -> BetaAdminApiKeys<'a> {
+        BetaAdminApiKeys::new(self.raw)
+    }
 
-    pub fn audit_logs(&self) -> BetaAdminAuditLogs<'a> { BetaAdminAuditLogs::new(self.raw) }
+    pub fn audit_logs(&self) -> BetaAdminAuditLogs<'a> {
+        BetaAdminAuditLogs::new(self.raw)
+    }
 
-    pub fn billing(&self) -> BetaAdminBilling<'a> { BetaAdminBilling::new(self.raw) }
+    pub fn billing(&self) -> BetaAdminBilling<'a> {
+        BetaAdminBilling::new(self.raw)
+    }
 
-    pub fn scim(&self) -> BetaAdminScim<'a> { BetaAdminScim::new(self.raw) }
+    pub fn scim(&self) -> BetaAdminScim<'a> {
+        BetaAdminScim::new(self.raw)
+    }
 
-    pub fn user_groups(&self) -> BetaAdminUserGroups<'a> { BetaAdminUserGroups::new(self.raw) }
+    pub fn user_groups(&self) -> BetaAdminUserGroups<'a> {
+        BetaAdminUserGroups::new(self.raw)
+    }
 
-    pub fn users(&self) -> BetaAdminUsers<'a> { BetaAdminUsers::new(self.raw) }
+    pub fn users(&self) -> BetaAdminUsers<'a> {
+        BetaAdminUsers::new(self.raw)
+    }
 
-    pub fn vibe_code_analytics(&self) -> BetaAdminVibeCodeAnalytics<'a> { BetaAdminVibeCodeAnalytics::new(self.raw) }
+    pub fn vibe_code_analytics(&self) -> BetaAdminVibeCodeAnalytics<'a> {
+        BetaAdminVibeCodeAnalytics::new(self.raw)
+    }
 
-    pub fn vibe_work_analytics(&self) -> BetaAdminVibeWorkAnalytics<'a> { BetaAdminVibeWorkAnalytics::new(self.raw) }
+    pub fn vibe_work_analytics(&self) -> BetaAdminVibeWorkAnalytics<'a> {
+        BetaAdminVibeWorkAnalytics::new(self.raw)
+    }
 
-    pub fn workspaces(&self) -> BetaAdminWorkspaces<'a> { BetaAdminWorkspaces::new(self.raw) }
+    pub fn workspaces(&self) -> BetaAdminWorkspaces<'a> {
+        BetaAdminWorkspaces::new(self.raw)
+    }
 }

@@ -2,11 +2,22 @@
 use super::*;
 use crate::generated::client::HttpClient;
 #[derive(Clone, Copy)]
-pub struct Embeddings<'a> { raw: &'a HttpClient }
+pub struct Embeddings<'a> {
+    raw: &'a HttpClient,
+}
 
 impl<'a> Embeddings<'a> {
-    pub(crate) fn new(raw: &'a HttpClient) -> Self { Self { raw } }
-    pub async fn create(&self, request: CreateEmbeddingsRequest) -> Result<CreateEmbeddingsResponse, SdkError> {
-        self.raw.embeddings_v1_embeddings_post(request.into_raw()).await.map(Into::into).map_err(Into::into)
+    pub(crate) fn new(raw: &'a HttpClient) -> Self {
+        Self { raw }
+    }
+    pub async fn create(
+        &self,
+        request: CreateEmbeddingsRequest,
+    ) -> Result<CreateEmbeddingsResponse, SdkError> {
+        self.raw
+            .embeddings_v1_embeddings_post(request.into_raw())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 }

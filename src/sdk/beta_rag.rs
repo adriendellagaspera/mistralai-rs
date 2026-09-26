@@ -2,11 +2,19 @@
 use super::*;
 use crate::generated::client::HttpClient;
 #[derive(Clone, Copy)]
-pub struct BetaRag<'a> { raw: &'a HttpClient }
+pub struct BetaRag<'a> {
+    raw: &'a HttpClient,
+}
 
 impl<'a> BetaRag<'a> {
-    pub(crate) fn new(raw: &'a HttpClient) -> Self { Self { raw } }
-    pub fn ingestion_pipeline_configurations(&self) -> BetaRagIngestionPipelineConfigurations<'a> { BetaRagIngestionPipelineConfigurations::new(self.raw) }
+    pub(crate) fn new(raw: &'a HttpClient) -> Self {
+        Self { raw }
+    }
+    pub fn ingestion_pipeline_configurations(&self) -> BetaRagIngestionPipelineConfigurations<'a> {
+        BetaRagIngestionPipelineConfigurations::new(self.raw)
+    }
 
-    pub fn search_indexes(&self) -> BetaRagSearchIndexes<'a> { BetaRagSearchIndexes::new(self.raw) }
+    pub fn search_indexes(&self) -> BetaRagSearchIndexes<'a> {
+        BetaRagSearchIndexes::new(self.raw)
+    }
 }

@@ -2,61 +2,197 @@
 use super::*;
 use crate::generated::client::HttpClient;
 
-
 #[derive(Debug, Clone)]
-pub struct GetSignedUrlFilesRequest { file_id: String, expiry: Option<i64> }
-impl GetSignedUrlFilesRequest { pub fn new(file_id: impl Into<String>) -> Self { Self { file_id: file_id.into(), expiry: None } }
-#[must_use] pub fn expiry(mut self, expiry: i64) -> Self { self.expiry = Some(expiry); self }
+pub struct GetSignedUrlFilesRequest {
+    file_id: String,
+    expiry: Option<i64>,
+}
+impl GetSignedUrlFilesRequest {
+    pub fn new(file_id: impl Into<String>) -> Self {
+        Self {
+            file_id: file_id.into(),
+            expiry: None,
+        }
+    }
+    #[must_use]
+    pub fn expiry(mut self, expiry: i64) -> Self {
+        self.expiry = Some(expiry);
+        self
+    }
 }
 
 #[derive(Debug, Clone, Default)]
-pub struct ListFilesRequest { page: Option<i64>, page_size: Option<i64>, include_total: Option<bool>, sample_type: Option<String>, source: Option<String>, search: Option<String>, purpose: Option<String>, mimetypes: Option<String> }
-impl ListFilesRequest { pub fn new() -> Self { Self { page: None, page_size: None, include_total: None, sample_type: None, source: None, search: None, purpose: None, mimetypes: None } }
-#[must_use] pub fn page(mut self, page: i64) -> Self { self.page = Some(page); self }
-#[must_use] pub fn page_size(mut self, page_size: i64) -> Self { self.page_size = Some(page_size); self }
-#[must_use] pub fn include_total(mut self, include_total: bool) -> Self { self.include_total = Some(include_total); self }
-#[must_use] pub fn sample_type(mut self, sample_type: impl Into<String>) -> Self { self.sample_type = Some(sample_type.into()); self }
-#[must_use] pub fn source(mut self, source: impl Into<String>) -> Self { self.source = Some(source.into()); self }
-#[must_use] pub fn search(mut self, search: impl Into<String>) -> Self { self.search = Some(search.into()); self }
-#[must_use] pub fn purpose(mut self, purpose: impl Into<String>) -> Self { self.purpose = Some(purpose.into()); self }
-#[must_use] pub fn mimetypes(mut self, mimetypes: impl Into<String>) -> Self { self.mimetypes = Some(mimetypes.into()); self }
+pub struct ListFilesRequest {
+    page: Option<i64>,
+    page_size: Option<i64>,
+    include_total: Option<bool>,
+    sample_type: Option<String>,
+    source: Option<String>,
+    search: Option<String>,
+    purpose: Option<String>,
+    mimetypes: Option<String>,
+}
+impl ListFilesRequest {
+    pub fn new() -> Self {
+        Self {
+            page: None,
+            page_size: None,
+            include_total: None,
+            sample_type: None,
+            source: None,
+            search: None,
+            purpose: None,
+            mimetypes: None,
+        }
+    }
+    #[must_use]
+    pub fn page(mut self, page: i64) -> Self {
+        self.page = Some(page);
+        self
+    }
+    #[must_use]
+    pub fn page_size(mut self, page_size: i64) -> Self {
+        self.page_size = Some(page_size);
+        self
+    }
+    #[must_use]
+    pub fn include_total(mut self, include_total: bool) -> Self {
+        self.include_total = Some(include_total);
+        self
+    }
+    #[must_use]
+    pub fn sample_type(mut self, sample_type: impl Into<String>) -> Self {
+        self.sample_type = Some(sample_type.into());
+        self
+    }
+    #[must_use]
+    pub fn source(mut self, source: impl Into<String>) -> Self {
+        self.source = Some(source.into());
+        self
+    }
+    #[must_use]
+    pub fn search(mut self, search: impl Into<String>) -> Self {
+        self.search = Some(search.into());
+        self
+    }
+    #[must_use]
+    pub fn purpose(mut self, purpose: impl Into<String>) -> Self {
+        self.purpose = Some(purpose.into());
+        self
+    }
+    #[must_use]
+    pub fn mimetypes(mut self, mimetypes: impl Into<String>) -> Self {
+        self.mimetypes = Some(mimetypes.into());
+        self
+    }
 }
 
-
 #[derive(Clone, Copy)]
-pub struct Files<'a> { raw: &'a HttpClient }
+pub struct Files<'a> {
+    raw: &'a HttpClient,
+}
 
 impl<'a> Files<'a> {
-    pub(crate) fn new(raw: &'a HttpClient) -> Self { Self { raw } }
+    pub(crate) fn new(raw: &'a HttpClient) -> Self {
+        Self { raw }
+    }
     pub async fn delete(&self, file_id: impl AsRef<str>) -> Result<DeleteFilesResponse, SdkError> {
-        self.raw.files_api_routes_delete_file(file_id.as_ref()).await.map(Into::into).map_err(Into::into)
+        self.raw
+            .files_api_routes_delete_file(file_id.as_ref())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
     pub async fn download(&self, file_id: impl AsRef<str>) -> Result<bytes::Bytes, SdkError> {
-        self.raw.files_api_routes_download_file(file_id.as_ref()).await.map_err(Into::into)
+        self.raw
+            .files_api_routes_download_file(file_id.as_ref())
+            .await
+            .map_err(Into::into)
     }
 
-    pub async fn get_signed_url(&self, request: GetSignedUrlFilesRequest) -> Result<GetSignedUrlFilesResponse, SdkError> {
-        self.raw.files_api_routes_get_signed_url(request.file_id.as_str(), request.expiry).await.map(Into::into).map_err(Into::into)
+    pub async fn get_signed_url(
+        &self,
+        request: GetSignedUrlFilesRequest,
+    ) -> Result<GetSignedUrlFilesResponse, SdkError> {
+        self.raw
+            .files_api_routes_get_signed_url(request.file_id.as_str(), request.expiry)
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
     pub async fn list(&self) -> Result<ListFilesResponseView, SdkError> {
-        self.raw.files_api_routes_list_files(None, None, None, None::<&str>, None::<&str>, None::<&str>, None::<&str>, None::<&str>).await.map(Into::into).map_err(Into::into)
+        self.raw
+            .files_api_routes_list_files(
+                None,
+                None,
+                None,
+                None::<&str>,
+                None::<&str>,
+                None::<&str>,
+                None::<&str>,
+                None::<&str>,
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
-    pub async fn list_with(&self, request: ListFilesRequest) -> Result<ListFilesResponseView, SdkError> {
-        self.raw.files_api_routes_list_files(request.page, request.page_size, request.include_total, request.sample_type.as_deref(), request.source.as_deref(), request.search.as_deref(), request.purpose.as_deref(), request.mimetypes.as_deref()).await.map(Into::into).map_err(Into::into)
+    pub async fn list_with(
+        &self,
+        request: ListFilesRequest,
+    ) -> Result<ListFilesResponseView, SdkError> {
+        self.raw
+            .files_api_routes_list_files(
+                request.page,
+                request.page_size,
+                request.include_total,
+                request.sample_type.as_deref(),
+                request.source.as_deref(),
+                request.search.as_deref(),
+                request.purpose.as_deref(),
+                request.mimetypes.as_deref(),
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
-    pub async fn retrieve(&self, file_id: impl AsRef<str>) -> Result<RetrieveFilesResponse, SdkError> {
-        self.raw.files_api_routes_retrieve_file(file_id.as_ref()).await.map(Into::into).map_err(Into::into)
+    pub async fn retrieve(
+        &self,
+        file_id: impl AsRef<str>,
+    ) -> Result<RetrieveFilesResponse, SdkError> {
+        self.raw
+            .files_api_routes_retrieve_file(file_id.as_ref())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
-    pub async fn upload(&self, request: UploadFilesRequest) -> Result<UploadFilesResponse, SdkError> {
-        self.raw.files_api_routes_upload_file(request.into_raw()).await.map(Into::into).map_err(Into::into)
+    pub async fn upload(
+        &self,
+        request: UploadFilesRequest,
+    ) -> Result<UploadFilesResponse, SdkError> {
+        self.raw
+            .files_api_routes_upload_file(request.into_raw())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
-    pub async fn upload_with_filenames(&self, request: UploadFilesRequest, multipart_filenames: &[(&str, &str)]) -> Result<UploadFilesResponse, SdkError> {
-        self.raw.files_api_routes_upload_file_with_multipart_filenames(request.into_raw(), multipart_filenames).await.map(Into::into).map_err(Into::into)
+    pub async fn upload_with_filenames(
+        &self,
+        request: UploadFilesRequest,
+        multipart_filenames: &[(&str, &str)],
+    ) -> Result<UploadFilesResponse, SdkError> {
+        self.raw
+            .files_api_routes_upload_file_with_multipart_filenames(
+                request.into_raw(),
+                multipart_filenames,
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 }

@@ -2,49 +2,146 @@
 use super::*;
 use crate::generated::client::HttpClient;
 
-
-
-
 #[derive(Debug, Clone, Default)]
-pub struct ListBetaObservabilityJudgesRequest { type_filter: Option<String>, model_filter: Option<String>, page_size: Option<i64>, page: Option<i64>, q: Option<String> }
-impl ListBetaObservabilityJudgesRequest { pub fn new() -> Self { Self { type_filter: None, model_filter: None, page_size: None, page: None, q: None } }
-#[must_use] pub fn type_filter(mut self, type_filter: impl Into<String>) -> Self { self.type_filter = Some(type_filter.into()); self }
-#[must_use] pub fn model_filter(mut self, model_filter: impl Into<String>) -> Self { self.model_filter = Some(model_filter.into()); self }
-#[must_use] pub fn page_size(mut self, page_size: i64) -> Self { self.page_size = Some(page_size); self }
-#[must_use] pub fn page(mut self, page: i64) -> Self { self.page = Some(page); self }
-#[must_use] pub fn q(mut self, q: impl Into<String>) -> Self { self.q = Some(q.into()); self }
+pub struct ListBetaObservabilityJudgesRequest {
+    type_filter: Option<String>,
+    model_filter: Option<String>,
+    page_size: Option<i64>,
+    page: Option<i64>,
+    q: Option<String>,
+}
+impl ListBetaObservabilityJudgesRequest {
+    pub fn new() -> Self {
+        Self {
+            type_filter: None,
+            model_filter: None,
+            page_size: None,
+            page: None,
+            q: None,
+        }
+    }
+    #[must_use]
+    pub fn type_filter(mut self, type_filter: impl Into<String>) -> Self {
+        self.type_filter = Some(type_filter.into());
+        self
+    }
+    #[must_use]
+    pub fn model_filter(mut self, model_filter: impl Into<String>) -> Self {
+        self.model_filter = Some(model_filter.into());
+        self
+    }
+    #[must_use]
+    pub fn page_size(mut self, page_size: i64) -> Self {
+        self.page_size = Some(page_size);
+        self
+    }
+    #[must_use]
+    pub fn page(mut self, page: i64) -> Self {
+        self.page = Some(page);
+        self
+    }
+    #[must_use]
+    pub fn q(mut self, q: impl Into<String>) -> Self {
+        self.q = Some(q.into());
+        self
+    }
 }
 
 #[derive(Clone, Copy)]
-pub struct BetaObservabilityJudges<'a> { raw: &'a HttpClient }
+pub struct BetaObservabilityJudges<'a> {
+    raw: &'a HttpClient,
+}
 
 impl<'a> BetaObservabilityJudges<'a> {
-    pub(crate) fn new(raw: &'a HttpClient) -> Self { Self { raw } }
-    pub async fn create(&self, request: CreateBetaObservabilityJudgesRequest) -> Result<CreateBetaObservabilityJudgesResponse, SdkError> {
-        self.raw.create_judge_v1_observability_judges_post(request.into_raw()).await.map(Into::into).map_err(Into::into)
+    pub(crate) fn new(raw: &'a HttpClient) -> Self {
+        Self { raw }
+    }
+    pub async fn create(
+        &self,
+        request: CreateBetaObservabilityJudgesRequest,
+    ) -> Result<CreateBetaObservabilityJudgesResponse, SdkError> {
+        self.raw
+            .create_judge_v1_observability_judges_post(request.into_raw())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
     pub async fn delete(&self, judge_id: impl AsRef<str>) -> Result<(), SdkError> {
-        self.raw.delete_judge_v1_observability_judges_judge_id_delete(judge_id.as_ref()).await.map_err(Into::into)
+        self.raw
+            .delete_judge_v1_observability_judges_judge_id_delete(judge_id.as_ref())
+            .await
+            .map_err(Into::into)
     }
 
-    pub async fn fetch(&self, judge_id: impl AsRef<str>) -> Result<FetchBetaObservabilityJudgesResponse, SdkError> {
-        self.raw.get_judge_by_id_v1_observability_judges_judge_id_get(judge_id.as_ref()).await.map(Into::into).map_err(Into::into)
+    pub async fn fetch(
+        &self,
+        judge_id: impl AsRef<str>,
+    ) -> Result<FetchBetaObservabilityJudgesResponse, SdkError> {
+        self.raw
+            .get_judge_by_id_v1_observability_judges_judge_id_get(judge_id.as_ref())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
-    pub async fn judge_conversation(&self, judge_id: impl AsRef<str>, request: JudgeConversationBetaObservabilityJudgesRequest) -> Result<JudgeConversationBetaObservabilityJudgesResponse, SdkError> {
-        self.raw.judge_conversation_v1_observability_judges_judge_id_live_judging_post(judge_id.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
+    pub async fn judge_conversation(
+        &self,
+        judge_id: impl AsRef<str>,
+        request: JudgeConversationBetaObservabilityJudgesRequest,
+    ) -> Result<JudgeConversationBetaObservabilityJudgesResponse, SdkError> {
+        self.raw
+            .judge_conversation_v1_observability_judges_judge_id_live_judging_post(
+                judge_id.as_ref(),
+                request.into_raw(),
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
     pub async fn list(&self) -> Result<ListBetaObservabilityJudgesResponse, SdkError> {
-        self.raw.get_judges_v1_observability_judges_get(None::<&str>, None::<&str>, None, None, None::<&str>).await.map(Into::into).map_err(Into::into)
+        self.raw
+            .get_judges_v1_observability_judges_get(
+                None::<&str>,
+                None::<&str>,
+                None,
+                None,
+                None::<&str>,
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
-    pub async fn list_with(&self, request: ListBetaObservabilityJudgesRequest) -> Result<ListBetaObservabilityJudgesResponse, SdkError> {
-        self.raw.get_judges_v1_observability_judges_get(request.type_filter.as_deref(), request.model_filter.as_deref(), request.page_size, request.page, request.q.as_deref()).await.map(Into::into).map_err(Into::into)
+    pub async fn list_with(
+        &self,
+        request: ListBetaObservabilityJudgesRequest,
+    ) -> Result<ListBetaObservabilityJudgesResponse, SdkError> {
+        self.raw
+            .get_judges_v1_observability_judges_get(
+                request.type_filter.as_deref(),
+                request.model_filter.as_deref(),
+                request.page_size,
+                request.page,
+                request.q.as_deref(),
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
-    pub async fn update(&self, judge_id: impl AsRef<str>, request: UpdateBetaObservabilityJudgesRequest) -> Result<(), SdkError> {
-        self.raw.update_judge_v1_observability_judges_judge_id_put(judge_id.as_ref(), request.into_raw()).await.map_err(Into::into)
+    pub async fn update(
+        &self,
+        judge_id: impl AsRef<str>,
+        request: UpdateBetaObservabilityJudgesRequest,
+    ) -> Result<(), SdkError> {
+        self.raw
+            .update_judge_v1_observability_judges_judge_id_put(
+                judge_id.as_ref(),
+                request.into_raw(),
+            )
+            .await
+            .map_err(Into::into)
     }
 }

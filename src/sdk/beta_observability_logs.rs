@@ -2,27 +2,83 @@
 use super::*;
 use crate::generated::client::HttpClient;
 #[derive(Debug, Clone)]
-pub struct GetLogFieldOptionsBetaObservabilityLogsRequest { field_name: String, from: Option<String>, to: Option<String> }
-impl GetLogFieldOptionsBetaObservabilityLogsRequest { pub fn new(field_name: impl Into<String>) -> Self { Self { field_name: field_name.into(), from: None, to: None } }
-#[must_use] pub fn from(mut self, from: impl Into<String>) -> Self { self.from = Some(from.into()); self }
-#[must_use] pub fn to(mut self, to: impl Into<String>) -> Self { self.to = Some(to.into()); self }
+pub struct GetLogFieldOptionsBetaObservabilityLogsRequest {
+    field_name: String,
+    from: Option<String>,
+    to: Option<String>,
+}
+impl GetLogFieldOptionsBetaObservabilityLogsRequest {
+    pub fn new(field_name: impl Into<String>) -> Self {
+        Self {
+            field_name: field_name.into(),
+            from: None,
+            to: None,
+        }
+    }
+    #[must_use]
+    pub fn from(mut self, from: impl Into<String>) -> Self {
+        self.from = Some(from.into());
+        self
+    }
+    #[must_use]
+    pub fn to(mut self, to: impl Into<String>) -> Self {
+        self.to = Some(to.into());
+        self
+    }
 }
 
-
 #[derive(Clone, Copy)]
-pub struct BetaObservabilityLogs<'a> { raw: &'a HttpClient }
+pub struct BetaObservabilityLogs<'a> {
+    raw: &'a HttpClient,
+}
 
 impl<'a> BetaObservabilityLogs<'a> {
-    pub(crate) fn new(raw: &'a HttpClient) -> Self { Self { raw } }
-    pub async fn get_log_field_options(&self, request: GetLogFieldOptionsBetaObservabilityLogsRequest) -> Result<GetLogFieldOptionsBetaObservabilityLogsResponse, SdkError> {
-        self.raw.get_log_field_options_v1_observability_logs_fields_field_name_options_get(request.field_name.as_str(), request.from.as_deref(), request.to.as_deref()).await.map(Into::into).map_err(Into::into)
+    pub(crate) fn new(raw: &'a HttpClient) -> Self {
+        Self { raw }
+    }
+    pub async fn get_log_field_options(
+        &self,
+        request: GetLogFieldOptionsBetaObservabilityLogsRequest,
+    ) -> Result<GetLogFieldOptionsBetaObservabilityLogsResponse, SdkError> {
+        self.raw
+            .get_log_field_options_v1_observability_logs_fields_field_name_options_get(
+                request.field_name.as_str(),
+                request.from.as_deref(),
+                request.to.as_deref(),
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
-    pub async fn get_log_fields(&self) -> Result<GetLogFieldsBetaObservabilityLogsResponse, SdkError> {
-        self.raw.get_log_fields_v1_observability_logs_fields_get().await.map(Into::into).map_err(Into::into)
+    pub async fn get_log_fields(
+        &self,
+    ) -> Result<GetLogFieldsBetaObservabilityLogsResponse, SdkError> {
+        self.raw
+            .get_log_fields_v1_observability_logs_fields_get()
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
-    pub async fn search_logs(&self, from: Option<String>, to: Option<String>, page_size: Option<i64>, cursor: Option<String>, request: SearchLogsBetaObservabilityLogsRequest) -> Result<SearchLogsBetaObservabilityLogsResponse, SdkError> {
-        self.raw.search_logs_v1_observability_logs_search_post(from, to, page_size, cursor, request.into_raw()).await.map(Into::into).map_err(Into::into)
+    pub async fn search_logs(
+        &self,
+        from: Option<String>,
+        to: Option<String>,
+        page_size: Option<i64>,
+        cursor: Option<String>,
+        request: SearchLogsBetaObservabilityLogsRequest,
+    ) -> Result<SearchLogsBetaObservabilityLogsResponse, SdkError> {
+        self.raw
+            .search_logs_v1_observability_logs_search_post(
+                from,
+                to,
+                page_size,
+                cursor,
+                request.into_raw(),
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 }

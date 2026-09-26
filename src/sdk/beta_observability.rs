@@ -2,21 +2,39 @@
 use super::*;
 use crate::generated::client::HttpClient;
 #[derive(Clone, Copy)]
-pub struct BetaObservability<'a> { raw: &'a HttpClient }
+pub struct BetaObservability<'a> {
+    raw: &'a HttpClient,
+}
 
 impl<'a> BetaObservability<'a> {
-    pub(crate) fn new(raw: &'a HttpClient) -> Self { Self { raw } }
-    pub fn campaigns(&self) -> BetaObservabilityCampaigns<'a> { BetaObservabilityCampaigns::new(self.raw) }
+    pub(crate) fn new(raw: &'a HttpClient) -> Self {
+        Self { raw }
+    }
+    pub fn campaigns(&self) -> BetaObservabilityCampaigns<'a> {
+        BetaObservabilityCampaigns::new(self.raw)
+    }
 
-    pub fn chat_completion_events(&self) -> BetaObservabilityChatCompletionEvents<'a> { BetaObservabilityChatCompletionEvents::new(self.raw) }
+    pub fn chat_completion_events(&self) -> BetaObservabilityChatCompletionEvents<'a> {
+        BetaObservabilityChatCompletionEvents::new(self.raw)
+    }
 
-    pub fn datasets(&self) -> BetaObservabilityDatasets<'a> { BetaObservabilityDatasets::new(self.raw) }
+    pub fn datasets(&self) -> BetaObservabilityDatasets<'a> {
+        BetaObservabilityDatasets::new(self.raw)
+    }
 
-    pub fn judges(&self) -> BetaObservabilityJudges<'a> { BetaObservabilityJudges::new(self.raw) }
+    pub fn judges(&self) -> BetaObservabilityJudges<'a> {
+        BetaObservabilityJudges::new(self.raw)
+    }
 
-    pub fn logs(&self) -> BetaObservabilityLogs<'a> { BetaObservabilityLogs::new(self.raw) }
+    pub fn logs(&self) -> BetaObservabilityLogs<'a> {
+        BetaObservabilityLogs::new(self.raw)
+    }
 
-    pub fn spans(&self) -> BetaObservabilitySpans<'a> { BetaObservabilitySpans::new(self.raw) }
+    pub fn spans(&self) -> BetaObservabilitySpans<'a> {
+        BetaObservabilitySpans::new(self.raw)
+    }
 
-    pub fn traces(&self) -> BetaObservabilityTraces<'a> { BetaObservabilityTraces::new(self.raw) }
+    pub fn traces(&self) -> BetaObservabilityTraces<'a> {
+        BetaObservabilityTraces::new(self.raw)
+    }
 }

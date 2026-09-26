@@ -2,118 +2,454 @@
 use super::*;
 use crate::generated::client::HttpClient;
 
-
-
-
-
-
 #[derive(Debug, Clone)]
-pub struct GetWorkflowRegistrationWorkflowsRequest { workflow_registration_id: String, with_workflow: Option<bool>, include_shared: Option<bool> }
-impl GetWorkflowRegistrationWorkflowsRequest { pub fn new(workflow_registration_id: impl Into<String>) -> Self { Self { workflow_registration_id: workflow_registration_id.into(), with_workflow: None, include_shared: None } }
-#[must_use] pub fn with_workflow(mut self, with_workflow: bool) -> Self { self.with_workflow = Some(with_workflow); self }
-#[must_use] pub fn include_shared(mut self, include_shared: bool) -> Self { self.include_shared = Some(include_shared); self }
+pub struct GetWorkflowRegistrationWorkflowsRequest {
+    workflow_registration_id: String,
+    with_workflow: Option<bool>,
+    include_shared: Option<bool>,
+}
+impl GetWorkflowRegistrationWorkflowsRequest {
+    pub fn new(workflow_registration_id: impl Into<String>) -> Self {
+        Self {
+            workflow_registration_id: workflow_registration_id.into(),
+            with_workflow: None,
+            include_shared: None,
+        }
+    }
+    #[must_use]
+    pub fn with_workflow(mut self, with_workflow: bool) -> Self {
+        self.with_workflow = Some(with_workflow);
+        self
+    }
+    #[must_use]
+    pub fn include_shared(mut self, include_shared: bool) -> Self {
+        self.include_shared = Some(include_shared);
+        self
+    }
 }
 
 #[derive(Debug, Clone, Default)]
-pub struct GetWorkflowRegistrationsWorkflowsRequest { workflow_id: Option<String>, task_queue: Option<String>, active_only: Option<bool>, include_shared: Option<bool>, workflow_search: Option<String>, archived: Option<String>, with_workflow: Option<bool>, available_in_chat_assistant: Option<String>, limit: Option<i64>, cursor: Option<String> }
-impl GetWorkflowRegistrationsWorkflowsRequest { pub fn new() -> Self { Self { workflow_id: None, task_queue: None, active_only: None, include_shared: None, workflow_search: None, archived: None, with_workflow: None, available_in_chat_assistant: None, limit: None, cursor: None } }
-#[must_use] pub fn workflow_id(mut self, workflow_id: impl Into<String>) -> Self { self.workflow_id = Some(workflow_id.into()); self }
-#[must_use] pub fn task_queue(mut self, task_queue: impl Into<String>) -> Self { self.task_queue = Some(task_queue.into()); self }
-#[must_use] pub fn active_only(mut self, active_only: bool) -> Self { self.active_only = Some(active_only); self }
-#[must_use] pub fn include_shared(mut self, include_shared: bool) -> Self { self.include_shared = Some(include_shared); self }
-#[must_use] pub fn workflow_search(mut self, workflow_search: impl Into<String>) -> Self { self.workflow_search = Some(workflow_search.into()); self }
-#[must_use] pub fn archived(mut self, archived: impl Into<String>) -> Self { self.archived = Some(archived.into()); self }
-#[must_use] pub fn with_workflow(mut self, with_workflow: bool) -> Self { self.with_workflow = Some(with_workflow); self }
-#[must_use] pub fn available_in_chat_assistant(mut self, available_in_chat_assistant: impl Into<String>) -> Self { self.available_in_chat_assistant = Some(available_in_chat_assistant.into()); self }
-#[must_use] pub fn limit(mut self, limit: i64) -> Self { self.limit = Some(limit); self }
-#[must_use] pub fn cursor(mut self, cursor: impl Into<String>) -> Self { self.cursor = Some(cursor.into()); self }
+pub struct GetWorkflowRegistrationsWorkflowsRequest {
+    workflow_id: Option<String>,
+    task_queue: Option<String>,
+    active_only: Option<bool>,
+    include_shared: Option<bool>,
+    workflow_search: Option<String>,
+    archived: Option<String>,
+    with_workflow: Option<bool>,
+    available_in_chat_assistant: Option<String>,
+    limit: Option<i64>,
+    cursor: Option<String>,
+}
+impl GetWorkflowRegistrationsWorkflowsRequest {
+    pub fn new() -> Self {
+        Self {
+            workflow_id: None,
+            task_queue: None,
+            active_only: None,
+            include_shared: None,
+            workflow_search: None,
+            archived: None,
+            with_workflow: None,
+            available_in_chat_assistant: None,
+            limit: None,
+            cursor: None,
+        }
+    }
+    #[must_use]
+    pub fn workflow_id(mut self, workflow_id: impl Into<String>) -> Self {
+        self.workflow_id = Some(workflow_id.into());
+        self
+    }
+    #[must_use]
+    pub fn task_queue(mut self, task_queue: impl Into<String>) -> Self {
+        self.task_queue = Some(task_queue.into());
+        self
+    }
+    #[must_use]
+    pub fn active_only(mut self, active_only: bool) -> Self {
+        self.active_only = Some(active_only);
+        self
+    }
+    #[must_use]
+    pub fn include_shared(mut self, include_shared: bool) -> Self {
+        self.include_shared = Some(include_shared);
+        self
+    }
+    #[must_use]
+    pub fn workflow_search(mut self, workflow_search: impl Into<String>) -> Self {
+        self.workflow_search = Some(workflow_search.into());
+        self
+    }
+    #[must_use]
+    pub fn archived(mut self, archived: impl Into<String>) -> Self {
+        self.archived = Some(archived.into());
+        self
+    }
+    #[must_use]
+    pub fn with_workflow(mut self, with_workflow: bool) -> Self {
+        self.with_workflow = Some(with_workflow);
+        self
+    }
+    #[must_use]
+    pub fn available_in_chat_assistant(
+        mut self,
+        available_in_chat_assistant: impl Into<String>,
+    ) -> Self {
+        self.available_in_chat_assistant = Some(available_in_chat_assistant.into());
+        self
+    }
+    #[must_use]
+    pub fn limit(mut self, limit: i64) -> Self {
+        self.limit = Some(limit);
+        self
+    }
+    #[must_use]
+    pub fn cursor(mut self, cursor: impl Into<String>) -> Self {
+        self.cursor = Some(cursor.into());
+        self
+    }
 }
 
 #[derive(Debug, Clone, Default)]
-pub struct GetWorkflowsWorkflowsRequest { status: Option<String>, include_shared: Option<bool>, available_in_chat_assistant: Option<String>, deployment_name: Option<String>, deployment_status: Option<String>, archived: Option<String>, tags: Option<String>, sort_by: Option<String>, order: Option<crate::generated::client::GetWorkflowsV1WorkflowsGetOrder>, cursor: Option<String>, limit: Option<i64>, active_only: Option<bool>, search: Option<String> }
-impl GetWorkflowsWorkflowsRequest { pub fn new() -> Self { Self { status: None, include_shared: None, available_in_chat_assistant: None, deployment_name: None, deployment_status: None, archived: None, tags: None, sort_by: None, order: None, cursor: None, limit: None, active_only: None, search: None } }
-#[must_use] pub fn status(mut self, status: impl Into<String>) -> Self { self.status = Some(status.into()); self }
-#[must_use] pub fn include_shared(mut self, include_shared: bool) -> Self { self.include_shared = Some(include_shared); self }
-#[must_use] pub fn available_in_chat_assistant(mut self, available_in_chat_assistant: impl Into<String>) -> Self { self.available_in_chat_assistant = Some(available_in_chat_assistant.into()); self }
-#[must_use] pub fn deployment_name(mut self, deployment_name: impl Into<String>) -> Self { self.deployment_name = Some(deployment_name.into()); self }
-#[must_use] pub fn deployment_status(mut self, deployment_status: impl Into<String>) -> Self { self.deployment_status = Some(deployment_status.into()); self }
-#[must_use] pub fn archived(mut self, archived: impl Into<String>) -> Self { self.archived = Some(archived.into()); self }
-#[must_use] pub fn tags(mut self, tags: impl Into<String>) -> Self { self.tags = Some(tags.into()); self }
-#[must_use] pub fn sort_by(mut self, sort_by: impl Into<String>) -> Self { self.sort_by = Some(sort_by.into()); self }
-#[must_use] pub fn order(mut self, order: crate::generated::client::GetWorkflowsV1WorkflowsGetOrder) -> Self { self.order = Some(order); self }
-#[must_use] pub fn cursor(mut self, cursor: impl Into<String>) -> Self { self.cursor = Some(cursor.into()); self }
-#[must_use] pub fn limit(mut self, limit: i64) -> Self { self.limit = Some(limit); self }
-#[must_use] pub fn active_only(mut self, active_only: bool) -> Self { self.active_only = Some(active_only); self }
-#[must_use] pub fn search(mut self, search: impl Into<String>) -> Self { self.search = Some(search.into()); self }
+pub struct GetWorkflowsWorkflowsRequest {
+    status: Option<String>,
+    include_shared: Option<bool>,
+    available_in_chat_assistant: Option<String>,
+    deployment_name: Option<String>,
+    deployment_status: Option<String>,
+    archived: Option<String>,
+    tags: Option<String>,
+    sort_by: Option<String>,
+    order: Option<crate::generated::client::GetWorkflowsV1WorkflowsGetOrder>,
+    cursor: Option<String>,
+    limit: Option<i64>,
+    active_only: Option<bool>,
+    search: Option<String>,
 }
-
+impl GetWorkflowsWorkflowsRequest {
+    pub fn new() -> Self {
+        Self {
+            status: None,
+            include_shared: None,
+            available_in_chat_assistant: None,
+            deployment_name: None,
+            deployment_status: None,
+            archived: None,
+            tags: None,
+            sort_by: None,
+            order: None,
+            cursor: None,
+            limit: None,
+            active_only: None,
+            search: None,
+        }
+    }
+    #[must_use]
+    pub fn status(mut self, status: impl Into<String>) -> Self {
+        self.status = Some(status.into());
+        self
+    }
+    #[must_use]
+    pub fn include_shared(mut self, include_shared: bool) -> Self {
+        self.include_shared = Some(include_shared);
+        self
+    }
+    #[must_use]
+    pub fn available_in_chat_assistant(
+        mut self,
+        available_in_chat_assistant: impl Into<String>,
+    ) -> Self {
+        self.available_in_chat_assistant = Some(available_in_chat_assistant.into());
+        self
+    }
+    #[must_use]
+    pub fn deployment_name(mut self, deployment_name: impl Into<String>) -> Self {
+        self.deployment_name = Some(deployment_name.into());
+        self
+    }
+    #[must_use]
+    pub fn deployment_status(mut self, deployment_status: impl Into<String>) -> Self {
+        self.deployment_status = Some(deployment_status.into());
+        self
+    }
+    #[must_use]
+    pub fn archived(mut self, archived: impl Into<String>) -> Self {
+        self.archived = Some(archived.into());
+        self
+    }
+    #[must_use]
+    pub fn tags(mut self, tags: impl Into<String>) -> Self {
+        self.tags = Some(tags.into());
+        self
+    }
+    #[must_use]
+    pub fn sort_by(mut self, sort_by: impl Into<String>) -> Self {
+        self.sort_by = Some(sort_by.into());
+        self
+    }
+    #[must_use]
+    pub fn order(
+        mut self,
+        order: crate::generated::client::GetWorkflowsV1WorkflowsGetOrder,
+    ) -> Self {
+        self.order = Some(order);
+        self
+    }
+    #[must_use]
+    pub fn cursor(mut self, cursor: impl Into<String>) -> Self {
+        self.cursor = Some(cursor.into());
+        self
+    }
+    #[must_use]
+    pub fn limit(mut self, limit: i64) -> Self {
+        self.limit = Some(limit);
+        self
+    }
+    #[must_use]
+    pub fn active_only(mut self, active_only: bool) -> Self {
+        self.active_only = Some(active_only);
+        self
+    }
+    #[must_use]
+    pub fn search(mut self, search: impl Into<String>) -> Self {
+        self.search = Some(search.into());
+        self
+    }
+}
 
 #[derive(Clone, Copy)]
-pub struct Workflows<'a> { raw: &'a HttpClient }
+pub struct Workflows<'a> {
+    raw: &'a HttpClient,
+}
 
 impl<'a> Workflows<'a> {
-    pub(crate) fn new(raw: &'a HttpClient) -> Self { Self { raw } }
-    pub fn deployments(&self) -> WorkflowsDeployments<'a> { WorkflowsDeployments::new(self.raw) }
-
-    pub fn events(&self) -> WorkflowsEvents<'a> { WorkflowsEvents::new(self.raw) }
-
-    pub fn executions(&self) -> WorkflowsExecutions<'a> { WorkflowsExecutions::new(self.raw) }
-
-    pub fn metrics(&self) -> WorkflowsMetrics<'a> { WorkflowsMetrics::new(self.raw) }
-
-    pub fn runs(&self) -> WorkflowsRuns<'a> { WorkflowsRuns::new(self.raw) }
-
-    pub fn schedules(&self) -> WorkflowsSchedules<'a> { WorkflowsSchedules::new(self.raw) }
-
-    pub async fn archive_workflow(&self, workflow_identifier: impl AsRef<str>) -> Result<ArchiveWorkflowWorkflowsResponse, SdkError> {
-        self.raw.archive_workflow_v1_workflows_workflow_identifier_archive_put(workflow_identifier.as_ref()).await.map(Into::into).map_err(Into::into)
+    pub(crate) fn new(raw: &'a HttpClient) -> Self {
+        Self { raw }
+    }
+    pub fn deployments(&self) -> WorkflowsDeployments<'a> {
+        WorkflowsDeployments::new(self.raw)
     }
 
-    pub async fn bulk_archive_workflows(&self, request: BulkArchiveWorkflowsWorkflowsRequest) -> Result<BulkArchiveWorkflowsWorkflowsResponse, SdkError> {
-        self.raw.bulk_archive_workflows_v1_workflows_archive_put(request.into_raw()).await.map(Into::into).map_err(Into::into)
+    pub fn events(&self) -> WorkflowsEvents<'a> {
+        WorkflowsEvents::new(self.raw)
     }
 
-    pub async fn bulk_unarchive_workflows(&self, request: BulkUnarchiveWorkflowsWorkflowsRequest) -> Result<BulkUnarchiveWorkflowsWorkflowsResponse, SdkError> {
-        self.raw.bulk_unarchive_workflows_v1_workflows_unarchive_put(request.into_raw()).await.map(Into::into).map_err(Into::into)
+    pub fn executions(&self) -> WorkflowsExecutions<'a> {
+        WorkflowsExecutions::new(self.raw)
     }
 
-    pub async fn execute_workflow(&self, workflow_identifier: impl AsRef<str>, request: ExecuteWorkflowWorkflowsRequest) -> Result<ExecuteWorkflowWorkflowsResponse, SdkError> {
-        self.raw.execute_workflow_v1_workflows_workflow_identifier_execute_post(workflow_identifier.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
+    pub fn metrics(&self) -> WorkflowsMetrics<'a> {
+        WorkflowsMetrics::new(self.raw)
     }
 
-    pub async fn execute_workflow_registration(&self, workflow_registration_id: impl AsRef<str>, request: ExecuteWorkflowRegistrationWorkflowsRequest) -> Result<ExecuteWorkflowRegistrationWorkflowsResponse, SdkError> {
+    pub fn runs(&self) -> WorkflowsRuns<'a> {
+        WorkflowsRuns::new(self.raw)
+    }
+
+    pub fn schedules(&self) -> WorkflowsSchedules<'a> {
+        WorkflowsSchedules::new(self.raw)
+    }
+
+    pub async fn archive_workflow(
+        &self,
+        workflow_identifier: impl AsRef<str>,
+    ) -> Result<ArchiveWorkflowWorkflowsResponse, SdkError> {
+        self.raw
+            .archive_workflow_v1_workflows_workflow_identifier_archive_put(
+                workflow_identifier.as_ref(),
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn bulk_archive_workflows(
+        &self,
+        request: BulkArchiveWorkflowsWorkflowsRequest,
+    ) -> Result<BulkArchiveWorkflowsWorkflowsResponse, SdkError> {
+        self.raw
+            .bulk_archive_workflows_v1_workflows_archive_put(request.into_raw())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn bulk_unarchive_workflows(
+        &self,
+        request: BulkUnarchiveWorkflowsWorkflowsRequest,
+    ) -> Result<BulkUnarchiveWorkflowsWorkflowsResponse, SdkError> {
+        self.raw
+            .bulk_unarchive_workflows_v1_workflows_unarchive_put(request.into_raw())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn execute_workflow(
+        &self,
+        workflow_identifier: impl AsRef<str>,
+        request: ExecuteWorkflowWorkflowsRequest,
+    ) -> Result<ExecuteWorkflowWorkflowsResponse, SdkError> {
+        self.raw
+            .execute_workflow_v1_workflows_workflow_identifier_execute_post(
+                workflow_identifier.as_ref(),
+                request.into_raw(),
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn execute_workflow_registration(
+        &self,
+        workflow_registration_id: impl AsRef<str>,
+        request: ExecuteWorkflowRegistrationWorkflowsRequest,
+    ) -> Result<ExecuteWorkflowRegistrationWorkflowsResponse, SdkError> {
         self.raw.execute_workflow_registration_v1_workflows_registrations_workflow_registration_id_execute_post(workflow_registration_id.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn get_workflow(&self, workflow_identifier: impl AsRef<str>) -> Result<GetWorkflowWorkflowsResponse, SdkError> {
-        self.raw.get_workflow_v1_workflows_workflow_identifier_get(workflow_identifier.as_ref()).await.map(Into::into).map_err(Into::into)
+    pub async fn get_workflow(
+        &self,
+        workflow_identifier: impl AsRef<str>,
+    ) -> Result<GetWorkflowWorkflowsResponse, SdkError> {
+        self.raw
+            .get_workflow_v1_workflows_workflow_identifier_get(workflow_identifier.as_ref())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
-    pub async fn get_workflow_registration(&self, request: GetWorkflowRegistrationWorkflowsRequest) -> Result<GetWorkflowRegistrationWorkflowsResponse, SdkError> {
-        self.raw.get_workflow_registration_v1_workflows_registrations_workflow_registration_id_get(request.workflow_registration_id.as_str(), request.with_workflow, request.include_shared).await.map(Into::into).map_err(Into::into)
+    pub async fn get_workflow_registration(
+        &self,
+        request: GetWorkflowRegistrationWorkflowsRequest,
+    ) -> Result<GetWorkflowRegistrationWorkflowsResponse, SdkError> {
+        self.raw
+            .get_workflow_registration_v1_workflows_registrations_workflow_registration_id_get(
+                request.workflow_registration_id.as_str(),
+                request.with_workflow,
+                request.include_shared,
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
-    pub async fn get_workflow_registrations(&self) -> Result<GetWorkflowRegistrationsWorkflowsResponse, SdkError> {
-        self.raw.get_workflow_registrations_v1_workflows_registrations_get(None::<&str>, None::<&str>, None, None, None::<&str>, None::<&str>, None, None::<&str>, None, None::<&str>).await.map(Into::into).map_err(Into::into)
+    pub async fn get_workflow_registrations(
+        &self,
+    ) -> Result<GetWorkflowRegistrationsWorkflowsResponse, SdkError> {
+        self.raw
+            .get_workflow_registrations_v1_workflows_registrations_get(
+                None::<&str>,
+                None::<&str>,
+                None,
+                None,
+                None::<&str>,
+                None::<&str>,
+                None,
+                None::<&str>,
+                None,
+                None::<&str>,
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
-    pub async fn get_workflow_registrations_with(&self, request: GetWorkflowRegistrationsWorkflowsRequest) -> Result<GetWorkflowRegistrationsWorkflowsResponse, SdkError> {
-        self.raw.get_workflow_registrations_v1_workflows_registrations_get(request.workflow_id.as_deref(), request.task_queue.as_deref(), request.active_only, request.include_shared, request.workflow_search.as_deref(), request.archived.as_deref(), request.with_workflow, request.available_in_chat_assistant.as_deref(), request.limit, request.cursor.as_deref()).await.map(Into::into).map_err(Into::into)
+    pub async fn get_workflow_registrations_with(
+        &self,
+        request: GetWorkflowRegistrationsWorkflowsRequest,
+    ) -> Result<GetWorkflowRegistrationsWorkflowsResponse, SdkError> {
+        self.raw
+            .get_workflow_registrations_v1_workflows_registrations_get(
+                request.workflow_id.as_deref(),
+                request.task_queue.as_deref(),
+                request.active_only,
+                request.include_shared,
+                request.workflow_search.as_deref(),
+                request.archived.as_deref(),
+                request.with_workflow,
+                request.available_in_chat_assistant.as_deref(),
+                request.limit,
+                request.cursor.as_deref(),
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
     pub async fn get_workflows(&self) -> Result<GetWorkflowsWorkflowsResponse, SdkError> {
-        self.raw.get_workflows_v1_workflows_get(None::<&str>, None, None::<&str>, None::<&str>, None::<&str>, None::<&str>, None::<&str>, None::<&str>, None, None::<&str>, None, None, None::<&str>).await.map(Into::into).map_err(Into::into)
+        self.raw
+            .get_workflows_v1_workflows_get(
+                None::<&str>,
+                None,
+                None::<&str>,
+                None::<&str>,
+                None::<&str>,
+                None::<&str>,
+                None::<&str>,
+                None::<&str>,
+                None,
+                None::<&str>,
+                None,
+                None,
+                None::<&str>,
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
-    pub async fn get_workflows_with(&self, request: GetWorkflowsWorkflowsRequest) -> Result<GetWorkflowsWorkflowsResponse, SdkError> {
-        self.raw.get_workflows_v1_workflows_get(request.status.as_deref(), request.include_shared, request.available_in_chat_assistant.as_deref(), request.deployment_name.as_deref(), request.deployment_status.as_deref(), request.archived.as_deref(), request.tags.as_deref(), request.sort_by.as_deref(), request.order, request.cursor.as_deref(), request.limit, request.active_only, request.search.as_deref()).await.map(Into::into).map_err(Into::into)
+    pub async fn get_workflows_with(
+        &self,
+        request: GetWorkflowsWorkflowsRequest,
+    ) -> Result<GetWorkflowsWorkflowsResponse, SdkError> {
+        self.raw
+            .get_workflows_v1_workflows_get(
+                request.status.as_deref(),
+                request.include_shared,
+                request.available_in_chat_assistant.as_deref(),
+                request.deployment_name.as_deref(),
+                request.deployment_status.as_deref(),
+                request.archived.as_deref(),
+                request.tags.as_deref(),
+                request.sort_by.as_deref(),
+                request.order,
+                request.cursor.as_deref(),
+                request.limit,
+                request.active_only,
+                request.search.as_deref(),
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
-    pub async fn unarchive_workflow(&self, workflow_identifier: impl AsRef<str>) -> Result<UnarchiveWorkflowWorkflowsResponse, SdkError> {
-        self.raw.unarchive_workflow_v1_workflows_workflow_identifier_unarchive_put(workflow_identifier.as_ref()).await.map(Into::into).map_err(Into::into)
+    pub async fn unarchive_workflow(
+        &self,
+        workflow_identifier: impl AsRef<str>,
+    ) -> Result<UnarchiveWorkflowWorkflowsResponse, SdkError> {
+        self.raw
+            .unarchive_workflow_v1_workflows_workflow_identifier_unarchive_put(
+                workflow_identifier.as_ref(),
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
-    pub async fn update_workflow(&self, workflow_identifier: impl AsRef<str>, request: UpdateWorkflowWorkflowsRequest) -> Result<UpdateWorkflowWorkflowsResponse, SdkError> {
-        self.raw.update_workflow_v1_workflows_workflow_identifier_put(workflow_identifier.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
+    pub async fn update_workflow(
+        &self,
+        workflow_identifier: impl AsRef<str>,
+        request: UpdateWorkflowWorkflowsRequest,
+    ) -> Result<UpdateWorkflowWorkflowsResponse, SdkError> {
+        self.raw
+            .update_workflow_v1_workflows_workflow_identifier_put(
+                workflow_identifier.as_ref(),
+                request.into_raw(),
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 }

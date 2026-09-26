@@ -3,41 +3,115 @@ use super::*;
 use crate::generated::client::HttpClient;
 
 #[derive(Debug, Clone, Default)]
-pub struct ListOrganizationsBetaUsersRequest { offset: Option<i64>, limit: Option<i64> }
-impl ListOrganizationsBetaUsersRequest { pub fn new() -> Self { Self { offset: None, limit: None } }
-#[must_use] pub fn offset(mut self, offset: i64) -> Self { self.offset = Some(offset); self }
-#[must_use] pub fn limit(mut self, limit: i64) -> Self { self.limit = Some(limit); self }
+pub struct ListOrganizationsBetaUsersRequest {
+    offset: Option<i64>,
+    limit: Option<i64>,
+}
+impl ListOrganizationsBetaUsersRequest {
+    pub fn new() -> Self {
+        Self {
+            offset: None,
+            limit: None,
+        }
+    }
+    #[must_use]
+    pub fn offset(mut self, offset: i64) -> Self {
+        self.offset = Some(offset);
+        self
+    }
+    #[must_use]
+    pub fn limit(mut self, limit: i64) -> Self {
+        self.limit = Some(limit);
+        self
+    }
 }
 
 #[derive(Debug, Clone, Default)]
-pub struct ListWorkspacesBetaUsersRequest { organization_id: Option<String>, offset: Option<i64>, limit: Option<i64> }
-impl ListWorkspacesBetaUsersRequest { pub fn new() -> Self { Self { organization_id: None, offset: None, limit: None } }
-#[must_use] pub fn organization_id(mut self, organization_id: impl Into<String>) -> Self { self.organization_id = Some(organization_id.into()); self }
-#[must_use] pub fn offset(mut self, offset: i64) -> Self { self.offset = Some(offset); self }
-#[must_use] pub fn limit(mut self, limit: i64) -> Self { self.limit = Some(limit); self }
+pub struct ListWorkspacesBetaUsersRequest {
+    organization_id: Option<String>,
+    offset: Option<i64>,
+    limit: Option<i64>,
+}
+impl ListWorkspacesBetaUsersRequest {
+    pub fn new() -> Self {
+        Self {
+            organization_id: None,
+            offset: None,
+            limit: None,
+        }
+    }
+    #[must_use]
+    pub fn organization_id(mut self, organization_id: impl Into<String>) -> Self {
+        self.organization_id = Some(organization_id.into());
+        self
+    }
+    #[must_use]
+    pub fn offset(mut self, offset: i64) -> Self {
+        self.offset = Some(offset);
+        self
+    }
+    #[must_use]
+    pub fn limit(mut self, limit: i64) -> Self {
+        self.limit = Some(limit);
+        self
+    }
 }
 #[derive(Clone, Copy)]
-pub struct BetaUsers<'a> { raw: &'a HttpClient }
+pub struct BetaUsers<'a> {
+    raw: &'a HttpClient,
+}
 
 impl<'a> BetaUsers<'a> {
-    pub(crate) fn new(raw: &'a HttpClient) -> Self { Self { raw } }
+    pub(crate) fn new(raw: &'a HttpClient) -> Self {
+        Self { raw }
+    }
     pub async fn get_identity(&self) -> Result<GetIdentityBetaUsersResponse, SdkError> {
-        self.raw.users_api_get_identity().await.map(Into::into).map_err(Into::into)
+        self.raw
+            .users_api_get_identity()
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
     pub async fn list_organizations(&self) -> Result<ListOrganizationsBetaUsersResponse, SdkError> {
-        self.raw.users_api_list_organizations(None, None).await.map(Into::into).map_err(Into::into)
+        self.raw
+            .users_api_list_organizations(None, None)
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
-    pub async fn list_organizations_with(&self, request: ListOrganizationsBetaUsersRequest) -> Result<ListOrganizationsBetaUsersResponse, SdkError> {
-        self.raw.users_api_list_organizations(request.offset, request.limit).await.map(Into::into).map_err(Into::into)
+    pub async fn list_organizations_with(
+        &self,
+        request: ListOrganizationsBetaUsersRequest,
+    ) -> Result<ListOrganizationsBetaUsersResponse, SdkError> {
+        self.raw
+            .users_api_list_organizations(request.offset, request.limit)
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
     pub async fn list_workspaces(&self) -> Result<ListWorkspacesBetaUsersResponse, SdkError> {
-        self.raw.users_api_list_workspaces(None::<&str>, None, None).await.map(Into::into).map_err(Into::into)
+        self.raw
+            .users_api_list_workspaces(None::<&str>, None, None)
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
-    pub async fn list_workspaces_with(&self, request: ListWorkspacesBetaUsersRequest) -> Result<ListWorkspacesBetaUsersResponse, SdkError> {
-        self.raw.users_api_list_workspaces(request.organization_id.as_deref(), request.offset, request.limit).await.map(Into::into).map_err(Into::into)
+    pub async fn list_workspaces_with(
+        &self,
+        request: ListWorkspacesBetaUsersRequest,
+    ) -> Result<ListWorkspacesBetaUsersResponse, SdkError> {
+        self.raw
+            .users_api_list_workspaces(
+                request.organization_id.as_deref(),
+                request.offset,
+                request.limit,
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 }

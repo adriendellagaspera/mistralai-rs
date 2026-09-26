@@ -2,33 +2,78 @@
 use super::*;
 use crate::generated::client::HttpClient;
 
-
-
-
 #[derive(Clone, Copy)]
-pub struct BetaObservabilityChatCompletionEvents<'a> { raw: &'a HttpClient }
+pub struct BetaObservabilityChatCompletionEvents<'a> {
+    raw: &'a HttpClient,
+}
 
 impl<'a> BetaObservabilityChatCompletionEvents<'a> {
-    pub(crate) fn new(raw: &'a HttpClient) -> Self { Self { raw } }
-    pub fn fields(&self) -> BetaObservabilityChatCompletionEventsFields<'a> { BetaObservabilityChatCompletionEventsFields::new(self.raw) }
-
-    pub async fn get_chat_completion_event(&self, event_id: impl AsRef<str>) -> Result<GetChatCompletionEventBetaObservabilityChatCompletionEventsResponse, SdkError> {
-        self.raw.get_chat_completion_event_v1_observability_chat_completion_events_event_id_get(event_id.as_ref()).await.map(Into::into).map_err(Into::into)
+    pub(crate) fn new(raw: &'a HttpClient) -> Self {
+        Self { raw }
+    }
+    pub fn fields(&self) -> BetaObservabilityChatCompletionEventsFields<'a> {
+        BetaObservabilityChatCompletionEventsFields::new(self.raw)
     }
 
-    pub async fn get_chat_completion_event_ids(&self, request: GetChatCompletionEventIdsBetaObservabilityChatCompletionEventsRequest) -> Result<GetChatCompletionEventIdsBetaObservabilityChatCompletionEventsResponse, SdkError> {
-        self.raw.get_chat_completion_event_ids_v1_observability_chat_completion_events_search_ids_post(request.into_raw()).await.map(Into::into).map_err(Into::into)
+    pub async fn get_chat_completion_event(
+        &self,
+        event_id: impl AsRef<str>,
+    ) -> Result<GetChatCompletionEventBetaObservabilityChatCompletionEventsResponse, SdkError> {
+        self.raw
+            .get_chat_completion_event_v1_observability_chat_completion_events_event_id_get(
+                event_id.as_ref(),
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
-    pub async fn get_chat_completion_events(&self, page_size: Option<i64>, cursor: Option<String>, request: GetChatCompletionEventsBetaObservabilityChatCompletionEventsRequest) -> Result<GetChatCompletionEventsBetaObservabilityChatCompletionEventsResponse, SdkError> {
-        self.raw.get_chat_completion_events_v1_observability_chat_completion_events_search_post(page_size, cursor, request.into_raw()).await.map(Into::into).map_err(Into::into)
+    pub async fn get_chat_completion_event_ids(
+        &self,
+        request: GetChatCompletionEventIdsBetaObservabilityChatCompletionEventsRequest,
+    ) -> Result<GetChatCompletionEventIdsBetaObservabilityChatCompletionEventsResponse, SdkError>
+    {
+        self.raw
+            .get_chat_completion_event_ids_v1_observability_chat_completion_events_search_ids_post(
+                request.into_raw(),
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
-    pub async fn get_similar_chat_completion_events(&self, event_id: impl AsRef<str>) -> Result<GetSimilarChatCompletionEventsBetaObservabilityChatCompletionEventsResponse, SdkError> {
+    pub async fn get_chat_completion_events(
+        &self,
+        page_size: Option<i64>,
+        cursor: Option<String>,
+        request: GetChatCompletionEventsBetaObservabilityChatCompletionEventsRequest,
+    ) -> Result<GetChatCompletionEventsBetaObservabilityChatCompletionEventsResponse, SdkError>
+    {
+        self.raw
+            .get_chat_completion_events_v1_observability_chat_completion_events_search_post(
+                page_size,
+                cursor,
+                request.into_raw(),
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn get_similar_chat_completion_events(
+        &self,
+        event_id: impl AsRef<str>,
+    ) -> Result<GetSimilarChatCompletionEventsBetaObservabilityChatCompletionEventsResponse, SdkError>
+    {
         self.raw.get_similar_chat_completion_events_v1_observability_chat_completion_events_event_id_similar_events_get(event_id.as_ref()).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn judge_chat_completion_event(&self, event_id: impl AsRef<str>, request: JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequest) -> Result<JudgeChatCompletionEventBetaObservabilityChatCompletionEventsResponse, SdkError> {
+    pub async fn judge_chat_completion_event(
+        &self,
+        event_id: impl AsRef<str>,
+        request: JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequest,
+    ) -> Result<JudgeChatCompletionEventBetaObservabilityChatCompletionEventsResponse, SdkError>
+    {
         self.raw.judge_chat_completion_event_v1_observability_chat_completion_events_event_id_live_judging_post(event_id.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
     }
 }

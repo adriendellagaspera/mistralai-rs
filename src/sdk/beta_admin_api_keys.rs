@@ -2,32 +2,87 @@
 use super::*;
 use crate::generated::client::HttpClient;
 
-
 #[derive(Debug, Clone, Default)]
-pub struct GetApiKeysBetaAdminApiKeysRequest { limit: Option<i64>, offset: Option<i64>, name: Option<String> }
-impl GetApiKeysBetaAdminApiKeysRequest { pub fn new() -> Self { Self { limit: None, offset: None, name: None } }
-#[must_use] pub fn limit(mut self, limit: i64) -> Self { self.limit = Some(limit); self }
-#[must_use] pub fn offset(mut self, offset: i64) -> Self { self.offset = Some(offset); self }
-#[must_use] pub fn name(mut self, name: impl Into<String>) -> Self { self.name = Some(name.into()); self }
+pub struct GetApiKeysBetaAdminApiKeysRequest {
+    limit: Option<i64>,
+    offset: Option<i64>,
+    name: Option<String>,
+}
+impl GetApiKeysBetaAdminApiKeysRequest {
+    pub fn new() -> Self {
+        Self {
+            limit: None,
+            offset: None,
+            name: None,
+        }
+    }
+    #[must_use]
+    pub fn limit(mut self, limit: i64) -> Self {
+        self.limit = Some(limit);
+        self
+    }
+    #[must_use]
+    pub fn offset(mut self, offset: i64) -> Self {
+        self.offset = Some(offset);
+        self
+    }
+    #[must_use]
+    pub fn name(mut self, name: impl Into<String>) -> Self {
+        self.name = Some(name.into());
+        self
+    }
 }
 #[derive(Clone, Copy)]
-pub struct BetaAdminApiKeys<'a> { raw: &'a HttpClient }
+pub struct BetaAdminApiKeys<'a> {
+    raw: &'a HttpClient,
+}
 
 impl<'a> BetaAdminApiKeys<'a> {
-    pub(crate) fn new(raw: &'a HttpClient) -> Self { Self { raw } }
-    pub async fn create_api_key(&self, request: CreateApiKeyBetaAdminApiKeysRequest) -> Result<CreateApiKeyBetaAdminApiKeysResponse, SdkError> {
-        self.raw.users_api_admin_api_keys_create_api_key(request.into_raw()).await.map(Into::into).map_err(Into::into)
+    pub(crate) fn new(raw: &'a HttpClient) -> Self {
+        Self { raw }
+    }
+    pub async fn create_api_key(
+        &self,
+        request: CreateApiKeyBetaAdminApiKeysRequest,
+    ) -> Result<CreateApiKeyBetaAdminApiKeysResponse, SdkError> {
+        self.raw
+            .users_api_admin_api_keys_create_api_key(request.into_raw())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
-    pub async fn delete_api_key(&self, key_id: impl AsRef<str>) -> Result<DeleteApiKeyBetaAdminApiKeysResponse, SdkError> {
-        self.raw.users_api_admin_api_keys_delete_api_key(key_id.as_ref()).await.map(Into::into).map_err(Into::into)
+    pub async fn delete_api_key(
+        &self,
+        key_id: impl AsRef<str>,
+    ) -> Result<DeleteApiKeyBetaAdminApiKeysResponse, SdkError> {
+        self.raw
+            .users_api_admin_api_keys_delete_api_key(key_id.as_ref())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
     pub async fn get_api_keys(&self) -> Result<GetApiKeysBetaAdminApiKeysResponse, SdkError> {
-        self.raw.users_api_admin_api_keys_get_api_keys(None, None, None::<&str>).await.map(Into::into).map_err(Into::into)
+        self.raw
+            .users_api_admin_api_keys_get_api_keys(None, None, None::<&str>)
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
-    pub async fn get_api_keys_with(&self, request: GetApiKeysBetaAdminApiKeysRequest) -> Result<GetApiKeysBetaAdminApiKeysResponse, SdkError> {
-        self.raw.users_api_admin_api_keys_get_api_keys(request.limit, request.offset, request.name.as_deref()).await.map(Into::into).map_err(Into::into)
+    pub async fn get_api_keys_with(
+        &self,
+        request: GetApiKeysBetaAdminApiKeysRequest,
+    ) -> Result<GetApiKeysBetaAdminApiKeysResponse, SdkError> {
+        self.raw
+            .users_api_admin_api_keys_get_api_keys(
+                request.limit,
+                request.offset,
+                request.name.as_deref(),
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 }

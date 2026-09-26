@@ -2,27 +2,51 @@
 use super::*;
 use crate::generated::client::HttpClient;
 #[derive(Clone, Copy)]
-pub struct Beta<'a> { raw: &'a HttpClient }
+pub struct Beta<'a> {
+    raw: &'a HttpClient,
+}
 
 impl<'a> Beta<'a> {
-    pub(crate) fn new(raw: &'a HttpClient) -> Self { Self { raw } }
-    pub fn admin(&self) -> BetaAdmin<'a> { BetaAdmin::new(self.raw) }
+    pub(crate) fn new(raw: &'a HttpClient) -> Self {
+        Self { raw }
+    }
+    pub fn admin(&self) -> BetaAdmin<'a> {
+        BetaAdmin::new(self.raw)
+    }
 
-    pub fn agents(&self) -> BetaAgents<'a> { BetaAgents::new(self.raw) }
+    pub fn agents(&self) -> BetaAgents<'a> {
+        BetaAgents::new(self.raw)
+    }
 
-    pub fn connectors(&self) -> BetaConnectors<'a> { BetaConnectors::new(self.raw) }
+    pub fn connectors(&self) -> BetaConnectors<'a> {
+        BetaConnectors::new(self.raw)
+    }
 
-    pub fn conversations(&self) -> BetaConversations<'a> { BetaConversations::new(self.raw) }
+    pub fn conversations(&self) -> BetaConversations<'a> {
+        BetaConversations::new(self.raw)
+    }
 
-    pub fn libraries(&self) -> BetaLibraries<'a> { BetaLibraries::new(self.raw) }
+    pub fn libraries(&self) -> BetaLibraries<'a> {
+        BetaLibraries::new(self.raw)
+    }
 
-    pub fn observability(&self) -> BetaObservability<'a> { BetaObservability::new(self.raw) }
+    pub fn observability(&self) -> BetaObservability<'a> {
+        BetaObservability::new(self.raw)
+    }
 
-    pub fn prompts(&self) -> BetaPrompts<'a> { BetaPrompts::new(self.raw) }
+    pub fn prompts(&self) -> BetaPrompts<'a> {
+        BetaPrompts::new(self.raw)
+    }
 
-    pub fn rag(&self) -> BetaRag<'a> { BetaRag::new(self.raw) }
+    pub fn rag(&self) -> BetaRag<'a> {
+        BetaRag::new(self.raw)
+    }
 
-    pub fn skills(&self) -> BetaSkills<'a> { BetaSkills::new(self.raw) }
+    pub fn skills(&self) -> BetaSkills<'a> {
+        BetaSkills::new(self.raw)
+    }
 
-    pub fn users(&self) -> BetaUsers<'a> { BetaUsers::new(self.raw) }
+    pub fn users(&self) -> BetaUsers<'a> {
+        BetaUsers::new(self.raw)
+    }
 }

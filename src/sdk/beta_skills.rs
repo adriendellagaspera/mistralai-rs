@@ -2,79 +2,269 @@
 use super::*;
 use crate::generated::client::HttpClient;
 
-
-
 #[derive(Debug, Clone)]
-pub struct GetBetaSkillsRequest { skill_id: String, version: Option<i32>, alias: Option<String>, fields: Option<Vec<String>> }
-impl GetBetaSkillsRequest { pub fn new(skill_id: impl Into<String>) -> Self { Self { skill_id: skill_id.into(), version: None, alias: None, fields: None } }
-#[must_use] pub fn version(mut self, version: i32) -> Self { self.version = Some(version); self }
-#[must_use] pub fn alias(mut self, alias: impl Into<String>) -> Self { self.alias = Some(alias.into()); self }
-#[must_use] pub fn fields(mut self, fields: Vec<String>) -> Self { self.fields = Some(fields); self }
+pub struct GetBetaSkillsRequest {
+    skill_id: String,
+    version: Option<i32>,
+    alias: Option<String>,
+    fields: Option<Vec<String>>,
+}
+impl GetBetaSkillsRequest {
+    pub fn new(skill_id: impl Into<String>) -> Self {
+        Self {
+            skill_id: skill_id.into(),
+            version: None,
+            alias: None,
+            fields: None,
+        }
+    }
+    #[must_use]
+    pub fn version(mut self, version: i32) -> Self {
+        self.version = Some(version);
+        self
+    }
+    #[must_use]
+    pub fn alias(mut self, alias: impl Into<String>) -> Self {
+        self.alias = Some(alias.into());
+        self
+    }
+    #[must_use]
+    pub fn fields(mut self, fields: Vec<String>) -> Self {
+        self.fields = Some(fields);
+        self
+    }
 }
 
 #[derive(Debug, Clone)]
-pub struct GetVersionBetaSkillsRequest { skill_id: String, version: i32, fields: Option<Vec<String>> }
-impl GetVersionBetaSkillsRequest { pub fn new(skill_id: impl Into<String>, version: i32) -> Self { Self { skill_id: skill_id.into(), version: version, fields: None } }
-#[must_use] pub fn fields(mut self, fields: Vec<String>) -> Self { self.fields = Some(fields); self }
+pub struct GetVersionBetaSkillsRequest {
+    skill_id: String,
+    version: i32,
+    fields: Option<Vec<String>>,
+}
+impl GetVersionBetaSkillsRequest {
+    pub fn new(skill_id: impl Into<String>, version: i32) -> Self {
+        Self {
+            skill_id: skill_id.into(),
+            version: version,
+            fields: None,
+        }
+    }
+    #[must_use]
+    pub fn fields(mut self, fields: Vec<String>) -> Self {
+        self.fields = Some(fields);
+        self
+    }
 }
 
 #[derive(Debug, Clone, Default)]
-pub struct ListBetaSkillsRequest { page_size: Option<i32>, page_token: Option<String>, alias: Option<String>, fields: Option<Vec<String>>, sort_field: Option<crate::generated::types::ListSortField>, sort_direction: Option<crate::generated::types::ListSortDirection>, sort_by: Option<String>, sort_direction_2: Option<String> }
-impl ListBetaSkillsRequest { pub fn new() -> Self { Self { page_size: None, page_token: None, alias: None, fields: None, sort_field: None, sort_direction: None, sort_by: None, sort_direction_2: None } }
-#[must_use] pub fn page_size(mut self, page_size: i32) -> Self { self.page_size = Some(page_size); self }
-#[must_use] pub fn page_token(mut self, page_token: impl Into<String>) -> Self { self.page_token = Some(page_token.into()); self }
-#[must_use] pub fn alias(mut self, alias: impl Into<String>) -> Self { self.alias = Some(alias.into()); self }
-#[must_use] pub fn fields(mut self, fields: Vec<String>) -> Self { self.fields = Some(fields); self }
-#[must_use] pub fn sort_field(mut self, sort_field: crate::generated::types::ListSortField) -> Self { self.sort_field = Some(sort_field); self }
-#[must_use] pub fn sort_direction(mut self, sort_direction: crate::generated::types::ListSortDirection) -> Self { self.sort_direction = Some(sort_direction); self }
-#[must_use] pub fn sort_by(mut self, sort_by: impl Into<String>) -> Self { self.sort_by = Some(sort_by.into()); self }
-#[must_use] pub fn sort_direction_2(mut self, sort_direction_2: impl Into<String>) -> Self { self.sort_direction_2 = Some(sort_direction_2.into()); self }
+pub struct ListBetaSkillsRequest {
+    page_size: Option<i32>,
+    page_token: Option<String>,
+    alias: Option<String>,
+    fields: Option<Vec<String>>,
+    sort_field: Option<crate::generated::types::ListSortField>,
+    sort_direction: Option<crate::generated::types::ListSortDirection>,
+    sort_by: Option<String>,
+    sort_direction_2: Option<String>,
+}
+impl ListBetaSkillsRequest {
+    pub fn new() -> Self {
+        Self {
+            page_size: None,
+            page_token: None,
+            alias: None,
+            fields: None,
+            sort_field: None,
+            sort_direction: None,
+            sort_by: None,
+            sort_direction_2: None,
+        }
+    }
+    #[must_use]
+    pub fn page_size(mut self, page_size: i32) -> Self {
+        self.page_size = Some(page_size);
+        self
+    }
+    #[must_use]
+    pub fn page_token(mut self, page_token: impl Into<String>) -> Self {
+        self.page_token = Some(page_token.into());
+        self
+    }
+    #[must_use]
+    pub fn alias(mut self, alias: impl Into<String>) -> Self {
+        self.alias = Some(alias.into());
+        self
+    }
+    #[must_use]
+    pub fn fields(mut self, fields: Vec<String>) -> Self {
+        self.fields = Some(fields);
+        self
+    }
+    #[must_use]
+    pub fn sort_field(mut self, sort_field: crate::generated::types::ListSortField) -> Self {
+        self.sort_field = Some(sort_field);
+        self
+    }
+    #[must_use]
+    pub fn sort_direction(
+        mut self,
+        sort_direction: crate::generated::types::ListSortDirection,
+    ) -> Self {
+        self.sort_direction = Some(sort_direction);
+        self
+    }
+    #[must_use]
+    pub fn sort_by(mut self, sort_by: impl Into<String>) -> Self {
+        self.sort_by = Some(sort_by.into());
+        self
+    }
+    #[must_use]
+    pub fn sort_direction_2(mut self, sort_direction_2: impl Into<String>) -> Self {
+        self.sort_direction_2 = Some(sort_direction_2.into());
+        self
+    }
 }
 
-
-
 #[derive(Clone, Copy)]
-pub struct BetaSkills<'a> { raw: &'a HttpClient }
+pub struct BetaSkills<'a> {
+    raw: &'a HttpClient,
+}
 
 impl<'a> BetaSkills<'a> {
-    pub(crate) fn new(raw: &'a HttpClient) -> Self { Self { raw } }
-    pub async fn create(&self, request: CreateBetaSkillsRequest) -> Result<CreateBetaSkillsResponse, SdkError> {
-        self.raw.skills_create(request.into_raw()).await.map(Into::into).map_err(Into::into)
+    pub(crate) fn new(raw: &'a HttpClient) -> Self {
+        Self { raw }
+    }
+    pub async fn create(
+        &self,
+        request: CreateBetaSkillsRequest,
+    ) -> Result<CreateBetaSkillsResponse, SdkError> {
+        self.raw
+            .skills_create(request.into_raw())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
-    pub async fn create_version(&self, skill_id: impl AsRef<str>, request: CreateVersionBetaSkillsRequest) -> Result<CreateVersionBetaSkillsResponse, SdkError> {
-        self.raw.skills_create_version(skill_id.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
+    pub async fn create_version(
+        &self,
+        skill_id: impl AsRef<str>,
+        request: CreateVersionBetaSkillsRequest,
+    ) -> Result<CreateVersionBetaSkillsResponse, SdkError> {
+        self.raw
+            .skills_create_version(skill_id.as_ref(), request.into_raw())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
-    pub async fn delete(&self, skill_id: impl AsRef<str>) -> Result<DeleteBetaSkillsResponse, SdkError> {
-        self.raw.skills_delete(skill_id.as_ref()).await.map(Into::into).map_err(Into::into)
+    pub async fn delete(
+        &self,
+        skill_id: impl AsRef<str>,
+    ) -> Result<DeleteBetaSkillsResponse, SdkError> {
+        self.raw
+            .skills_delete(skill_id.as_ref())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
-    pub async fn get(&self, request: GetBetaSkillsRequest) -> Result<GetBetaSkillsResponse, SdkError> {
-        self.raw.skills_get(request.skill_id.as_str(), request.version, request.alias.as_deref(), request.fields).await.map(Into::into).map_err(Into::into)
+    pub async fn get(
+        &self,
+        request: GetBetaSkillsRequest,
+    ) -> Result<GetBetaSkillsResponse, SdkError> {
+        self.raw
+            .skills_get(
+                request.skill_id.as_str(),
+                request.version,
+                request.alias.as_deref(),
+                request.fields,
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
-    pub async fn get_version(&self, request: GetVersionBetaSkillsRequest) -> Result<GetVersionBetaSkillsResponse, SdkError> {
-        self.raw.skills_get_version(request.skill_id.as_str(), request.version, request.fields).await.map(Into::into).map_err(Into::into)
+    pub async fn get_version(
+        &self,
+        request: GetVersionBetaSkillsRequest,
+    ) -> Result<GetVersionBetaSkillsResponse, SdkError> {
+        self.raw
+            .skills_get_version(request.skill_id.as_str(), request.version, request.fields)
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
     pub async fn list(&self) -> Result<ListBetaSkillsResponse, SdkError> {
-        self.raw.skills_list(None, None::<&str>, None::<&str>, None, None, None, None::<&str>, None::<&str>).await.map(Into::into).map_err(Into::into)
+        self.raw
+            .skills_list(
+                None,
+                None::<&str>,
+                None::<&str>,
+                None,
+                None,
+                None,
+                None::<&str>,
+                None::<&str>,
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
-    pub async fn list_with(&self, request: ListBetaSkillsRequest) -> Result<ListBetaSkillsResponse, SdkError> {
-        self.raw.skills_list(request.page_size, request.page_token.as_deref(), request.alias.as_deref(), request.fields, request.sort_field, request.sort_direction, request.sort_by.as_deref(), request.sort_direction_2.as_deref()).await.map(Into::into).map_err(Into::into)
+    pub async fn list_with(
+        &self,
+        request: ListBetaSkillsRequest,
+    ) -> Result<ListBetaSkillsResponse, SdkError> {
+        self.raw
+            .skills_list(
+                request.page_size,
+                request.page_token.as_deref(),
+                request.alias.as_deref(),
+                request.fields,
+                request.sort_field,
+                request.sort_direction,
+                request.sort_by.as_deref(),
+                request.sort_direction_2.as_deref(),
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
-    pub async fn list_versions(&self, skill_id: impl AsRef<str>) -> Result<ListVersionsBetaSkillsResponse, SdkError> {
-        self.raw.skills_list_versions(skill_id.as_ref()).await.map(Into::into).map_err(Into::into)
+    pub async fn list_versions(
+        &self,
+        skill_id: impl AsRef<str>,
+    ) -> Result<ListVersionsBetaSkillsResponse, SdkError> {
+        self.raw
+            .skills_list_versions(skill_id.as_ref())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
-    pub async fn update(&self, skill_id: impl AsRef<str>, request: UpdateBetaSkillsRequest) -> Result<UpdateBetaSkillsResponse, SdkError> {
-        self.raw.skills_update(skill_id.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
+    pub async fn update(
+        &self,
+        skill_id: impl AsRef<str>,
+        request: UpdateBetaSkillsRequest,
+    ) -> Result<UpdateBetaSkillsResponse, SdkError> {
+        self.raw
+            .skills_update(skill_id.as_ref(), request.into_raw())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
-    pub async fn update_version_metadata(&self, skill_id: impl AsRef<str>, version: i32, request: UpdateVersionMetadataBetaSkillsRequest) -> Result<UpdateVersionMetadataBetaSkillsResponse, SdkError> {
-        self.raw.skills_update_version_metadata(skill_id.as_ref(), version, request.into_raw()).await.map(Into::into).map_err(Into::into)
+    pub async fn update_version_metadata(
+        &self,
+        skill_id: impl AsRef<str>,
+        version: i32,
+        request: UpdateVersionMetadataBetaSkillsRequest,
+    ) -> Result<UpdateVersionMetadataBetaSkillsResponse, SdkError> {
+        self.raw
+            .skills_update_version_metadata(skill_id.as_ref(), version, request.into_raw())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 }

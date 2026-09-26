@@ -3,59 +3,182 @@ use super::*;
 use crate::generated::client::HttpClient;
 
 #[derive(Debug, Clone, Default)]
-pub struct GetSchedulesWorkflowsSchedulesRequest { workflow_name: Option<String>, user_id: Option<String>, status: Option<String>, search: Option<String>, page_size: Option<String>, next_page_token: Option<String> }
-impl GetSchedulesWorkflowsSchedulesRequest { pub fn new() -> Self { Self { workflow_name: None, user_id: None, status: None, search: None, page_size: None, next_page_token: None } }
-#[must_use] pub fn workflow_name(mut self, workflow_name: impl Into<String>) -> Self { self.workflow_name = Some(workflow_name.into()); self }
-#[must_use] pub fn user_id(mut self, user_id: impl Into<String>) -> Self { self.user_id = Some(user_id.into()); self }
-#[must_use] pub fn status(mut self, status: impl Into<String>) -> Self { self.status = Some(status.into()); self }
-#[must_use] pub fn search(mut self, search: impl Into<String>) -> Self { self.search = Some(search.into()); self }
-#[must_use] pub fn page_size(mut self, page_size: impl Into<String>) -> Self { self.page_size = Some(page_size.into()); self }
-#[must_use] pub fn next_page_token(mut self, next_page_token: impl Into<String>) -> Self { self.next_page_token = Some(next_page_token.into()); self }
+pub struct GetSchedulesWorkflowsSchedulesRequest {
+    workflow_name: Option<String>,
+    user_id: Option<String>,
+    status: Option<String>,
+    search: Option<String>,
+    page_size: Option<String>,
+    next_page_token: Option<String>,
+}
+impl GetSchedulesWorkflowsSchedulesRequest {
+    pub fn new() -> Self {
+        Self {
+            workflow_name: None,
+            user_id: None,
+            status: None,
+            search: None,
+            page_size: None,
+            next_page_token: None,
+        }
+    }
+    #[must_use]
+    pub fn workflow_name(mut self, workflow_name: impl Into<String>) -> Self {
+        self.workflow_name = Some(workflow_name.into());
+        self
+    }
+    #[must_use]
+    pub fn user_id(mut self, user_id: impl Into<String>) -> Self {
+        self.user_id = Some(user_id.into());
+        self
+    }
+    #[must_use]
+    pub fn status(mut self, status: impl Into<String>) -> Self {
+        self.status = Some(status.into());
+        self
+    }
+    #[must_use]
+    pub fn search(mut self, search: impl Into<String>) -> Self {
+        self.search = Some(search.into());
+        self
+    }
+    #[must_use]
+    pub fn page_size(mut self, page_size: impl Into<String>) -> Self {
+        self.page_size = Some(page_size.into());
+        self
+    }
+    #[must_use]
+    pub fn next_page_token(mut self, next_page_token: impl Into<String>) -> Self {
+        self.next_page_token = Some(next_page_token.into());
+        self
+    }
 }
 
-
-
-
-
-
 #[derive(Clone, Copy)]
-pub struct WorkflowsSchedules<'a> { raw: &'a HttpClient }
+pub struct WorkflowsSchedules<'a> {
+    raw: &'a HttpClient,
+}
 
 impl<'a> WorkflowsSchedules<'a> {
-    pub(crate) fn new(raw: &'a HttpClient) -> Self { Self { raw } }
-    pub async fn get_schedule(&self, schedule_id: impl AsRef<str>) -> Result<GetScheduleWorkflowsSchedulesResponse, SdkError> {
-        self.raw.get_schedule_v1_workflows_schedules_schedule_id_get(schedule_id.as_ref()).await.map(Into::into).map_err(Into::into)
+    pub(crate) fn new(raw: &'a HttpClient) -> Self {
+        Self { raw }
+    }
+    pub async fn get_schedule(
+        &self,
+        schedule_id: impl AsRef<str>,
+    ) -> Result<GetScheduleWorkflowsSchedulesResponse, SdkError> {
+        self.raw
+            .get_schedule_v1_workflows_schedules_schedule_id_get(schedule_id.as_ref())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
     pub async fn get_schedules(&self) -> Result<GetSchedulesWorkflowsSchedulesResponse, SdkError> {
-        self.raw.get_schedules_v1_workflows_schedules_get(None::<&str>, None::<&str>, None::<&str>, None::<&str>, None::<&str>, None::<&str>).await.map(Into::into).map_err(Into::into)
+        self.raw
+            .get_schedules_v1_workflows_schedules_get(
+                None::<&str>,
+                None::<&str>,
+                None::<&str>,
+                None::<&str>,
+                None::<&str>,
+                None::<&str>,
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
-    pub async fn get_schedules_with(&self, request: GetSchedulesWorkflowsSchedulesRequest) -> Result<GetSchedulesWorkflowsSchedulesResponse, SdkError> {
-        self.raw.get_schedules_v1_workflows_schedules_get(request.workflow_name.as_deref(), request.user_id.as_deref(), request.status.as_deref(), request.search.as_deref(), request.page_size.as_deref(), request.next_page_token.as_deref()).await.map(Into::into).map_err(Into::into)
+    pub async fn get_schedules_with(
+        &self,
+        request: GetSchedulesWorkflowsSchedulesRequest,
+    ) -> Result<GetSchedulesWorkflowsSchedulesResponse, SdkError> {
+        self.raw
+            .get_schedules_v1_workflows_schedules_get(
+                request.workflow_name.as_deref(),
+                request.user_id.as_deref(),
+                request.status.as_deref(),
+                request.search.as_deref(),
+                request.page_size.as_deref(),
+                request.next_page_token.as_deref(),
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
-    pub async fn pause_schedule(&self, schedule_id: impl AsRef<str>, request: Option<Option<PauseScheduleWorkflowsSchedulesRequest>>) -> Result<(), SdkError> {
-        self.raw.pause_schedule_v1_workflows_schedules_schedule_id_pause_post(schedule_id.as_ref(), request.map(|request| request.map(|request| request.into_raw()))).await.map_err(Into::into)
+    pub async fn pause_schedule(
+        &self,
+        schedule_id: impl AsRef<str>,
+        request: Option<Option<PauseScheduleWorkflowsSchedulesRequest>>,
+    ) -> Result<(), SdkError> {
+        self.raw
+            .pause_schedule_v1_workflows_schedules_schedule_id_pause_post(
+                schedule_id.as_ref(),
+                request.map(|request| request.map(|request| request.into_raw())),
+            )
+            .await
+            .map_err(Into::into)
     }
 
-    pub async fn resume_schedule(&self, schedule_id: impl AsRef<str>, request: Option<Option<ResumeScheduleWorkflowsSchedulesRequest>>) -> Result<(), SdkError> {
-        self.raw.resume_schedule_v1_workflows_schedules_schedule_id_resume_post(schedule_id.as_ref(), request.map(|request| request.map(|request| request.into_raw()))).await.map_err(Into::into)
+    pub async fn resume_schedule(
+        &self,
+        schedule_id: impl AsRef<str>,
+        request: Option<Option<ResumeScheduleWorkflowsSchedulesRequest>>,
+    ) -> Result<(), SdkError> {
+        self.raw
+            .resume_schedule_v1_workflows_schedules_schedule_id_resume_post(
+                schedule_id.as_ref(),
+                request.map(|request| request.map(|request| request.into_raw())),
+            )
+            .await
+            .map_err(Into::into)
     }
 
-    pub async fn schedule_workflow(&self, request: ScheduleWorkflowWorkflowsSchedulesRequest) -> Result<ScheduleWorkflowWorkflowsSchedulesResponse, SdkError> {
-        self.raw.schedule_workflow_v1_workflows_schedules_post(request.into_raw()).await.map(Into::into).map_err(Into::into)
+    pub async fn schedule_workflow(
+        &self,
+        request: ScheduleWorkflowWorkflowsSchedulesRequest,
+    ) -> Result<ScheduleWorkflowWorkflowsSchedulesResponse, SdkError> {
+        self.raw
+            .schedule_workflow_v1_workflows_schedules_post(request.into_raw())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
-    pub async fn trigger_schedule(&self, schedule_id: impl AsRef<str>, request: Option<Option<TriggerScheduleWorkflowsSchedulesRequest>>) -> Result<(), SdkError> {
-        self.raw.trigger_schedule_v1_workflows_schedules_schedule_id_trigger_post(schedule_id.as_ref(), request.map(|request| request.map(|request| request.into_raw()))).await.map_err(Into::into)
+    pub async fn trigger_schedule(
+        &self,
+        schedule_id: impl AsRef<str>,
+        request: Option<Option<TriggerScheduleWorkflowsSchedulesRequest>>,
+    ) -> Result<(), SdkError> {
+        self.raw
+            .trigger_schedule_v1_workflows_schedules_schedule_id_trigger_post(
+                schedule_id.as_ref(),
+                request.map(|request| request.map(|request| request.into_raw())),
+            )
+            .await
+            .map_err(Into::into)
     }
 
     pub async fn unschedule_workflow(&self, schedule_id: impl AsRef<str>) -> Result<(), SdkError> {
-        self.raw.unschedule_workflow_v1_workflows_schedules_schedule_id_delete(schedule_id.as_ref()).await.map_err(Into::into)
+        self.raw
+            .unschedule_workflow_v1_workflows_schedules_schedule_id_delete(schedule_id.as_ref())
+            .await
+            .map_err(Into::into)
     }
 
-    pub async fn update_schedule(&self, schedule_id: impl AsRef<str>, request: UpdateScheduleWorkflowsSchedulesRequest) -> Result<UpdateScheduleWorkflowsSchedulesResponse, SdkError> {
-        self.raw.update_schedule_v1_workflows_schedules_schedule_id_patch(schedule_id.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
+    pub async fn update_schedule(
+        &self,
+        schedule_id: impl AsRef<str>,
+        request: UpdateScheduleWorkflowsSchedulesRequest,
+    ) -> Result<UpdateScheduleWorkflowsSchedulesResponse, SdkError> {
+        self.raw
+            .update_schedule_v1_workflows_schedules_schedule_id_patch(
+                schedule_id.as_ref(),
+                request.into_raw(),
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 }

@@ -3,15 +3,41 @@ use super::*;
 use crate::generated::client::HttpClient;
 
 #[derive(Clone, Copy)]
-pub struct Agents<'a> { raw: &'a HttpClient }
+pub struct Agents<'a> {
+    raw: &'a HttpClient,
+}
 
 impl<'a> Agents<'a> {
-    pub(crate) fn new(raw: &'a HttpClient) -> Self { Self { raw } }
-    pub async fn complete(&self, request: CompleteAgentsRequest) -> Result<CompleteAgentsResponse, SdkError> {
-        self.raw.agents_completion_v1_agents_completions_post({ let mut raw = request.into_raw(); raw.stream = Some(false); raw }).await.map(Into::into).map_err(Into::into)
+    pub(crate) fn new(raw: &'a HttpClient) -> Self {
+        Self { raw }
+    }
+    pub async fn complete(
+        &self,
+        request: CompleteAgentsRequest,
+    ) -> Result<CompleteAgentsResponse, SdkError> {
+        self.raw
+            .agents_completion_v1_agents_completions_post({
+                let mut raw = request.into_raw();
+                raw.stream = Some(false);
+                raw
+            })
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 
-    pub async fn stream(&self, request: StreamAgentsRequest) -> Result<StreamAgentsResponse, SdkError> {
-        self.raw.agents_completion_v1_agents_completions_post({ let mut raw = request.into_raw(); raw.stream = Some(false); raw }).await.map(Into::into).map_err(Into::into)
+    pub async fn stream(
+        &self,
+        request: StreamAgentsRequest,
+    ) -> Result<StreamAgentsResponse, SdkError> {
+        self.raw
+            .agents_completion_v1_agents_completions_post({
+                let mut raw = request.into_raw();
+                raw.stream = Some(false);
+                raw
+            })
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 }

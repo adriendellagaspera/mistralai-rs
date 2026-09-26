@@ -2,11 +2,26 @@
 use super::*;
 use crate::generated::client::HttpClient;
 #[derive(Clone, Copy)]
-pub struct AudioSpeech<'a> { raw: &'a HttpClient }
+pub struct AudioSpeech<'a> {
+    raw: &'a HttpClient,
+}
 
 impl<'a> AudioSpeech<'a> {
-    pub(crate) fn new(raw: &'a HttpClient) -> Self { Self { raw } }
-    pub async fn complete(&self, request: CompleteAudioSpeechRequest) -> Result<CompleteAudioSpeechResponse, SdkError> {
-        self.raw.speech_v1_audio_speech_post({ let mut raw = request.into_raw(); raw.stream = Some(false); raw }).await.map(Into::into).map_err(Into::into)
+    pub(crate) fn new(raw: &'a HttpClient) -> Self {
+        Self { raw }
+    }
+    pub async fn complete(
+        &self,
+        request: CompleteAudioSpeechRequest,
+    ) -> Result<CompleteAudioSpeechResponse, SdkError> {
+        self.raw
+            .speech_v1_audio_speech_post({
+                let mut raw = request.into_raw();
+                raw.stream = Some(false);
+                raw
+            })
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
     }
 }

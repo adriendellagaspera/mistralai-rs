@@ -2,13 +2,23 @@
 use super::*;
 use crate::generated::client::HttpClient;
 #[derive(Clone, Copy)]
-pub struct Audio<'a> { raw: &'a HttpClient }
+pub struct Audio<'a> {
+    raw: &'a HttpClient,
+}
 
 impl<'a> Audio<'a> {
-    pub(crate) fn new(raw: &'a HttpClient) -> Self { Self { raw } }
-    pub fn speech(&self) -> AudioSpeech<'a> { AudioSpeech::new(self.raw) }
+    pub(crate) fn new(raw: &'a HttpClient) -> Self {
+        Self { raw }
+    }
+    pub fn speech(&self) -> AudioSpeech<'a> {
+        AudioSpeech::new(self.raw)
+    }
 
-    pub fn transcriptions(&self) -> AudioTranscriptions<'a> { AudioTranscriptions::new(self.raw) }
+    pub fn transcriptions(&self) -> AudioTranscriptions<'a> {
+        AudioTranscriptions::new(self.raw)
+    }
 
-    pub fn voices(&self) -> AudioVoices<'a> { AudioVoices::new(self.raw) }
+    pub fn voices(&self) -> AudioVoices<'a> {
+        AudioVoices::new(self.raw)
+    }
 }
