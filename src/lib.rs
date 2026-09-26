@@ -15,6 +15,7 @@
     dead_code,
     missing_docs,
     rustdoc::broken_intra_doc_links,
+    rustdoc::invalid_html_tags,
     clippy::allow_attributes_without_reason,
     clippy::clone_on_copy,
     clippy::double_must_use,
