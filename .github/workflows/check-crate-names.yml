@@ -19,7 +19,7 @@ jobs:
         run: |
           set -euo pipefail
           for name in mistralai-sdk mistral-ai-sdk mistral-rs mistral-sdk-rs; do
-            code="$(curl --silent --show-error --output "/tmp/$name.json" --write-out "%{http_code}" "https://crates.io/api/v1/crates/$name")"
+            code="$(curl --silent --show-error --user-agent "mistralai-rs-name-check/1.0 (https://github.com/adriendellagaspera/mistralai-rs)" --output "/tmp/$name.json" --write-out "%{http_code}" "https://crates.io/api/v1/crates/$name")"
             printf '%s %s\n' "$name" "$code"
             if [ "$code" = "200" ]; then
               jq -r '"  existing max_version=" + (.crate.max_version // "?") + " repository=" + (.crate.repository // "?")' "/tmp/$name.json"
