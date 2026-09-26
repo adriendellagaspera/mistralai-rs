@@ -213,6 +213,7 @@ jobs:
           path: |
             sdk-build/target/candidate-derivation-report.json
             sdk-build/target/candidate-sdk-definition.json
+            sdk-build/target/candidate-api-inventory.json
             sdk-build/target/candidate-bindings.json
             sdk-build/target/candidate-overlaid.json
           if-no-files-found: warn
