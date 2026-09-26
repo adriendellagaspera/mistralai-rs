@@ -19,7 +19,18 @@
     "VoiceCreateRequestParams",
     "VoiceUpdateRequestParams",
     "VoiceResponseView",
-    "VoiceListResponseView"
+    "VoiceListResponseView",
+    "ClassificationInput",
+    "ClassificationParams",
+    "ClassificationResult",
+    "ClassificationResultSet",
+    "ClassifierConversation",
+    "ChatClassificationInput",
+    "ChatClassificationParams",
+    "ChatModerationInput",
+    "ChatModerationParams",
+    "ModerationResult",
+    "ModerationResultSet"
   ],
   "accessor_paths": {
     "ChatResponse.text": [
@@ -62,6 +73,12 @@
       "get",
       "list",
       "update"
+    ],
+    "classifiers": [
+      "classify",
+      "classify_chat",
+      "moderate",
+      "moderate_chat"
     ]
   }
 }
