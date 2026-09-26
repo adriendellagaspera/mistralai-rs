@@ -5,6 +5,8 @@ on:
     tags:
       - "v*"
 
+permissions: {}
+
 concurrency:
   group: publish-${{ github.ref }}
   cancel-in-progress: false
@@ -20,6 +22,8 @@ jobs:
       already-published: ${{ steps.registry.outputs.already-published }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Install pinned Rust toolchain
         run: rustup show
@@ -78,7 +82,7 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       contents: read
-      id-token: write
+      id-token: write # Mint the short-lived crates.io Trusted Publishing credential.
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -103,7 +107,7 @@ jobs:
       (needs.publish.result == 'success' || needs.publish.result == 'skipped')
     runs-on: ubuntu-24.04
     permissions:
-      contents: write
+      contents: write # Create the GitHub Release for the already-pushed release tag.
     steps:
       - name: Create GitHub Release
         env:
