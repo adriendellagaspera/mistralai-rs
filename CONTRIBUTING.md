@@ -43,3 +43,11 @@ Never edit `src/generated/` or generated Rust in `src/sdk/` by hand. Generated c
 ## Automated updates
 
 The scheduled source-update workflow creates a candidate PR for changed source pins, including a blocked PR with the failed stage recorded when generation or validation fails. On a source incompatibility, it fails closed instead of silently changing the public SDK. Review source pins, generated changes, coverage and semver before merging. No workflow automatically publishes a release.
+
+## Publishing
+
+The package name in `Cargo.toml` is `mistralai-sdk`; the library import remains `mistralai`. Publish only after the 288-operation source has replaced the current published source and the release commit has passed CI. The [`publish-crates-io.yml`](.github/workflows/publish-crates-io.yml) workflow rejects the current 173-operation package.
+
+crates.io requires the first release of a new crate to be published manually. On the release commit, check `cargo publish --dry-run --locked`, then publish the first version with `cargo publish --locked` using your own crates.io credentials. This upload is permanent. After that, register GitHub trusted publishing for repository `adriendellagaspera/mistralai-rs` and workflow file `publish-crates-io.yml` in that crate's settings. The optional GitHub environment is `crates-io`.
+
+For later releases, merge and validate the version change, create a matching `vMAJOR.MINOR.PATCH` tag on the release commit, and start **Publish to crates.io** with that tag. The workflow checks the exact tag, main ancestry, source operation count and package dry run before requesting a short-lived crates.io credential. It does not create releases or tags.
