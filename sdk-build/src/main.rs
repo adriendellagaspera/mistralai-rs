@@ -788,6 +788,7 @@ fn verify_candidate_derivation(
     raw: &Path,
     bindings: &Path,
     compiler: &Path,
+    publish_outputs: bool,
 ) -> Result<()> {
     let temp = Workspace::new(root)?;
     let work = &temp.0;
@@ -983,6 +984,10 @@ fn verify_candidate_derivation(
     }
     copy_dir(&compatible_facade, &compatible_review_source)?;
 
+    if publish_outputs {
+        publish(root, work, &generated, &compatible_facade)?;
+    }
+
     println!(
         "{}",
         serde_json::to_string_pretty(&json!({
@@ -1005,10 +1010,16 @@ struct Options {
 
 fn parse_args() -> Result<Options> {
     let mut args = env::args().skip(1);
-    let command = args.next().ok_or("usage: mistralai-sdk-build <raw|generate|check|probe|candidate-raw|candidate-derive> [--require-parity] [--compatibility-definition PATH]")?;
+    let command = args.next().ok_or("usage: mistralai-sdk-build <raw|generate|check|probe|candidate-raw|candidate-derive|candidate-publish> [--require-parity] [--compatibility-definition PATH]")?;
     if !matches!(
         command.as_str(),
-        "raw" | "generate" | "check" | "probe" | "candidate-raw" | "candidate-derive"
+        "raw"
+            | "generate"
+            | "check"
+            | "probe"
+            | "candidate-raw"
+            | "candidate-derive"
+            | "candidate-publish"
     ) {
         return fail(format!("unknown command: {command}"));
     }
@@ -1051,8 +1062,16 @@ fn execute(root: &Path, args: &Options) -> Result<()> {
         return verify_candidate_raw(root, &lock, &version, &raw, &bindings);
     }
     let compiler = install_tool(root, &lock, "rust_sdk_generator", "rust-sdk-generator")?;
-    if args.command == "candidate-derive" {
-        return verify_candidate_derivation(root, &lock, &version, &raw, &bindings, &compiler);
+    if args.command == "candidate-derive" || args.command == "candidate-publish" {
+        return verify_candidate_derivation(
+            root,
+            &lock,
+            &version,
+            &raw,
+            &bindings,
+            &compiler,
+            args.command == "candidate-publish",
+        );
     }
 
     let temp = Workspace::new(root)?;
