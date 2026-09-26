@@ -497,6 +497,80 @@ fn compile_candidate_facade(
     )
 }
 
+fn candidate_compatibility_inventory(
+    root: &Path,
+    definition: &Value,
+    bindings: &Value,
+) -> Result<Value> {
+    let published = read_json(&root.join("sdk-build/compatibility-definition.json"))?;
+    let old_resources = field(&published, "resources")?
+        .as_object()
+        .ok_or("published resources must be an object")?;
+    let new_resources = field(definition, "resources")?
+        .as_object()
+        .ok_or("candidate resources must be an object")?;
+    let new_slots: BTreeSet<_> = new_resources
+        .iter()
+        .flat_map(|(resource, value)| {
+            value["operations"]
+                .as_object()
+                .into_iter()
+                .flat_map(move |operations| operations.keys().map(move |name| (resource, name)))
+        })
+        .collect();
+    let source_ids: BTreeSet<_> = field(bindings, "operations")?
+        .as_object()
+        .ok_or("candidate bindings operations must be an object")?
+        .values()
+        .filter_map(|operation| operation["metadata"]["source_operation"]["operation_id"].as_str())
+        .collect();
+    let mut published_slots = 0;
+    let mut retained_slots = 0;
+    let mut retired = Vec::new();
+    for (resource, value) in old_resources {
+        let operations = field(value, "operations")?
+            .as_object()
+            .ok_or("published resource operations must be an object")?;
+        for (name, operation) in operations {
+            published_slots += 1;
+            retained_slots += usize::from(new_slots.contains(&(resource, name)));
+            let id = string(operation, "operation_id")?;
+            if !source_ids.contains(id) {
+                retired.push(json!({"resource": resource, "method": name, "operation_id": id}));
+            }
+        }
+    }
+    let old_models = field(&published, "models")?
+        .as_object()
+        .ok_or("published models must be an object")?;
+    let mut raw_symbols = BTreeSet::new();
+    for category in ["structs", "enums", "aliases"] {
+        raw_symbols.extend(
+            field(bindings, category)?
+                .as_object()
+                .ok_or("candidate raw symbols must be an object")?
+                .keys()
+                .map(String::as_str),
+        );
+    }
+    let missing_raw_models: BTreeMap<_, _> = old_models
+        .iter()
+        .filter_map(|(name, model)| {
+            let raw = model["raw"].as_str()?;
+            (!raw_symbols.contains(raw)).then_some((name.clone(), raw.to_owned()))
+        })
+        .collect();
+    Ok(json!({
+        "schema_version": 1,
+        "published_operation_slots": published_slots,
+        "candidate_operation_slots": new_slots.len(),
+        "retained_operation_paths": retained_slots,
+        "retired_source_operations": retired,
+        "published_models": old_models.len(),
+        "missing_published_raw_models": missing_raw_models
+    }))
+}
+
 fn verify_candidate_raw(
     root: &Path,
     lock: &Value,
@@ -713,6 +787,13 @@ fn verify_candidate_derivation(
             "candidate 288 derivation status/reason/override inventory drifted; review and update baseline only after proving the changed operations",
         );
     }
+
+    let compatibility = candidate_compatibility_inventory(
+        root,
+        field(&derivation, "definition")?,
+        &bindings_value,
+    )?;
+    write_json(&target.join("candidate-compatibility-inventory.json"), &compatibility)?;
 
     let runtime = work.join("runtime.json");
     write_json(&runtime, &runtime_config())?;
