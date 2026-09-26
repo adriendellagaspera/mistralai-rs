@@ -2,28 +2,21 @@
 use super::*;
 use crate::generated::client::HttpClient;
 
+
 #[derive(Clone, Copy)]
-pub struct BetaObservabilityChatCompletionEventsFields<'a> {
-    raw: &'a HttpClient,
-}
+pub struct BetaObservabilityChatCompletionEventsFields<'a> { raw: &'a HttpClient }
 
 impl<'a> BetaObservabilityChatCompletionEventsFields<'a> {
-    pub(crate) fn new(raw: &'a HttpClient) -> Self {
-        Self { raw }
-    }
-    pub async fn get_chat_completion_field_options(
-        &self,
-        field_name: impl AsRef<str>,
-        operator: crate::generated::client::GetChatCompletionFieldOptionsV1ObservabilityChatCompletionFieldsFieldNameOptionsGetOperator,
-    ) -> Result<ChatCompletionFieldOptionsView, SdkError> {
+    pub(crate) fn new(raw: &'a HttpClient) -> Self { Self { raw } }
+    pub async fn get_chat_completion_field_options(&self, field_name: impl AsRef<str>, operator: crate::generated::client::GetChatCompletionFieldOptionsV1ObservabilityChatCompletionFieldsFieldNameOptionsGetOperator) -> Result<GetChatCompletionFieldOptionsBetaObservabilityChatCompletionEventsFieldsResponse, SdkError> {
         self.raw.get_chat_completion_field_options_v1_observability_chat_completion_fields_field_name_options_get(field_name.as_ref(), operator).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn get_chat_completion_fields(&self) -> Result<ChatCompletionFieldsView, SdkError> {
-        self.raw
-            .get_chat_completion_fields_v1_observability_chat_completion_fields_get()
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+    pub async fn get_chat_completion_field_options_counts(&self, field_name: impl AsRef<str>, request: GetChatCompletionFieldOptionsCountsBetaObservabilityChatCompletionEventsFieldsRequest) -> Result<GetChatCompletionFieldOptionsCountsBetaObservabilityChatCompletionEventsFieldsResponse, SdkError> {
+        self.raw.get_chat_completion_field_options_counts_v1_observability_chat_completion_fields_field_name_options_counts_post(field_name.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
+    }
+
+    pub async fn get_chat_completion_fields(&self) -> Result<GetChatCompletionFieldsBetaObservabilityChatCompletionEventsFieldsResponse, SdkError> {
+        self.raw.get_chat_completion_fields_v1_observability_chat_completion_fields_get().await.map(Into::into).map_err(Into::into)
     }
 }

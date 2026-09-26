@@ -5,14 +5,14 @@ use super::*;
 use crate::generated::client::HttpClient;
 #[derive(Debug, serde::Deserialize)]
 #[serde(untagged)]
-enum __GetStreamEventsWorkflowsEventsStreamItemRaw {
+enum __GetStreamEventsEventsStreamItemRaw {
     StreamEventSsePayload(StreamEventSsePayload),
     StreamEventSseErrorData(StreamEventSseErrorData)
 }
 
 #[derive(Debug, Clone, Default)]
-pub struct GetStreamEventsWorkflowsEventsRequest { scope: Option<crate::generated::client::GetStreamEventsV1WorkflowsEventsStreamGetScope>, activity_name: Option<String>, activity_id: Option<String>, workflow_name: Option<String>, workflow_exec_id: Option<String>, root_workflow_exec_id: Option<String>, parent_workflow_exec_id: Option<String>, stream: Option<String>, start_seq: Option<i64>, metadata_filters: Option<String>, workflow_event_types: Option<String>, last_event_id: Option<String> }
-impl GetStreamEventsWorkflowsEventsRequest { pub fn new() -> Self { Self { scope: None, activity_name: None, activity_id: None, workflow_name: None, workflow_exec_id: None, root_workflow_exec_id: None, parent_workflow_exec_id: None, stream: None, start_seq: None, metadata_filters: None, workflow_event_types: None, last_event_id: None } }
+pub struct GetStreamEventsEventsRequest { scope: Option<crate::generated::client::GetStreamEventsV1WorkflowsEventsStreamGetScope>, activity_name: Option<String>, activity_id: Option<String>, workflow_name: Option<String>, workflow_exec_id: Option<String>, root_workflow_exec_id: Option<String>, parent_workflow_exec_id: Option<String>, stream: Option<String>, start_seq: Option<i64>, metadata_filters: Option<String>, workflow_event_types: Option<String>, last_event_id: Option<String> }
+impl GetStreamEventsEventsRequest { pub fn new() -> Self { Self { scope: None, activity_name: None, activity_id: None, workflow_name: None, workflow_exec_id: None, root_workflow_exec_id: None, parent_workflow_exec_id: None, stream: None, start_seq: None, metadata_filters: None, workflow_event_types: None, last_event_id: None } }
 #[must_use] pub fn scope(mut self, scope: crate::generated::client::GetStreamEventsV1WorkflowsEventsStreamGetScope) -> Self { self.scope = Some(scope); self }
 #[must_use] pub fn activity_name(mut self, activity_name: impl Into<String>) -> Self { self.activity_name = Some(activity_name.into()); self }
 #[must_use] pub fn activity_id(mut self, activity_id: impl Into<String>) -> Self { self.activity_id = Some(activity_id.into()); self }
@@ -28,8 +28,8 @@ impl GetStreamEventsWorkflowsEventsRequest { pub fn new() -> Self { Self { scope
 }
 
 #[derive(Debug, Clone, Default)]
-pub struct GetWorkflowEventsWorkflowsEventsRequest { root_workflow_exec_id: Option<String>, workflow_exec_id: Option<String>, workflow_run_id: Option<String>, limit: Option<i64>, cursor: Option<String> }
-impl GetWorkflowEventsWorkflowsEventsRequest { pub fn new() -> Self { Self { root_workflow_exec_id: None, workflow_exec_id: None, workflow_run_id: None, limit: None, cursor: None } }
+pub struct GetWorkflowEventsEventsRequest { root_workflow_exec_id: Option<String>, workflow_exec_id: Option<String>, workflow_run_id: Option<String>, limit: Option<i64>, cursor: Option<String> }
+impl GetWorkflowEventsEventsRequest { pub fn new() -> Self { Self { root_workflow_exec_id: None, workflow_exec_id: None, workflow_run_id: None, limit: None, cursor: None } }
 #[must_use] pub fn root_workflow_exec_id(mut self, root_workflow_exec_id: impl Into<String>) -> Self { self.root_workflow_exec_id = Some(root_workflow_exec_id.into()); self }
 #[must_use] pub fn workflow_exec_id(mut self, workflow_exec_id: impl Into<String>) -> Self { self.workflow_exec_id = Some(workflow_exec_id.into()); self }
 #[must_use] pub fn workflow_run_id(mut self, workflow_run_id: impl Into<String>) -> Self { self.workflow_run_id = Some(workflow_run_id.into()); self }
@@ -37,22 +37,22 @@ impl GetWorkflowEventsWorkflowsEventsRequest { pub fn new() -> Self { Self { roo
 #[must_use] pub fn cursor(mut self, cursor: impl Into<String>) -> Self { self.cursor = Some(cursor.into()); self }
 }
 #[derive(Clone, Copy)]
-pub struct WorkflowsEvents<'a> { raw: &'a HttpClient }
+pub struct Events<'a> { raw: &'a HttpClient }
 
-impl<'a> WorkflowsEvents<'a> {
+impl<'a> Events<'a> {
     pub(crate) fn new(raw: &'a HttpClient) -> Self { Self { raw } }
-    pub async fn get_stream_events(&self, request: GetStreamEventsWorkflowsEventsRequest) -> Result<GetStreamEventsWorkflowsEventsStream, SdkError> {
+    pub async fn get_stream_events(&self, request: GetStreamEventsEventsRequest) -> Result<GetStreamEventsEventsStream, SdkError> {
         let bytes = self.raw.get_stream_events_v1_workflows_events_stream_get(request.scope, request.activity_name.as_deref(), request.activity_id.as_deref(), request.workflow_name.as_deref(), request.workflow_exec_id.as_deref(), request.root_workflow_exec_id.as_deref(), request.parent_workflow_exec_id.as_deref(), request.stream.as_deref(), request.start_seq, request.metadata_filters.as_deref(), request.workflow_event_types.as_deref(), request.last_event_id.as_deref()).await.map_err(SdkError::from)?;
-        let events = crate::streaming::json_events::<_, _, __GetStreamEventsWorkflowsEventsStreamItemRaw>(bytes)
-            .map(|event| event.map(|event| match event.data { __GetStreamEventsWorkflowsEventsStreamItemRaw::StreamEventSsePayload(value) => GetStreamEventsWorkflowsEventsStreamItem::StreamEventSsePayload(GetStreamEventsWorkflowsEventsStreamItemStreamEventSsePayload::from(value)),__GetStreamEventsWorkflowsEventsStreamItemRaw::StreamEventSseErrorData(value) => GetStreamEventsWorkflowsEventsStreamItem::StreamEventSseErrorData(GetStreamEventsWorkflowsEventsStreamItemStreamEventSseErrorData::from(value)) }).map_err(Into::into));
+        let events = crate::streaming::json_events::<_, _, __GetStreamEventsEventsStreamItemRaw>(bytes)
+            .map(|event| event.map(|event| match event.data { __GetStreamEventsEventsStreamItemRaw::StreamEventSsePayload(value) => GetStreamEventsEventsStreamItem::StreamEventSsePayload(GetStreamEventsEventsStreamItemStreamEventSsePayload::from(value)),__GetStreamEventsEventsStreamItemRaw::StreamEventSseErrorData(value) => GetStreamEventsEventsStreamItem::StreamEventSseErrorData(GetStreamEventsEventsStreamItemStreamEventSseErrorData::from(value)) }).map_err(Into::into));
         Ok(Box::pin(events))
     }
 
-    pub async fn get_workflow_events(&self) -> Result<GetWorkflowEventsWorkflowsEventsResponse, SdkError> {
+    pub async fn get_workflow_events(&self) -> Result<GetWorkflowEventsEventsResponse, SdkError> {
         self.raw.get_workflow_events_v1_workflows_events_list_get(None::<&str>, None::<&str>, None::<&str>, None, None::<&str>).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn get_workflow_events_with(&self, request: GetWorkflowEventsWorkflowsEventsRequest) -> Result<GetWorkflowEventsWorkflowsEventsResponse, SdkError> {
+    pub async fn get_workflow_events_with(&self, request: GetWorkflowEventsEventsRequest) -> Result<GetWorkflowEventsEventsResponse, SdkError> {
         self.raw.get_workflow_events_v1_workflows_events_list_get(request.root_workflow_exec_id.as_deref(), request.workflow_exec_id.as_deref(), request.workflow_run_id.as_deref(), request.limit, request.cursor.as_deref()).await.map(Into::into).map_err(Into::into)
     }
 }

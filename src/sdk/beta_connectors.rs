@@ -2,414 +2,174 @@
 use super::*;
 use crate::generated::client::HttpClient;
 
+
+
+
+
+
+
+
+
+
+
+
 #[derive(Debug, Clone)]
-pub struct GetAuthUrlBetaConnectorsRequest {
-    connector_id_or_name: String,
-    app_return_url: Option<String>,
-    credentials_name: Option<String>,
-}
-impl GetAuthUrlBetaConnectorsRequest {
-    pub fn new(connector_id_or_name: impl Into<String>) -> Self {
-        Self {
-            connector_id_or_name: connector_id_or_name.into(),
-            app_return_url: None,
-            credentials_name: None,
-        }
-    }
-    #[must_use]
-    pub fn app_return_url(mut self, app_return_url: impl Into<String>) -> Self {
-        self.app_return_url = Some(app_return_url.into());
-        self
-    }
-    #[must_use]
-    pub fn credentials_name(mut self, credentials_name: impl Into<String>) -> Self {
-        self.credentials_name = Some(credentials_name.into());
-        self
-    }
+pub struct GetBetaConnectorsRequest { connector_id_or_name: String, fetch_user_data: Option<bool>, fetch_customer_data: Option<bool> }
+impl GetBetaConnectorsRequest { pub fn new(connector_id_or_name: impl Into<String>) -> Self { Self { connector_id_or_name: connector_id_or_name.into(), fetch_user_data: None, fetch_customer_data: None } }
+#[must_use] pub fn fetch_user_data(mut self, fetch_user_data: bool) -> Self { self.fetch_user_data = Some(fetch_user_data); self }
+#[must_use] pub fn fetch_customer_data(mut self, fetch_customer_data: bool) -> Self { self.fetch_customer_data = Some(fetch_customer_data); self }
 }
 
 #[derive(Debug, Clone)]
-pub struct GetBetaConnectorsRequest {
-    connector_id_or_name: String,
-    fetch_customer_data: Option<bool>,
-    fetch_connection_secrets: Option<bool>,
-}
-impl GetBetaConnectorsRequest {
-    pub fn new(connector_id_or_name: impl Into<String>) -> Self {
-        Self {
-            connector_id_or_name: connector_id_or_name.into(),
-            fetch_customer_data: None,
-            fetch_connection_secrets: None,
-        }
-    }
-    #[must_use]
-    pub fn fetch_customer_data(mut self, fetch_customer_data: bool) -> Self {
-        self.fetch_customer_data = Some(fetch_customer_data);
-        self
-    }
-    #[must_use]
-    pub fn fetch_connection_secrets(mut self, fetch_connection_secrets: bool) -> Self {
-        self.fetch_connection_secrets = Some(fetch_connection_secrets);
-        self
-    }
+pub struct GetAuthUrlBetaConnectorsRequest { connector_id_or_name: String, app_return_url: Option<String>, method_type: Option<crate::generated::types::OutboundAuthenticationType>, credentials_name: Option<String>, credentials_title: Option<String>, github_installation_link: Option<bool> }
+impl GetAuthUrlBetaConnectorsRequest { pub fn new(connector_id_or_name: impl Into<String>) -> Self { Self { connector_id_or_name: connector_id_or_name.into(), app_return_url: None, method_type: None, credentials_name: None, credentials_title: None, github_installation_link: None } }
+#[must_use] pub fn app_return_url(mut self, app_return_url: impl Into<String>) -> Self { self.app_return_url = Some(app_return_url.into()); self }
+#[must_use] pub fn method_type(mut self, method_type: crate::generated::types::OutboundAuthenticationType) -> Self { self.method_type = Some(method_type); self }
+#[must_use] pub fn credentials_name(mut self, credentials_name: impl Into<String>) -> Self { self.credentials_name = Some(credentials_name.into()); self }
+#[must_use] pub fn credentials_title(mut self, credentials_title: impl Into<String>) -> Self { self.credentials_title = Some(credentials_title.into()); self }
+#[must_use] pub fn github_installation_link(mut self, github_installation_link: bool) -> Self { self.github_installation_link = Some(github_installation_link); self }
 }
 
-#[derive(Debug, Clone)]
-pub struct ListOrganizationCredentialsBetaConnectorsRequest {
-    connector_id_or_name: String,
-    auth_type: Option<String>,
-    fetch_default: Option<bool>,
-}
-impl ListOrganizationCredentialsBetaConnectorsRequest {
-    pub fn new(connector_id_or_name: impl Into<String>) -> Self {
-        Self {
-            connector_id_or_name: connector_id_or_name.into(),
-            auth_type: None,
-            fetch_default: None,
-        }
-    }
-    #[must_use]
-    pub fn auth_type(mut self, auth_type: impl Into<String>) -> Self {
-        self.auth_type = Some(auth_type.into());
-        self
-    }
-    #[must_use]
-    pub fn fetch_default(mut self, fetch_default: bool) -> Self {
-        self.fetch_default = Some(fetch_default);
-        self
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct ListUserCredentialsBetaConnectorsRequest {
-    connector_id_or_name: String,
-    auth_type: Option<String>,
-    fetch_default: Option<bool>,
-}
-impl ListUserCredentialsBetaConnectorsRequest {
-    pub fn new(connector_id_or_name: impl Into<String>) -> Self {
-        Self {
-            connector_id_or_name: connector_id_or_name.into(),
-            auth_type: None,
-            fetch_default: None,
-        }
-    }
-    #[must_use]
-    pub fn auth_type(mut self, auth_type: impl Into<String>) -> Self {
-        self.auth_type = Some(auth_type.into());
-        self
-    }
-    #[must_use]
-    pub fn fetch_default(mut self, fetch_default: bool) -> Self {
-        self.fetch_default = Some(fetch_default);
-        self
-    }
-}
 
 #[derive(Debug, Clone, Default)]
-pub struct ListBetaConnectorsRequest {
-    query_filters: Option<crate::generated::types::ConnectorsQueryFilters>,
-    cursor: Option<String>,
-    page_size: Option<i64>,
-}
-impl ListBetaConnectorsRequest {
-    pub fn new() -> Self {
-        Self {
-            query_filters: None,
-            cursor: None,
-            page_size: None,
-        }
-    }
-    #[must_use]
-    pub fn query_filters(
-        mut self,
-        query_filters: crate::generated::types::ConnectorsQueryFilters,
-    ) -> Self {
-        self.query_filters = Some(query_filters);
-        self
-    }
-    #[must_use]
-    pub fn cursor(mut self, cursor: impl Into<String>) -> Self {
-        self.cursor = Some(cursor.into());
-        self
-    }
-    #[must_use]
-    pub fn page_size(mut self, page_size: i64) -> Self {
-        self.page_size = Some(page_size);
-        self
-    }
+pub struct ListBetaConnectorsRequest { query_filters: Option<crate::generated::types::ConnectorsQueryFilters>, cursor: Option<String>, page_size: Option<i64> }
+impl ListBetaConnectorsRequest { pub fn new() -> Self { Self { query_filters: None, cursor: None, page_size: None } }
+#[must_use] pub fn query_filters(mut self, query_filters: crate::generated::types::ConnectorsQueryFilters) -> Self { self.query_filters = Some(query_filters); self }
+#[must_use] pub fn cursor(mut self, cursor: impl Into<String>) -> Self { self.cursor = Some(cursor.into()); self }
+#[must_use] pub fn page_size(mut self, page_size: i64) -> Self { self.page_size = Some(page_size); self }
 }
 
 #[derive(Debug, Clone)]
-pub struct ListWorkspaceCredentialsBetaConnectorsRequest {
-    connector_id_or_name: String,
-    auth_type: Option<String>,
-    fetch_default: Option<bool>,
+pub struct ListOrganizationCredentialsBetaConnectorsRequest { connector_id_or_name: String, auth_type: Option<String>, fetch_default: Option<bool> }
+impl ListOrganizationCredentialsBetaConnectorsRequest { pub fn new(connector_id_or_name: impl Into<String>) -> Self { Self { connector_id_or_name: connector_id_or_name.into(), auth_type: None, fetch_default: None } }
+#[must_use] pub fn auth_type(mut self, auth_type: impl Into<String>) -> Self { self.auth_type = Some(auth_type.into()); self }
+#[must_use] pub fn fetch_default(mut self, fetch_default: bool) -> Self { self.fetch_default = Some(fetch_default); self }
 }
-impl ListWorkspaceCredentialsBetaConnectorsRequest {
-    pub fn new(connector_id_or_name: impl Into<String>) -> Self {
-        Self {
-            connector_id_or_name: connector_id_or_name.into(),
-            auth_type: None,
-            fetch_default: None,
-        }
-    }
-    #[must_use]
-    pub fn auth_type(mut self, auth_type: impl Into<String>) -> Self {
-        self.auth_type = Some(auth_type.into());
-        self
-    }
-    #[must_use]
-    pub fn fetch_default(mut self, fetch_default: bool) -> Self {
-        self.fetch_default = Some(fetch_default);
-        self
-    }
+
+#[derive(Debug, Clone)]
+pub struct ListToolsBetaConnectorsRequest { connector_id_or_name: String, page: Option<i64>, page_size: Option<i64>, refresh: Option<bool>, pretty: Option<bool>, credentials_name: Option<String> }
+impl ListToolsBetaConnectorsRequest { pub fn new(connector_id_or_name: impl Into<String>) -> Self { Self { connector_id_or_name: connector_id_or_name.into(), page: None, page_size: None, refresh: None, pretty: None, credentials_name: None } }
+#[must_use] pub fn page(mut self, page: i64) -> Self { self.page = Some(page); self }
+#[must_use] pub fn page_size(mut self, page_size: i64) -> Self { self.page_size = Some(page_size); self }
+#[must_use] pub fn refresh(mut self, refresh: bool) -> Self { self.refresh = Some(refresh); self }
+#[must_use] pub fn pretty(mut self, pretty: bool) -> Self { self.pretty = Some(pretty); self }
+#[must_use] pub fn credentials_name(mut self, credentials_name: impl Into<String>) -> Self { self.credentials_name = Some(credentials_name.into()); self }
 }
+
+#[derive(Debug, Clone)]
+pub struct ListUserCredentialsBetaConnectorsRequest { connector_id_or_name: String, auth_type: Option<String>, fetch_default: Option<bool> }
+impl ListUserCredentialsBetaConnectorsRequest { pub fn new(connector_id_or_name: impl Into<String>) -> Self { Self { connector_id_or_name: connector_id_or_name.into(), auth_type: None, fetch_default: None } }
+#[must_use] pub fn auth_type(mut self, auth_type: impl Into<String>) -> Self { self.auth_type = Some(auth_type.into()); self }
+#[must_use] pub fn fetch_default(mut self, fetch_default: bool) -> Self { self.fetch_default = Some(fetch_default); self }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListWorkspaceCredentialsBetaConnectorsRequest { connector_id_or_name: String, auth_type: Option<String>, fetch_default: Option<bool> }
+impl ListWorkspaceCredentialsBetaConnectorsRequest { pub fn new(connector_id_or_name: impl Into<String>) -> Self { Self { connector_id_or_name: connector_id_or_name.into(), auth_type: None, fetch_default: None } }
+#[must_use] pub fn auth_type(mut self, auth_type: impl Into<String>) -> Self { self.auth_type = Some(auth_type.into()); self }
+#[must_use] pub fn fetch_default(mut self, fetch_default: bool) -> Self { self.fetch_default = Some(fetch_default); self }
+}
+
+
 
 #[derive(Clone, Copy)]
-pub struct BetaConnectors<'a> {
-    raw: &'a HttpClient,
-}
+pub struct BetaConnectors<'a> { raw: &'a HttpClient }
 
 impl<'a> BetaConnectors<'a> {
-    pub(crate) fn new(raw: &'a HttpClient) -> Self {
-        Self { raw }
-    }
-    pub async fn call_tool(
-        &self,
-        tool_name: impl AsRef<str>,
-        connector_id_or_name: impl AsRef<str>,
-        credentials_name: Option<String>,
-        request: MCPToolCallRequestParams,
-    ) -> Result<MCPToolCallResponseView, SdkError> {
-        self.raw
-            .connector_call_tool_v1(
-                tool_name.as_ref(),
-                connector_id_or_name.as_ref(),
-                credentials_name,
-                request.into_raw(),
-            )
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+    pub(crate) fn new(raw: &'a HttpClient) -> Self { Self { raw } }
+    pub async fn activate_for_consumer(&self, connector_id: impl AsRef<str>, consumer_scope: crate::generated::client::ConnectorActivateForConsumerV1ConsumerScope) -> Result<ActivateForConsumerBetaConnectorsResponse, SdkError> {
+        self.raw.connector_activate_for_consumer_v1(connector_id.as_ref(), consumer_scope).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn create_or_update_organization_credentials(
-        &self,
-        connector_id_or_name: impl AsRef<str>,
-        request: CredentialsCreateOrUpdateParams,
-    ) -> Result<MessageResponseView, SdkError> {
-        self.raw
-            .connector_create_or_update_organization_credentials_v1(
-                connector_id_or_name.as_ref(),
-                request.into_raw(),
-            )
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+    pub async fn call_tool(&self, tool_name: impl AsRef<str>, connector_id_or_name: impl AsRef<str>, credentials_name: Option<String>, request: CallToolBetaConnectorsRequest) -> Result<CallToolBetaConnectorsResponse, SdkError> {
+        self.raw.connector_call_tool_v1(tool_name.as_ref(), connector_id_or_name.as_ref(), credentials_name, request.into_raw()).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn create_or_update_user_credentials(
-        &self,
-        connector_id_or_name: impl AsRef<str>,
-        request: CredentialsCreateOrUpdateParams,
-    ) -> Result<MessageResponseView, SdkError> {
-        self.raw
-            .connector_create_or_update_user_credentials_v1(
-                connector_id_or_name.as_ref(),
-                request.into_raw(),
-            )
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+    pub async fn create(&self, request: CreateBetaConnectorsRequest) -> Result<CreateBetaConnectorsResponse, SdkError> {
+        self.raw.connector_create_v1(request.into_raw()).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn create_or_update_workspace_credentials(
-        &self,
-        connector_id_or_name: impl AsRef<str>,
-        request: CredentialsCreateOrUpdateParams,
-    ) -> Result<MessageResponseView, SdkError> {
-        self.raw
-            .connector_create_or_update_workspace_credentials_v1(
-                connector_id_or_name.as_ref(),
-                request.into_raw(),
-            )
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+    pub async fn create_or_update_organization_credentials(&self, connector_id_or_name: impl AsRef<str>, request: CreateOrUpdateOrganizationCredentialsBetaConnectorsRequest) -> Result<CreateOrUpdateOrganizationCredentialsBetaConnectorsResponse, SdkError> {
+        self.raw.connector_create_or_update_organization_credentials_v1(connector_id_or_name.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn create(
-        &self,
-        request: ConnectorMCPCreateParams,
-    ) -> Result<ConnectorView, SdkError> {
-        self.raw
-            .connector_create_v1(request.into_raw())
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+    pub async fn create_or_update_user_credentials(&self, connector_id_or_name: impl AsRef<str>, request: CreateOrUpdateUserCredentialsBetaConnectorsRequest) -> Result<CreateOrUpdateUserCredentialsBetaConnectorsResponse, SdkError> {
+        self.raw.connector_create_or_update_user_credentials_v1(connector_id_or_name.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn delete_organization_credentials(
-        &self,
-        credentials_name: impl AsRef<str>,
-        connector_id_or_name: impl AsRef<str>,
-    ) -> Result<MessageResponseView, SdkError> {
-        self.raw
-            .connector_delete_organization_credentials_v1(
-                credentials_name.as_ref(),
-                connector_id_or_name.as_ref(),
-            )
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+    pub async fn create_or_update_workspace_credentials(&self, connector_id_or_name: impl AsRef<str>, request: CreateOrUpdateWorkspaceCredentialsBetaConnectorsRequest) -> Result<CreateOrUpdateWorkspaceCredentialsBetaConnectorsResponse, SdkError> {
+        self.raw.connector_create_or_update_workspace_credentials_v1(connector_id_or_name.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn delete_user_credentials(
-        &self,
-        credentials_name: impl AsRef<str>,
-        connector_id_or_name: impl AsRef<str>,
-    ) -> Result<MessageResponseView, SdkError> {
-        self.raw
-            .connector_delete_user_credentials_v1(
-                credentials_name.as_ref(),
-                connector_id_or_name.as_ref(),
-            )
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+    pub async fn deactivate_for_consumer(&self, connector_id: impl AsRef<str>, consumer_scope: crate::generated::client::ConnectorDeactivateForConsumerV1ConsumerScope) -> Result<DeactivateForConsumerBetaConnectorsResponse, SdkError> {
+        self.raw.connector_deactivate_for_consumer_v1(connector_id.as_ref(), consumer_scope).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn delete(
-        &self,
-        connector_id: impl AsRef<str>,
-    ) -> Result<MessageResponseView, SdkError> {
-        self.raw
-            .connector_delete_v1(connector_id.as_ref())
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+    pub async fn delete(&self, connector_id: impl AsRef<str>) -> Result<DeleteBetaConnectorsResponse, SdkError> {
+        self.raw.connector_delete_v1(connector_id.as_ref()).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn delete_workspace_credentials(
-        &self,
-        credentials_name: impl AsRef<str>,
-        connector_id_or_name: impl AsRef<str>,
-    ) -> Result<MessageResponseView, SdkError> {
-        self.raw
-            .connector_delete_workspace_credentials_v1(
-                credentials_name.as_ref(),
-                connector_id_or_name.as_ref(),
-            )
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+    pub async fn delete_all_user_credentials(&self, connector_id_or_name: impl AsRef<str>) -> Result<DeleteAllUserCredentialsBetaConnectorsResponse, SdkError> {
+        self.raw.connector_delete_all_user_credentials_v1(connector_id_or_name.as_ref()).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn get_auth_url(
-        &self,
-        request: GetAuthUrlBetaConnectorsRequest,
-    ) -> Result<AuthUrlResponseView, SdkError> {
-        self.raw
-            .connector_get_auth_url_v1(
-                request.connector_id_or_name.as_str(),
-                request.app_return_url.as_deref(),
-                request.credentials_name.as_deref(),
-            )
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+    pub async fn delete_organization_credentials(&self, credentials_name: impl AsRef<str>, connector_id_or_name: impl AsRef<str>) -> Result<DeleteOrganizationCredentialsBetaConnectorsResponse, SdkError> {
+        self.raw.connector_delete_organization_credentials_v1(credentials_name.as_ref(), connector_id_or_name.as_ref()).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn get(&self, request: GetBetaConnectorsRequest) -> Result<ConnectorView, SdkError> {
-        self.raw
-            .connector_get_v1(
-                request.connector_id_or_name.as_str(),
-                request.fetch_customer_data,
-                request.fetch_connection_secrets,
-            )
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+    pub async fn delete_user_credentials(&self, credentials_name: impl AsRef<str>, connector_id_or_name: impl AsRef<str>) -> Result<DeleteUserCredentialsBetaConnectorsResponse, SdkError> {
+        self.raw.connector_delete_user_credentials_v1(credentials_name.as_ref(), connector_id_or_name.as_ref()).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn list_organization_credentials(
-        &self,
-        request: ListOrganizationCredentialsBetaConnectorsRequest,
-    ) -> Result<CredentialsResponseView, SdkError> {
-        self.raw
-            .connector_list_organization_credentials_v1(
-                request.connector_id_or_name.as_str(),
-                request.auth_type.as_deref(),
-                request.fetch_default,
-            )
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+    pub async fn delete_workspace_credentials(&self, credentials_name: impl AsRef<str>, connector_id_or_name: impl AsRef<str>) -> Result<DeleteWorkspaceCredentialsBetaConnectorsResponse, SdkError> {
+        self.raw.connector_delete_workspace_credentials_v1(credentials_name.as_ref(), connector_id_or_name.as_ref()).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn list_user_credentials(
-        &self,
-        request: ListUserCredentialsBetaConnectorsRequest,
-    ) -> Result<CredentialsResponseView, SdkError> {
-        self.raw
-            .connector_list_user_credentials_v1(
-                request.connector_id_or_name.as_str(),
-                request.auth_type.as_deref(),
-                request.fetch_default,
-            )
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+    pub async fn get(&self, request: GetBetaConnectorsRequest) -> Result<GetBetaConnectorsResponse, SdkError> {
+        self.raw.connector_get_v1(request.connector_id_or_name.as_str(), request.fetch_user_data, request.fetch_customer_data).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn list(&self) -> Result<PaginatedConnectorsView, SdkError> {
-        self.raw
-            .connector_list_v1(None, None::<&str>, None)
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+    pub async fn get_auth_url(&self, request: GetAuthUrlBetaConnectorsRequest) -> Result<GetAuthUrlBetaConnectorsResponse, SdkError> {
+        self.raw.connector_get_auth_url_v1(request.connector_id_or_name.as_str(), request.app_return_url.as_deref(), request.method_type, request.credentials_name.as_deref(), request.credentials_title.as_deref(), request.github_installation_link).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn list_with(
-        &self,
-        request: ListBetaConnectorsRequest,
-    ) -> Result<PaginatedConnectorsView, SdkError> {
-        self.raw
-            .connector_list_v1(
-                request.query_filters,
-                request.cursor.as_deref(),
-                request.page_size,
-            )
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+    pub async fn get_authentication_methods(&self, connector_id_or_name: impl AsRef<str>) -> Result<GetAuthenticationMethodsBetaConnectorsResponse, SdkError> {
+        self.raw.connector_get_authentication_methods_v1(connector_id_or_name.as_ref()).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn list_workspace_credentials(
-        &self,
-        request: ListWorkspaceCredentialsBetaConnectorsRequest,
-    ) -> Result<CredentialsResponseView, SdkError> {
-        self.raw
-            .connector_list_workspace_credentials_v1(
-                request.connector_id_or_name.as_str(),
-                request.auth_type.as_deref(),
-                request.fetch_default,
-            )
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+    pub async fn list(&self) -> Result<ListBetaConnectorsResponse, SdkError> {
+        self.raw.connector_list_v1(None, None::<&str>, None).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn update(
-        &self,
-        connector_id: impl AsRef<str>,
-        request: ConnectorMCPUpdateParams,
-    ) -> Result<ConnectorView, SdkError> {
-        self.raw
-            .connector_update_v1(connector_id.as_ref(), request.into_raw())
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+    pub async fn list_with(&self, request: ListBetaConnectorsRequest) -> Result<ListBetaConnectorsResponse, SdkError> {
+        self.raw.connector_list_v1(request.query_filters, request.cursor.as_deref(), request.page_size).await.map(Into::into).map_err(Into::into)
+    }
+
+    pub async fn list_organization_credentials(&self, request: ListOrganizationCredentialsBetaConnectorsRequest) -> Result<ListOrganizationCredentialsBetaConnectorsResponse, SdkError> {
+        self.raw.connector_list_organization_credentials_v1(request.connector_id_or_name.as_str(), request.auth_type.as_deref(), request.fetch_default).await.map(Into::into).map_err(Into::into)
+    }
+
+    pub async fn list_tools(&self, request: ListToolsBetaConnectorsRequest) -> Result<ListToolsBetaConnectorsResponse, SdkError> {
+        self.raw.connector_list_tools_v1(request.connector_id_or_name.as_str(), request.page, request.page_size, request.refresh, request.pretty, request.credentials_name.as_deref()).await.map(Into::into).map_err(Into::into)
+    }
+
+    pub async fn list_user_credentials(&self, request: ListUserCredentialsBetaConnectorsRequest) -> Result<ListUserCredentialsBetaConnectorsResponse, SdkError> {
+        self.raw.connector_list_user_credentials_v1(request.connector_id_or_name.as_str(), request.auth_type.as_deref(), request.fetch_default).await.map(Into::into).map_err(Into::into)
+    }
+
+    pub async fn list_workspace_credentials(&self, request: ListWorkspaceCredentialsBetaConnectorsRequest) -> Result<ListWorkspaceCredentialsBetaConnectorsResponse, SdkError> {
+        self.raw.connector_list_workspace_credentials_v1(request.connector_id_or_name.as_str(), request.auth_type.as_deref(), request.fetch_default).await.map(Into::into).map_err(Into::into)
+    }
+
+    pub async fn share(&self, connector_id: impl AsRef<str>) -> Result<ShareBetaConnectorsResponse, SdkError> {
+        self.raw.connector_share_v1(connector_id.as_ref()).await.map(Into::into).map_err(Into::into)
+    }
+
+    pub async fn unshare(&self, connector_id: impl AsRef<str>) -> Result<UnshareBetaConnectorsResponse, SdkError> {
+        self.raw.connector_unshare_v1(connector_id.as_ref()).await.map(Into::into).map_err(Into::into)
+    }
+
+    pub async fn update(&self, connector_id: impl AsRef<str>, request: UpdateBetaConnectorsRequest) -> Result<UpdateBetaConnectorsResponse, SdkError> {
+        self.raw.connector_update_v1(connector_id.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
     }
 }

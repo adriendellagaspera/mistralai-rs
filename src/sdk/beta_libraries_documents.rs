@@ -2,160 +2,81 @@
 use super::*;
 use crate::generated::client::HttpClient;
 
+
+
+
+
 #[derive(Debug, Clone)]
-pub struct ListBetaLibrariesDocumentsRequest {
-    library_id: String,
-    search: Option<String>,
-    page_size: Option<i64>,
-    page: Option<i64>,
-    filters_attributes: Option<String>,
-    sort_by: Option<String>,
-    sort_order: Option<String>,
+pub struct ListBetaLibrariesDocumentsRequest { library_id: String, search: Option<String>, page_size: Option<i64>, page: Option<i64>, filters_attributes: Option<String>, sort_by: Option<String>, sort_order: Option<String> }
+impl ListBetaLibrariesDocumentsRequest { pub fn new(library_id: impl Into<String>) -> Self { Self { library_id: library_id.into(), search: None, page_size: None, page: None, filters_attributes: None, sort_by: None, sort_order: None } }
+#[must_use] pub fn search(mut self, search: impl Into<String>) -> Self { self.search = Some(search.into()); self }
+#[must_use] pub fn page_size(mut self, page_size: i64) -> Self { self.page_size = Some(page_size); self }
+#[must_use] pub fn page(mut self, page: i64) -> Self { self.page = Some(page); self }
+#[must_use] pub fn filters_attributes(mut self, filters_attributes: impl Into<String>) -> Self { self.filters_attributes = Some(filters_attributes.into()); self }
+#[must_use] pub fn sort_by(mut self, sort_by: impl Into<String>) -> Self { self.sort_by = Some(sort_by.into()); self }
+#[must_use] pub fn sort_order(mut self, sort_order: impl Into<String>) -> Self { self.sort_order = Some(sort_order.into()); self }
 }
-impl ListBetaLibrariesDocumentsRequest {
-    pub fn new(library_id: impl Into<String>) -> Self {
-        Self {
-            library_id: library_id.into(),
-            search: None,
-            page_size: None,
-            page: None,
-            filters_attributes: None,
-            sort_by: None,
-            sort_order: None,
-        }
-    }
-    #[must_use]
-    pub fn search(mut self, search: impl Into<String>) -> Self {
-        self.search = Some(search.into());
-        self
-    }
-    #[must_use]
-    pub fn page_size(mut self, page_size: i64) -> Self {
-        self.page_size = Some(page_size);
-        self
-    }
-    #[must_use]
-    pub fn page(mut self, page: i64) -> Self {
-        self.page = Some(page);
-        self
-    }
-    #[must_use]
-    pub fn filters_attributes(mut self, filters_attributes: impl Into<String>) -> Self {
-        self.filters_attributes = Some(filters_attributes.into());
-        self
-    }
-    #[must_use]
-    pub fn sort_by(mut self, sort_by: impl Into<String>) -> Self {
-        self.sort_by = Some(sort_by.into());
-        self
-    }
-    #[must_use]
-    pub fn sort_order(mut self, sort_order: impl Into<String>) -> Self {
-        self.sort_order = Some(sort_order.into());
-        self
-    }
+
+
+
+
+#[derive(Debug, Clone)]
+pub struct TextContentBetaLibrariesDocumentsRequest { library_id: String, document_id: String, page_start: Option<String>, page_end: Option<String> }
+impl TextContentBetaLibrariesDocumentsRequest { pub fn new(library_id: impl Into<String>, document_id: impl Into<String>) -> Self { Self { library_id: library_id.into(), document_id: document_id.into(), page_start: None, page_end: None } }
+#[must_use] pub fn page_start(mut self, page_start: impl Into<String>) -> Self { self.page_start = Some(page_start.into()); self }
+#[must_use] pub fn page_end(mut self, page_end: impl Into<String>) -> Self { self.page_end = Some(page_end.into()); self }
 }
 
 #[derive(Clone, Copy)]
-pub struct BetaLibrariesDocuments<'a> {
-    raw: &'a HttpClient,
-}
+pub struct BetaLibrariesDocuments<'a> { raw: &'a HttpClient }
 
 impl<'a> BetaLibrariesDocuments<'a> {
-    pub(crate) fn new(raw: &'a HttpClient) -> Self {
-        Self { raw }
-    }
-    pub async fn delete(
-        &self,
-        library_id: impl AsRef<str>,
-        document_id: impl AsRef<str>,
-    ) -> Result<(), SdkError> {
-        self.raw
-            .libraries_documents_delete_v1(library_id.as_ref(), document_id.as_ref())
-            .await
-            .map_err(Into::into)
+    pub(crate) fn new(raw: &'a HttpClient) -> Self { Self { raw } }
+    pub async fn delete(&self, library_id: impl AsRef<str>, document_id: impl AsRef<str>) -> Result<(), SdkError> {
+        self.raw.libraries_documents_delete_v1(library_id.as_ref(), document_id.as_ref()).await.map_err(Into::into)
     }
 
-    pub async fn status(
-        &self,
-        library_id: impl AsRef<str>,
-        document_id: impl AsRef<str>,
-    ) -> Result<ProcessingStatusOutView, SdkError> {
-        self.raw
-            .libraries_documents_get_status_v1(library_id.as_ref(), document_id.as_ref())
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+    pub async fn extracted_text_signed_url(&self, library_id: impl AsRef<str>, document_id: impl AsRef<str>) -> Result<ExtractedTextSignedUrlBetaLibrariesDocumentsResponse, SdkError> {
+        self.raw.libraries_documents_get_extracted_text_signed_url_v1(library_id.as_ref(), document_id.as_ref()).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn text_content(
-        &self,
-        library_id: impl AsRef<str>,
-        document_id: impl AsRef<str>,
-    ) -> Result<DocumentTextContentView, SdkError> {
-        self.raw
-            .libraries_documents_get_text_content_v1(library_id.as_ref(), document_id.as_ref())
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+    pub async fn get(&self, library_id: impl AsRef<str>, document_id: impl AsRef<str>) -> Result<GetBetaLibrariesDocumentsResponse, SdkError> {
+        self.raw.libraries_documents_get_v1(library_id.as_ref(), document_id.as_ref()).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn get(
-        &self,
-        library_id: impl AsRef<str>,
-        document_id: impl AsRef<str>,
-    ) -> Result<DocumentOutView, SdkError> {
-        self.raw
-            .libraries_documents_get_v1(library_id.as_ref(), document_id.as_ref())
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+    pub async fn get_signed_url(&self, library_id: impl AsRef<str>, document_id: impl AsRef<str>) -> Result<GetSignedUrlBetaLibrariesDocumentsResponse, SdkError> {
+        self.raw.libraries_documents_get_signed_url_v1(library_id.as_ref(), document_id.as_ref()).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn list(
-        &self,
-        request: ListBetaLibrariesDocumentsRequest,
-    ) -> Result<ListDocumentOutView, SdkError> {
-        self.raw
-            .libraries_documents_list_v1(
-                request.library_id.as_str(),
-                request.search.as_deref(),
-                request.page_size,
-                request.page,
-                request.filters_attributes.as_deref(),
-                request.sort_by.as_deref(),
-                request.sort_order.as_deref(),
-            )
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+    pub async fn libraries_documents_update_v1(&self, library_id: impl AsRef<str>, document_id: impl AsRef<str>, request: LibrariesDocumentsUpdateV1BetaLibrariesDocumentsRequest) -> Result<LibrariesDocumentsUpdateV1BetaLibrariesDocumentsResponse, SdkError> {
+        self.raw.libraries_documents_update_v1(library_id.as_ref(), document_id.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn reprocess(
-        &self,
-        library_id: impl AsRef<str>,
-        document_id: impl AsRef<str>,
-    ) -> Result<(), SdkError> {
-        self.raw
-            .libraries_documents_reprocess_v1(library_id.as_ref(), document_id.as_ref())
-            .await
-            .map_err(Into::into)
+    pub async fn list(&self, request: ListBetaLibrariesDocumentsRequest) -> Result<ListBetaLibrariesDocumentsResponse, SdkError> {
+        self.raw.libraries_documents_list_v1(request.library_id.as_str(), request.search.as_deref(), request.page_size, request.page, request.filters_attributes.as_deref(), request.sort_by.as_deref(), request.sort_order.as_deref()).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn libraries_documents_update_v1(
-        &self,
-        library_id: impl AsRef<str>,
-        document_id: impl AsRef<str>,
-        request: DocumentUpdateInParams,
-    ) -> Result<DocumentOutView, SdkError> {
-        self.raw
-            .libraries_documents_update_v1(
-                library_id.as_ref(),
-                document_id.as_ref(),
-                request.into_raw(),
-            )
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+    pub async fn patch(&self, library_id: impl AsRef<str>, document_id: impl AsRef<str>, request: PatchBetaLibrariesDocumentsRequest) -> Result<PatchBetaLibrariesDocumentsResponse, SdkError> {
+        self.raw.libraries_documents_patch_v1(library_id.as_ref(), document_id.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
+    }
+
+    pub async fn reprocess(&self, library_id: impl AsRef<str>, document_id: impl AsRef<str>) -> Result<(), SdkError> {
+        self.raw.libraries_documents_reprocess_v1(library_id.as_ref(), document_id.as_ref()).await.map_err(Into::into)
+    }
+
+    pub async fn status(&self, library_id: impl AsRef<str>, document_id: impl AsRef<str>) -> Result<StatusBetaLibrariesDocumentsResponse, SdkError> {
+        self.raw.libraries_documents_get_status_v1(library_id.as_ref(), document_id.as_ref()).await.map(Into::into).map_err(Into::into)
+    }
+
+    pub async fn text_content(&self, request: TextContentBetaLibrariesDocumentsRequest) -> Result<TextContentBetaLibrariesDocumentsResponse, SdkError> {
+        self.raw.libraries_documents_get_text_content_v1(request.library_id.as_str(), request.document_id.as_str(), request.page_start.as_deref(), request.page_end.as_deref()).await.map(Into::into).map_err(Into::into)
+    }
+
+    pub async fn upload(&self, library_id: impl AsRef<str>, request: UploadBetaLibrariesDocumentsRequest) -> Result<UploadBetaLibrariesDocumentsResponse, SdkError> {
+        self.raw.libraries_documents_upload_v1(library_id.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
+    }
+
+    pub async fn upload_with_filenames(&self, library_id: impl AsRef<str>, request: UploadBetaLibrariesDocumentsRequest, multipart_filenames: &[(&str, &str)]) -> Result<UploadBetaLibrariesDocumentsResponse, SdkError> {
+        self.raw.libraries_documents_upload_v1_with_multipart_filenames(library_id.as_ref(), request.into_raw(), multipart_filenames).await.map(Into::into).map_err(Into::into)
     }
 }

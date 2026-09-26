@@ -2,62 +2,36 @@
 use super::*;
 use crate::generated::client::HttpClient;
 
+
+
+
+
 #[derive(Clone, Copy)]
-pub struct BetaObservabilityDatasetsRecords<'a> {
-    raw: &'a HttpClient,
-}
+pub struct BetaObservabilityDatasetsRecords<'a> { raw: &'a HttpClient }
 
 impl<'a> BetaObservabilityDatasetsRecords<'a> {
-    pub(crate) fn new(raw: &'a HttpClient) -> Self {
-        Self { raw }
+    pub(crate) fn new(raw: &'a HttpClient) -> Self { Self { raw } }
+    pub async fn bulk_delete(&self, request: BulkDeleteBetaObservabilityDatasetsRecordsRequest) -> Result<(), SdkError> {
+        self.raw.delete_dataset_records_v1_observability_dataset_records_bulk_delete_post(request.into_raw()).await.map_err(Into::into)
     }
+
     pub async fn delete(&self, dataset_record_id: impl AsRef<str>) -> Result<(), SdkError> {
-        self.raw
-            .delete_dataset_record_v1_observability_dataset_records_dataset_record_id_delete(
-                dataset_record_id.as_ref(),
-            )
-            .await
-            .map_err(Into::into)
+        self.raw.delete_dataset_record_v1_observability_dataset_records_dataset_record_id_delete(dataset_record_id.as_ref()).await.map_err(Into::into)
     }
 
-    pub async fn bulk_delete(
-        &self,
-        request: DeleteDatasetRecordsInSchemaParams,
-    ) -> Result<(), SdkError> {
-        self.raw
-            .delete_dataset_records_v1_observability_dataset_records_bulk_delete_post(
-                request.into_raw(),
-            )
-            .await
-            .map_err(Into::into)
+    pub async fn fetch(&self, dataset_record_id: impl AsRef<str>) -> Result<FetchBetaObservabilityDatasetsRecordsResponse, SdkError> {
+        self.raw.get_dataset_record_v1_observability_dataset_records_dataset_record_id_get(dataset_record_id.as_ref()).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn fetch(
-        &self,
-        dataset_record_id: impl AsRef<str>,
-    ) -> Result<DatasetRecordView, SdkError> {
-        self.raw
-            .get_dataset_record_v1_observability_dataset_records_dataset_record_id_get(
-                dataset_record_id.as_ref(),
-            )
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
-    }
-
-    pub async fn judge(
-        &self,
-        dataset_record_id: impl AsRef<str>,
-        request: PostDatasetRecordJudgingInSchemaParams,
-    ) -> Result<JudgeOutputView, SdkError> {
+    pub async fn judge(&self, dataset_record_id: impl AsRef<str>, request: JudgeBetaObservabilityDatasetsRecordsRequest) -> Result<JudgeBetaObservabilityDatasetsRecordsResponse, SdkError> {
         self.raw.judge_dataset_record_v1_observability_dataset_records_dataset_record_id_live_judging_post(dataset_record_id.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn update_properties(
-        &self,
-        dataset_record_id: impl AsRef<str>,
-        request: PutDatasetRecordPropertiesInSchemaParams,
-    ) -> Result<(), SdkError> {
+    pub async fn update_payload(&self, dataset_record_id: impl AsRef<str>, request: UpdatePayloadBetaObservabilityDatasetsRecordsRequest) -> Result<(), SdkError> {
+        self.raw.update_dataset_record_payload_v1_observability_dataset_records_dataset_record_id_payload_put(dataset_record_id.as_ref(), request.into_raw()).await.map_err(Into::into)
+    }
+
+    pub async fn update_properties(&self, dataset_record_id: impl AsRef<str>, request: UpdatePropertiesBetaObservabilityDatasetsRecordsRequest) -> Result<(), SdkError> {
         self.raw.update_dataset_record_properties_v1_observability_dataset_records_dataset_record_id_properties_put(dataset_record_id.as_ref(), request.into_raw()).await.map_err(Into::into)
     }
 }

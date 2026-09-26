@@ -2,15 +2,9 @@
 use super::*;
 use crate::generated::client::HttpClient;
 #[derive(Clone, Copy)]
-pub struct Batch<'a> {
-    raw: &'a HttpClient,
-}
+pub struct Batch<'a> { raw: &'a HttpClient }
 
 impl<'a> Batch<'a> {
-    pub(crate) fn new(raw: &'a HttpClient) -> Self {
-        Self { raw }
-    }
-    pub fn jobs(&self) -> BatchJobs<'a> {
-        BatchJobs::new(self.raw)
-    }
+    pub(crate) fn new(raw: &'a HttpClient) -> Self { Self { raw } }
+    pub fn jobs(&self) -> BatchJobs<'a> { BatchJobs::new(self.raw) }
 }

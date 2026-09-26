@@ -2,64 +2,53 @@
 use super::*;
 use crate::generated::client::HttpClient;
 
-#[derive(Clone, Copy)]
-pub struct BetaLibraries<'a> {
-    raw: &'a HttpClient,
+
+
+
+#[derive(Debug, Clone, Default)]
+pub struct ListBetaLibrariesRequest { page_size: Option<i64>, page_token: Option<String>, page: Option<i64>, search: Option<String>, filter_owned_by_me: Option<String> }
+impl ListBetaLibrariesRequest { pub fn new() -> Self { Self { page_size: None, page_token: None, page: None, search: None, filter_owned_by_me: None } }
+#[must_use] pub fn page_size(mut self, page_size: i64) -> Self { self.page_size = Some(page_size); self }
+#[must_use] pub fn page_token(mut self, page_token: impl Into<String>) -> Self { self.page_token = Some(page_token.into()); self }
+#[must_use] pub fn page(mut self, page: i64) -> Self { self.page = Some(page); self }
+#[must_use] pub fn search(mut self, search: impl Into<String>) -> Self { self.search = Some(search.into()); self }
+#[must_use] pub fn filter_owned_by_me(mut self, filter_owned_by_me: impl Into<String>) -> Self { self.filter_owned_by_me = Some(filter_owned_by_me.into()); self }
 }
 
+#[derive(Clone, Copy)]
+pub struct BetaLibraries<'a> { raw: &'a HttpClient }
+
 impl<'a> BetaLibraries<'a> {
-    pub(crate) fn new(raw: &'a HttpClient) -> Self {
-        Self { raw }
-    }
-    pub fn accesses(&self) -> BetaLibrariesAccesses<'a> {
-        BetaLibrariesAccesses::new(self.raw)
+    pub(crate) fn new(raw: &'a HttpClient) -> Self { Self { raw } }
+    pub fn accesses(&self) -> BetaLibrariesAccesses<'a> { BetaLibrariesAccesses::new(self.raw) }
+
+    pub fn documents(&self) -> BetaLibrariesDocuments<'a> { BetaLibrariesDocuments::new(self.raw) }
+
+    pub async fn create(&self, request: CreateBetaLibrariesRequest) -> Result<CreateBetaLibrariesResponse, SdkError> {
+        self.raw.libraries_create_v1(request.into_raw()).await.map(Into::into).map_err(Into::into)
     }
 
-    pub fn documents(&self) -> BetaLibrariesDocuments<'a> {
-        BetaLibrariesDocuments::new(self.raw)
+    pub async fn delete(&self, library_id: impl AsRef<str>) -> Result<DeleteBetaLibrariesResponse, SdkError> {
+        self.raw.libraries_delete_v1(library_id.as_ref()).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn create(&self, request: LibraryInParams) -> Result<LibraryOutView, SdkError> {
-        self.raw
-            .libraries_create_v1(request.into_raw())
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+    pub async fn get(&self, library_id: impl AsRef<str>) -> Result<GetBetaLibrariesResponse, SdkError> {
+        self.raw.libraries_get_v1(library_id.as_ref()).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn delete(&self, library_id: impl AsRef<str>) -> Result<LibraryOutView, SdkError> {
-        self.raw
-            .libraries_delete_v1(library_id.as_ref())
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+    pub async fn libraries_update_v1(&self, library_id: impl AsRef<str>, request: LibrariesUpdateV1BetaLibrariesRequest) -> Result<LibrariesUpdateV1BetaLibrariesResponse, SdkError> {
+        self.raw.libraries_update_v1(library_id.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn get(&self, library_id: impl AsRef<str>) -> Result<LibraryOutView, SdkError> {
-        self.raw
-            .libraries_get_v1(library_id.as_ref())
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+    pub async fn list(&self) -> Result<ListBetaLibrariesResponse, SdkError> {
+        self.raw.libraries_list_v1(None, None::<&str>, None, None::<&str>, None::<&str>).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn list(&self) -> Result<ListLibraryOutView, SdkError> {
-        self.raw
-            .libraries_list_v1()
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+    pub async fn list_with(&self, request: ListBetaLibrariesRequest) -> Result<ListBetaLibrariesResponse, SdkError> {
+        self.raw.libraries_list_v1(request.page_size, request.page_token.as_deref(), request.page, request.search.as_deref(), request.filter_owned_by_me.as_deref()).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn libraries_update_v1(
-        &self,
-        library_id: impl AsRef<str>,
-        request: LibraryInUpdateParams,
-    ) -> Result<LibraryOutView, SdkError> {
-        self.raw
-            .libraries_update_v1(library_id.as_ref(), request.into_raw())
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+    pub async fn patch(&self, library_id: impl AsRef<str>, request: PatchBetaLibrariesRequest) -> Result<PatchBetaLibrariesResponse, SdkError> {
+        self.raw.libraries_patch_v1(library_id.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
     }
 }

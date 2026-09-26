@@ -2,98 +2,51 @@
 use super::*;
 use crate::generated::client::HttpClient;
 
-#[derive(Debug, Clone, Default)]
-pub struct ListRunsWorkflowsRunsRequest {
-    workflow_identifier: Option<String>,
-    search: Option<String>,
-    status: Option<String>,
-    page_size: Option<i64>,
-    next_page_token: Option<String>,
+#[derive(Debug, Clone)]
+pub struct GetRunHistoryWorkflowsRunsRequest { run_id: String, decode_payloads: Option<bool> }
+impl GetRunHistoryWorkflowsRunsRequest { pub fn new(run_id: impl Into<String>) -> Self { Self { run_id: run_id.into(), decode_payloads: None } }
+#[must_use] pub fn decode_payloads(mut self, decode_payloads: bool) -> Self { self.decode_payloads = Some(decode_payloads); self }
 }
-impl ListRunsWorkflowsRunsRequest {
-    pub fn new() -> Self {
-        Self {
-            workflow_identifier: None,
-            search: None,
-            status: None,
-            page_size: None,
-            next_page_token: None,
-        }
-    }
-    #[must_use]
-    pub fn workflow_identifier(mut self, workflow_identifier: impl Into<String>) -> Self {
-        self.workflow_identifier = Some(workflow_identifier.into());
-        self
-    }
-    #[must_use]
-    pub fn search(mut self, search: impl Into<String>) -> Self {
-        self.search = Some(search.into());
-        self
-    }
-    #[must_use]
-    pub fn status(mut self, status: impl Into<String>) -> Self {
-        self.status = Some(status.into());
-        self
-    }
-    #[must_use]
-    pub fn page_size(mut self, page_size: i64) -> Self {
-        self.page_size = Some(page_size);
-        self
-    }
-    #[must_use]
-    pub fn next_page_token(mut self, next_page_token: impl Into<String>) -> Self {
-        self.next_page_token = Some(next_page_token.into());
-        self
-    }
+
+#[derive(Debug, Clone, Default)]
+pub struct ListRunsWorkflowsRunsRequest { workflow_identifier: Option<String>, root_execution_id: Option<String>, search: Option<String>, status: Option<String>, deployment_name: Option<String>, sort_by: Option<String>, order: Option<crate::generated::client::ListRunsV1WorkflowsRunsGetOrder>, start_time_after: Option<String>, start_time_before: Option<String>, end_time_after: Option<String>, end_time_before: Option<String>, user_id: Option<String>, workflow_tags: Option<String>, include_internal: Option<bool>, page_size: Option<i64>, next_page_token: Option<String>, search_key: Option<String> }
+impl ListRunsWorkflowsRunsRequest { pub fn new() -> Self { Self { workflow_identifier: None, root_execution_id: None, search: None, status: None, deployment_name: None, sort_by: None, order: None, start_time_after: None, start_time_before: None, end_time_after: None, end_time_before: None, user_id: None, workflow_tags: None, include_internal: None, page_size: None, next_page_token: None, search_key: None } }
+#[must_use] pub fn workflow_identifier(mut self, workflow_identifier: impl Into<String>) -> Self { self.workflow_identifier = Some(workflow_identifier.into()); self }
+#[must_use] pub fn root_execution_id(mut self, root_execution_id: impl Into<String>) -> Self { self.root_execution_id = Some(root_execution_id.into()); self }
+#[must_use] pub fn search(mut self, search: impl Into<String>) -> Self { self.search = Some(search.into()); self }
+#[must_use] pub fn status(mut self, status: impl Into<String>) -> Self { self.status = Some(status.into()); self }
+#[must_use] pub fn deployment_name(mut self, deployment_name: impl Into<String>) -> Self { self.deployment_name = Some(deployment_name.into()); self }
+#[must_use] pub fn sort_by(mut self, sort_by: impl Into<String>) -> Self { self.sort_by = Some(sort_by.into()); self }
+#[must_use] pub fn order(mut self, order: crate::generated::client::ListRunsV1WorkflowsRunsGetOrder) -> Self { self.order = Some(order); self }
+#[must_use] pub fn start_time_after(mut self, start_time_after: impl Into<String>) -> Self { self.start_time_after = Some(start_time_after.into()); self }
+#[must_use] pub fn start_time_before(mut self, start_time_before: impl Into<String>) -> Self { self.start_time_before = Some(start_time_before.into()); self }
+#[must_use] pub fn end_time_after(mut self, end_time_after: impl Into<String>) -> Self { self.end_time_after = Some(end_time_after.into()); self }
+#[must_use] pub fn end_time_before(mut self, end_time_before: impl Into<String>) -> Self { self.end_time_before = Some(end_time_before.into()); self }
+#[must_use] pub fn user_id(mut self, user_id: impl Into<String>) -> Self { self.user_id = Some(user_id.into()); self }
+#[must_use] pub fn workflow_tags(mut self, workflow_tags: impl Into<String>) -> Self { self.workflow_tags = Some(workflow_tags.into()); self }
+#[must_use] pub fn include_internal(mut self, include_internal: bool) -> Self { self.include_internal = Some(include_internal); self }
+#[must_use] pub fn page_size(mut self, page_size: i64) -> Self { self.page_size = Some(page_size); self }
+#[must_use] pub fn next_page_token(mut self, next_page_token: impl Into<String>) -> Self { self.next_page_token = Some(next_page_token.into()); self }
+#[must_use] pub fn search_key(mut self, search_key: impl Into<String>) -> Self { self.search_key = Some(search_key.into()); self }
 }
 #[derive(Clone, Copy)]
-pub struct WorkflowsRuns<'a> {
-    raw: &'a HttpClient,
-}
+pub struct WorkflowsRuns<'a> { raw: &'a HttpClient }
 
 impl<'a> WorkflowsRuns<'a> {
-    pub(crate) fn new(raw: &'a HttpClient) -> Self {
-        Self { raw }
-    }
-    pub async fn get_run(
-        &self,
-        run_id: impl AsRef<str>,
-    ) -> Result<WorkflowExecutionResponseView, SdkError> {
-        self.raw
-            .get_run_v1_workflows_runs_run_id_get(run_id.as_ref())
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+    pub(crate) fn new(raw: &'a HttpClient) -> Self { Self { raw } }
+    pub async fn get_run(&self, run_id: impl AsRef<str>) -> Result<GetRunWorkflowsRunsResponse, SdkError> {
+        self.raw.get_run_v1_workflows_runs_run_id_get(run_id.as_ref()).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn list_runs(&self) -> Result<WorkflowExecutionListResponseView, SdkError> {
-        self.raw
-            .list_runs_v1_workflows_runs_get(
-                None::<&str>,
-                None::<&str>,
-                None::<&str>,
-                None,
-                None::<&str>,
-            )
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+    pub async fn get_run_history(&self, request: GetRunHistoryWorkflowsRunsRequest) -> Result<GetRunHistoryWorkflowsRunsResponse, SdkError> {
+        self.raw.get_run_history_v1_workflows_runs_run_id_history_get(request.run_id.as_str(), request.decode_payloads).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn list_runs_with(
-        &self,
-        request: ListRunsWorkflowsRunsRequest,
-    ) -> Result<WorkflowExecutionListResponseView, SdkError> {
-        self.raw
-            .list_runs_v1_workflows_runs_get(
-                request.workflow_identifier.as_deref(),
-                request.search.as_deref(),
-                request.status.as_deref(),
-                request.page_size,
-                request.next_page_token.as_deref(),
-            )
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+    pub async fn list_runs(&self) -> Result<ListRunsWorkflowsRunsResponse, SdkError> {
+        self.raw.list_runs_v1_workflows_runs_get(None::<&str>, None::<&str>, None::<&str>, None::<&str>, None::<&str>, None::<&str>, None, None::<&str>, None::<&str>, None::<&str>, None::<&str>, None::<&str>, None::<&str>, None, None, None::<&str>, None::<&str>).await.map(Into::into).map_err(Into::into)
+    }
+
+    pub async fn list_runs_with(&self, request: ListRunsWorkflowsRunsRequest) -> Result<ListRunsWorkflowsRunsResponse, SdkError> {
+        self.raw.list_runs_v1_workflows_runs_get(request.workflow_identifier.as_deref(), request.root_execution_id.as_deref(), request.search.as_deref(), request.status.as_deref(), request.deployment_name.as_deref(), request.sort_by.as_deref(), request.order, request.start_time_after.as_deref(), request.start_time_before.as_deref(), request.end_time_after.as_deref(), request.end_time_before.as_deref(), request.user_id.as_deref(), request.workflow_tags.as_deref(), request.include_internal, request.page_size, request.next_page_token.as_deref(), request.search_key.as_deref()).await.map(Into::into).map_err(Into::into)
     }
 }

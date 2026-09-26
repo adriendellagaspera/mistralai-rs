@@ -2,44 +2,21 @@
 use super::*;
 use crate::generated::client::HttpClient;
 
+
 #[derive(Clone, Copy)]
-pub struct BetaLibrariesAccesses<'a> {
-    raw: &'a HttpClient,
-}
+pub struct BetaLibrariesAccesses<'a> { raw: &'a HttpClient }
 
 impl<'a> BetaLibrariesAccesses<'a> {
-    pub(crate) fn new(raw: &'a HttpClient) -> Self {
-        Self { raw }
-    }
-    pub async fn update_or_create(
-        &self,
-        library_id: impl AsRef<str>,
-        request: SharingInParams,
-    ) -> Result<SharingOutView, SdkError> {
-        self.raw
-            .libraries_share_create_v1(library_id.as_ref(), request.into_raw())
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+    pub(crate) fn new(raw: &'a HttpClient) -> Self { Self { raw } }
+    pub async fn delete(&self, library_id: impl AsRef<str>, request: DeleteBetaLibrariesAccessesRequest) -> Result<DeleteBetaLibrariesAccessesResponse, SdkError> {
+        self.raw.libraries_share_delete_v1(library_id.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn delete(
-        &self,
-        library_id: impl AsRef<str>,
-        request: SharingDeleteParams,
-    ) -> Result<SharingOutView, SdkError> {
-        self.raw
-            .libraries_share_delete_v1(library_id.as_ref(), request.into_raw())
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+    pub async fn list(&self, library_id: impl AsRef<str>) -> Result<ListBetaLibrariesAccessesResponse, SdkError> {
+        self.raw.libraries_share_list_v1(library_id.as_ref()).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn list(&self, library_id: impl AsRef<str>) -> Result<ListSharingOutView, SdkError> {
-        self.raw
-            .libraries_share_list_v1(library_id.as_ref())
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+    pub async fn update_or_create(&self, library_id: impl AsRef<str>, request: UpdateOrCreateBetaLibrariesAccessesRequest) -> Result<UpdateOrCreateBetaLibrariesAccessesResponse, SdkError> {
+        self.raw.libraries_share_create_v1(library_id.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
     }
 }

@@ -2,19 +2,11 @@
 use super::*;
 use crate::generated::client::HttpClient;
 #[derive(Clone, Copy)]
-pub struct Ocr<'a> {
-    raw: &'a HttpClient,
-}
+pub struct Ocr<'a> { raw: &'a HttpClient }
 
 impl<'a> Ocr<'a> {
-    pub(crate) fn new(raw: &'a HttpClient) -> Self {
-        Self { raw }
-    }
-    pub async fn process(&self, request: OcrRequest) -> Result<OcrResponse, SdkError> {
-        self.raw
-            .ocr_v1_ocr_post(request.into_raw())
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+    pub(crate) fn new(raw: &'a HttpClient) -> Self { Self { raw } }
+    pub async fn process(&self, request: ProcessOcrRequest) -> Result<ProcessOcrResponse, SdkError> {
+        self.raw.ocr_v1_ocr_post(request.into_raw()).await.map(Into::into).map_err(Into::into)
     }
 }
