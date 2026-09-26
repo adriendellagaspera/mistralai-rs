@@ -12,9 +12,11 @@
 )]
 
 #[allow(
+    dead_code,
     missing_docs,
     rustdoc::broken_intra_doc_links,
     clippy::allow_attributes_without_reason,
+    clippy::clone_on_copy,
     clippy::double_must_use,
     clippy::nonminimal_bool,
     clippy::redundant_field_names,
@@ -24,6 +26,7 @@
     clippy::empty_docs,
     clippy::missing_errors_doc,
     clippy::missing_panics_doc,
+    clippy::unnecessary_to_owned,
     reason = "openapi-to-rust output is generated and kept behind this module boundary"
 )]
 mod generated;
@@ -38,8 +41,12 @@ pub mod raw {
     missing_docs,
     rustdoc::broken_intra_doc_links,
     clippy::allow_attributes_without_reason,
+    clippy::large_enum_variant,
     clippy::missing_errors_doc,
     clippy::missing_panics_doc,
+    clippy::redundant_field_names,
+    clippy::useless_conversion,
+    clippy::wrong_self_convention,
     reason = "the idiomatic SDK facade is generated and validated by generation/API gates"
 )]
 mod sdk;
