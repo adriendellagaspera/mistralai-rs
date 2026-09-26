@@ -150,7 +150,7 @@ async fn binary_downloads_and_wav_use_correct_media_and_escaped_paths() {
     let (url, worker) = server("200 OK", "audio/wav", bytes);
     let result = Client::new()
         .with_base_url(&url)
-        .get_voice_sample_audio_v1_audio_voices_voice_id_sample_get_wav("test")
+        .get_voice_sample_audio_v1_audio_voices_voice_id_sample_get("test")
         .await
         .unwrap();
     assert_eq!(result.as_ref(), bytes);
