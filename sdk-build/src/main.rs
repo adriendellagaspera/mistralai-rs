@@ -800,6 +800,7 @@ fn verify_candidate_derivation(
     format_rust(root, version, &generated)?;
 
     let coverage = raw_coverage(&generated, &spec)?;
+    write_json(&generated.join("coverage.json"), &coverage)?;
     let candidate = field(lock, "openapi_candidate")?;
     let expected_operations = candidate["operations"]
         .as_u64()
