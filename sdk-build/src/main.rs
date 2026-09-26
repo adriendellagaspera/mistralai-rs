@@ -571,6 +571,129 @@ fn candidate_compatibility_inventory(
     }))
 }
 
+fn candidate_compatibility_definition(root: &Path, derived: &Value) -> Result<Value> {
+    let selection = read_json(&root.join("sdk-build/candidate-compatibility-selection.json"))?;
+    if field(&selection, "schema_version")?.as_u64() != Some(1) {
+        return fail("unsupported candidate compatibility selection version");
+    }
+    let published = read_json(&root.join("sdk-build/compatibility-definition.json"))?;
+    let mut candidate = derived.clone();
+    for name in field(&selection, "models")?
+        .as_array()
+        .ok_or("selected compatibility models must be an array")?
+    {
+        let name = name
+            .as_str()
+            .ok_or("selected model name must be a string")?;
+        let model = field(field(&published, "models")?, name)?.clone();
+        let models = candidate
+            .get_mut("models")
+            .and_then(Value::as_object_mut)
+            .ok_or("candidate models must be an object")?;
+        if models.insert(name.to_owned(), model).is_some() {
+            return fail(format!(
+                "candidate compatibility model already exists: {name}"
+            ));
+        }
+    }
+    let accessor_paths = field(&selection, "accessor_paths")?
+        .as_object()
+        .ok_or("selected accessor paths must be an object")?;
+    for (qualified, path) in accessor_paths {
+        let (model_name, accessor_name) = qualified
+            .split_once('.')
+            .ok_or("selected accessor must be model.name")?;
+        let accessors = candidate
+            .get_mut("models")
+            .and_then(|models| models.get_mut(model_name))
+            .and_then(|model| model.get_mut("accessors"))
+            .and_then(Value::as_object_mut)
+            .ok_or("selected model accessors are missing")?;
+        let accessor = accessors
+            .get_mut(accessor_name)
+            .ok_or("selected accessor is missing")?;
+        let path = path
+            .as_array()
+            .ok_or("selected accessor path must be an array")?;
+        if path.iter().any(|segment| !segment.is_string()) {
+            return fail("selected accessor path must contain only strings");
+        }
+        accessor["path"] = Value::Array(path.clone());
+    }
+    let selections = field(&selection, "operations")?
+        .as_object()
+        .ok_or("selected compatibility operations must be an object")?;
+    for (resource, names) in selections {
+        for name in names
+            .as_array()
+            .ok_or("selected resource operations must be an array")?
+        {
+            let name = name
+                .as_str()
+                .ok_or("selected operation name must be a string")?;
+            let replacement = field(
+                field(
+                    field(field(&published, "resources")?, resource)?,
+                    "operations",
+                )?,
+                name,
+            )?
+            .clone();
+            let operations = candidate
+                .get_mut("resources")
+                .and_then(Value::as_object_mut)
+                .and_then(|resources| resources.get_mut(resource))
+                .and_then(|value| value.get_mut("operations"))
+                .and_then(Value::as_object_mut)
+                .ok_or("candidate resource operations must be an object")?;
+            let existing = operations
+                .get(name)
+                .ok_or("selected operation is missing in candidate")?;
+            if field(existing, "operation_id")? != field(&replacement, "operation_id")? {
+                return fail(format!("source identity drift for {resource}.{name}"));
+            }
+            operations.insert(name.to_owned(), replacement);
+        }
+    }
+    Ok(candidate)
+}
+
+fn verify_candidate_compatibility_signatures(root: &Path, facade: &Path) -> Result<()> {
+    fn signature(source: &str, name: &str) -> Result<String> {
+        let start = source
+            .find(&format!("pub async fn {name}("))
+            .ok_or_else(|| format!("public async method missing: {name}"))?;
+        let rest = &source[start..];
+        let end = rest.find('{').ok_or("public async method has no body")?;
+        Ok(rest[..end]
+            .split_whitespace()
+            .collect::<String>()
+            .replace(",)", ")"))
+    }
+
+    let selection = read_json(&root.join("sdk-build/candidate-compatibility-selection.json"))?;
+    let resources = field(&selection, "operations")?
+        .as_object()
+        .ok_or("selected compatibility operations must be an object")?;
+    for (resource, names) in resources {
+        let file = format!("{resource}.rs");
+        let published = fs::read_to_string(root.join("src/sdk").join(&file))?;
+        let candidate = fs::read_to_string(facade.join(file))?;
+        for name in names
+            .as_array()
+            .ok_or("selected resource operations must be an array")?
+        {
+            let name = name
+                .as_str()
+                .ok_or("selected operation name must be a string")?;
+            if signature(&published, name)? != signature(&candidate, name)? {
+                return fail(format!("public signature drift for {resource}.{name}"));
+            }
+        }
+    }
+    Ok(())
+}
+
 fn verify_candidate_raw(
     root: &Path,
     lock: &Value,
@@ -827,6 +950,38 @@ fn verify_candidate_derivation(
         fs::remove_dir_all(&review_source)?;
     }
     copy_dir(&facade, &review_source)?;
+
+    let compatible_definition =
+        candidate_compatibility_definition(root, field(&derivation, "definition")?)?;
+    let compatible_definition_path = target.join("candidate-compatible-definition.json");
+    write_json(&compatible_definition_path, &compatible_definition)?;
+    let compatible_facade = work.join("candidate-compatible-facade");
+    run(
+        compiler,
+        vec![
+            "generate".into(),
+            "--openapi".into(),
+            str_arg(&overlaid),
+            "--bindings".into(),
+            str_arg(&bindings_path),
+            "--definition".into(),
+            str_arg(&compatible_definition_path),
+            "--runtime".into(),
+            str_arg(&runtime),
+            "--output".into(),
+            str_arg(&compatible_facade),
+            "--inventory".into(),
+            str_arg(&target.join("candidate-compatible-api-inventory.json")),
+        ],
+        root,
+    )?;
+    compile_candidate_facade(root, version, &generated, &compatible_facade, work)?;
+    verify_candidate_compatibility_signatures(root, &compatible_facade)?;
+    let compatible_review_source = target.join("candidate-compatible-facade-source");
+    if compatible_review_source.exists() {
+        fs::remove_dir_all(&compatible_review_source)?;
+    }
+    copy_dir(&compatible_facade, &compatible_review_source)?;
 
     println!(
         "{}",

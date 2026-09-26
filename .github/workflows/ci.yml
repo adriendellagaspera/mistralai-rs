@@ -216,6 +216,9 @@ jobs:
             sdk-build/target/candidate-api-inventory.json
             sdk-build/target/candidate-compatibility-inventory.json
             sdk-build/target/candidate-facade-source/
+            sdk-build/target/candidate-compatible-definition.json
+            sdk-build/target/candidate-compatible-api-inventory.json
+            sdk-build/target/candidate-compatible-facade-source/
             sdk-build/target/candidate-bindings.json
             sdk-build/target/candidate-overlaid.json
           if-no-files-found: warn
