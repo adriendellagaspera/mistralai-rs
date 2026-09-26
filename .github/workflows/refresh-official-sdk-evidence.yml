@@ -1,0 +1,32 @@
+name: Refresh official SDK evidence
+
+on:
+  push:
+    branches:
+      - feat/cutover-288
+    paths:
+      - .github/workflows/refresh-official-sdk-evidence.yml
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: feat/cutover-288
+      - name: Refresh pinned official SDK surface
+        run: python3 sdk-build/official-sdks/update.py update
+      - name: Commit refreshed evidence
+        run: |
+          if git diff --quiet -- sdk-build/official-sdks/surface.json; then
+            echo "No evidence drift"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sdk-build/official-sdks/surface.json
+          git commit -m "chore(sdk-build): refresh official SDK evidence"
+          git push origin HEAD:feat/cutover-288
