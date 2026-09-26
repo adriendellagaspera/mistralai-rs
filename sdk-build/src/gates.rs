@@ -297,6 +297,7 @@ pub(crate) fn verify_overlaid(spec: &Value) -> Result<()> {
         || required(&schemas["SharingDelete"], "level")
         || required(&schemas["WorkflowListResponse"], "beta.workflows")
         || !required(&schemas["WorkflowListResponse"], "workflows")
+        || !required(&schemas["WorkflowListResponse"], "next_cursor")
     {
         return fail("Mistral OpenAPI overlay assertions failed");
     }
@@ -324,46 +325,6 @@ pub(crate) fn verify_overlaid(spec: &Value) -> Result<()> {
     Ok(())
 }
 
-pub(crate) fn verify_candidate_overlaid(spec: &Value) -> Result<()> {
-    let schemas = &spec["components"]["schemas"];
-    let required = |value: &Value, needle: &str| {
-        value
-            .get("required")
-            .and_then(Value::as_array)
-            .is_some_and(|items| items.iter().any(|item| item.as_str() == Some(needle)))
-    };
-    if required(&schemas["ChatCompletionResponse"]["allOf"][1], "data")
-        || required(&schemas["SharingDelete"], "level")
-        || required(&schemas["WorkflowListResponse"], "beta.workflows")
-        || !required(&schemas["WorkflowListResponse"], "workflows")
-        || !required(&schemas["WorkflowListResponse"], "next_cursor")
-    {
-        return fail("candidate Mistral OpenAPI overlay assertions failed");
-    }
-    let paths = field(spec, "paths")?
-        .as_object()
-        .ok_or("OpenAPI paths must be an object")?;
-    let actual: BTreeSet<_> = paths
-        .keys()
-        .filter(|p| p.contains("#stream") || p.contains("#wav"))
-        .map(String::as_str)
-        .collect();
-    let expected: BTreeSet<_> = [
-        "/v1/conversations#stream",
-        "/v1/conversations/{conversation_id}#stream",
-        "/v1/conversations/{conversation_id}/restart#stream",
-        "/v1/audio/transcriptions#stream",
-    ]
-    .into_iter()
-    .collect();
-    if actual != expected {
-        return fail(format!(
-            "candidate overlay changed representation-specific path inventory: {actual:?}"
-        ));
-    }
-    Ok(())
-}
-
 pub(crate) fn verify_bindings_coverage(bindings: &Value, spec: &Value) -> Result<Value> {
     if bindings["schema_version"] != 3 {
         return fail("candidate bindings adapter did not emit Bindings v3");
@@ -372,7 +333,7 @@ pub(crate) fn verify_bindings_coverage(bindings: &Value, spec: &Value) -> Result
     let exact_paths = source_paths(spec)?;
     let operations = field(bindings, "operations")?
         .as_object()
-        .ok_or("candidate Bindings operations must be an object")?;
+        .ok_or("Bindings operations must be an object")?;
     let mut covered = BTreeSet::new();
     let mut call_shapes = 0usize;
     let mut helper_bindings = 0usize;
@@ -388,15 +349,15 @@ pub(crate) fn verify_bindings_coverage(bindings: &Value, spec: &Value) -> Result
         let path = string(origin, "path")?;
         let Some(expected) = source.get(id) else {
             return fail(format!(
-                "candidate Bindings operation {name} has unknown source {id}"
+                "Bindings operation {name} has unknown source {id}"
             ));
         };
         let expected_path = exact_paths.get(id).ok_or_else(|| {
-            std::io::Error::other(format!("candidate source path missing for {id}"))
+            std::io::Error::other(format!("source path missing for {id}"))
         })?;
         if expected["method"].as_str() != Some(method) || expected_path != path {
             return fail(format!(
-                "candidate Bindings source identity drift for {name}: {method} {path}"
+                "Bindings source identity drift for {name}: {method} {path}"
             ));
         }
 
@@ -412,7 +373,7 @@ pub(crate) fn verify_bindings_coverage(bindings: &Value, spec: &Value) -> Result
             "multipart_filenames" => helper_bindings += 1,
             other => {
                 return fail(format!(
-                    "candidate Bindings operation {name} has unsupported metadata kind {other}"
+                    "Bindings operation {name} has unsupported metadata kind {other}"
                 ));
             }
         }
@@ -422,10 +383,10 @@ pub(crate) fn verify_bindings_coverage(bindings: &Value, spec: &Value) -> Result
         let streaming = matches!(representation_kind, "event_stream" | "binary_stream");
         let stream_abi = metadata
             .get("stream_abi")
-            .ok_or("candidate Bindings metadata missing stream_abi")?;
+            .ok_or("Bindings metadata missing stream_abi")?;
         if streaming == stream_abi.is_null() {
             return fail(format!(
-                "candidate Bindings stream ABI disagrees with representation for {name}"
+                "Bindings stream ABI disagrees with representation for {name}"
             ));
         }
         if streaming {
@@ -436,7 +397,7 @@ pub(crate) fn verify_bindings_coverage(bindings: &Value, spec: &Value) -> Result
     let expected: BTreeSet<_> = source.keys().cloned().collect();
     if covered != expected {
         return fail(format!(
-            "candidate Bindings source coverage disagrees with OpenAPI: missing={:?}; extra={:?}",
+            "Bindings source coverage disagrees with OpenAPI: missing={:?}; extra={:?}",
             expected.difference(&covered).collect::<Vec<_>>(),
             covered.difference(&expected).collect::<Vec<_>>()
         ));
@@ -445,7 +406,7 @@ pub(crate) fn verify_bindings_coverage(bindings: &Value, spec: &Value) -> Result
     let has_stream_discriminator = |metadata: &Value, expected: bool| -> Result<bool> {
         let discriminators = field(metadata, "request_discriminators")?
             .as_array()
-            .ok_or("candidate Bindings request_discriminators must be an array")?;
+            .ok_or("Bindings request_discriminators must be an array")?;
         Ok(discriminators.iter().any(|discriminator| {
             discriminator["wire_name"].as_str() == Some("stream")
                 && discriminator["value"].as_bool() == Some(expected)
@@ -459,10 +420,10 @@ pub(crate) fn verify_bindings_coverage(bindings: &Value, spec: &Value) -> Result
     {
         let base_path = stream_path
             .strip_suffix("#stream")
-            .ok_or("candidate stream path suffix disappeared")?;
+            .ok_or("stream path suffix disappeared")?;
         let method = source[stream_id]["method"]
             .as_str()
-            .ok_or("candidate source method must be a string")?;
+            .ok_or("source method must be a string")?;
         let buffered_ids = exact_paths
             .iter()
             .filter_map(|(id, path)| {
@@ -471,7 +432,7 @@ pub(crate) fn verify_bindings_coverage(bindings: &Value, spec: &Value) -> Result
             .collect::<Vec<_>>();
         if buffered_ids.len() != 1 {
             return fail(format!(
-                "candidate stream source {stream_id} has {} buffered counterparts at {base_path}",
+                "stream source {stream_id} has {} buffered counterparts at {base_path}",
                 buffered_ids.len()
             ));
         }
@@ -479,7 +440,7 @@ pub(crate) fn verify_bindings_coverage(bindings: &Value, spec: &Value) -> Result
 
         let stream_bindings = call_shape_metadata.get(stream_id).ok_or_else(|| {
             std::io::Error::other(format!(
-                "candidate stream source {stream_id} has no call shape"
+                "stream source {stream_id} has no call shape"
             ))
         })?;
         let mut proved_stream = false;
@@ -494,13 +455,13 @@ pub(crate) fn verify_bindings_coverage(bindings: &Value, spec: &Value) -> Result
         }
         if !proved_stream {
             return fail(format!(
-                "candidate stream source {stream_id} lacks streaming representation + stream=true discriminator"
+                "stream source {stream_id} lacks streaming representation + stream=true discriminator"
             ));
         }
 
         let buffered_bindings = call_shape_metadata.get(buffered_id).ok_or_else(|| {
             std::io::Error::other(format!(
-                "candidate buffered source {buffered_id} has no call shape"
+                "buffered source {buffered_id} has no call shape"
             ))
         })?;
         let mut proved_buffered = false;
@@ -515,7 +476,7 @@ pub(crate) fn verify_bindings_coverage(bindings: &Value, spec: &Value) -> Result
         }
         if !proved_buffered {
             return fail(format!(
-                "candidate buffered source {buffered_id} lacks buffered representation + stream=false discriminator"
+                "buffered source {buffered_id} lacks buffered representation + stream=false discriminator"
             ));
         }
         representation_path_pairs += 1;
@@ -702,7 +663,7 @@ mod tests {
     }
 
     #[test]
-    fn candidate_bindings_preserve_exact_source_and_stream_identity() {
+    fn bindings_preserve_exact_source_and_stream_identity() {
         let spec = json!({"paths":{
             "/v1/events":{"get":{"operationId":"events","responses":{"200":{"content":{"application/json":{}}}}}},
             "/v1/events#stream":{"get":{"operationId":"events_stream","responses":{"200":{"content":{"text/event-stream":{}}}}}}
