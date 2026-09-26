@@ -459,7 +459,10 @@ fn compile_candidate_facade(
     for file in ["lib.rs", "streaming.rs"] {
         fs::copy(root.join("src").join(file), crate_src.join(file))?;
     }
-    fs::copy(root.join("src/sdk/error.rs"), crate_src.join("sdk/error.rs"))?;
+    fs::copy(
+        root.join("src/sdk/error.rs"),
+        crate_src.join("sdk/error.rs"),
+    )?;
 
     let dependencies = fs::read_to_string(raw.join("REQUIRED_DEPS.toml"))?;
     if !dependencies.contains("[dependencies]\n") {
