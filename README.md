@@ -13,19 +13,19 @@ tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 Pin a Git `rev` for reproducible builds.
 
 ```rust,no_run
-use mistralai::{ChatRequest, Message, Mistral};
+use mistralai::raw::types::ChatCompletionRequest;
+use mistralai::{CompleteChatRequest, Mistral};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mistral = Mistral::new(std::env::var("MISTRAL_API_KEY")?);
-    let response = mistral
-        .chat()
-        .complete(
-            ChatRequest::new("mistral-small-latest", [Message::user("Say hello in French.")])
-                .max_tokens(64),
-        )
-        .await?;
-    println!("{}", response.text().unwrap_or_default());
+    let raw: ChatCompletionRequest = serde_json::from_value(serde_json::json!({
+        "model": "mistral-small-latest",
+        "messages": [{"role": "user", "content": "Say hello in French."}],
+        "max_tokens": 64
+    }))?;
+    let response = mistral.chat().complete(CompleteChatRequest::from(raw)).await?;
+    println!("{}", serde_json::to_string_pretty(response.raw())?);
     Ok(())
 }
 ```
