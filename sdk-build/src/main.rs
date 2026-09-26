@@ -938,6 +938,7 @@ fn verify_candidate_derivation(
         ],
         root,
     )?;
+    format_rust(root, version, &facade)?;
     compile_candidate_facade(root, version, &generated, &facade, work)?;
     let review_source = target.join("candidate-facade-source");
     if review_source.exists() {
