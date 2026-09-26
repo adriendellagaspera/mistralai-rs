@@ -38,7 +38,7 @@ impl<'a> WorkflowsMetrics<'a> {
     pub async fn get_workflow_metrics(
         &self,
         request: GetWorkflowMetricsWorkflowsMetricsRequest,
-    ) -> Result<WorkflowMetricsView, SdkError> {
+    ) -> Result<GetWorkflowMetricsWorkflowsMetricsResponse, SdkError> {
         self.raw
             .get_workflow_metrics_v1_workflows_workflow_name_metrics_get(
                 request.workflow_name.as_str(),

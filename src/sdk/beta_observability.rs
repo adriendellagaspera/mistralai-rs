@@ -25,4 +25,16 @@ impl<'a> BetaObservability<'a> {
     pub fn judges(&self) -> BetaObservabilityJudges<'a> {
         BetaObservabilityJudges::new(self.raw)
     }
+
+    pub fn logs(&self) -> BetaObservabilityLogs<'a> {
+        BetaObservabilityLogs::new(self.raw)
+    }
+
+    pub fn spans(&self) -> BetaObservabilitySpans<'a> {
+        BetaObservabilitySpans::new(self.raw)
+    }
+
+    pub fn traces(&self) -> BetaObservabilityTraces<'a> {
+        BetaObservabilityTraces::new(self.raw)
+    }
 }

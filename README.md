@@ -13,19 +13,19 @@ tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 Pin a Git `rev` for reproducible builds.
 
 ```rust,no_run
-use mistralai::{ChatRequest, Message, Mistral};
+use mistralai::raw::types::ChatCompletionRequest;
+use mistralai::{CompleteChatRequest, Mistral};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mistral = Mistral::new(std::env::var("MISTRAL_API_KEY")?);
-    let response = mistral
-        .chat()
-        .complete(
-            ChatRequest::new("mistral-small-latest", [Message::user("Say hello in French.")])
-                .max_tokens(64),
-        )
-        .await?;
-    println!("{}", response.text().unwrap_or_default());
+    let raw: ChatCompletionRequest = serde_json::from_value(serde_json::json!({
+        "model": "mistral-small-latest",
+        "messages": [{"role": "user", "content": "Say hello in French."}],
+        "max_tokens": 64
+    }))?;
+    let response = mistral.chat().complete(CompleteChatRequest::from(raw)).await?;
+    println!("{}", serde_json::to_string_pretty(response.raw())?);
     Ok(())
 }
 ```
@@ -34,9 +34,9 @@ The client defaults to `https://api.mistral.ai`. It does not automatically retry
 
 ## API
 
-The resource-oriented facade is in `mistralai`; the complete generated transport for the pinned source is in `mistralai::raw`. See [`src/generated/coverage.json`](src/generated/coverage.json) for raw operation coverage and [`sdk-build/compatibility-definition.json`](sdk-build/compatibility-definition.json) for the published facade. Streaming, multipart and binary download examples are in [`examples/`](examples/).
+The resource-oriented facade is in `mistralai`; the complete generated transport for the pinned source is in `mistralai::raw`. See [`src/generated/coverage.json`](src/generated/coverage.json) for raw operation coverage. The public facade is derived canonically from the pinned OpenAPI source; no legacy compatibility definition is applied by default. Streaming, multipart and binary download examples are in [`examples/`](examples/).
 
-The published generation input is [`sdk-build/openapi/published.yaml`](sdk-build/openapi/published.yaml). The separately pinned [`public-288.yaml`](sdk-build/openapi/public-288.yaml) is a migration candidate, not the published API. The remaining work and acceptance criteria are tracked in [#134](https://github.com/adriendellagaspera/mistralai-rs/issues/134), [#137](https://github.com/adriendellagaspera/mistralai-rs/issues/137) and [#138](https://github.com/adriendellagaspera/mistralai-rs/issues/138).
+The published generation input is [`sdk-build/openapi/published.yaml`](sdk-build/openapi/published.yaml), pinned to `mistralai/platform-docs-public/public/openapi.yaml` with 288 source operations. The 0.4.0 cutover intentionally permits reviewed breaking API changes rather than carrying compatibility shims from the previous 0.x surface.
 
 ## Development
 

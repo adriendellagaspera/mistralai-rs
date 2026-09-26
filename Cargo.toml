@@ -1,6 +1,6 @@
 [package]
 name = "mistralai-sdk"
-version = "0.3.0"
+version = "0.4.0"
 edition = "2024"
 rust-version = "1.94"
 description = "Unofficial Mistral AI SDK reproducibly generated from the official OpenAPI specification"
@@ -12,9 +12,12 @@ categories = ["api-bindings", "asynchronous"]
 
 [lib]
 name = "mistralai"
+# Upstream OpenAPI descriptions are documentation, not executable Rust examples.
+doctest = false
 
 # Keep aligned with src/generated/REQUIRED_DEPS.toml.
 [dependencies]
+base64 = "0.22"
 chrono = { version = "0.4", features = ["serde"] }
 reqwest = { version = "0.13", default-features = false, features = ["query", "rustls", "stream", "multipart"] }
 reqwest-middleware = { version = "0.5", features = ["query", "multipart"] }

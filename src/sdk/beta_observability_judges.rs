@@ -58,8 +58,8 @@ impl<'a> BetaObservabilityJudges<'a> {
     }
     pub async fn create(
         &self,
-        request: PostJudgeInSchemaParams,
-    ) -> Result<JudgePreviewView, SdkError> {
+        request: CreateBetaObservabilityJudgesRequest,
+    ) -> Result<CreateBetaObservabilityJudgesResponse, SdkError> {
         self.raw
             .create_judge_v1_observability_judges_post(request.into_raw())
             .await
@@ -74,7 +74,10 @@ impl<'a> BetaObservabilityJudges<'a> {
             .map_err(Into::into)
     }
 
-    pub async fn fetch(&self, judge_id: impl AsRef<str>) -> Result<JudgePreviewView, SdkError> {
+    pub async fn fetch(
+        &self,
+        judge_id: impl AsRef<str>,
+    ) -> Result<FetchBetaObservabilityJudgesResponse, SdkError> {
         self.raw
             .get_judge_by_id_v1_observability_judges_judge_id_get(judge_id.as_ref())
             .await
@@ -82,7 +85,22 @@ impl<'a> BetaObservabilityJudges<'a> {
             .map_err(Into::into)
     }
 
-    pub async fn list(&self) -> Result<JudgePreviewsView, SdkError> {
+    pub async fn judge_conversation(
+        &self,
+        judge_id: impl AsRef<str>,
+        request: JudgeConversationBetaObservabilityJudgesRequest,
+    ) -> Result<JudgeConversationBetaObservabilityJudgesResponse, SdkError> {
+        self.raw
+            .judge_conversation_v1_observability_judges_judge_id_live_judging_post(
+                judge_id.as_ref(),
+                request.into_raw(),
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn list(&self) -> Result<ListBetaObservabilityJudgesResponse, SdkError> {
         self.raw
             .get_judges_v1_observability_judges_get(
                 None::<&str>,
@@ -99,7 +117,7 @@ impl<'a> BetaObservabilityJudges<'a> {
     pub async fn list_with(
         &self,
         request: ListBetaObservabilityJudgesRequest,
-    ) -> Result<JudgePreviewsView, SdkError> {
+    ) -> Result<ListBetaObservabilityJudgesResponse, SdkError> {
         self.raw
             .get_judges_v1_observability_judges_get(
                 request.type_filter.as_deref(),
@@ -113,25 +131,10 @@ impl<'a> BetaObservabilityJudges<'a> {
             .map_err(Into::into)
     }
 
-    pub async fn judge_conversation(
-        &self,
-        judge_id: impl AsRef<str>,
-        request: JudgeConversationRequestParams,
-    ) -> Result<JudgeOutputView, SdkError> {
-        self.raw
-            .judge_conversation_v1_observability_judges_judge_id_live_judging_post(
-                judge_id.as_ref(),
-                request.into_raw(),
-            )
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
-    }
-
     pub async fn update(
         &self,
         judge_id: impl AsRef<str>,
-        request: PutJudgeInSchemaParams,
+        request: UpdateBetaObservabilityJudgesRequest,
     ) -> Result<(), SdkError> {
         self.raw
             .update_judge_v1_observability_judges_judge_id_put(

@@ -13,7 +13,10 @@ impl<'a> Fim<'a> {
     pub(crate) fn new(raw: &'a HttpClient) -> Self {
         Self { raw }
     }
-    pub async fn complete(&self, request: FimRequest) -> Result<FimResponse, SdkError> {
+    pub async fn complete(
+        &self,
+        request: CompleteFimRequest,
+    ) -> Result<CompleteFimResponse, SdkError> {
         self.raw
             .fim_completion_v1_fim_completions_post({
                 let mut raw = request.into_raw();
@@ -25,7 +28,7 @@ impl<'a> Fim<'a> {
             .map_err(Into::into)
     }
 
-    pub async fn stream(&self, request: FimRequest) -> Result<FimStream, SdkError> {
+    pub async fn stream(&self, request: StreamFimRequest) -> Result<StreamFimStream, SdkError> {
         let bytes = self
             .raw
             .fim_completion_v1_fim_completions_post_stream({
@@ -37,7 +40,7 @@ impl<'a> Fim<'a> {
             .map_err(SdkError::from)?;
         let events = crate::streaming::json_events::<_, _, CompletionChunk>(bytes).map(|event| {
             event
-                .map(|event| FimStreamChunk::from(event.data))
+                .map(|event| StreamFimStreamItem::from(event.data))
                 .map_err(Into::into)
         });
         Ok(Box::pin(events))

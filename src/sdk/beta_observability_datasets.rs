@@ -2,58 +2,6 @@
 use super::*;
 use crate::generated::client::HttpClient;
 
-#[derive(Debug, Clone)]
-pub struct ListTasksBetaObservabilityDatasetsRequest {
-    dataset_id: String,
-    page_size: Option<i64>,
-    page: Option<i64>,
-}
-impl ListTasksBetaObservabilityDatasetsRequest {
-    pub fn new(dataset_id: impl Into<String>) -> Self {
-        Self {
-            dataset_id: dataset_id.into(),
-            page_size: None,
-            page: None,
-        }
-    }
-    #[must_use]
-    pub fn page_size(mut self, page_size: i64) -> Self {
-        self.page_size = Some(page_size);
-        self
-    }
-    #[must_use]
-    pub fn page(mut self, page: i64) -> Self {
-        self.page = Some(page);
-        self
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct ListRecordsBetaObservabilityDatasetsRequest {
-    dataset_id: String,
-    page_size: Option<i64>,
-    page: Option<i64>,
-}
-impl ListRecordsBetaObservabilityDatasetsRequest {
-    pub fn new(dataset_id: impl Into<String>) -> Self {
-        Self {
-            dataset_id: dataset_id.into(),
-            page_size: None,
-            page: None,
-        }
-    }
-    #[must_use]
-    pub fn page_size(mut self, page_size: i64) -> Self {
-        self.page_size = Some(page_size);
-        self
-    }
-    #[must_use]
-    pub fn page(mut self, page: i64) -> Self {
-        self.page = Some(page);
-        self
-    }
-}
-
 #[derive(Debug, Clone, Default)]
 pub struct ListBetaObservabilityDatasetsRequest {
     page_size: Option<i64>,
@@ -85,6 +33,58 @@ impl ListBetaObservabilityDatasetsRequest {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct ListRecordsBetaObservabilityDatasetsRequest {
+    dataset_id: String,
+    page_size: Option<i64>,
+    page: Option<i64>,
+}
+impl ListRecordsBetaObservabilityDatasetsRequest {
+    pub fn new(dataset_id: impl Into<String>) -> Self {
+        Self {
+            dataset_id: dataset_id.into(),
+            page_size: None,
+            page: None,
+        }
+    }
+    #[must_use]
+    pub fn page_size(mut self, page_size: i64) -> Self {
+        self.page_size = Some(page_size);
+        self
+    }
+    #[must_use]
+    pub fn page(mut self, page: i64) -> Self {
+        self.page = Some(page);
+        self
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListTasksBetaObservabilityDatasetsRequest {
+    dataset_id: String,
+    page_size: Option<i64>,
+    page: Option<i64>,
+}
+impl ListTasksBetaObservabilityDatasetsRequest {
+    pub fn new(dataset_id: impl Into<String>) -> Self {
+        Self {
+            dataset_id: dataset_id.into(),
+            page_size: None,
+            page: None,
+        }
+    }
+    #[must_use]
+    pub fn page_size(mut self, page_size: i64) -> Self {
+        self.page_size = Some(page_size);
+        self
+    }
+    #[must_use]
+    pub fn page(mut self, page: i64) -> Self {
+        self.page = Some(page);
+        self
+    }
+}
+
 #[derive(Clone, Copy)]
 pub struct BetaObservabilityDatasets<'a> {
     raw: &'a HttpClient,
@@ -100,10 +100,25 @@ impl<'a> BetaObservabilityDatasets<'a> {
 
     pub async fn create(
         &self,
-        request: PostDatasetInSchemaParams,
-    ) -> Result<DatasetView, SdkError> {
+        request: CreateBetaObservabilityDatasetsRequest,
+    ) -> Result<CreateBetaObservabilityDatasetsResponse, SdkError> {
         self.raw
             .create_dataset_v1_observability_datasets_post(request.into_raw())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn create_record(
+        &self,
+        dataset_id: impl AsRef<str>,
+        request: CreateRecordBetaObservabilityDatasetsRequest,
+    ) -> Result<CreateRecordBetaObservabilityDatasetsResponse, SdkError> {
+        self.raw
+            .create_dataset_record_v1_observability_datasets_dataset_id_records_post(
+                dataset_id.as_ref(),
+                request.into_raw(),
+            )
             .await
             .map(Into::into)
             .map_err(Into::into)
@@ -119,7 +134,7 @@ impl<'a> BetaObservabilityDatasets<'a> {
     pub async fn export_to_jsonl(
         &self,
         dataset_id: impl AsRef<str>,
-    ) -> Result<DatasetExportView, SdkError> {
+    ) -> Result<ExportToJsonlBetaObservabilityDatasetsResponse, SdkError> {
         self.raw
             .export_dataset_to_jsonl_v1_observability_datasets_dataset_id_exports_to_jsonl_get(
                 dataset_id.as_ref(),
@@ -129,7 +144,10 @@ impl<'a> BetaObservabilityDatasets<'a> {
             .map_err(Into::into)
     }
 
-    pub async fn fetch(&self, dataset_id: impl AsRef<str>) -> Result<DatasetPreviewView, SdkError> {
+    pub async fn fetch(
+        &self,
+        dataset_id: impl AsRef<str>,
+    ) -> Result<FetchBetaObservabilityDatasetsResponse, SdkError> {
         self.raw
             .get_dataset_by_id_v1_observability_datasets_dataset_id_get(dataset_id.as_ref())
             .await
@@ -141,7 +159,7 @@ impl<'a> BetaObservabilityDatasets<'a> {
         &self,
         dataset_id: impl AsRef<str>,
         task_id: impl AsRef<str>,
-    ) -> Result<DatasetImportTaskView, SdkError> {
+    ) -> Result<FetchTaskBetaObservabilityDatasetsResponse, SdkError> {
         self.raw
             .get_dataset_import_task_v1_observability_datasets_dataset_id_tasks_task_id_get(
                 dataset_id.as_ref(),
@@ -152,37 +170,31 @@ impl<'a> BetaObservabilityDatasets<'a> {
             .map_err(Into::into)
     }
 
-    pub async fn list_tasks(
+    pub async fn import_from_dataset_records(
         &self,
-        request: ListTasksBetaObservabilityDatasetsRequest,
-    ) -> Result<DatasetImportTasksView, SdkError> {
-        self.raw
-            .get_dataset_import_tasks_v1_observability_datasets_dataset_id_tasks_get(
-                request.dataset_id.as_str(),
-                request.page_size,
-                request.page,
-            )
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+        dataset_id: impl AsRef<str>,
+        request: ImportFromDatasetRecordsBetaObservabilityDatasetsRequest,
+    ) -> Result<ImportFromDatasetRecordsBetaObservabilityDatasetsResponse, SdkError> {
+        self.raw.post_dataset_records_from_dataset_v1_observability_datasets_dataset_id_imports_from_dataset_post(dataset_id.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn list_records(
+    pub async fn import_from_file(
         &self,
-        request: ListRecordsBetaObservabilityDatasetsRequest,
-    ) -> Result<DatasetRecordsView, SdkError> {
-        self.raw
-            .get_dataset_records_v1_observability_datasets_dataset_id_records_get(
-                request.dataset_id.as_str(),
-                request.page_size,
-                request.page,
-            )
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+        dataset_id: impl AsRef<str>,
+        request: ImportFromFileBetaObservabilityDatasetsRequest,
+    ) -> Result<ImportFromFileBetaObservabilityDatasetsResponse, SdkError> {
+        self.raw.post_dataset_records_from_file_v1_observability_datasets_dataset_id_imports_from_file_post(dataset_id.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
     }
 
-    pub async fn list(&self) -> Result<DatasetPreviewsView, SdkError> {
+    pub async fn import_from_playground(
+        &self,
+        dataset_id: impl AsRef<str>,
+        request: ImportFromPlaygroundBetaObservabilityDatasetsRequest,
+    ) -> Result<ImportFromPlaygroundBetaObservabilityDatasetsResponse, SdkError> {
+        self.raw.post_dataset_records_from_playground_v1_observability_datasets_dataset_id_imports_from_playground_post(dataset_id.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
+    }
+
+    pub async fn list(&self) -> Result<ListBetaObservabilityDatasetsResponse, SdkError> {
         self.raw
             .get_datasets_v1_observability_datasets_get(None, None, None::<&str>)
             .await
@@ -193,7 +205,7 @@ impl<'a> BetaObservabilityDatasets<'a> {
     pub async fn list_with(
         &self,
         request: ListBetaObservabilityDatasetsRequest,
-    ) -> Result<DatasetPreviewsView, SdkError> {
+    ) -> Result<ListBetaObservabilityDatasetsResponse, SdkError> {
         self.raw
             .get_datasets_v1_observability_datasets_get(
                 request.page_size,
@@ -205,51 +217,57 @@ impl<'a> BetaObservabilityDatasets<'a> {
             .map_err(Into::into)
     }
 
+    pub async fn list_records(
+        &self,
+        request: ListRecordsBetaObservabilityDatasetsRequest,
+    ) -> Result<ListRecordsBetaObservabilityDatasetsResponse, SdkError> {
+        self.raw
+            .get_dataset_records_v1_observability_datasets_dataset_id_records_get(
+                request.dataset_id.as_str(),
+                request.page_size,
+                request.page,
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn list_tasks(
+        &self,
+        request: ListTasksBetaObservabilityDatasetsRequest,
+    ) -> Result<ListTasksBetaObservabilityDatasetsResponse, SdkError> {
+        self.raw
+            .get_dataset_import_tasks_v1_observability_datasets_dataset_id_tasks_get(
+                request.dataset_id.as_str(),
+                request.page_size,
+                request.page,
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
     pub async fn post_dataset_records_from_campaign(
         &self,
         dataset_id: impl AsRef<str>,
-        request: PostDatasetImportFromCampaignInSchemaParams,
-    ) -> Result<DatasetImportTaskView, SdkError> {
+        request: PostDatasetRecordsFromCampaignBetaObservabilityDatasetsRequest,
+    ) -> Result<PostDatasetRecordsFromCampaignBetaObservabilityDatasetsResponse, SdkError> {
         self.raw.post_dataset_records_from_campaign_v1_observability_datasets_dataset_id_imports_from_campaign_post(dataset_id.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
-    }
-
-    pub async fn import_from_dataset_records(
-        &self,
-        dataset_id: impl AsRef<str>,
-        request: PostDatasetImportFromDatasetInSchemaParams,
-    ) -> Result<DatasetImportTaskView, SdkError> {
-        self.raw.post_dataset_records_from_dataset_v1_observability_datasets_dataset_id_imports_from_dataset_post(dataset_id.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
     }
 
     pub async fn post_dataset_records_from_explorer(
         &self,
         dataset_id: impl AsRef<str>,
-        request: PostDatasetImportFromExplorerInSchemaParams,
-    ) -> Result<DatasetImportTaskView, SdkError> {
+        request: PostDatasetRecordsFromExplorerBetaObservabilityDatasetsRequest,
+    ) -> Result<PostDatasetRecordsFromExplorerBetaObservabilityDatasetsResponse, SdkError> {
         self.raw.post_dataset_records_from_explorer_v1_observability_datasets_dataset_id_imports_from_explorer_post(dataset_id.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
-    }
-
-    pub async fn import_from_file(
-        &self,
-        dataset_id: impl AsRef<str>,
-        request: PostDatasetImportFromFileInSchemaParams,
-    ) -> Result<DatasetImportTaskView, SdkError> {
-        self.raw.post_dataset_records_from_file_v1_observability_datasets_dataset_id_imports_from_file_post(dataset_id.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
-    }
-
-    pub async fn import_from_playground(
-        &self,
-        dataset_id: impl AsRef<str>,
-        request: PostDatasetImportFromPlaygroundInSchemaParams,
-    ) -> Result<DatasetImportTaskView, SdkError> {
-        self.raw.post_dataset_records_from_playground_v1_observability_datasets_dataset_id_imports_from_playground_post(dataset_id.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
     }
 
     pub async fn update(
         &self,
         dataset_id: impl AsRef<str>,
-        request: PatchDatasetInSchemaParams,
-    ) -> Result<DatasetPreviewView, SdkError> {
+        request: UpdateBetaObservabilityDatasetsRequest,
+    ) -> Result<UpdateBetaObservabilityDatasetsResponse, SdkError> {
         self.raw
             .update_dataset_v1_observability_datasets_dataset_id_patch(
                 dataset_id.as_ref(),

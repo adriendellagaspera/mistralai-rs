@@ -5,940 +5,1134 @@ use futures_util::Stream;
 use std::pin::Pin;
 
 #[derive(Debug, Clone)]
-#[non_exhaustive]
-pub enum Message {
-    Assistant(String),
-    System(String),
-    Tool(String),
-    User(String),
+pub struct ActivateForConsumerBetaConnectorsResponse {
+    raw: MessageResponse,
 }
 
-impl Message {
-    pub fn assistant(content: impl Into<String>) -> Self {
-        Self::Assistant(content.into())
+impl ActivateForConsumerBetaConnectorsResponse {
+    pub fn message(&self) -> &str {
+        &self.raw.message
     }
-    pub fn system(content: impl Into<String>) -> Self {
-        Self::System(content.into())
-    }
-    pub fn tool(content: impl Into<String>) -> Self {
-        Self::Tool(content.into())
-    }
-    pub fn user(content: impl Into<String>) -> Self {
-        Self::User(content.into())
-    }
-}
-
-impl From<Message> for ChatCompletionRequestMessagesItemUnion {
-    fn from(value: Message) -> Self {
-        match value {
-            Message::Assistant(content) => Self::AssistantMessage(AssistantMessage {
-                content: Some(Some(AssistantMessageContent::String(content))),
-                prefix: None,
-                role: None,
-                tool_calls: None,
-            }),
-            Message::System(content) => Self::SystemMessage(SystemMessage {
-                content: SystemMessageContent::String(content),
-                role: None,
-            }),
-            Message::Tool(content) => Self::ToolMessage(ToolMessage {
-                content: Some(ToolMessageContent::String(content)),
-                name: None,
-                role: None,
-                tool_call_id: None,
-            }),
-            Message::User(content) => Self::UserMessage(UserMessage {
-                content: Some(UserMessageContent::String(content)),
-                role: None,
-            }),
-        }
-    }
-}
-
-impl From<Message> for ChatModerationRequestInputItemUnion {
-    fn from(value: Message) -> Self {
-        match value {
-            Message::Assistant(content) => Self::AssistantMessage(AssistantMessage {
-                content: Some(Some(AssistantMessageContent::String(content))),
-                prefix: None,
-                role: None,
-                tool_calls: None,
-            }),
-            Message::System(content) => Self::SystemMessage(SystemMessage {
-                content: SystemMessageContent::String(content),
-                role: None,
-            }),
-            Message::Tool(content) => Self::ToolMessage(ToolMessage {
-                content: Some(ToolMessageContent::String(content)),
-                name: None,
-                role: None,
-                tool_call_id: None,
-            }),
-            Message::User(content) => Self::UserMessage(UserMessage {
-                content: Some(UserMessageContent::String(content)),
-                role: None,
-            }),
-        }
-    }
-}
-
-impl From<Message> for InstructRequestMessagesItemUnion {
-    fn from(value: Message) -> Self {
-        match value {
-            Message::Assistant(content) => Self::AssistantMessage(AssistantMessage {
-                content: Some(Some(AssistantMessageContent::String(content))),
-                prefix: None,
-                role: None,
-                tool_calls: None,
-            }),
-            Message::System(content) => Self::SystemMessage(SystemMessage {
-                content: SystemMessageContent::String(content),
-                role: None,
-            }),
-            Message::Tool(content) => Self::ToolMessage(ToolMessage {
-                content: Some(ToolMessageContent::String(content)),
-                name: None,
-                role: None,
-                tool_call_id: None,
-            }),
-            Message::User(content) => Self::UserMessage(UserMessage {
-                content: Some(UserMessageContent::String(content)),
-                role: None,
-            }),
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct ChatRequest {
-    raw: ChatCompletionRequest,
-}
-
-impl ChatRequest {
-    pub fn new(model: impl Into<String>, messages: impl IntoIterator<Item = Message>) -> Self {
-        Self {
-            raw: ChatCompletionRequest {
-                frequency_penalty: None,
-                guardrails: None,
-                max_tokens: None,
-                messages: messages.into_iter().map(Into::into).collect(),
-                metadata: None,
-                model: model.into(),
-                n: None,
-                parallel_tool_calls: None,
-                prediction: None,
-                presence_penalty: None,
-                prompt_cache_key: None,
-                prompt_mode: None,
-                random_seed: None,
-                reasoning_effort: None,
-                response_format: None,
-                safe_prompt: None,
-                stop: None,
-                stream: None,
-                temperature: None,
-                tool_choice: None,
-                tools: None,
-                top_p: None,
-            },
-        }
-    }
-    #[must_use]
-    pub fn frequency_penalty(mut self, frequency_penalty: f64) -> Self {
-        self.raw.frequency_penalty = Some(frequency_penalty);
-        self
-    }
-
-    #[must_use]
-    pub fn guardrails(mut self, guardrails: Vec<GuardrailConfig>) -> Self {
-        self.raw.guardrails = Some(Some(guardrails));
-        self
-    }
-
-    #[must_use]
-    pub fn guardrails_null(mut self) -> Self {
-        self.raw.guardrails = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn max_tokens(mut self, max_tokens: i64) -> Self {
-        self.raw.max_tokens = Some(Some(max_tokens));
-        self
-    }
-
-    #[must_use]
-    pub fn max_tokens_null(mut self) -> Self {
-        self.raw.max_tokens = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn metadata(mut self, metadata: ChatCompletionRequestMetadata) -> Self {
-        self.raw.metadata = Some(Some(metadata));
-        self
-    }
-
-    #[must_use]
-    pub fn metadata_null(mut self) -> Self {
-        self.raw.metadata = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn n(mut self, n: i64) -> Self {
-        self.raw.n = Some(Some(n));
-        self
-    }
-
-    #[must_use]
-    pub fn n_null(mut self) -> Self {
-        self.raw.n = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn parallel_tool_calls(mut self, parallel_tool_calls: bool) -> Self {
-        self.raw.parallel_tool_calls = Some(parallel_tool_calls);
-        self
-    }
-
-    #[must_use]
-    pub fn prediction(mut self, prediction: Prediction) -> Self {
-        self.raw.prediction = Some(prediction);
-        self
-    }
-
-    #[must_use]
-    pub fn presence_penalty(mut self, presence_penalty: f64) -> Self {
-        self.raw.presence_penalty = Some(presence_penalty);
-        self
-    }
-
-    #[must_use]
-    pub fn prompt_cache_key(mut self, prompt_cache_key: impl Into<String>) -> Self {
-        self.raw.prompt_cache_key = Some(Some(prompt_cache_key.into()));
-        self
-    }
-
-    #[must_use]
-    pub fn prompt_cache_key_null(mut self) -> Self {
-        self.raw.prompt_cache_key = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn prompt_mode(mut self, prompt_mode: MistralPromptMode) -> Self {
-        self.raw.prompt_mode = Some(Some(prompt_mode));
-        self
-    }
-
-    #[must_use]
-    pub fn prompt_mode_null(mut self) -> Self {
-        self.raw.prompt_mode = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn random_seed(mut self, random_seed: i64) -> Self {
-        self.raw.random_seed = Some(Some(random_seed));
-        self
-    }
-
-    #[must_use]
-    pub fn random_seed_null(mut self) -> Self {
-        self.raw.random_seed = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn reasoning_effort(
-        mut self,
-        reasoning_effort: ChatCompletionRequestReasoningEffort,
-    ) -> Self {
-        self.raw.reasoning_effort = Some(reasoning_effort);
-        self
-    }
-
-    #[must_use]
-    pub fn response_format(mut self, response_format: ResponseFormat) -> Self {
-        self.raw.response_format = Some(response_format);
-        self
-    }
-
-    #[must_use]
-    pub fn safe_prompt(mut self, safe_prompt: bool) -> Self {
-        self.raw.safe_prompt = Some(safe_prompt);
-        self
-    }
-
-    #[must_use]
-    pub fn stop(mut self, stop: ChatCompletionRequestStop) -> Self {
-        self.raw.stop = Some(stop);
-        self
-    }
-
-    #[must_use]
-    pub fn temperature(mut self, temperature: f64) -> Self {
-        self.raw.temperature = Some(Some(temperature));
-        self
-    }
-
-    #[must_use]
-    pub fn temperature_null(mut self) -> Self {
-        self.raw.temperature = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn tool_choice(mut self, tool_choice: ChatCompletionRequestToolChoice) -> Self {
-        self.raw.tool_choice = Some(tool_choice);
-        self
-    }
-
-    #[must_use]
-    pub fn tools(mut self, tools: Vec<Tool>) -> Self {
-        self.raw.tools = Some(Some(tools));
-        self
-    }
-
-    #[must_use]
-    pub fn tools_null(mut self) -> Self {
-        self.raw.tools = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn top_p(mut self, top_p: f64) -> Self {
-        self.raw.top_p = Some(top_p);
-        self
-    }
-    pub fn from_raw(raw: ChatCompletionRequest) -> Self {
-        Self { raw }
-    }
-    pub fn as_raw(&self) -> &ChatCompletionRequest {
+    pub fn raw(&self) -> &MessageResponse {
         &self.raw
     }
-    pub fn into_raw(self) -> ChatCompletionRequest {
+    pub fn into_raw(self) -> MessageResponse {
         self.raw
     }
 }
 
-impl From<ChatCompletionRequest> for ChatRequest {
-    fn from(raw: ChatCompletionRequest) -> Self {
+impl From<MessageResponse> for ActivateForConsumerBetaConnectorsResponse {
+    fn from(raw: MessageResponse) -> Self {
         Self { raw }
     }
 }
 
-impl From<ChatRequest> for ChatCompletionRequest {
-    fn from(value: ChatRequest) -> Self {
+impl From<ActivateForConsumerBetaConnectorsResponse> for MessageResponse {
+    fn from(value: ActivateForConsumerBetaConnectorsResponse) -> Self {
         value.into_raw()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct ChatResponse {
-    raw: ChatCompletionResponse,
+pub struct AddOrUpdateUsersWorkspacesBetaAdminWorkspacesRequest {
+    raw: WorkspaceMemberIN,
 }
 
-impl ChatResponse {
-    pub fn text(&self) -> Option<&str> {
-        match self
-            .raw
-            .choices
-            .first()?
-            .message
-            .content
-            .as_ref()?
-            .as_ref()?
-        {
-            AssistantMessageContent::String(value) => Some(value),
-            _ => None,
-        }
-    }
-    pub fn raw(&self) -> &ChatCompletionResponse {
-        &self.raw
-    }
-    pub fn into_raw(self) -> ChatCompletionResponse {
-        self.raw
-    }
-}
-
-impl From<ChatCompletionResponse> for ChatResponse {
-    fn from(raw: ChatCompletionResponse) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<ChatResponse> for ChatCompletionResponse {
-    fn from(value: ChatResponse) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct ChatStreamChunk {
-    raw: CompletionChunk,
-}
-
-impl ChatStreamChunk {
-    pub fn text(&self) -> Option<&str> {
-        match self.raw.choices.first()?.delta.content.as_ref()?.as_ref()? {
-            DeltaMessageContent::String(value) => Some(value),
-            _ => None,
-        }
-    }
-    pub fn raw(&self) -> &CompletionChunk {
-        &self.raw
-    }
-    pub fn into_raw(self) -> CompletionChunk {
-        self.raw
-    }
-}
-
-impl From<CompletionChunk> for ChatStreamChunk {
-    fn from(raw: CompletionChunk) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<ChatStreamChunk> for CompletionChunk {
-    fn from(value: ChatStreamChunk) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct OcrPage<'a> {
-    raw: &'a OCRPageObject,
-}
-
-impl<'a> OcrPage<'a> {
-    pub(crate) fn new(raw: &'a OCRPageObject) -> Self {
-        Self { raw }
-    }
-    pub fn index(&self) -> i64 {
-        self.raw.index
-    }
-    pub fn markdown(&self) -> &str {
-        &self.raw.markdown
-    }
-    pub fn raw(&self) -> &'a OCRPageObject {
-        self.raw
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct OcrRequest {
-    raw: OCRRequest,
-}
-
-impl OcrRequest {
-    pub fn document_url(model: impl Into<String>, document_url: impl Into<String>) -> Self {
-        Self {
-            raw: OCRRequest {
-                bbox_annotation_format: None,
-                confidence_scores_granularity: None,
-                document: OCRRequestDocument::DocumentURLChunk(DocumentURLChunk {
-                    document_name: None,
-                    document_url: document_url.into(),
-                    r#type: None,
-                }),
-                document_annotation_format: None,
-                document_annotation_prompt: None,
-                extract_footer: None,
-                extract_header: None,
-                id: None,
-                image_limit: None,
-                image_min_size: None,
-                include_blocks: None,
-                include_image_base64: None,
-                model: Some(model.into()),
-                pages: None,
-                table_format: None,
-            },
-        }
-    }
-
-    pub fn file_id(model: impl Into<String>, file_id: uuid::Uuid) -> Self {
-        Self {
-            raw: OCRRequest {
-                bbox_annotation_format: None,
-                confidence_scores_granularity: None,
-                document: OCRRequestDocument::FileChunk(FileChunk {
-                    file_id,
-                    r#type: None,
-                }),
-                document_annotation_format: None,
-                document_annotation_prompt: None,
-                extract_footer: None,
-                extract_header: None,
-                id: None,
-                image_limit: None,
-                image_min_size: None,
-                include_blocks: None,
-                include_image_base64: None,
-                model: Some(model.into()),
-                pages: None,
-                table_format: None,
-            },
-        }
-    }
-
-    pub fn image_url(model: impl Into<String>, image_url: impl Into<String>) -> Self {
-        Self {
-            raw: OCRRequest {
-                bbox_annotation_format: None,
-                confidence_scores_granularity: None,
-                document: OCRRequestDocument::ImageURLChunk(ImageURLChunk {
-                    image_url: ImageURLChunkImageUrl::String(image_url.into()),
-                    r#type: None,
-                }),
-                document_annotation_format: None,
-                document_annotation_prompt: None,
-                extract_footer: None,
-                extract_header: None,
-                id: None,
-                image_limit: None,
-                image_min_size: None,
-                include_blocks: None,
-                include_image_base64: None,
-                model: Some(model.into()),
-                pages: None,
-                table_format: None,
-            },
-        }
-    }
-    #[must_use]
-    pub fn bbox_annotation_format(mut self, bbox_annotation_format: ResponseFormat) -> Self {
-        self.raw.bbox_annotation_format = Some(Some(bbox_annotation_format));
-        self
-    }
-
-    #[must_use]
-    pub fn bbox_annotation_format_null(mut self) -> Self {
-        self.raw.bbox_annotation_format = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn confidence_scores_granularity(
-        mut self,
-        confidence_scores_granularity: OCRRequestConfidenceScoresGranularity,
-    ) -> Self {
-        self.raw.confidence_scores_granularity = Some(Some(confidence_scores_granularity));
-        self
-    }
-
-    #[must_use]
-    pub fn confidence_scores_granularity_null(mut self) -> Self {
-        self.raw.confidence_scores_granularity = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn document_annotation_format(
-        mut self,
-        document_annotation_format: ResponseFormat,
-    ) -> Self {
-        self.raw.document_annotation_format = Some(Some(document_annotation_format));
-        self
-    }
-
-    #[must_use]
-    pub fn document_annotation_format_null(mut self) -> Self {
-        self.raw.document_annotation_format = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn document_annotation_prompt(
-        mut self,
-        document_annotation_prompt: impl Into<String>,
-    ) -> Self {
-        self.raw.document_annotation_prompt = Some(Some(document_annotation_prompt.into()));
-        self
-    }
-
-    #[must_use]
-    pub fn document_annotation_prompt_null(mut self) -> Self {
-        self.raw.document_annotation_prompt = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn extract_footer(mut self, extract_footer: bool) -> Self {
-        self.raw.extract_footer = Some(extract_footer);
-        self
-    }
-
-    #[must_use]
-    pub fn extract_header(mut self, extract_header: bool) -> Self {
-        self.raw.extract_header = Some(extract_header);
-        self
-    }
-
-    #[must_use]
-    pub fn id(mut self, id: impl Into<String>) -> Self {
-        self.raw.id = Some(id.into());
-        self
-    }
-
-    #[must_use]
-    pub fn image_limit(mut self, image_limit: i64) -> Self {
-        self.raw.image_limit = Some(Some(image_limit));
-        self
-    }
-
-    #[must_use]
-    pub fn image_limit_null(mut self) -> Self {
-        self.raw.image_limit = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn image_min_size(mut self, image_min_size: i64) -> Self {
-        self.raw.image_min_size = Some(Some(image_min_size));
-        self
-    }
-
-    #[must_use]
-    pub fn image_min_size_null(mut self) -> Self {
-        self.raw.image_min_size = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn include_blocks(mut self, include_blocks: bool) -> Self {
-        self.raw.include_blocks = Some(include_blocks);
-        self
-    }
-
-    #[must_use]
-    pub fn include_image_base64(mut self, include_image_base64: bool) -> Self {
-        self.raw.include_image_base64 = Some(Some(include_image_base64));
-        self
-    }
-
-    #[must_use]
-    pub fn include_image_base64_null(mut self) -> Self {
-        self.raw.include_image_base64 = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn pages(mut self, pages: OCRRequestPages) -> Self {
-        self.raw.pages = Some(Some(pages));
-        self
-    }
-
-    #[must_use]
-    pub fn pages_null(mut self) -> Self {
-        self.raw.pages = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn table_format(mut self, table_format: OCRRequestTableFormat) -> Self {
-        self.raw.table_format = Some(Some(table_format));
-        self
-    }
-
-    #[must_use]
-    pub fn table_format_null(mut self) -> Self {
-        self.raw.table_format = Some(None);
-        self
-    }
-    pub fn from_raw(raw: OCRRequest) -> Self {
-        Self { raw }
-    }
-    pub fn as_raw(&self) -> &OCRRequest {
-        &self.raw
-    }
-    pub fn into_raw(self) -> OCRRequest {
-        self.raw
-    }
-}
-
-impl From<OCRRequest> for OcrRequest {
-    fn from(raw: OCRRequest) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<OcrRequest> for OCRRequest {
-    fn from(value: OcrRequest) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct OcrResponse {
-    raw: OCRResponse,
-}
-
-impl OcrResponse {
-    pub fn model(&self) -> &str {
-        &self.raw.model
-    }
-    pub fn pages(&self) -> impl ExactSizeIterator<Item = OcrPage<'_>> {
-        self.raw.pages.iter().map(OcrPage::new)
-    }
-    pub fn raw(&self) -> &OCRResponse {
-        &self.raw
-    }
-    pub fn into_raw(self) -> OCRResponse {
-        self.raw
-    }
-}
-
-impl From<OCRResponse> for OcrResponse {
-    fn from(raw: OCRResponse) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<OcrResponse> for OCRResponse {
-    fn from(value: OcrResponse) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct ModelListResponse {
-    raw: ModelList,
-}
-
-impl ModelListResponse {
-    pub fn raw(&self) -> &ModelList {
-        &self.raw
-    }
-    pub fn into_raw(self) -> ModelList {
-        self.raw
-    }
-}
-
-impl From<ModelList> for ModelListResponse {
-    fn from(raw: ModelList) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<ModelListResponse> for ModelList {
-    fn from(value: ModelListResponse) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct BaseModel {
-    raw: BaseModelCard,
-}
-
-impl BaseModel {
-    pub fn id(&self) -> &str {
-        &self.raw.id
-    }
-    pub fn raw(&self) -> &BaseModelCard {
-        &self.raw
-    }
-    pub fn into_raw(self) -> BaseModelCard {
-        self.raw
-    }
-}
-
-impl From<BaseModelCard> for BaseModel {
-    fn from(raw: BaseModelCard) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<BaseModel> for BaseModelCard {
-    fn from(value: BaseModel) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct FineTunedModel {
-    raw: FTModelCard,
-}
-
-impl FineTunedModel {
-    pub fn id(&self) -> &str {
-        &self.raw.id
-    }
-    pub fn archived(&self) -> Option<bool> {
-        self.raw.archived
-    }
-    pub fn raw(&self) -> &FTModelCard {
-        &self.raw
-    }
-    pub fn into_raw(self) -> FTModelCard {
-        self.raw
-    }
-}
-
-impl From<FTModelCard> for FineTunedModel {
-    fn from(raw: FTModelCard) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<FineTunedModel> for FTModelCard {
-    fn from(value: FineTunedModel) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-#[non_exhaustive]
-pub enum ModelResponse {
-    Base(BaseModel),
-    FineTuned(FineTunedModel),
-}
-
-impl From<BaseModel> for ModelResponse {
-    fn from(value: BaseModel) -> Self {
-        Self::Base(value)
-    }
-}
-
-impl From<FineTunedModel> for ModelResponse {
-    fn from(value: FineTunedModel) -> Self {
-        Self::FineTuned(value)
-    }
-}
-
-impl From<ModelResponse> for RetrieveModelV1ModelsModelIdGetResponse {
-    fn from(value: ModelResponse) -> Self {
-        match value {
-            ModelResponse::Base(value) => Self::BaseModelCard(value.into()),
-            ModelResponse::FineTuned(value) => Self::FTModelCard(value.into()),
-        }
-    }
-}
-
-impl From<RetrieveModelV1ModelsModelIdGetResponse> for ModelResponse {
-    fn from(value: RetrieveModelV1ModelsModelIdGetResponse) -> Self {
-        match value {
-            RetrieveModelV1ModelsModelIdGetResponse::BaseModelCard(value) => {
-                Self::Base(value.into())
-            }
-            RetrieveModelV1ModelsModelIdGetResponse::FTModelCard(value) => {
-                Self::FineTuned(value.into())
-            }
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct DeleteModelResponse {
-    raw: DeleteModelOut,
-}
-
-impl DeleteModelResponse {
-    pub fn id(&self) -> &str {
-        &self.raw.id
-    }
-    pub fn deleted(&self) -> Option<bool> {
-        self.raw.deleted
-    }
-    pub fn raw(&self) -> &DeleteModelOut {
-        &self.raw
-    }
-    pub fn into_raw(self) -> DeleteModelOut {
-        self.raw
-    }
-}
-
-impl From<DeleteModelOut> for DeleteModelResponse {
-    fn from(raw: DeleteModelOut) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<DeleteModelResponse> for DeleteModelOut {
-    fn from(value: DeleteModelResponse) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct ArchiveModelResponse {
-    raw: ArchiveFTModelOut,
-}
-
-impl ArchiveModelResponse {
-    pub fn id(&self) -> &str {
-        &self.raw.id
-    }
-    pub fn archived(&self) -> Option<bool> {
-        self.raw.archived
-    }
-    pub fn raw(&self) -> &ArchiveFTModelOut {
-        &self.raw
-    }
-    pub fn into_raw(self) -> ArchiveFTModelOut {
-        self.raw
-    }
-}
-
-impl From<ArchiveFTModelOut> for ArchiveModelResponse {
-    fn from(raw: ArchiveFTModelOut) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<ArchiveModelResponse> for ArchiveFTModelOut {
-    fn from(value: ArchiveModelResponse) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct UnarchiveModelResponse {
-    raw: UnarchiveFTModelOut,
-}
-
-impl UnarchiveModelResponse {
-    pub fn id(&self) -> &str {
-        &self.raw.id
-    }
-    pub fn archived(&self) -> Option<bool> {
-        self.raw.archived
-    }
-    pub fn raw(&self) -> &UnarchiveFTModelOut {
-        &self.raw
-    }
-    pub fn into_raw(self) -> UnarchiveFTModelOut {
-        self.raw
-    }
-}
-
-impl From<UnarchiveFTModelOut> for UnarchiveModelResponse {
-    fn from(raw: UnarchiveFTModelOut) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<UnarchiveModelResponse> for UnarchiveFTModelOut {
-    fn from(value: UnarchiveModelResponse) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct UpdateModelRequest {
-    raw: UpdateFTModelIn,
-}
-
-impl UpdateModelRequest {
+impl AddOrUpdateUsersWorkspacesBetaAdminWorkspacesRequest {
     pub fn new() -> Self {
         Self {
-            raw: UpdateFTModelIn {
+            raw: WorkspaceMemberIN { members: None },
+        }
+    }
+    #[must_use]
+    pub fn members(mut self, members: Vec<WorkspaceMemberSingleIN>) -> Self {
+        self.raw.members = Some(Some(members));
+        self
+    }
+
+    #[must_use]
+    pub fn members_null(mut self) -> Self {
+        self.raw.members = Some(None);
+        self
+    }
+    pub fn from_raw(raw: WorkspaceMemberIN) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &WorkspaceMemberIN {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkspaceMemberIN {
+        self.raw
+    }
+}
+
+impl From<WorkspaceMemberIN> for AddOrUpdateUsersWorkspacesBetaAdminWorkspacesRequest {
+    fn from(raw: WorkspaceMemberIN) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<AddOrUpdateUsersWorkspacesBetaAdminWorkspacesRequest> for WorkspaceMemberIN {
+    fn from(value: AddOrUpdateUsersWorkspacesBetaAdminWorkspacesRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for AddOrUpdateUsersWorkspacesBetaAdminWorkspacesRequest {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct AddOrUpdateUsersWorkspacesBetaAdminWorkspacesResponse {
+    raw: AddOrUpdateUsersToWorkspaceOUT,
+}
+
+impl AddOrUpdateUsersWorkspacesBetaAdminWorkspacesResponse {
+    pub fn added_members_count(&self) -> i64 {
+        self.raw.added_members_count
+    }
+    pub fn updated_members_count(&self) -> i64 {
+        self.raw.updated_members_count
+    }
+    pub fn raw(&self) -> &AddOrUpdateUsersToWorkspaceOUT {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AddOrUpdateUsersToWorkspaceOUT {
+        self.raw
+    }
+}
+
+impl From<AddOrUpdateUsersToWorkspaceOUT>
+    for AddOrUpdateUsersWorkspacesBetaAdminWorkspacesResponse
+{
+    fn from(raw: AddOrUpdateUsersToWorkspaceOUT) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<AddOrUpdateUsersWorkspacesBetaAdminWorkspacesResponse>
+    for AddOrUpdateUsersToWorkspaceOUT
+{
+    fn from(value: AddOrUpdateUsersWorkspacesBetaAdminWorkspacesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct AddUsersWorkspacesBetaAdminWorkspacesRequest {
+    raw: WorkspaceMemberIN,
+}
+
+impl AddUsersWorkspacesBetaAdminWorkspacesRequest {
+    pub fn new() -> Self {
+        Self {
+            raw: WorkspaceMemberIN { members: None },
+        }
+    }
+    #[must_use]
+    pub fn members(mut self, members: Vec<WorkspaceMemberSingleIN>) -> Self {
+        self.raw.members = Some(Some(members));
+        self
+    }
+
+    #[must_use]
+    pub fn members_null(mut self) -> Self {
+        self.raw.members = Some(None);
+        self
+    }
+    pub fn from_raw(raw: WorkspaceMemberIN) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &WorkspaceMemberIN {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkspaceMemberIN {
+        self.raw
+    }
+}
+
+impl From<WorkspaceMemberIN> for AddUsersWorkspacesBetaAdminWorkspacesRequest {
+    fn from(raw: WorkspaceMemberIN) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<AddUsersWorkspacesBetaAdminWorkspacesRequest> for WorkspaceMemberIN {
+    fn from(value: AddUsersWorkspacesBetaAdminWorkspacesRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for AddUsersWorkspacesBetaAdminWorkspacesRequest {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct AddUsersWorkspacesBetaAdminWorkspacesResponse {
+    raw: AddUsersToWorkspaceOUT,
+}
+
+impl AddUsersWorkspacesBetaAdminWorkspacesResponse {
+    pub fn added_members_count(&self) -> i64 {
+        self.raw.added_members_count
+    }
+    pub fn raw(&self) -> &AddUsersToWorkspaceOUT {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AddUsersToWorkspaceOUT {
+        self.raw
+    }
+}
+
+impl From<AddUsersToWorkspaceOUT> for AddUsersWorkspacesBetaAdminWorkspacesResponse {
+    fn from(raw: AddUsersToWorkspaceOUT) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<AddUsersWorkspacesBetaAdminWorkspacesResponse> for AddUsersToWorkspaceOUT {
+    fn from(value: AddUsersWorkspacesBetaAdminWorkspacesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct AdminUserGroupsGetGroupWorkspaceAssignmentsBetaAdminUserGroupsResponse {
+    raw: GroupWorkspaceAssignmentsOut,
+}
+
+impl AdminUserGroupsGetGroupWorkspaceAssignmentsBetaAdminUserGroupsResponse {
+    pub fn raw(&self) -> &GroupWorkspaceAssignmentsOut {
+        &self.raw
+    }
+    pub fn into_raw(self) -> GroupWorkspaceAssignmentsOut {
+        self.raw
+    }
+}
+
+impl From<GroupWorkspaceAssignmentsOut>
+    for AdminUserGroupsGetGroupWorkspaceAssignmentsBetaAdminUserGroupsResponse
+{
+    fn from(raw: GroupWorkspaceAssignmentsOut) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<AdminUserGroupsGetGroupWorkspaceAssignmentsBetaAdminUserGroupsResponse>
+    for GroupWorkspaceAssignmentsOut
+{
+    fn from(value: AdminUserGroupsGetGroupWorkspaceAssignmentsBetaAdminUserGroupsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct AdminUserGroupsUpdateGroupWorkspaceAssignmentBetaAdminUserGroupsRequest {
+    raw: UpdateGroupWorkspaceAssignmentIn,
+}
+
+impl AdminUserGroupsUpdateGroupWorkspaceAssignmentBetaAdminUserGroupsRequest {
+    pub fn raw(&self) -> &UpdateGroupWorkspaceAssignmentIn {
+        &self.raw
+    }
+    pub fn into_raw(self) -> UpdateGroupWorkspaceAssignmentIn {
+        self.raw
+    }
+}
+
+impl From<UpdateGroupWorkspaceAssignmentIn>
+    for AdminUserGroupsUpdateGroupWorkspaceAssignmentBetaAdminUserGroupsRequest
+{
+    fn from(raw: UpdateGroupWorkspaceAssignmentIn) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<AdminUserGroupsUpdateGroupWorkspaceAssignmentBetaAdminUserGroupsRequest>
+    for UpdateGroupWorkspaceAssignmentIn
+{
+    fn from(
+        value: AdminUserGroupsUpdateGroupWorkspaceAssignmentBetaAdminUserGroupsRequest,
+    ) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct AdminUserGroupsUpdateUserGroupOrganizationRoleBetaAdminUserGroupsRequest {
+    raw: UpdateUserGroupOrganizationRoleIn,
+}
+
+impl AdminUserGroupsUpdateUserGroupOrganizationRoleBetaAdminUserGroupsRequest {
+    pub fn new(organization_role: UpdateUserGroupOrganizationRoleInOrganizationRole) -> Self {
+        Self {
+            raw: UpdateUserGroupOrganizationRoleIn { organization_role },
+        }
+    }
+    pub fn from_raw(raw: UpdateUserGroupOrganizationRoleIn) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &UpdateUserGroupOrganizationRoleIn {
+        &self.raw
+    }
+    pub fn into_raw(self) -> UpdateUserGroupOrganizationRoleIn {
+        self.raw
+    }
+}
+
+impl From<UpdateUserGroupOrganizationRoleIn>
+    for AdminUserGroupsUpdateUserGroupOrganizationRoleBetaAdminUserGroupsRequest
+{
+    fn from(raw: UpdateUserGroupOrganizationRoleIn) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<AdminUserGroupsUpdateUserGroupOrganizationRoleBetaAdminUserGroupsRequest>
+    for UpdateUserGroupOrganizationRoleIn
+{
+    fn from(
+        value: AdminUserGroupsUpdateUserGroupOrganizationRoleBetaAdminUserGroupsRequest,
+    ) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct AggregateBetaObservabilitySpansRequest {
+    raw: AggregationRequest,
+}
+
+impl AggregateBetaObservabilitySpansRequest {
+    pub fn new(metric: impl Into<AggregateBetaObservabilitySpansRequestMetric>) -> Self {
+        Self {
+            raw: AggregationRequest {
+                dimensions: None,
+                limit: None,
+                metric: Into::<AggregateBetaObservabilitySpansRequestMetric>::into(metric).into(),
+                order_by: None,
+                search_expression: None,
+                time_dimension: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn dimensions(mut self, dimensions: Vec<String>) -> Self {
+        self.raw.dimensions = Some(dimensions);
+        self
+    }
+
+    #[must_use]
+    pub fn limit(mut self, limit: i64) -> Self {
+        self.raw.limit = Some(limit);
+        self
+    }
+
+    #[must_use]
+    pub fn order_by(mut self, order_by: Vec<OrderByClause>) -> Self {
+        self.raw.order_by = Some(Some(order_by));
+        self
+    }
+
+    #[must_use]
+    pub fn order_by_null(mut self) -> Self {
+        self.raw.order_by = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn search_expression(mut self, search_expression: impl Into<String>) -> Self {
+        self.raw.search_expression = Some(Some(search_expression.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn search_expression_null(mut self) -> Self {
+        self.raw.search_expression = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn time_dimension(
+        mut self,
+        time_dimension: impl Into<AggregateBetaObservabilitySpansRequestTimeDimension>,
+    ) -> Self {
+        self.raw.time_dimension = Some(Some(
+            Into::<AggregateBetaObservabilitySpansRequestTimeDimension>::into(time_dimension)
+                .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn time_dimension_null(mut self) -> Self {
+        self.raw.time_dimension = Some(None);
+        self
+    }
+    pub fn from_raw(raw: AggregationRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &AggregationRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AggregationRequest {
+        self.raw
+    }
+}
+
+impl From<AggregationRequest> for AggregateBetaObservabilitySpansRequest {
+    fn from(raw: AggregationRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<AggregateBetaObservabilitySpansRequest> for AggregationRequest {
+    fn from(value: AggregateBetaObservabilitySpansRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct AggregateBetaObservabilitySpansRequestMetric {
+    raw: MetricDefinition,
+}
+
+impl AggregateBetaObservabilitySpansRequestMetric {
+    pub fn new(measure: impl Into<String>, aggregation: MetricAggregation) -> Self {
+        Self {
+            raw: MetricDefinition {
+                aggregation,
+                measure: measure.into(),
+            },
+        }
+    }
+    pub fn from_raw(raw: MetricDefinition) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &MetricDefinition {
+        &self.raw
+    }
+    pub fn into_raw(self) -> MetricDefinition {
+        self.raw
+    }
+}
+
+impl From<MetricDefinition> for AggregateBetaObservabilitySpansRequestMetric {
+    fn from(raw: MetricDefinition) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<AggregateBetaObservabilitySpansRequestMetric> for MetricDefinition {
+    fn from(value: AggregateBetaObservabilitySpansRequestMetric) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct AggregateBetaObservabilitySpansRequestTimeDimension {
+    raw: TimeDimension,
+}
+
+impl AggregateBetaObservabilitySpansRequestTimeDimension {
+    pub fn new() -> Self {
+        Self {
+            raw: TimeDimension { granularity: None },
+        }
+    }
+    #[must_use]
+    pub fn granularity(mut self, granularity: Granularity) -> Self {
+        self.raw.granularity = Some(granularity);
+        self
+    }
+    pub fn from_raw(raw: TimeDimension) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &TimeDimension {
+        &self.raw
+    }
+    pub fn into_raw(self) -> TimeDimension {
+        self.raw
+    }
+}
+
+impl From<TimeDimension> for AggregateBetaObservabilitySpansRequestTimeDimension {
+    fn from(raw: TimeDimension) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<AggregateBetaObservabilitySpansRequestTimeDimension> for TimeDimension {
+    fn from(value: AggregateBetaObservabilitySpansRequestTimeDimension) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for AggregateBetaObservabilitySpansRequestTimeDimension {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct AggregateBetaObservabilitySpansResponse {
+    raw: Aggregation,
+}
+
+impl AggregateBetaObservabilitySpansResponse {
+    pub fn raw(&self) -> &Aggregation {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Aggregation {
+        self.raw
+    }
+}
+
+impl From<Aggregation> for AggregateBetaObservabilitySpansResponse {
+    fn from(raw: Aggregation) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<AggregateBetaObservabilitySpansResponse> for Aggregation {
+    fn from(value: AggregateBetaObservabilitySpansResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct AggregateBetaObservabilityTracesRequest {
+    raw: AggregationRequest,
+}
+
+impl AggregateBetaObservabilityTracesRequest {
+    pub fn new(metric: impl Into<AggregateBetaObservabilityTracesRequestMetric>) -> Self {
+        Self {
+            raw: AggregationRequest {
+                dimensions: None,
+                limit: None,
+                metric: Into::<AggregateBetaObservabilityTracesRequestMetric>::into(metric).into(),
+                order_by: None,
+                search_expression: None,
+                time_dimension: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn dimensions(mut self, dimensions: Vec<String>) -> Self {
+        self.raw.dimensions = Some(dimensions);
+        self
+    }
+
+    #[must_use]
+    pub fn limit(mut self, limit: i64) -> Self {
+        self.raw.limit = Some(limit);
+        self
+    }
+
+    #[must_use]
+    pub fn order_by(mut self, order_by: Vec<OrderByClause>) -> Self {
+        self.raw.order_by = Some(Some(order_by));
+        self
+    }
+
+    #[must_use]
+    pub fn order_by_null(mut self) -> Self {
+        self.raw.order_by = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn search_expression(mut self, search_expression: impl Into<String>) -> Self {
+        self.raw.search_expression = Some(Some(search_expression.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn search_expression_null(mut self) -> Self {
+        self.raw.search_expression = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn time_dimension(
+        mut self,
+        time_dimension: impl Into<AggregateBetaObservabilityTracesRequestTimeDimension>,
+    ) -> Self {
+        self.raw.time_dimension = Some(Some(
+            Into::<AggregateBetaObservabilityTracesRequestTimeDimension>::into(time_dimension)
+                .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn time_dimension_null(mut self) -> Self {
+        self.raw.time_dimension = Some(None);
+        self
+    }
+    pub fn from_raw(raw: AggregationRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &AggregationRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AggregationRequest {
+        self.raw
+    }
+}
+
+impl From<AggregationRequest> for AggregateBetaObservabilityTracesRequest {
+    fn from(raw: AggregationRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<AggregateBetaObservabilityTracesRequest> for AggregationRequest {
+    fn from(value: AggregateBetaObservabilityTracesRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct AggregateBetaObservabilityTracesRequestMetric {
+    raw: MetricDefinition,
+}
+
+impl AggregateBetaObservabilityTracesRequestMetric {
+    pub fn new(measure: impl Into<String>, aggregation: MetricAggregation) -> Self {
+        Self {
+            raw: MetricDefinition {
+                aggregation,
+                measure: measure.into(),
+            },
+        }
+    }
+    pub fn from_raw(raw: MetricDefinition) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &MetricDefinition {
+        &self.raw
+    }
+    pub fn into_raw(self) -> MetricDefinition {
+        self.raw
+    }
+}
+
+impl From<MetricDefinition> for AggregateBetaObservabilityTracesRequestMetric {
+    fn from(raw: MetricDefinition) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<AggregateBetaObservabilityTracesRequestMetric> for MetricDefinition {
+    fn from(value: AggregateBetaObservabilityTracesRequestMetric) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct AggregateBetaObservabilityTracesRequestTimeDimension {
+    raw: TimeDimension,
+}
+
+impl AggregateBetaObservabilityTracesRequestTimeDimension {
+    pub fn new() -> Self {
+        Self {
+            raw: TimeDimension { granularity: None },
+        }
+    }
+    #[must_use]
+    pub fn granularity(mut self, granularity: Granularity) -> Self {
+        self.raw.granularity = Some(granularity);
+        self
+    }
+    pub fn from_raw(raw: TimeDimension) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &TimeDimension {
+        &self.raw
+    }
+    pub fn into_raw(self) -> TimeDimension {
+        self.raw
+    }
+}
+
+impl From<TimeDimension> for AggregateBetaObservabilityTracesRequestTimeDimension {
+    fn from(raw: TimeDimension) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<AggregateBetaObservabilityTracesRequestTimeDimension> for TimeDimension {
+    fn from(value: AggregateBetaObservabilityTracesRequestTimeDimension) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for AggregateBetaObservabilityTracesRequestTimeDimension {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct AggregateBetaObservabilityTracesResponse {
+    raw: Aggregation,
+}
+
+impl AggregateBetaObservabilityTracesResponse {
+    pub fn raw(&self) -> &Aggregation {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Aggregation {
+        self.raw
+    }
+}
+
+impl From<Aggregation> for AggregateBetaObservabilityTracesResponse {
+    fn from(raw: Aggregation) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<AggregateBetaObservabilityTracesResponse> for Aggregation {
+    fn from(value: AggregateBetaObservabilityTracesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ApiAdminUserGroupsAssignGroupToWorkspaceBetaAdminUserGroupsRequest {
+    raw: AssignGroupToWorkspaceIn,
+}
+
+impl ApiAdminUserGroupsAssignGroupToWorkspaceBetaAdminUserGroupsRequest {
+    pub fn raw(&self) -> &AssignGroupToWorkspaceIn {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AssignGroupToWorkspaceIn {
+        self.raw
+    }
+}
+
+impl From<AssignGroupToWorkspaceIn>
+    for ApiAdminUserGroupsAssignGroupToWorkspaceBetaAdminUserGroupsRequest
+{
+    fn from(raw: AssignGroupToWorkspaceIn) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ApiAdminUserGroupsAssignGroupToWorkspaceBetaAdminUserGroupsRequest>
+    for AssignGroupToWorkspaceIn
+{
+    fn from(value: ApiAdminUserGroupsAssignGroupToWorkspaceBetaAdminUserGroupsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ApiAdminUserGroupsAssignUsersToGroupBetaAdminUserGroupsRequest {
+    raw: AdminAssignUsersToGroupIn,
+}
+
+impl ApiAdminUserGroupsAssignUsersToGroupBetaAdminUserGroupsRequest {
+    pub fn new(user_uuids: Vec<String>) -> Self {
+        Self {
+            raw: AdminAssignUsersToGroupIn { user_uuids },
+        }
+    }
+    pub fn from_raw(raw: AdminAssignUsersToGroupIn) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &AdminAssignUsersToGroupIn {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AdminAssignUsersToGroupIn {
+        self.raw
+    }
+}
+
+impl From<AdminAssignUsersToGroupIn>
+    for ApiAdminUserGroupsAssignUsersToGroupBetaAdminUserGroupsRequest
+{
+    fn from(raw: AdminAssignUsersToGroupIn) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ApiAdminUserGroupsAssignUsersToGroupBetaAdminUserGroupsRequest>
+    for AdminAssignUsersToGroupIn
+{
+    fn from(value: ApiAdminUserGroupsAssignUsersToGroupBetaAdminUserGroupsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ApiAdminUserGroupsCreateUserGroupBetaAdminUserGroupsRequest {
+    raw: AdminUserGroupIn,
+}
+
+impl ApiAdminUserGroupsCreateUserGroupBetaAdminUserGroupsRequest {
+    pub fn new(name: impl Into<String>) -> Self {
+        Self {
+            raw: AdminUserGroupIn {
+                description: None,
+                name: name.into(),
+                parent_group_ids: None,
+                target_type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.raw.description = Some(Some(description.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn description_null(mut self) -> Self {
+        self.raw.description = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn parent_group_ids(mut self, parent_group_ids: Vec<String>) -> Self {
+        self.raw.parent_group_ids = Some(parent_group_ids);
+        self
+    }
+
+    #[must_use]
+    pub fn target_type(mut self, target_type: UserGroupTargetType) -> Self {
+        self.raw.target_type = Some(Some(target_type));
+        self
+    }
+
+    #[must_use]
+    pub fn target_type_null(mut self) -> Self {
+        self.raw.target_type = Some(None);
+        self
+    }
+    pub fn from_raw(raw: AdminUserGroupIn) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &AdminUserGroupIn {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AdminUserGroupIn {
+        self.raw
+    }
+}
+
+impl From<AdminUserGroupIn> for ApiAdminUserGroupsCreateUserGroupBetaAdminUserGroupsRequest {
+    fn from(raw: AdminUserGroupIn) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ApiAdminUserGroupsCreateUserGroupBetaAdminUserGroupsRequest> for AdminUserGroupIn {
+    fn from(value: ApiAdminUserGroupsCreateUserGroupBetaAdminUserGroupsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ApiAdminUserGroupsCreateUserGroupBetaAdminUserGroupsResponse {
+    raw: AdminUserGroupOut,
+}
+
+impl ApiAdminUserGroupsCreateUserGroupBetaAdminUserGroupsResponse {
+    pub fn raw(&self) -> &AdminUserGroupOut {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AdminUserGroupOut {
+        self.raw
+    }
+}
+
+impl From<AdminUserGroupOut> for ApiAdminUserGroupsCreateUserGroupBetaAdminUserGroupsResponse {
+    fn from(raw: AdminUserGroupOut) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ApiAdminUserGroupsCreateUserGroupBetaAdminUserGroupsResponse> for AdminUserGroupOut {
+    fn from(value: ApiAdminUserGroupsCreateUserGroupBetaAdminUserGroupsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ApiAdminUserGroupsGetNestedGroupsBetaAdminUserGroupsResponse {
+    raw: NestedGroupsOut,
+}
+
+impl ApiAdminUserGroupsGetNestedGroupsBetaAdminUserGroupsResponse {
+    pub fn raw(&self) -> &NestedGroupsOut {
+        &self.raw
+    }
+    pub fn into_raw(self) -> NestedGroupsOut {
+        self.raw
+    }
+}
+
+impl From<NestedGroupsOut> for ApiAdminUserGroupsGetNestedGroupsBetaAdminUserGroupsResponse {
+    fn from(raw: NestedGroupsOut) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ApiAdminUserGroupsGetNestedGroupsBetaAdminUserGroupsResponse> for NestedGroupsOut {
+    fn from(value: ApiAdminUserGroupsGetNestedGroupsBetaAdminUserGroupsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ApiAdminUserGroupsGetUserGroupBetaAdminUserGroupsResponse {
+    raw: AdminUserGroupOut,
+}
+
+impl ApiAdminUserGroupsGetUserGroupBetaAdminUserGroupsResponse {
+    pub fn raw(&self) -> &AdminUserGroupOut {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AdminUserGroupOut {
+        self.raw
+    }
+}
+
+impl From<AdminUserGroupOut> for ApiAdminUserGroupsGetUserGroupBetaAdminUserGroupsResponse {
+    fn from(raw: AdminUserGroupOut) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ApiAdminUserGroupsGetUserGroupBetaAdminUserGroupsResponse> for AdminUserGroupOut {
+    fn from(value: ApiAdminUserGroupsGetUserGroupBetaAdminUserGroupsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ApiAdminUserGroupsGetUserGroupMembersBetaAdminUserGroupsResponse {
+    raw: AdminUserGroupMembersOut,
+}
+
+impl ApiAdminUserGroupsGetUserGroupMembersBetaAdminUserGroupsResponse {
+    pub fn raw(&self) -> &AdminUserGroupMembersOut {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AdminUserGroupMembersOut {
+        self.raw
+    }
+}
+
+impl From<AdminUserGroupMembersOut>
+    for ApiAdminUserGroupsGetUserGroupMembersBetaAdminUserGroupsResponse
+{
+    fn from(raw: AdminUserGroupMembersOut) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ApiAdminUserGroupsGetUserGroupMembersBetaAdminUserGroupsResponse>
+    for AdminUserGroupMembersOut
+{
+    fn from(value: ApiAdminUserGroupsGetUserGroupMembersBetaAdminUserGroupsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ApiAdminUserGroupsGetUserGroupsBetaAdminUserGroupsResponse {
+    raw: AdminUserGroupsOut,
+}
+
+impl ApiAdminUserGroupsGetUserGroupsBetaAdminUserGroupsResponse {
+    pub fn raw(&self) -> &AdminUserGroupsOut {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AdminUserGroupsOut {
+        self.raw
+    }
+}
+
+impl From<AdminUserGroupsOut> for ApiAdminUserGroupsGetUserGroupsBetaAdminUserGroupsResponse {
+    fn from(raw: AdminUserGroupsOut) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ApiAdminUserGroupsGetUserGroupsBetaAdminUserGroupsResponse> for AdminUserGroupsOut {
+    fn from(value: ApiAdminUserGroupsGetUserGroupsBetaAdminUserGroupsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ApiAdminUserGroupsProvisionGroupToWorkspaceBetaAdminUserGroupsRequest {
+    raw: AdminProvisionGroupToWorkspaceIn,
+}
+
+impl ApiAdminUserGroupsProvisionGroupToWorkspaceBetaAdminUserGroupsRequest {
+    pub fn new(user_group_uuid: uuid::Uuid, workspace_uuid: uuid::Uuid) -> Self {
+        Self {
+            raw: AdminProvisionGroupToWorkspaceIn {
+                user_group_uuid,
+                workspace_role: None,
+                workspace_role_name: None,
+                workspace_uuid,
+            },
+        }
+    }
+    #[must_use]
+    pub fn workspace_role(
+        mut self,
+        workspace_role: AdminProvisionGroupToWorkspaceInWorkspaceRole,
+    ) -> Self {
+        self.raw.workspace_role = Some(Some(workspace_role));
+        self
+    }
+
+    #[must_use]
+    pub fn workspace_role_null(mut self) -> Self {
+        self.raw.workspace_role = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn workspace_role_name(
+        mut self,
+        workspace_role_name: AdminProvisionGroupToWorkspaceInWorkspaceRoleName,
+    ) -> Self {
+        self.raw.workspace_role_name = Some(Some(workspace_role_name));
+        self
+    }
+
+    #[must_use]
+    pub fn workspace_role_name_null(mut self) -> Self {
+        self.raw.workspace_role_name = Some(None);
+        self
+    }
+    pub fn from_raw(raw: AdminProvisionGroupToWorkspaceIn) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &AdminProvisionGroupToWorkspaceIn {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AdminProvisionGroupToWorkspaceIn {
+        self.raw
+    }
+}
+
+impl From<AdminProvisionGroupToWorkspaceIn>
+    for ApiAdminUserGroupsProvisionGroupToWorkspaceBetaAdminUserGroupsRequest
+{
+    fn from(raw: AdminProvisionGroupToWorkspaceIn) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ApiAdminUserGroupsProvisionGroupToWorkspaceBetaAdminUserGroupsRequest>
+    for AdminProvisionGroupToWorkspaceIn
+{
+    fn from(value: ApiAdminUserGroupsProvisionGroupToWorkspaceBetaAdminUserGroupsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ApiAdminUserGroupsRemoveUsersFromGroupBetaAdminUserGroupsRequest {
+    raw: AdminAssignUsersToGroupIn,
+}
+
+impl ApiAdminUserGroupsRemoveUsersFromGroupBetaAdminUserGroupsRequest {
+    pub fn new(user_uuids: Vec<String>) -> Self {
+        Self {
+            raw: AdminAssignUsersToGroupIn { user_uuids },
+        }
+    }
+    pub fn from_raw(raw: AdminAssignUsersToGroupIn) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &AdminAssignUsersToGroupIn {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AdminAssignUsersToGroupIn {
+        self.raw
+    }
+}
+
+impl From<AdminAssignUsersToGroupIn>
+    for ApiAdminUserGroupsRemoveUsersFromGroupBetaAdminUserGroupsRequest
+{
+    fn from(raw: AdminAssignUsersToGroupIn) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ApiAdminUserGroupsRemoveUsersFromGroupBetaAdminUserGroupsRequest>
+    for AdminAssignUsersToGroupIn
+{
+    fn from(value: ApiAdminUserGroupsRemoveUsersFromGroupBetaAdminUserGroupsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ApiAdminUserGroupsSetNestedGroupsBetaAdminUserGroupsRequest {
+    raw: SetNestedGroupsIn,
+}
+
+impl ApiAdminUserGroupsSetNestedGroupsBetaAdminUserGroupsRequest {
+    pub fn new(child_group_uuids: Vec<String>) -> Self {
+        Self {
+            raw: SetNestedGroupsIn { child_group_uuids },
+        }
+    }
+    pub fn from_raw(raw: SetNestedGroupsIn) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &SetNestedGroupsIn {
+        &self.raw
+    }
+    pub fn into_raw(self) -> SetNestedGroupsIn {
+        self.raw
+    }
+}
+
+impl From<SetNestedGroupsIn> for ApiAdminUserGroupsSetNestedGroupsBetaAdminUserGroupsRequest {
+    fn from(raw: SetNestedGroupsIn) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ApiAdminUserGroupsSetNestedGroupsBetaAdminUserGroupsRequest> for SetNestedGroupsIn {
+    fn from(value: ApiAdminUserGroupsSetNestedGroupsBetaAdminUserGroupsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ApiAdminUserGroupsUpdateUserGroupBetaAdminUserGroupsRequest {
+    raw: AdminUpdateUserGroupIn,
+}
+
+impl ApiAdminUserGroupsUpdateUserGroupBetaAdminUserGroupsRequest {
+    pub fn new() -> Self {
+        Self {
+            raw: AdminUpdateUserGroupIn {
                 description: None,
                 name: None,
+                parent_group_ids: None,
+                target_type: None,
             },
         }
     }
@@ -965,200 +1159,1569 @@ impl UpdateModelRequest {
         self.raw.name = Some(None);
         self
     }
-    pub fn from_raw(raw: UpdateFTModelIn) -> Self {
+
+    #[must_use]
+    pub fn parent_group_ids(mut self, parent_group_ids: Vec<String>) -> Self {
+        self.raw.parent_group_ids = Some(Some(parent_group_ids));
+        self
+    }
+
+    #[must_use]
+    pub fn parent_group_ids_null(mut self) -> Self {
+        self.raw.parent_group_ids = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn target_type(mut self, target_type: UserGroupTargetType) -> Self {
+        self.raw.target_type = Some(Some(target_type));
+        self
+    }
+
+    #[must_use]
+    pub fn target_type_null(mut self) -> Self {
+        self.raw.target_type = Some(None);
+        self
+    }
+    pub fn from_raw(raw: AdminUpdateUserGroupIn) -> Self {
         Self { raw }
     }
-    pub fn as_raw(&self) -> &UpdateFTModelIn {
+    pub fn as_raw(&self) -> &AdminUpdateUserGroupIn {
         &self.raw
     }
-    pub fn into_raw(self) -> UpdateFTModelIn {
+    pub fn into_raw(self) -> AdminUpdateUserGroupIn {
         self.raw
     }
 }
 
-impl From<UpdateFTModelIn> for UpdateModelRequest {
-    fn from(raw: UpdateFTModelIn) -> Self {
+impl From<AdminUpdateUserGroupIn> for ApiAdminUserGroupsUpdateUserGroupBetaAdminUserGroupsRequest {
+    fn from(raw: AdminUpdateUserGroupIn) -> Self {
         Self { raw }
     }
 }
 
-impl From<UpdateModelRequest> for UpdateFTModelIn {
-    fn from(value: UpdateModelRequest) -> Self {
+impl From<ApiAdminUserGroupsUpdateUserGroupBetaAdminUserGroupsRequest> for AdminUpdateUserGroupIn {
+    fn from(value: ApiAdminUserGroupsUpdateUserGroupBetaAdminUserGroupsRequest) -> Self {
         value.into_raw()
     }
 }
 
-impl Default for UpdateModelRequest {
+impl Default for ApiAdminUserGroupsUpdateUserGroupBetaAdminUserGroupsRequest {
     fn default() -> Self {
         Self::new()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct CompletionFineTunedModel {
-    raw: CompletionFTModelOut,
+pub struct ApiAdminUserGroupsUpdateUserGroupBetaAdminUserGroupsResponse {
+    raw: AdminUserGroupOut,
 }
 
-impl CompletionFineTunedModel {
-    pub fn id(&self) -> &str {
-        &self.raw.id
-    }
-    pub fn archived(&self) -> bool {
-        self.raw.archived
-    }
-    pub fn raw(&self) -> &CompletionFTModelOut {
+impl ApiAdminUserGroupsUpdateUserGroupBetaAdminUserGroupsResponse {
+    pub fn raw(&self) -> &AdminUserGroupOut {
         &self.raw
     }
-    pub fn into_raw(self) -> CompletionFTModelOut {
+    pub fn into_raw(self) -> AdminUserGroupOut {
         self.raw
     }
 }
 
-impl From<CompletionFTModelOut> for CompletionFineTunedModel {
-    fn from(raw: CompletionFTModelOut) -> Self {
+impl From<AdminUserGroupOut> for ApiAdminUserGroupsUpdateUserGroupBetaAdminUserGroupsResponse {
+    fn from(raw: AdminUserGroupOut) -> Self {
         Self { raw }
     }
 }
 
-impl From<CompletionFineTunedModel> for CompletionFTModelOut {
-    fn from(value: CompletionFineTunedModel) -> Self {
+impl From<ApiAdminUserGroupsUpdateUserGroupBetaAdminUserGroupsResponse> for AdminUserGroupOut {
+    fn from(value: ApiAdminUserGroupsUpdateUserGroupBetaAdminUserGroupsResponse) -> Self {
         value.into_raw()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct ClassifierFineTunedModel {
-    raw: ClassifierFTModelOut,
+pub struct AppendBetaConversationsRequest {
+    raw: ConversationAppendRequest,
 }
 
-impl ClassifierFineTunedModel {
-    pub fn id(&self) -> &str {
-        &self.raw.id
-    }
-    pub fn archived(&self) -> bool {
-        self.raw.archived
-    }
-    pub fn raw(&self) -> &ClassifierFTModelOut {
-        &self.raw
-    }
-    pub fn into_raw(self) -> ClassifierFTModelOut {
-        self.raw
-    }
-}
-
-impl From<ClassifierFTModelOut> for ClassifierFineTunedModel {
-    fn from(raw: ClassifierFTModelOut) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<ClassifierFineTunedModel> for ClassifierFTModelOut {
-    fn from(value: ClassifierFineTunedModel) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-#[non_exhaustive]
-pub enum UpdateModelResponse {
-    Completion(CompletionFineTunedModel),
-    Classifier(ClassifierFineTunedModel),
-}
-
-impl From<CompletionFineTunedModel> for UpdateModelResponse {
-    fn from(value: CompletionFineTunedModel) -> Self {
-        Self::Completion(value)
-    }
-}
-
-impl From<ClassifierFineTunedModel> for UpdateModelResponse {
-    fn from(value: ClassifierFineTunedModel) -> Self {
-        Self::Classifier(value)
-    }
-}
-
-impl From<UpdateModelResponse> for JobsApiRoutesFineTuningUpdateFineTunedModelResponse {
-    fn from(value: UpdateModelResponse) -> Self {
-        match value {
-            UpdateModelResponse::Completion(value) => Self::CompletionFTModelOut(value.into()),
-            UpdateModelResponse::Classifier(value) => Self::ClassifierFTModelOut(value.into()),
-        }
-    }
-}
-
-impl From<JobsApiRoutesFineTuningUpdateFineTunedModelResponse> for UpdateModelResponse {
-    fn from(value: JobsApiRoutesFineTuningUpdateFineTunedModelResponse) -> Self {
-        match value {
-            JobsApiRoutesFineTuningUpdateFineTunedModelResponse::CompletionFTModelOut(value) => {
-                Self::Completion(value.into())
-            }
-            JobsApiRoutesFineTuningUpdateFineTunedModelResponse::ClassifierFTModelOut(value) => {
-                Self::Classifier(value.into())
-            }
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-#[non_exhaustive]
-pub enum EmbeddingInput {
-    Text(String),
-    Batch(Vec<String>),
-}
-
-impl From<String> for EmbeddingInput {
-    fn from(value: String) -> Self {
-        Self::Text(value)
-    }
-}
-
-impl From<&str> for EmbeddingInput {
-    fn from(value: &str) -> Self {
-        Self::Text(value.into())
-    }
-}
-
-impl From<Vec<String>> for EmbeddingInput {
-    fn from(value: Vec<String>) -> Self {
-        Self::Batch(value)
-    }
-}
-
-impl From<EmbeddingInput> for EmbeddingRequestInput {
-    fn from(value: EmbeddingInput) -> Self {
-        match value {
-            EmbeddingInput::Text(value) => Self::String(value),
-            EmbeddingInput::Batch(value) => Self::EmbeddingRequestInputStringArray(value),
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct EmbeddingParams {
-    raw: EmbeddingRequest,
-}
-
-impl EmbeddingParams {
-    pub fn new(model: impl Into<String>, input: impl Into<EmbeddingInput>) -> Self {
+impl AppendBetaConversationsRequest {
+    pub fn new() -> Self {
         Self {
-            raw: EmbeddingRequest {
-                encoding_format: None,
-                input: Into::<EmbeddingInput>::into(input).into(),
-                metadata: None,
-                model: model.into(),
-                output_dimension: None,
-                output_dtype: None,
+            raw: ConversationAppendRequest {
+                completion_args: None,
+                handoff_execution: None,
+                inputs: None,
+                store: None,
+                stream: None,
+                tool_confirmations: None,
             },
         }
     }
     #[must_use]
-    pub fn encoding_format(mut self, encoding_format: EncodingFormat) -> Self {
-        self.raw.encoding_format = Some(encoding_format);
+    pub fn completion_args(
+        mut self,
+        completion_args: impl Into<AppendBetaConversationsRequestCompletionArgs>,
+    ) -> Self {
+        self.raw.completion_args = Some(
+            Into::<AppendBetaConversationsRequestCompletionArgs>::into(completion_args).into(),
+        );
         self
     }
 
     #[must_use]
-    pub fn metadata(mut self, metadata: EmbeddingRequestMetadata) -> Self {
+    pub fn handoff_execution(
+        mut self,
+        handoff_execution: AppendConversationRequestHandoffExecution,
+    ) -> Self {
+        self.raw.handoff_execution = Some(handoff_execution);
+        self
+    }
+
+    #[must_use]
+    pub fn inputs(mut self, inputs: ConversationInputs) -> Self {
+        self.raw.inputs = Some(inputs);
+        self
+    }
+
+    #[must_use]
+    pub fn store(mut self, store: bool) -> Self {
+        self.raw.store = Some(store);
+        self
+    }
+
+    #[must_use]
+    pub fn tool_confirmations(mut self, tool_confirmations: Vec<ToolCallConfirmation>) -> Self {
+        self.raw.tool_confirmations = Some(Some(tool_confirmations));
+        self
+    }
+
+    #[must_use]
+    pub fn tool_confirmations_null(mut self) -> Self {
+        self.raw.tool_confirmations = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ConversationAppendRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ConversationAppendRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ConversationAppendRequest {
+        self.raw
+    }
+}
+
+impl From<ConversationAppendRequest> for AppendBetaConversationsRequest {
+    fn from(raw: ConversationAppendRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<AppendBetaConversationsRequest> for ConversationAppendRequest {
+    fn from(value: AppendBetaConversationsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for AppendBetaConversationsRequest {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct AppendBetaConversationsRequestCompletionArgs {
+    raw: CompletionArgs,
+}
+
+impl AppendBetaConversationsRequestCompletionArgs {
+    pub fn new() -> Self {
+        Self {
+            raw: CompletionArgs {
+                frequency_penalty: None,
+                max_tokens: None,
+                prediction: None,
+                presence_penalty: None,
+                random_seed: None,
+                reasoning_effort: None,
+                response_format: None,
+                stop: None,
+                temperature: None,
+                tool_choice: None,
+                top_p: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn frequency_penalty(mut self, frequency_penalty: f64) -> Self {
+        self.raw.frequency_penalty = Some(Some(frequency_penalty));
+        self
+    }
+
+    #[must_use]
+    pub fn frequency_penalty_null(mut self) -> Self {
+        self.raw.frequency_penalty = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn max_tokens(mut self, max_tokens: i64) -> Self {
+        self.raw.max_tokens = Some(Some(max_tokens));
+        self
+    }
+
+    #[must_use]
+    pub fn max_tokens_null(mut self) -> Self {
+        self.raw.max_tokens = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn prediction(
+        mut self,
+        prediction: impl Into<AppendBetaConversationsRequestCompletionArgsPrediction>,
+    ) -> Self {
+        self.raw.prediction = Some(Some(
+            Into::<AppendBetaConversationsRequestCompletionArgsPrediction>::into(prediction).into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn prediction_null(mut self) -> Self {
+        self.raw.prediction = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn presence_penalty(mut self, presence_penalty: f64) -> Self {
+        self.raw.presence_penalty = Some(Some(presence_penalty));
+        self
+    }
+
+    #[must_use]
+    pub fn presence_penalty_null(mut self) -> Self {
+        self.raw.presence_penalty = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn random_seed(mut self, random_seed: i64) -> Self {
+        self.raw.random_seed = Some(Some(random_seed));
+        self
+    }
+
+    #[must_use]
+    pub fn random_seed_null(mut self) -> Self {
+        self.raw.random_seed = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn reasoning_effort(mut self, reasoning_effort: ReasoningEffort) -> Self {
+        self.raw.reasoning_effort = Some(Some(reasoning_effort));
+        self
+    }
+
+    #[must_use]
+    pub fn reasoning_effort_null(mut self) -> Self {
+        self.raw.reasoning_effort = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn response_format(
+        mut self,
+        response_format: impl Into<AppendBetaConversationsRequestCompletionArgsResponseFormat>,
+    ) -> Self {
+        self.raw.response_format = Some(Some(
+            Into::<AppendBetaConversationsRequestCompletionArgsResponseFormat>::into(
+                response_format,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn response_format_null(mut self) -> Self {
+        self.raw.response_format = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn stop(mut self, stop: CompletionArgsStop) -> Self {
+        self.raw.stop = Some(Some(stop));
+        self
+    }
+
+    #[must_use]
+    pub fn stop_null(mut self) -> Self {
+        self.raw.stop = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn temperature(mut self, temperature: f64) -> Self {
+        self.raw.temperature = Some(Some(temperature));
+        self
+    }
+
+    #[must_use]
+    pub fn temperature_null(mut self) -> Self {
+        self.raw.temperature = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn tool_choice(mut self, tool_choice: ToolChoiceEnum) -> Self {
+        self.raw.tool_choice = Some(tool_choice);
+        self
+    }
+
+    #[must_use]
+    pub fn top_p(mut self, top_p: f64) -> Self {
+        self.raw.top_p = Some(Some(top_p));
+        self
+    }
+
+    #[must_use]
+    pub fn top_p_null(mut self) -> Self {
+        self.raw.top_p = Some(None);
+        self
+    }
+    pub fn from_raw(raw: CompletionArgs) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &CompletionArgs {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CompletionArgs {
+        self.raw
+    }
+}
+
+impl From<CompletionArgs> for AppendBetaConversationsRequestCompletionArgs {
+    fn from(raw: CompletionArgs) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<AppendBetaConversationsRequestCompletionArgs> for CompletionArgs {
+    fn from(value: AppendBetaConversationsRequestCompletionArgs) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for AppendBetaConversationsRequestCompletionArgs {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct AppendBetaConversationsRequestCompletionArgsPrediction {
+    raw: Prediction,
+}
+
+impl AppendBetaConversationsRequestCompletionArgsPrediction {
+    pub fn new() -> Self {
+        Self {
+            raw: Prediction {
+                content: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn content(mut self, content: impl Into<String>) -> Self {
+        self.raw.content = Some(content.into());
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: PredictionType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: Prediction) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &Prediction {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Prediction {
+        self.raw
+    }
+}
+
+impl From<Prediction> for AppendBetaConversationsRequestCompletionArgsPrediction {
+    fn from(raw: Prediction) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<AppendBetaConversationsRequestCompletionArgsPrediction> for Prediction {
+    fn from(value: AppendBetaConversationsRequestCompletionArgsPrediction) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for AppendBetaConversationsRequestCompletionArgsPrediction {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct AppendBetaConversationsRequestCompletionArgsResponseFormat {
+    raw: ResponseFormat,
+}
+
+impl AppendBetaConversationsRequestCompletionArgsResponseFormat {
+    pub fn new() -> Self {
+        Self {
+            raw: ResponseFormat {
+                json_schema: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn json_schema(
+        mut self,
+        json_schema: impl Into<AppendBetaConversationsRequestCompletionArgsResponseFormatJsonSchema>,
+    ) -> Self {
+        self.raw.json_schema = Some(Some(
+            Into::<AppendBetaConversationsRequestCompletionArgsResponseFormatJsonSchema>::into(
+                json_schema,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn json_schema_null(mut self) -> Self {
+        self.raw.json_schema = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: ResponseFormats) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: ResponseFormat) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ResponseFormat {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ResponseFormat {
+        self.raw
+    }
+}
+
+impl From<ResponseFormat> for AppendBetaConversationsRequestCompletionArgsResponseFormat {
+    fn from(raw: ResponseFormat) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<AppendBetaConversationsRequestCompletionArgsResponseFormat> for ResponseFormat {
+    fn from(value: AppendBetaConversationsRequestCompletionArgsResponseFormat) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for AppendBetaConversationsRequestCompletionArgsResponseFormat {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct AppendBetaConversationsRequestCompletionArgsResponseFormatJsonSchema {
+    raw: JsonSchema,
+}
+
+impl AppendBetaConversationsRequestCompletionArgsResponseFormatJsonSchema {
+    pub fn new(name: impl Into<String>, schema: JsonSchemaSchema) -> Self {
+        Self {
+            raw: JsonSchema {
+                description: None,
+                name: name.into(),
+                schema,
+                strict: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.raw.description = Some(Some(description.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn description_null(mut self) -> Self {
+        self.raw.description = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn strict(mut self, strict: bool) -> Self {
+        self.raw.strict = Some(strict);
+        self
+    }
+    pub fn from_raw(raw: JsonSchema) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &JsonSchema {
+        &self.raw
+    }
+    pub fn into_raw(self) -> JsonSchema {
+        self.raw
+    }
+}
+
+impl From<JsonSchema> for AppendBetaConversationsRequestCompletionArgsResponseFormatJsonSchema {
+    fn from(raw: JsonSchema) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<AppendBetaConversationsRequestCompletionArgsResponseFormatJsonSchema> for JsonSchema {
+    fn from(value: AppendBetaConversationsRequestCompletionArgsResponseFormatJsonSchema) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct AppendBetaConversationsResponse {
+    raw: ConversationResponse,
+}
+
+impl AppendBetaConversationsResponse {
+    pub fn raw(&self) -> &ConversationResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ConversationResponse {
+        self.raw
+    }
+}
+
+impl From<ConversationResponse> for AppendBetaConversationsResponse {
+    fn from(raw: ConversationResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<AppendBetaConversationsResponse> for ConversationResponse {
+    fn from(value: AppendBetaConversationsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct AppendStreamBetaConversationsRequest {
+    raw: ConversationAppendStreamRequest,
+}
+
+impl AppendStreamBetaConversationsRequest {
+    pub fn new() -> Self {
+        Self {
+            raw: ConversationAppendStreamRequest {
+                completion_args: None,
+                handoff_execution: None,
+                inputs: None,
+                store: None,
+                stream: None,
+                tool_confirmations: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn completion_args(
+        mut self,
+        completion_args: impl Into<AppendStreamBetaConversationsRequestCompletionArgs>,
+    ) -> Self {
+        self.raw.completion_args = Some(
+            Into::<AppendStreamBetaConversationsRequestCompletionArgs>::into(completion_args)
+                .into(),
+        );
+        self
+    }
+
+    #[must_use]
+    pub fn handoff_execution(
+        mut self,
+        handoff_execution: AppendConversationRequestHandoffExecution,
+    ) -> Self {
+        self.raw.handoff_execution = Some(handoff_execution);
+        self
+    }
+
+    #[must_use]
+    pub fn inputs(mut self, inputs: ConversationInputs) -> Self {
+        self.raw.inputs = Some(inputs);
+        self
+    }
+
+    #[must_use]
+    pub fn store(mut self, store: bool) -> Self {
+        self.raw.store = Some(store);
+        self
+    }
+
+    #[must_use]
+    pub fn tool_confirmations(mut self, tool_confirmations: Vec<ToolCallConfirmation>) -> Self {
+        self.raw.tool_confirmations = Some(Some(tool_confirmations));
+        self
+    }
+
+    #[must_use]
+    pub fn tool_confirmations_null(mut self) -> Self {
+        self.raw.tool_confirmations = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ConversationAppendStreamRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ConversationAppendStreamRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ConversationAppendStreamRequest {
+        self.raw
+    }
+}
+
+impl From<ConversationAppendStreamRequest> for AppendStreamBetaConversationsRequest {
+    fn from(raw: ConversationAppendStreamRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<AppendStreamBetaConversationsRequest> for ConversationAppendStreamRequest {
+    fn from(value: AppendStreamBetaConversationsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for AppendStreamBetaConversationsRequest {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct AppendStreamBetaConversationsRequestCompletionArgs {
+    raw: CompletionArgs,
+}
+
+impl AppendStreamBetaConversationsRequestCompletionArgs {
+    pub fn new() -> Self {
+        Self {
+            raw: CompletionArgs {
+                frequency_penalty: None,
+                max_tokens: None,
+                prediction: None,
+                presence_penalty: None,
+                random_seed: None,
+                reasoning_effort: None,
+                response_format: None,
+                stop: None,
+                temperature: None,
+                tool_choice: None,
+                top_p: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn frequency_penalty(mut self, frequency_penalty: f64) -> Self {
+        self.raw.frequency_penalty = Some(Some(frequency_penalty));
+        self
+    }
+
+    #[must_use]
+    pub fn frequency_penalty_null(mut self) -> Self {
+        self.raw.frequency_penalty = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn max_tokens(mut self, max_tokens: i64) -> Self {
+        self.raw.max_tokens = Some(Some(max_tokens));
+        self
+    }
+
+    #[must_use]
+    pub fn max_tokens_null(mut self) -> Self {
+        self.raw.max_tokens = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn prediction(
+        mut self,
+        prediction: impl Into<AppendStreamBetaConversationsRequestCompletionArgsPrediction>,
+    ) -> Self {
+        self.raw.prediction = Some(Some(
+            Into::<AppendStreamBetaConversationsRequestCompletionArgsPrediction>::into(prediction)
+                .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn prediction_null(mut self) -> Self {
+        self.raw.prediction = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn presence_penalty(mut self, presence_penalty: f64) -> Self {
+        self.raw.presence_penalty = Some(Some(presence_penalty));
+        self
+    }
+
+    #[must_use]
+    pub fn presence_penalty_null(mut self) -> Self {
+        self.raw.presence_penalty = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn random_seed(mut self, random_seed: i64) -> Self {
+        self.raw.random_seed = Some(Some(random_seed));
+        self
+    }
+
+    #[must_use]
+    pub fn random_seed_null(mut self) -> Self {
+        self.raw.random_seed = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn reasoning_effort(mut self, reasoning_effort: ReasoningEffort) -> Self {
+        self.raw.reasoning_effort = Some(Some(reasoning_effort));
+        self
+    }
+
+    #[must_use]
+    pub fn reasoning_effort_null(mut self) -> Self {
+        self.raw.reasoning_effort = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn response_format(
+        mut self,
+        response_format: impl Into<AppendStreamBetaConversationsRequestCompletionArgsResponseFormat>,
+    ) -> Self {
+        self.raw.response_format = Some(Some(
+            Into::<AppendStreamBetaConversationsRequestCompletionArgsResponseFormat>::into(
+                response_format,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn response_format_null(mut self) -> Self {
+        self.raw.response_format = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn stop(mut self, stop: CompletionArgsStop) -> Self {
+        self.raw.stop = Some(Some(stop));
+        self
+    }
+
+    #[must_use]
+    pub fn stop_null(mut self) -> Self {
+        self.raw.stop = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn temperature(mut self, temperature: f64) -> Self {
+        self.raw.temperature = Some(Some(temperature));
+        self
+    }
+
+    #[must_use]
+    pub fn temperature_null(mut self) -> Self {
+        self.raw.temperature = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn tool_choice(mut self, tool_choice: ToolChoiceEnum) -> Self {
+        self.raw.tool_choice = Some(tool_choice);
+        self
+    }
+
+    #[must_use]
+    pub fn top_p(mut self, top_p: f64) -> Self {
+        self.raw.top_p = Some(Some(top_p));
+        self
+    }
+
+    #[must_use]
+    pub fn top_p_null(mut self) -> Self {
+        self.raw.top_p = Some(None);
+        self
+    }
+    pub fn from_raw(raw: CompletionArgs) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &CompletionArgs {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CompletionArgs {
+        self.raw
+    }
+}
+
+impl From<CompletionArgs> for AppendStreamBetaConversationsRequestCompletionArgs {
+    fn from(raw: CompletionArgs) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<AppendStreamBetaConversationsRequestCompletionArgs> for CompletionArgs {
+    fn from(value: AppendStreamBetaConversationsRequestCompletionArgs) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for AppendStreamBetaConversationsRequestCompletionArgs {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct AppendStreamBetaConversationsRequestCompletionArgsPrediction {
+    raw: Prediction,
+}
+
+impl AppendStreamBetaConversationsRequestCompletionArgsPrediction {
+    pub fn new() -> Self {
+        Self {
+            raw: Prediction {
+                content: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn content(mut self, content: impl Into<String>) -> Self {
+        self.raw.content = Some(content.into());
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: PredictionType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: Prediction) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &Prediction {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Prediction {
+        self.raw
+    }
+}
+
+impl From<Prediction> for AppendStreamBetaConversationsRequestCompletionArgsPrediction {
+    fn from(raw: Prediction) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<AppendStreamBetaConversationsRequestCompletionArgsPrediction> for Prediction {
+    fn from(value: AppendStreamBetaConversationsRequestCompletionArgsPrediction) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for AppendStreamBetaConversationsRequestCompletionArgsPrediction {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct AppendStreamBetaConversationsRequestCompletionArgsResponseFormat {
+    raw: ResponseFormat,
+}
+
+impl AppendStreamBetaConversationsRequestCompletionArgsResponseFormat {
+    pub fn new() -> Self {
+        Self {
+            raw: ResponseFormat {
+                json_schema: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn json_schema(
+        mut self,
+        json_schema: impl Into<
+            AppendStreamBetaConversationsRequestCompletionArgsResponseFormatJsonSchema,
+        >,
+    ) -> Self {
+        self.raw.json_schema =
+            Some(
+                Some(
+                    Into::<
+                        AppendStreamBetaConversationsRequestCompletionArgsResponseFormatJsonSchema,
+                    >::into(json_schema)
+                    .into(),
+                ),
+            );
+        self
+    }
+
+    #[must_use]
+    pub fn json_schema_null(mut self) -> Self {
+        self.raw.json_schema = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: ResponseFormats) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: ResponseFormat) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ResponseFormat {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ResponseFormat {
+        self.raw
+    }
+}
+
+impl From<ResponseFormat> for AppendStreamBetaConversationsRequestCompletionArgsResponseFormat {
+    fn from(raw: ResponseFormat) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<AppendStreamBetaConversationsRequestCompletionArgsResponseFormat> for ResponseFormat {
+    fn from(value: AppendStreamBetaConversationsRequestCompletionArgsResponseFormat) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for AppendStreamBetaConversationsRequestCompletionArgsResponseFormat {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct AppendStreamBetaConversationsRequestCompletionArgsResponseFormatJsonSchema {
+    raw: JsonSchema,
+}
+
+impl AppendStreamBetaConversationsRequestCompletionArgsResponseFormatJsonSchema {
+    pub fn new(name: impl Into<String>, schema: JsonSchemaSchema) -> Self {
+        Self {
+            raw: JsonSchema {
+                description: None,
+                name: name.into(),
+                schema,
+                strict: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.raw.description = Some(Some(description.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn description_null(mut self) -> Self {
+        self.raw.description = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn strict(mut self, strict: bool) -> Self {
+        self.raw.strict = Some(strict);
+        self
+    }
+    pub fn from_raw(raw: JsonSchema) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &JsonSchema {
+        &self.raw
+    }
+    pub fn into_raw(self) -> JsonSchema {
+        self.raw
+    }
+}
+
+impl From<JsonSchema>
+    for AppendStreamBetaConversationsRequestCompletionArgsResponseFormatJsonSchema
+{
+    fn from(raw: JsonSchema) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<AppendStreamBetaConversationsRequestCompletionArgsResponseFormatJsonSchema>
+    for JsonSchema
+{
+    fn from(
+        value: AppendStreamBetaConversationsRequestCompletionArgsResponseFormatJsonSchema,
+    ) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct AppendStreamBetaConversationsStreamItem {
+    raw: ConversationEvents,
+}
+
+impl AppendStreamBetaConversationsStreamItem {
+    pub fn raw(&self) -> &ConversationEvents {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ConversationEvents {
+        self.raw
+    }
+}
+
+impl From<ConversationEvents> for AppendStreamBetaConversationsStreamItem {
+    fn from(raw: ConversationEvents) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<AppendStreamBetaConversationsStreamItem> for ConversationEvents {
+    fn from(value: AppendStreamBetaConversationsStreamItem) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ArchiveModelsResponse {
+    raw: ArchiveModelResponse,
+}
+
+impl ArchiveModelsResponse {
+    pub fn raw(&self) -> &ArchiveModelResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ArchiveModelResponse {
+        self.raw
+    }
+}
+
+impl From<ArchiveModelResponse> for ArchiveModelsResponse {
+    fn from(raw: ArchiveModelResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ArchiveModelsResponse> for ArchiveModelResponse {
+    fn from(value: ArchiveModelsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ArchiveWorkflowWorkflowsResponse {
+    raw: WorkflowArchiveResponse,
+}
+
+impl ArchiveWorkflowWorkflowsResponse {
+    pub fn raw(&self) -> &WorkflowArchiveResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowArchiveResponse {
+        self.raw
+    }
+}
+
+impl From<WorkflowArchiveResponse> for ArchiveWorkflowWorkflowsResponse {
+    fn from(raw: WorkflowArchiveResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ArchiveWorkflowWorkflowsResponse> for WorkflowArchiveResponse {
+    fn from(value: ArchiveWorkflowWorkflowsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct BatchCancelWorkflowExecutionsWorkflowsExecutionsRequest {
+    raw: BatchExecutionBody,
+}
+
+impl BatchCancelWorkflowExecutionsWorkflowsExecutionsRequest {
+    pub fn new(execution_ids: Vec<String>) -> Self {
+        Self {
+            raw: BatchExecutionBody { execution_ids },
+        }
+    }
+    pub fn from_raw(raw: BatchExecutionBody) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &BatchExecutionBody {
+        &self.raw
+    }
+    pub fn into_raw(self) -> BatchExecutionBody {
+        self.raw
+    }
+}
+
+impl From<BatchExecutionBody> for BatchCancelWorkflowExecutionsWorkflowsExecutionsRequest {
+    fn from(raw: BatchExecutionBody) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<BatchCancelWorkflowExecutionsWorkflowsExecutionsRequest> for BatchExecutionBody {
+    fn from(value: BatchCancelWorkflowExecutionsWorkflowsExecutionsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct BatchCancelWorkflowExecutionsWorkflowsExecutionsResponse {
+    raw: BatchExecutionResponse,
+}
+
+impl BatchCancelWorkflowExecutionsWorkflowsExecutionsResponse {
+    pub fn raw(&self) -> &BatchExecutionResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> BatchExecutionResponse {
+        self.raw
+    }
+}
+
+impl From<BatchExecutionResponse> for BatchCancelWorkflowExecutionsWorkflowsExecutionsResponse {
+    fn from(raw: BatchExecutionResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<BatchCancelWorkflowExecutionsWorkflowsExecutionsResponse> for BatchExecutionResponse {
+    fn from(value: BatchCancelWorkflowExecutionsWorkflowsExecutionsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct BatchTerminateWorkflowExecutionsWorkflowsExecutionsRequest {
+    raw: BatchExecutionBody,
+}
+
+impl BatchTerminateWorkflowExecutionsWorkflowsExecutionsRequest {
+    pub fn new(execution_ids: Vec<String>) -> Self {
+        Self {
+            raw: BatchExecutionBody { execution_ids },
+        }
+    }
+    pub fn from_raw(raw: BatchExecutionBody) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &BatchExecutionBody {
+        &self.raw
+    }
+    pub fn into_raw(self) -> BatchExecutionBody {
+        self.raw
+    }
+}
+
+impl From<BatchExecutionBody> for BatchTerminateWorkflowExecutionsWorkflowsExecutionsRequest {
+    fn from(raw: BatchExecutionBody) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<BatchTerminateWorkflowExecutionsWorkflowsExecutionsRequest> for BatchExecutionBody {
+    fn from(value: BatchTerminateWorkflowExecutionsWorkflowsExecutionsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct BatchTerminateWorkflowExecutionsWorkflowsExecutionsResponse {
+    raw: BatchExecutionResponse,
+}
+
+impl BatchTerminateWorkflowExecutionsWorkflowsExecutionsResponse {
+    pub fn raw(&self) -> &BatchExecutionResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> BatchExecutionResponse {
+        self.raw
+    }
+}
+
+impl From<BatchExecutionResponse> for BatchTerminateWorkflowExecutionsWorkflowsExecutionsResponse {
+    fn from(raw: BatchExecutionResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<BatchTerminateWorkflowExecutionsWorkflowsExecutionsResponse> for BatchExecutionResponse {
+    fn from(value: BatchTerminateWorkflowExecutionsWorkflowsExecutionsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct BulkArchiveWorkflowsWorkflowsRequest {
+    raw: WorkflowBulkArchiveRequest,
+}
+
+impl BulkArchiveWorkflowsWorkflowsRequest {
+    pub fn new(workflow_ids: Vec<String>) -> Self {
+        Self {
+            raw: WorkflowBulkArchiveRequest { workflow_ids },
+        }
+    }
+    pub fn from_raw(raw: WorkflowBulkArchiveRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &WorkflowBulkArchiveRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowBulkArchiveRequest {
+        self.raw
+    }
+}
+
+impl From<WorkflowBulkArchiveRequest> for BulkArchiveWorkflowsWorkflowsRequest {
+    fn from(raw: WorkflowBulkArchiveRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<BulkArchiveWorkflowsWorkflowsRequest> for WorkflowBulkArchiveRequest {
+    fn from(value: BulkArchiveWorkflowsWorkflowsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct BulkArchiveWorkflowsWorkflowsResponse {
+    raw: WorkflowBulkArchiveResponse,
+}
+
+impl BulkArchiveWorkflowsWorkflowsResponse {
+    pub fn raw(&self) -> &WorkflowBulkArchiveResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowBulkArchiveResponse {
+        self.raw
+    }
+}
+
+impl From<WorkflowBulkArchiveResponse> for BulkArchiveWorkflowsWorkflowsResponse {
+    fn from(raw: WorkflowBulkArchiveResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<BulkArchiveWorkflowsWorkflowsResponse> for WorkflowBulkArchiveResponse {
+    fn from(value: BulkArchiveWorkflowsWorkflowsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct BulkDeleteBetaObservabilityDatasetsRecordsRequest {
+    raw: DeleteDatasetRecordsRequest,
+}
+
+impl BulkDeleteBetaObservabilityDatasetsRecordsRequest {
+    pub fn new(dataset_record_ids: Vec<String>) -> Self {
+        Self {
+            raw: DeleteDatasetRecordsRequest { dataset_record_ids },
+        }
+    }
+    pub fn from_raw(raw: DeleteDatasetRecordsRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &DeleteDatasetRecordsRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DeleteDatasetRecordsRequest {
+        self.raw
+    }
+}
+
+impl From<DeleteDatasetRecordsRequest> for BulkDeleteBetaObservabilityDatasetsRecordsRequest {
+    fn from(raw: DeleteDatasetRecordsRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<BulkDeleteBetaObservabilityDatasetsRecordsRequest> for DeleteDatasetRecordsRequest {
+    fn from(value: BulkDeleteBetaObservabilityDatasetsRecordsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct BulkUnarchiveWorkflowsWorkflowsRequest {
+    raw: WorkflowBulkUnarchiveRequest,
+}
+
+impl BulkUnarchiveWorkflowsWorkflowsRequest {
+    pub fn new(workflow_ids: Vec<String>) -> Self {
+        Self {
+            raw: WorkflowBulkUnarchiveRequest { workflow_ids },
+        }
+    }
+    pub fn from_raw(raw: WorkflowBulkUnarchiveRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &WorkflowBulkUnarchiveRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowBulkUnarchiveRequest {
+        self.raw
+    }
+}
+
+impl From<WorkflowBulkUnarchiveRequest> for BulkUnarchiveWorkflowsWorkflowsRequest {
+    fn from(raw: WorkflowBulkUnarchiveRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<BulkUnarchiveWorkflowsWorkflowsRequest> for WorkflowBulkUnarchiveRequest {
+    fn from(value: BulkUnarchiveWorkflowsWorkflowsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct BulkUnarchiveWorkflowsWorkflowsResponse {
+    raw: WorkflowBulkUnarchiveResponse,
+}
+
+impl BulkUnarchiveWorkflowsWorkflowsResponse {
+    pub fn raw(&self) -> &WorkflowBulkUnarchiveResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowBulkUnarchiveResponse {
+        self.raw
+    }
+}
+
+impl From<WorkflowBulkUnarchiveResponse> for BulkUnarchiveWorkflowsWorkflowsResponse {
+    fn from(raw: WorkflowBulkUnarchiveResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<BulkUnarchiveWorkflowsWorkflowsResponse> for WorkflowBulkUnarchiveResponse {
+    fn from(value: BulkUnarchiveWorkflowsWorkflowsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CallToolBetaConnectorsRequest {
+    raw: ConnectorCallToolRequest,
+}
+
+impl CallToolBetaConnectorsRequest {
+    pub fn new() -> Self {
+        Self {
+            raw: ConnectorCallToolRequest { arguments: None },
+        }
+    }
+    #[must_use]
+    pub fn arguments(mut self, arguments: ConnectorCallToolRequestArguments) -> Self {
+        self.raw.arguments = Some(arguments);
+        self
+    }
+    pub fn from_raw(raw: ConnectorCallToolRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ConnectorCallToolRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ConnectorCallToolRequest {
+        self.raw
+    }
+}
+
+impl From<ConnectorCallToolRequest> for CallToolBetaConnectorsRequest {
+    fn from(raw: ConnectorCallToolRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CallToolBetaConnectorsRequest> for ConnectorCallToolRequest {
+    fn from(value: CallToolBetaConnectorsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for CallToolBetaConnectorsRequest {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CallToolBetaConnectorsResponse {
+    raw: ConnectorToolCallResponse,
+}
+
+impl CallToolBetaConnectorsResponse {
+    pub fn raw(&self) -> &ConnectorToolCallResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ConnectorToolCallResponse {
+        self.raw
+    }
+}
+
+impl From<ConnectorToolCallResponse> for CallToolBetaConnectorsResponse {
+    fn from(raw: ConnectorToolCallResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CallToolBetaConnectorsResponse> for ConnectorToolCallResponse {
+    fn from(value: CallToolBetaConnectorsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CancelBatchJobsResponse {
+    raw: BatchJob,
+}
+
+impl CancelBatchJobsResponse {
+    pub fn raw(&self) -> &BatchJob {
+        &self.raw
+    }
+    pub fn into_raw(self) -> BatchJob {
+        self.raw
+    }
+}
+
+impl From<BatchJob> for CancelBatchJobsResponse {
+    fn from(raw: BatchJob) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CancelBatchJobsResponse> for BatchJob {
+    fn from(value: CancelBatchJobsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ClassifyChatClassifiersRequest {
+    raw: ChatClassificationRequest,
+}
+
+impl ClassifyChatClassifiersRequest {
+    pub fn new(input: ChatClassificationRequestInputs, model: impl Into<String>) -> Self {
+        Self {
+            raw: ChatClassificationRequest {
+                input,
+                model: model.into(),
+            },
+        }
+    }
+    pub fn from_raw(raw: ChatClassificationRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ChatClassificationRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ChatClassificationRequest {
+        self.raw
+    }
+}
+
+impl From<ChatClassificationRequest> for ClassifyChatClassifiersRequest {
+    fn from(raw: ChatClassificationRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ClassifyChatClassifiersRequest> for ChatClassificationRequest {
+    fn from(value: ClassifyChatClassifiersRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ClassifyChatClassifiersResponse {
+    raw: ClassificationResponse,
+}
+
+impl ClassifyChatClassifiersResponse {
+    pub fn raw(&self) -> &ClassificationResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ClassificationResponse {
+        self.raw
+    }
+}
+
+impl From<ClassificationResponse> for ClassifyChatClassifiersResponse {
+    fn from(raw: ClassificationResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ClassifyChatClassifiersResponse> for ClassificationResponse {
+    fn from(value: ClassifyChatClassifiersResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ClassifyClassifiersRequest {
+    raw: ClassificationRequest,
+}
+
+impl ClassifyClassifiersRequest {
+    pub fn new(input: ClassificationRequestInput, model: impl Into<String>) -> Self {
+        Self {
+            raw: ClassificationRequest {
+                input,
+                metadata: None,
+                model: model.into(),
+            },
+        }
+    }
+    #[must_use]
+    pub fn metadata(mut self, metadata: ClassificationRequestMetadata) -> Self {
         self.raw.metadata = Some(Some(metadata));
         self
     }
@@ -1168,143 +2731,273 @@ impl EmbeddingParams {
         self.raw.metadata = Some(None);
         self
     }
-
-    #[must_use]
-    pub fn output_dimension(mut self, output_dimension: i64) -> Self {
-        self.raw.output_dimension = Some(Some(output_dimension));
-        self
-    }
-
-    #[must_use]
-    pub fn output_dimension_null(mut self) -> Self {
-        self.raw.output_dimension = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn output_dtype(mut self, output_dtype: EmbeddingDtype) -> Self {
-        self.raw.output_dtype = Some(output_dtype);
-        self
-    }
-    pub fn from_raw(raw: EmbeddingRequest) -> Self {
+    pub fn from_raw(raw: ClassificationRequest) -> Self {
         Self { raw }
     }
-    pub fn as_raw(&self) -> &EmbeddingRequest {
+    pub fn as_raw(&self) -> &ClassificationRequest {
         &self.raw
     }
-    pub fn into_raw(self) -> EmbeddingRequest {
+    pub fn into_raw(self) -> ClassificationRequest {
         self.raw
     }
 }
 
-impl From<EmbeddingRequest> for EmbeddingParams {
-    fn from(raw: EmbeddingRequest) -> Self {
+impl From<ClassificationRequest> for ClassifyClassifiersRequest {
+    fn from(raw: ClassificationRequest) -> Self {
         Self { raw }
     }
 }
 
-impl From<EmbeddingParams> for EmbeddingRequest {
-    fn from(value: EmbeddingParams) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct Embedding<'a> {
-    raw: &'a EmbeddingResponseData,
-}
-
-impl<'a> Embedding<'a> {
-    pub(crate) fn new(raw: &'a EmbeddingResponseData) -> Self {
-        Self { raw }
-    }
-    pub fn index(&self) -> Option<i64> {
-        self.raw.index
-    }
-    pub fn values(&self) -> Option<&[f64]> {
-        self.raw.embedding.as_deref()
-    }
-    pub fn raw(&self) -> &'a EmbeddingResponseData {
-        self.raw
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct EmbeddingResult {
-    raw: EmbeddingResponse,
-}
-
-impl EmbeddingResult {
-    pub fn id(&self) -> &str {
-        &self.raw.id
-    }
-    pub fn model(&self) -> &str {
-        &self.raw.model
-    }
-    pub fn embeddings(&self) -> impl ExactSizeIterator<Item = Embedding<'_>> {
-        self.raw.data.iter().map(Embedding::new)
-    }
-    pub fn raw(&self) -> &EmbeddingResponse {
-        &self.raw
-    }
-    pub fn into_raw(self) -> EmbeddingResponse {
-        self.raw
-    }
-}
-
-impl From<EmbeddingResponse> for EmbeddingResult {
-    fn from(raw: EmbeddingResponse) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<EmbeddingResult> for EmbeddingResponse {
-    fn from(value: EmbeddingResult) -> Self {
+impl From<ClassifyClassifiersRequest> for ClassificationRequest {
+    fn from(value: ClassifyClassifiersRequest) -> Self {
         value.into_raw()
     }
 }
 
 #[derive(Debug, Clone)]
-#[non_exhaustive]
-pub enum StopSequences {
-    One(String),
-    Many(Vec<String>),
+pub struct ClassifyClassifiersResponse {
+    raw: ClassificationResponse,
 }
 
-impl From<String> for StopSequences {
-    fn from(value: String) -> Self {
-        Self::One(value)
+impl ClassifyClassifiersResponse {
+    pub fn raw(&self) -> &ClassificationResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ClassificationResponse {
+        self.raw
     }
 }
 
-impl From<&str> for StopSequences {
-    fn from(value: &str) -> Self {
-        Self::One(value.into())
+impl From<ClassificationResponse> for ClassifyClassifiersResponse {
+    fn from(raw: ClassificationResponse) -> Self {
+        Self { raw }
     }
 }
 
-impl From<Vec<String>> for StopSequences {
-    fn from(value: Vec<String>) -> Self {
-        Self::Many(value)
-    }
-}
-
-impl From<StopSequences> for FIMCompletionRequestStop {
-    fn from(value: StopSequences) -> Self {
-        match value {
-            StopSequences::One(value) => Self::String(value),
-            StopSequences::Many(value) => Self::FIMCompletionRequestStopStringArray(value),
-        }
+impl From<ClassifyClassifiersResponse> for ClassificationResponse {
+    fn from(value: ClassifyClassifiersResponse) -> Self {
+        value.into_raw()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct FimRequest {
+pub struct CompleteAgentsRequest {
+    raw: AgentsCompletionRequest,
+}
+
+impl CompleteAgentsRequest {
+    pub fn raw(&self) -> &AgentsCompletionRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AgentsCompletionRequest {
+        self.raw
+    }
+}
+
+impl From<AgentsCompletionRequest> for CompleteAgentsRequest {
+    fn from(raw: AgentsCompletionRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CompleteAgentsRequest> for AgentsCompletionRequest {
+    fn from(value: CompleteAgentsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CompleteAgentsResponse {
+    raw: ChatCompletionResponse,
+}
+
+impl CompleteAgentsResponse {
+    pub fn raw(&self) -> &ChatCompletionResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ChatCompletionResponse {
+        self.raw
+    }
+}
+
+impl From<ChatCompletionResponse> for CompleteAgentsResponse {
+    fn from(raw: ChatCompletionResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CompleteAgentsResponse> for ChatCompletionResponse {
+    fn from(value: CompleteAgentsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CompleteAudioSpeechRequest {
+    raw: SpeechRequest,
+}
+
+impl CompleteAudioSpeechRequest {
+    pub fn raw(&self) -> &SpeechRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> SpeechRequest {
+        self.raw
+    }
+}
+
+impl From<SpeechRequest> for CompleteAudioSpeechRequest {
+    fn from(raw: SpeechRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CompleteAudioSpeechRequest> for SpeechRequest {
+    fn from(value: CompleteAudioSpeechRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CompleteAudioSpeechResponse {
+    raw: SpeechV1AudioSpeechPostResponse,
+}
+
+impl CompleteAudioSpeechResponse {
+    pub fn audio_data(&self) -> &str {
+        &self.raw.audio_data
+    }
+    pub fn raw(&self) -> &SpeechV1AudioSpeechPostResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> SpeechV1AudioSpeechPostResponse {
+        self.raw
+    }
+}
+
+impl From<SpeechV1AudioSpeechPostResponse> for CompleteAudioSpeechResponse {
+    fn from(raw: SpeechV1AudioSpeechPostResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CompleteAudioSpeechResponse> for SpeechV1AudioSpeechPostResponse {
+    fn from(value: CompleteAudioSpeechResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CompleteAudioTranscriptionsRequest {
+    raw: AudioTranscriptionRequest,
+}
+
+impl CompleteAudioTranscriptionsRequest {
+    pub fn raw(&self) -> &AudioTranscriptionRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AudioTranscriptionRequest {
+        self.raw
+    }
+}
+
+impl From<AudioTranscriptionRequest> for CompleteAudioTranscriptionsRequest {
+    fn from(raw: AudioTranscriptionRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CompleteAudioTranscriptionsRequest> for AudioTranscriptionRequest {
+    fn from(value: CompleteAudioTranscriptionsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CompleteAudioTranscriptionsResponse {
+    raw: TranscriptionResponse,
+}
+
+impl CompleteAudioTranscriptionsResponse {
+    pub fn raw(&self) -> &TranscriptionResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> TranscriptionResponse {
+        self.raw
+    }
+}
+
+impl From<TranscriptionResponse> for CompleteAudioTranscriptionsResponse {
+    fn from(raw: TranscriptionResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CompleteAudioTranscriptionsResponse> for TranscriptionResponse {
+    fn from(value: CompleteAudioTranscriptionsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CompleteChatRequest {
+    raw: ChatCompletionRequest,
+}
+
+impl CompleteChatRequest {
+    pub fn raw(&self) -> &ChatCompletionRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ChatCompletionRequest {
+        self.raw
+    }
+}
+
+impl From<ChatCompletionRequest> for CompleteChatRequest {
+    fn from(raw: ChatCompletionRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CompleteChatRequest> for ChatCompletionRequest {
+    fn from(value: CompleteChatRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CompleteChatResponse {
+    raw: ChatCompletionResponse,
+}
+
+impl CompleteChatResponse {
+    pub fn raw(&self) -> &ChatCompletionResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ChatCompletionResponse {
+        self.raw
+    }
+}
+
+impl From<ChatCompletionResponse> for CompleteChatResponse {
+    fn from(raw: ChatCompletionResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CompleteChatResponse> for ChatCompletionResponse {
+    fn from(value: CompleteChatResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CompleteFimRequest {
     raw: FIMCompletionRequest,
 }
 
-impl FimRequest {
-    pub fn new(model: impl Into<String>, prompt: impl Into<String>) -> Self {
+impl CompleteFimRequest {
+    pub fn new(prompt: impl Into<String>, model: impl Into<String>) -> Self {
         Self {
             raw: FIMCompletionRequest {
                 max_tokens: None,
@@ -1383,8 +3076,14 @@ impl FimRequest {
     }
 
     #[must_use]
-    pub fn stop(mut self, stop: impl Into<StopSequences>) -> Self {
-        self.raw.stop = Some(Into::<StopSequences>::into(stop).into());
+    pub fn stop(mut self, stop: FIMCompletionRequestStop) -> Self {
+        self.raw.stop = Some(Some(stop));
+        self
+    }
+
+    #[must_use]
+    pub fn stop_null(mut self) -> Self {
+        self.raw.stop = Some(None);
         self
     }
 
@@ -1414,7 +3113,13 @@ impl FimRequest {
 
     #[must_use]
     pub fn top_p(mut self, top_p: f64) -> Self {
-        self.raw.top_p = Some(top_p);
+        self.raw.top_p = Some(Some(top_p));
+        self
+    }
+
+    #[must_use]
+    pub fn top_p_null(mut self) -> Self {
+        self.raw.top_p = Some(None);
         self
     }
     pub fn from_raw(raw: FIMCompletionRequest) -> Self {
@@ -1428,38 +3133,24 @@ impl FimRequest {
     }
 }
 
-impl From<FIMCompletionRequest> for FimRequest {
+impl From<FIMCompletionRequest> for CompleteFimRequest {
     fn from(raw: FIMCompletionRequest) -> Self {
         Self { raw }
     }
 }
 
-impl From<FimRequest> for FIMCompletionRequest {
-    fn from(value: FimRequest) -> Self {
+impl From<CompleteFimRequest> for FIMCompletionRequest {
+    fn from(value: CompleteFimRequest) -> Self {
         value.into_raw()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct FimResponse {
+pub struct CompleteFimResponse {
     raw: FIMCompletionResponse,
 }
 
-impl FimResponse {
-    pub fn text(&self) -> Option<&str> {
-        match self
-            .raw
-            .choices
-            .first()?
-            .message
-            .content
-            .as_ref()?
-            .as_ref()?
-        {
-            AssistantMessageContent::String(value) => Some(value),
-            _ => None,
-        }
-    }
+impl CompleteFimResponse {
     pub fn raw(&self) -> &FIMCompletionResponse {
         &self.raw
     }
@@ -1468,1828 +3159,43 @@ impl FimResponse {
     }
 }
 
-impl From<FIMCompletionResponse> for FimResponse {
+impl From<FIMCompletionResponse> for CompleteFimResponse {
     fn from(raw: FIMCompletionResponse) -> Self {
         Self { raw }
     }
 }
 
-impl From<FimResponse> for FIMCompletionResponse {
-    fn from(value: FimResponse) -> Self {
+impl From<CompleteFimResponse> for FIMCompletionResponse {
+    fn from(value: CompleteFimResponse) -> Self {
         value.into_raw()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct FimStreamChunk {
-    raw: CompletionChunk,
+pub struct CreateApiKeyBetaAdminApiKeysRequest {
+    raw: AdminCreateAPIKeyIN,
 }
 
-impl FimStreamChunk {
-    pub fn text(&self) -> Option<&str> {
-        match self.raw.choices.first()?.delta.content.as_ref()?.as_ref()? {
-            DeltaMessageContent::String(value) => Some(value),
-            _ => None,
-        }
-    }
-    pub fn raw(&self) -> &CompletionChunk {
-        &self.raw
-    }
-    pub fn into_raw(self) -> CompletionChunk {
-        self.raw
-    }
-}
-
-impl From<CompletionChunk> for FimStreamChunk {
-    fn from(raw: CompletionChunk) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<FimStreamChunk> for CompletionChunk {
-    fn from(value: FimStreamChunk) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-#[non_exhaustive]
-pub enum ClassificationInput {
-    Text(String),
-    Batch(Vec<String>),
-}
-
-impl From<String> for ClassificationInput {
-    fn from(value: String) -> Self {
-        Self::Text(value)
-    }
-}
-
-impl From<&str> for ClassificationInput {
-    fn from(value: &str) -> Self {
-        Self::Text(value.into())
-    }
-}
-
-impl From<Vec<String>> for ClassificationInput {
-    fn from(value: Vec<String>) -> Self {
-        Self::Batch(value)
-    }
-}
-
-impl From<ClassificationInput> for ClassificationRequestInput {
-    fn from(value: ClassificationInput) -> Self {
-        match value {
-            ClassificationInput::Text(value) => Self::String(value),
-            ClassificationInput::Batch(value) => Self::ClassificationRequestInputStringArray(value),
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct ClassificationParams {
-    raw: ClassificationRequest,
-}
-
-impl ClassificationParams {
-    pub fn new(model: impl Into<String>, input: impl Into<ClassificationInput>) -> Self {
+impl CreateApiKeyBetaAdminApiKeysRequest {
+    pub fn new(workspace_uuid: uuid::Uuid, user_id: uuid::Uuid) -> Self {
         Self {
-            raw: ClassificationRequest {
-                input: Into::<ClassificationInput>::into(input).into(),
-                metadata: None,
-                model: model.into(),
-            },
-        }
-    }
-    #[must_use]
-    pub fn metadata(mut self, metadata: ClassificationRequestMetadata) -> Self {
-        self.raw.metadata = Some(Some(metadata));
-        self
-    }
-
-    #[must_use]
-    pub fn metadata_null(mut self) -> Self {
-        self.raw.metadata = Some(None);
-        self
-    }
-    pub fn from_raw(raw: ClassificationRequest) -> Self {
-        Self { raw }
-    }
-    pub fn as_raw(&self) -> &ClassificationRequest {
-        &self.raw
-    }
-    pub fn into_raw(self) -> ClassificationRequest {
-        self.raw
-    }
-}
-
-impl From<ClassificationRequest> for ClassificationParams {
-    fn from(raw: ClassificationRequest) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<ClassificationParams> for ClassificationRequest {
-    fn from(value: ClassificationParams) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct ClassifierConversation {
-    raw: InstructRequest,
-}
-
-impl ClassifierConversation {
-    pub fn new(messages: impl IntoIterator<Item = Message>) -> Self {
-        Self {
-            raw: InstructRequest {
-                messages: messages.into_iter().map(Into::into).collect(),
-            },
-        }
-    }
-    pub fn from_raw(raw: InstructRequest) -> Self {
-        Self { raw }
-    }
-    pub fn as_raw(&self) -> &InstructRequest {
-        &self.raw
-    }
-    pub fn into_raw(self) -> InstructRequest {
-        self.raw
-    }
-}
-
-impl From<InstructRequest> for ClassifierConversation {
-    fn from(raw: InstructRequest) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<ClassifierConversation> for InstructRequest {
-    fn from(value: ClassifierConversation) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-#[non_exhaustive]
-pub enum ChatClassificationInput {
-    Conversation(ClassifierConversation),
-    Batch(Vec<ClassifierConversation>),
-}
-
-impl From<ClassifierConversation> for ChatClassificationInput {
-    fn from(value: ClassifierConversation) -> Self {
-        Self::Conversation(value)
-    }
-}
-
-impl From<Vec<ClassifierConversation>> for ChatClassificationInput {
-    fn from(value: Vec<ClassifierConversation>) -> Self {
-        Self::Batch(value)
-    }
-}
-
-impl From<ChatClassificationInput> for ChatClassificationRequestInputs {
-    fn from(value: ChatClassificationInput) -> Self {
-        match value {
-            ChatClassificationInput::Conversation(value) => Self::InstructRequest(value.into()),
-            ChatClassificationInput::Batch(value) => {
-                Self::InstructRequestArray(value.into_iter().map(|value| value.into()).collect())
-            }
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-#[non_exhaustive]
-pub enum ChatModerationInput {
-    Conversation(Vec<Message>),
-    Batch(Vec<Vec<Message>>),
-}
-
-impl From<Vec<Message>> for ChatModerationInput {
-    fn from(value: Vec<Message>) -> Self {
-        Self::Conversation(value)
-    }
-}
-
-impl From<Vec<Vec<Message>>> for ChatModerationInput {
-    fn from(value: Vec<Vec<Message>>) -> Self {
-        Self::Batch(value)
-    }
-}
-
-impl From<ChatModerationInput> for ChatModerationRequestInput {
-    fn from(value: ChatModerationInput) -> Self {
-        match value {
-            ChatModerationInput::Conversation(value) => Self::ChatModerationRequestInputArray(
-                value.into_iter().map(|value| value.into()).collect(),
-            ),
-            ChatModerationInput::Batch(value) => Self::ChatModerationRequestInputArrayInline(
-                value
-                    .into_iter()
-                    .map(|value| value.into_iter().map(|value| value.into()).collect())
-                    .collect(),
-            ),
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct ChatClassificationParams {
-    raw: ChatClassificationRequest,
-}
-
-impl ChatClassificationParams {
-    pub fn new(model: impl Into<String>, input: impl Into<ChatClassificationInput>) -> Self {
-        Self {
-            raw: ChatClassificationRequest {
-                input: Into::<ChatClassificationInput>::into(input).into(),
-                model: model.into(),
-            },
-        }
-    }
-    pub fn from_raw(raw: ChatClassificationRequest) -> Self {
-        Self { raw }
-    }
-    pub fn as_raw(&self) -> &ChatClassificationRequest {
-        &self.raw
-    }
-    pub fn into_raw(self) -> ChatClassificationRequest {
-        self.raw
-    }
-}
-
-impl From<ChatClassificationRequest> for ChatClassificationParams {
-    fn from(raw: ChatClassificationRequest) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<ChatClassificationParams> for ChatClassificationRequest {
-    fn from(value: ChatClassificationParams) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct ChatModerationParams {
-    raw: ChatModerationRequest,
-}
-
-impl ChatModerationParams {
-    pub fn new(model: impl Into<String>, input: impl Into<ChatModerationInput>) -> Self {
-        Self {
-            raw: ChatModerationRequest {
-                input: Into::<ChatModerationInput>::into(input).into(),
-                model: model.into(),
-            },
-        }
-    }
-    pub fn from_raw(raw: ChatModerationRequest) -> Self {
-        Self { raw }
-    }
-    pub fn as_raw(&self) -> &ChatModerationRequest {
-        &self.raw
-    }
-    pub fn into_raw(self) -> ChatModerationRequest {
-        self.raw
-    }
-}
-
-impl From<ChatModerationRequest> for ChatModerationParams {
-    fn from(raw: ChatModerationRequest) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<ChatModerationParams> for ChatModerationRequest {
-    fn from(value: ChatModerationParams) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct ClassificationResult<'a> {
-    raw: &'a ClassificationResponseResultsItem,
-}
-
-impl<'a> ClassificationResult<'a> {
-    pub(crate) fn new(raw: &'a ClassificationResponseResultsItem) -> Self {
-        Self { raw }
-    }
-
-    pub fn raw(&self) -> &'a ClassificationResponseResultsItem {
-        self.raw
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct ClassificationResultSet {
-    raw: ClassificationResponse,
-}
-
-impl ClassificationResultSet {
-    pub fn id(&self) -> &str {
-        &self.raw.id
-    }
-    pub fn model(&self) -> &str {
-        &self.raw.model
-    }
-    pub fn results(&self) -> impl ExactSizeIterator<Item = ClassificationResult<'_>> {
-        self.raw.results.iter().map(ClassificationResult::new)
-    }
-    pub fn raw(&self) -> &ClassificationResponse {
-        &self.raw
-    }
-    pub fn into_raw(self) -> ClassificationResponse {
-        self.raw
-    }
-}
-
-impl From<ClassificationResponse> for ClassificationResultSet {
-    fn from(raw: ClassificationResponse) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<ClassificationResultSet> for ClassificationResponse {
-    fn from(value: ClassificationResultSet) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct ModerationResult<'a> {
-    raw: &'a ModerationObject,
-}
-
-impl<'a> ModerationResult<'a> {
-    pub(crate) fn new(raw: &'a ModerationObject) -> Self {
-        Self { raw }
-    }
-
-    pub fn raw(&self) -> &'a ModerationObject {
-        self.raw
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct ModerationResultSet {
-    raw: ModerationResponse,
-}
-
-impl ModerationResultSet {
-    pub fn id(&self) -> &str {
-        &self.raw.id
-    }
-    pub fn model(&self) -> &str {
-        &self.raw.model
-    }
-    pub fn results(&self) -> impl ExactSizeIterator<Item = ModerationResult<'_>> {
-        self.raw.results.iter().map(ModerationResult::new)
-    }
-    pub fn raw(&self) -> &ModerationResponse {
-        &self.raw
-    }
-    pub fn into_raw(self) -> ModerationResponse {
-        self.raw
-    }
-}
-
-impl From<ModerationResponse> for ModerationResultSet {
-    fn from(raw: ModerationResponse) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<ModerationResultSet> for ModerationResponse {
-    fn from(value: ModerationResultSet) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct FileInfo<'a> {
-    raw: &'a FileSchema,
-}
-
-impl<'a> FileInfo<'a> {
-    pub(crate) fn new(raw: &'a FileSchema) -> Self {
-        Self { raw }
-    }
-    pub fn id(&self) -> &uuid::Uuid {
-        &self.raw.id
-    }
-    pub fn filename(&self) -> &str {
-        &self.raw.filename
-    }
-    pub fn size_bytes(&self) -> i64 {
-        self.raw.bytes
-    }
-    pub fn created_at(&self) -> i64 {
-        self.raw.created_at
-    }
-    pub fn raw(&self) -> &'a FileSchema {
-        self.raw
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct FileDetails {
-    raw: RetrieveFileOut,
-}
-
-impl FileDetails {
-    pub fn id(&self) -> &uuid::Uuid {
-        &self.raw.id
-    }
-    pub fn filename(&self) -> &str {
-        &self.raw.filename
-    }
-    pub fn size_bytes(&self) -> i64 {
-        self.raw.bytes
-    }
-    pub fn created_at(&self) -> i64 {
-        self.raw.created_at
-    }
-    pub fn deleted(&self) -> bool {
-        self.raw.deleted
-    }
-    pub fn raw(&self) -> &RetrieveFileOut {
-        &self.raw
-    }
-    pub fn into_raw(self) -> RetrieveFileOut {
-        self.raw
-    }
-}
-
-impl From<RetrieveFileOut> for FileDetails {
-    fn from(raw: RetrieveFileOut) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<FileDetails> for RetrieveFileOut {
-    fn from(value: FileDetails) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct FileList {
-    raw: ListFilesOut,
-}
-
-impl FileList {
-    pub fn files(&self) -> impl ExactSizeIterator<Item = FileInfo<'_>> {
-        self.raw.data.iter().map(FileInfo::new)
-    }
-    pub fn raw(&self) -> &ListFilesOut {
-        &self.raw
-    }
-    pub fn into_raw(self) -> ListFilesOut {
-        self.raw
-    }
-}
-
-impl From<ListFilesOut> for FileList {
-    fn from(raw: ListFilesOut) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<FileList> for ListFilesOut {
-    fn from(value: FileList) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct DeletedFile {
-    raw: DeleteFileOut,
-}
-
-impl DeletedFile {
-    pub fn id(&self) -> &uuid::Uuid {
-        &self.raw.id
-    }
-    pub fn deleted(&self) -> bool {
-        self.raw.deleted
-    }
-    pub fn raw(&self) -> &DeleteFileOut {
-        &self.raw
-    }
-    pub fn into_raw(self) -> DeleteFileOut {
-        self.raw
-    }
-}
-
-impl From<DeleteFileOut> for DeletedFile {
-    fn from(raw: DeleteFileOut) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<DeletedFile> for DeleteFileOut {
-    fn from(value: DeletedFile) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct FileSignedUrl {
-    raw: FileSignedURL,
-}
-
-impl FileSignedUrl {
-    pub fn url(&self) -> &str {
-        &self.raw.url
-    }
-    pub fn raw(&self) -> &FileSignedURL {
-        &self.raw
-    }
-    pub fn into_raw(self) -> FileSignedURL {
-        self.raw
-    }
-}
-
-impl From<FileSignedURL> for FileSignedUrl {
-    fn from(raw: FileSignedURL) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<FileSignedUrl> for FileSignedURL {
-    fn from(value: FileSignedUrl) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct AgentView {
-    raw: Agent,
-}
-
-impl AgentView {
-    pub fn deployment_chat(&self) -> bool {
-        self.raw.deployment_chat
-    }
-    pub fn id(&self) -> &str {
-        &self.raw.id
-    }
-    pub fn model(&self) -> &str {
-        &self.raw.model
-    }
-    pub fn name(&self) -> &str {
-        &self.raw.name
-    }
-    pub fn source(&self) -> &str {
-        &self.raw.source
-    }
-    pub fn version(&self) -> i64 {
-        self.raw.version
-    }
-    pub fn raw(&self) -> &Agent {
-        &self.raw
-    }
-    pub fn into_raw(self) -> Agent {
-        self.raw
-    }
-}
-
-impl From<Agent> for AgentView {
-    fn from(raw: Agent) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<AgentView> for Agent {
-    fn from(value: AgentView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct AgentAliasResponseView {
-    raw: AgentAliasResponse,
-}
-
-impl AgentAliasResponseView {
-    pub fn alias(&self) -> &str {
-        &self.raw.alias
-    }
-    pub fn version(&self) -> i64 {
-        self.raw.version
-    }
-    pub fn raw(&self) -> &AgentAliasResponse {
-        &self.raw
-    }
-    pub fn into_raw(self) -> AgentAliasResponse {
-        self.raw
-    }
-}
-
-impl From<AgentAliasResponse> for AgentAliasResponseView {
-    fn from(raw: AgentAliasResponse) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<AgentAliasResponseView> for AgentAliasResponse {
-    fn from(value: AgentAliasResponseView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct AgentListPageView {
-    raw: AgentListPage,
-}
-
-impl AgentListPageView {
-    pub fn raw(&self) -> &AgentListPage {
-        &self.raw
-    }
-    pub fn into_raw(self) -> AgentListPage {
-        self.raw
-    }
-}
-
-impl From<AgentListPage> for AgentListPageView {
-    fn from(raw: AgentListPage) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<AgentListPageView> for AgentListPage {
-    fn from(value: AgentListPageView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct ConversationResponseView {
-    raw: ConversationResponse,
-}
-
-impl ConversationResponseView {
-    pub fn conversation_id(&self) -> &str {
-        &self.raw.conversation_id
-    }
-    pub fn raw(&self) -> &ConversationResponse {
-        &self.raw
-    }
-    pub fn into_raw(self) -> ConversationResponse {
-        self.raw
-    }
-}
-
-impl From<ConversationResponse> for ConversationResponseView {
-    fn from(raw: ConversationResponse) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<ConversationResponseView> for ConversationResponse {
-    fn from(value: ConversationResponseView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct ConversationHistoryView {
-    raw: ConversationHistory,
-}
-
-impl ConversationHistoryView {
-    pub fn conversation_id(&self) -> &str {
-        &self.raw.conversation_id
-    }
-    pub fn raw(&self) -> &ConversationHistory {
-        &self.raw
-    }
-    pub fn into_raw(self) -> ConversationHistory {
-        self.raw
-    }
-}
-
-impl From<ConversationHistory> for ConversationHistoryView {
-    fn from(raw: ConversationHistory) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<ConversationHistoryView> for ConversationHistory {
-    fn from(value: ConversationHistoryView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct ConversationMessagesView {
-    raw: ConversationMessages,
-}
-
-impl ConversationMessagesView {
-    pub fn conversation_id(&self) -> &str {
-        &self.raw.conversation_id
-    }
-    pub fn raw(&self) -> &ConversationMessages {
-        &self.raw
-    }
-    pub fn into_raw(self) -> ConversationMessages {
-        self.raw
-    }
-}
-
-impl From<ConversationMessages> for ConversationMessagesView {
-    fn from(raw: ConversationMessages) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<ConversationMessagesView> for ConversationMessages {
-    fn from(value: ConversationMessagesView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct WorkflowArchiveResponseView {
-    raw: WorkflowArchiveResponse,
-}
-
-impl WorkflowArchiveResponseView {
-    pub fn raw(&self) -> &WorkflowArchiveResponse {
-        &self.raw
-    }
-    pub fn into_raw(self) -> WorkflowArchiveResponse {
-        self.raw
-    }
-}
-
-impl From<WorkflowArchiveResponse> for WorkflowArchiveResponseView {
-    fn from(raw: WorkflowArchiveResponse) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<WorkflowArchiveResponseView> for WorkflowArchiveResponse {
-    fn from(value: WorkflowArchiveResponseView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct TranscriptionResponseView {
-    raw: TranscriptionResponse,
-}
-
-impl TranscriptionResponseView {
-    pub fn model(&self) -> &str {
-        &self.raw.model
-    }
-    pub fn text(&self) -> &str {
-        &self.raw.text
-    }
-    pub fn raw(&self) -> &TranscriptionResponse {
-        &self.raw
-    }
-    pub fn into_raw(self) -> TranscriptionResponse {
-        self.raw
-    }
-}
-
-impl From<TranscriptionResponse> for TranscriptionResponseView {
-    fn from(raw: TranscriptionResponse) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<TranscriptionResponseView> for TranscriptionResponse {
-    fn from(value: TranscriptionResponseView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct BatchExecutionResponseView {
-    raw: BatchExecutionResponse,
-}
-
-impl BatchExecutionResponseView {
-    pub fn raw(&self) -> &BatchExecutionResponse {
-        &self.raw
-    }
-    pub fn into_raw(self) -> BatchExecutionResponse {
-        self.raw
-    }
-}
-
-impl From<BatchExecutionResponse> for BatchExecutionResponseView {
-    fn from(raw: BatchExecutionResponse) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<BatchExecutionResponseView> for BatchExecutionResponse {
-    fn from(value: BatchExecutionResponseView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct BatchExecutionBodyParams {
-    raw: BatchExecutionBody,
-}
-
-impl BatchExecutionBodyParams {
-    pub fn new(execution_ids: Vec<String>) -> Self {
-        Self {
-            raw: BatchExecutionBody { execution_ids },
-        }
-    }
-    pub fn from_raw(raw: BatchExecutionBody) -> Self {
-        Self { raw }
-    }
-    pub fn as_raw(&self) -> &BatchExecutionBody {
-        &self.raw
-    }
-    pub fn into_raw(self) -> BatchExecutionBody {
-        self.raw
-    }
-}
-
-impl From<BatchExecutionBody> for BatchExecutionBodyParams {
-    fn from(raw: BatchExecutionBody) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<BatchExecutionBodyParams> for BatchExecutionBody {
-    fn from(value: BatchExecutionBodyParams) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct MCPToolCallResponseView {
-    raw: MCPToolCallResponse,
-}
-
-impl MCPToolCallResponseView {
-    pub fn raw(&self) -> &MCPToolCallResponse {
-        &self.raw
-    }
-    pub fn into_raw(self) -> MCPToolCallResponse {
-        self.raw
-    }
-}
-
-impl From<MCPToolCallResponse> for MCPToolCallResponseView {
-    fn from(raw: MCPToolCallResponse) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<MCPToolCallResponseView> for MCPToolCallResponse {
-    fn from(value: MCPToolCallResponseView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct MCPToolCallRequestArgumentsMap {
-    values: std::collections::BTreeMap<String, serde_json::Value>,
-}
-
-impl MCPToolCallRequestArgumentsMap {
-    pub fn new(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
-        Self { values }
-    }
-    pub fn as_map(&self) -> &std::collections::BTreeMap<String, serde_json::Value> {
-        &self.values
-    }
-    pub fn into_map(self) -> std::collections::BTreeMap<String, serde_json::Value> {
-        self.values
-    }
-}
-
-impl From<std::collections::BTreeMap<String, serde_json::Value>>
-    for MCPToolCallRequestArgumentsMap
-{
-    fn from(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
-        Self { values }
-    }
-}
-
-impl From<MCPToolCallRequestArguments> for MCPToolCallRequestArgumentsMap {
-    fn from(value: MCPToolCallRequestArguments) -> Self {
-        Self {
-            values: value.additional_properties,
-        }
-    }
-}
-
-impl From<MCPToolCallRequestArgumentsMap> for MCPToolCallRequestArguments {
-    fn from(value: MCPToolCallRequestArgumentsMap) -> Self {
-        Self {
-            additional_properties: value.values,
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct MCPToolCallRequestParams {
-    raw: MCPToolCallRequest,
-}
-
-impl MCPToolCallRequestParams {
-    pub fn new() -> Self {
-        Self {
-            raw: MCPToolCallRequest { arguments: None },
-        }
-    }
-    #[must_use]
-    pub fn arguments(mut self, arguments: impl Into<MCPToolCallRequestArgumentsMap>) -> Self {
-        self.raw.arguments = Some(Into::<MCPToolCallRequestArgumentsMap>::into(arguments).into());
-        self
-    }
-    pub fn from_raw(raw: MCPToolCallRequest) -> Self {
-        Self { raw }
-    }
-    pub fn as_raw(&self) -> &MCPToolCallRequest {
-        &self.raw
-    }
-    pub fn into_raw(self) -> MCPToolCallRequest {
-        self.raw
-    }
-}
-
-impl From<MCPToolCallRequest> for MCPToolCallRequestParams {
-    fn from(raw: MCPToolCallRequest) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<MCPToolCallRequestParams> for MCPToolCallRequest {
-    fn from(value: MCPToolCallRequestParams) -> Self {
-        value.into_raw()
-    }
-}
-
-impl Default for MCPToolCallRequestParams {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct MessageResponseView {
-    raw: MessageResponse,
-}
-
-impl MessageResponseView {
-    pub fn message(&self) -> &str {
-        &self.raw.message
-    }
-    pub fn raw(&self) -> &MessageResponse {
-        &self.raw
-    }
-    pub fn into_raw(self) -> MessageResponse {
-        self.raw
-    }
-}
-
-impl From<MessageResponse> for MessageResponseView {
-    fn from(raw: MessageResponse) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<MessageResponseView> for MessageResponse {
-    fn from(value: MessageResponseView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct ConnectionCredentialsHeadersMap {
-    values: std::collections::BTreeMap<String, String>,
-}
-
-impl ConnectionCredentialsHeadersMap {
-    pub fn new(values: std::collections::BTreeMap<String, String>) -> Self {
-        Self { values }
-    }
-    pub fn as_map(&self) -> &std::collections::BTreeMap<String, String> {
-        &self.values
-    }
-    pub fn into_map(self) -> std::collections::BTreeMap<String, String> {
-        self.values
-    }
-}
-
-impl From<std::collections::BTreeMap<String, String>> for ConnectionCredentialsHeadersMap {
-    fn from(values: std::collections::BTreeMap<String, String>) -> Self {
-        Self { values }
-    }
-}
-
-impl From<ConnectionCredentialsHeaders> for ConnectionCredentialsHeadersMap {
-    fn from(value: ConnectionCredentialsHeaders) -> Self {
-        Self {
-            values: value.additional_properties,
-        }
-    }
-}
-
-impl From<ConnectionCredentialsHeadersMap> for ConnectionCredentialsHeaders {
-    fn from(value: ConnectionCredentialsHeadersMap) -> Self {
-        Self {
-            additional_properties: value.values,
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct OAuth2TokenParams {
-    raw: OAuth2Token,
-}
-
-impl OAuth2TokenParams {
-    pub fn new(access_token: impl Into<String>) -> Self {
-        Self {
-            raw: OAuth2Token {
-                access_token: access_token.into(),
-                expires_at: None,
-                expires_in: None,
-                refresh_token: None,
-                scope: None,
-                token_type: None,
-            },
-        }
-    }
-    #[must_use]
-    pub fn expires_at(mut self, expires_at: chrono::DateTime<chrono::Utc>) -> Self {
-        self.raw.expires_at = Some(Some(expires_at));
-        self
-    }
-
-    #[must_use]
-    pub fn expires_at_null(mut self) -> Self {
-        self.raw.expires_at = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn expires_in(mut self, expires_in: i64) -> Self {
-        self.raw.expires_in = Some(Some(expires_in));
-        self
-    }
-
-    #[must_use]
-    pub fn expires_in_null(mut self) -> Self {
-        self.raw.expires_in = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn refresh_token(mut self, refresh_token: impl Into<String>) -> Self {
-        self.raw.refresh_token = Some(Some(refresh_token.into()));
-        self
-    }
-
-    #[must_use]
-    pub fn refresh_token_null(mut self) -> Self {
-        self.raw.refresh_token = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn scope(mut self, scope: impl Into<String>) -> Self {
-        self.raw.scope = Some(Some(scope.into()));
-        self
-    }
-
-    #[must_use]
-    pub fn scope_null(mut self) -> Self {
-        self.raw.scope = Some(None);
-        self
-    }
-    pub fn from_raw(raw: OAuth2Token) -> Self {
-        Self { raw }
-    }
-    pub fn as_raw(&self) -> &OAuth2Token {
-        &self.raw
-    }
-    pub fn into_raw(self) -> OAuth2Token {
-        self.raw
-    }
-}
-
-impl From<OAuth2Token> for OAuth2TokenParams {
-    fn from(raw: OAuth2Token) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<OAuth2TokenParams> for OAuth2Token {
-    fn from(value: OAuth2TokenParams) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct ConnectionCredentialsParams {
-    raw: ConnectionCredentials,
-}
-
-impl ConnectionCredentialsParams {
-    pub fn new() -> Self {
-        Self {
-            raw: ConnectionCredentials {
-                bearer_token: None,
-                headers: None,
-                oauth: None,
-            },
-        }
-    }
-    #[must_use]
-    pub fn bearer_token(mut self, bearer_token: impl Into<String>) -> Self {
-        self.raw.bearer_token = Some(Some(bearer_token.into()));
-        self
-    }
-
-    #[must_use]
-    pub fn bearer_token_null(mut self) -> Self {
-        self.raw.bearer_token = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn headers(mut self, headers: impl Into<ConnectionCredentialsHeadersMap>) -> Self {
-        self.raw.headers = Some(Some(
-            Into::<ConnectionCredentialsHeadersMap>::into(headers).into(),
-        ));
-        self
-    }
-
-    #[must_use]
-    pub fn headers_null(mut self) -> Self {
-        self.raw.headers = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn oauth(mut self, oauth: impl Into<OAuth2TokenParams>) -> Self {
-        self.raw.oauth = Some(Some(Into::<OAuth2TokenParams>::into(oauth).into()));
-        self
-    }
-
-    #[must_use]
-    pub fn oauth_null(mut self) -> Self {
-        self.raw.oauth = Some(None);
-        self
-    }
-    pub fn from_raw(raw: ConnectionCredentials) -> Self {
-        Self { raw }
-    }
-    pub fn as_raw(&self) -> &ConnectionCredentials {
-        &self.raw
-    }
-    pub fn into_raw(self) -> ConnectionCredentials {
-        self.raw
-    }
-}
-
-impl From<ConnectionCredentials> for ConnectionCredentialsParams {
-    fn from(raw: ConnectionCredentials) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<ConnectionCredentialsParams> for ConnectionCredentials {
-    fn from(value: ConnectionCredentialsParams) -> Self {
-        value.into_raw()
-    }
-}
-
-impl Default for ConnectionCredentialsParams {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct CredentialsCreateOrUpdateParams {
-    raw: CredentialsCreateOrUpdate,
-}
-
-impl CredentialsCreateOrUpdateParams {
-    pub fn new(name: impl Into<String>) -> Self {
-        Self {
-            raw: CredentialsCreateOrUpdate {
-                credentials: None,
-                is_default: None,
-                name: name.into(),
-            },
-        }
-    }
-    #[must_use]
-    pub fn credentials(mut self, credentials: impl Into<ConnectionCredentialsParams>) -> Self {
-        self.raw.credentials = Some(Some(
-            Into::<ConnectionCredentialsParams>::into(credentials).into(),
-        ));
-        self
-    }
-
-    #[must_use]
-    pub fn credentials_null(mut self) -> Self {
-        self.raw.credentials = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn is_default(mut self, is_default: bool) -> Self {
-        self.raw.is_default = Some(Some(is_default));
-        self
-    }
-
-    #[must_use]
-    pub fn is_default_null(mut self) -> Self {
-        self.raw.is_default = Some(None);
-        self
-    }
-    pub fn from_raw(raw: CredentialsCreateOrUpdate) -> Self {
-        Self { raw }
-    }
-    pub fn as_raw(&self) -> &CredentialsCreateOrUpdate {
-        &self.raw
-    }
-    pub fn into_raw(self) -> CredentialsCreateOrUpdate {
-        self.raw
-    }
-}
-
-impl From<CredentialsCreateOrUpdate> for CredentialsCreateOrUpdateParams {
-    fn from(raw: CredentialsCreateOrUpdate) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<CredentialsCreateOrUpdateParams> for CredentialsCreateOrUpdate {
-    fn from(value: CredentialsCreateOrUpdateParams) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct ConnectorView {
-    raw: Connector,
-}
-
-impl ConnectorView {
-    pub fn description(&self) -> &str {
-        &self.raw.description
-    }
-    pub fn name(&self) -> &str {
-        &self.raw.name
-    }
-    pub fn raw(&self) -> &Connector {
-        &self.raw
-    }
-    pub fn into_raw(self) -> Connector {
-        self.raw
-    }
-}
-
-impl From<Connector> for ConnectorView {
-    fn from(raw: Connector) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<ConnectorView> for Connector {
-    fn from(value: ConnectorView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct AuthDataParams {
-    raw: AuthData,
-}
-
-impl AuthDataParams {
-    pub fn new(client_id: impl Into<String>, client_secret: impl Into<String>) -> Self {
-        Self {
-            raw: AuthData {
-                client_id: client_id.into(),
-                client_secret: client_secret.into(),
-            },
-        }
-    }
-    pub fn from_raw(raw: AuthData) -> Self {
-        Self { raw }
-    }
-    pub fn as_raw(&self) -> &AuthData {
-        &self.raw
-    }
-    pub fn into_raw(self) -> AuthData {
-        self.raw
-    }
-}
-
-impl From<AuthData> for AuthDataParams {
-    fn from(raw: AuthData) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<AuthDataParams> for AuthData {
-    fn from(value: AuthDataParams) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct ConnectorMCPCreateHeadersMap {
-    values: std::collections::BTreeMap<String, serde_json::Value>,
-}
-
-impl ConnectorMCPCreateHeadersMap {
-    pub fn new(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
-        Self { values }
-    }
-    pub fn as_map(&self) -> &std::collections::BTreeMap<String, serde_json::Value> {
-        &self.values
-    }
-    pub fn into_map(self) -> std::collections::BTreeMap<String, serde_json::Value> {
-        self.values
-    }
-}
-
-impl From<std::collections::BTreeMap<String, serde_json::Value>> for ConnectorMCPCreateHeadersMap {
-    fn from(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
-        Self { values }
-    }
-}
-
-impl From<ConnectorMCPCreateHeaders> for ConnectorMCPCreateHeadersMap {
-    fn from(value: ConnectorMCPCreateHeaders) -> Self {
-        Self {
-            values: value.additional_properties,
-        }
-    }
-}
-
-impl From<ConnectorMCPCreateHeadersMap> for ConnectorMCPCreateHeaders {
-    fn from(value: ConnectorMCPCreateHeadersMap) -> Self {
-        Self {
-            additional_properties: value.values,
-        }
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[non_exhaustive]
-pub enum ResourceVisibilityValue {
-    SharedGlobal,
-    SharedOrg,
-    SharedWorkspace,
-    Private,
-}
-
-impl From<ResourceVisibilityValue> for ResourceVisibility {
-    fn from(value: ResourceVisibilityValue) -> Self {
-        match value {
-            ResourceVisibilityValue::SharedGlobal => Self::SharedGlobal,
-            ResourceVisibilityValue::SharedOrg => Self::SharedOrg,
-            ResourceVisibilityValue::SharedWorkspace => Self::SharedWorkspace,
-            ResourceVisibilityValue::Private => Self::Private,
-        }
-    }
-}
-
-impl From<ResourceVisibility> for ResourceVisibilityValue {
-    fn from(value: ResourceVisibility) -> Self {
-        match value {
-            ResourceVisibility::SharedGlobal => Self::SharedGlobal,
-            ResourceVisibility::SharedOrg => Self::SharedOrg,
-            ResourceVisibility::SharedWorkspace => Self::SharedWorkspace,
-            ResourceVisibility::Private => Self::Private,
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct ConnectorMCPCreateParams {
-    raw: ConnectorMCPCreate,
-}
-
-impl ConnectorMCPCreateParams {
-    pub fn new(name: impl Into<String>, description: impl Into<String>, server: url::Url) -> Self {
-        Self {
-            raw: ConnectorMCPCreate {
-                auth_data: None,
-                description: description.into(),
-                headers: None,
-                icon_url: None,
-                name: name.into(),
-                server,
-                system_prompt: None,
-                visibility: None,
-            },
-        }
-    }
-    #[must_use]
-    pub fn auth_data(mut self, auth_data: impl Into<AuthDataParams>) -> Self {
-        self.raw.auth_data = Some(Some(Into::<AuthDataParams>::into(auth_data).into()));
-        self
-    }
-
-    #[must_use]
-    pub fn auth_data_null(mut self) -> Self {
-        self.raw.auth_data = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn headers(mut self, headers: impl Into<ConnectorMCPCreateHeadersMap>) -> Self {
-        self.raw.headers = Some(Some(
-            Into::<ConnectorMCPCreateHeadersMap>::into(headers).into(),
-        ));
-        self
-    }
-
-    #[must_use]
-    pub fn headers_null(mut self) -> Self {
-        self.raw.headers = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn icon_url(mut self, icon_url: impl Into<String>) -> Self {
-        self.raw.icon_url = Some(Some(icon_url.into()));
-        self
-    }
-
-    #[must_use]
-    pub fn icon_url_null(mut self) -> Self {
-        self.raw.icon_url = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn system_prompt(mut self, system_prompt: impl Into<String>) -> Self {
-        self.raw.system_prompt = Some(Some(system_prompt.into()));
-        self
-    }
-
-    #[must_use]
-    pub fn system_prompt_null(mut self) -> Self {
-        self.raw.system_prompt = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn visibility(mut self, visibility: impl Into<ResourceVisibilityValue>) -> Self {
-        self.raw.visibility = Some(Into::<ResourceVisibilityValue>::into(visibility).into());
-        self
-    }
-    pub fn from_raw(raw: ConnectorMCPCreate) -> Self {
-        Self { raw }
-    }
-    pub fn as_raw(&self) -> &ConnectorMCPCreate {
-        &self.raw
-    }
-    pub fn into_raw(self) -> ConnectorMCPCreate {
-        self.raw
-    }
-}
-
-impl From<ConnectorMCPCreate> for ConnectorMCPCreateParams {
-    fn from(raw: ConnectorMCPCreate) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<ConnectorMCPCreateParams> for ConnectorMCPCreate {
-    fn from(value: ConnectorMCPCreateParams) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct AuthUrlResponseView {
-    raw: AuthUrlResponse,
-}
-
-impl AuthUrlResponseView {
-    pub fn auth_url(&self) -> &str {
-        &self.raw.auth_url
-    }
-    pub fn ttl(&self) -> i64 {
-        self.raw.ttl
-    }
-    pub fn raw(&self) -> &AuthUrlResponse {
-        &self.raw
-    }
-    pub fn into_raw(self) -> AuthUrlResponse {
-        self.raw
-    }
-}
-
-impl From<AuthUrlResponse> for AuthUrlResponseView {
-    fn from(raw: AuthUrlResponse) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<AuthUrlResponseView> for AuthUrlResponse {
-    fn from(value: AuthUrlResponseView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct CredentialsResponseView {
-    raw: CredentialsResponse,
-}
-
-impl CredentialsResponseView {
-    pub fn raw(&self) -> &CredentialsResponse {
-        &self.raw
-    }
-    pub fn into_raw(self) -> CredentialsResponse {
-        self.raw
-    }
-}
-
-impl From<CredentialsResponse> for CredentialsResponseView {
-    fn from(raw: CredentialsResponse) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<CredentialsResponseView> for CredentialsResponse {
-    fn from(value: CredentialsResponseView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct PaginatedConnectorsView {
-    raw: PaginatedConnectors,
-}
-
-impl PaginatedConnectorsView {
-    pub fn raw(&self) -> &PaginatedConnectors {
-        &self.raw
-    }
-    pub fn into_raw(self) -> PaginatedConnectors {
-        self.raw
-    }
-}
-
-impl From<PaginatedConnectors> for PaginatedConnectorsView {
-    fn from(raw: PaginatedConnectors) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<PaginatedConnectorsView> for PaginatedConnectors {
-    fn from(value: PaginatedConnectorsView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct ConnectorMCPUpdateConnectionConfigMap {
-    values: std::collections::BTreeMap<String, serde_json::Value>,
-}
-
-impl ConnectorMCPUpdateConnectionConfigMap {
-    pub fn new(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
-        Self { values }
-    }
-    pub fn as_map(&self) -> &std::collections::BTreeMap<String, serde_json::Value> {
-        &self.values
-    }
-    pub fn into_map(self) -> std::collections::BTreeMap<String, serde_json::Value> {
-        self.values
-    }
-}
-
-impl From<std::collections::BTreeMap<String, serde_json::Value>>
-    for ConnectorMCPUpdateConnectionConfigMap
-{
-    fn from(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
-        Self { values }
-    }
-}
-
-impl From<ConnectorMCPUpdateConnectionConfig> for ConnectorMCPUpdateConnectionConfigMap {
-    fn from(value: ConnectorMCPUpdateConnectionConfig) -> Self {
-        Self {
-            values: value.additional_properties,
-        }
-    }
-}
-
-impl From<ConnectorMCPUpdateConnectionConfigMap> for ConnectorMCPUpdateConnectionConfig {
-    fn from(value: ConnectorMCPUpdateConnectionConfigMap) -> Self {
-        Self {
-            additional_properties: value.values,
-        }
-    }
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct ConnectorMCPUpdateConnectionSecretsMap {
-    values: std::collections::BTreeMap<String, serde_json::Value>,
-}
-
-impl ConnectorMCPUpdateConnectionSecretsMap {
-    pub fn new(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
-        Self { values }
-    }
-    pub fn as_map(&self) -> &std::collections::BTreeMap<String, serde_json::Value> {
-        &self.values
-    }
-    pub fn into_map(self) -> std::collections::BTreeMap<String, serde_json::Value> {
-        self.values
-    }
-}
-
-impl From<std::collections::BTreeMap<String, serde_json::Value>>
-    for ConnectorMCPUpdateConnectionSecretsMap
-{
-    fn from(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
-        Self { values }
-    }
-}
-
-impl From<ConnectorMCPUpdateConnectionSecrets> for ConnectorMCPUpdateConnectionSecretsMap {
-    fn from(value: ConnectorMCPUpdateConnectionSecrets) -> Self {
-        Self {
-            values: value.additional_properties,
-        }
-    }
-}
-
-impl From<ConnectorMCPUpdateConnectionSecretsMap> for ConnectorMCPUpdateConnectionSecrets {
-    fn from(value: ConnectorMCPUpdateConnectionSecretsMap) -> Self {
-        Self {
-            additional_properties: value.values,
-        }
-    }
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct ConnectorMCPUpdateHeadersMap {
-    values: std::collections::BTreeMap<String, serde_json::Value>,
-}
-
-impl ConnectorMCPUpdateHeadersMap {
-    pub fn new(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
-        Self { values }
-    }
-    pub fn as_map(&self) -> &std::collections::BTreeMap<String, serde_json::Value> {
-        &self.values
-    }
-    pub fn into_map(self) -> std::collections::BTreeMap<String, serde_json::Value> {
-        self.values
-    }
-}
-
-impl From<std::collections::BTreeMap<String, serde_json::Value>> for ConnectorMCPUpdateHeadersMap {
-    fn from(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
-        Self { values }
-    }
-}
-
-impl From<ConnectorMCPUpdateHeaders> for ConnectorMCPUpdateHeadersMap {
-    fn from(value: ConnectorMCPUpdateHeaders) -> Self {
-        Self {
-            values: value.additional_properties,
-        }
-    }
-}
-
-impl From<ConnectorMCPUpdateHeadersMap> for ConnectorMCPUpdateHeaders {
-    fn from(value: ConnectorMCPUpdateHeadersMap) -> Self {
-        Self {
-            additional_properties: value.values,
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct ConnectorMCPUpdateParams {
-    raw: ConnectorMCPUpdate,
-}
-
-impl ConnectorMCPUpdateParams {
-    pub fn new() -> Self {
-        Self {
-            raw: ConnectorMCPUpdate {
-                auth_data: None,
-                connection_config: None,
-                connection_secrets: None,
-                description: None,
-                headers: None,
-                icon_url: None,
+            raw: AdminCreateAPIKeyIN {
+                expiration: None,
                 name: None,
-                server: None,
-                system_prompt: None,
+                user_id,
+                workspace_uuid,
             },
         }
     }
     #[must_use]
-    pub fn auth_data(mut self, auth_data: impl Into<AuthDataParams>) -> Self {
-        self.raw.auth_data = Some(Some(Into::<AuthDataParams>::into(auth_data).into()));
+    pub fn expiration(mut self, expiration: chrono::NaiveDate) -> Self {
+        self.raw.expiration = Some(Some(expiration));
         self
     }
 
     #[must_use]
-    pub fn auth_data_null(mut self) -> Self {
-        self.raw.auth_data = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn connection_config(
-        mut self,
-        connection_config: impl Into<ConnectorMCPUpdateConnectionConfigMap>,
-    ) -> Self {
-        self.raw.connection_config = Some(Some(
-            Into::<ConnectorMCPUpdateConnectionConfigMap>::into(connection_config).into(),
-        ));
-        self
-    }
-
-    #[must_use]
-    pub fn connection_config_null(mut self) -> Self {
-        self.raw.connection_config = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn connection_secrets(
-        mut self,
-        connection_secrets: impl Into<ConnectorMCPUpdateConnectionSecretsMap>,
-    ) -> Self {
-        self.raw.connection_secrets = Some(Some(
-            Into::<ConnectorMCPUpdateConnectionSecretsMap>::into(connection_secrets).into(),
-        ));
-        self
-    }
-
-    #[must_use]
-    pub fn connection_secrets_null(mut self) -> Self {
-        self.raw.connection_secrets = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn description(mut self, description: impl Into<String>) -> Self {
-        self.raw.description = Some(Some(description.into()));
-        self
-    }
-
-    #[must_use]
-    pub fn description_null(mut self) -> Self {
-        self.raw.description = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn headers(mut self, headers: impl Into<ConnectorMCPUpdateHeadersMap>) -> Self {
-        self.raw.headers = Some(Some(
-            Into::<ConnectorMCPUpdateHeadersMap>::into(headers).into(),
-        ));
-        self
-    }
-
-    #[must_use]
-    pub fn headers_null(mut self) -> Self {
-        self.raw.headers = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn icon_url(mut self, icon_url: impl Into<String>) -> Self {
-        self.raw.icon_url = Some(Some(icon_url.into()));
-        self
-    }
-
-    #[must_use]
-    pub fn icon_url_null(mut self) -> Self {
-        self.raw.icon_url = Some(None);
+    pub fn expiration_null(mut self) -> Self {
+        self.raw.expiration = Some(None);
         self
     }
 
@@ -3304,475 +3210,67 @@ impl ConnectorMCPUpdateParams {
         self.raw.name = Some(None);
         self
     }
-
-    #[must_use]
-    pub fn server(mut self, server: url::Url) -> Self {
-        self.raw.server = Some(Some(server));
-        self
-    }
-
-    #[must_use]
-    pub fn server_null(mut self) -> Self {
-        self.raw.server = Some(None);
-        self
-    }
-
-    #[must_use]
-    pub fn system_prompt(mut self, system_prompt: impl Into<String>) -> Self {
-        self.raw.system_prompt = Some(Some(system_prompt.into()));
-        self
-    }
-
-    #[must_use]
-    pub fn system_prompt_null(mut self) -> Self {
-        self.raw.system_prompt = Some(None);
-        self
-    }
-    pub fn from_raw(raw: ConnectorMCPUpdate) -> Self {
+    pub fn from_raw(raw: AdminCreateAPIKeyIN) -> Self {
         Self { raw }
     }
-    pub fn as_raw(&self) -> &ConnectorMCPUpdate {
+    pub fn as_raw(&self) -> &AdminCreateAPIKeyIN {
         &self.raw
     }
-    pub fn into_raw(self) -> ConnectorMCPUpdate {
+    pub fn into_raw(self) -> AdminCreateAPIKeyIN {
         self.raw
     }
 }
 
-impl From<ConnectorMCPUpdate> for ConnectorMCPUpdateParams {
-    fn from(raw: ConnectorMCPUpdate) -> Self {
+impl From<AdminCreateAPIKeyIN> for CreateApiKeyBetaAdminApiKeysRequest {
+    fn from(raw: AdminCreateAPIKeyIN) -> Self {
         Self { raw }
     }
 }
 
-impl From<ConnectorMCPUpdateParams> for ConnectorMCPUpdate {
-    fn from(value: ConnectorMCPUpdateParams) -> Self {
-        value.into_raw()
-    }
-}
-
-impl Default for ConnectorMCPUpdateParams {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct CampaignPreviewView {
-    raw: CampaignPreview,
-}
-
-impl CampaignPreviewView {
-    pub fn description(&self) -> &str {
-        &self.raw.description
-    }
-    pub fn max_nb_events(&self) -> i64 {
-        self.raw.max_nb_events
-    }
-    pub fn name(&self) -> &str {
-        &self.raw.name
-    }
-    pub fn raw(&self) -> &CampaignPreview {
-        &self.raw
-    }
-    pub fn into_raw(self) -> CampaignPreview {
-        self.raw
-    }
-}
-
-impl From<CampaignPreview> for CampaignPreviewView {
-    fn from(raw: CampaignPreview) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<CampaignPreviewView> for CampaignPreview {
-    fn from(value: CampaignPreviewView) -> Self {
+impl From<CreateApiKeyBetaAdminApiKeysRequest> for AdminCreateAPIKeyIN {
+    fn from(value: CreateApiKeyBetaAdminApiKeysRequest) -> Self {
         value.into_raw()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct DatasetRecordView {
-    raw: DatasetRecord,
+pub struct CreateApiKeyBetaAdminApiKeysResponse {
+    raw: APIKeyOUT,
 }
 
-impl DatasetRecordView {
-    pub fn raw(&self) -> &DatasetRecord {
+impl CreateApiKeyBetaAdminApiKeysResponse {
+    pub fn raw(&self) -> &APIKeyOUT {
         &self.raw
     }
-    pub fn into_raw(self) -> DatasetRecord {
+    pub fn into_raw(self) -> APIKeyOUT {
         self.raw
     }
 }
 
-impl From<DatasetRecord> for DatasetRecordView {
-    fn from(raw: DatasetRecord) -> Self {
+impl From<APIKeyOUT> for CreateApiKeyBetaAdminApiKeysResponse {
+    fn from(raw: APIKeyOUT) -> Self {
         Self { raw }
     }
 }
 
-impl From<DatasetRecordView> for DatasetRecord {
-    fn from(value: DatasetRecordView) -> Self {
+impl From<CreateApiKeyBetaAdminApiKeysResponse> for APIKeyOUT {
+    fn from(value: CreateApiKeyBetaAdminApiKeysResponse) -> Self {
         value.into_raw()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct DatasetView {
-    raw: Dataset,
-}
-
-impl DatasetView {
-    pub fn description(&self) -> &str {
-        &self.raw.description
-    }
-    pub fn name(&self) -> &str {
-        &self.raw.name
-    }
-    pub fn raw(&self) -> &Dataset {
-        &self.raw
-    }
-    pub fn into_raw(self) -> Dataset {
-        self.raw
-    }
-}
-
-impl From<Dataset> for DatasetView {
-    fn from(raw: Dataset) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<DatasetView> for Dataset {
-    fn from(value: DatasetView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct PostDatasetInSchemaParams {
-    raw: PostDatasetInSchema,
-}
-
-impl PostDatasetInSchemaParams {
-    pub fn new(name: impl Into<String>, description: impl Into<String>) -> Self {
-        Self {
-            raw: PostDatasetInSchema {
-                description: description.into(),
-                name: name.into(),
-            },
-        }
-    }
-    pub fn from_raw(raw: PostDatasetInSchema) -> Self {
-        Self { raw }
-    }
-    pub fn as_raw(&self) -> &PostDatasetInSchema {
-        &self.raw
-    }
-    pub fn into_raw(self) -> PostDatasetInSchema {
-        self.raw
-    }
-}
-
-impl From<PostDatasetInSchema> for PostDatasetInSchemaParams {
-    fn from(raw: PostDatasetInSchema) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<PostDatasetInSchemaParams> for PostDatasetInSchema {
-    fn from(value: PostDatasetInSchemaParams) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct JudgePreviewView {
-    raw: JudgePreview,
-}
-
-impl JudgePreviewView {
-    pub fn description(&self) -> &str {
-        &self.raw.description
-    }
-    pub fn instructions(&self) -> &str {
-        &self.raw.instructions
-    }
-    pub fn model_name(&self) -> &str {
-        &self.raw.model_name
-    }
-    pub fn name(&self) -> &str {
-        &self.raw.name
-    }
-    pub fn raw(&self) -> &JudgePreview {
-        &self.raw
-    }
-    pub fn into_raw(self) -> JudgePreview {
-        self.raw
-    }
-}
-
-impl From<JudgePreview> for JudgePreviewView {
-    fn from(raw: JudgePreview) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<JudgePreviewView> for JudgePreview {
-    fn from(value: JudgePreviewView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct JudgeClassificationOutputOptionParams {
-    raw: JudgeClassificationOutputOption,
-}
-
-impl JudgeClassificationOutputOptionParams {
-    pub fn new(value: impl Into<String>, description: impl Into<String>) -> Self {
-        Self {
-            raw: JudgeClassificationOutputOption {
-                description: description.into(),
-                value: value.into(),
-            },
-        }
-    }
-    pub fn from_raw(raw: JudgeClassificationOutputOption) -> Self {
-        Self { raw }
-    }
-    pub fn as_raw(&self) -> &JudgeClassificationOutputOption {
-        &self.raw
-    }
-    pub fn into_raw(self) -> JudgeClassificationOutputOption {
-        self.raw
-    }
-}
-
-impl From<JudgeClassificationOutputOption> for JudgeClassificationOutputOptionParams {
-    fn from(raw: JudgeClassificationOutputOption) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<JudgeClassificationOutputOptionParams> for JudgeClassificationOutputOption {
-    fn from(value: JudgeClassificationOutputOptionParams) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct JudgeClassificationOutputParams {
-    raw: JudgeClassificationOutput,
-}
-
-impl JudgeClassificationOutputParams {
-    pub fn new(options: impl IntoIterator<Item = JudgeClassificationOutputOptionParams>) -> Self {
-        Self {
-            raw: JudgeClassificationOutput {
-                options: options.into_iter().map(Into::into).collect(),
-                r#type: None,
-            },
-        }
-    }
-    pub fn from_raw(raw: JudgeClassificationOutput) -> Self {
-        Self { raw }
-    }
-    pub fn as_raw(&self) -> &JudgeClassificationOutput {
-        &self.raw
-    }
-    pub fn into_raw(self) -> JudgeClassificationOutput {
-        self.raw
-    }
-}
-
-impl From<JudgeClassificationOutput> for JudgeClassificationOutputParams {
-    fn from(raw: JudgeClassificationOutput) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<JudgeClassificationOutputParams> for JudgeClassificationOutput {
-    fn from(value: JudgeClassificationOutputParams) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct JudgeRegressionOutputParams {
-    raw: JudgeRegressionOutput,
-}
-
-impl JudgeRegressionOutputParams {
-    pub fn new(min_description: impl Into<String>, max_description: impl Into<String>) -> Self {
-        Self {
-            raw: JudgeRegressionOutput {
-                max: None,
-                max_description: max_description.into(),
-                min: None,
-                min_description: min_description.into(),
-                r#type: None,
-            },
-        }
-    }
-    #[must_use]
-    pub fn max(mut self, max: f64) -> Self {
-        self.raw.max = Some(max);
-        self
-    }
-
-    #[must_use]
-    pub fn min(mut self, min: f64) -> Self {
-        self.raw.min = Some(min);
-        self
-    }
-    pub fn from_raw(raw: JudgeRegressionOutput) -> Self {
-        Self { raw }
-    }
-    pub fn as_raw(&self) -> &JudgeRegressionOutput {
-        &self.raw
-    }
-    pub fn into_raw(self) -> JudgeRegressionOutput {
-        self.raw
-    }
-}
-
-impl From<JudgeRegressionOutput> for JudgeRegressionOutputParams {
-    fn from(raw: JudgeRegressionOutput) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<JudgeRegressionOutputParams> for JudgeRegressionOutput {
-    fn from(value: JudgeRegressionOutputParams) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-#[non_exhaustive]
-pub enum PostJudgeInSchemaOutputValue {
-    Classification(JudgeClassificationOutputParams),
-    Regression(JudgeRegressionOutputParams),
-}
-
-impl From<JudgeClassificationOutputParams> for PostJudgeInSchemaOutputValue {
-    fn from(value: JudgeClassificationOutputParams) -> Self {
-        Self::Classification(value)
-    }
-}
-
-impl From<JudgeRegressionOutputParams> for PostJudgeInSchemaOutputValue {
-    fn from(value: JudgeRegressionOutputParams) -> Self {
-        Self::Regression(value)
-    }
-}
-
-impl From<PostJudgeInSchemaOutputValue> for PostJudgeInSchemaOutput {
-    fn from(value: PostJudgeInSchemaOutputValue) -> Self {
-        match value {
-            PostJudgeInSchemaOutputValue::Classification(value) => {
-                Self::JudgeClassificationOutput(value.into())
-            }
-            PostJudgeInSchemaOutputValue::Regression(value) => {
-                Self::JudgeRegressionOutput(value.into())
-            }
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct PostJudgeInSchemaParams {
-    raw: PostJudgeInSchema,
-}
-
-impl PostJudgeInSchemaParams {
-    pub fn new(
-        name: impl Into<String>,
-        description: impl Into<String>,
-        model_name: impl Into<String>,
-        output: impl Into<PostJudgeInSchemaOutputValue>,
-        instructions: impl Into<String>,
-        tools: Vec<String>,
-    ) -> Self {
-        Self {
-            raw: PostJudgeInSchema {
-                description: description.into(),
-                instructions: instructions.into(),
-                model_name: model_name.into(),
-                name: name.into(),
-                output: Into::<PostJudgeInSchemaOutputValue>::into(output).into(),
-                tools,
-            },
-        }
-    }
-    pub fn from_raw(raw: PostJudgeInSchema) -> Self {
-        Self { raw }
-    }
-    pub fn as_raw(&self) -> &PostJudgeInSchema {
-        &self.raw
-    }
-    pub fn into_raw(self) -> PostJudgeInSchema {
-        self.raw
-    }
-}
-
-impl From<PostJudgeInSchema> for PostJudgeInSchemaParams {
-    fn from(raw: PostJudgeInSchema) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<PostJudgeInSchemaParams> for PostJudgeInSchema {
-    fn from(value: PostJudgeInSchemaParams) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct VoiceResponseView {
-    raw: VoiceResponse,
-}
-
-impl VoiceResponseView {
-    pub fn name(&self) -> &str {
-        &self.raw.name
-    }
-    pub fn retention_notice(&self) -> Option<i64> {
-        self.raw.retention_notice
-    }
-    pub fn raw(&self) -> &VoiceResponse {
-        &self.raw
-    }
-    pub fn into_raw(self) -> VoiceResponse {
-        self.raw
-    }
-}
-
-impl From<VoiceResponse> for VoiceResponseView {
-    fn from(raw: VoiceResponse) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<VoiceResponseView> for VoiceResponse {
-    fn from(value: VoiceResponseView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct VoiceCreateRequestParams {
+pub struct CreateAudioVoicesRequest {
     raw: VoiceCreateRequest,
 }
 
-impl VoiceCreateRequestParams {
+impl CreateAudioVoicesRequest {
     pub fn new(name: impl Into<String>, sample_audio: impl Into<String>) -> Self {
         Self {
             raw: VoiceCreateRequest {
                 age: None,
                 color: None,
+                description: None,
                 gender: None,
                 languages: None,
                 name: name.into(),
@@ -3805,6 +3303,18 @@ impl VoiceCreateRequestParams {
     #[must_use]
     pub fn color_null(mut self) -> Self {
         self.raw.color = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.raw.description = Some(Some(description.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn description_null(mut self) -> Self {
+        self.raw.description = Some(None);
         self
     }
 
@@ -3878,1129 +3388,55 @@ impl VoiceCreateRequestParams {
     }
 }
 
-impl From<VoiceCreateRequest> for VoiceCreateRequestParams {
+impl From<VoiceCreateRequest> for CreateAudioVoicesRequest {
     fn from(raw: VoiceCreateRequest) -> Self {
         Self { raw }
     }
 }
 
-impl From<VoiceCreateRequestParams> for VoiceCreateRequest {
-    fn from(value: VoiceCreateRequestParams) -> Self {
+impl From<CreateAudioVoicesRequest> for VoiceCreateRequest {
+    fn from(value: CreateAudioVoicesRequest) -> Self {
         value.into_raw()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct DeleteDatasetRecordsInSchemaParams {
-    raw: DeleteDatasetRecordsInSchema,
+pub struct CreateAudioVoicesResponse {
+    raw: VoiceResponse,
 }
 
-impl DeleteDatasetRecordsInSchemaParams {
-    pub fn new(dataset_record_ids: Vec<String>) -> Self {
+impl CreateAudioVoicesResponse {
+    pub fn raw(&self) -> &VoiceResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> VoiceResponse {
+        self.raw
+    }
+}
+
+impl From<VoiceResponse> for CreateAudioVoicesResponse {
+    fn from(raw: VoiceResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateAudioVoicesResponse> for VoiceResponse {
+    fn from(value: CreateAudioVoicesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateBatchJobsRequest {
+    raw: CreateBatchJobRequest,
+}
+
+impl CreateBatchJobsRequest {
+    pub fn new(endpoint: ApiEndpoint) -> Self {
         Self {
-            raw: DeleteDatasetRecordsInSchema { dataset_record_ids },
-        }
-    }
-    pub fn from_raw(raw: DeleteDatasetRecordsInSchema) -> Self {
-        Self { raw }
-    }
-    pub fn as_raw(&self) -> &DeleteDatasetRecordsInSchema {
-        &self.raw
-    }
-    pub fn into_raw(self) -> DeleteDatasetRecordsInSchema {
-        self.raw
-    }
-}
-
-impl From<DeleteDatasetRecordsInSchema> for DeleteDatasetRecordsInSchemaParams {
-    fn from(raw: DeleteDatasetRecordsInSchema) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<DeleteDatasetRecordsInSchemaParams> for DeleteDatasetRecordsInSchema {
-    fn from(value: DeleteDatasetRecordsInSchemaParams) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct DatasetExportView {
-    raw: DatasetExport,
-}
-
-impl DatasetExportView {
-    pub fn file_url(&self) -> &str {
-        &self.raw.file_url
-    }
-    pub fn raw(&self) -> &DatasetExport {
-        &self.raw
-    }
-    pub fn into_raw(self) -> DatasetExport {
-        self.raw
-    }
-}
-
-impl From<DatasetExport> for DatasetExportView {
-    fn from(raw: DatasetExport) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<DatasetExportView> for DatasetExport {
-    fn from(value: DatasetExportView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct UploadFileOutView {
-    raw: UploadFileOut,
-}
-
-impl UploadFileOutView {
-    pub fn bytes(&self) -> i64 {
-        self.raw.bytes
-    }
-    pub fn created_at(&self) -> i64 {
-        self.raw.created_at
-    }
-    pub fn filename(&self) -> &str {
-        &self.raw.filename
-    }
-    pub fn object(&self) -> &str {
-        &self.raw.object
-    }
-    pub fn raw(&self) -> &UploadFileOut {
-        &self.raw
-    }
-    pub fn into_raw(self) -> UploadFileOut {
-        self.raw
-    }
-}
-
-impl From<UploadFileOut> for UploadFileOutView {
-    fn from(raw: UploadFileOut) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<UploadFileOutView> for UploadFileOut {
-    fn from(value: UploadFileOutView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct CampaignSelectedEventsView {
-    raw: CampaignSelectedEvents,
-}
-
-impl CampaignSelectedEventsView {
-    pub fn raw(&self) -> &CampaignSelectedEvents {
-        &self.raw
-    }
-    pub fn into_raw(self) -> CampaignSelectedEvents {
-        self.raw
-    }
-}
-
-impl From<CampaignSelectedEvents> for CampaignSelectedEventsView {
-    fn from(raw: CampaignSelectedEvents) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<CampaignSelectedEventsView> for CampaignSelectedEvents {
-    fn from(value: CampaignSelectedEventsView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct CampaignStatusView {
-    raw: CampaignStatus,
-}
-
-impl CampaignStatusView {
-    pub fn raw(&self) -> &CampaignStatus {
-        &self.raw
-    }
-    pub fn into_raw(self) -> CampaignStatus {
-        self.raw
-    }
-}
-
-impl From<CampaignStatus> for CampaignStatusView {
-    fn from(raw: CampaignStatus) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<CampaignStatusView> for CampaignStatus {
-    fn from(value: CampaignStatusView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct CampaignPreviewsView {
-    raw: CampaignPreviews,
-}
-
-impl CampaignPreviewsView {
-    pub fn raw(&self) -> &CampaignPreviews {
-        &self.raw
-    }
-    pub fn into_raw(self) -> CampaignPreviews {
-        self.raw
-    }
-}
-
-impl From<CampaignPreviews> for CampaignPreviewsView {
-    fn from(raw: CampaignPreviews) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<CampaignPreviewsView> for CampaignPreviews {
-    fn from(value: CampaignPreviewsView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct ChatCompletionEventIdsView {
-    raw: ChatCompletionEventIds,
-}
-
-impl ChatCompletionEventIdsView {
-    pub fn raw(&self) -> &ChatCompletionEventIds {
-        &self.raw
-    }
-    pub fn into_raw(self) -> ChatCompletionEventIds {
-        self.raw
-    }
-}
-
-impl From<ChatCompletionEventIds> for ChatCompletionEventIdsView {
-    fn from(raw: ChatCompletionEventIds) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<ChatCompletionEventIdsView> for ChatCompletionEventIds {
-    fn from(value: ChatCompletionEventIdsView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct ChatCompletionEventView {
-    raw: ChatCompletionEvent,
-}
-
-impl ChatCompletionEventView {
-    pub fn correlation_id(&self) -> &str {
-        &self.raw.correlation_id
-    }
-    pub fn event_id(&self) -> &str {
-        &self.raw.event_id
-    }
-    pub fn nb_input_tokens(&self) -> i64 {
-        self.raw.nb_input_tokens
-    }
-    pub fn nb_messages(&self) -> i64 {
-        self.raw.nb_messages
-    }
-    pub fn nb_output_tokens(&self) -> i64 {
-        self.raw.nb_output_tokens
-    }
-    pub fn raw(&self) -> &ChatCompletionEvent {
-        &self.raw
-    }
-    pub fn into_raw(self) -> ChatCompletionEvent {
-        self.raw
-    }
-}
-
-impl From<ChatCompletionEvent> for ChatCompletionEventView {
-    fn from(raw: ChatCompletionEvent) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<ChatCompletionEventView> for ChatCompletionEvent {
-    fn from(value: ChatCompletionEventView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct ChatCompletionEventsView {
-    raw: ChatCompletionEvents,
-}
-
-impl ChatCompletionEventsView {
-    pub fn raw(&self) -> &ChatCompletionEvents {
-        &self.raw
-    }
-    pub fn into_raw(self) -> ChatCompletionEvents {
-        self.raw
-    }
-}
-
-impl From<ChatCompletionEvents> for ChatCompletionEventsView {
-    fn from(raw: ChatCompletionEvents) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<ChatCompletionEventsView> for ChatCompletionEvents {
-    fn from(value: ChatCompletionEventsView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct FieldOptionCountsView {
-    raw: FieldOptionCounts,
-}
-
-impl FieldOptionCountsView {
-    pub fn raw(&self) -> &FieldOptionCounts {
-        &self.raw
-    }
-    pub fn into_raw(self) -> FieldOptionCounts {
-        self.raw
-    }
-}
-
-impl From<FieldOptionCounts> for FieldOptionCountsView {
-    fn from(raw: FieldOptionCounts) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<FieldOptionCountsView> for FieldOptionCounts {
-    fn from(value: FieldOptionCountsView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct ChatCompletionFieldOptionsView {
-    raw: ChatCompletionFieldOptions,
-}
-
-impl ChatCompletionFieldOptionsView {
-    pub fn raw(&self) -> &ChatCompletionFieldOptions {
-        &self.raw
-    }
-    pub fn into_raw(self) -> ChatCompletionFieldOptions {
-        self.raw
-    }
-}
-
-impl From<ChatCompletionFieldOptions> for ChatCompletionFieldOptionsView {
-    fn from(raw: ChatCompletionFieldOptions) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<ChatCompletionFieldOptionsView> for ChatCompletionFieldOptions {
-    fn from(value: ChatCompletionFieldOptionsView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct ChatCompletionFieldsView {
-    raw: ChatCompletionFields,
-}
-
-impl ChatCompletionFieldsView {
-    pub fn raw(&self) -> &ChatCompletionFields {
-        &self.raw
-    }
-    pub fn into_raw(self) -> ChatCompletionFields {
-        self.raw
-    }
-}
-
-impl From<ChatCompletionFields> for ChatCompletionFieldsView {
-    fn from(raw: ChatCompletionFields) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<ChatCompletionFieldsView> for ChatCompletionFields {
-    fn from(value: ChatCompletionFieldsView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct DatasetPreviewView {
-    raw: DatasetPreview,
-}
-
-impl DatasetPreviewView {
-    pub fn description(&self) -> &str {
-        &self.raw.description
-    }
-    pub fn name(&self) -> &str {
-        &self.raw.name
-    }
-    pub fn raw(&self) -> &DatasetPreview {
-        &self.raw
-    }
-    pub fn into_raw(self) -> DatasetPreview {
-        self.raw
-    }
-}
-
-impl From<DatasetPreview> for DatasetPreviewView {
-    fn from(raw: DatasetPreview) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<DatasetPreviewView> for DatasetPreview {
-    fn from(value: DatasetPreviewView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct DatasetImportTaskView {
-    raw: DatasetImportTask,
-}
-
-impl DatasetImportTaskView {
-    pub fn raw(&self) -> &DatasetImportTask {
-        &self.raw
-    }
-    pub fn into_raw(self) -> DatasetImportTask {
-        self.raw
-    }
-}
-
-impl From<DatasetImportTask> for DatasetImportTaskView {
-    fn from(raw: DatasetImportTask) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<DatasetImportTaskView> for DatasetImportTask {
-    fn from(value: DatasetImportTaskView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct DatasetImportTasksView {
-    raw: DatasetImportTasks,
-}
-
-impl DatasetImportTasksView {
-    pub fn raw(&self) -> &DatasetImportTasks {
-        &self.raw
-    }
-    pub fn into_raw(self) -> DatasetImportTasks {
-        self.raw
-    }
-}
-
-impl From<DatasetImportTasks> for DatasetImportTasksView {
-    fn from(raw: DatasetImportTasks) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<DatasetImportTasksView> for DatasetImportTasks {
-    fn from(value: DatasetImportTasksView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct DatasetRecordsView {
-    raw: DatasetRecords,
-}
-
-impl DatasetRecordsView {
-    pub fn raw(&self) -> &DatasetRecords {
-        &self.raw
-    }
-    pub fn into_raw(self) -> DatasetRecords {
-        self.raw
-    }
-}
-
-impl From<DatasetRecords> for DatasetRecordsView {
-    fn from(raw: DatasetRecords) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<DatasetRecordsView> for DatasetRecords {
-    fn from(value: DatasetRecordsView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct DatasetPreviewsView {
-    raw: DatasetPreviews,
-}
-
-impl DatasetPreviewsView {
-    pub fn raw(&self) -> &DatasetPreviews {
-        &self.raw
-    }
-    pub fn into_raw(self) -> DatasetPreviews {
-        self.raw
-    }
-}
-
-impl From<DatasetPreviews> for DatasetPreviewsView {
-    fn from(raw: DatasetPreviews) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<DatasetPreviewsView> for DatasetPreviews {
-    fn from(value: DatasetPreviewsView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct DeploymentDetailResponseView {
-    raw: DeploymentDetailResponse,
-}
-
-impl DeploymentDetailResponseView {
-    pub fn is_active(&self) -> bool {
-        self.raw.is_active
-    }
-    pub fn name(&self) -> &str {
-        &self.raw.name
-    }
-    pub fn raw(&self) -> &DeploymentDetailResponse {
-        &self.raw
-    }
-    pub fn into_raw(self) -> DeploymentDetailResponse {
-        self.raw
-    }
-}
-
-impl From<DeploymentDetailResponse> for DeploymentDetailResponseView {
-    fn from(raw: DeploymentDetailResponse) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<DeploymentDetailResponseView> for DeploymentDetailResponse {
-    fn from(value: DeploymentDetailResponseView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct JudgePreviewsView {
-    raw: JudgePreviews,
-}
-
-impl JudgePreviewsView {
-    pub fn raw(&self) -> &JudgePreviews {
-        &self.raw
-    }
-    pub fn into_raw(self) -> JudgePreviews {
-        self.raw
-    }
-}
-
-impl From<JudgePreviews> for JudgePreviewsView {
-    fn from(raw: JudgePreviews) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<JudgePreviewsView> for JudgePreviews {
-    fn from(value: JudgePreviewsView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct WorkflowExecutionResponseView {
-    raw: WorkflowExecutionResponse,
-}
-
-impl WorkflowExecutionResponseView {
-    pub fn execution_id(&self) -> &str {
-        &self.raw.execution_id
-    }
-    pub fn root_execution_id(&self) -> &str {
-        &self.raw.root_execution_id
-    }
-    pub fn workflow_name(&self) -> &str {
-        &self.raw.workflow_name
-    }
-    pub fn raw(&self) -> &WorkflowExecutionResponse {
-        &self.raw
-    }
-    pub fn into_raw(self) -> WorkflowExecutionResponse {
-        self.raw
-    }
-}
-
-impl From<WorkflowExecutionResponse> for WorkflowExecutionResponseView {
-    fn from(raw: WorkflowExecutionResponse) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<WorkflowExecutionResponseView> for WorkflowExecutionResponse {
-    fn from(value: WorkflowExecutionResponseView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct WorkflowScheduleListResponseView {
-    raw: WorkflowScheduleListResponse,
-}
-
-impl WorkflowScheduleListResponseView {
-    pub fn raw(&self) -> &WorkflowScheduleListResponse {
-        &self.raw
-    }
-    pub fn into_raw(self) -> WorkflowScheduleListResponse {
-        self.raw
-    }
-}
-
-impl From<WorkflowScheduleListResponse> for WorkflowScheduleListResponseView {
-    fn from(raw: WorkflowScheduleListResponse) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<WorkflowScheduleListResponseView> for WorkflowScheduleListResponse {
-    fn from(value: WorkflowScheduleListResponseView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct WorkerInfoView {
-    raw: WorkerInfo,
-}
-
-impl WorkerInfoView {
-    pub fn namespace(&self) -> &str {
-        &self.raw.namespace
-    }
-    pub fn scheduler_url(&self) -> &str {
-        &self.raw.scheduler_url
-    }
-    pub fn tls(&self) -> Option<bool> {
-        self.raw.tls
-    }
-    pub fn raw(&self) -> &WorkerInfo {
-        &self.raw
-    }
-    pub fn into_raw(self) -> WorkerInfo {
-        self.raw
-    }
-}
-
-impl From<WorkerInfo> for WorkerInfoView {
-    fn from(raw: WorkerInfo) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<WorkerInfoView> for WorkerInfo {
-    fn from(value: WorkerInfoView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct ListWorkflowEventResponseView {
-    raw: ListWorkflowEventResponse,
-}
-
-impl ListWorkflowEventResponseView {
-    pub fn raw(&self) -> &ListWorkflowEventResponse {
-        &self.raw
-    }
-    pub fn into_raw(self) -> ListWorkflowEventResponse {
-        self.raw
-    }
-}
-
-impl From<ListWorkflowEventResponse> for ListWorkflowEventResponseView {
-    fn from(raw: ListWorkflowEventResponse) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<ListWorkflowEventResponseView> for ListWorkflowEventResponse {
-    fn from(value: ListWorkflowEventResponseView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct WorkflowExecutionTraceEventsResponseView {
-    raw: WorkflowExecutionTraceEventsResponse,
-}
-
-impl WorkflowExecutionTraceEventsResponseView {
-    pub fn execution_id(&self) -> &str {
-        &self.raw.execution_id
-    }
-    pub fn root_execution_id(&self) -> &str {
-        &self.raw.root_execution_id
-    }
-    pub fn workflow_name(&self) -> &str {
-        &self.raw.workflow_name
-    }
-    pub fn raw(&self) -> &WorkflowExecutionTraceEventsResponse {
-        &self.raw
-    }
-    pub fn into_raw(self) -> WorkflowExecutionTraceEventsResponse {
-        self.raw
-    }
-}
-
-impl From<WorkflowExecutionTraceEventsResponse> for WorkflowExecutionTraceEventsResponseView {
-    fn from(raw: WorkflowExecutionTraceEventsResponse) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<WorkflowExecutionTraceEventsResponseView> for WorkflowExecutionTraceEventsResponse {
-    fn from(value: WorkflowExecutionTraceEventsResponseView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct WorkflowExecutionTraceOTelResponseView {
-    raw: WorkflowExecutionTraceOTelResponse,
-}
-
-impl WorkflowExecutionTraceOTelResponseView {
-    pub fn data_source(&self) -> &str {
-        &self.raw.data_source
-    }
-    pub fn execution_id(&self) -> &str {
-        &self.raw.execution_id
-    }
-    pub fn root_execution_id(&self) -> &str {
-        &self.raw.root_execution_id
-    }
-    pub fn workflow_name(&self) -> &str {
-        &self.raw.workflow_name
-    }
-    pub fn raw(&self) -> &WorkflowExecutionTraceOTelResponse {
-        &self.raw
-    }
-    pub fn into_raw(self) -> WorkflowExecutionTraceOTelResponse {
-        self.raw
-    }
-}
-
-impl From<WorkflowExecutionTraceOTelResponse> for WorkflowExecutionTraceOTelResponseView {
-    fn from(raw: WorkflowExecutionTraceOTelResponse) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<WorkflowExecutionTraceOTelResponseView> for WorkflowExecutionTraceOTelResponse {
-    fn from(value: WorkflowExecutionTraceOTelResponseView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct WorkflowExecutionTraceSummaryResponseView {
-    raw: WorkflowExecutionTraceSummaryResponse,
-}
-
-impl WorkflowExecutionTraceSummaryResponseView {
-    pub fn execution_id(&self) -> &str {
-        &self.raw.execution_id
-    }
-    pub fn root_execution_id(&self) -> &str {
-        &self.raw.root_execution_id
-    }
-    pub fn workflow_name(&self) -> &str {
-        &self.raw.workflow_name
-    }
-    pub fn raw(&self) -> &WorkflowExecutionTraceSummaryResponse {
-        &self.raw
-    }
-    pub fn into_raw(self) -> WorkflowExecutionTraceSummaryResponse {
-        self.raw
-    }
-}
-
-impl From<WorkflowExecutionTraceSummaryResponse> for WorkflowExecutionTraceSummaryResponseView {
-    fn from(raw: WorkflowExecutionTraceSummaryResponse) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<WorkflowExecutionTraceSummaryResponseView> for WorkflowExecutionTraceSummaryResponse {
-    fn from(value: WorkflowExecutionTraceSummaryResponseView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct WorkflowMetricsView {
-    raw: WorkflowMetrics,
-}
-
-impl WorkflowMetricsView {
-    pub fn raw(&self) -> &WorkflowMetrics {
-        &self.raw
-    }
-    pub fn into_raw(self) -> WorkflowMetrics {
-        self.raw
-    }
-}
-
-impl From<WorkflowMetrics> for WorkflowMetricsView {
-    fn from(raw: WorkflowMetrics) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<WorkflowMetricsView> for WorkflowMetrics {
-    fn from(value: WorkflowMetricsView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct WorkflowRegistrationGetResponseView {
-    raw: WorkflowRegistrationGetResponse,
-}
-
-impl WorkflowRegistrationGetResponseView {
-    pub fn raw(&self) -> &WorkflowRegistrationGetResponse {
-        &self.raw
-    }
-    pub fn into_raw(self) -> WorkflowRegistrationGetResponse {
-        self.raw
-    }
-}
-
-impl From<WorkflowRegistrationGetResponse> for WorkflowRegistrationGetResponseView {
-    fn from(raw: WorkflowRegistrationGetResponse) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<WorkflowRegistrationGetResponseView> for WorkflowRegistrationGetResponse {
-    fn from(value: WorkflowRegistrationGetResponseView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct WorkflowRegistrationListResponseView {
-    raw: WorkflowRegistrationListResponse,
-}
-
-impl WorkflowRegistrationListResponseView {
-    pub fn raw(&self) -> &WorkflowRegistrationListResponse {
-        &self.raw
-    }
-    pub fn into_raw(self) -> WorkflowRegistrationListResponse {
-        self.raw
-    }
-}
-
-impl From<WorkflowRegistrationListResponse> for WorkflowRegistrationListResponseView {
-    fn from(raw: WorkflowRegistrationListResponse) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<WorkflowRegistrationListResponseView> for WorkflowRegistrationListResponse {
-    fn from(value: WorkflowRegistrationListResponseView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct WorkflowGetResponseView {
-    raw: WorkflowGetResponse,
-}
-
-impl WorkflowGetResponseView {
-    pub fn raw(&self) -> &WorkflowGetResponse {
-        &self.raw
-    }
-    pub fn into_raw(self) -> WorkflowGetResponse {
-        self.raw
-    }
-}
-
-impl From<WorkflowGetResponse> for WorkflowGetResponseView {
-    fn from(raw: WorkflowGetResponse) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<WorkflowGetResponseView> for WorkflowGetResponse {
-    fn from(value: WorkflowGetResponseView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct BatchJobOutView {
-    raw: BatchJobOut,
-}
-
-impl BatchJobOutView {
-    pub fn completed_requests(&self) -> i64 {
-        self.raw.completed_requests
-    }
-    pub fn created_at(&self) -> i64 {
-        self.raw.created_at
-    }
-    pub fn endpoint(&self) -> &str {
-        &self.raw.endpoint
-    }
-    pub fn failed_requests(&self) -> i64 {
-        self.raw.failed_requests
-    }
-    pub fn id(&self) -> &str {
-        &self.raw.id
-    }
-    pub fn succeeded_requests(&self) -> i64 {
-        self.raw.succeeded_requests
-    }
-    pub fn total_requests(&self) -> i64 {
-        self.raw.total_requests
-    }
-    pub fn raw(&self) -> &BatchJobOut {
-        &self.raw
-    }
-    pub fn into_raw(self) -> BatchJobOut {
-        self.raw
-    }
-}
-
-impl From<BatchJobOut> for BatchJobOutView {
-    fn from(raw: BatchJobOut) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<BatchJobOutView> for BatchJobOut {
-    fn from(value: BatchJobOutView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[non_exhaustive]
-pub enum ApiEndpointValue {
-    V1ChatCompletions,
-    V1Embeddings,
-    V1FimCompletions,
-    V1Moderations,
-    V1ChatModerations,
-    V1Ocr,
-    V1Classifications,
-    V1ChatClassifications,
-    V1Conversations,
-    V1AudioTranscriptions,
-}
-
-impl From<ApiEndpointValue> for ApiEndpoint {
-    fn from(value: ApiEndpointValue) -> Self {
-        match value {
-            ApiEndpointValue::V1ChatCompletions => Self::V1ChatCompletions,
-            ApiEndpointValue::V1Embeddings => Self::V1Embeddings,
-            ApiEndpointValue::V1FimCompletions => Self::V1FimCompletions,
-            ApiEndpointValue::V1Moderations => Self::V1Moderations,
-            ApiEndpointValue::V1ChatModerations => Self::V1ChatModerations,
-            ApiEndpointValue::V1Ocr => Self::V1Ocr,
-            ApiEndpointValue::V1Classifications => Self::V1Classifications,
-            ApiEndpointValue::V1ChatClassifications => Self::V1ChatClassifications,
-            ApiEndpointValue::V1Conversations => Self::V1Conversations,
-            ApiEndpointValue::V1AudioTranscriptions => Self::V1AudioTranscriptions,
-        }
-    }
-}
-
-impl From<ApiEndpoint> for ApiEndpointValue {
-    fn from(value: ApiEndpoint) -> Self {
-        match value {
-            ApiEndpoint::V1ChatCompletions => Self::V1ChatCompletions,
-            ApiEndpoint::V1Embeddings => Self::V1Embeddings,
-            ApiEndpoint::V1FimCompletions => Self::V1FimCompletions,
-            ApiEndpoint::V1Moderations => Self::V1Moderations,
-            ApiEndpoint::V1ChatModerations => Self::V1ChatModerations,
-            ApiEndpoint::V1Ocr => Self::V1Ocr,
-            ApiEndpoint::V1Classifications => Self::V1Classifications,
-            ApiEndpoint::V1ChatClassifications => Self::V1ChatClassifications,
-            ApiEndpoint::V1Conversations => Self::V1Conversations,
-            ApiEndpoint::V1AudioTranscriptions => Self::V1AudioTranscriptions,
-        }
-    }
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct BatchJobInMetadataMap {
-    values: std::collections::BTreeMap<String, String>,
-}
-
-impl BatchJobInMetadataMap {
-    pub fn new(values: std::collections::BTreeMap<String, String>) -> Self {
-        Self { values }
-    }
-    pub fn as_map(&self) -> &std::collections::BTreeMap<String, String> {
-        &self.values
-    }
-    pub fn into_map(self) -> std::collections::BTreeMap<String, String> {
-        self.values
-    }
-}
-
-impl From<std::collections::BTreeMap<String, String>> for BatchJobInMetadataMap {
-    fn from(values: std::collections::BTreeMap<String, String>) -> Self {
-        Self { values }
-    }
-}
-
-impl From<BatchJobInMetadata> for BatchJobInMetadataMap {
-    fn from(value: BatchJobInMetadata) -> Self {
-        Self {
-            values: value.additional_properties,
-        }
-    }
-}
-
-impl From<BatchJobInMetadataMap> for BatchJobInMetadata {
-    fn from(value: BatchJobInMetadataMap) -> Self {
-        Self {
-            additional_properties: value.values,
-        }
-    }
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct BatchRequestBodyMap {
-    values: std::collections::BTreeMap<String, serde_json::Value>,
-}
-
-impl BatchRequestBodyMap {
-    pub fn new(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
-        Self { values }
-    }
-    pub fn as_map(&self) -> &std::collections::BTreeMap<String, serde_json::Value> {
-        &self.values
-    }
-    pub fn into_map(self) -> std::collections::BTreeMap<String, serde_json::Value> {
-        self.values
-    }
-}
-
-impl From<std::collections::BTreeMap<String, serde_json::Value>> for BatchRequestBodyMap {
-    fn from(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
-        Self { values }
-    }
-}
-
-impl From<BatchRequestBody> for BatchRequestBodyMap {
-    fn from(value: BatchRequestBody) -> Self {
-        Self {
-            values: value.additional_properties,
-        }
-    }
-}
-
-impl From<BatchRequestBodyMap> for BatchRequestBody {
-    fn from(value: BatchRequestBodyMap) -> Self {
-        Self {
-            additional_properties: value.values,
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct BatchRequestParams {
-    raw: BatchRequest,
-}
-
-impl BatchRequestParams {
-    pub fn new(body: impl Into<BatchRequestBodyMap>) -> Self {
-        Self {
-            raw: BatchRequest {
-                body: Into::<BatchRequestBodyMap>::into(body).into(),
-                custom_id: None,
-            },
-        }
-    }
-    #[must_use]
-    pub fn custom_id(mut self, custom_id: impl Into<String>) -> Self {
-        self.raw.custom_id = Some(Some(custom_id.into()));
-        self
-    }
-
-    #[must_use]
-    pub fn custom_id_null(mut self) -> Self {
-        self.raw.custom_id = Some(None);
-        self
-    }
-    pub fn from_raw(raw: BatchRequest) -> Self {
-        Self { raw }
-    }
-    pub fn as_raw(&self) -> &BatchRequest {
-        &self.raw
-    }
-    pub fn into_raw(self) -> BatchRequest {
-        self.raw
-    }
-}
-
-impl From<BatchRequest> for BatchRequestParams {
-    fn from(raw: BatchRequest) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<BatchRequestParams> for BatchRequest {
-    fn from(value: BatchRequestParams) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct BatchJobInParams {
-    raw: BatchJobIn,
-}
-
-impl BatchJobInParams {
-    pub fn new(endpoint: impl Into<ApiEndpointValue>) -> Self {
-        Self {
-            raw: BatchJobIn {
+            raw: CreateBatchJobRequest {
                 agent_id: None,
-                endpoint: Into::<ApiEndpointValue>::into(endpoint).into(),
+                endpoint,
                 input_files: None,
                 metadata: None,
                 model: None,
@@ -5034,8 +3470,8 @@ impl BatchJobInParams {
     }
 
     #[must_use]
-    pub fn metadata(mut self, metadata: impl Into<BatchJobInMetadataMap>) -> Self {
-        self.raw.metadata = Some(Some(Into::<BatchJobInMetadataMap>::into(metadata).into()));
+    pub fn metadata(mut self, metadata: CreateBatchJobRequestMetadata) -> Self {
+        self.raw.metadata = Some(Some(metadata));
         self
     }
 
@@ -5058,8 +3494,8 @@ impl BatchJobInParams {
     }
 
     #[must_use]
-    pub fn requests(mut self, requests: impl IntoIterator<Item = BatchRequestParams>) -> Self {
-        self.raw.requests = Some(Some(requests.into_iter().map(Into::into).collect()));
+    pub fn requests(mut self, requests: Vec<BatchRequest>) -> Self {
+        self.raw.requests = Some(Some(requests));
         self
     }
 
@@ -5074,375 +3510,2372 @@ impl BatchJobInParams {
         self.raw.timeout_hours = Some(timeout_hours);
         self
     }
-    pub fn from_raw(raw: BatchJobIn) -> Self {
+    pub fn from_raw(raw: CreateBatchJobRequest) -> Self {
         Self { raw }
     }
-    pub fn as_raw(&self) -> &BatchJobIn {
+    pub fn as_raw(&self) -> &CreateBatchJobRequest {
         &self.raw
     }
-    pub fn into_raw(self) -> BatchJobIn {
+    pub fn into_raw(self) -> CreateBatchJobRequest {
         self.raw
     }
 }
 
-impl From<BatchJobIn> for BatchJobInParams {
-    fn from(raw: BatchJobIn) -> Self {
+impl From<CreateBatchJobRequest> for CreateBatchJobsRequest {
+    fn from(raw: CreateBatchJobRequest) -> Self {
         Self { raw }
     }
 }
 
-impl From<BatchJobInParams> for BatchJobIn {
-    fn from(value: BatchJobInParams) -> Self {
+impl From<CreateBatchJobsRequest> for CreateBatchJobRequest {
+    fn from(value: CreateBatchJobsRequest) -> Self {
         value.into_raw()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct BatchJobsOutView {
-    raw: BatchJobsOut,
+pub struct CreateBatchJobsResponse {
+    raw: BatchJob,
 }
 
-impl BatchJobsOutView {
-    pub fn total(&self) -> i64 {
-        self.raw.total
-    }
-    pub fn raw(&self) -> &BatchJobsOut {
+impl CreateBatchJobsResponse {
+    pub fn raw(&self) -> &BatchJob {
         &self.raw
     }
-    pub fn into_raw(self) -> BatchJobsOut {
+    pub fn into_raw(self) -> BatchJob {
         self.raw
     }
 }
 
-impl From<BatchJobsOut> for BatchJobsOutView {
-    fn from(raw: BatchJobsOut) -> Self {
+impl From<BatchJob> for CreateBatchJobsResponse {
+    fn from(raw: BatchJob) -> Self {
         Self { raw }
     }
 }
 
-impl From<BatchJobsOutView> for BatchJobsOut {
-    fn from(value: BatchJobsOutView) -> Self {
+impl From<CreateBatchJobsResponse> for BatchJob {
+    fn from(value: CreateBatchJobsResponse) -> Self {
         value.into_raw()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct JobsOutView {
-    raw: JobsOut,
+pub struct CreateBetaAgentsRequest {
+    raw: CreateAgentRequest,
 }
 
-impl JobsOutView {
-    pub fn total(&self) -> i64 {
-        self.raw.total
-    }
-    pub fn raw(&self) -> &JobsOut {
-        &self.raw
-    }
-    pub fn into_raw(self) -> JobsOut {
-        self.raw
-    }
-}
-
-impl From<JobsOut> for JobsOutView {
-    fn from(raw: JobsOut) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<JobsOutView> for JobsOut {
-    fn from(value: JobsOutView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct JudgeOutputView {
-    raw: JudgeOutput,
-}
-
-impl JudgeOutputView {
-    pub fn analysis(&self) -> &str {
-        &self.raw.analysis
-    }
-    pub fn raw(&self) -> &JudgeOutput {
-        &self.raw
-    }
-    pub fn into_raw(self) -> JudgeOutput {
-        self.raw
-    }
-}
-
-impl From<JudgeOutput> for JudgeOutputView {
-    fn from(raw: JudgeOutput) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<JudgeOutputView> for JudgeOutput {
-    fn from(value: JudgeOutputView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct PostChatCompletionEventJudgingInSchemaParams {
-    raw: PostChatCompletionEventJudgingInSchema,
-}
-
-impl PostChatCompletionEventJudgingInSchemaParams {
-    pub fn new(judge_definition: impl Into<PostJudgeInSchemaParams>) -> Self {
+impl CreateBetaAgentsRequest {
+    pub fn new(model: impl Into<String>, name: impl Into<String>) -> Self {
         Self {
-            raw: PostChatCompletionEventJudgingInSchema {
-                judge_definition: Into::<PostJudgeInSchemaParams>::into(judge_definition).into(),
-            },
-        }
-    }
-    pub fn from_raw(raw: PostChatCompletionEventJudgingInSchema) -> Self {
-        Self { raw }
-    }
-    pub fn as_raw(&self) -> &PostChatCompletionEventJudgingInSchema {
-        &self.raw
-    }
-    pub fn into_raw(self) -> PostChatCompletionEventJudgingInSchema {
-        self.raw
-    }
-}
-
-impl From<PostChatCompletionEventJudgingInSchema> for PostChatCompletionEventJudgingInSchemaParams {
-    fn from(raw: PostChatCompletionEventJudgingInSchema) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<PostChatCompletionEventJudgingInSchemaParams> for PostChatCompletionEventJudgingInSchema {
-    fn from(value: PostChatCompletionEventJudgingInSchemaParams) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct JudgeConversationRequestMessagesItemMap {
-    values: std::collections::BTreeMap<String, serde_json::Value>,
-}
-
-impl JudgeConversationRequestMessagesItemMap {
-    pub fn new(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
-        Self { values }
-    }
-    pub fn as_map(&self) -> &std::collections::BTreeMap<String, serde_json::Value> {
-        &self.values
-    }
-    pub fn into_map(self) -> std::collections::BTreeMap<String, serde_json::Value> {
-        self.values
-    }
-}
-
-impl From<std::collections::BTreeMap<String, serde_json::Value>>
-    for JudgeConversationRequestMessagesItemMap
-{
-    fn from(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
-        Self { values }
-    }
-}
-
-impl From<JudgeConversationRequestMessagesItem> for JudgeConversationRequestMessagesItemMap {
-    fn from(value: JudgeConversationRequestMessagesItem) -> Self {
-        Self {
-            values: value.additional_properties,
-        }
-    }
-}
-
-impl From<JudgeConversationRequestMessagesItemMap> for JudgeConversationRequestMessagesItem {
-    fn from(value: JudgeConversationRequestMessagesItemMap) -> Self {
-        Self {
-            additional_properties: value.values,
-        }
-    }
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct JudgeConversationRequestPropertiesMap {
-    values: std::collections::BTreeMap<String, serde_json::Value>,
-}
-
-impl JudgeConversationRequestPropertiesMap {
-    pub fn new(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
-        Self { values }
-    }
-    pub fn as_map(&self) -> &std::collections::BTreeMap<String, serde_json::Value> {
-        &self.values
-    }
-    pub fn into_map(self) -> std::collections::BTreeMap<String, serde_json::Value> {
-        self.values
-    }
-}
-
-impl From<std::collections::BTreeMap<String, serde_json::Value>>
-    for JudgeConversationRequestPropertiesMap
-{
-    fn from(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
-        Self { values }
-    }
-}
-
-impl From<JudgeConversationRequestProperties> for JudgeConversationRequestPropertiesMap {
-    fn from(value: JudgeConversationRequestProperties) -> Self {
-        Self {
-            values: value.additional_properties,
-        }
-    }
-}
-
-impl From<JudgeConversationRequestPropertiesMap> for JudgeConversationRequestProperties {
-    fn from(value: JudgeConversationRequestPropertiesMap) -> Self {
-        Self {
-            additional_properties: value.values,
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct JudgeConversationRequestParams {
-    raw: JudgeConversationRequest,
-}
-
-impl JudgeConversationRequestParams {
-    pub fn new(
-        messages: impl IntoIterator<Item = JudgeConversationRequestMessagesItemMap>,
-    ) -> Self {
-        Self {
-            raw: JudgeConversationRequest {
-                messages: messages.into_iter().map(Into::into).collect(),
-                properties: None,
+            raw: CreateAgentRequest {
+                completion_args: None,
+                description: None,
+                guardrails: None,
+                handoffs: None,
+                instructions: None,
+                metadata: None,
+                model: model.into(),
+                name: name.into(),
+                tools: None,
+                version_message: None,
             },
         }
     }
     #[must_use]
-    pub fn properties(
+    pub fn completion_args(
         mut self,
-        properties: impl Into<JudgeConversationRequestPropertiesMap>,
+        completion_args: impl Into<CreateBetaAgentsRequestCompletionArgs>,
     ) -> Self {
-        self.raw.properties = Some(Some(
-            Into::<JudgeConversationRequestPropertiesMap>::into(properties).into(),
+        self.raw.completion_args =
+            Some(Into::<CreateBetaAgentsRequestCompletionArgs>::into(completion_args).into());
+        self
+    }
+
+    #[must_use]
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.raw.description = Some(Some(description.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn description_null(mut self) -> Self {
+        self.raw.description = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn guardrails(mut self, guardrails: Vec<GuardrailConfig>) -> Self {
+        self.raw.guardrails = Some(Some(guardrails));
+        self
+    }
+
+    #[must_use]
+    pub fn guardrails_null(mut self) -> Self {
+        self.raw.guardrails = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn handoffs(mut self, handoffs: Vec<String>) -> Self {
+        self.raw.handoffs = Some(Some(handoffs));
+        self
+    }
+
+    #[must_use]
+    pub fn handoffs_null(mut self) -> Self {
+        self.raw.handoffs = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn instructions(mut self, instructions: impl Into<String>) -> Self {
+        self.raw.instructions = Some(Some(instructions.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn instructions_null(mut self) -> Self {
+        self.raw.instructions = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn metadata(mut self, metadata: MetadataDict) -> Self {
+        self.raw.metadata = Some(Some(metadata));
+        self
+    }
+
+    #[must_use]
+    pub fn metadata_null(mut self) -> Self {
+        self.raw.metadata = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn tools(mut self, tools: impl IntoIterator<Item = CreateBetaAgentsRequestTools>) -> Self {
+        self.raw.tools = Some(tools.into_iter().map(Into::into).collect());
+        self
+    }
+
+    #[must_use]
+    pub fn version_message(mut self, version_message: impl Into<String>) -> Self {
+        self.raw.version_message = Some(Some(version_message.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn version_message_null(mut self) -> Self {
+        self.raw.version_message = Some(None);
+        self
+    }
+    pub fn from_raw(raw: CreateAgentRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &CreateAgentRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CreateAgentRequest {
+        self.raw
+    }
+}
+
+impl From<CreateAgentRequest> for CreateBetaAgentsRequest {
+    fn from(raw: CreateAgentRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateBetaAgentsRequest> for CreateAgentRequest {
+    fn from(value: CreateBetaAgentsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateBetaAgentsRequestCompletionArgs {
+    raw: CompletionArgs,
+}
+
+impl CreateBetaAgentsRequestCompletionArgs {
+    pub fn new() -> Self {
+        Self {
+            raw: CompletionArgs {
+                frequency_penalty: None,
+                max_tokens: None,
+                prediction: None,
+                presence_penalty: None,
+                random_seed: None,
+                reasoning_effort: None,
+                response_format: None,
+                stop: None,
+                temperature: None,
+                tool_choice: None,
+                top_p: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn frequency_penalty(mut self, frequency_penalty: f64) -> Self {
+        self.raw.frequency_penalty = Some(Some(frequency_penalty));
+        self
+    }
+
+    #[must_use]
+    pub fn frequency_penalty_null(mut self) -> Self {
+        self.raw.frequency_penalty = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn max_tokens(mut self, max_tokens: i64) -> Self {
+        self.raw.max_tokens = Some(Some(max_tokens));
+        self
+    }
+
+    #[must_use]
+    pub fn max_tokens_null(mut self) -> Self {
+        self.raw.max_tokens = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn prediction(
+        mut self,
+        prediction: impl Into<CreateBetaAgentsRequestCompletionArgsPrediction>,
+    ) -> Self {
+        self.raw.prediction = Some(Some(
+            Into::<CreateBetaAgentsRequestCompletionArgsPrediction>::into(prediction).into(),
         ));
         self
     }
 
     #[must_use]
-    pub fn properties_null(mut self) -> Self {
-        self.raw.properties = Some(None);
+    pub fn prediction_null(mut self) -> Self {
+        self.raw.prediction = Some(None);
         self
     }
-    pub fn from_raw(raw: JudgeConversationRequest) -> Self {
+
+    #[must_use]
+    pub fn presence_penalty(mut self, presence_penalty: f64) -> Self {
+        self.raw.presence_penalty = Some(Some(presence_penalty));
+        self
+    }
+
+    #[must_use]
+    pub fn presence_penalty_null(mut self) -> Self {
+        self.raw.presence_penalty = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn random_seed(mut self, random_seed: i64) -> Self {
+        self.raw.random_seed = Some(Some(random_seed));
+        self
+    }
+
+    #[must_use]
+    pub fn random_seed_null(mut self) -> Self {
+        self.raw.random_seed = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn reasoning_effort(mut self, reasoning_effort: ReasoningEffort) -> Self {
+        self.raw.reasoning_effort = Some(Some(reasoning_effort));
+        self
+    }
+
+    #[must_use]
+    pub fn reasoning_effort_null(mut self) -> Self {
+        self.raw.reasoning_effort = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn response_format(
+        mut self,
+        response_format: impl Into<CreateBetaAgentsRequestCompletionArgsResponseFormat>,
+    ) -> Self {
+        self.raw.response_format = Some(Some(
+            Into::<CreateBetaAgentsRequestCompletionArgsResponseFormat>::into(response_format)
+                .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn response_format_null(mut self) -> Self {
+        self.raw.response_format = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn stop(mut self, stop: CompletionArgsStop) -> Self {
+        self.raw.stop = Some(Some(stop));
+        self
+    }
+
+    #[must_use]
+    pub fn stop_null(mut self) -> Self {
+        self.raw.stop = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn temperature(mut self, temperature: f64) -> Self {
+        self.raw.temperature = Some(Some(temperature));
+        self
+    }
+
+    #[must_use]
+    pub fn temperature_null(mut self) -> Self {
+        self.raw.temperature = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn tool_choice(mut self, tool_choice: ToolChoiceEnum) -> Self {
+        self.raw.tool_choice = Some(tool_choice);
+        self
+    }
+
+    #[must_use]
+    pub fn top_p(mut self, top_p: f64) -> Self {
+        self.raw.top_p = Some(Some(top_p));
+        self
+    }
+
+    #[must_use]
+    pub fn top_p_null(mut self) -> Self {
+        self.raw.top_p = Some(None);
+        self
+    }
+    pub fn from_raw(raw: CompletionArgs) -> Self {
         Self { raw }
     }
-    pub fn as_raw(&self) -> &JudgeConversationRequest {
+    pub fn as_raw(&self) -> &CompletionArgs {
         &self.raw
     }
-    pub fn into_raw(self) -> JudgeConversationRequest {
+    pub fn into_raw(self) -> CompletionArgs {
         self.raw
     }
 }
 
-impl From<JudgeConversationRequest> for JudgeConversationRequestParams {
-    fn from(raw: JudgeConversationRequest) -> Self {
+impl From<CompletionArgs> for CreateBetaAgentsRequestCompletionArgs {
+    fn from(raw: CompletionArgs) -> Self {
         Self { raw }
     }
 }
 
-impl From<JudgeConversationRequestParams> for JudgeConversationRequest {
-    fn from(value: JudgeConversationRequestParams) -> Self {
+impl From<CreateBetaAgentsRequestCompletionArgs> for CompletionArgs {
+    fn from(value: CreateBetaAgentsRequestCompletionArgs) -> Self {
         value.into_raw()
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct PostDatasetRecordJudgingInSchemaParams {
-    raw: PostDatasetRecordJudgingInSchema,
+impl Default for CreateBetaAgentsRequestCompletionArgs {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
-impl PostDatasetRecordJudgingInSchemaParams {
-    pub fn new(judge_definition: impl Into<PostJudgeInSchemaParams>) -> Self {
+#[derive(Debug, Clone)]
+pub struct CreateBetaAgentsRequestCompletionArgsPrediction {
+    raw: Prediction,
+}
+
+impl CreateBetaAgentsRequestCompletionArgsPrediction {
+    pub fn new() -> Self {
         Self {
-            raw: PostDatasetRecordJudgingInSchema {
-                judge_definition: Into::<PostJudgeInSchemaParams>::into(judge_definition).into(),
+            raw: Prediction {
+                content: None,
+                r#type: None,
             },
         }
     }
-    pub fn from_raw(raw: PostDatasetRecordJudgingInSchema) -> Self {
+    #[must_use]
+    pub fn content(mut self, content: impl Into<String>) -> Self {
+        self.raw.content = Some(content.into());
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: PredictionType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: Prediction) -> Self {
         Self { raw }
     }
-    pub fn as_raw(&self) -> &PostDatasetRecordJudgingInSchema {
+    pub fn as_raw(&self) -> &Prediction {
         &self.raw
     }
-    pub fn into_raw(self) -> PostDatasetRecordJudgingInSchema {
+    pub fn into_raw(self) -> Prediction {
         self.raw
     }
 }
 
-impl From<PostDatasetRecordJudgingInSchema> for PostDatasetRecordJudgingInSchemaParams {
-    fn from(raw: PostDatasetRecordJudgingInSchema) -> Self {
+impl From<Prediction> for CreateBetaAgentsRequestCompletionArgsPrediction {
+    fn from(raw: Prediction) -> Self {
         Self { raw }
     }
 }
 
-impl From<PostDatasetRecordJudgingInSchemaParams> for PostDatasetRecordJudgingInSchema {
-    fn from(value: PostDatasetRecordJudgingInSchemaParams) -> Self {
+impl From<CreateBetaAgentsRequestCompletionArgsPrediction> for Prediction {
+    fn from(value: CreateBetaAgentsRequestCompletionArgsPrediction) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for CreateBetaAgentsRequestCompletionArgsPrediction {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateBetaAgentsRequestCompletionArgsResponseFormat {
+    raw: ResponseFormat,
+}
+
+impl CreateBetaAgentsRequestCompletionArgsResponseFormat {
+    pub fn new() -> Self {
+        Self {
+            raw: ResponseFormat {
+                json_schema: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn json_schema(
+        mut self,
+        json_schema: impl Into<CreateBetaAgentsRequestCompletionArgsResponseFormatJsonSchema>,
+    ) -> Self {
+        self.raw.json_schema = Some(Some(
+            Into::<CreateBetaAgentsRequestCompletionArgsResponseFormatJsonSchema>::into(
+                json_schema,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn json_schema_null(mut self) -> Self {
+        self.raw.json_schema = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: ResponseFormats) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: ResponseFormat) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ResponseFormat {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ResponseFormat {
+        self.raw
+    }
+}
+
+impl From<ResponseFormat> for CreateBetaAgentsRequestCompletionArgsResponseFormat {
+    fn from(raw: ResponseFormat) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateBetaAgentsRequestCompletionArgsResponseFormat> for ResponseFormat {
+    fn from(value: CreateBetaAgentsRequestCompletionArgsResponseFormat) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for CreateBetaAgentsRequestCompletionArgsResponseFormat {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateBetaAgentsRequestCompletionArgsResponseFormatJsonSchema {
+    raw: JsonSchema,
+}
+
+impl CreateBetaAgentsRequestCompletionArgsResponseFormatJsonSchema {
+    pub fn new(name: impl Into<String>, schema: JsonSchemaSchema) -> Self {
+        Self {
+            raw: JsonSchema {
+                description: None,
+                name: name.into(),
+                schema,
+                strict: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.raw.description = Some(Some(description.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn description_null(mut self) -> Self {
+        self.raw.description = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn strict(mut self, strict: bool) -> Self {
+        self.raw.strict = Some(strict);
+        self
+    }
+    pub fn from_raw(raw: JsonSchema) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &JsonSchema {
+        &self.raw
+    }
+    pub fn into_raw(self) -> JsonSchema {
+        self.raw
+    }
+}
+
+impl From<JsonSchema> for CreateBetaAgentsRequestCompletionArgsResponseFormatJsonSchema {
+    fn from(raw: JsonSchema) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateBetaAgentsRequestCompletionArgsResponseFormatJsonSchema> for JsonSchema {
+    fn from(value: CreateBetaAgentsRequestCompletionArgsResponseFormatJsonSchema) -> Self {
         value.into_raw()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct LibraryOutView {
-    raw: LibraryOut,
+#[non_exhaustive]
+pub enum CreateBetaAgentsRequestTools {
+    CodeInterpreterTool(CreateBetaAgentsRequestToolsCodeInterpreterTool),
+    CustomConnector(CreateBetaAgentsRequestToolsCustomConnector),
+    DocumentLibraryTool(CreateBetaAgentsRequestToolsDocumentLibraryTool),
+    FunctionTool(CreateBetaAgentsRequestToolsFunctionTool),
+    ImageGenerationTool(CreateBetaAgentsRequestToolsImageGenerationTool),
+    WebSearchPremiumTool(CreateBetaAgentsRequestToolsWebSearchPremiumTool),
+    WebSearchTool(CreateBetaAgentsRequestToolsWebSearchTool),
 }
 
-impl LibraryOutView {
-    pub fn name(&self) -> &str {
-        &self.raw.name
+impl From<CreateBetaAgentsRequestToolsCodeInterpreterTool> for CreateBetaAgentsRequestTools {
+    fn from(value: CreateBetaAgentsRequestToolsCodeInterpreterTool) -> Self {
+        Self::CodeInterpreterTool(value)
     }
-    pub fn nb_documents(&self) -> i64 {
-        self.raw.nb_documents
+}
+
+impl From<CreateBetaAgentsRequestToolsCustomConnector> for CreateBetaAgentsRequestTools {
+    fn from(value: CreateBetaAgentsRequestToolsCustomConnector) -> Self {
+        Self::CustomConnector(value)
     }
-    pub fn owner_type(&self) -> &str {
-        &self.raw.owner_type
+}
+
+impl From<CreateBetaAgentsRequestToolsDocumentLibraryTool> for CreateBetaAgentsRequestTools {
+    fn from(value: CreateBetaAgentsRequestToolsDocumentLibraryTool) -> Self {
+        Self::DocumentLibraryTool(value)
     }
-    pub fn total_size(&self) -> i64 {
-        self.raw.total_size
+}
+
+impl From<CreateBetaAgentsRequestToolsFunctionTool> for CreateBetaAgentsRequestTools {
+    fn from(value: CreateBetaAgentsRequestToolsFunctionTool) -> Self {
+        Self::FunctionTool(value)
     }
-    pub fn raw(&self) -> &LibraryOut {
+}
+
+impl From<CreateBetaAgentsRequestToolsImageGenerationTool> for CreateBetaAgentsRequestTools {
+    fn from(value: CreateBetaAgentsRequestToolsImageGenerationTool) -> Self {
+        Self::ImageGenerationTool(value)
+    }
+}
+
+impl From<CreateBetaAgentsRequestToolsWebSearchPremiumTool> for CreateBetaAgentsRequestTools {
+    fn from(value: CreateBetaAgentsRequestToolsWebSearchPremiumTool) -> Self {
+        Self::WebSearchPremiumTool(value)
+    }
+}
+
+impl From<CreateBetaAgentsRequestToolsWebSearchTool> for CreateBetaAgentsRequestTools {
+    fn from(value: CreateBetaAgentsRequestToolsWebSearchTool) -> Self {
+        Self::WebSearchTool(value)
+    }
+}
+
+impl From<CreateBetaAgentsRequestTools> for CreateAgentRequestToolsItemUnion {
+    fn from(value: CreateBetaAgentsRequestTools) -> Self {
+        match value {
+            CreateBetaAgentsRequestTools::CodeInterpreterTool(value) => {
+                Self::CodeInterpreterTool(value.into())
+            }
+            CreateBetaAgentsRequestTools::CustomConnector(value) => {
+                Self::CustomConnector(value.into())
+            }
+            CreateBetaAgentsRequestTools::DocumentLibraryTool(value) => {
+                Self::DocumentLibraryTool(value.into())
+            }
+            CreateBetaAgentsRequestTools::FunctionTool(value) => Self::FunctionTool(value.into()),
+            CreateBetaAgentsRequestTools::ImageGenerationTool(value) => {
+                Self::ImageGenerationTool(value.into())
+            }
+            CreateBetaAgentsRequestTools::WebSearchPremiumTool(value) => {
+                Self::WebSearchPremiumTool(value.into())
+            }
+            CreateBetaAgentsRequestTools::WebSearchTool(value) => Self::WebSearchTool(value.into()),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateBetaAgentsRequestToolsCodeInterpreterTool {
+    raw: CodeInterpreterTool,
+}
+
+impl CreateBetaAgentsRequestToolsCodeInterpreterTool {
+    pub fn new() -> Self {
+        Self {
+            raw: CodeInterpreterTool {
+                tool_configuration: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn tool_configuration(
+        mut self,
+        tool_configuration: impl Into<CreateBetaAgentsRequestToolsCodeInterpreterToolToolConfiguration>,
+    ) -> Self {
+        self.raw.tool_configuration = Some(Some(
+            Into::<CreateBetaAgentsRequestToolsCodeInterpreterToolToolConfiguration>::into(
+                tool_configuration,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn tool_configuration_null(mut self) -> Self {
+        self.raw.tool_configuration = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: CodeInterpreterToolType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: CodeInterpreterTool) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &CodeInterpreterTool {
         &self.raw
     }
-    pub fn into_raw(self) -> LibraryOut {
+    pub fn into_raw(self) -> CodeInterpreterTool {
         self.raw
     }
 }
 
-impl From<LibraryOut> for LibraryOutView {
-    fn from(raw: LibraryOut) -> Self {
+impl From<CodeInterpreterTool> for CreateBetaAgentsRequestToolsCodeInterpreterTool {
+    fn from(raw: CodeInterpreterTool) -> Self {
         Self { raw }
     }
 }
 
-impl From<LibraryOutView> for LibraryOut {
-    fn from(value: LibraryOutView) -> Self {
+impl From<CreateBetaAgentsRequestToolsCodeInterpreterTool> for CodeInterpreterTool {
+    fn from(value: CreateBetaAgentsRequestToolsCodeInterpreterTool) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for CreateBetaAgentsRequestToolsCodeInterpreterTool {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateBetaAgentsRequestToolsCodeInterpreterToolToolConfiguration {
+    raw: ToolConfiguration,
+}
+
+impl CreateBetaAgentsRequestToolsCodeInterpreterToolToolConfiguration {
+    pub fn new() -> Self {
+        Self {
+            raw: ToolConfiguration {
+                exclude: None,
+                include: None,
+                requires_confirmation: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn exclude(mut self, exclude: Vec<String>) -> Self {
+        self.raw.exclude = Some(Some(exclude));
+        self
+    }
+
+    #[must_use]
+    pub fn exclude_null(mut self) -> Self {
+        self.raw.exclude = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn include(mut self, include: Vec<String>) -> Self {
+        self.raw.include = Some(Some(include));
+        self
+    }
+
+    #[must_use]
+    pub fn include_null(mut self) -> Self {
+        self.raw.include = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation(mut self, requires_confirmation: Vec<String>) -> Self {
+        self.raw.requires_confirmation = Some(Some(requires_confirmation));
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation_null(mut self) -> Self {
+        self.raw.requires_confirmation = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ToolConfiguration {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ToolConfiguration {
+        self.raw
+    }
+}
+
+impl From<ToolConfiguration> for CreateBetaAgentsRequestToolsCodeInterpreterToolToolConfiguration {
+    fn from(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateBetaAgentsRequestToolsCodeInterpreterToolToolConfiguration> for ToolConfiguration {
+    fn from(value: CreateBetaAgentsRequestToolsCodeInterpreterToolToolConfiguration) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for CreateBetaAgentsRequestToolsCodeInterpreterToolToolConfiguration {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateBetaAgentsRequestToolsCustomConnector {
+    raw: CustomConnector,
+}
+
+impl CreateBetaAgentsRequestToolsCustomConnector {
+    pub fn new(connector_id: impl Into<String>) -> Self {
+        Self {
+            raw: CustomConnector {
+                authorization: None,
+                connector_id: connector_id.into(),
+                tool_configuration: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn authorization(
+        mut self,
+        authorization: impl Into<CreateBetaAgentsRequestToolsCustomConnectorAuthorization>,
+    ) -> Self {
+        self.raw.authorization = Some(Some(
+            Into::<CreateBetaAgentsRequestToolsCustomConnectorAuthorization>::into(authorization)
+                .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn authorization_null(mut self) -> Self {
+        self.raw.authorization = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn tool_configuration(
+        mut self,
+        tool_configuration: impl Into<CreateBetaAgentsRequestToolsCustomConnectorToolConfiguration>,
+    ) -> Self {
+        self.raw.tool_configuration = Some(Some(
+            Into::<CreateBetaAgentsRequestToolsCustomConnectorToolConfiguration>::into(
+                tool_configuration,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn tool_configuration_null(mut self) -> Self {
+        self.raw.tool_configuration = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: CustomConnectorType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: CustomConnector) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &CustomConnector {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CustomConnector {
+        self.raw
+    }
+}
+
+impl From<CustomConnector> for CreateBetaAgentsRequestToolsCustomConnector {
+    fn from(raw: CustomConnector) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateBetaAgentsRequestToolsCustomConnector> for CustomConnector {
+    fn from(value: CreateBetaAgentsRequestToolsCustomConnector) -> Self {
         value.into_raw()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct LibraryInParams {
-    raw: LibraryIn,
+#[non_exhaustive]
+pub enum CreateBetaAgentsRequestToolsCustomConnectorAuthorization {
+    APIKeyAuth(CreateBetaAgentsRequestToolsCustomConnectorAuthorizationAPIKeyAuth),
+    OAuth2TokenAuth(CreateBetaAgentsRequestToolsCustomConnectorAuthorizationOAuth2TokenAuth),
 }
 
-impl LibraryInParams {
+impl From<CreateBetaAgentsRequestToolsCustomConnectorAuthorizationAPIKeyAuth>
+    for CreateBetaAgentsRequestToolsCustomConnectorAuthorization
+{
+    fn from(value: CreateBetaAgentsRequestToolsCustomConnectorAuthorizationAPIKeyAuth) -> Self {
+        Self::APIKeyAuth(value)
+    }
+}
+
+impl From<CreateBetaAgentsRequestToolsCustomConnectorAuthorizationOAuth2TokenAuth>
+    for CreateBetaAgentsRequestToolsCustomConnectorAuthorization
+{
+    fn from(
+        value: CreateBetaAgentsRequestToolsCustomConnectorAuthorizationOAuth2TokenAuth,
+    ) -> Self {
+        Self::OAuth2TokenAuth(value)
+    }
+}
+
+impl From<CreateBetaAgentsRequestToolsCustomConnectorAuthorization>
+    for CustomConnectorAuthorizationInline
+{
+    fn from(value: CreateBetaAgentsRequestToolsCustomConnectorAuthorization) -> Self {
+        match value {
+            CreateBetaAgentsRequestToolsCustomConnectorAuthorization::APIKeyAuth(value) => {
+                Self::APIKeyAuth(value.into())
+            }
+            CreateBetaAgentsRequestToolsCustomConnectorAuthorization::OAuth2TokenAuth(value) => {
+                Self::OAuth2TokenAuth(value.into())
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateBetaAgentsRequestToolsCustomConnectorAuthorizationAPIKeyAuth {
+    raw: APIKeyAuth,
+}
+
+impl CreateBetaAgentsRequestToolsCustomConnectorAuthorizationAPIKeyAuth {
+    pub fn new(value: impl Into<String>) -> Self {
+        Self {
+            raw: APIKeyAuth {
+                r#type: None,
+                value: value.into(),
+            },
+        }
+    }
+    #[must_use]
+    pub fn r#type(mut self, r#type: APIKeyAuthType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: APIKeyAuth) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &APIKeyAuth {
+        &self.raw
+    }
+    pub fn into_raw(self) -> APIKeyAuth {
+        self.raw
+    }
+}
+
+impl From<APIKeyAuth> for CreateBetaAgentsRequestToolsCustomConnectorAuthorizationAPIKeyAuth {
+    fn from(raw: APIKeyAuth) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateBetaAgentsRequestToolsCustomConnectorAuthorizationAPIKeyAuth> for APIKeyAuth {
+    fn from(value: CreateBetaAgentsRequestToolsCustomConnectorAuthorizationAPIKeyAuth) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateBetaAgentsRequestToolsCustomConnectorAuthorizationOAuth2TokenAuth {
+    raw: OAuth2TokenAuth,
+}
+
+impl CreateBetaAgentsRequestToolsCustomConnectorAuthorizationOAuth2TokenAuth {
+    pub fn new(value: impl Into<String>) -> Self {
+        Self {
+            raw: OAuth2TokenAuth {
+                r#type: None,
+                value: value.into(),
+            },
+        }
+    }
+    #[must_use]
+    pub fn r#type(mut self, r#type: OAuth2TokenAuthType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: OAuth2TokenAuth) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &OAuth2TokenAuth {
+        &self.raw
+    }
+    pub fn into_raw(self) -> OAuth2TokenAuth {
+        self.raw
+    }
+}
+
+impl From<OAuth2TokenAuth>
+    for CreateBetaAgentsRequestToolsCustomConnectorAuthorizationOAuth2TokenAuth
+{
+    fn from(raw: OAuth2TokenAuth) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateBetaAgentsRequestToolsCustomConnectorAuthorizationOAuth2TokenAuth>
+    for OAuth2TokenAuth
+{
+    fn from(
+        value: CreateBetaAgentsRequestToolsCustomConnectorAuthorizationOAuth2TokenAuth,
+    ) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateBetaAgentsRequestToolsCustomConnectorToolConfiguration {
+    raw: ToolConfiguration,
+}
+
+impl CreateBetaAgentsRequestToolsCustomConnectorToolConfiguration {
+    pub fn new() -> Self {
+        Self {
+            raw: ToolConfiguration {
+                exclude: None,
+                include: None,
+                requires_confirmation: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn exclude(mut self, exclude: Vec<String>) -> Self {
+        self.raw.exclude = Some(Some(exclude));
+        self
+    }
+
+    #[must_use]
+    pub fn exclude_null(mut self) -> Self {
+        self.raw.exclude = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn include(mut self, include: Vec<String>) -> Self {
+        self.raw.include = Some(Some(include));
+        self
+    }
+
+    #[must_use]
+    pub fn include_null(mut self) -> Self {
+        self.raw.include = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation(mut self, requires_confirmation: Vec<String>) -> Self {
+        self.raw.requires_confirmation = Some(Some(requires_confirmation));
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation_null(mut self) -> Self {
+        self.raw.requires_confirmation = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ToolConfiguration {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ToolConfiguration {
+        self.raw
+    }
+}
+
+impl From<ToolConfiguration> for CreateBetaAgentsRequestToolsCustomConnectorToolConfiguration {
+    fn from(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateBetaAgentsRequestToolsCustomConnectorToolConfiguration> for ToolConfiguration {
+    fn from(value: CreateBetaAgentsRequestToolsCustomConnectorToolConfiguration) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for CreateBetaAgentsRequestToolsCustomConnectorToolConfiguration {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateBetaAgentsRequestToolsDocumentLibraryTool {
+    raw: DocumentLibraryTool,
+}
+
+impl CreateBetaAgentsRequestToolsDocumentLibraryTool {
+    pub fn new(library_ids: Vec<String>) -> Self {
+        Self {
+            raw: DocumentLibraryTool {
+                library_ids,
+                tool_configuration: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn tool_configuration(
+        mut self,
+        tool_configuration: impl Into<CreateBetaAgentsRequestToolsDocumentLibraryToolToolConfiguration>,
+    ) -> Self {
+        self.raw.tool_configuration = Some(Some(
+            Into::<CreateBetaAgentsRequestToolsDocumentLibraryToolToolConfiguration>::into(
+                tool_configuration,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn tool_configuration_null(mut self) -> Self {
+        self.raw.tool_configuration = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: DocumentLibraryToolType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: DocumentLibraryTool) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &DocumentLibraryTool {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DocumentLibraryTool {
+        self.raw
+    }
+}
+
+impl From<DocumentLibraryTool> for CreateBetaAgentsRequestToolsDocumentLibraryTool {
+    fn from(raw: DocumentLibraryTool) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateBetaAgentsRequestToolsDocumentLibraryTool> for DocumentLibraryTool {
+    fn from(value: CreateBetaAgentsRequestToolsDocumentLibraryTool) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateBetaAgentsRequestToolsDocumentLibraryToolToolConfiguration {
+    raw: ToolConfiguration,
+}
+
+impl CreateBetaAgentsRequestToolsDocumentLibraryToolToolConfiguration {
+    pub fn new() -> Self {
+        Self {
+            raw: ToolConfiguration {
+                exclude: None,
+                include: None,
+                requires_confirmation: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn exclude(mut self, exclude: Vec<String>) -> Self {
+        self.raw.exclude = Some(Some(exclude));
+        self
+    }
+
+    #[must_use]
+    pub fn exclude_null(mut self) -> Self {
+        self.raw.exclude = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn include(mut self, include: Vec<String>) -> Self {
+        self.raw.include = Some(Some(include));
+        self
+    }
+
+    #[must_use]
+    pub fn include_null(mut self) -> Self {
+        self.raw.include = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation(mut self, requires_confirmation: Vec<String>) -> Self {
+        self.raw.requires_confirmation = Some(Some(requires_confirmation));
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation_null(mut self) -> Self {
+        self.raw.requires_confirmation = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ToolConfiguration {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ToolConfiguration {
+        self.raw
+    }
+}
+
+impl From<ToolConfiguration> for CreateBetaAgentsRequestToolsDocumentLibraryToolToolConfiguration {
+    fn from(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateBetaAgentsRequestToolsDocumentLibraryToolToolConfiguration> for ToolConfiguration {
+    fn from(value: CreateBetaAgentsRequestToolsDocumentLibraryToolToolConfiguration) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for CreateBetaAgentsRequestToolsDocumentLibraryToolToolConfiguration {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateBetaAgentsRequestToolsFunctionTool {
+    raw: FunctionTool,
+}
+
+impl CreateBetaAgentsRequestToolsFunctionTool {
+    pub fn new(function: impl Into<CreateBetaAgentsRequestToolsFunctionToolFunction>) -> Self {
+        Self {
+            raw: FunctionTool {
+                function: Into::<CreateBetaAgentsRequestToolsFunctionToolFunction>::into(function)
+                    .into(),
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn r#type(mut self, r#type: FunctionToolType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: FunctionTool) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &FunctionTool {
+        &self.raw
+    }
+    pub fn into_raw(self) -> FunctionTool {
+        self.raw
+    }
+}
+
+impl From<FunctionTool> for CreateBetaAgentsRequestToolsFunctionTool {
+    fn from(raw: FunctionTool) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateBetaAgentsRequestToolsFunctionTool> for FunctionTool {
+    fn from(value: CreateBetaAgentsRequestToolsFunctionTool) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateBetaAgentsRequestToolsFunctionToolFunction {
+    raw: Function,
+}
+
+impl CreateBetaAgentsRequestToolsFunctionToolFunction {
+    pub fn new(name: impl Into<String>, parameters: FunctionParameters) -> Self {
+        Self {
+            raw: Function {
+                description: None,
+                name: name.into(),
+                parameters,
+                strict: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.raw.description = Some(description.into());
+        self
+    }
+
+    #[must_use]
+    pub fn strict(mut self, strict: bool) -> Self {
+        self.raw.strict = Some(strict);
+        self
+    }
+    pub fn from_raw(raw: Function) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &Function {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Function {
+        self.raw
+    }
+}
+
+impl From<Function> for CreateBetaAgentsRequestToolsFunctionToolFunction {
+    fn from(raw: Function) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateBetaAgentsRequestToolsFunctionToolFunction> for Function {
+    fn from(value: CreateBetaAgentsRequestToolsFunctionToolFunction) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateBetaAgentsRequestToolsImageGenerationTool {
+    raw: ImageGenerationTool,
+}
+
+impl CreateBetaAgentsRequestToolsImageGenerationTool {
+    pub fn new() -> Self {
+        Self {
+            raw: ImageGenerationTool {
+                tool_configuration: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn tool_configuration(
+        mut self,
+        tool_configuration: impl Into<CreateBetaAgentsRequestToolsImageGenerationToolToolConfiguration>,
+    ) -> Self {
+        self.raw.tool_configuration = Some(Some(
+            Into::<CreateBetaAgentsRequestToolsImageGenerationToolToolConfiguration>::into(
+                tool_configuration,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn tool_configuration_null(mut self) -> Self {
+        self.raw.tool_configuration = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: ImageGenerationToolType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: ImageGenerationTool) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ImageGenerationTool {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ImageGenerationTool {
+        self.raw
+    }
+}
+
+impl From<ImageGenerationTool> for CreateBetaAgentsRequestToolsImageGenerationTool {
+    fn from(raw: ImageGenerationTool) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateBetaAgentsRequestToolsImageGenerationTool> for ImageGenerationTool {
+    fn from(value: CreateBetaAgentsRequestToolsImageGenerationTool) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for CreateBetaAgentsRequestToolsImageGenerationTool {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateBetaAgentsRequestToolsImageGenerationToolToolConfiguration {
+    raw: ToolConfiguration,
+}
+
+impl CreateBetaAgentsRequestToolsImageGenerationToolToolConfiguration {
+    pub fn new() -> Self {
+        Self {
+            raw: ToolConfiguration {
+                exclude: None,
+                include: None,
+                requires_confirmation: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn exclude(mut self, exclude: Vec<String>) -> Self {
+        self.raw.exclude = Some(Some(exclude));
+        self
+    }
+
+    #[must_use]
+    pub fn exclude_null(mut self) -> Self {
+        self.raw.exclude = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn include(mut self, include: Vec<String>) -> Self {
+        self.raw.include = Some(Some(include));
+        self
+    }
+
+    #[must_use]
+    pub fn include_null(mut self) -> Self {
+        self.raw.include = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation(mut self, requires_confirmation: Vec<String>) -> Self {
+        self.raw.requires_confirmation = Some(Some(requires_confirmation));
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation_null(mut self) -> Self {
+        self.raw.requires_confirmation = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ToolConfiguration {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ToolConfiguration {
+        self.raw
+    }
+}
+
+impl From<ToolConfiguration> for CreateBetaAgentsRequestToolsImageGenerationToolToolConfiguration {
+    fn from(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateBetaAgentsRequestToolsImageGenerationToolToolConfiguration> for ToolConfiguration {
+    fn from(value: CreateBetaAgentsRequestToolsImageGenerationToolToolConfiguration) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for CreateBetaAgentsRequestToolsImageGenerationToolToolConfiguration {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateBetaAgentsRequestToolsWebSearchPremiumTool {
+    raw: WebSearchPremiumTool,
+}
+
+impl CreateBetaAgentsRequestToolsWebSearchPremiumTool {
+    pub fn new() -> Self {
+        Self {
+            raw: WebSearchPremiumTool {
+                tool_configuration: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn tool_configuration(
+        mut self,
+        tool_configuration: impl Into<CreateBetaAgentsRequestToolsWebSearchPremiumToolToolConfiguration>,
+    ) -> Self {
+        self.raw.tool_configuration = Some(Some(
+            Into::<CreateBetaAgentsRequestToolsWebSearchPremiumToolToolConfiguration>::into(
+                tool_configuration,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn tool_configuration_null(mut self) -> Self {
+        self.raw.tool_configuration = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: WebSearchPremiumToolType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: WebSearchPremiumTool) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &WebSearchPremiumTool {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WebSearchPremiumTool {
+        self.raw
+    }
+}
+
+impl From<WebSearchPremiumTool> for CreateBetaAgentsRequestToolsWebSearchPremiumTool {
+    fn from(raw: WebSearchPremiumTool) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateBetaAgentsRequestToolsWebSearchPremiumTool> for WebSearchPremiumTool {
+    fn from(value: CreateBetaAgentsRequestToolsWebSearchPremiumTool) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for CreateBetaAgentsRequestToolsWebSearchPremiumTool {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateBetaAgentsRequestToolsWebSearchPremiumToolToolConfiguration {
+    raw: ToolConfiguration,
+}
+
+impl CreateBetaAgentsRequestToolsWebSearchPremiumToolToolConfiguration {
+    pub fn new() -> Self {
+        Self {
+            raw: ToolConfiguration {
+                exclude: None,
+                include: None,
+                requires_confirmation: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn exclude(mut self, exclude: Vec<String>) -> Self {
+        self.raw.exclude = Some(Some(exclude));
+        self
+    }
+
+    #[must_use]
+    pub fn exclude_null(mut self) -> Self {
+        self.raw.exclude = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn include(mut self, include: Vec<String>) -> Self {
+        self.raw.include = Some(Some(include));
+        self
+    }
+
+    #[must_use]
+    pub fn include_null(mut self) -> Self {
+        self.raw.include = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation(mut self, requires_confirmation: Vec<String>) -> Self {
+        self.raw.requires_confirmation = Some(Some(requires_confirmation));
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation_null(mut self) -> Self {
+        self.raw.requires_confirmation = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ToolConfiguration {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ToolConfiguration {
+        self.raw
+    }
+}
+
+impl From<ToolConfiguration> for CreateBetaAgentsRequestToolsWebSearchPremiumToolToolConfiguration {
+    fn from(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateBetaAgentsRequestToolsWebSearchPremiumToolToolConfiguration> for ToolConfiguration {
+    fn from(value: CreateBetaAgentsRequestToolsWebSearchPremiumToolToolConfiguration) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for CreateBetaAgentsRequestToolsWebSearchPremiumToolToolConfiguration {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateBetaAgentsRequestToolsWebSearchTool {
+    raw: WebSearchTool,
+}
+
+impl CreateBetaAgentsRequestToolsWebSearchTool {
+    pub fn new() -> Self {
+        Self {
+            raw: WebSearchTool {
+                tool_configuration: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn tool_configuration(
+        mut self,
+        tool_configuration: impl Into<CreateBetaAgentsRequestToolsWebSearchToolToolConfiguration>,
+    ) -> Self {
+        self.raw.tool_configuration = Some(Some(
+            Into::<CreateBetaAgentsRequestToolsWebSearchToolToolConfiguration>::into(
+                tool_configuration,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn tool_configuration_null(mut self) -> Self {
+        self.raw.tool_configuration = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: WebSearchToolType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: WebSearchTool) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &WebSearchTool {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WebSearchTool {
+        self.raw
+    }
+}
+
+impl From<WebSearchTool> for CreateBetaAgentsRequestToolsWebSearchTool {
+    fn from(raw: WebSearchTool) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateBetaAgentsRequestToolsWebSearchTool> for WebSearchTool {
+    fn from(value: CreateBetaAgentsRequestToolsWebSearchTool) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for CreateBetaAgentsRequestToolsWebSearchTool {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateBetaAgentsRequestToolsWebSearchToolToolConfiguration {
+    raw: ToolConfiguration,
+}
+
+impl CreateBetaAgentsRequestToolsWebSearchToolToolConfiguration {
+    pub fn new() -> Self {
+        Self {
+            raw: ToolConfiguration {
+                exclude: None,
+                include: None,
+                requires_confirmation: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn exclude(mut self, exclude: Vec<String>) -> Self {
+        self.raw.exclude = Some(Some(exclude));
+        self
+    }
+
+    #[must_use]
+    pub fn exclude_null(mut self) -> Self {
+        self.raw.exclude = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn include(mut self, include: Vec<String>) -> Self {
+        self.raw.include = Some(Some(include));
+        self
+    }
+
+    #[must_use]
+    pub fn include_null(mut self) -> Self {
+        self.raw.include = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation(mut self, requires_confirmation: Vec<String>) -> Self {
+        self.raw.requires_confirmation = Some(Some(requires_confirmation));
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation_null(mut self) -> Self {
+        self.raw.requires_confirmation = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ToolConfiguration {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ToolConfiguration {
+        self.raw
+    }
+}
+
+impl From<ToolConfiguration> for CreateBetaAgentsRequestToolsWebSearchToolToolConfiguration {
+    fn from(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateBetaAgentsRequestToolsWebSearchToolToolConfiguration> for ToolConfiguration {
+    fn from(value: CreateBetaAgentsRequestToolsWebSearchToolToolConfiguration) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for CreateBetaAgentsRequestToolsWebSearchToolToolConfiguration {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateBetaAgentsResponse {
+    raw: Agent,
+}
+
+impl CreateBetaAgentsResponse {
+    pub fn raw(&self) -> &Agent {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Agent {
+        self.raw
+    }
+}
+
+impl From<Agent> for CreateBetaAgentsResponse {
+    fn from(raw: Agent) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateBetaAgentsResponse> for Agent {
+    fn from(value: CreateBetaAgentsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateBetaConnectorsRequest {
+    raw: CreateConnectorRequest,
+}
+
+impl CreateBetaConnectorsRequest {
+    pub fn new(name: impl Into<String>, description: impl Into<String>, server: url::Url) -> Self {
+        Self {
+            raw: CreateConnectorRequest {
+                auth_data: None,
+                description: description.into(),
+                global_headers: None,
+                headers: None,
+                icon_url: None,
+                name: name.into(),
+                oauth2_server_metadata: None,
+                oauth2_server_metadata_url: None,
+                protocol: None,
+                server,
+                system_prompt: None,
+                title: None,
+                visibility: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn auth_data(mut self, auth_data: impl Into<CreateBetaConnectorsRequestAuthData>) -> Self {
+        self.raw.auth_data = Some(Some(
+            Into::<CreateBetaConnectorsRequestAuthData>::into(auth_data).into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn auth_data_null(mut self) -> Self {
+        self.raw.auth_data = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn global_headers(mut self, global_headers: CreateConnectorRequestGlobalHeaders) -> Self {
+        self.raw.global_headers = Some(global_headers);
+        self
+    }
+
+    #[must_use]
+    pub fn headers(mut self, headers: CreateConnectorRequestHeaders) -> Self {
+        self.raw.headers = Some(Some(headers));
+        self
+    }
+
+    #[must_use]
+    pub fn headers_null(mut self) -> Self {
+        self.raw.headers = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn icon_url(mut self, icon_url: impl Into<String>) -> Self {
+        self.raw.icon_url = Some(Some(icon_url.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn icon_url_null(mut self) -> Self {
+        self.raw.icon_url = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn oauth2_server_metadata(
+        mut self,
+        oauth2_server_metadata: impl Into<CreateBetaConnectorsRequestOauth2ServerMetadata>,
+    ) -> Self {
+        self.raw.oauth2_server_metadata = Some(Some(
+            Into::<CreateBetaConnectorsRequestOauth2ServerMetadata>::into(oauth2_server_metadata)
+                .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn oauth2_server_metadata_null(mut self) -> Self {
+        self.raw.oauth2_server_metadata = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn oauth2_server_metadata_url(mut self, oauth2_server_metadata_url: url::Url) -> Self {
+        self.raw.oauth2_server_metadata_url = Some(Some(oauth2_server_metadata_url));
+        self
+    }
+
+    #[must_use]
+    pub fn oauth2_server_metadata_url_null(mut self) -> Self {
+        self.raw.oauth2_server_metadata_url = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn protocol(mut self, protocol: CreateConnectorRequestProtocol) -> Self {
+        self.raw.protocol = Some(protocol);
+        self
+    }
+
+    #[must_use]
+    pub fn system_prompt(mut self, system_prompt: impl Into<String>) -> Self {
+        self.raw.system_prompt = Some(Some(system_prompt.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn system_prompt_null(mut self) -> Self {
+        self.raw.system_prompt = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn title(mut self, title: impl Into<String>) -> Self {
+        self.raw.title = Some(Some(title.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn title_null(mut self) -> Self {
+        self.raw.title = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn visibility(mut self, visibility: PublicResourceVisibility) -> Self {
+        self.raw.visibility = Some(visibility);
+        self
+    }
+    pub fn from_raw(raw: CreateConnectorRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &CreateConnectorRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CreateConnectorRequest {
+        self.raw
+    }
+}
+
+impl From<CreateConnectorRequest> for CreateBetaConnectorsRequest {
+    fn from(raw: CreateConnectorRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateBetaConnectorsRequest> for CreateConnectorRequest {
+    fn from(value: CreateBetaConnectorsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateBetaConnectorsRequestAuthData {
+    raw: AuthData,
+}
+
+impl CreateBetaConnectorsRequestAuthData {
+    pub fn new(client_id: impl Into<String>) -> Self {
+        Self {
+            raw: AuthData {
+                client_id: client_id.into(),
+                client_secret: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn client_secret(mut self, client_secret: impl Into<String>) -> Self {
+        self.raw.client_secret = Some(Some(client_secret.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn client_secret_null(mut self) -> Self {
+        self.raw.client_secret = Some(None);
+        self
+    }
+    pub fn from_raw(raw: AuthData) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &AuthData {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AuthData {
+        self.raw
+    }
+}
+
+impl From<AuthData> for CreateBetaConnectorsRequestAuthData {
+    fn from(raw: AuthData) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateBetaConnectorsRequestAuthData> for AuthData {
+    fn from(value: CreateBetaConnectorsRequestAuthData) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateBetaConnectorsRequestOauth2ServerMetadata {
+    raw: ExtendedOAuthServerMetadata,
+}
+
+impl CreateBetaConnectorsRequestOauth2ServerMetadata {
+    pub fn new(
+        issuer: url::Url,
+        authorization_endpoint: url::Url,
+        token_endpoint: url::Url,
+    ) -> Self {
+        Self {
+            raw: ExtendedOAuthServerMetadata {
+                authorization_endpoint,
+                client_id_metadata_document_supported: None,
+                code_challenge_methods_supported: None,
+                grant_types_supported: None,
+                introspection_endpoint: None,
+                introspection_endpoint_auth_methods_supported: None,
+                introspection_endpoint_auth_signing_alg_values_supported: None,
+                issuer,
+                op_policy_uri: None,
+                op_tos_uri: None,
+                registration_endpoint: None,
+                response_modes_supported: None,
+                response_types_supported: None,
+                revocation_endpoint: None,
+                revocation_endpoint_auth_methods_supported: None,
+                revocation_endpoint_auth_signing_alg_values_supported: None,
+                scopes_supported: None,
+                service_documentation: None,
+                token_endpoint,
+                token_endpoint_auth_methods_supported: None,
+                token_endpoint_auth_signing_alg_values_supported: None,
+                ui_locales_supported: None,
+                x_resource_url: None,
+                x_scope: None,
+                x_source: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn client_id_metadata_document_supported(
+        mut self,
+        client_id_metadata_document_supported: bool,
+    ) -> Self {
+        self.raw.client_id_metadata_document_supported =
+            Some(Some(client_id_metadata_document_supported));
+        self
+    }
+
+    #[must_use]
+    pub fn client_id_metadata_document_supported_null(mut self) -> Self {
+        self.raw.client_id_metadata_document_supported = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn code_challenge_methods_supported(
+        mut self,
+        code_challenge_methods_supported: Vec<String>,
+    ) -> Self {
+        self.raw.code_challenge_methods_supported = Some(Some(code_challenge_methods_supported));
+        self
+    }
+
+    #[must_use]
+    pub fn code_challenge_methods_supported_null(mut self) -> Self {
+        self.raw.code_challenge_methods_supported = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn grant_types_supported(mut self, grant_types_supported: Vec<String>) -> Self {
+        self.raw.grant_types_supported = Some(Some(grant_types_supported));
+        self
+    }
+
+    #[must_use]
+    pub fn grant_types_supported_null(mut self) -> Self {
+        self.raw.grant_types_supported = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn introspection_endpoint(mut self, introspection_endpoint: url::Url) -> Self {
+        self.raw.introspection_endpoint = Some(Some(introspection_endpoint));
+        self
+    }
+
+    #[must_use]
+    pub fn introspection_endpoint_null(mut self) -> Self {
+        self.raw.introspection_endpoint = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn introspection_endpoint_auth_methods_supported(
+        mut self,
+        introspection_endpoint_auth_methods_supported: Vec<String>,
+    ) -> Self {
+        self.raw.introspection_endpoint_auth_methods_supported =
+            Some(Some(introspection_endpoint_auth_methods_supported));
+        self
+    }
+
+    #[must_use]
+    pub fn introspection_endpoint_auth_methods_supported_null(mut self) -> Self {
+        self.raw.introspection_endpoint_auth_methods_supported = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn introspection_endpoint_auth_signing_alg_values_supported(
+        mut self,
+        introspection_endpoint_auth_signing_alg_values_supported: Vec<String>,
+    ) -> Self {
+        self.raw
+            .introspection_endpoint_auth_signing_alg_values_supported = Some(Some(
+            introspection_endpoint_auth_signing_alg_values_supported,
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn introspection_endpoint_auth_signing_alg_values_supported_null(mut self) -> Self {
+        self.raw
+            .introspection_endpoint_auth_signing_alg_values_supported = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn op_policy_uri(mut self, op_policy_uri: url::Url) -> Self {
+        self.raw.op_policy_uri = Some(Some(op_policy_uri));
+        self
+    }
+
+    #[must_use]
+    pub fn op_policy_uri_null(mut self) -> Self {
+        self.raw.op_policy_uri = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn op_tos_uri(mut self, op_tos_uri: url::Url) -> Self {
+        self.raw.op_tos_uri = Some(Some(op_tos_uri));
+        self
+    }
+
+    #[must_use]
+    pub fn op_tos_uri_null(mut self) -> Self {
+        self.raw.op_tos_uri = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn registration_endpoint(mut self, registration_endpoint: url::Url) -> Self {
+        self.raw.registration_endpoint = Some(Some(registration_endpoint));
+        self
+    }
+
+    #[must_use]
+    pub fn registration_endpoint_null(mut self) -> Self {
+        self.raw.registration_endpoint = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn response_modes_supported(mut self, response_modes_supported: Vec<String>) -> Self {
+        self.raw.response_modes_supported = Some(Some(response_modes_supported));
+        self
+    }
+
+    #[must_use]
+    pub fn response_modes_supported_null(mut self) -> Self {
+        self.raw.response_modes_supported = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn response_types_supported(mut self, response_types_supported: Vec<String>) -> Self {
+        self.raw.response_types_supported = Some(response_types_supported);
+        self
+    }
+
+    #[must_use]
+    pub fn revocation_endpoint(mut self, revocation_endpoint: url::Url) -> Self {
+        self.raw.revocation_endpoint = Some(Some(revocation_endpoint));
+        self
+    }
+
+    #[must_use]
+    pub fn revocation_endpoint_null(mut self) -> Self {
+        self.raw.revocation_endpoint = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn revocation_endpoint_auth_methods_supported(
+        mut self,
+        revocation_endpoint_auth_methods_supported: Vec<String>,
+    ) -> Self {
+        self.raw.revocation_endpoint_auth_methods_supported =
+            Some(Some(revocation_endpoint_auth_methods_supported));
+        self
+    }
+
+    #[must_use]
+    pub fn revocation_endpoint_auth_methods_supported_null(mut self) -> Self {
+        self.raw.revocation_endpoint_auth_methods_supported = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn revocation_endpoint_auth_signing_alg_values_supported(
+        mut self,
+        revocation_endpoint_auth_signing_alg_values_supported: Vec<String>,
+    ) -> Self {
+        self.raw
+            .revocation_endpoint_auth_signing_alg_values_supported =
+            Some(Some(revocation_endpoint_auth_signing_alg_values_supported));
+        self
+    }
+
+    #[must_use]
+    pub fn revocation_endpoint_auth_signing_alg_values_supported_null(mut self) -> Self {
+        self.raw
+            .revocation_endpoint_auth_signing_alg_values_supported = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn scopes_supported(mut self, scopes_supported: Vec<String>) -> Self {
+        self.raw.scopes_supported = Some(Some(scopes_supported));
+        self
+    }
+
+    #[must_use]
+    pub fn scopes_supported_null(mut self) -> Self {
+        self.raw.scopes_supported = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn service_documentation(mut self, service_documentation: url::Url) -> Self {
+        self.raw.service_documentation = Some(Some(service_documentation));
+        self
+    }
+
+    #[must_use]
+    pub fn service_documentation_null(mut self) -> Self {
+        self.raw.service_documentation = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn token_endpoint_auth_methods_supported(
+        mut self,
+        token_endpoint_auth_methods_supported: Vec<String>,
+    ) -> Self {
+        self.raw.token_endpoint_auth_methods_supported =
+            Some(Some(token_endpoint_auth_methods_supported));
+        self
+    }
+
+    #[must_use]
+    pub fn token_endpoint_auth_methods_supported_null(mut self) -> Self {
+        self.raw.token_endpoint_auth_methods_supported = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn token_endpoint_auth_signing_alg_values_supported(
+        mut self,
+        token_endpoint_auth_signing_alg_values_supported: Vec<String>,
+    ) -> Self {
+        self.raw.token_endpoint_auth_signing_alg_values_supported =
+            Some(Some(token_endpoint_auth_signing_alg_values_supported));
+        self
+    }
+
+    #[must_use]
+    pub fn token_endpoint_auth_signing_alg_values_supported_null(mut self) -> Self {
+        self.raw.token_endpoint_auth_signing_alg_values_supported = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn ui_locales_supported(mut self, ui_locales_supported: Vec<String>) -> Self {
+        self.raw.ui_locales_supported = Some(Some(ui_locales_supported));
+        self
+    }
+
+    #[must_use]
+    pub fn ui_locales_supported_null(mut self) -> Self {
+        self.raw.ui_locales_supported = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn x_resource_url(mut self, x_resource_url: impl Into<String>) -> Self {
+        self.raw.x_resource_url = Some(Some(x_resource_url.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn x_resource_url_null(mut self) -> Self {
+        self.raw.x_resource_url = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn x_scope(mut self, x_scope: impl Into<String>) -> Self {
+        self.raw.x_scope = Some(Some(x_scope.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn x_scope_null(mut self) -> Self {
+        self.raw.x_scope = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn x_source(mut self, x_source: OAuthMetadataSource) -> Self {
+        self.raw.x_source = Some(Some(x_source));
+        self
+    }
+
+    #[must_use]
+    pub fn x_source_null(mut self) -> Self {
+        self.raw.x_source = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ExtendedOAuthServerMetadata) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ExtendedOAuthServerMetadata {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ExtendedOAuthServerMetadata {
+        self.raw
+    }
+}
+
+impl From<ExtendedOAuthServerMetadata> for CreateBetaConnectorsRequestOauth2ServerMetadata {
+    fn from(raw: ExtendedOAuthServerMetadata) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateBetaConnectorsRequestOauth2ServerMetadata> for ExtendedOAuthServerMetadata {
+    fn from(value: CreateBetaConnectorsRequestOauth2ServerMetadata) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateBetaConnectorsResponse {
+    raw: Connector,
+}
+
+impl CreateBetaConnectorsResponse {
+    pub fn raw(&self) -> &Connector {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Connector {
+        self.raw
+    }
+}
+
+impl From<Connector> for CreateBetaConnectorsResponse {
+    fn from(raw: Connector) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateBetaConnectorsResponse> for Connector {
+    fn from(value: CreateBetaConnectorsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateBetaLibrariesRequest {
+    raw: CreateLibraryRequest,
+}
+
+impl CreateBetaLibrariesRequest {
     pub fn new(name: impl Into<String>) -> Self {
         Self {
-            raw: LibraryIn {
+            raw: CreateLibraryRequest {
                 chunk_size: None,
                 description: None,
                 name: name.into(),
+                owner_type: None,
             },
         }
     }
@@ -5469,434 +5902,2302 @@ impl LibraryInParams {
         self.raw.description = Some(None);
         self
     }
-    pub fn from_raw(raw: LibraryIn) -> Self {
+
+    #[must_use]
+    pub fn owner_type(mut self, owner_type: CreateLibraryRequestOwnerType) -> Self {
+        self.raw.owner_type = Some(Some(owner_type));
+        self
+    }
+
+    #[must_use]
+    pub fn owner_type_null(mut self) -> Self {
+        self.raw.owner_type = Some(None);
+        self
+    }
+    pub fn from_raw(raw: CreateLibraryRequest) -> Self {
         Self { raw }
     }
-    pub fn as_raw(&self) -> &LibraryIn {
+    pub fn as_raw(&self) -> &CreateLibraryRequest {
         &self.raw
     }
-    pub fn into_raw(self) -> LibraryIn {
+    pub fn into_raw(self) -> CreateLibraryRequest {
         self.raw
     }
 }
 
-impl From<LibraryIn> for LibraryInParams {
-    fn from(raw: LibraryIn) -> Self {
+impl From<CreateLibraryRequest> for CreateBetaLibrariesRequest {
+    fn from(raw: CreateLibraryRequest) -> Self {
         Self { raw }
     }
 }
 
-impl From<LibraryInParams> for LibraryIn {
-    fn from(value: LibraryInParams) -> Self {
+impl From<CreateBetaLibrariesRequest> for CreateLibraryRequest {
+    fn from(value: CreateBetaLibrariesRequest) -> Self {
         value.into_raw()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct ProcessingStatusOutView {
-    raw: ProcessingStatusOut,
+pub struct CreateBetaLibrariesResponse {
+    raw: Library,
 }
 
-impl ProcessingStatusOutView {
-    pub fn processing_status(&self) -> &str {
-        &self.raw.processing_status
-    }
-    pub fn raw(&self) -> &ProcessingStatusOut {
+impl CreateBetaLibrariesResponse {
+    pub fn raw(&self) -> &Library {
         &self.raw
     }
-    pub fn into_raw(self) -> ProcessingStatusOut {
+    pub fn into_raw(self) -> Library {
         self.raw
     }
 }
 
-impl From<ProcessingStatusOut> for ProcessingStatusOutView {
-    fn from(raw: ProcessingStatusOut) -> Self {
+impl From<Library> for CreateBetaLibrariesResponse {
+    fn from(raw: Library) -> Self {
         Self { raw }
     }
 }
 
-impl From<ProcessingStatusOutView> for ProcessingStatusOut {
-    fn from(value: ProcessingStatusOutView) -> Self {
+impl From<CreateBetaLibrariesResponse> for Library {
+    fn from(value: CreateBetaLibrariesResponse) -> Self {
         value.into_raw()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct DocumentTextContentView {
-    raw: DocumentTextContent,
+pub struct CreateBetaObservabilityDatasetsRequest {
+    raw: CreateDatasetRequest,
 }
 
-impl DocumentTextContentView {
-    pub fn text(&self) -> &str {
-        &self.raw.text
-    }
-    pub fn raw(&self) -> &DocumentTextContent {
-        &self.raw
-    }
-    pub fn into_raw(self) -> DocumentTextContent {
-        self.raw
-    }
-}
-
-impl From<DocumentTextContent> for DocumentTextContentView {
-    fn from(raw: DocumentTextContent) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<DocumentTextContentView> for DocumentTextContent {
-    fn from(value: DocumentTextContentView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct DocumentOutView {
-    raw: DocumentOut,
-}
-
-impl DocumentOutView {
-    pub fn name(&self) -> &str {
-        &self.raw.name
-    }
-    pub fn processing_status(&self) -> &str {
-        &self.raw.processing_status
-    }
-    pub fn tokens_processing_total(&self) -> i64 {
-        self.raw.tokens_processing_total
-    }
-    pub fn uploaded_by_type(&self) -> &str {
-        &self.raw.uploaded_by_type
-    }
-    pub fn raw(&self) -> &DocumentOut {
-        &self.raw
-    }
-    pub fn into_raw(self) -> DocumentOut {
-        self.raw
-    }
-}
-
-impl From<DocumentOut> for DocumentOutView {
-    fn from(raw: DocumentOut) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<DocumentOutView> for DocumentOut {
-    fn from(value: DocumentOutView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct ListDocumentOutView {
-    raw: ListDocumentOut,
-}
-
-impl ListDocumentOutView {
-    pub fn raw(&self) -> &ListDocumentOut {
-        &self.raw
-    }
-    pub fn into_raw(self) -> ListDocumentOut {
-        self.raw
-    }
-}
-
-impl From<ListDocumentOut> for ListDocumentOutView {
-    fn from(raw: ListDocumentOut) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<ListDocumentOutView> for ListDocumentOut {
-    fn from(value: ListDocumentOutView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct DocumentUpdateInAttributesMap {
-    values: std::collections::BTreeMap<String, serde_json::Value>,
-}
-
-impl DocumentUpdateInAttributesMap {
-    pub fn new(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
-        Self { values }
-    }
-    pub fn as_map(&self) -> &std::collections::BTreeMap<String, serde_json::Value> {
-        &self.values
-    }
-    pub fn into_map(self) -> std::collections::BTreeMap<String, serde_json::Value> {
-        self.values
-    }
-}
-
-impl From<std::collections::BTreeMap<String, serde_json::Value>> for DocumentUpdateInAttributesMap {
-    fn from(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
-        Self { values }
-    }
-}
-
-impl From<DocumentUpdateInAttributes> for DocumentUpdateInAttributesMap {
-    fn from(value: DocumentUpdateInAttributes) -> Self {
+impl CreateBetaObservabilityDatasetsRequest {
+    pub fn new(name: impl Into<String>, description: impl Into<String>) -> Self {
         Self {
-            values: value.additional_properties,
+            raw: CreateDatasetRequest {
+                description: description.into(),
+                name: name.into(),
+            },
+        }
+    }
+    pub fn from_raw(raw: CreateDatasetRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &CreateDatasetRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CreateDatasetRequest {
+        self.raw
+    }
+}
+
+impl From<CreateDatasetRequest> for CreateBetaObservabilityDatasetsRequest {
+    fn from(raw: CreateDatasetRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateBetaObservabilityDatasetsRequest> for CreateDatasetRequest {
+    fn from(value: CreateBetaObservabilityDatasetsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateBetaObservabilityDatasetsResponse {
+    raw: Dataset,
+}
+
+impl CreateBetaObservabilityDatasetsResponse {
+    pub fn raw(&self) -> &Dataset {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Dataset {
+        self.raw
+    }
+}
+
+impl From<Dataset> for CreateBetaObservabilityDatasetsResponse {
+    fn from(raw: Dataset) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateBetaObservabilityDatasetsResponse> for Dataset {
+    fn from(value: CreateBetaObservabilityDatasetsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateBetaObservabilityJudgesRequest {
+    raw: CreateJudgeRequest,
+}
+
+impl CreateBetaObservabilityJudgesRequest {
+    pub fn new(
+        name: impl Into<String>,
+        description: impl Into<String>,
+        model_name: impl Into<String>,
+        output: impl Into<CreateBetaObservabilityJudgesRequestOutput>,
+        instructions: impl Into<String>,
+        tools: Vec<String>,
+    ) -> Self {
+        Self {
+            raw: CreateJudgeRequest {
+                description: description.into(),
+                instructions: instructions.into(),
+                model_name: model_name.into(),
+                name: name.into(),
+                output: Into::<CreateBetaObservabilityJudgesRequestOutput>::into(output).into(),
+                tools,
+            },
+        }
+    }
+    pub fn from_raw(raw: CreateJudgeRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &CreateJudgeRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CreateJudgeRequest {
+        self.raw
+    }
+}
+
+impl From<CreateJudgeRequest> for CreateBetaObservabilityJudgesRequest {
+    fn from(raw: CreateJudgeRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateBetaObservabilityJudgesRequest> for CreateJudgeRequest {
+    fn from(value: CreateBetaObservabilityJudgesRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub enum CreateBetaObservabilityJudgesRequestOutput {
+    JudgeClassificationOutput(CreateBetaObservabilityJudgesRequestOutputJudgeClassificationOutput),
+    JudgeRegressionOutput(CreateBetaObservabilityJudgesRequestOutputJudgeRegressionOutput),
+}
+
+impl From<CreateBetaObservabilityJudgesRequestOutputJudgeClassificationOutput>
+    for CreateBetaObservabilityJudgesRequestOutput
+{
+    fn from(value: CreateBetaObservabilityJudgesRequestOutputJudgeClassificationOutput) -> Self {
+        Self::JudgeClassificationOutput(value)
+    }
+}
+
+impl From<CreateBetaObservabilityJudgesRequestOutputJudgeRegressionOutput>
+    for CreateBetaObservabilityJudgesRequestOutput
+{
+    fn from(value: CreateBetaObservabilityJudgesRequestOutputJudgeRegressionOutput) -> Self {
+        Self::JudgeRegressionOutput(value)
+    }
+}
+
+impl From<CreateBetaObservabilityJudgesRequestOutput> for CreateJudgeRequestOutput {
+    fn from(value: CreateBetaObservabilityJudgesRequestOutput) -> Self {
+        match value {
+            CreateBetaObservabilityJudgesRequestOutput::JudgeClassificationOutput(value) => {
+                Self::JudgeClassificationOutput(value.into())
+            }
+            CreateBetaObservabilityJudgesRequestOutput::JudgeRegressionOutput(value) => {
+                Self::JudgeRegressionOutput(value.into())
+            }
         }
     }
 }
 
-impl From<DocumentUpdateInAttributesMap> for DocumentUpdateInAttributes {
-    fn from(value: DocumentUpdateInAttributesMap) -> Self {
-        Self {
-            additional_properties: value.values,
-        }
-    }
-}
-
 #[derive(Debug, Clone)]
-pub struct DocumentUpdateInParams {
-    raw: DocumentUpdateIn,
+pub struct CreateBetaObservabilityJudgesRequestOutputJudgeClassificationOutput {
+    raw: JudgeClassificationOutput,
 }
 
-impl DocumentUpdateInParams {
-    pub fn new() -> Self {
+impl CreateBetaObservabilityJudgesRequestOutputJudgeClassificationOutput {
+    pub fn new(options: Vec<JudgeClassificationOutputOption>) -> Self {
         Self {
-            raw: DocumentUpdateIn {
-                attributes: None,
-                name: None,
+            raw: JudgeClassificationOutput {
+                options,
+                r#type: None,
             },
         }
     }
     #[must_use]
-    pub fn attributes(mut self, attributes: impl Into<DocumentUpdateInAttributesMap>) -> Self {
-        self.raw.attributes = Some(Some(
-            Into::<DocumentUpdateInAttributesMap>::into(attributes).into(),
+    pub fn r#type(mut self, r#type: JudgeClassificationOutputType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: JudgeClassificationOutput) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &JudgeClassificationOutput {
+        &self.raw
+    }
+    pub fn into_raw(self) -> JudgeClassificationOutput {
+        self.raw
+    }
+}
+
+impl From<JudgeClassificationOutput>
+    for CreateBetaObservabilityJudgesRequestOutputJudgeClassificationOutput
+{
+    fn from(raw: JudgeClassificationOutput) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateBetaObservabilityJudgesRequestOutputJudgeClassificationOutput>
+    for JudgeClassificationOutput
+{
+    fn from(value: CreateBetaObservabilityJudgesRequestOutputJudgeClassificationOutput) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateBetaObservabilityJudgesRequestOutputJudgeRegressionOutput {
+    raw: JudgeRegressionOutput,
+}
+
+impl CreateBetaObservabilityJudgesRequestOutputJudgeRegressionOutput {
+    pub fn new(min_description: impl Into<String>, max_description: impl Into<String>) -> Self {
+        Self {
+            raw: JudgeRegressionOutput {
+                max: None,
+                max_description: max_description.into(),
+                min: None,
+                min_description: min_description.into(),
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn max(mut self, max: f64) -> Self {
+        self.raw.max = Some(max);
+        self
+    }
+
+    #[must_use]
+    pub fn min(mut self, min: f64) -> Self {
+        self.raw.min = Some(min);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: JudgeRegressionOutputType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: JudgeRegressionOutput) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &JudgeRegressionOutput {
+        &self.raw
+    }
+    pub fn into_raw(self) -> JudgeRegressionOutput {
+        self.raw
+    }
+}
+
+impl From<JudgeRegressionOutput>
+    for CreateBetaObservabilityJudgesRequestOutputJudgeRegressionOutput
+{
+    fn from(raw: JudgeRegressionOutput) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateBetaObservabilityJudgesRequestOutputJudgeRegressionOutput>
+    for JudgeRegressionOutput
+{
+    fn from(value: CreateBetaObservabilityJudgesRequestOutputJudgeRegressionOutput) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateBetaObservabilityJudgesResponse {
+    raw: Judge,
+}
+
+impl CreateBetaObservabilityJudgesResponse {
+    pub fn raw(&self) -> &Judge {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Judge {
+        self.raw
+    }
+}
+
+impl From<Judge> for CreateBetaObservabilityJudgesResponse {
+    fn from(raw: Judge) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateBetaObservabilityJudgesResponse> for Judge {
+    fn from(value: CreateBetaObservabilityJudgesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateBetaPromptsRequest {
+    raw: CreatePromptRequest,
+}
+
+impl CreateBetaPromptsRequest {
+    pub fn raw(&self) -> &CreatePromptRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CreatePromptRequest {
+        self.raw
+    }
+}
+
+impl From<CreatePromptRequest> for CreateBetaPromptsRequest {
+    fn from(raw: CreatePromptRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateBetaPromptsRequest> for CreatePromptRequest {
+    fn from(value: CreateBetaPromptsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateBetaPromptsResponse {
+    raw: Prompt,
+}
+
+impl CreateBetaPromptsResponse {
+    pub fn raw(&self) -> &Prompt {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Prompt {
+        self.raw
+    }
+}
+
+impl From<Prompt> for CreateBetaPromptsResponse {
+    fn from(raw: Prompt) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateBetaPromptsResponse> for Prompt {
+    fn from(value: CreateBetaPromptsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateBetaSkillsRequest {
+    raw: CreateSkillRequest,
+}
+
+impl CreateBetaSkillsRequest {
+    pub fn raw(&self) -> &CreateSkillRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CreateSkillRequest {
+        self.raw
+    }
+}
+
+impl From<CreateSkillRequest> for CreateBetaSkillsRequest {
+    fn from(raw: CreateSkillRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateBetaSkillsRequest> for CreateSkillRequest {
+    fn from(value: CreateBetaSkillsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateBetaSkillsResponse {
+    raw: Skill,
+}
+
+impl CreateBetaSkillsResponse {
+    pub fn raw(&self) -> &Skill {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Skill {
+        self.raw
+    }
+}
+
+impl From<Skill> for CreateBetaSkillsResponse {
+    fn from(raw: Skill) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateBetaSkillsResponse> for Skill {
+    fn from(value: CreateBetaSkillsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateCampaignBetaObservabilityCampaignsRequest {
+    raw: CreateCampaignRequest,
+}
+
+impl CreateCampaignBetaObservabilityCampaignsRequest {
+    pub fn new(
+        search_params: FilterPayload,
+        judge_id: uuid::Uuid,
+        name: impl Into<String>,
+        description: impl Into<String>,
+        max_nb_events: i64,
+    ) -> Self {
+        Self {
+            raw: CreateCampaignRequest {
+                description: description.into(),
+                judge_id,
+                max_nb_events,
+                name: name.into(),
+                search_params,
+            },
+        }
+    }
+    pub fn from_raw(raw: CreateCampaignRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &CreateCampaignRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CreateCampaignRequest {
+        self.raw
+    }
+}
+
+impl From<CreateCampaignRequest> for CreateCampaignBetaObservabilityCampaignsRequest {
+    fn from(raw: CreateCampaignRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateCampaignBetaObservabilityCampaignsRequest> for CreateCampaignRequest {
+    fn from(value: CreateCampaignBetaObservabilityCampaignsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateCampaignBetaObservabilityCampaignsResponse {
+    raw: Campaign,
+}
+
+impl CreateCampaignBetaObservabilityCampaignsResponse {
+    pub fn raw(&self) -> &Campaign {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Campaign {
+        self.raw
+    }
+}
+
+impl From<Campaign> for CreateCampaignBetaObservabilityCampaignsResponse {
+    fn from(raw: Campaign) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateCampaignBetaObservabilityCampaignsResponse> for Campaign {
+    fn from(value: CreateCampaignBetaObservabilityCampaignsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateDeploymentWorkflowsDeploymentsRequest {
+    raw: CreateDeploymentRequest,
+}
+
+impl CreateDeploymentWorkflowsDeploymentsRequest {
+    pub fn new(
+        name: impl Into<String>,
+        spec: impl Into<CreateDeploymentWorkflowsDeploymentsRequestSpec>,
+    ) -> Self {
+        Self {
+            raw: CreateDeploymentRequest {
+                hardened: None,
+                name: name.into(),
+                resources: None,
+                spec: Into::<CreateDeploymentWorkflowsDeploymentsRequestSpec>::into(spec).into(),
+            },
+        }
+    }
+    #[must_use]
+    pub fn hardened(mut self, hardened: bool) -> Self {
+        self.raw.hardened = Some(hardened);
+        self
+    }
+
+    #[must_use]
+    pub fn resources(
+        mut self,
+        resources: impl Into<CreateDeploymentWorkflowsDeploymentsRequestResources>,
+    ) -> Self {
+        self.raw.resources = Some(Some(
+            Into::<CreateDeploymentWorkflowsDeploymentsRequestResources>::into(resources).into(),
         ));
         self
     }
 
     #[must_use]
-    pub fn attributes_null(mut self) -> Self {
-        self.raw.attributes = Some(None);
+    pub fn resources_null(mut self) -> Self {
+        self.raw.resources = Some(None);
         self
     }
-
-    #[must_use]
-    pub fn name(mut self, name: impl Into<String>) -> Self {
-        self.raw.name = Some(Some(name.into()));
-        self
-    }
-
-    #[must_use]
-    pub fn name_null(mut self) -> Self {
-        self.raw.name = Some(None);
-        self
-    }
-    pub fn from_raw(raw: DocumentUpdateIn) -> Self {
+    pub fn from_raw(raw: CreateDeploymentRequest) -> Self {
         Self { raw }
     }
-    pub fn as_raw(&self) -> &DocumentUpdateIn {
+    pub fn as_raw(&self) -> &CreateDeploymentRequest {
         &self.raw
     }
-    pub fn into_raw(self) -> DocumentUpdateIn {
+    pub fn into_raw(self) -> CreateDeploymentRequest {
         self.raw
     }
 }
 
-impl From<DocumentUpdateIn> for DocumentUpdateInParams {
-    fn from(raw: DocumentUpdateIn) -> Self {
+impl From<CreateDeploymentRequest> for CreateDeploymentWorkflowsDeploymentsRequest {
+    fn from(raw: CreateDeploymentRequest) -> Self {
         Self { raw }
     }
 }
 
-impl From<DocumentUpdateInParams> for DocumentUpdateIn {
-    fn from(value: DocumentUpdateInParams) -> Self {
+impl From<CreateDeploymentWorkflowsDeploymentsRequest> for CreateDeploymentRequest {
+    fn from(value: CreateDeploymentWorkflowsDeploymentsRequest) -> Self {
         value.into_raw()
     }
 }
 
-impl Default for DocumentUpdateInParams {
+#[derive(Debug, Clone)]
+pub struct CreateDeploymentWorkflowsDeploymentsRequestResources {
+    raw: DeploymentResourceConfig,
+}
+
+impl CreateDeploymentWorkflowsDeploymentsRequestResources {
+    pub fn new() -> Self {
+        Self {
+            raw: DeploymentResourceConfig {
+                cpu_limit: None,
+                cpu_request: None,
+                memory_limit: None,
+                memory_request: None,
+                replicas: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn cpu_limit(mut self, cpu_limit: impl Into<String>) -> Self {
+        self.raw.cpu_limit = Some(Some(cpu_limit.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn cpu_limit_null(mut self) -> Self {
+        self.raw.cpu_limit = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn cpu_request(mut self, cpu_request: impl Into<String>) -> Self {
+        self.raw.cpu_request = Some(Some(cpu_request.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn cpu_request_null(mut self) -> Self {
+        self.raw.cpu_request = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn memory_limit(mut self, memory_limit: impl Into<String>) -> Self {
+        self.raw.memory_limit = Some(Some(memory_limit.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn memory_limit_null(mut self) -> Self {
+        self.raw.memory_limit = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn memory_request(mut self, memory_request: impl Into<String>) -> Self {
+        self.raw.memory_request = Some(Some(memory_request.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn memory_request_null(mut self) -> Self {
+        self.raw.memory_request = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn replicas(mut self, replicas: i64) -> Self {
+        self.raw.replicas = Some(Some(replicas));
+        self
+    }
+
+    #[must_use]
+    pub fn replicas_null(mut self) -> Self {
+        self.raw.replicas = Some(None);
+        self
+    }
+    pub fn from_raw(raw: DeploymentResourceConfig) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &DeploymentResourceConfig {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DeploymentResourceConfig {
+        self.raw
+    }
+}
+
+impl From<DeploymentResourceConfig> for CreateDeploymentWorkflowsDeploymentsRequestResources {
+    fn from(raw: DeploymentResourceConfig) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateDeploymentWorkflowsDeploymentsRequestResources> for DeploymentResourceConfig {
+    fn from(value: CreateDeploymentWorkflowsDeploymentsRequestResources) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for CreateDeploymentWorkflowsDeploymentsRequestResources {
     fn default() -> Self {
         Self::new()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct ListLibraryOutView {
-    raw: ListLibraryOut,
+pub struct CreateDeploymentWorkflowsDeploymentsRequestSpec {
+    raw: DeploymentWorkerSpecInput,
 }
 
-impl ListLibraryOutView {
-    pub fn raw(&self) -> &ListLibraryOut {
-        &self.raw
-    }
-    pub fn into_raw(self) -> ListLibraryOut {
-        self.raw
-    }
-}
-
-impl From<ListLibraryOut> for ListLibraryOutView {
-    fn from(raw: ListLibraryOut) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<ListLibraryOutView> for ListLibraryOut {
-    fn from(value: ListLibraryOutView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct SharingOutView {
-    raw: SharingOut,
-}
-
-impl SharingOutView {
-    pub fn role(&self) -> &str {
-        &self.raw.role
-    }
-    pub fn share_with_type(&self) -> &str {
-        &self.raw.share_with_type
-    }
-    pub fn raw(&self) -> &SharingOut {
-        &self.raw
-    }
-    pub fn into_raw(self) -> SharingOut {
-        self.raw
-    }
-}
-
-impl From<SharingOut> for SharingOutView {
-    fn from(raw: SharingOut) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<SharingOutView> for SharingOut {
-    fn from(value: SharingOutView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[non_exhaustive]
-pub enum ShareEnumValue {
-    Viewer,
-    Editor,
-}
-
-impl From<ShareEnumValue> for ShareEnum {
-    fn from(value: ShareEnumValue) -> Self {
-        match value {
-            ShareEnumValue::Viewer => Self::Viewer,
-            ShareEnumValue::Editor => Self::Editor,
-        }
-    }
-}
-
-impl From<ShareEnum> for ShareEnumValue {
-    fn from(value: ShareEnum) -> Self {
-        match value {
-            ShareEnum::Viewer => Self::Viewer,
-            ShareEnum::Editor => Self::Editor,
-        }
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[non_exhaustive]
-pub enum EntityTypeValue {
-    User,
-    Workspace,
-    Org,
-}
-
-impl From<EntityTypeValue> for EntityType {
-    fn from(value: EntityTypeValue) -> Self {
-        match value {
-            EntityTypeValue::User => Self::User,
-            EntityTypeValue::Workspace => Self::Workspace,
-            EntityTypeValue::Org => Self::Org,
-        }
-    }
-}
-
-impl From<EntityType> for EntityTypeValue {
-    fn from(value: EntityType) -> Self {
-        match value {
-            EntityType::User => Self::User,
-            EntityType::Workspace => Self::Workspace,
-            EntityType::Org => Self::Org,
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct SharingInParams {
-    raw: SharingIn,
-}
-
-impl SharingInParams {
-    pub fn new(
-        share_with_uuid: uuid::Uuid,
-        share_with_type: impl Into<EntityTypeValue>,
-        level: impl Into<ShareEnumValue>,
-    ) -> Self {
+impl CreateDeploymentWorkflowsDeploymentsRequestSpec {
+    pub fn new(github_url: impl Into<String>) -> Self {
         Self {
-            raw: SharingIn {
-                level: Into::<ShareEnumValue>::into(level).into(),
-                org_id: None,
-                share_with_type: Into::<EntityTypeValue>::into(share_with_type).into(),
-                share_with_uuid,
+            raw: DeploymentWorkerSpecInput {
+                entrypoint: None,
+                github_url: github_url.into(),
+                revision: None,
+                working_dir: None,
             },
         }
     }
     #[must_use]
-    pub fn org_id(mut self, org_id: uuid::Uuid) -> Self {
-        self.raw.org_id = Some(Some(org_id));
+    pub fn entrypoint(mut self, entrypoint: impl Into<String>) -> Self {
+        self.raw.entrypoint = Some(Some(entrypoint.into()));
         self
     }
 
     #[must_use]
-    pub fn org_id_null(mut self) -> Self {
-        self.raw.org_id = Some(None);
+    pub fn entrypoint_null(mut self) -> Self {
+        self.raw.entrypoint = Some(None);
         self
     }
-    pub fn from_raw(raw: SharingIn) -> Self {
+
+    #[must_use]
+    pub fn revision(mut self, revision: impl Into<String>) -> Self {
+        self.raw.revision = Some(Some(revision.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn revision_null(mut self) -> Self {
+        self.raw.revision = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn working_dir(mut self, working_dir: impl Into<String>) -> Self {
+        self.raw.working_dir = Some(Some(working_dir.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn working_dir_null(mut self) -> Self {
+        self.raw.working_dir = Some(None);
+        self
+    }
+    pub fn from_raw(raw: DeploymentWorkerSpecInput) -> Self {
         Self { raw }
     }
-    pub fn as_raw(&self) -> &SharingIn {
+    pub fn as_raw(&self) -> &DeploymentWorkerSpecInput {
         &self.raw
     }
-    pub fn into_raw(self) -> SharingIn {
+    pub fn into_raw(self) -> DeploymentWorkerSpecInput {
         self.raw
     }
 }
 
-impl From<SharingIn> for SharingInParams {
-    fn from(raw: SharingIn) -> Self {
+impl From<DeploymentWorkerSpecInput> for CreateDeploymentWorkflowsDeploymentsRequestSpec {
+    fn from(raw: DeploymentWorkerSpecInput) -> Self {
         Self { raw }
     }
 }
 
-impl From<SharingInParams> for SharingIn {
-    fn from(value: SharingInParams) -> Self {
+impl From<CreateDeploymentWorkflowsDeploymentsRequestSpec> for DeploymentWorkerSpecInput {
+    fn from(value: CreateDeploymentWorkflowsDeploymentsRequestSpec) -> Self {
         value.into_raw()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct SharingDeleteParams {
+pub struct CreateDeploymentWorkflowsDeploymentsResponse {
+    raw: ManagedDeploymentResponse,
+}
+
+impl CreateDeploymentWorkflowsDeploymentsResponse {
+    pub fn raw(&self) -> &ManagedDeploymentResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ManagedDeploymentResponse {
+        self.raw
+    }
+}
+
+impl From<ManagedDeploymentResponse> for CreateDeploymentWorkflowsDeploymentsResponse {
+    fn from(raw: ManagedDeploymentResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateDeploymentWorkflowsDeploymentsResponse> for ManagedDeploymentResponse {
+    fn from(value: CreateDeploymentWorkflowsDeploymentsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateEmbeddingsRequest {
+    raw: EmbeddingRequest,
+}
+
+impl CreateEmbeddingsRequest {
+    pub fn new(input: EmbeddingRequestInput, model: impl Into<String>) -> Self {
+        Self {
+            raw: EmbeddingRequest {
+                encoding_format: None,
+                input,
+                metadata: None,
+                model: model.into(),
+                output_dimension: None,
+                output_dtype: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn encoding_format(mut self, encoding_format: EncodingFormat) -> Self {
+        self.raw.encoding_format = Some(encoding_format);
+        self
+    }
+
+    #[must_use]
+    pub fn metadata(mut self, metadata: EmbeddingRequestMetadata) -> Self {
+        self.raw.metadata = Some(Some(metadata));
+        self
+    }
+
+    #[must_use]
+    pub fn metadata_null(mut self) -> Self {
+        self.raw.metadata = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn output_dimension(mut self, output_dimension: i64) -> Self {
+        self.raw.output_dimension = Some(Some(output_dimension));
+        self
+    }
+
+    #[must_use]
+    pub fn output_dimension_null(mut self) -> Self {
+        self.raw.output_dimension = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn output_dtype(mut self, output_dtype: EmbeddingDtype) -> Self {
+        self.raw.output_dtype = Some(output_dtype);
+        self
+    }
+    pub fn from_raw(raw: EmbeddingRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &EmbeddingRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> EmbeddingRequest {
+        self.raw
+    }
+}
+
+impl From<EmbeddingRequest> for CreateEmbeddingsRequest {
+    fn from(raw: EmbeddingRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateEmbeddingsRequest> for EmbeddingRequest {
+    fn from(value: CreateEmbeddingsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateEmbeddingsResponse {
+    raw: EmbeddingResponse,
+}
+
+impl CreateEmbeddingsResponse {
+    pub fn raw(&self) -> &EmbeddingResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> EmbeddingResponse {
+        self.raw
+    }
+}
+
+impl From<EmbeddingResponse> for CreateEmbeddingsResponse {
+    fn from(raw: EmbeddingResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateEmbeddingsResponse> for EmbeddingResponse {
+    fn from(value: CreateEmbeddingsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateOrUpdateOrganizationCredentialsBetaConnectorsRequest {
+    raw: CredentialsCreateOrUpdate,
+}
+
+impl CreateOrUpdateOrganizationCredentialsBetaConnectorsRequest {
+    pub fn new(name: impl Into<String>) -> Self {
+        Self {
+            raw: CredentialsCreateOrUpdate {
+                credentials: None,
+                is_default: None,
+                name: name.into(),
+                title: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn credentials(
+        mut self,
+        credentials: impl Into<CreateOrUpdateOrganizationCredentialsBetaConnectorsRequestCredentials>,
+    ) -> Self {
+        self.raw.credentials = Some(Some(
+            Into::<CreateOrUpdateOrganizationCredentialsBetaConnectorsRequestCredentials>::into(
+                credentials,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn credentials_null(mut self) -> Self {
+        self.raw.credentials = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn is_default(mut self, is_default: bool) -> Self {
+        self.raw.is_default = Some(Some(is_default));
+        self
+    }
+
+    #[must_use]
+    pub fn is_default_null(mut self) -> Self {
+        self.raw.is_default = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn title(mut self, title: impl Into<String>) -> Self {
+        self.raw.title = Some(Some(title.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn title_null(mut self) -> Self {
+        self.raw.title = Some(None);
+        self
+    }
+    pub fn from_raw(raw: CredentialsCreateOrUpdate) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &CredentialsCreateOrUpdate {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CredentialsCreateOrUpdate {
+        self.raw
+    }
+}
+
+impl From<CredentialsCreateOrUpdate>
+    for CreateOrUpdateOrganizationCredentialsBetaConnectorsRequest
+{
+    fn from(raw: CredentialsCreateOrUpdate) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateOrUpdateOrganizationCredentialsBetaConnectorsRequest>
+    for CredentialsCreateOrUpdate
+{
+    fn from(value: CreateOrUpdateOrganizationCredentialsBetaConnectorsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateOrUpdateOrganizationCredentialsBetaConnectorsRequestCredentials {
+    raw: ConnectionCredentials,
+}
+
+impl CreateOrUpdateOrganizationCredentialsBetaConnectorsRequestCredentials {
+    pub fn new() -> Self {
+        Self {
+            raw: ConnectionCredentials {
+                bearer_token: None,
+                github_installation_id: None,
+                headers: None,
+                oauth: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn bearer_token(mut self, bearer_token: impl Into<String>) -> Self {
+        self.raw.bearer_token = Some(Some(bearer_token.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn bearer_token_null(mut self) -> Self {
+        self.raw.bearer_token = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn github_installation_id(mut self, github_installation_id: impl Into<String>) -> Self {
+        self.raw.github_installation_id = Some(Some(github_installation_id.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn github_installation_id_null(mut self) -> Self {
+        self.raw.github_installation_id = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn headers(mut self, headers: ConnectionCredentialsHeaders) -> Self {
+        self.raw.headers = Some(Some(headers));
+        self
+    }
+
+    #[must_use]
+    pub fn headers_null(mut self) -> Self {
+        self.raw.headers = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn oauth(
+        mut self,
+        oauth: impl Into<CreateOrUpdateOrganizationCredentialsBetaConnectorsRequestCredentialsOauth>,
+    ) -> Self {
+        self.raw.oauth =
+            Some(
+                Some(
+                    Into::<
+                        CreateOrUpdateOrganizationCredentialsBetaConnectorsRequestCredentialsOauth,
+                    >::into(oauth)
+                    .into(),
+                ),
+            );
+        self
+    }
+
+    #[must_use]
+    pub fn oauth_null(mut self) -> Self {
+        self.raw.oauth = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ConnectionCredentials) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ConnectionCredentials {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ConnectionCredentials {
+        self.raw
+    }
+}
+
+impl From<ConnectionCredentials>
+    for CreateOrUpdateOrganizationCredentialsBetaConnectorsRequestCredentials
+{
+    fn from(raw: ConnectionCredentials) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateOrUpdateOrganizationCredentialsBetaConnectorsRequestCredentials>
+    for ConnectionCredentials
+{
+    fn from(value: CreateOrUpdateOrganizationCredentialsBetaConnectorsRequestCredentials) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for CreateOrUpdateOrganizationCredentialsBetaConnectorsRequestCredentials {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateOrUpdateOrganizationCredentialsBetaConnectorsRequestCredentialsOauth {
+    raw: OAuth2Token,
+}
+
+impl CreateOrUpdateOrganizationCredentialsBetaConnectorsRequestCredentialsOauth {
+    pub fn new(access_token: impl Into<String>) -> Self {
+        Self {
+            raw: OAuth2Token {
+                access_token: access_token.into(),
+                expires_at: None,
+                expires_in: None,
+                refresh_token: None,
+                scope: None,
+                token_type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn expires_at(mut self, expires_at: chrono::DateTime<chrono::Utc>) -> Self {
+        self.raw.expires_at = Some(Some(expires_at));
+        self
+    }
+
+    #[must_use]
+    pub fn expires_at_null(mut self) -> Self {
+        self.raw.expires_at = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn expires_in(mut self, expires_in: i64) -> Self {
+        self.raw.expires_in = Some(Some(expires_in));
+        self
+    }
+
+    #[must_use]
+    pub fn expires_in_null(mut self) -> Self {
+        self.raw.expires_in = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn refresh_token(mut self, refresh_token: impl Into<String>) -> Self {
+        self.raw.refresh_token = Some(Some(refresh_token.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn refresh_token_null(mut self) -> Self {
+        self.raw.refresh_token = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn scope(mut self, scope: impl Into<String>) -> Self {
+        self.raw.scope = Some(Some(scope.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn scope_null(mut self) -> Self {
+        self.raw.scope = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn token_type(mut self, token_type: OAuth2TokenTokenType) -> Self {
+        self.raw.token_type = Some(token_type);
+        self
+    }
+    pub fn from_raw(raw: OAuth2Token) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &OAuth2Token {
+        &self.raw
+    }
+    pub fn into_raw(self) -> OAuth2Token {
+        self.raw
+    }
+}
+
+impl From<OAuth2Token>
+    for CreateOrUpdateOrganizationCredentialsBetaConnectorsRequestCredentialsOauth
+{
+    fn from(raw: OAuth2Token) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateOrUpdateOrganizationCredentialsBetaConnectorsRequestCredentialsOauth>
+    for OAuth2Token
+{
+    fn from(
+        value: CreateOrUpdateOrganizationCredentialsBetaConnectorsRequestCredentialsOauth,
+    ) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateOrUpdateOrganizationCredentialsBetaConnectorsResponse {
+    raw: MessageResponse,
+}
+
+impl CreateOrUpdateOrganizationCredentialsBetaConnectorsResponse {
+    pub fn message(&self) -> &str {
+        &self.raw.message
+    }
+    pub fn raw(&self) -> &MessageResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> MessageResponse {
+        self.raw
+    }
+}
+
+impl From<MessageResponse> for CreateOrUpdateOrganizationCredentialsBetaConnectorsResponse {
+    fn from(raw: MessageResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateOrUpdateOrganizationCredentialsBetaConnectorsResponse> for MessageResponse {
+    fn from(value: CreateOrUpdateOrganizationCredentialsBetaConnectorsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateOrUpdateUserCredentialsBetaConnectorsRequest {
+    raw: CredentialsCreateOrUpdate,
+}
+
+impl CreateOrUpdateUserCredentialsBetaConnectorsRequest {
+    pub fn new(name: impl Into<String>) -> Self {
+        Self {
+            raw: CredentialsCreateOrUpdate {
+                credentials: None,
+                is_default: None,
+                name: name.into(),
+                title: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn credentials(
+        mut self,
+        credentials: impl Into<CreateOrUpdateUserCredentialsBetaConnectorsRequestCredentials>,
+    ) -> Self {
+        self.raw.credentials = Some(Some(
+            Into::<CreateOrUpdateUserCredentialsBetaConnectorsRequestCredentials>::into(
+                credentials,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn credentials_null(mut self) -> Self {
+        self.raw.credentials = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn is_default(mut self, is_default: bool) -> Self {
+        self.raw.is_default = Some(Some(is_default));
+        self
+    }
+
+    #[must_use]
+    pub fn is_default_null(mut self) -> Self {
+        self.raw.is_default = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn title(mut self, title: impl Into<String>) -> Self {
+        self.raw.title = Some(Some(title.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn title_null(mut self) -> Self {
+        self.raw.title = Some(None);
+        self
+    }
+    pub fn from_raw(raw: CredentialsCreateOrUpdate) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &CredentialsCreateOrUpdate {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CredentialsCreateOrUpdate {
+        self.raw
+    }
+}
+
+impl From<CredentialsCreateOrUpdate> for CreateOrUpdateUserCredentialsBetaConnectorsRequest {
+    fn from(raw: CredentialsCreateOrUpdate) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateOrUpdateUserCredentialsBetaConnectorsRequest> for CredentialsCreateOrUpdate {
+    fn from(value: CreateOrUpdateUserCredentialsBetaConnectorsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateOrUpdateUserCredentialsBetaConnectorsRequestCredentials {
+    raw: ConnectionCredentials,
+}
+
+impl CreateOrUpdateUserCredentialsBetaConnectorsRequestCredentials {
+    pub fn new() -> Self {
+        Self {
+            raw: ConnectionCredentials {
+                bearer_token: None,
+                github_installation_id: None,
+                headers: None,
+                oauth: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn bearer_token(mut self, bearer_token: impl Into<String>) -> Self {
+        self.raw.bearer_token = Some(Some(bearer_token.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn bearer_token_null(mut self) -> Self {
+        self.raw.bearer_token = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn github_installation_id(mut self, github_installation_id: impl Into<String>) -> Self {
+        self.raw.github_installation_id = Some(Some(github_installation_id.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn github_installation_id_null(mut self) -> Self {
+        self.raw.github_installation_id = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn headers(mut self, headers: ConnectionCredentialsHeaders) -> Self {
+        self.raw.headers = Some(Some(headers));
+        self
+    }
+
+    #[must_use]
+    pub fn headers_null(mut self) -> Self {
+        self.raw.headers = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn oauth(
+        mut self,
+        oauth: impl Into<CreateOrUpdateUserCredentialsBetaConnectorsRequestCredentialsOauth>,
+    ) -> Self {
+        self.raw.oauth = Some(Some(
+            Into::<CreateOrUpdateUserCredentialsBetaConnectorsRequestCredentialsOauth>::into(oauth)
+                .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn oauth_null(mut self) -> Self {
+        self.raw.oauth = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ConnectionCredentials) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ConnectionCredentials {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ConnectionCredentials {
+        self.raw
+    }
+}
+
+impl From<ConnectionCredentials> for CreateOrUpdateUserCredentialsBetaConnectorsRequestCredentials {
+    fn from(raw: ConnectionCredentials) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateOrUpdateUserCredentialsBetaConnectorsRequestCredentials> for ConnectionCredentials {
+    fn from(value: CreateOrUpdateUserCredentialsBetaConnectorsRequestCredentials) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for CreateOrUpdateUserCredentialsBetaConnectorsRequestCredentials {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateOrUpdateUserCredentialsBetaConnectorsRequestCredentialsOauth {
+    raw: OAuth2Token,
+}
+
+impl CreateOrUpdateUserCredentialsBetaConnectorsRequestCredentialsOauth {
+    pub fn new(access_token: impl Into<String>) -> Self {
+        Self {
+            raw: OAuth2Token {
+                access_token: access_token.into(),
+                expires_at: None,
+                expires_in: None,
+                refresh_token: None,
+                scope: None,
+                token_type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn expires_at(mut self, expires_at: chrono::DateTime<chrono::Utc>) -> Self {
+        self.raw.expires_at = Some(Some(expires_at));
+        self
+    }
+
+    #[must_use]
+    pub fn expires_at_null(mut self) -> Self {
+        self.raw.expires_at = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn expires_in(mut self, expires_in: i64) -> Self {
+        self.raw.expires_in = Some(Some(expires_in));
+        self
+    }
+
+    #[must_use]
+    pub fn expires_in_null(mut self) -> Self {
+        self.raw.expires_in = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn refresh_token(mut self, refresh_token: impl Into<String>) -> Self {
+        self.raw.refresh_token = Some(Some(refresh_token.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn refresh_token_null(mut self) -> Self {
+        self.raw.refresh_token = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn scope(mut self, scope: impl Into<String>) -> Self {
+        self.raw.scope = Some(Some(scope.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn scope_null(mut self) -> Self {
+        self.raw.scope = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn token_type(mut self, token_type: OAuth2TokenTokenType) -> Self {
+        self.raw.token_type = Some(token_type);
+        self
+    }
+    pub fn from_raw(raw: OAuth2Token) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &OAuth2Token {
+        &self.raw
+    }
+    pub fn into_raw(self) -> OAuth2Token {
+        self.raw
+    }
+}
+
+impl From<OAuth2Token> for CreateOrUpdateUserCredentialsBetaConnectorsRequestCredentialsOauth {
+    fn from(raw: OAuth2Token) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateOrUpdateUserCredentialsBetaConnectorsRequestCredentialsOauth> for OAuth2Token {
+    fn from(value: CreateOrUpdateUserCredentialsBetaConnectorsRequestCredentialsOauth) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateOrUpdateUserCredentialsBetaConnectorsResponse {
+    raw: MessageResponse,
+}
+
+impl CreateOrUpdateUserCredentialsBetaConnectorsResponse {
+    pub fn message(&self) -> &str {
+        &self.raw.message
+    }
+    pub fn raw(&self) -> &MessageResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> MessageResponse {
+        self.raw
+    }
+}
+
+impl From<MessageResponse> for CreateOrUpdateUserCredentialsBetaConnectorsResponse {
+    fn from(raw: MessageResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateOrUpdateUserCredentialsBetaConnectorsResponse> for MessageResponse {
+    fn from(value: CreateOrUpdateUserCredentialsBetaConnectorsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateOrUpdateWorkspaceCredentialsBetaConnectorsRequest {
+    raw: CredentialsCreateOrUpdate,
+}
+
+impl CreateOrUpdateWorkspaceCredentialsBetaConnectorsRequest {
+    pub fn new(name: impl Into<String>) -> Self {
+        Self {
+            raw: CredentialsCreateOrUpdate {
+                credentials: None,
+                is_default: None,
+                name: name.into(),
+                title: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn credentials(
+        mut self,
+        credentials: impl Into<CreateOrUpdateWorkspaceCredentialsBetaConnectorsRequestCredentials>,
+    ) -> Self {
+        self.raw.credentials = Some(Some(
+            Into::<CreateOrUpdateWorkspaceCredentialsBetaConnectorsRequestCredentials>::into(
+                credentials,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn credentials_null(mut self) -> Self {
+        self.raw.credentials = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn is_default(mut self, is_default: bool) -> Self {
+        self.raw.is_default = Some(Some(is_default));
+        self
+    }
+
+    #[must_use]
+    pub fn is_default_null(mut self) -> Self {
+        self.raw.is_default = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn title(mut self, title: impl Into<String>) -> Self {
+        self.raw.title = Some(Some(title.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn title_null(mut self) -> Self {
+        self.raw.title = Some(None);
+        self
+    }
+    pub fn from_raw(raw: CredentialsCreateOrUpdate) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &CredentialsCreateOrUpdate {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CredentialsCreateOrUpdate {
+        self.raw
+    }
+}
+
+impl From<CredentialsCreateOrUpdate> for CreateOrUpdateWorkspaceCredentialsBetaConnectorsRequest {
+    fn from(raw: CredentialsCreateOrUpdate) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateOrUpdateWorkspaceCredentialsBetaConnectorsRequest> for CredentialsCreateOrUpdate {
+    fn from(value: CreateOrUpdateWorkspaceCredentialsBetaConnectorsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateOrUpdateWorkspaceCredentialsBetaConnectorsRequestCredentials {
+    raw: ConnectionCredentials,
+}
+
+impl CreateOrUpdateWorkspaceCredentialsBetaConnectorsRequestCredentials {
+    pub fn new() -> Self {
+        Self {
+            raw: ConnectionCredentials {
+                bearer_token: None,
+                github_installation_id: None,
+                headers: None,
+                oauth: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn bearer_token(mut self, bearer_token: impl Into<String>) -> Self {
+        self.raw.bearer_token = Some(Some(bearer_token.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn bearer_token_null(mut self) -> Self {
+        self.raw.bearer_token = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn github_installation_id(mut self, github_installation_id: impl Into<String>) -> Self {
+        self.raw.github_installation_id = Some(Some(github_installation_id.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn github_installation_id_null(mut self) -> Self {
+        self.raw.github_installation_id = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn headers(mut self, headers: ConnectionCredentialsHeaders) -> Self {
+        self.raw.headers = Some(Some(headers));
+        self
+    }
+
+    #[must_use]
+    pub fn headers_null(mut self) -> Self {
+        self.raw.headers = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn oauth(
+        mut self,
+        oauth: impl Into<CreateOrUpdateWorkspaceCredentialsBetaConnectorsRequestCredentialsOauth>,
+    ) -> Self {
+        self.raw.oauth = Some(Some(
+            Into::<CreateOrUpdateWorkspaceCredentialsBetaConnectorsRequestCredentialsOauth>::into(
+                oauth,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn oauth_null(mut self) -> Self {
+        self.raw.oauth = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ConnectionCredentials) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ConnectionCredentials {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ConnectionCredentials {
+        self.raw
+    }
+}
+
+impl From<ConnectionCredentials>
+    for CreateOrUpdateWorkspaceCredentialsBetaConnectorsRequestCredentials
+{
+    fn from(raw: ConnectionCredentials) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateOrUpdateWorkspaceCredentialsBetaConnectorsRequestCredentials>
+    for ConnectionCredentials
+{
+    fn from(value: CreateOrUpdateWorkspaceCredentialsBetaConnectorsRequestCredentials) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for CreateOrUpdateWorkspaceCredentialsBetaConnectorsRequestCredentials {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateOrUpdateWorkspaceCredentialsBetaConnectorsRequestCredentialsOauth {
+    raw: OAuth2Token,
+}
+
+impl CreateOrUpdateWorkspaceCredentialsBetaConnectorsRequestCredentialsOauth {
+    pub fn new(access_token: impl Into<String>) -> Self {
+        Self {
+            raw: OAuth2Token {
+                access_token: access_token.into(),
+                expires_at: None,
+                expires_in: None,
+                refresh_token: None,
+                scope: None,
+                token_type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn expires_at(mut self, expires_at: chrono::DateTime<chrono::Utc>) -> Self {
+        self.raw.expires_at = Some(Some(expires_at));
+        self
+    }
+
+    #[must_use]
+    pub fn expires_at_null(mut self) -> Self {
+        self.raw.expires_at = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn expires_in(mut self, expires_in: i64) -> Self {
+        self.raw.expires_in = Some(Some(expires_in));
+        self
+    }
+
+    #[must_use]
+    pub fn expires_in_null(mut self) -> Self {
+        self.raw.expires_in = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn refresh_token(mut self, refresh_token: impl Into<String>) -> Self {
+        self.raw.refresh_token = Some(Some(refresh_token.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn refresh_token_null(mut self) -> Self {
+        self.raw.refresh_token = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn scope(mut self, scope: impl Into<String>) -> Self {
+        self.raw.scope = Some(Some(scope.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn scope_null(mut self) -> Self {
+        self.raw.scope = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn token_type(mut self, token_type: OAuth2TokenTokenType) -> Self {
+        self.raw.token_type = Some(token_type);
+        self
+    }
+    pub fn from_raw(raw: OAuth2Token) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &OAuth2Token {
+        &self.raw
+    }
+    pub fn into_raw(self) -> OAuth2Token {
+        self.raw
+    }
+}
+
+impl From<OAuth2Token> for CreateOrUpdateWorkspaceCredentialsBetaConnectorsRequestCredentialsOauth {
+    fn from(raw: OAuth2Token) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateOrUpdateWorkspaceCredentialsBetaConnectorsRequestCredentialsOauth> for OAuth2Token {
+    fn from(
+        value: CreateOrUpdateWorkspaceCredentialsBetaConnectorsRequestCredentialsOauth,
+    ) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateOrUpdateWorkspaceCredentialsBetaConnectorsResponse {
+    raw: MessageResponse,
+}
+
+impl CreateOrUpdateWorkspaceCredentialsBetaConnectorsResponse {
+    pub fn message(&self) -> &str {
+        &self.raw.message
+    }
+    pub fn raw(&self) -> &MessageResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> MessageResponse {
+        self.raw
+    }
+}
+
+impl From<MessageResponse> for CreateOrUpdateWorkspaceCredentialsBetaConnectorsResponse {
+    fn from(raw: MessageResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateOrUpdateWorkspaceCredentialsBetaConnectorsResponse> for MessageResponse {
+    fn from(value: CreateOrUpdateWorkspaceCredentialsBetaConnectorsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateRecordBetaObservabilityDatasetsRequest {
+    raw: CreateDatasetRecordRequest,
+}
+
+impl CreateRecordBetaObservabilityDatasetsRequest {
+    pub fn new(payload: DatasetRecordPayload) -> Self {
+        Self {
+            raw: CreateDatasetRecordRequest {
+                payload,
+                properties: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn properties(mut self, properties: CreateDatasetRecordRequestProperties) -> Self {
+        self.raw.properties = Some(properties);
+        self
+    }
+    pub fn from_raw(raw: CreateDatasetRecordRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &CreateDatasetRecordRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CreateDatasetRecordRequest {
+        self.raw
+    }
+}
+
+impl From<CreateDatasetRecordRequest> for CreateRecordBetaObservabilityDatasetsRequest {
+    fn from(raw: CreateDatasetRecordRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateRecordBetaObservabilityDatasetsRequest> for CreateDatasetRecordRequest {
+    fn from(value: CreateRecordBetaObservabilityDatasetsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateRecordBetaObservabilityDatasetsResponse {
+    raw: DatasetRecord,
+}
+
+impl CreateRecordBetaObservabilityDatasetsResponse {
+    pub fn raw(&self) -> &DatasetRecord {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DatasetRecord {
+        self.raw
+    }
+}
+
+impl From<DatasetRecord> for CreateRecordBetaObservabilityDatasetsResponse {
+    fn from(raw: DatasetRecord) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateRecordBetaObservabilityDatasetsResponse> for DatasetRecord {
+    fn from(value: CreateRecordBetaObservabilityDatasetsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateVersionAliasBetaAgentsResponse {
+    raw: AgentAliasResponse,
+}
+
+impl CreateVersionAliasBetaAgentsResponse {
+    pub fn raw(&self) -> &AgentAliasResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AgentAliasResponse {
+        self.raw
+    }
+}
+
+impl From<AgentAliasResponse> for CreateVersionAliasBetaAgentsResponse {
+    fn from(raw: AgentAliasResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateVersionAliasBetaAgentsResponse> for AgentAliasResponse {
+    fn from(value: CreateVersionAliasBetaAgentsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateVersionBetaPromptsRequest {
+    raw: PromptsCreateVersionRequest,
+}
+
+impl CreateVersionBetaPromptsRequest {
+    pub fn raw(&self) -> &PromptsCreateVersionRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> PromptsCreateVersionRequest {
+        self.raw
+    }
+}
+
+impl From<PromptsCreateVersionRequest> for CreateVersionBetaPromptsRequest {
+    fn from(raw: PromptsCreateVersionRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateVersionBetaPromptsRequest> for PromptsCreateVersionRequest {
+    fn from(value: CreateVersionBetaPromptsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateVersionBetaPromptsResponse {
+    raw: CreatePromptVersionResponse,
+}
+
+impl CreateVersionBetaPromptsResponse {
+    pub fn deduplicated(&self) -> Option<bool> {
+        self.raw.deduplicated
+    }
+    pub fn version(&self) -> Option<i32> {
+        self.raw.version
+    }
+    pub fn raw(&self) -> &CreatePromptVersionResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CreatePromptVersionResponse {
+        self.raw
+    }
+}
+
+impl From<CreatePromptVersionResponse> for CreateVersionBetaPromptsResponse {
+    fn from(raw: CreatePromptVersionResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateVersionBetaPromptsResponse> for CreatePromptVersionResponse {
+    fn from(value: CreateVersionBetaPromptsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateVersionBetaSkillsRequest {
+    raw: SkillsCreateVersionRequest,
+}
+
+impl CreateVersionBetaSkillsRequest {
+    pub fn raw(&self) -> &SkillsCreateVersionRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> SkillsCreateVersionRequest {
+        self.raw
+    }
+}
+
+impl From<SkillsCreateVersionRequest> for CreateVersionBetaSkillsRequest {
+    fn from(raw: SkillsCreateVersionRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateVersionBetaSkillsRequest> for SkillsCreateVersionRequest {
+    fn from(value: CreateVersionBetaSkillsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateVersionBetaSkillsResponse {
+    raw: CreateSkillVersionResponse,
+}
+
+impl CreateVersionBetaSkillsResponse {
+    pub fn deduplicated(&self) -> Option<bool> {
+        self.raw.deduplicated
+    }
+    pub fn version(&self) -> Option<i32> {
+        self.raw.version
+    }
+    pub fn raw(&self) -> &CreateSkillVersionResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CreateSkillVersionResponse {
+        self.raw
+    }
+}
+
+impl From<CreateSkillVersionResponse> for CreateVersionBetaSkillsResponse {
+    fn from(raw: CreateSkillVersionResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateVersionBetaSkillsResponse> for CreateSkillVersionResponse {
+    fn from(value: CreateVersionBetaSkillsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateWorkspaceBetaAdminWorkspacesRequest {
+    raw: AdminWorkspaceIn,
+}
+
+impl CreateWorkspaceBetaAdminWorkspacesRequest {
+    pub fn new(name: impl Into<String>, admin_user_id: uuid::Uuid) -> Self {
+        Self {
+            raw: AdminWorkspaceIn {
+                add_all_org_members: None,
+                admin_user_id,
+                description: None,
+                icon: None,
+                name: name.into(),
+            },
+        }
+    }
+    #[must_use]
+    pub fn add_all_org_members(mut self, add_all_org_members: bool) -> Self {
+        self.raw.add_all_org_members = Some(add_all_org_members);
+        self
+    }
+
+    #[must_use]
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.raw.description = Some(description.into());
+        self
+    }
+
+    #[must_use]
+    pub fn icon(mut self, icon: impl Into<String>) -> Self {
+        self.raw.icon = Some(icon.into());
+        self
+    }
+    pub fn from_raw(raw: AdminWorkspaceIn) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &AdminWorkspaceIn {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AdminWorkspaceIn {
+        self.raw
+    }
+}
+
+impl From<AdminWorkspaceIn> for CreateWorkspaceBetaAdminWorkspacesRequest {
+    fn from(raw: AdminWorkspaceIn) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateWorkspaceBetaAdminWorkspacesRequest> for AdminWorkspaceIn {
+    fn from(value: CreateWorkspaceBetaAdminWorkspacesRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CreateWorkspaceBetaAdminWorkspacesResponse {
+    raw: WorkspaceEnrichedOUT,
+}
+
+impl CreateWorkspaceBetaAdminWorkspacesResponse {
+    pub fn raw(&self) -> &WorkspaceEnrichedOUT {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkspaceEnrichedOUT {
+        self.raw
+    }
+}
+
+impl From<WorkspaceEnrichedOUT> for CreateWorkspaceBetaAdminWorkspacesResponse {
+    fn from(raw: WorkspaceEnrichedOUT) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<CreateWorkspaceBetaAdminWorkspacesResponse> for WorkspaceEnrichedOUT {
+    fn from(value: CreateWorkspaceBetaAdminWorkspacesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DeactivateForConsumerBetaConnectorsResponse {
+    raw: MessageResponse,
+}
+
+impl DeactivateForConsumerBetaConnectorsResponse {
+    pub fn message(&self) -> &str {
+        &self.raw.message
+    }
+    pub fn raw(&self) -> &MessageResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> MessageResponse {
+        self.raw
+    }
+}
+
+impl From<MessageResponse> for DeactivateForConsumerBetaConnectorsResponse {
+    fn from(raw: MessageResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<DeactivateForConsumerBetaConnectorsResponse> for MessageResponse {
+    fn from(value: DeactivateForConsumerBetaConnectorsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DeleteAllUserCredentialsBetaConnectorsResponse {
+    raw: MessageResponse,
+}
+
+impl DeleteAllUserCredentialsBetaConnectorsResponse {
+    pub fn message(&self) -> &str {
+        &self.raw.message
+    }
+    pub fn raw(&self) -> &MessageResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> MessageResponse {
+        self.raw
+    }
+}
+
+impl From<MessageResponse> for DeleteAllUserCredentialsBetaConnectorsResponse {
+    fn from(raw: MessageResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<DeleteAllUserCredentialsBetaConnectorsResponse> for MessageResponse {
+    fn from(value: DeleteAllUserCredentialsBetaConnectorsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DeleteApiKeyBetaAdminApiKeysResponse {
+    raw: DeleteAPIKeyOUT,
+}
+
+impl DeleteApiKeyBetaAdminApiKeysResponse {
+    pub fn detail(&self) -> &str {
+        &self.raw.detail
+    }
+    pub fn raw(&self) -> &DeleteAPIKeyOUT {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DeleteAPIKeyOUT {
+        self.raw
+    }
+}
+
+impl From<DeleteAPIKeyOUT> for DeleteApiKeyBetaAdminApiKeysResponse {
+    fn from(raw: DeleteAPIKeyOUT) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<DeleteApiKeyBetaAdminApiKeysResponse> for DeleteAPIKeyOUT {
+    fn from(value: DeleteApiKeyBetaAdminApiKeysResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DeleteAudioVoicesResponse {
+    raw: VoiceResponse,
+}
+
+impl DeleteAudioVoicesResponse {
+    pub fn raw(&self) -> &VoiceResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> VoiceResponse {
+        self.raw
+    }
+}
+
+impl From<VoiceResponse> for DeleteAudioVoicesResponse {
+    fn from(raw: VoiceResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<DeleteAudioVoicesResponse> for VoiceResponse {
+    fn from(value: DeleteAudioVoicesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DeleteBatchJobsResponse {
+    raw: DeleteBatchJobResponse,
+}
+
+impl DeleteBatchJobsResponse {
+    pub fn raw(&self) -> &DeleteBatchJobResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DeleteBatchJobResponse {
+        self.raw
+    }
+}
+
+impl From<DeleteBatchJobResponse> for DeleteBatchJobsResponse {
+    fn from(raw: DeleteBatchJobResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<DeleteBatchJobsResponse> for DeleteBatchJobResponse {
+    fn from(value: DeleteBatchJobsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DeleteBetaConnectorsResponse {
+    raw: MessageResponse,
+}
+
+impl DeleteBetaConnectorsResponse {
+    pub fn message(&self) -> &str {
+        &self.raw.message
+    }
+    pub fn raw(&self) -> &MessageResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> MessageResponse {
+        self.raw
+    }
+}
+
+impl From<MessageResponse> for DeleteBetaConnectorsResponse {
+    fn from(raw: MessageResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<DeleteBetaConnectorsResponse> for MessageResponse {
+    fn from(value: DeleteBetaConnectorsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DeleteBetaLibrariesAccessesRequest {
     raw: SharingDelete,
 }
 
-impl SharingDeleteParams {
-    pub fn new(share_with_uuid: uuid::Uuid, share_with_type: impl Into<EntityTypeValue>) -> Self {
+impl DeleteBetaLibrariesAccessesRequest {
+    pub fn new(share_with_uuid: uuid::Uuid, share_with_type: EntityType) -> Self {
         Self {
             raw: SharingDelete {
                 org_id: None,
-                share_with_type: Into::<EntityTypeValue>::into(share_with_type).into(),
+                share_with_type,
                 share_with_uuid,
             },
         }
@@ -5923,53 +8224,3918 @@ impl SharingDeleteParams {
     }
 }
 
-impl From<SharingDelete> for SharingDeleteParams {
+impl From<SharingDelete> for DeleteBetaLibrariesAccessesRequest {
     fn from(raw: SharingDelete) -> Self {
         Self { raw }
     }
 }
 
-impl From<SharingDeleteParams> for SharingDelete {
-    fn from(value: SharingDeleteParams) -> Self {
+impl From<DeleteBetaLibrariesAccessesRequest> for SharingDelete {
+    fn from(value: DeleteBetaLibrariesAccessesRequest) -> Self {
         value.into_raw()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct ListSharingOutView {
-    raw: ListSharingOut,
+pub struct DeleteBetaLibrariesAccessesResponse {
+    raw: Sharing,
 }
 
-impl ListSharingOutView {
-    pub fn raw(&self) -> &ListSharingOut {
+impl DeleteBetaLibrariesAccessesResponse {
+    pub fn raw(&self) -> &Sharing {
         &self.raw
     }
-    pub fn into_raw(self) -> ListSharingOut {
+    pub fn into_raw(self) -> Sharing {
         self.raw
     }
 }
 
-impl From<ListSharingOut> for ListSharingOutView {
-    fn from(raw: ListSharingOut) -> Self {
+impl From<Sharing> for DeleteBetaLibrariesAccessesResponse {
+    fn from(raw: Sharing) -> Self {
         Self { raw }
     }
 }
 
-impl From<ListSharingOutView> for ListSharingOut {
-    fn from(value: ListSharingOutView) -> Self {
+impl From<DeleteBetaLibrariesAccessesResponse> for Sharing {
+    fn from(value: DeleteBetaLibrariesAccessesResponse) -> Self {
         value.into_raw()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct LibraryInUpdateParams {
-    raw: LibraryInUpdate,
+pub struct DeleteBetaLibrariesResponse {
+    raw: Library,
 }
 
-impl LibraryInUpdateParams {
+impl DeleteBetaLibrariesResponse {
+    pub fn raw(&self) -> &Library {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Library {
+        self.raw
+    }
+}
+
+impl From<Library> for DeleteBetaLibrariesResponse {
+    fn from(raw: Library) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<DeleteBetaLibrariesResponse> for Library {
+    fn from(value: DeleteBetaLibrariesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DeleteBetaPromptsResponse {
+    raw: DeletePromptResponse,
+}
+
+impl DeleteBetaPromptsResponse {
+    pub fn raw(&self) -> &DeletePromptResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DeletePromptResponse {
+        self.raw
+    }
+}
+
+impl From<DeletePromptResponse> for DeleteBetaPromptsResponse {
+    fn from(raw: DeletePromptResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<DeleteBetaPromptsResponse> for DeletePromptResponse {
+    fn from(value: DeleteBetaPromptsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DeleteBetaSkillsResponse {
+    raw: DeleteSkillResponse,
+}
+
+impl DeleteBetaSkillsResponse {
+    pub fn raw(&self) -> &DeleteSkillResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DeleteSkillResponse {
+        self.raw
+    }
+}
+
+impl From<DeleteSkillResponse> for DeleteBetaSkillsResponse {
+    fn from(raw: DeleteSkillResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<DeleteBetaSkillsResponse> for DeleteSkillResponse {
+    fn from(value: DeleteBetaSkillsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DeleteDeploymentWorkflowsDeploymentsResponse {
+    raw: ManagedDeploymentResponse,
+}
+
+impl DeleteDeploymentWorkflowsDeploymentsResponse {
+    pub fn raw(&self) -> &ManagedDeploymentResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ManagedDeploymentResponse {
+        self.raw
+    }
+}
+
+impl From<ManagedDeploymentResponse> for DeleteDeploymentWorkflowsDeploymentsResponse {
+    fn from(raw: ManagedDeploymentResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<DeleteDeploymentWorkflowsDeploymentsResponse> for ManagedDeploymentResponse {
+    fn from(value: DeleteDeploymentWorkflowsDeploymentsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DeleteFilesResponse {
+    raw: DeleteFileResponse,
+}
+
+impl DeleteFilesResponse {
+    pub fn raw(&self) -> &DeleteFileResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DeleteFileResponse {
+        self.raw
+    }
+}
+
+impl From<DeleteFileResponse> for DeleteFilesResponse {
+    fn from(raw: DeleteFileResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<DeleteFilesResponse> for DeleteFileResponse {
+    fn from(value: DeleteFilesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DeleteModelsResponse {
+    raw: DeleteModelResponse,
+}
+
+impl DeleteModelsResponse {
+    pub fn deleted(&self) -> Option<bool> {
+        self.raw.deleted
+    }
+    pub fn id(&self) -> &str {
+        &self.raw.id
+    }
+    pub fn object(&self) -> Option<&str> {
+        self.raw.object.as_deref()
+    }
+    pub fn raw(&self) -> &DeleteModelResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DeleteModelResponse {
+        self.raw
+    }
+}
+
+impl From<DeleteModelResponse> for DeleteModelsResponse {
+    fn from(raw: DeleteModelResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<DeleteModelsResponse> for DeleteModelResponse {
+    fn from(value: DeleteModelsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DeleteOrganizationCredentialsBetaConnectorsResponse {
+    raw: MessageResponse,
+}
+
+impl DeleteOrganizationCredentialsBetaConnectorsResponse {
+    pub fn message(&self) -> &str {
+        &self.raw.message
+    }
+    pub fn raw(&self) -> &MessageResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> MessageResponse {
+        self.raw
+    }
+}
+
+impl From<MessageResponse> for DeleteOrganizationCredentialsBetaConnectorsResponse {
+    fn from(raw: MessageResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<DeleteOrganizationCredentialsBetaConnectorsResponse> for MessageResponse {
+    fn from(value: DeleteOrganizationCredentialsBetaConnectorsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DeleteUserCredentialsBetaConnectorsResponse {
+    raw: MessageResponse,
+}
+
+impl DeleteUserCredentialsBetaConnectorsResponse {
+    pub fn message(&self) -> &str {
+        &self.raw.message
+    }
+    pub fn raw(&self) -> &MessageResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> MessageResponse {
+        self.raw
+    }
+}
+
+impl From<MessageResponse> for DeleteUserCredentialsBetaConnectorsResponse {
+    fn from(raw: MessageResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<DeleteUserCredentialsBetaConnectorsResponse> for MessageResponse {
+    fn from(value: DeleteUserCredentialsBetaConnectorsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct DeleteWorkspaceCredentialsBetaConnectorsResponse {
+    raw: MessageResponse,
+}
+
+impl DeleteWorkspaceCredentialsBetaConnectorsResponse {
+    pub fn message(&self) -> &str {
+        &self.raw.message
+    }
+    pub fn raw(&self) -> &MessageResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> MessageResponse {
+        self.raw
+    }
+}
+
+impl From<MessageResponse> for DeleteWorkspaceCredentialsBetaConnectorsResponse {
+    fn from(raw: MessageResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<DeleteWorkspaceCredentialsBetaConnectorsResponse> for MessageResponse {
+    fn from(value: DeleteWorkspaceCredentialsBetaConnectorsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ExecuteWorkflowRegistrationWorkflowsRequest {
+    raw: WorkflowExecutionRequest,
+}
+
+impl ExecuteWorkflowRegistrationWorkflowsRequest {
     pub fn new() -> Self {
         Self {
-            raw: LibraryInUpdate {
+            raw: WorkflowExecutionRequest {
+                custom_tracing_attributes: None,
+                deployment_name: None,
+                execution_id: None,
+                extensions: None,
+                force_new_trace: None,
+                input: None,
+                task_queue: None,
+                timeout_seconds: None,
+                wait_for_result: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn custom_tracing_attributes(
+        mut self,
+        custom_tracing_attributes: WorkflowExecutionRequestCustomTracingAttributes,
+    ) -> Self {
+        self.raw.custom_tracing_attributes = Some(Some(custom_tracing_attributes));
+        self
+    }
+
+    #[must_use]
+    pub fn custom_tracing_attributes_null(mut self) -> Self {
+        self.raw.custom_tracing_attributes = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn deployment_name(mut self, deployment_name: impl Into<String>) -> Self {
+        self.raw.deployment_name = Some(Some(deployment_name.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn deployment_name_null(mut self) -> Self {
+        self.raw.deployment_name = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn execution_id(mut self, execution_id: impl Into<String>) -> Self {
+        self.raw.execution_id = Some(Some(execution_id.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn execution_id_null(mut self) -> Self {
+        self.raw.execution_id = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn extensions(mut self, extensions: WorkflowExecutionRequestExtensions) -> Self {
+        self.raw.extensions = Some(Some(extensions));
+        self
+    }
+
+    #[must_use]
+    pub fn extensions_null(mut self) -> Self {
+        self.raw.extensions = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn force_new_trace(mut self, force_new_trace: bool) -> Self {
+        self.raw.force_new_trace = Some(force_new_trace);
+        self
+    }
+
+    #[must_use]
+    pub fn input(mut self, input: WorkflowExecutionRequestInput) -> Self {
+        self.raw.input = Some(Some(input));
+        self
+    }
+
+    #[must_use]
+    pub fn input_null(mut self) -> Self {
+        self.raw.input = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn task_queue(mut self, task_queue: impl Into<String>) -> Self {
+        self.raw.task_queue = Some(Some(task_queue.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn task_queue_null(mut self) -> Self {
+        self.raw.task_queue = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn timeout_seconds(mut self, timeout_seconds: f64) -> Self {
+        self.raw.timeout_seconds = Some(Some(timeout_seconds));
+        self
+    }
+
+    #[must_use]
+    pub fn timeout_seconds_null(mut self) -> Self {
+        self.raw.timeout_seconds = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn wait_for_result(mut self, wait_for_result: bool) -> Self {
+        self.raw.wait_for_result = Some(wait_for_result);
+        self
+    }
+    pub fn from_raw(raw: WorkflowExecutionRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &WorkflowExecutionRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowExecutionRequest {
+        self.raw
+    }
+}
+
+impl From<WorkflowExecutionRequest> for ExecuteWorkflowRegistrationWorkflowsRequest {
+    fn from(raw: WorkflowExecutionRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ExecuteWorkflowRegistrationWorkflowsRequest> for WorkflowExecutionRequest {
+    fn from(value: ExecuteWorkflowRegistrationWorkflowsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for ExecuteWorkflowRegistrationWorkflowsRequest {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub enum ExecuteWorkflowRegistrationWorkflowsResponse {
+    WorkflowExecutionResponse(
+        ExecuteWorkflowRegistrationWorkflowsResponseWorkflowExecutionResponse,
+    ),
+    WorkflowExecutionSyncResponse(
+        ExecuteWorkflowRegistrationWorkflowsResponseWorkflowExecutionSyncResponse,
+    ),
+}
+
+impl From<ExecuteWorkflowRegistrationWorkflowsResponseWorkflowExecutionResponse>
+    for ExecuteWorkflowRegistrationWorkflowsResponse
+{
+    fn from(value: ExecuteWorkflowRegistrationWorkflowsResponseWorkflowExecutionResponse) -> Self {
+        Self::WorkflowExecutionResponse(value)
+    }
+}
+
+impl From<ExecuteWorkflowRegistrationWorkflowsResponseWorkflowExecutionSyncResponse>
+    for ExecuteWorkflowRegistrationWorkflowsResponse
+{
+    fn from(
+        value: ExecuteWorkflowRegistrationWorkflowsResponseWorkflowExecutionSyncResponse,
+    ) -> Self {
+        Self::WorkflowExecutionSyncResponse(value)
+    }
+}
+
+impl From<ExecuteWorkflowRegistrationWorkflowsResponse>
+    for ExecuteWorkflowRegistrationV1WorkflowsRegistrationsWorkflowRegistrationIdExecutePostResponse
+{
+    fn from(value: ExecuteWorkflowRegistrationWorkflowsResponse) -> Self {
+        match value {
+            ExecuteWorkflowRegistrationWorkflowsResponse::WorkflowExecutionResponse(value) => {
+                Self::WorkflowExecutionResponse(value.into())
+            }
+            ExecuteWorkflowRegistrationWorkflowsResponse::WorkflowExecutionSyncResponse(value) => {
+                Self::WorkflowExecutionSyncResponse(value.into())
+            }
+        }
+    }
+}
+
+impl From<ExecuteWorkflowRegistrationV1WorkflowsRegistrationsWorkflowRegistrationIdExecutePostResponse> for ExecuteWorkflowRegistrationWorkflowsResponse {
+    fn from(value: ExecuteWorkflowRegistrationV1WorkflowsRegistrationsWorkflowRegistrationIdExecutePostResponse) -> Self { match value {
+        ExecuteWorkflowRegistrationV1WorkflowsRegistrationsWorkflowRegistrationIdExecutePostResponse::WorkflowExecutionResponse(value) => Self::WorkflowExecutionResponse(value.into()),ExecuteWorkflowRegistrationV1WorkflowsRegistrationsWorkflowRegistrationIdExecutePostResponse::WorkflowExecutionSyncResponse(value) => Self::WorkflowExecutionSyncResponse(value.into())
+    } }
+}
+
+#[derive(Debug, Clone)]
+pub struct ExecuteWorkflowRegistrationWorkflowsResponseWorkflowExecutionResponse {
+    raw: WorkflowExecutionResponse,
+}
+
+impl ExecuteWorkflowRegistrationWorkflowsResponseWorkflowExecutionResponse {
+    pub fn raw(&self) -> &WorkflowExecutionResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowExecutionResponse {
+        self.raw
+    }
+}
+
+impl From<WorkflowExecutionResponse>
+    for ExecuteWorkflowRegistrationWorkflowsResponseWorkflowExecutionResponse
+{
+    fn from(raw: WorkflowExecutionResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ExecuteWorkflowRegistrationWorkflowsResponseWorkflowExecutionResponse>
+    for WorkflowExecutionResponse
+{
+    fn from(value: ExecuteWorkflowRegistrationWorkflowsResponseWorkflowExecutionResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ExecuteWorkflowRegistrationWorkflowsResponseWorkflowExecutionSyncResponse {
+    raw: WorkflowExecutionSyncResponse,
+}
+
+impl ExecuteWorkflowRegistrationWorkflowsResponseWorkflowExecutionSyncResponse {
+    pub fn raw(&self) -> &WorkflowExecutionSyncResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowExecutionSyncResponse {
+        self.raw
+    }
+}
+
+impl From<WorkflowExecutionSyncResponse>
+    for ExecuteWorkflowRegistrationWorkflowsResponseWorkflowExecutionSyncResponse
+{
+    fn from(raw: WorkflowExecutionSyncResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ExecuteWorkflowRegistrationWorkflowsResponseWorkflowExecutionSyncResponse>
+    for WorkflowExecutionSyncResponse
+{
+    fn from(
+        value: ExecuteWorkflowRegistrationWorkflowsResponseWorkflowExecutionSyncResponse,
+    ) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ExecuteWorkflowWorkflowsRequest {
+    raw: WorkflowExecutionRequest,
+}
+
+impl ExecuteWorkflowWorkflowsRequest {
+    pub fn new() -> Self {
+        Self {
+            raw: WorkflowExecutionRequest {
+                custom_tracing_attributes: None,
+                deployment_name: None,
+                execution_id: None,
+                extensions: None,
+                force_new_trace: None,
+                input: None,
+                task_queue: None,
+                timeout_seconds: None,
+                wait_for_result: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn custom_tracing_attributes(
+        mut self,
+        custom_tracing_attributes: WorkflowExecutionRequestCustomTracingAttributes,
+    ) -> Self {
+        self.raw.custom_tracing_attributes = Some(Some(custom_tracing_attributes));
+        self
+    }
+
+    #[must_use]
+    pub fn custom_tracing_attributes_null(mut self) -> Self {
+        self.raw.custom_tracing_attributes = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn deployment_name(mut self, deployment_name: impl Into<String>) -> Self {
+        self.raw.deployment_name = Some(Some(deployment_name.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn deployment_name_null(mut self) -> Self {
+        self.raw.deployment_name = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn execution_id(mut self, execution_id: impl Into<String>) -> Self {
+        self.raw.execution_id = Some(Some(execution_id.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn execution_id_null(mut self) -> Self {
+        self.raw.execution_id = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn extensions(mut self, extensions: WorkflowExecutionRequestExtensions) -> Self {
+        self.raw.extensions = Some(Some(extensions));
+        self
+    }
+
+    #[must_use]
+    pub fn extensions_null(mut self) -> Self {
+        self.raw.extensions = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn force_new_trace(mut self, force_new_trace: bool) -> Self {
+        self.raw.force_new_trace = Some(force_new_trace);
+        self
+    }
+
+    #[must_use]
+    pub fn input(mut self, input: WorkflowExecutionRequestInput) -> Self {
+        self.raw.input = Some(Some(input));
+        self
+    }
+
+    #[must_use]
+    pub fn input_null(mut self) -> Self {
+        self.raw.input = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn task_queue(mut self, task_queue: impl Into<String>) -> Self {
+        self.raw.task_queue = Some(Some(task_queue.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn task_queue_null(mut self) -> Self {
+        self.raw.task_queue = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn timeout_seconds(mut self, timeout_seconds: f64) -> Self {
+        self.raw.timeout_seconds = Some(Some(timeout_seconds));
+        self
+    }
+
+    #[must_use]
+    pub fn timeout_seconds_null(mut self) -> Self {
+        self.raw.timeout_seconds = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn wait_for_result(mut self, wait_for_result: bool) -> Self {
+        self.raw.wait_for_result = Some(wait_for_result);
+        self
+    }
+    pub fn from_raw(raw: WorkflowExecutionRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &WorkflowExecutionRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowExecutionRequest {
+        self.raw
+    }
+}
+
+impl From<WorkflowExecutionRequest> for ExecuteWorkflowWorkflowsRequest {
+    fn from(raw: WorkflowExecutionRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ExecuteWorkflowWorkflowsRequest> for WorkflowExecutionRequest {
+    fn from(value: ExecuteWorkflowWorkflowsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for ExecuteWorkflowWorkflowsRequest {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub enum ExecuteWorkflowWorkflowsResponse {
+    WorkflowExecutionResponse(ExecuteWorkflowWorkflowsResponseWorkflowExecutionResponse),
+    WorkflowExecutionSyncResponse(ExecuteWorkflowWorkflowsResponseWorkflowExecutionSyncResponse),
+}
+
+impl From<ExecuteWorkflowWorkflowsResponseWorkflowExecutionResponse>
+    for ExecuteWorkflowWorkflowsResponse
+{
+    fn from(value: ExecuteWorkflowWorkflowsResponseWorkflowExecutionResponse) -> Self {
+        Self::WorkflowExecutionResponse(value)
+    }
+}
+
+impl From<ExecuteWorkflowWorkflowsResponseWorkflowExecutionSyncResponse>
+    for ExecuteWorkflowWorkflowsResponse
+{
+    fn from(value: ExecuteWorkflowWorkflowsResponseWorkflowExecutionSyncResponse) -> Self {
+        Self::WorkflowExecutionSyncResponse(value)
+    }
+}
+
+impl From<ExecuteWorkflowWorkflowsResponse>
+    for ExecuteWorkflowV1WorkflowsWorkflowIdentifierExecutePostResponse
+{
+    fn from(value: ExecuteWorkflowWorkflowsResponse) -> Self {
+        match value {
+            ExecuteWorkflowWorkflowsResponse::WorkflowExecutionResponse(value) => {
+                Self::WorkflowExecutionResponse(value.into())
+            }
+            ExecuteWorkflowWorkflowsResponse::WorkflowExecutionSyncResponse(value) => {
+                Self::WorkflowExecutionSyncResponse(value.into())
+            }
+        }
+    }
+}
+
+impl From<ExecuteWorkflowV1WorkflowsWorkflowIdentifierExecutePostResponse>
+    for ExecuteWorkflowWorkflowsResponse
+{
+    fn from(value: ExecuteWorkflowV1WorkflowsWorkflowIdentifierExecutePostResponse) -> Self {
+        match value {
+        ExecuteWorkflowV1WorkflowsWorkflowIdentifierExecutePostResponse::WorkflowExecutionResponse(value) => Self::WorkflowExecutionResponse(value.into()),ExecuteWorkflowV1WorkflowsWorkflowIdentifierExecutePostResponse::WorkflowExecutionSyncResponse(value) => Self::WorkflowExecutionSyncResponse(value.into())
+    }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ExecuteWorkflowWorkflowsResponseWorkflowExecutionResponse {
+    raw: WorkflowExecutionResponse,
+}
+
+impl ExecuteWorkflowWorkflowsResponseWorkflowExecutionResponse {
+    pub fn raw(&self) -> &WorkflowExecutionResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowExecutionResponse {
+        self.raw
+    }
+}
+
+impl From<WorkflowExecutionResponse> for ExecuteWorkflowWorkflowsResponseWorkflowExecutionResponse {
+    fn from(raw: WorkflowExecutionResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ExecuteWorkflowWorkflowsResponseWorkflowExecutionResponse> for WorkflowExecutionResponse {
+    fn from(value: ExecuteWorkflowWorkflowsResponseWorkflowExecutionResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ExecuteWorkflowWorkflowsResponseWorkflowExecutionSyncResponse {
+    raw: WorkflowExecutionSyncResponse,
+}
+
+impl ExecuteWorkflowWorkflowsResponseWorkflowExecutionSyncResponse {
+    pub fn raw(&self) -> &WorkflowExecutionSyncResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowExecutionSyncResponse {
+        self.raw
+    }
+}
+
+impl From<WorkflowExecutionSyncResponse>
+    for ExecuteWorkflowWorkflowsResponseWorkflowExecutionSyncResponse
+{
+    fn from(raw: WorkflowExecutionSyncResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ExecuteWorkflowWorkflowsResponseWorkflowExecutionSyncResponse>
+    for WorkflowExecutionSyncResponse
+{
+    fn from(value: ExecuteWorkflowWorkflowsResponseWorkflowExecutionSyncResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ExportToJsonlBetaObservabilityDatasetsResponse {
+    raw: ExportDatasetResponse,
+}
+
+impl ExportToJsonlBetaObservabilityDatasetsResponse {
+    pub fn file_url(&self) -> &str {
+        &self.raw.file_url
+    }
+    pub fn raw(&self) -> &ExportDatasetResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ExportDatasetResponse {
+        self.raw
+    }
+}
+
+impl From<ExportDatasetResponse> for ExportToJsonlBetaObservabilityDatasetsResponse {
+    fn from(raw: ExportDatasetResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ExportToJsonlBetaObservabilityDatasetsResponse> for ExportDatasetResponse {
+    fn from(value: ExportToJsonlBetaObservabilityDatasetsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+pub type ExtractedTextSignedUrlBetaLibrariesDocumentsResponse = String;
+
+#[derive(Debug, Clone)]
+pub struct FetchBetaObservabilityDatasetsRecordsResponse {
+    raw: DatasetRecord,
+}
+
+impl FetchBetaObservabilityDatasetsRecordsResponse {
+    pub fn raw(&self) -> &DatasetRecord {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DatasetRecord {
+        self.raw
+    }
+}
+
+impl From<DatasetRecord> for FetchBetaObservabilityDatasetsRecordsResponse {
+    fn from(raw: DatasetRecord) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<FetchBetaObservabilityDatasetsRecordsResponse> for DatasetRecord {
+    fn from(value: FetchBetaObservabilityDatasetsRecordsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct FetchBetaObservabilityDatasetsResponse {
+    raw: DatasetPreview,
+}
+
+impl FetchBetaObservabilityDatasetsResponse {
+    pub fn raw(&self) -> &DatasetPreview {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DatasetPreview {
+        self.raw
+    }
+}
+
+impl From<DatasetPreview> for FetchBetaObservabilityDatasetsResponse {
+    fn from(raw: DatasetPreview) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<FetchBetaObservabilityDatasetsResponse> for DatasetPreview {
+    fn from(value: FetchBetaObservabilityDatasetsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct FetchBetaObservabilityJudgesResponse {
+    raw: Judge,
+}
+
+impl FetchBetaObservabilityJudgesResponse {
+    pub fn raw(&self) -> &Judge {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Judge {
+        self.raw
+    }
+}
+
+impl From<Judge> for FetchBetaObservabilityJudgesResponse {
+    fn from(raw: Judge) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<FetchBetaObservabilityJudgesResponse> for Judge {
+    fn from(value: FetchBetaObservabilityJudgesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct FetchOptionsBetaObservabilityLogsResponse {
+    raw: GetLogFieldOptions,
+}
+
+impl FetchOptionsBetaObservabilityLogsResponse {
+    pub fn raw(&self) -> &GetLogFieldOptions {
+        &self.raw
+    }
+    pub fn into_raw(self) -> GetLogFieldOptions {
+        self.raw
+    }
+}
+
+impl From<GetLogFieldOptions> for FetchOptionsBetaObservabilityLogsResponse {
+    fn from(raw: GetLogFieldOptions) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<FetchOptionsBetaObservabilityLogsResponse> for GetLogFieldOptions {
+    fn from(value: FetchOptionsBetaObservabilityLogsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct FetchOptionsBetaObservabilityTracesResponse {
+    raw: GetTraceFieldOptions,
+}
+
+impl FetchOptionsBetaObservabilityTracesResponse {
+    pub fn raw(&self) -> &GetTraceFieldOptions {
+        &self.raw
+    }
+    pub fn into_raw(self) -> GetTraceFieldOptions {
+        self.raw
+    }
+}
+
+impl From<GetTraceFieldOptions> for FetchOptionsBetaObservabilityTracesResponse {
+    fn from(raw: GetTraceFieldOptions) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<FetchOptionsBetaObservabilityTracesResponse> for GetTraceFieldOptions {
+    fn from(value: FetchOptionsBetaObservabilityTracesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct FetchSpanEvalFieldOptionsBetaObservabilitySpansResponse {
+    raw: GetSpanEvaluationFieldOptions,
+}
+
+impl FetchSpanEvalFieldOptionsBetaObservabilitySpansResponse {
+    pub fn raw(&self) -> &GetSpanEvaluationFieldOptions {
+        &self.raw
+    }
+    pub fn into_raw(self) -> GetSpanEvaluationFieldOptions {
+        self.raw
+    }
+}
+
+impl From<GetSpanEvaluationFieldOptions>
+    for FetchSpanEvalFieldOptionsBetaObservabilitySpansResponse
+{
+    fn from(raw: GetSpanEvaluationFieldOptions) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<FetchSpanEvalFieldOptionsBetaObservabilitySpansResponse>
+    for GetSpanEvaluationFieldOptions
+{
+    fn from(value: FetchSpanEvalFieldOptionsBetaObservabilitySpansResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct FetchSpanFieldOptionsBetaObservabilitySpansResponse {
+    raw: GetSpanFieldOptions,
+}
+
+impl FetchSpanFieldOptionsBetaObservabilitySpansResponse {
+    pub fn raw(&self) -> &GetSpanFieldOptions {
+        &self.raw
+    }
+    pub fn into_raw(self) -> GetSpanFieldOptions {
+        self.raw
+    }
+}
+
+impl From<GetSpanFieldOptions> for FetchSpanFieldOptionsBetaObservabilitySpansResponse {
+    fn from(raw: GetSpanFieldOptions) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<FetchSpanFieldOptionsBetaObservabilitySpansResponse> for GetSpanFieldOptions {
+    fn from(value: FetchSpanFieldOptionsBetaObservabilitySpansResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct FetchTaskBetaObservabilityDatasetsResponse {
+    raw: DatasetImportTask,
+}
+
+impl FetchTaskBetaObservabilityDatasetsResponse {
+    pub fn raw(&self) -> &DatasetImportTask {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DatasetImportTask {
+        self.raw
+    }
+}
+
+impl From<DatasetImportTask> for FetchTaskBetaObservabilityDatasetsResponse {
+    fn from(raw: DatasetImportTask) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<FetchTaskBetaObservabilityDatasetsResponse> for DatasetImportTask {
+    fn from(value: FetchTaskBetaObservabilityDatasetsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetApiKeysBetaAdminApiKeysResponse {
+    raw: APIKeysExtendedOUT,
+}
+
+impl GetApiKeysBetaAdminApiKeysResponse {
+    pub fn raw(&self) -> &APIKeysExtendedOUT {
+        &self.raw
+    }
+    pub fn into_raw(self) -> APIKeysExtendedOUT {
+        self.raw
+    }
+}
+
+impl From<APIKeysExtendedOUT> for GetApiKeysBetaAdminApiKeysResponse {
+    fn from(raw: APIKeysExtendedOUT) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetApiKeysBetaAdminApiKeysResponse> for APIKeysExtendedOUT {
+    fn from(value: GetApiKeysBetaAdminApiKeysResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetAudioVoicesResponse {
+    raw: VoiceResponse,
+}
+
+impl GetAudioVoicesResponse {
+    pub fn raw(&self) -> &VoiceResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> VoiceResponse {
+        self.raw
+    }
+}
+
+impl From<VoiceResponse> for GetAudioVoicesResponse {
+    fn from(raw: VoiceResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetAudioVoicesResponse> for VoiceResponse {
+    fn from(value: GetAudioVoicesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetAuthUrlBetaConnectorsResponse {
+    raw: AuthUrlResponse,
+}
+
+impl GetAuthUrlBetaConnectorsResponse {
+    pub fn auth_url(&self) -> &str {
+        &self.raw.auth_url
+    }
+    pub fn ttl(&self) -> i64 {
+        self.raw.ttl
+    }
+    pub fn raw(&self) -> &AuthUrlResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AuthUrlResponse {
+        self.raw
+    }
+}
+
+impl From<AuthUrlResponse> for GetAuthUrlBetaConnectorsResponse {
+    fn from(raw: AuthUrlResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetAuthUrlBetaConnectorsResponse> for AuthUrlResponse {
+    fn from(value: GetAuthUrlBetaConnectorsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetAuthenticationMethodsBetaConnectorsResponse {
+    raw: ConnectorGetAuthenticationMethodsV1Response,
+}
+
+impl GetAuthenticationMethodsBetaConnectorsResponse {
+    pub fn iter(
+        &self,
+    ) -> impl ExactSizeIterator<Item = GetAuthenticationMethodsBetaConnectorsResponseItem<'_>> {
+        self.raw
+            .iter()
+            .map(GetAuthenticationMethodsBetaConnectorsResponseItem::new)
+    }
+    pub fn raw(&self) -> &ConnectorGetAuthenticationMethodsV1Response {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ConnectorGetAuthenticationMethodsV1Response {
+        self.raw
+    }
+}
+
+impl From<ConnectorGetAuthenticationMethodsV1Response>
+    for GetAuthenticationMethodsBetaConnectorsResponse
+{
+    fn from(raw: ConnectorGetAuthenticationMethodsV1Response) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetAuthenticationMethodsBetaConnectorsResponse>
+    for ConnectorGetAuthenticationMethodsV1Response
+{
+    fn from(value: GetAuthenticationMethodsBetaConnectorsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct GetAuthenticationMethodsBetaConnectorsResponseItem<'a> {
+    raw: &'a PublicAuthenticationMethod,
+}
+
+impl<'a> GetAuthenticationMethodsBetaConnectorsResponseItem<'a> {
+    pub(crate) fn new(raw: &'a PublicAuthenticationMethod) -> Self {
+        Self { raw }
+    }
+
+    pub fn raw(&self) -> &'a PublicAuthenticationMethod {
+        self.raw
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetBatchJobsResponse {
+    raw: BatchJob,
+}
+
+impl GetBatchJobsResponse {
+    pub fn raw(&self) -> &BatchJob {
+        &self.raw
+    }
+    pub fn into_raw(self) -> BatchJob {
+        self.raw
+    }
+}
+
+impl From<BatchJob> for GetBatchJobsResponse {
+    fn from(raw: BatchJob) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetBatchJobsResponse> for BatchJob {
+    fn from(value: GetBatchJobsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetBetaAgentsResponse {
+    raw: Agent,
+}
+
+impl GetBetaAgentsResponse {
+    pub fn raw(&self) -> &Agent {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Agent {
+        self.raw
+    }
+}
+
+impl From<Agent> for GetBetaAgentsResponse {
+    fn from(raw: Agent) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetBetaAgentsResponse> for Agent {
+    fn from(value: GetBetaAgentsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetBetaConnectorsResponse {
+    raw: Connector,
+}
+
+impl GetBetaConnectorsResponse {
+    pub fn raw(&self) -> &Connector {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Connector {
+        self.raw
+    }
+}
+
+impl From<Connector> for GetBetaConnectorsResponse {
+    fn from(raw: Connector) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetBetaConnectorsResponse> for Connector {
+    fn from(value: GetBetaConnectorsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub enum GetBetaConversationsResponse {
+    AgentConversation(GetBetaConversationsResponseAgentConversation),
+    ModelConversation(GetBetaConversationsResponseModelConversation),
+}
+
+impl From<GetBetaConversationsResponseAgentConversation> for GetBetaConversationsResponse {
+    fn from(value: GetBetaConversationsResponseAgentConversation) -> Self {
+        Self::AgentConversation(value)
+    }
+}
+
+impl From<GetBetaConversationsResponseModelConversation> for GetBetaConversationsResponse {
+    fn from(value: GetBetaConversationsResponseModelConversation) -> Self {
+        Self::ModelConversation(value)
+    }
+}
+
+impl From<GetBetaConversationsResponse> for AgentsApiV1ConversationsGetResponse {
+    fn from(value: GetBetaConversationsResponse) -> Self {
+        match value {
+            GetBetaConversationsResponse::AgentConversation(value) => {
+                Self::AgentConversation(value.into())
+            }
+            GetBetaConversationsResponse::ModelConversation(value) => {
+                Self::ModelConversation(value.into())
+            }
+        }
+    }
+}
+
+impl From<AgentsApiV1ConversationsGetResponse> for GetBetaConversationsResponse {
+    fn from(value: AgentsApiV1ConversationsGetResponse) -> Self {
+        match value {
+            AgentsApiV1ConversationsGetResponse::AgentConversation(value) => {
+                Self::AgentConversation(value.into())
+            }
+            AgentsApiV1ConversationsGetResponse::ModelConversation(value) => {
+                Self::ModelConversation(value.into())
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetBetaConversationsResponseAgentConversation {
+    raw: AgentConversation,
+}
+
+impl GetBetaConversationsResponseAgentConversation {
+    pub fn raw(&self) -> &AgentConversation {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AgentConversation {
+        self.raw
+    }
+}
+
+impl From<AgentConversation> for GetBetaConversationsResponseAgentConversation {
+    fn from(raw: AgentConversation) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetBetaConversationsResponseAgentConversation> for AgentConversation {
+    fn from(value: GetBetaConversationsResponseAgentConversation) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetBetaConversationsResponseModelConversation {
+    raw: ModelConversation,
+}
+
+impl GetBetaConversationsResponseModelConversation {
+    pub fn raw(&self) -> &ModelConversation {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ModelConversation {
+        self.raw
+    }
+}
+
+impl From<ModelConversation> for GetBetaConversationsResponseModelConversation {
+    fn from(raw: ModelConversation) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetBetaConversationsResponseModelConversation> for ModelConversation {
+    fn from(value: GetBetaConversationsResponseModelConversation) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetBetaLibrariesDocumentsResponse {
+    raw: Document,
+}
+
+impl GetBetaLibrariesDocumentsResponse {
+    pub fn raw(&self) -> &Document {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Document {
+        self.raw
+    }
+}
+
+impl From<Document> for GetBetaLibrariesDocumentsResponse {
+    fn from(raw: Document) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetBetaLibrariesDocumentsResponse> for Document {
+    fn from(value: GetBetaLibrariesDocumentsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetBetaLibrariesResponse {
+    raw: Library,
+}
+
+impl GetBetaLibrariesResponse {
+    pub fn raw(&self) -> &Library {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Library {
+        self.raw
+    }
+}
+
+impl From<Library> for GetBetaLibrariesResponse {
+    fn from(raw: Library) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetBetaLibrariesResponse> for Library {
+    fn from(value: GetBetaLibrariesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetBetaPromptsResponse {
+    raw: Prompt,
+}
+
+impl GetBetaPromptsResponse {
+    pub fn raw(&self) -> &Prompt {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Prompt {
+        self.raw
+    }
+}
+
+impl From<Prompt> for GetBetaPromptsResponse {
+    fn from(raw: Prompt) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetBetaPromptsResponse> for Prompt {
+    fn from(value: GetBetaPromptsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetBetaSkillsResponse {
+    raw: Skill,
+}
+
+impl GetBetaSkillsResponse {
+    pub fn raw(&self) -> &Skill {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Skill {
+        self.raw
+    }
+}
+
+impl From<Skill> for GetBetaSkillsResponse {
+    fn from(raw: Skill) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetBetaSkillsResponse> for Skill {
+    fn from(value: GetBetaSkillsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetByAgentStatsBetaAdminVibeWorkAnalyticsResponse {
+    raw: VibeWorkByAgentStatsOUT,
+}
+
+impl GetByAgentStatsBetaAdminVibeWorkAnalyticsResponse {
+    pub fn raw(&self) -> &VibeWorkByAgentStatsOUT {
+        &self.raw
+    }
+    pub fn into_raw(self) -> VibeWorkByAgentStatsOUT {
+        self.raw
+    }
+}
+
+impl From<VibeWorkByAgentStatsOUT> for GetByAgentStatsBetaAdminVibeWorkAnalyticsResponse {
+    fn from(raw: VibeWorkByAgentStatsOUT) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetByAgentStatsBetaAdminVibeWorkAnalyticsResponse> for VibeWorkByAgentStatsOUT {
+    fn from(value: GetByAgentStatsBetaAdminVibeWorkAnalyticsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetByTimeStatsBetaAdminVibeWorkAnalyticsResponse {
+    raw: VibeWorkByTimeStatsOUT,
+}
+
+impl GetByTimeStatsBetaAdminVibeWorkAnalyticsResponse {
+    pub fn raw(&self) -> &VibeWorkByTimeStatsOUT {
+        &self.raw
+    }
+    pub fn into_raw(self) -> VibeWorkByTimeStatsOUT {
+        self.raw
+    }
+}
+
+impl From<VibeWorkByTimeStatsOUT> for GetByTimeStatsBetaAdminVibeWorkAnalyticsResponse {
+    fn from(raw: VibeWorkByTimeStatsOUT) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetByTimeStatsBetaAdminVibeWorkAnalyticsResponse> for VibeWorkByTimeStatsOUT {
+    fn from(value: GetByTimeStatsBetaAdminVibeWorkAnalyticsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetByUserStatsBetaAdminVibeWorkAnalyticsResponse {
+    raw: VibeWorkByUserStatsOUT,
+}
+
+impl GetByUserStatsBetaAdminVibeWorkAnalyticsResponse {
+    pub fn raw(&self) -> &VibeWorkByUserStatsOUT {
+        &self.raw
+    }
+    pub fn into_raw(self) -> VibeWorkByUserStatsOUT {
+        self.raw
+    }
+}
+
+impl From<VibeWorkByUserStatsOUT> for GetByUserStatsBetaAdminVibeWorkAnalyticsResponse {
+    fn from(raw: VibeWorkByUserStatsOUT) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetByUserStatsBetaAdminVibeWorkAnalyticsResponse> for VibeWorkByUserStatsOUT {
+    fn from(value: GetByUserStatsBetaAdminVibeWorkAnalyticsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetCampaignByIdBetaObservabilityCampaignsResponse {
+    raw: Campaign,
+}
+
+impl GetCampaignByIdBetaObservabilityCampaignsResponse {
+    pub fn raw(&self) -> &Campaign {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Campaign {
+        self.raw
+    }
+}
+
+impl From<Campaign> for GetCampaignByIdBetaObservabilityCampaignsResponse {
+    fn from(raw: Campaign) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetCampaignByIdBetaObservabilityCampaignsResponse> for Campaign {
+    fn from(value: GetCampaignByIdBetaObservabilityCampaignsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetCampaignSelectedEventsBetaObservabilityCampaignsResponse {
+    raw: ListCampaignSelectedEventsResponse,
+}
+
+impl GetCampaignSelectedEventsBetaObservabilityCampaignsResponse {
+    pub fn raw(&self) -> &ListCampaignSelectedEventsResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ListCampaignSelectedEventsResponse {
+        self.raw
+    }
+}
+
+impl From<ListCampaignSelectedEventsResponse>
+    for GetCampaignSelectedEventsBetaObservabilityCampaignsResponse
+{
+    fn from(raw: ListCampaignSelectedEventsResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetCampaignSelectedEventsBetaObservabilityCampaignsResponse>
+    for ListCampaignSelectedEventsResponse
+{
+    fn from(value: GetCampaignSelectedEventsBetaObservabilityCampaignsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetCampaignStatusByIdBetaObservabilityCampaignsResponse {
+    raw: FetchCampaignStatusResponse,
+}
+
+impl GetCampaignStatusByIdBetaObservabilityCampaignsResponse {
+    pub fn raw(&self) -> &FetchCampaignStatusResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> FetchCampaignStatusResponse {
+        self.raw
+    }
+}
+
+impl From<FetchCampaignStatusResponse> for GetCampaignStatusByIdBetaObservabilityCampaignsResponse {
+    fn from(raw: FetchCampaignStatusResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetCampaignStatusByIdBetaObservabilityCampaignsResponse> for FetchCampaignStatusResponse {
+    fn from(value: GetCampaignStatusByIdBetaObservabilityCampaignsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetCampaignsBetaObservabilityCampaignsResponse {
+    raw: ListCampaignsResponse,
+}
+
+impl GetCampaignsBetaObservabilityCampaignsResponse {
+    pub fn raw(&self) -> &ListCampaignsResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ListCampaignsResponse {
+        self.raw
+    }
+}
+
+impl From<ListCampaignsResponse> for GetCampaignsBetaObservabilityCampaignsResponse {
+    fn from(raw: ListCampaignsResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetCampaignsBetaObservabilityCampaignsResponse> for ListCampaignsResponse {
+    fn from(value: GetCampaignsBetaObservabilityCampaignsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetChatCompletionEventBetaObservabilityChatCompletionEventsResponse {
+    raw: ChatCompletionEvent,
+}
+
+impl GetChatCompletionEventBetaObservabilityChatCompletionEventsResponse {
+    pub fn raw(&self) -> &ChatCompletionEvent {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ChatCompletionEvent {
+        self.raw
+    }
+}
+
+impl From<ChatCompletionEvent>
+    for GetChatCompletionEventBetaObservabilityChatCompletionEventsResponse
+{
+    fn from(raw: ChatCompletionEvent) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetChatCompletionEventBetaObservabilityChatCompletionEventsResponse>
+    for ChatCompletionEvent
+{
+    fn from(value: GetChatCompletionEventBetaObservabilityChatCompletionEventsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetChatCompletionEventIdsBetaObservabilityChatCompletionEventsRequest {
+    raw: SearchChatCompletionEventIdsRequest,
+}
+
+impl GetChatCompletionEventIdsBetaObservabilityChatCompletionEventsRequest {
+    pub fn new(search_params: FilterPayload) -> Self {
+        Self {
+            raw: SearchChatCompletionEventIdsRequest {
+                extra_fields: None,
+                search_params,
+            },
+        }
+    }
+    #[must_use]
+    pub fn extra_fields(mut self, extra_fields: Vec<String>) -> Self {
+        self.raw.extra_fields = Some(Some(extra_fields));
+        self
+    }
+
+    #[must_use]
+    pub fn extra_fields_null(mut self) -> Self {
+        self.raw.extra_fields = Some(None);
+        self
+    }
+    pub fn from_raw(raw: SearchChatCompletionEventIdsRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &SearchChatCompletionEventIdsRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> SearchChatCompletionEventIdsRequest {
+        self.raw
+    }
+}
+
+impl From<SearchChatCompletionEventIdsRequest>
+    for GetChatCompletionEventIdsBetaObservabilityChatCompletionEventsRequest
+{
+    fn from(raw: SearchChatCompletionEventIdsRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetChatCompletionEventIdsBetaObservabilityChatCompletionEventsRequest>
+    for SearchChatCompletionEventIdsRequest
+{
+    fn from(value: GetChatCompletionEventIdsBetaObservabilityChatCompletionEventsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetChatCompletionEventIdsBetaObservabilityChatCompletionEventsResponse {
+    raw: SearchChatCompletionEventIdsResponse,
+}
+
+impl GetChatCompletionEventIdsBetaObservabilityChatCompletionEventsResponse {
+    pub fn raw(&self) -> &SearchChatCompletionEventIdsResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> SearchChatCompletionEventIdsResponse {
+        self.raw
+    }
+}
+
+impl From<SearchChatCompletionEventIdsResponse>
+    for GetChatCompletionEventIdsBetaObservabilityChatCompletionEventsResponse
+{
+    fn from(raw: SearchChatCompletionEventIdsResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetChatCompletionEventIdsBetaObservabilityChatCompletionEventsResponse>
+    for SearchChatCompletionEventIdsResponse
+{
+    fn from(value: GetChatCompletionEventIdsBetaObservabilityChatCompletionEventsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetChatCompletionEventsBetaObservabilityChatCompletionEventsRequest {
+    raw: SearchChatCompletionEventsRequest,
+}
+
+impl GetChatCompletionEventsBetaObservabilityChatCompletionEventsRequest {
+    pub fn new(search_params: FilterPayload) -> Self {
+        Self {
+            raw: SearchChatCompletionEventsRequest {
+                extra_fields: None,
+                search_params,
+            },
+        }
+    }
+    #[must_use]
+    pub fn extra_fields(mut self, extra_fields: Vec<String>) -> Self {
+        self.raw.extra_fields = Some(Some(extra_fields));
+        self
+    }
+
+    #[must_use]
+    pub fn extra_fields_null(mut self) -> Self {
+        self.raw.extra_fields = Some(None);
+        self
+    }
+    pub fn from_raw(raw: SearchChatCompletionEventsRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &SearchChatCompletionEventsRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> SearchChatCompletionEventsRequest {
+        self.raw
+    }
+}
+
+impl From<SearchChatCompletionEventsRequest>
+    for GetChatCompletionEventsBetaObservabilityChatCompletionEventsRequest
+{
+    fn from(raw: SearchChatCompletionEventsRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetChatCompletionEventsBetaObservabilityChatCompletionEventsRequest>
+    for SearchChatCompletionEventsRequest
+{
+    fn from(value: GetChatCompletionEventsBetaObservabilityChatCompletionEventsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetChatCompletionEventsBetaObservabilityChatCompletionEventsResponse {
+    raw: SearchChatCompletionEventsResponse,
+}
+
+impl GetChatCompletionEventsBetaObservabilityChatCompletionEventsResponse {
+    pub fn raw(&self) -> &SearchChatCompletionEventsResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> SearchChatCompletionEventsResponse {
+        self.raw
+    }
+}
+
+impl From<SearchChatCompletionEventsResponse>
+    for GetChatCompletionEventsBetaObservabilityChatCompletionEventsResponse
+{
+    fn from(raw: SearchChatCompletionEventsResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetChatCompletionEventsBetaObservabilityChatCompletionEventsResponse>
+    for SearchChatCompletionEventsResponse
+{
+    fn from(value: GetChatCompletionEventsBetaObservabilityChatCompletionEventsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetChatCompletionFieldOptionsBetaObservabilityChatCompletionEventsFieldsResponse {
+    raw: FetchChatCompletionFieldOptionsResponse,
+}
+
+impl GetChatCompletionFieldOptionsBetaObservabilityChatCompletionEventsFieldsResponse {
+    pub fn raw(&self) -> &FetchChatCompletionFieldOptionsResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> FetchChatCompletionFieldOptionsResponse {
+        self.raw
+    }
+}
+
+impl From<FetchChatCompletionFieldOptionsResponse>
+    for GetChatCompletionFieldOptionsBetaObservabilityChatCompletionEventsFieldsResponse
+{
+    fn from(raw: FetchChatCompletionFieldOptionsResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetChatCompletionFieldOptionsBetaObservabilityChatCompletionEventsFieldsResponse>
+    for FetchChatCompletionFieldOptionsResponse
+{
+    fn from(
+        value: GetChatCompletionFieldOptionsBetaObservabilityChatCompletionEventsFieldsResponse,
+    ) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetChatCompletionFieldOptionsCountsBetaObservabilityChatCompletionEventsFieldsRequest {
+    raw: FetchFieldOptionCountsRequest,
+}
+
+impl GetChatCompletionFieldOptionsCountsBetaObservabilityChatCompletionEventsFieldsRequest {
+    pub fn new() -> Self {
+        Self {
+            raw: FetchFieldOptionCountsRequest {
+                filter_params: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn filter_params(mut self, filter_params: FilterPayload) -> Self {
+        self.raw.filter_params = Some(Some(filter_params));
+        self
+    }
+
+    #[must_use]
+    pub fn filter_params_null(mut self) -> Self {
+        self.raw.filter_params = Some(None);
+        self
+    }
+    pub fn from_raw(raw: FetchFieldOptionCountsRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &FetchFieldOptionCountsRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> FetchFieldOptionCountsRequest {
+        self.raw
+    }
+}
+
+impl From<FetchFieldOptionCountsRequest>
+    for GetChatCompletionFieldOptionsCountsBetaObservabilityChatCompletionEventsFieldsRequest
+{
+    fn from(raw: FetchFieldOptionCountsRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetChatCompletionFieldOptionsCountsBetaObservabilityChatCompletionEventsFieldsRequest>
+    for FetchFieldOptionCountsRequest
+{
+    fn from(
+        value: GetChatCompletionFieldOptionsCountsBetaObservabilityChatCompletionEventsFieldsRequest,
+    ) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default
+    for GetChatCompletionFieldOptionsCountsBetaObservabilityChatCompletionEventsFieldsRequest
+{
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetChatCompletionFieldOptionsCountsBetaObservabilityChatCompletionEventsFieldsResponse {
+    raw: FetchFieldOptionCountsResponse,
+}
+
+impl GetChatCompletionFieldOptionsCountsBetaObservabilityChatCompletionEventsFieldsResponse {
+    pub fn raw(&self) -> &FetchFieldOptionCountsResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> FetchFieldOptionCountsResponse {
+        self.raw
+    }
+}
+
+impl From<FetchFieldOptionCountsResponse>
+    for GetChatCompletionFieldOptionsCountsBetaObservabilityChatCompletionEventsFieldsResponse
+{
+    fn from(raw: FetchFieldOptionCountsResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetChatCompletionFieldOptionsCountsBetaObservabilityChatCompletionEventsFieldsResponse>
+    for FetchFieldOptionCountsResponse
+{
+    fn from(
+        value: GetChatCompletionFieldOptionsCountsBetaObservabilityChatCompletionEventsFieldsResponse,
+    ) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetChatCompletionFieldsBetaObservabilityChatCompletionEventsFieldsResponse {
+    raw: ListChatCompletionFieldsResponse,
+}
+
+impl GetChatCompletionFieldsBetaObservabilityChatCompletionEventsFieldsResponse {
+    pub fn raw(&self) -> &ListChatCompletionFieldsResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ListChatCompletionFieldsResponse {
+        self.raw
+    }
+}
+
+impl From<ListChatCompletionFieldsResponse>
+    for GetChatCompletionFieldsBetaObservabilityChatCompletionEventsFieldsResponse
+{
+    fn from(raw: ListChatCompletionFieldsResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetChatCompletionFieldsBetaObservabilityChatCompletionEventsFieldsResponse>
+    for ListChatCompletionFieldsResponse
+{
+    fn from(
+        value: GetChatCompletionFieldsBetaObservabilityChatCompletionEventsFieldsResponse,
+    ) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetDeploymentLogsWorkflowsDeploymentsResponse {
+    raw: DeploymentLogSearchResponse,
+}
+
+impl GetDeploymentLogsWorkflowsDeploymentsResponse {
+    pub fn raw(&self) -> &DeploymentLogSearchResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DeploymentLogSearchResponse {
+        self.raw
+    }
+}
+
+impl From<DeploymentLogSearchResponse> for GetDeploymentLogsWorkflowsDeploymentsResponse {
+    fn from(raw: DeploymentLogSearchResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetDeploymentLogsWorkflowsDeploymentsResponse> for DeploymentLogSearchResponse {
+    fn from(value: GetDeploymentLogsWorkflowsDeploymentsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetDeploymentSummariesBetaRagSearchIndexesResponse {
+    raw: GetDeploymentSummariesResponse,
+}
+
+impl GetDeploymentSummariesBetaRagSearchIndexesResponse {
+    pub fn raw(&self) -> &GetDeploymentSummariesResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> GetDeploymentSummariesResponse {
+        self.raw
+    }
+}
+
+impl From<GetDeploymentSummariesResponse> for GetDeploymentSummariesBetaRagSearchIndexesResponse {
+    fn from(raw: GetDeploymentSummariesResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetDeploymentSummariesBetaRagSearchIndexesResponse> for GetDeploymentSummariesResponse {
+    fn from(value: GetDeploymentSummariesBetaRagSearchIndexesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetDeploymentWorkflowsDeploymentsResponse {
+    raw: DeploymentDetailResponse,
+}
+
+impl GetDeploymentWorkflowsDeploymentsResponse {
+    pub fn raw(&self) -> &DeploymentDetailResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DeploymentDetailResponse {
+        self.raw
+    }
+}
+
+impl From<DeploymentDetailResponse> for GetDeploymentWorkflowsDeploymentsResponse {
+    fn from(raw: DeploymentDetailResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetDeploymentWorkflowsDeploymentsResponse> for DeploymentDetailResponse {
+    fn from(value: GetDeploymentWorkflowsDeploymentsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetHistoryBetaConversationsResponse {
+    raw: ConversationHistory,
+}
+
+impl GetHistoryBetaConversationsResponse {
+    pub fn raw(&self) -> &ConversationHistory {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ConversationHistory {
+        self.raw
+    }
+}
+
+impl From<ConversationHistory> for GetHistoryBetaConversationsResponse {
+    fn from(raw: ConversationHistory) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetHistoryBetaConversationsResponse> for ConversationHistory {
+    fn from(value: GetHistoryBetaConversationsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetIdentityBetaUsersResponse {
+    raw: UserIdentity,
+}
+
+impl GetIdentityBetaUsersResponse {
+    pub fn raw(&self) -> &UserIdentity {
+        &self.raw
+    }
+    pub fn into_raw(self) -> UserIdentity {
+        self.raw
+    }
+}
+
+impl From<UserIdentity> for GetIdentityBetaUsersResponse {
+    fn from(raw: UserIdentity) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetIdentityBetaUsersResponse> for UserIdentity {
+    fn from(value: GetIdentityBetaUsersResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetMessagesBetaConversationsResponse {
+    raw: ConversationMessages,
+}
+
+impl GetMessagesBetaConversationsResponse {
+    pub fn raw(&self) -> &ConversationMessages {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ConversationMessages {
+        self.raw
+    }
+}
+
+impl From<ConversationMessages> for GetMessagesBetaConversationsResponse {
+    fn from(raw: ConversationMessages) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetMessagesBetaConversationsResponse> for ConversationMessages {
+    fn from(value: GetMessagesBetaConversationsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetOrganizationStatsBetaAdminVibeCodeAnalyticsResponse {
+    raw: VibeOrganizationStatsOUT,
+}
+
+impl GetOrganizationStatsBetaAdminVibeCodeAnalyticsResponse {
+    pub fn raw(&self) -> &VibeOrganizationStatsOUT {
+        &self.raw
+    }
+    pub fn into_raw(self) -> VibeOrganizationStatsOUT {
+        self.raw
+    }
+}
+
+impl From<VibeOrganizationStatsOUT> for GetOrganizationStatsBetaAdminVibeCodeAnalyticsResponse {
+    fn from(raw: VibeOrganizationStatsOUT) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetOrganizationStatsBetaAdminVibeCodeAnalyticsResponse> for VibeOrganizationStatsOUT {
+    fn from(value: GetOrganizationStatsBetaAdminVibeCodeAnalyticsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+pub type GetRunHistoryWorkflowsRunsResponse = serde_json::Value;
+
+#[derive(Debug, Clone)]
+pub struct GetRunWorkflowsRunsResponse {
+    raw: WorkflowExecutionResponse,
+}
+
+impl GetRunWorkflowsRunsResponse {
+    pub fn raw(&self) -> &WorkflowExecutionResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowExecutionResponse {
+        self.raw
+    }
+}
+
+impl From<WorkflowExecutionResponse> for GetRunWorkflowsRunsResponse {
+    fn from(raw: WorkflowExecutionResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetRunWorkflowsRunsResponse> for WorkflowExecutionResponse {
+    fn from(value: GetRunWorkflowsRunsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetScheduleWorkflowsSchedulesResponse {
+    raw: ScheduleDefinitionOutput,
+}
+
+impl GetScheduleWorkflowsSchedulesResponse {
+    pub fn raw(&self) -> &ScheduleDefinitionOutput {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ScheduleDefinitionOutput {
+        self.raw
+    }
+}
+
+impl From<ScheduleDefinitionOutput> for GetScheduleWorkflowsSchedulesResponse {
+    fn from(raw: ScheduleDefinitionOutput) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetScheduleWorkflowsSchedulesResponse> for ScheduleDefinitionOutput {
+    fn from(value: GetScheduleWorkflowsSchedulesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetSchedulesWorkflowsSchedulesResponse {
+    raw: WorkflowScheduleListResponse,
+}
+
+impl GetSchedulesWorkflowsSchedulesResponse {
+    pub fn raw(&self) -> &WorkflowScheduleListResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowScheduleListResponse {
+        self.raw
+    }
+}
+
+impl From<WorkflowScheduleListResponse> for GetSchedulesWorkflowsSchedulesResponse {
+    fn from(raw: WorkflowScheduleListResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetSchedulesWorkflowsSchedulesResponse> for WorkflowScheduleListResponse {
+    fn from(value: GetSchedulesWorkflowsSchedulesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetScimSyncRunBetaAdminScimResponse {
+    raw: AdminScimSyncRunOUT,
+}
+
+impl GetScimSyncRunBetaAdminScimResponse {
+    pub fn raw(&self) -> &AdminScimSyncRunOUT {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AdminScimSyncRunOUT {
+        self.raw
+    }
+}
+
+impl From<AdminScimSyncRunOUT> for GetScimSyncRunBetaAdminScimResponse {
+    fn from(raw: AdminScimSyncRunOUT) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetScimSyncRunBetaAdminScimResponse> for AdminScimSyncRunOUT {
+    fn from(value: GetScimSyncRunBetaAdminScimResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+pub type GetSignedUrlBetaLibrariesDocumentsResponse = String;
+
+#[derive(Debug, Clone)]
+pub struct GetSignedUrlFilesResponse {
+    raw: GetSignedUrlResponse,
+}
+
+impl GetSignedUrlFilesResponse {
+    pub fn url(&self) -> &str {
+        &self.raw.url
+    }
+    pub fn raw(&self) -> &GetSignedUrlResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> GetSignedUrlResponse {
+        self.raw
+    }
+}
+
+impl From<GetSignedUrlResponse> for GetSignedUrlFilesResponse {
+    fn from(raw: GetSignedUrlResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetSignedUrlFilesResponse> for GetSignedUrlResponse {
+    fn from(value: GetSignedUrlFilesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetSimilarChatCompletionEventsBetaObservabilityChatCompletionEventsResponse {
+    raw: SearchChatCompletionEventsResponse,
+}
+
+impl GetSimilarChatCompletionEventsBetaObservabilityChatCompletionEventsResponse {
+    pub fn raw(&self) -> &SearchChatCompletionEventsResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> SearchChatCompletionEventsResponse {
+        self.raw
+    }
+}
+
+impl From<SearchChatCompletionEventsResponse>
+    for GetSimilarChatCompletionEventsBetaObservabilityChatCompletionEventsResponse
+{
+    fn from(raw: SearchChatCompletionEventsResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetSimilarChatCompletionEventsBetaObservabilityChatCompletionEventsResponse>
+    for SearchChatCompletionEventsResponse
+{
+    fn from(
+        value: GetSimilarChatCompletionEventsBetaObservabilityChatCompletionEventsResponse,
+    ) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetSpanByIdBetaObservabilityTracesResponse {
+    raw: GetSpan,
+}
+
+impl GetSpanByIdBetaObservabilityTracesResponse {
+    pub fn raw(&self) -> &GetSpan {
+        &self.raw
+    }
+    pub fn into_raw(self) -> GetSpan {
+        self.raw
+    }
+}
+
+impl From<GetSpan> for GetSpanByIdBetaObservabilityTracesResponse {
+    fn from(raw: GetSpan) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetSpanByIdBetaObservabilityTracesResponse> for GetSpan {
+    fn from(value: GetSpanByIdBetaObservabilityTracesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetStreamEventsEventsStreamItemStreamEventSseErrorData {
+    raw: StreamEventSseErrorData,
+}
+
+impl GetStreamEventsEventsStreamItemStreamEventSseErrorData {
+    pub fn error(&self) -> &str {
+        &self.raw.error
+    }
+    pub fn reason(&self) -> &str {
+        &self.raw.reason
+    }
+    pub fn raw(&self) -> &StreamEventSseErrorData {
+        &self.raw
+    }
+    pub fn into_raw(self) -> StreamEventSseErrorData {
+        self.raw
+    }
+}
+
+impl From<StreamEventSseErrorData> for GetStreamEventsEventsStreamItemStreamEventSseErrorData {
+    fn from(raw: StreamEventSseErrorData) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetStreamEventsEventsStreamItemStreamEventSseErrorData> for StreamEventSseErrorData {
+    fn from(value: GetStreamEventsEventsStreamItemStreamEventSseErrorData) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetStreamEventsEventsStreamItemStreamEventSsePayload {
+    raw: StreamEventSsePayload,
+}
+
+impl GetStreamEventsEventsStreamItemStreamEventSsePayload {
+    pub fn raw(&self) -> &StreamEventSsePayload {
+        &self.raw
+    }
+    pub fn into_raw(self) -> StreamEventSsePayload {
+        self.raw
+    }
+}
+
+impl From<StreamEventSsePayload> for GetStreamEventsEventsStreamItemStreamEventSsePayload {
+    fn from(raw: StreamEventSsePayload) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetStreamEventsEventsStreamItemStreamEventSsePayload> for StreamEventSsePayload {
+    fn from(value: GetStreamEventsEventsStreamItemStreamEventSsePayload) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetStreamEventsWorkflowsEventsStreamItemStreamEventSseErrorData {
+    raw: StreamEventSseErrorData,
+}
+
+impl GetStreamEventsWorkflowsEventsStreamItemStreamEventSseErrorData {
+    pub fn error(&self) -> &str {
+        &self.raw.error
+    }
+    pub fn reason(&self) -> &str {
+        &self.raw.reason
+    }
+    pub fn raw(&self) -> &StreamEventSseErrorData {
+        &self.raw
+    }
+    pub fn into_raw(self) -> StreamEventSseErrorData {
+        self.raw
+    }
+}
+
+impl From<StreamEventSseErrorData>
+    for GetStreamEventsWorkflowsEventsStreamItemStreamEventSseErrorData
+{
+    fn from(raw: StreamEventSseErrorData) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetStreamEventsWorkflowsEventsStreamItemStreamEventSseErrorData>
+    for StreamEventSseErrorData
+{
+    fn from(value: GetStreamEventsWorkflowsEventsStreamItemStreamEventSseErrorData) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetStreamEventsWorkflowsEventsStreamItemStreamEventSsePayload {
+    raw: StreamEventSsePayload,
+}
+
+impl GetStreamEventsWorkflowsEventsStreamItemStreamEventSsePayload {
+    pub fn raw(&self) -> &StreamEventSsePayload {
+        &self.raw
+    }
+    pub fn into_raw(self) -> StreamEventSsePayload {
+        self.raw
+    }
+}
+
+impl From<StreamEventSsePayload> for GetStreamEventsWorkflowsEventsStreamItemStreamEventSsePayload {
+    fn from(raw: StreamEventSsePayload) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetStreamEventsWorkflowsEventsStreamItemStreamEventSsePayload> for StreamEventSsePayload {
+    fn from(value: GetStreamEventsWorkflowsEventsStreamItemStreamEventSsePayload) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetTraceByIdBetaObservabilityTracesResponse {
+    raw: GetTrace,
+}
+
+impl GetTraceByIdBetaObservabilityTracesResponse {
+    pub fn raw(&self) -> &GetTrace {
+        &self.raw
+    }
+    pub fn into_raw(self) -> GetTrace {
+        self.raw
+    }
+}
+
+impl From<GetTrace> for GetTraceByIdBetaObservabilityTracesResponse {
+    fn from(raw: GetTrace) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetTraceByIdBetaObservabilityTracesResponse> for GetTrace {
+    fn from(value: GetTraceByIdBetaObservabilityTracesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetTraceFieldsBetaObservabilityTracesResponse {
+    raw: GetTraceFields,
+}
+
+impl GetTraceFieldsBetaObservabilityTracesResponse {
+    pub fn raw(&self) -> &GetTraceFields {
+        &self.raw
+    }
+    pub fn into_raw(self) -> GetTraceFields {
+        self.raw
+    }
+}
+
+impl From<GetTraceFields> for GetTraceFieldsBetaObservabilityTracesResponse {
+    fn from(raw: GetTraceFields) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetTraceFieldsBetaObservabilityTracesResponse> for GetTraceFields {
+    fn from(value: GetTraceFieldsBetaObservabilityTracesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetTraceSpansBetaObservabilityTracesResponse {
+    raw: GetSpans,
+}
+
+impl GetTraceSpansBetaObservabilityTracesResponse {
+    pub fn raw(&self) -> &GetSpans {
+        &self.raw
+    }
+    pub fn into_raw(self) -> GetSpans {
+        self.raw
+    }
+}
+
+impl From<GetSpans> for GetTraceSpansBetaObservabilityTracesResponse {
+    fn from(raw: GetSpans) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetTraceSpansBetaObservabilityTracesResponse> for GetSpans {
+    fn from(value: GetTraceSpansBetaObservabilityTracesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetVersionBetaAgentsResponse {
+    raw: Agent,
+}
+
+impl GetVersionBetaAgentsResponse {
+    pub fn raw(&self) -> &Agent {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Agent {
+        self.raw
+    }
+}
+
+impl From<Agent> for GetVersionBetaAgentsResponse {
+    fn from(raw: Agent) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetVersionBetaAgentsResponse> for Agent {
+    fn from(value: GetVersionBetaAgentsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetVersionBetaPromptsResponse {
+    raw: Prompt,
+}
+
+impl GetVersionBetaPromptsResponse {
+    pub fn raw(&self) -> &Prompt {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Prompt {
+        self.raw
+    }
+}
+
+impl From<Prompt> for GetVersionBetaPromptsResponse {
+    fn from(raw: Prompt) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetVersionBetaPromptsResponse> for Prompt {
+    fn from(value: GetVersionBetaPromptsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetVersionBetaSkillsResponse {
+    raw: Skill,
+}
+
+impl GetVersionBetaSkillsResponse {
+    pub fn raw(&self) -> &Skill {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Skill {
+        self.raw
+    }
+}
+
+impl From<Skill> for GetVersionBetaSkillsResponse {
+    fn from(raw: Skill) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetVersionBetaSkillsResponse> for Skill {
+    fn from(value: GetVersionBetaSkillsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetWorkflowEventsEventsResponse {
+    raw: ListWorkflowEventResponse,
+}
+
+impl GetWorkflowEventsEventsResponse {
+    pub fn raw(&self) -> &ListWorkflowEventResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ListWorkflowEventResponse {
+        self.raw
+    }
+}
+
+impl From<ListWorkflowEventResponse> for GetWorkflowEventsEventsResponse {
+    fn from(raw: ListWorkflowEventResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetWorkflowEventsEventsResponse> for ListWorkflowEventResponse {
+    fn from(value: GetWorkflowEventsEventsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetWorkflowEventsWorkflowsEventsResponse {
+    raw: ListWorkflowEventResponse,
+}
+
+impl GetWorkflowEventsWorkflowsEventsResponse {
+    pub fn raw(&self) -> &ListWorkflowEventResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ListWorkflowEventResponse {
+        self.raw
+    }
+}
+
+impl From<ListWorkflowEventResponse> for GetWorkflowEventsWorkflowsEventsResponse {
+    fn from(raw: ListWorkflowEventResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetWorkflowEventsWorkflowsEventsResponse> for ListWorkflowEventResponse {
+    fn from(value: GetWorkflowEventsWorkflowsEventsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+pub type GetWorkflowExecutionHistoryWorkflowsExecutionsResponse = serde_json::Value;
+
+#[derive(Debug, Clone)]
+pub struct GetWorkflowExecutionLogsWorkflowsExecutionsResponse {
+    raw: ExecutionLogSearchResponse,
+}
+
+impl GetWorkflowExecutionLogsWorkflowsExecutionsResponse {
+    pub fn raw(&self) -> &ExecutionLogSearchResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ExecutionLogSearchResponse {
+        self.raw
+    }
+}
+
+impl From<ExecutionLogSearchResponse> for GetWorkflowExecutionLogsWorkflowsExecutionsResponse {
+    fn from(raw: ExecutionLogSearchResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetWorkflowExecutionLogsWorkflowsExecutionsResponse> for ExecutionLogSearchResponse {
+    fn from(value: GetWorkflowExecutionLogsWorkflowsExecutionsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetWorkflowExecutionTraceEventsWorkflowsExecutionsResponse {
+    raw: WorkflowExecutionTraceEventsResponse,
+}
+
+impl GetWorkflowExecutionTraceEventsWorkflowsExecutionsResponse {
+    pub fn raw(&self) -> &WorkflowExecutionTraceEventsResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowExecutionTraceEventsResponse {
+        self.raw
+    }
+}
+
+impl From<WorkflowExecutionTraceEventsResponse>
+    for GetWorkflowExecutionTraceEventsWorkflowsExecutionsResponse
+{
+    fn from(raw: WorkflowExecutionTraceEventsResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetWorkflowExecutionTraceEventsWorkflowsExecutionsResponse>
+    for WorkflowExecutionTraceEventsResponse
+{
+    fn from(value: GetWorkflowExecutionTraceEventsWorkflowsExecutionsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetWorkflowExecutionTraceInfoWorkflowsExecutionsResponse {
+    raw: ExecutionTraceInfoResponse,
+}
+
+impl GetWorkflowExecutionTraceInfoWorkflowsExecutionsResponse {
+    pub fn has_trace_data(&self) -> Option<bool> {
+        self.raw.has_trace_data
+    }
+    pub fn otel_trace_id(&self) -> Option<&Option<String>> {
+        self.raw.otel_trace_id.as_ref()
+    }
+    pub fn raw(&self) -> &ExecutionTraceInfoResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ExecutionTraceInfoResponse {
+        self.raw
+    }
+}
+
+impl From<ExecutionTraceInfoResponse> for GetWorkflowExecutionTraceInfoWorkflowsExecutionsResponse {
+    fn from(raw: ExecutionTraceInfoResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetWorkflowExecutionTraceInfoWorkflowsExecutionsResponse> for ExecutionTraceInfoResponse {
+    fn from(value: GetWorkflowExecutionTraceInfoWorkflowsExecutionsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetWorkflowExecutionTraceOtelWorkflowsExecutionsResponse {
+    raw: WorkflowExecutionTraceOTelResponse,
+}
+
+impl GetWorkflowExecutionTraceOtelWorkflowsExecutionsResponse {
+    pub fn raw(&self) -> &WorkflowExecutionTraceOTelResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowExecutionTraceOTelResponse {
+        self.raw
+    }
+}
+
+impl From<WorkflowExecutionTraceOTelResponse>
+    for GetWorkflowExecutionTraceOtelWorkflowsExecutionsResponse
+{
+    fn from(raw: WorkflowExecutionTraceOTelResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetWorkflowExecutionTraceOtelWorkflowsExecutionsResponse>
+    for WorkflowExecutionTraceOTelResponse
+{
+    fn from(value: GetWorkflowExecutionTraceOtelWorkflowsExecutionsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetWorkflowExecutionTraceSummaryWorkflowsExecutionsResponse {
+    raw: WorkflowExecutionTraceSummaryResponse,
+}
+
+impl GetWorkflowExecutionTraceSummaryWorkflowsExecutionsResponse {
+    pub fn raw(&self) -> &WorkflowExecutionTraceSummaryResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowExecutionTraceSummaryResponse {
+        self.raw
+    }
+}
+
+impl From<WorkflowExecutionTraceSummaryResponse>
+    for GetWorkflowExecutionTraceSummaryWorkflowsExecutionsResponse
+{
+    fn from(raw: WorkflowExecutionTraceSummaryResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetWorkflowExecutionTraceSummaryWorkflowsExecutionsResponse>
+    for WorkflowExecutionTraceSummaryResponse
+{
+    fn from(value: GetWorkflowExecutionTraceSummaryWorkflowsExecutionsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetWorkflowExecutionWorkflowsExecutionsResponse {
+    raw: WorkflowExecutionResponse,
+}
+
+impl GetWorkflowExecutionWorkflowsExecutionsResponse {
+    pub fn raw(&self) -> &WorkflowExecutionResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowExecutionResponse {
+        self.raw
+    }
+}
+
+impl From<WorkflowExecutionResponse> for GetWorkflowExecutionWorkflowsExecutionsResponse {
+    fn from(raw: WorkflowExecutionResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetWorkflowExecutionWorkflowsExecutionsResponse> for WorkflowExecutionResponse {
+    fn from(value: GetWorkflowExecutionWorkflowsExecutionsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetWorkflowMetricsWorkflowsMetricsResponse {
+    raw: WorkflowMetrics,
+}
+
+impl GetWorkflowMetricsWorkflowsMetricsResponse {
+    pub fn raw(&self) -> &WorkflowMetrics {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowMetrics {
+        self.raw
+    }
+}
+
+impl From<WorkflowMetrics> for GetWorkflowMetricsWorkflowsMetricsResponse {
+    fn from(raw: WorkflowMetrics) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetWorkflowMetricsWorkflowsMetricsResponse> for WorkflowMetrics {
+    fn from(value: GetWorkflowMetricsWorkflowsMetricsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetWorkflowRegistrationWorkflowsResponse {
+    raw: WorkflowRegistrationGetResponse,
+}
+
+impl GetWorkflowRegistrationWorkflowsResponse {
+    pub fn raw(&self) -> &WorkflowRegistrationGetResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowRegistrationGetResponse {
+        self.raw
+    }
+}
+
+impl From<WorkflowRegistrationGetResponse> for GetWorkflowRegistrationWorkflowsResponse {
+    fn from(raw: WorkflowRegistrationGetResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetWorkflowRegistrationWorkflowsResponse> for WorkflowRegistrationGetResponse {
+    fn from(value: GetWorkflowRegistrationWorkflowsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetWorkflowRegistrationsWorkflowsResponse {
+    raw: WorkflowRegistrationListResponse,
+}
+
+impl GetWorkflowRegistrationsWorkflowsResponse {
+    pub fn raw(&self) -> &WorkflowRegistrationListResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowRegistrationListResponse {
+        self.raw
+    }
+}
+
+impl From<WorkflowRegistrationListResponse> for GetWorkflowRegistrationsWorkflowsResponse {
+    fn from(raw: WorkflowRegistrationListResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetWorkflowRegistrationsWorkflowsResponse> for WorkflowRegistrationListResponse {
+    fn from(value: GetWorkflowRegistrationsWorkflowsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetWorkflowWorkflowsResponse {
+    raw: WorkflowGetResponse,
+}
+
+impl GetWorkflowWorkflowsResponse {
+    pub fn raw(&self) -> &WorkflowGetResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowGetResponse {
+        self.raw
+    }
+}
+
+impl From<WorkflowGetResponse> for GetWorkflowWorkflowsResponse {
+    fn from(raw: WorkflowGetResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetWorkflowWorkflowsResponse> for WorkflowGetResponse {
+    fn from(value: GetWorkflowWorkflowsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetWorkflowsWorkflowsResponse {
+    raw: WorkflowListResponse,
+}
+
+impl GetWorkflowsWorkflowsResponse {
+    pub fn raw(&self) -> &WorkflowListResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowListResponse {
+        self.raw
+    }
+}
+
+impl From<WorkflowListResponse> for GetWorkflowsWorkflowsResponse {
+    fn from(raw: WorkflowListResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetWorkflowsWorkflowsResponse> for WorkflowListResponse {
+    fn from(value: GetWorkflowsWorkflowsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetWorkspaceStatsBetaAdminVibeCodeAnalyticsResponse {
+    raw: VibeWorkspaceStatsOUT,
+}
+
+impl GetWorkspaceStatsBetaAdminVibeCodeAnalyticsResponse {
+    pub fn raw(&self) -> &VibeWorkspaceStatsOUT {
+        &self.raw
+    }
+    pub fn into_raw(self) -> VibeWorkspaceStatsOUT {
+        self.raw
+    }
+}
+
+impl From<VibeWorkspaceStatsOUT> for GetWorkspaceStatsBetaAdminVibeCodeAnalyticsResponse {
+    fn from(raw: VibeWorkspaceStatsOUT) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetWorkspaceStatsBetaAdminVibeCodeAnalyticsResponse> for VibeWorkspaceStatsOUT {
+    fn from(value: GetWorkspaceStatsBetaAdminVibeCodeAnalyticsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct GetWorkspacesBetaAdminWorkspacesResponse {
+    raw: WorkspacesOut,
+}
+
+impl GetWorkspacesBetaAdminWorkspacesResponse {
+    pub fn raw(&self) -> &WorkspacesOut {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkspacesOut {
+        self.raw
+    }
+}
+
+impl From<WorkspacesOut> for GetWorkspacesBetaAdminWorkspacesResponse {
+    fn from(raw: WorkspacesOut) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<GetWorkspacesBetaAdminWorkspacesResponse> for WorkspacesOut {
+    fn from(value: GetWorkspacesBetaAdminWorkspacesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ImportFromDatasetRecordsBetaObservabilityDatasetsRequest {
+    raw: ImportDatasetFromDatasetRequest,
+}
+
+impl ImportFromDatasetRecordsBetaObservabilityDatasetsRequest {
+    pub fn new(dataset_record_ids: Vec<String>) -> Self {
+        Self {
+            raw: ImportDatasetFromDatasetRequest { dataset_record_ids },
+        }
+    }
+    pub fn from_raw(raw: ImportDatasetFromDatasetRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ImportDatasetFromDatasetRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ImportDatasetFromDatasetRequest {
+        self.raw
+    }
+}
+
+impl From<ImportDatasetFromDatasetRequest>
+    for ImportFromDatasetRecordsBetaObservabilityDatasetsRequest
+{
+    fn from(raw: ImportDatasetFromDatasetRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ImportFromDatasetRecordsBetaObservabilityDatasetsRequest>
+    for ImportDatasetFromDatasetRequest
+{
+    fn from(value: ImportFromDatasetRecordsBetaObservabilityDatasetsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ImportFromDatasetRecordsBetaObservabilityDatasetsResponse {
+    raw: DatasetImportTask,
+}
+
+impl ImportFromDatasetRecordsBetaObservabilityDatasetsResponse {
+    pub fn raw(&self) -> &DatasetImportTask {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DatasetImportTask {
+        self.raw
+    }
+}
+
+impl From<DatasetImportTask> for ImportFromDatasetRecordsBetaObservabilityDatasetsResponse {
+    fn from(raw: DatasetImportTask) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ImportFromDatasetRecordsBetaObservabilityDatasetsResponse> for DatasetImportTask {
+    fn from(value: ImportFromDatasetRecordsBetaObservabilityDatasetsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ImportFromFileBetaObservabilityDatasetsRequest {
+    raw: ImportDatasetFromFileRequest,
+}
+
+impl ImportFromFileBetaObservabilityDatasetsRequest {
+    pub fn new(file_id: impl Into<String>) -> Self {
+        Self {
+            raw: ImportDatasetFromFileRequest {
+                file_id: file_id.into(),
+            },
+        }
+    }
+    pub fn from_raw(raw: ImportDatasetFromFileRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ImportDatasetFromFileRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ImportDatasetFromFileRequest {
+        self.raw
+    }
+}
+
+impl From<ImportDatasetFromFileRequest> for ImportFromFileBetaObservabilityDatasetsRequest {
+    fn from(raw: ImportDatasetFromFileRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ImportFromFileBetaObservabilityDatasetsRequest> for ImportDatasetFromFileRequest {
+    fn from(value: ImportFromFileBetaObservabilityDatasetsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ImportFromFileBetaObservabilityDatasetsResponse {
+    raw: DatasetImportTask,
+}
+
+impl ImportFromFileBetaObservabilityDatasetsResponse {
+    pub fn raw(&self) -> &DatasetImportTask {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DatasetImportTask {
+        self.raw
+    }
+}
+
+impl From<DatasetImportTask> for ImportFromFileBetaObservabilityDatasetsResponse {
+    fn from(raw: DatasetImportTask) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ImportFromFileBetaObservabilityDatasetsResponse> for DatasetImportTask {
+    fn from(value: ImportFromFileBetaObservabilityDatasetsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ImportFromPlaygroundBetaObservabilityDatasetsRequest {
+    raw: ImportDatasetFromPlaygroundRequest,
+}
+
+impl ImportFromPlaygroundBetaObservabilityDatasetsRequest {
+    pub fn new(conversation_ids: Vec<String>) -> Self {
+        Self {
+            raw: ImportDatasetFromPlaygroundRequest { conversation_ids },
+        }
+    }
+    pub fn from_raw(raw: ImportDatasetFromPlaygroundRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ImportDatasetFromPlaygroundRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ImportDatasetFromPlaygroundRequest {
+        self.raw
+    }
+}
+
+impl From<ImportDatasetFromPlaygroundRequest>
+    for ImportFromPlaygroundBetaObservabilityDatasetsRequest
+{
+    fn from(raw: ImportDatasetFromPlaygroundRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ImportFromPlaygroundBetaObservabilityDatasetsRequest>
+    for ImportDatasetFromPlaygroundRequest
+{
+    fn from(value: ImportFromPlaygroundBetaObservabilityDatasetsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ImportFromPlaygroundBetaObservabilityDatasetsResponse {
+    raw: DatasetImportTask,
+}
+
+impl ImportFromPlaygroundBetaObservabilityDatasetsResponse {
+    pub fn raw(&self) -> &DatasetImportTask {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DatasetImportTask {
+        self.raw
+    }
+}
+
+impl From<DatasetImportTask> for ImportFromPlaygroundBetaObservabilityDatasetsResponse {
+    fn from(raw: DatasetImportTask) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ImportFromPlaygroundBetaObservabilityDatasetsResponse> for DatasetImportTask {
+    fn from(value: ImportFromPlaygroundBetaObservabilityDatasetsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct JudgeBetaObservabilityDatasetsRecordsRequest {
+    raw: JudgeDatasetRecordRequest,
+}
+
+impl JudgeBetaObservabilityDatasetsRecordsRequest {
+    pub fn new(
+        judge_definition: impl Into<JudgeBetaObservabilityDatasetsRecordsRequestJudgeDefinition>,
+    ) -> Self {
+        Self {
+            raw: JudgeDatasetRecordRequest {
+                judge_definition:
+                    Into::<JudgeBetaObservabilityDatasetsRecordsRequestJudgeDefinition>::into(
+                        judge_definition,
+                    )
+                    .into(),
+            },
+        }
+    }
+    pub fn from_raw(raw: JudgeDatasetRecordRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &JudgeDatasetRecordRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> JudgeDatasetRecordRequest {
+        self.raw
+    }
+}
+
+impl From<JudgeDatasetRecordRequest> for JudgeBetaObservabilityDatasetsRecordsRequest {
+    fn from(raw: JudgeDatasetRecordRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<JudgeBetaObservabilityDatasetsRecordsRequest> for JudgeDatasetRecordRequest {
+    fn from(value: JudgeBetaObservabilityDatasetsRecordsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct JudgeBetaObservabilityDatasetsRecordsRequestJudgeDefinition {
+    raw: CreateJudgeRequest,
+}
+
+impl JudgeBetaObservabilityDatasetsRecordsRequestJudgeDefinition {
+    pub fn new(
+        name: impl Into<String>,
+        description: impl Into<String>,
+        model_name: impl Into<String>,
+        output: impl Into<JudgeBetaObservabilityDatasetsRecordsRequestJudgeDefinitionOutput>,
+        instructions: impl Into<String>,
+        tools: Vec<String>,
+    ) -> Self {
+        Self {
+            raw: CreateJudgeRequest {
+                description: description.into(),
+                instructions: instructions.into(),
+                model_name: model_name.into(),
+                name: name.into(),
+                output:
+                    Into::<JudgeBetaObservabilityDatasetsRecordsRequestJudgeDefinitionOutput>::into(
+                        output,
+                    )
+                    .into(),
+                tools,
+            },
+        }
+    }
+    pub fn from_raw(raw: CreateJudgeRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &CreateJudgeRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CreateJudgeRequest {
+        self.raw
+    }
+}
+
+impl From<CreateJudgeRequest> for JudgeBetaObservabilityDatasetsRecordsRequestJudgeDefinition {
+    fn from(raw: CreateJudgeRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<JudgeBetaObservabilityDatasetsRecordsRequestJudgeDefinition> for CreateJudgeRequest {
+    fn from(value: JudgeBetaObservabilityDatasetsRecordsRequestJudgeDefinition) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub enum JudgeBetaObservabilityDatasetsRecordsRequestJudgeDefinitionOutput {
+    JudgeClassificationOutput(
+        JudgeBetaObservabilityDatasetsRecordsRequestJudgeDefinitionOutputJudgeClassificationOutput,
+    ),
+    JudgeRegressionOutput(
+        JudgeBetaObservabilityDatasetsRecordsRequestJudgeDefinitionOutputJudgeRegressionOutput,
+    ),
+}
+
+impl
+    From<JudgeBetaObservabilityDatasetsRecordsRequestJudgeDefinitionOutputJudgeClassificationOutput>
+    for JudgeBetaObservabilityDatasetsRecordsRequestJudgeDefinitionOutput
+{
+    fn from(
+        value: JudgeBetaObservabilityDatasetsRecordsRequestJudgeDefinitionOutputJudgeClassificationOutput,
+    ) -> Self {
+        Self::JudgeClassificationOutput(value)
+    }
+}
+
+impl From<JudgeBetaObservabilityDatasetsRecordsRequestJudgeDefinitionOutputJudgeRegressionOutput>
+    for JudgeBetaObservabilityDatasetsRecordsRequestJudgeDefinitionOutput
+{
+    fn from(
+        value: JudgeBetaObservabilityDatasetsRecordsRequestJudgeDefinitionOutputJudgeRegressionOutput,
+    ) -> Self {
+        Self::JudgeRegressionOutput(value)
+    }
+}
+
+impl From<JudgeBetaObservabilityDatasetsRecordsRequestJudgeDefinitionOutput>
+    for CreateJudgeRequestOutput
+{
+    fn from(value: JudgeBetaObservabilityDatasetsRecordsRequestJudgeDefinitionOutput) -> Self {
+        match value {
+        JudgeBetaObservabilityDatasetsRecordsRequestJudgeDefinitionOutput::JudgeClassificationOutput(value) => Self::JudgeClassificationOutput(value.into()),JudgeBetaObservabilityDatasetsRecordsRequestJudgeDefinitionOutput::JudgeRegressionOutput(value) => Self::JudgeRegressionOutput(value.into())
+    }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct JudgeBetaObservabilityDatasetsRecordsRequestJudgeDefinitionOutputJudgeClassificationOutput
+{
+    raw: JudgeClassificationOutput,
+}
+
+impl JudgeBetaObservabilityDatasetsRecordsRequestJudgeDefinitionOutputJudgeClassificationOutput {
+    pub fn new(options: Vec<JudgeClassificationOutputOption>) -> Self {
+        Self {
+            raw: JudgeClassificationOutput {
+                options,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn r#type(mut self, r#type: JudgeClassificationOutputType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: JudgeClassificationOutput) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &JudgeClassificationOutput {
+        &self.raw
+    }
+    pub fn into_raw(self) -> JudgeClassificationOutput {
+        self.raw
+    }
+}
+
+impl From<JudgeClassificationOutput>
+    for JudgeBetaObservabilityDatasetsRecordsRequestJudgeDefinitionOutputJudgeClassificationOutput
+{
+    fn from(raw: JudgeClassificationOutput) -> Self {
+        Self { raw }
+    }
+}
+
+impl
+    From<JudgeBetaObservabilityDatasetsRecordsRequestJudgeDefinitionOutputJudgeClassificationOutput>
+    for JudgeClassificationOutput
+{
+    fn from(
+        value: JudgeBetaObservabilityDatasetsRecordsRequestJudgeDefinitionOutputJudgeClassificationOutput,
+    ) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct JudgeBetaObservabilityDatasetsRecordsRequestJudgeDefinitionOutputJudgeRegressionOutput {
+    raw: JudgeRegressionOutput,
+}
+
+impl JudgeBetaObservabilityDatasetsRecordsRequestJudgeDefinitionOutputJudgeRegressionOutput {
+    pub fn new(min_description: impl Into<String>, max_description: impl Into<String>) -> Self {
+        Self {
+            raw: JudgeRegressionOutput {
+                max: None,
+                max_description: max_description.into(),
+                min: None,
+                min_description: min_description.into(),
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn max(mut self, max: f64) -> Self {
+        self.raw.max = Some(max);
+        self
+    }
+
+    #[must_use]
+    pub fn min(mut self, min: f64) -> Self {
+        self.raw.min = Some(min);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: JudgeRegressionOutputType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: JudgeRegressionOutput) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &JudgeRegressionOutput {
+        &self.raw
+    }
+    pub fn into_raw(self) -> JudgeRegressionOutput {
+        self.raw
+    }
+}
+
+impl From<JudgeRegressionOutput>
+    for JudgeBetaObservabilityDatasetsRecordsRequestJudgeDefinitionOutputJudgeRegressionOutput
+{
+    fn from(raw: JudgeRegressionOutput) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<JudgeBetaObservabilityDatasetsRecordsRequestJudgeDefinitionOutputJudgeRegressionOutput>
+    for JudgeRegressionOutput
+{
+    fn from(
+        value: JudgeBetaObservabilityDatasetsRecordsRequestJudgeDefinitionOutputJudgeRegressionOutput,
+    ) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct JudgeBetaObservabilityDatasetsRecordsResponse {
+    raw: JudgeOutput,
+}
+
+impl JudgeBetaObservabilityDatasetsRecordsResponse {
+    pub fn raw(&self) -> &JudgeOutput {
+        &self.raw
+    }
+    pub fn into_raw(self) -> JudgeOutput {
+        self.raw
+    }
+}
+
+impl From<JudgeOutput> for JudgeBetaObservabilityDatasetsRecordsResponse {
+    fn from(raw: JudgeOutput) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<JudgeBetaObservabilityDatasetsRecordsResponse> for JudgeOutput {
+    fn from(value: JudgeBetaObservabilityDatasetsRecordsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequest {
+    raw: JudgeChatCompletionEventRequest,
+}
+
+impl JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequest {
+    pub fn new(
+        judge_definition: impl Into<
+            JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequestJudgeDefinition,
+        >,
+    ) -> Self {
+        Self { raw: JudgeChatCompletionEventRequest { judge_definition: Into::<JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequestJudgeDefinition>::into(judge_definition).into() } }
+    }
+    pub fn from_raw(raw: JudgeChatCompletionEventRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &JudgeChatCompletionEventRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> JudgeChatCompletionEventRequest {
+        self.raw
+    }
+}
+
+impl From<JudgeChatCompletionEventRequest>
+    for JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequest
+{
+    fn from(raw: JudgeChatCompletionEventRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequest>
+    for JudgeChatCompletionEventRequest
+{
+    fn from(value: JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequestJudgeDefinition {
+    raw: CreateJudgeRequest,
+}
+
+impl JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequestJudgeDefinition {
+    pub fn new(
+        name: impl Into<String>,
+        description: impl Into<String>,
+        model_name: impl Into<String>,
+        output: impl Into<JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequestJudgeDefinitionOutput>,
+        instructions: impl Into<String>,
+        tools: Vec<String>,
+    ) -> Self {
+        Self { raw: CreateJudgeRequest { description: description.into(), instructions: instructions.into(), model_name: model_name.into(), name: name.into(), output: Into::<JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequestJudgeDefinitionOutput>::into(output).into(), tools } }
+    }
+    pub fn from_raw(raw: CreateJudgeRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &CreateJudgeRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CreateJudgeRequest {
+        self.raw
+    }
+}
+
+impl From<CreateJudgeRequest>
+    for JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequestJudgeDefinition
+{
+    fn from(raw: CreateJudgeRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequestJudgeDefinition>
+    for CreateJudgeRequest
+{
+    fn from(
+        value: JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequestJudgeDefinition,
+    ) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub enum JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequestJudgeDefinitionOutput {
+    JudgeClassificationOutput(JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequestJudgeDefinitionOutputJudgeClassificationOutput),JudgeRegressionOutput(JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequestJudgeDefinitionOutputJudgeRegressionOutput)
+}
+
+impl From<JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequestJudgeDefinitionOutputJudgeClassificationOutput> for JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequestJudgeDefinitionOutput {
+    fn from(value: JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequestJudgeDefinitionOutputJudgeClassificationOutput) -> Self { Self::JudgeClassificationOutput(value) }
+}
+
+impl From<JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequestJudgeDefinitionOutputJudgeRegressionOutput> for JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequestJudgeDefinitionOutput {
+    fn from(value: JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequestJudgeDefinitionOutputJudgeRegressionOutput) -> Self { Self::JudgeRegressionOutput(value) }
+}
+
+impl From<JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequestJudgeDefinitionOutput>
+    for CreateJudgeRequestOutput
+{
+    fn from(
+        value: JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequestJudgeDefinitionOutput,
+    ) -> Self {
+        match value {
+        JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequestJudgeDefinitionOutput::JudgeClassificationOutput(value) => Self::JudgeClassificationOutput(value.into()),JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequestJudgeDefinitionOutput::JudgeRegressionOutput(value) => Self::JudgeRegressionOutput(value.into())
+    }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequestJudgeDefinitionOutputJudgeClassificationOutput
+{
+    raw: JudgeClassificationOutput,
+}
+
+impl JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequestJudgeDefinitionOutputJudgeClassificationOutput {
+    pub fn new(options: Vec<JudgeClassificationOutputOption>) -> Self {
+        Self { raw: JudgeClassificationOutput { options, r#type: None } }
+    }
+    #[must_use]
+    pub fn r#type(mut self, r#type: JudgeClassificationOutputType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: JudgeClassificationOutput) -> Self { Self { raw } }
+    pub fn as_raw(&self) -> &JudgeClassificationOutput { &self.raw }
+    pub fn into_raw(self) -> JudgeClassificationOutput { self.raw }
+}
+
+impl From<JudgeClassificationOutput> for JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequestJudgeDefinitionOutputJudgeClassificationOutput {
+    fn from(raw: JudgeClassificationOutput) -> Self { Self { raw } }
+}
+
+impl From<JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequestJudgeDefinitionOutputJudgeClassificationOutput> for JudgeClassificationOutput {
+    fn from(value: JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequestJudgeDefinitionOutputJudgeClassificationOutput) -> Self { value.into_raw() }
+}
+
+#[derive(Debug, Clone)]
+pub struct JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequestJudgeDefinitionOutputJudgeRegressionOutput
+{
+    raw: JudgeRegressionOutput,
+}
+
+impl JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequestJudgeDefinitionOutputJudgeRegressionOutput {
+    pub fn new(min_description: impl Into<String>, max_description: impl Into<String>) -> Self {
+        Self { raw: JudgeRegressionOutput { max: None, max_description: max_description.into(), min: None, min_description: min_description.into(), r#type: None } }
+    }
+    #[must_use]
+    pub fn max(mut self, max: f64) -> Self {
+        self.raw.max = Some(max);
+        self
+    }
+
+    #[must_use]
+    pub fn min(mut self, min: f64) -> Self {
+        self.raw.min = Some(min);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: JudgeRegressionOutputType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: JudgeRegressionOutput) -> Self { Self { raw } }
+    pub fn as_raw(&self) -> &JudgeRegressionOutput { &self.raw }
+    pub fn into_raw(self) -> JudgeRegressionOutput { self.raw }
+}
+
+impl From<JudgeRegressionOutput> for JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequestJudgeDefinitionOutputJudgeRegressionOutput {
+    fn from(raw: JudgeRegressionOutput) -> Self { Self { raw } }
+}
+
+impl From<JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequestJudgeDefinitionOutputJudgeRegressionOutput> for JudgeRegressionOutput {
+    fn from(value: JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequestJudgeDefinitionOutputJudgeRegressionOutput) -> Self { value.into_raw() }
+}
+
+#[derive(Debug, Clone)]
+pub struct JudgeChatCompletionEventBetaObservabilityChatCompletionEventsResponse {
+    raw: JudgeOutput,
+}
+
+impl JudgeChatCompletionEventBetaObservabilityChatCompletionEventsResponse {
+    pub fn raw(&self) -> &JudgeOutput {
+        &self.raw
+    }
+    pub fn into_raw(self) -> JudgeOutput {
+        self.raw
+    }
+}
+
+impl From<JudgeOutput> for JudgeChatCompletionEventBetaObservabilityChatCompletionEventsResponse {
+    fn from(raw: JudgeOutput) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<JudgeChatCompletionEventBetaObservabilityChatCompletionEventsResponse> for JudgeOutput {
+    fn from(value: JudgeChatCompletionEventBetaObservabilityChatCompletionEventsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct JudgeConversationBetaObservabilityJudgesRequest {
+    raw: JudgeConversationRequest,
+}
+
+impl JudgeConversationBetaObservabilityJudgesRequest {
+    pub fn new(messages: Vec<JudgeConversationRequestMessagesItem>) -> Self {
+        Self {
+            raw: JudgeConversationRequest {
+                messages,
+                properties: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn properties(mut self, properties: JudgeConversationRequestProperties) -> Self {
+        self.raw.properties = Some(Some(properties));
+        self
+    }
+
+    #[must_use]
+    pub fn properties_null(mut self) -> Self {
+        self.raw.properties = Some(None);
+        self
+    }
+    pub fn from_raw(raw: JudgeConversationRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &JudgeConversationRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> JudgeConversationRequest {
+        self.raw
+    }
+}
+
+impl From<JudgeConversationRequest> for JudgeConversationBetaObservabilityJudgesRequest {
+    fn from(raw: JudgeConversationRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<JudgeConversationBetaObservabilityJudgesRequest> for JudgeConversationRequest {
+    fn from(value: JudgeConversationBetaObservabilityJudgesRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct JudgeConversationBetaObservabilityJudgesResponse {
+    raw: JudgeOutput,
+}
+
+impl JudgeConversationBetaObservabilityJudgesResponse {
+    pub fn raw(&self) -> &JudgeOutput {
+        &self.raw
+    }
+    pub fn into_raw(self) -> JudgeOutput {
+        self.raw
+    }
+}
+
+impl From<JudgeOutput> for JudgeConversationBetaObservabilityJudgesResponse {
+    fn from(raw: JudgeOutput) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<JudgeConversationBetaObservabilityJudgesResponse> for JudgeOutput {
+    fn from(value: JudgeConversationBetaObservabilityJudgesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct LibrariesDocumentsUpdateV1BetaLibrariesDocumentsRequest {
+    raw: UpdateDocumentRequest,
+}
+
+impl LibrariesDocumentsUpdateV1BetaLibrariesDocumentsRequest {
+    pub fn new() -> Self {
+        Self {
+            raw: UpdateDocumentRequest {
+                attributes: None,
+                expires_at: None,
+                name: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn attributes(mut self, attributes: UpdateDocumentRequestAttributes) -> Self {
+        self.raw.attributes = Some(Some(attributes));
+        self
+    }
+
+    #[must_use]
+    pub fn attributes_null(mut self) -> Self {
+        self.raw.attributes = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn expires_at(mut self, expires_at: chrono::DateTime<chrono::Utc>) -> Self {
+        self.raw.expires_at = Some(Some(expires_at));
+        self
+    }
+
+    #[must_use]
+    pub fn expires_at_null(mut self) -> Self {
+        self.raw.expires_at = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn name(mut self, name: impl Into<String>) -> Self {
+        self.raw.name = Some(name.into());
+        self
+    }
+    pub fn from_raw(raw: UpdateDocumentRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &UpdateDocumentRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> UpdateDocumentRequest {
+        self.raw
+    }
+}
+
+impl From<UpdateDocumentRequest> for LibrariesDocumentsUpdateV1BetaLibrariesDocumentsRequest {
+    fn from(raw: UpdateDocumentRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<LibrariesDocumentsUpdateV1BetaLibrariesDocumentsRequest> for UpdateDocumentRequest {
+    fn from(value: LibrariesDocumentsUpdateV1BetaLibrariesDocumentsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for LibrariesDocumentsUpdateV1BetaLibrariesDocumentsRequest {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct LibrariesDocumentsUpdateV1BetaLibrariesDocumentsResponse {
+    raw: Document,
+}
+
+impl LibrariesDocumentsUpdateV1BetaLibrariesDocumentsResponse {
+    pub fn raw(&self) -> &Document {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Document {
+        self.raw
+    }
+}
+
+impl From<Document> for LibrariesDocumentsUpdateV1BetaLibrariesDocumentsResponse {
+    fn from(raw: Document) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<LibrariesDocumentsUpdateV1BetaLibrariesDocumentsResponse> for Document {
+    fn from(value: LibrariesDocumentsUpdateV1BetaLibrariesDocumentsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct LibrariesUpdateV1BetaLibrariesRequest {
+    raw: UpdateLibraryRequest,
+}
+
+impl LibrariesUpdateV1BetaLibrariesRequest {
+    pub fn new() -> Self {
+        Self {
+            raw: UpdateLibraryRequest {
                 description: None,
                 name: None,
             },
@@ -5989,114 +12155,70 @@ impl LibraryInUpdateParams {
 
     #[must_use]
     pub fn name(mut self, name: impl Into<String>) -> Self {
-        self.raw.name = Some(Some(name.into()));
+        self.raw.name = Some(name.into());
         self
     }
-
-    #[must_use]
-    pub fn name_null(mut self) -> Self {
-        self.raw.name = Some(None);
-        self
-    }
-    pub fn from_raw(raw: LibraryInUpdate) -> Self {
+    pub fn from_raw(raw: UpdateLibraryRequest) -> Self {
         Self { raw }
     }
-    pub fn as_raw(&self) -> &LibraryInUpdate {
+    pub fn as_raw(&self) -> &UpdateLibraryRequest {
         &self.raw
     }
-    pub fn into_raw(self) -> LibraryInUpdate {
+    pub fn into_raw(self) -> UpdateLibraryRequest {
         self.raw
     }
 }
 
-impl From<LibraryInUpdate> for LibraryInUpdateParams {
-    fn from(raw: LibraryInUpdate) -> Self {
+impl From<UpdateLibraryRequest> for LibrariesUpdateV1BetaLibrariesRequest {
+    fn from(raw: UpdateLibraryRequest) -> Self {
         Self { raw }
     }
 }
 
-impl From<LibraryInUpdateParams> for LibraryInUpdate {
-    fn from(value: LibraryInUpdateParams) -> Self {
+impl From<LibrariesUpdateV1BetaLibrariesRequest> for UpdateLibraryRequest {
+    fn from(value: LibrariesUpdateV1BetaLibrariesRequest) -> Self {
         value.into_raw()
     }
 }
 
-impl Default for LibraryInUpdateParams {
+impl Default for LibrariesUpdateV1BetaLibrariesRequest {
     fn default() -> Self {
         Self::new()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct DeploymentListResponseView {
-    raw: DeploymentListResponse,
+pub struct LibrariesUpdateV1BetaLibrariesResponse {
+    raw: Library,
 }
 
-impl DeploymentListResponseView {
-    pub fn raw(&self) -> &DeploymentListResponse {
+impl LibrariesUpdateV1BetaLibrariesResponse {
+    pub fn raw(&self) -> &Library {
         &self.raw
     }
-    pub fn into_raw(self) -> DeploymentListResponse {
+    pub fn into_raw(self) -> Library {
         self.raw
     }
 }
 
-impl From<DeploymentListResponse> for DeploymentListResponseView {
-    fn from(raw: DeploymentListResponse) -> Self {
+impl From<Library> for LibrariesUpdateV1BetaLibrariesResponse {
+    fn from(raw: Library) -> Self {
         Self { raw }
     }
 }
 
-impl From<DeploymentListResponseView> for DeploymentListResponse {
-    fn from(value: DeploymentListResponseView) -> Self {
+impl From<LibrariesUpdateV1BetaLibrariesResponse> for Library {
+    fn from(value: LibrariesUpdateV1BetaLibrariesResponse) -> Self {
         value.into_raw()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct WorkflowExecutionListResponseView {
-    raw: WorkflowExecutionListResponse,
-}
-
-impl WorkflowExecutionListResponseView {
-    pub fn raw(&self) -> &WorkflowExecutionListResponse {
-        &self.raw
-    }
-    pub fn into_raw(self) -> WorkflowExecutionListResponse {
-        self.raw
-    }
-}
-
-impl From<WorkflowExecutionListResponse> for WorkflowExecutionListResponseView {
-    fn from(raw: WorkflowExecutionListResponse) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<WorkflowExecutionListResponseView> for WorkflowExecutionListResponse {
-    fn from(value: WorkflowExecutionListResponseView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct VoiceListResponseView {
+pub struct ListAudioVoicesResponse {
     raw: VoiceListResponse,
 }
 
-impl VoiceListResponseView {
-    pub fn page(&self) -> i64 {
-        self.raw.page
-    }
-    pub fn page_size(&self) -> i64 {
-        self.raw.page_size
-    }
-    pub fn total(&self) -> i64 {
-        self.raw.total
-    }
-    pub fn total_pages(&self) -> i64 {
-        self.raw.total_pages
-    }
+impl ListAudioVoicesResponse {
     pub fn raw(&self) -> &VoiceListResponse {
         &self.raw
     }
@@ -6105,205 +12227,1469 @@ impl VoiceListResponseView {
     }
 }
 
-impl From<VoiceListResponse> for VoiceListResponseView {
+impl From<VoiceListResponse> for ListAudioVoicesResponse {
     fn from(raw: VoiceListResponse) -> Self {
         Self { raw }
     }
 }
 
-impl From<VoiceListResponseView> for VoiceListResponse {
-    fn from(value: VoiceListResponseView) -> Self {
+impl From<ListAudioVoicesResponse> for VoiceListResponse {
+    fn from(value: ListAudioVoicesResponse) -> Self {
         value.into_raw()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct PostDatasetImportFromCampaignInSchemaParams {
-    raw: PostDatasetImportFromCampaignInSchema,
+pub struct ListBatchJobsResponseView {
+    raw: ListBatchJobsResponse,
 }
 
-impl PostDatasetImportFromCampaignInSchemaParams {
+impl ListBatchJobsResponseView {
+    pub fn raw(&self) -> &ListBatchJobsResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ListBatchJobsResponse {
+        self.raw
+    }
+}
+
+impl From<ListBatchJobsResponse> for ListBatchJobsResponseView {
+    fn from(raw: ListBatchJobsResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListBatchJobsResponseView> for ListBatchJobsResponse {
+    fn from(value: ListBatchJobsResponseView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListBetaAgentsResponse {
+    raw: AgentsApiV1AgentsListResponse,
+}
+
+impl ListBetaAgentsResponse {
+    pub fn iter(&self) -> impl ExactSizeIterator<Item = ListBetaAgentsResponseItem<'_>> {
+        self.raw.iter().map(ListBetaAgentsResponseItem::new)
+    }
+    pub fn raw(&self) -> &AgentsApiV1AgentsListResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AgentsApiV1AgentsListResponse {
+        self.raw
+    }
+}
+
+impl From<AgentsApiV1AgentsListResponse> for ListBetaAgentsResponse {
+    fn from(raw: AgentsApiV1AgentsListResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListBetaAgentsResponse> for AgentsApiV1AgentsListResponse {
+    fn from(value: ListBetaAgentsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct ListBetaAgentsResponseItem<'a> {
+    raw: &'a Agent,
+}
+
+impl<'a> ListBetaAgentsResponseItem<'a> {
+    pub(crate) fn new(raw: &'a Agent) -> Self {
+        Self { raw }
+    }
+
+    pub fn raw(&self) -> &'a Agent {
+        self.raw
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListBetaConnectorsResponse {
+    raw: PaginatedConnectors,
+}
+
+impl ListBetaConnectorsResponse {
+    pub fn raw(&self) -> &PaginatedConnectors {
+        &self.raw
+    }
+    pub fn into_raw(self) -> PaginatedConnectors {
+        self.raw
+    }
+}
+
+impl From<PaginatedConnectors> for ListBetaConnectorsResponse {
+    fn from(raw: PaginatedConnectors) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListBetaConnectorsResponse> for PaginatedConnectors {
+    fn from(value: ListBetaConnectorsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListBetaConversationsResponse {
+    raw: AgentsApiV1ConversationsListResponse,
+}
+
+impl ListBetaConversationsResponse {
+    pub fn raw(&self) -> &AgentsApiV1ConversationsListResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AgentsApiV1ConversationsListResponse {
+        self.raw
+    }
+}
+
+impl From<AgentsApiV1ConversationsListResponse> for ListBetaConversationsResponse {
+    fn from(raw: AgentsApiV1ConversationsListResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListBetaConversationsResponse> for AgentsApiV1ConversationsListResponse {
+    fn from(value: ListBetaConversationsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListBetaLibrariesAccessesResponse {
+    raw: ListSharingResponse,
+}
+
+impl ListBetaLibrariesAccessesResponse {
+    pub fn raw(&self) -> &ListSharingResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ListSharingResponse {
+        self.raw
+    }
+}
+
+impl From<ListSharingResponse> for ListBetaLibrariesAccessesResponse {
+    fn from(raw: ListSharingResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListBetaLibrariesAccessesResponse> for ListSharingResponse {
+    fn from(value: ListBetaLibrariesAccessesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListBetaLibrariesDocumentsResponse {
+    raw: ListDocumentsResponse,
+}
+
+impl ListBetaLibrariesDocumentsResponse {
+    pub fn raw(&self) -> &ListDocumentsResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ListDocumentsResponse {
+        self.raw
+    }
+}
+
+impl From<ListDocumentsResponse> for ListBetaLibrariesDocumentsResponse {
+    fn from(raw: ListDocumentsResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListBetaLibrariesDocumentsResponse> for ListDocumentsResponse {
+    fn from(value: ListBetaLibrariesDocumentsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListBetaLibrariesResponse {
+    raw: ListLibrariesResponse,
+}
+
+impl ListBetaLibrariesResponse {
+    pub fn raw(&self) -> &ListLibrariesResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ListLibrariesResponse {
+        self.raw
+    }
+}
+
+impl From<ListLibrariesResponse> for ListBetaLibrariesResponse {
+    fn from(raw: ListLibrariesResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListBetaLibrariesResponse> for ListLibrariesResponse {
+    fn from(value: ListBetaLibrariesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListBetaObservabilityDatasetsResponse {
+    raw: ListDatasetsResponse,
+}
+
+impl ListBetaObservabilityDatasetsResponse {
+    pub fn raw(&self) -> &ListDatasetsResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ListDatasetsResponse {
+        self.raw
+    }
+}
+
+impl From<ListDatasetsResponse> for ListBetaObservabilityDatasetsResponse {
+    fn from(raw: ListDatasetsResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListBetaObservabilityDatasetsResponse> for ListDatasetsResponse {
+    fn from(value: ListBetaObservabilityDatasetsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListBetaObservabilityJudgesResponse {
+    raw: ListJudgesResponse,
+}
+
+impl ListBetaObservabilityJudgesResponse {
+    pub fn raw(&self) -> &ListJudgesResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ListJudgesResponse {
+        self.raw
+    }
+}
+
+impl From<ListJudgesResponse> for ListBetaObservabilityJudgesResponse {
+    fn from(raw: ListJudgesResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListBetaObservabilityJudgesResponse> for ListJudgesResponse {
+    fn from(value: ListBetaObservabilityJudgesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListBetaObservabilityLogsResponse {
+    raw: GetLogFields,
+}
+
+impl ListBetaObservabilityLogsResponse {
+    pub fn raw(&self) -> &GetLogFields {
+        &self.raw
+    }
+    pub fn into_raw(self) -> GetLogFields {
+        self.raw
+    }
+}
+
+impl From<GetLogFields> for ListBetaObservabilityLogsResponse {
+    fn from(raw: GetLogFields) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListBetaObservabilityLogsResponse> for GetLogFields {
+    fn from(value: ListBetaObservabilityLogsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListBetaPromptsResponse {
+    raw: ListPromptsResponse,
+}
+
+impl ListBetaPromptsResponse {
+    pub fn raw(&self) -> &ListPromptsResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ListPromptsResponse {
+        self.raw
+    }
+}
+
+impl From<ListPromptsResponse> for ListBetaPromptsResponse {
+    fn from(raw: ListPromptsResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListBetaPromptsResponse> for ListPromptsResponse {
+    fn from(value: ListBetaPromptsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListBetaRagIngestionPipelineConfigurationsResponse {
+    raw: GetConfigsV1RagIngestionPipelineConfigurationsGetResponse,
+}
+
+impl ListBetaRagIngestionPipelineConfigurationsResponse {
+    pub fn iter(
+        &self,
+    ) -> impl ExactSizeIterator<Item = ListBetaRagIngestionPipelineConfigurationsResponseItem<'_>>
+    {
+        self.raw
+            .iter()
+            .map(ListBetaRagIngestionPipelineConfigurationsResponseItem::new)
+    }
+    pub fn raw(&self) -> &GetConfigsV1RagIngestionPipelineConfigurationsGetResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> GetConfigsV1RagIngestionPipelineConfigurationsGetResponse {
+        self.raw
+    }
+}
+
+impl From<GetConfigsV1RagIngestionPipelineConfigurationsGetResponse>
+    for ListBetaRagIngestionPipelineConfigurationsResponse
+{
+    fn from(raw: GetConfigsV1RagIngestionPipelineConfigurationsGetResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListBetaRagIngestionPipelineConfigurationsResponse>
+    for GetConfigsV1RagIngestionPipelineConfigurationsGetResponse
+{
+    fn from(value: ListBetaRagIngestionPipelineConfigurationsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct ListBetaRagIngestionPipelineConfigurationsResponseItem<'a> {
+    raw: &'a IngestionPipelineConfiguration,
+}
+
+impl<'a> ListBetaRagIngestionPipelineConfigurationsResponseItem<'a> {
+    pub(crate) fn new(raw: &'a IngestionPipelineConfiguration) -> Self {
+        Self { raw }
+    }
+
+    pub fn raw(&self) -> &'a IngestionPipelineConfiguration {
+        self.raw
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListBetaSkillsResponse {
+    raw: ListSkillsResponse,
+}
+
+impl ListBetaSkillsResponse {
+    pub fn raw(&self) -> &ListSkillsResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ListSkillsResponse {
+        self.raw
+    }
+}
+
+impl From<ListSkillsResponse> for ListBetaSkillsResponse {
+    fn from(raw: ListSkillsResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListBetaSkillsResponse> for ListSkillsResponse {
+    fn from(value: ListBetaSkillsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListDeploymentWorkersWorkflowsDeploymentsResponse {
+    raw: DeploymentWorkerListResponse,
+}
+
+impl ListDeploymentWorkersWorkflowsDeploymentsResponse {
+    pub fn raw(&self) -> &DeploymentWorkerListResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DeploymentWorkerListResponse {
+        self.raw
+    }
+}
+
+impl From<DeploymentWorkerListResponse> for ListDeploymentWorkersWorkflowsDeploymentsResponse {
+    fn from(raw: DeploymentWorkerListResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListDeploymentWorkersWorkflowsDeploymentsResponse> for DeploymentWorkerListResponse {
+    fn from(value: ListDeploymentWorkersWorkflowsDeploymentsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListDeploymentsWorkflowsDeploymentsResponse {
+    raw: DeploymentListResponse,
+}
+
+impl ListDeploymentsWorkflowsDeploymentsResponse {
+    pub fn raw(&self) -> &DeploymentListResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DeploymentListResponse {
+        self.raw
+    }
+}
+
+impl From<DeploymentListResponse> for ListDeploymentsWorkflowsDeploymentsResponse {
+    fn from(raw: DeploymentListResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListDeploymentsWorkflowsDeploymentsResponse> for DeploymentListResponse {
+    fn from(value: ListDeploymentsWorkflowsDeploymentsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListFilesResponseView {
+    raw: ListFilesResponse,
+}
+
+impl ListFilesResponseView {
+    pub fn raw(&self) -> &ListFilesResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ListFilesResponse {
+        self.raw
+    }
+}
+
+impl From<ListFilesResponse> for ListFilesResponseView {
+    fn from(raw: ListFilesResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListFilesResponseView> for ListFilesResponse {
+    fn from(value: ListFilesResponseView) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListModelsResponse {
+    raw: ModelList,
+}
+
+impl ListModelsResponse {
+    pub fn raw(&self) -> &ModelList {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ModelList {
+        self.raw
+    }
+}
+
+impl From<ModelList> for ListModelsResponse {
+    fn from(raw: ModelList) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListModelsResponse> for ModelList {
+    fn from(value: ListModelsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListOrganizationCredentialsBetaConnectorsResponse {
+    raw: CredentialsResponse,
+}
+
+impl ListOrganizationCredentialsBetaConnectorsResponse {
+    pub fn raw(&self) -> &CredentialsResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CredentialsResponse {
+        self.raw
+    }
+}
+
+impl From<CredentialsResponse> for ListOrganizationCredentialsBetaConnectorsResponse {
+    fn from(raw: CredentialsResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListOrganizationCredentialsBetaConnectorsResponse> for CredentialsResponse {
+    fn from(value: ListOrganizationCredentialsBetaConnectorsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListOrganizationsBetaUsersResponse {
+    raw: ListOrganizationsResponse,
+}
+
+impl ListOrganizationsBetaUsersResponse {
+    pub fn raw(&self) -> &ListOrganizationsResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ListOrganizationsResponse {
+        self.raw
+    }
+}
+
+impl From<ListOrganizationsResponse> for ListOrganizationsBetaUsersResponse {
+    fn from(raw: ListOrganizationsResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListOrganizationsBetaUsersResponse> for ListOrganizationsResponse {
+    fn from(value: ListOrganizationsBetaUsersResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListPagesBetaAgentsResponse {
+    raw: AgentListPage,
+}
+
+impl ListPagesBetaAgentsResponse {
+    pub fn raw(&self) -> &AgentListPage {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AgentListPage {
+        self.raw
+    }
+}
+
+impl From<AgentListPage> for ListPagesBetaAgentsResponse {
+    fn from(raw: AgentListPage) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListPagesBetaAgentsResponse> for AgentListPage {
+    fn from(value: ListPagesBetaAgentsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListRecordsBetaObservabilityDatasetsResponse {
+    raw: ListDatasetRecordsResponse,
+}
+
+impl ListRecordsBetaObservabilityDatasetsResponse {
+    pub fn raw(&self) -> &ListDatasetRecordsResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ListDatasetRecordsResponse {
+        self.raw
+    }
+}
+
+impl From<ListDatasetRecordsResponse> for ListRecordsBetaObservabilityDatasetsResponse {
+    fn from(raw: ListDatasetRecordsResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListRecordsBetaObservabilityDatasetsResponse> for ListDatasetRecordsResponse {
+    fn from(value: ListRecordsBetaObservabilityDatasetsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListRunsWorkflowsRunsResponse {
+    raw: WorkflowExecutionListResponse,
+}
+
+impl ListRunsWorkflowsRunsResponse {
+    pub fn raw(&self) -> &WorkflowExecutionListResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowExecutionListResponse {
+        self.raw
+    }
+}
+
+impl From<WorkflowExecutionListResponse> for ListRunsWorkflowsRunsResponse {
+    fn from(raw: WorkflowExecutionListResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListRunsWorkflowsRunsResponse> for WorkflowExecutionListResponse {
+    fn from(value: ListRunsWorkflowsRunsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListSpanEvalFieldsBetaObservabilitySpansResponse {
+    raw: GetSpanEvaluationFields,
+}
+
+impl ListSpanEvalFieldsBetaObservabilitySpansResponse {
+    pub fn raw(&self) -> &GetSpanEvaluationFields {
+        &self.raw
+    }
+    pub fn into_raw(self) -> GetSpanEvaluationFields {
+        self.raw
+    }
+}
+
+impl From<GetSpanEvaluationFields> for ListSpanEvalFieldsBetaObservabilitySpansResponse {
+    fn from(raw: GetSpanEvaluationFields) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListSpanEvalFieldsBetaObservabilitySpansResponse> for GetSpanEvaluationFields {
+    fn from(value: ListSpanEvalFieldsBetaObservabilitySpansResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListSpanFieldsBetaObservabilitySpansResponse {
+    raw: GetSpanFields,
+}
+
+impl ListSpanFieldsBetaObservabilitySpansResponse {
+    pub fn raw(&self) -> &GetSpanFields {
+        &self.raw
+    }
+    pub fn into_raw(self) -> GetSpanFields {
+        self.raw
+    }
+}
+
+impl From<GetSpanFields> for ListSpanFieldsBetaObservabilitySpansResponse {
+    fn from(raw: GetSpanFields) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListSpanFieldsBetaObservabilitySpansResponse> for GetSpanFields {
+    fn from(value: ListSpanFieldsBetaObservabilitySpansResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListTasksBetaObservabilityDatasetsResponse {
+    raw: ListDatasetImportTasksResponse,
+}
+
+impl ListTasksBetaObservabilityDatasetsResponse {
+    pub fn raw(&self) -> &ListDatasetImportTasksResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ListDatasetImportTasksResponse {
+        self.raw
+    }
+}
+
+impl From<ListDatasetImportTasksResponse> for ListTasksBetaObservabilityDatasetsResponse {
+    fn from(raw: ListDatasetImportTasksResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListTasksBetaObservabilityDatasetsResponse> for ListDatasetImportTasksResponse {
+    fn from(value: ListTasksBetaObservabilityDatasetsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListToolsBetaConnectorsResponse {
+    raw: ConnectorListToolsV1Response,
+}
+
+impl ListToolsBetaConnectorsResponse {
+    pub fn raw(&self) -> &ConnectorListToolsV1Response {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ConnectorListToolsV1Response {
+        self.raw
+    }
+}
+
+impl From<ConnectorListToolsV1Response> for ListToolsBetaConnectorsResponse {
+    fn from(raw: ConnectorListToolsV1Response) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListToolsBetaConnectorsResponse> for ConnectorListToolsV1Response {
+    fn from(value: ListToolsBetaConnectorsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListUserCredentialsBetaConnectorsResponse {
+    raw: CredentialsResponse,
+}
+
+impl ListUserCredentialsBetaConnectorsResponse {
+    pub fn raw(&self) -> &CredentialsResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CredentialsResponse {
+        self.raw
+    }
+}
+
+impl From<CredentialsResponse> for ListUserCredentialsBetaConnectorsResponse {
+    fn from(raw: CredentialsResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListUserCredentialsBetaConnectorsResponse> for CredentialsResponse {
+    fn from(value: ListUserCredentialsBetaConnectorsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListVersionAliasesBetaAgentsResponse {
+    raw: AgentsApiV1AgentsListVersionAliasesResponse,
+}
+
+impl ListVersionAliasesBetaAgentsResponse {
+    pub fn iter(
+        &self,
+    ) -> impl ExactSizeIterator<Item = ListVersionAliasesBetaAgentsResponseItem<'_>> {
+        self.raw
+            .iter()
+            .map(ListVersionAliasesBetaAgentsResponseItem::new)
+    }
+    pub fn raw(&self) -> &AgentsApiV1AgentsListVersionAliasesResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AgentsApiV1AgentsListVersionAliasesResponse {
+        self.raw
+    }
+}
+
+impl From<AgentsApiV1AgentsListVersionAliasesResponse> for ListVersionAliasesBetaAgentsResponse {
+    fn from(raw: AgentsApiV1AgentsListVersionAliasesResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListVersionAliasesBetaAgentsResponse> for AgentsApiV1AgentsListVersionAliasesResponse {
+    fn from(value: ListVersionAliasesBetaAgentsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct ListVersionAliasesBetaAgentsResponseItem<'a> {
+    raw: &'a AgentAliasResponse,
+}
+
+impl<'a> ListVersionAliasesBetaAgentsResponseItem<'a> {
+    pub(crate) fn new(raw: &'a AgentAliasResponse) -> Self {
+        Self { raw }
+    }
+
+    pub fn raw(&self) -> &'a AgentAliasResponse {
+        self.raw
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListVersionsBetaAgentsResponse {
+    raw: AgentsApiV1AgentsListVersionsResponse,
+}
+
+impl ListVersionsBetaAgentsResponse {
+    pub fn iter(&self) -> impl ExactSizeIterator<Item = ListVersionsBetaAgentsResponseItem<'_>> {
+        self.raw.iter().map(ListVersionsBetaAgentsResponseItem::new)
+    }
+    pub fn raw(&self) -> &AgentsApiV1AgentsListVersionsResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AgentsApiV1AgentsListVersionsResponse {
+        self.raw
+    }
+}
+
+impl From<AgentsApiV1AgentsListVersionsResponse> for ListVersionsBetaAgentsResponse {
+    fn from(raw: AgentsApiV1AgentsListVersionsResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListVersionsBetaAgentsResponse> for AgentsApiV1AgentsListVersionsResponse {
+    fn from(value: ListVersionsBetaAgentsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct ListVersionsBetaAgentsResponseItem<'a> {
+    raw: &'a Agent,
+}
+
+impl<'a> ListVersionsBetaAgentsResponseItem<'a> {
+    pub(crate) fn new(raw: &'a Agent) -> Self {
+        Self { raw }
+    }
+
+    pub fn raw(&self) -> &'a Agent {
+        self.raw
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListVersionsBetaPromptsResponse {
+    raw: ListPromptVersionsResponse,
+}
+
+impl ListVersionsBetaPromptsResponse {
+    pub fn raw(&self) -> &ListPromptVersionsResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ListPromptVersionsResponse {
+        self.raw
+    }
+}
+
+impl From<ListPromptVersionsResponse> for ListVersionsBetaPromptsResponse {
+    fn from(raw: ListPromptVersionsResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListVersionsBetaPromptsResponse> for ListPromptVersionsResponse {
+    fn from(value: ListVersionsBetaPromptsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListVersionsBetaSkillsResponse {
+    raw: ListSkillVersionsResponse,
+}
+
+impl ListVersionsBetaSkillsResponse {
+    pub fn raw(&self) -> &ListSkillVersionsResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ListSkillVersionsResponse {
+        self.raw
+    }
+}
+
+impl From<ListSkillVersionsResponse> for ListVersionsBetaSkillsResponse {
+    fn from(raw: ListSkillVersionsResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListVersionsBetaSkillsResponse> for ListSkillVersionsResponse {
+    fn from(value: ListVersionsBetaSkillsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListWorkspaceCredentialsBetaConnectorsResponse {
+    raw: CredentialsResponse,
+}
+
+impl ListWorkspaceCredentialsBetaConnectorsResponse {
+    pub fn raw(&self) -> &CredentialsResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CredentialsResponse {
+        self.raw
+    }
+}
+
+impl From<CredentialsResponse> for ListWorkspaceCredentialsBetaConnectorsResponse {
+    fn from(raw: CredentialsResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListWorkspaceCredentialsBetaConnectorsResponse> for CredentialsResponse {
+    fn from(value: ListWorkspaceCredentialsBetaConnectorsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ListWorkspacesBetaUsersResponse {
+    raw: ListWorkspacesResponse,
+}
+
+impl ListWorkspacesBetaUsersResponse {
+    pub fn raw(&self) -> &ListWorkspacesResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ListWorkspacesResponse {
+        self.raw
+    }
+}
+
+impl From<ListWorkspacesResponse> for ListWorkspacesBetaUsersResponse {
+    fn from(raw: ListWorkspacesResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ListWorkspacesBetaUsersResponse> for ListWorkspacesResponse {
+    fn from(value: ListWorkspacesBetaUsersResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ModerateChatClassifiersRequest {
+    raw: ChatModerationRequest,
+}
+
+impl ModerateChatClassifiersRequest {
+    pub fn new(input: ChatModerationRequestInput, model: impl Into<String>) -> Self {
+        Self {
+            raw: ChatModerationRequest {
+                input,
+                model: model.into(),
+            },
+        }
+    }
+    pub fn from_raw(raw: ChatModerationRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ChatModerationRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ChatModerationRequest {
+        self.raw
+    }
+}
+
+impl From<ChatModerationRequest> for ModerateChatClassifiersRequest {
+    fn from(raw: ChatModerationRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ModerateChatClassifiersRequest> for ChatModerationRequest {
+    fn from(value: ModerateChatClassifiersRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ModerateChatClassifiersResponse {
+    raw: ModerationResponse,
+}
+
+impl ModerateChatClassifiersResponse {
+    pub fn raw(&self) -> &ModerationResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ModerationResponse {
+        self.raw
+    }
+}
+
+impl From<ModerationResponse> for ModerateChatClassifiersResponse {
+    fn from(raw: ModerationResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ModerateChatClassifiersResponse> for ModerationResponse {
+    fn from(value: ModerateChatClassifiersResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ModerateClassifiersRequest {
+    raw: ClassificationRequest,
+}
+
+impl ModerateClassifiersRequest {
+    pub fn new(input: ClassificationRequestInput, model: impl Into<String>) -> Self {
+        Self {
+            raw: ClassificationRequest {
+                input,
+                metadata: None,
+                model: model.into(),
+            },
+        }
+    }
+    #[must_use]
+    pub fn metadata(mut self, metadata: ClassificationRequestMetadata) -> Self {
+        self.raw.metadata = Some(Some(metadata));
+        self
+    }
+
+    #[must_use]
+    pub fn metadata_null(mut self) -> Self {
+        self.raw.metadata = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ClassificationRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ClassificationRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ClassificationRequest {
+        self.raw
+    }
+}
+
+impl From<ClassificationRequest> for ModerateClassifiersRequest {
+    fn from(raw: ClassificationRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ModerateClassifiersRequest> for ClassificationRequest {
+    fn from(value: ModerateClassifiersRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ModerateClassifiersResponse {
+    raw: ModerationResponse,
+}
+
+impl ModerateClassifiersResponse {
+    pub fn raw(&self) -> &ModerationResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ModerationResponse {
+        self.raw
+    }
+}
+
+impl From<ModerationResponse> for ModerateClassifiersResponse {
+    fn from(raw: ModerationResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ModerateClassifiersResponse> for ModerationResponse {
+    fn from(value: ModerateClassifiersResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ParseChatRequest {
+    raw: ChatCompletionRequest,
+}
+
+impl ParseChatRequest {
+    pub fn raw(&self) -> &ChatCompletionRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ChatCompletionRequest {
+        self.raw
+    }
+}
+
+impl From<ChatCompletionRequest> for ParseChatRequest {
+    fn from(raw: ChatCompletionRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ParseChatRequest> for ChatCompletionRequest {
+    fn from(value: ParseChatRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ParseChatResponse {
+    raw: ChatCompletionResponse,
+}
+
+impl ParseChatResponse {
+    pub fn raw(&self) -> &ChatCompletionResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ChatCompletionResponse {
+        self.raw
+    }
+}
+
+impl From<ChatCompletionResponse> for ParseChatResponse {
+    fn from(raw: ChatCompletionResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ParseChatResponse> for ChatCompletionResponse {
+    fn from(value: ParseChatResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ParseStreamChatRequest {
+    raw: ChatCompletionRequest,
+}
+
+impl ParseStreamChatRequest {
+    pub fn raw(&self) -> &ChatCompletionRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ChatCompletionRequest {
+        self.raw
+    }
+}
+
+impl From<ChatCompletionRequest> for ParseStreamChatRequest {
+    fn from(raw: ChatCompletionRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ParseStreamChatRequest> for ChatCompletionRequest {
+    fn from(value: ParseStreamChatRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ParseStreamChatStreamItem {
+    raw: CompletionChunk,
+}
+
+impl ParseStreamChatStreamItem {
+    pub fn raw(&self) -> &CompletionChunk {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CompletionChunk {
+        self.raw
+    }
+}
+
+impl From<CompletionChunk> for ParseStreamChatStreamItem {
+    fn from(raw: CompletionChunk) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ParseStreamChatStreamItem> for CompletionChunk {
+    fn from(value: ParseStreamChatStreamItem) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct PauseScheduleWorkflowsSchedulesRequest {
+    raw: PauseScheduleV1WorkflowsSchedulesScheduleIdPausePostRequest,
+}
+
+impl PauseScheduleWorkflowsSchedulesRequest {
+    pub fn raw(&self) -> &PauseScheduleV1WorkflowsSchedulesScheduleIdPausePostRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> PauseScheduleV1WorkflowsSchedulesScheduleIdPausePostRequest {
+        self.raw
+    }
+}
+
+impl From<PauseScheduleV1WorkflowsSchedulesScheduleIdPausePostRequest>
+    for PauseScheduleWorkflowsSchedulesRequest
+{
+    fn from(raw: PauseScheduleV1WorkflowsSchedulesScheduleIdPausePostRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<PauseScheduleWorkflowsSchedulesRequest>
+    for PauseScheduleV1WorkflowsSchedulesScheduleIdPausePostRequest
+{
+    fn from(value: PauseScheduleWorkflowsSchedulesRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct PostDatasetRecordsFromCampaignBetaObservabilityDatasetsRequest {
+    raw: ImportDatasetFromCampaignRequest,
+}
+
+impl PostDatasetRecordsFromCampaignBetaObservabilityDatasetsRequest {
     pub fn new(campaign_id: uuid::Uuid) -> Self {
         Self {
-            raw: PostDatasetImportFromCampaignInSchema { campaign_id },
+            raw: ImportDatasetFromCampaignRequest { campaign_id },
         }
     }
-    pub fn from_raw(raw: PostDatasetImportFromCampaignInSchema) -> Self {
+    pub fn from_raw(raw: ImportDatasetFromCampaignRequest) -> Self {
         Self { raw }
     }
-    pub fn as_raw(&self) -> &PostDatasetImportFromCampaignInSchema {
+    pub fn as_raw(&self) -> &ImportDatasetFromCampaignRequest {
         &self.raw
     }
-    pub fn into_raw(self) -> PostDatasetImportFromCampaignInSchema {
+    pub fn into_raw(self) -> ImportDatasetFromCampaignRequest {
         self.raw
     }
 }
 
-impl From<PostDatasetImportFromCampaignInSchema> for PostDatasetImportFromCampaignInSchemaParams {
-    fn from(raw: PostDatasetImportFromCampaignInSchema) -> Self {
+impl From<ImportDatasetFromCampaignRequest>
+    for PostDatasetRecordsFromCampaignBetaObservabilityDatasetsRequest
+{
+    fn from(raw: ImportDatasetFromCampaignRequest) -> Self {
         Self { raw }
     }
 }
 
-impl From<PostDatasetImportFromCampaignInSchemaParams> for PostDatasetImportFromCampaignInSchema {
-    fn from(value: PostDatasetImportFromCampaignInSchemaParams) -> Self {
+impl From<PostDatasetRecordsFromCampaignBetaObservabilityDatasetsRequest>
+    for ImportDatasetFromCampaignRequest
+{
+    fn from(value: PostDatasetRecordsFromCampaignBetaObservabilityDatasetsRequest) -> Self {
         value.into_raw()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct PostDatasetImportFromDatasetInSchemaParams {
-    raw: PostDatasetImportFromDatasetInSchema,
+pub struct PostDatasetRecordsFromCampaignBetaObservabilityDatasetsResponse {
+    raw: DatasetImportTask,
 }
 
-impl PostDatasetImportFromDatasetInSchemaParams {
-    pub fn new(dataset_record_ids: Vec<String>) -> Self {
-        Self {
-            raw: PostDatasetImportFromDatasetInSchema { dataset_record_ids },
-        }
-    }
-    pub fn from_raw(raw: PostDatasetImportFromDatasetInSchema) -> Self {
-        Self { raw }
-    }
-    pub fn as_raw(&self) -> &PostDatasetImportFromDatasetInSchema {
+impl PostDatasetRecordsFromCampaignBetaObservabilityDatasetsResponse {
+    pub fn raw(&self) -> &DatasetImportTask {
         &self.raw
     }
-    pub fn into_raw(self) -> PostDatasetImportFromDatasetInSchema {
+    pub fn into_raw(self) -> DatasetImportTask {
         self.raw
     }
 }
 
-impl From<PostDatasetImportFromDatasetInSchema> for PostDatasetImportFromDatasetInSchemaParams {
-    fn from(raw: PostDatasetImportFromDatasetInSchema) -> Self {
+impl From<DatasetImportTask> for PostDatasetRecordsFromCampaignBetaObservabilityDatasetsResponse {
+    fn from(raw: DatasetImportTask) -> Self {
         Self { raw }
     }
 }
 
-impl From<PostDatasetImportFromDatasetInSchemaParams> for PostDatasetImportFromDatasetInSchema {
-    fn from(value: PostDatasetImportFromDatasetInSchemaParams) -> Self {
+impl From<PostDatasetRecordsFromCampaignBetaObservabilityDatasetsResponse> for DatasetImportTask {
+    fn from(value: PostDatasetRecordsFromCampaignBetaObservabilityDatasetsResponse) -> Self {
         value.into_raw()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct PostDatasetImportFromExplorerInSchemaParams {
-    raw: PostDatasetImportFromExplorerInSchema,
+pub struct PostDatasetRecordsFromExplorerBetaObservabilityDatasetsRequest {
+    raw: ImportDatasetFromExplorerRequest,
 }
 
-impl PostDatasetImportFromExplorerInSchemaParams {
+impl PostDatasetRecordsFromExplorerBetaObservabilityDatasetsRequest {
     pub fn new(completion_event_ids: Vec<String>) -> Self {
         Self {
-            raw: PostDatasetImportFromExplorerInSchema {
+            raw: ImportDatasetFromExplorerRequest {
                 completion_event_ids,
             },
         }
     }
-    pub fn from_raw(raw: PostDatasetImportFromExplorerInSchema) -> Self {
+    pub fn from_raw(raw: ImportDatasetFromExplorerRequest) -> Self {
         Self { raw }
     }
-    pub fn as_raw(&self) -> &PostDatasetImportFromExplorerInSchema {
+    pub fn as_raw(&self) -> &ImportDatasetFromExplorerRequest {
         &self.raw
     }
-    pub fn into_raw(self) -> PostDatasetImportFromExplorerInSchema {
+    pub fn into_raw(self) -> ImportDatasetFromExplorerRequest {
         self.raw
     }
 }
 
-impl From<PostDatasetImportFromExplorerInSchema> for PostDatasetImportFromExplorerInSchemaParams {
-    fn from(raw: PostDatasetImportFromExplorerInSchema) -> Self {
+impl From<ImportDatasetFromExplorerRequest>
+    for PostDatasetRecordsFromExplorerBetaObservabilityDatasetsRequest
+{
+    fn from(raw: ImportDatasetFromExplorerRequest) -> Self {
         Self { raw }
     }
 }
 
-impl From<PostDatasetImportFromExplorerInSchemaParams> for PostDatasetImportFromExplorerInSchema {
-    fn from(value: PostDatasetImportFromExplorerInSchemaParams) -> Self {
+impl From<PostDatasetRecordsFromExplorerBetaObservabilityDatasetsRequest>
+    for ImportDatasetFromExplorerRequest
+{
+    fn from(value: PostDatasetRecordsFromExplorerBetaObservabilityDatasetsRequest) -> Self {
         value.into_raw()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct PostDatasetImportFromFileInSchemaParams {
-    raw: PostDatasetImportFromFileInSchema,
+pub struct PostDatasetRecordsFromExplorerBetaObservabilityDatasetsResponse {
+    raw: DatasetImportTask,
 }
 
-impl PostDatasetImportFromFileInSchemaParams {
-    pub fn new(file_id: impl Into<String>) -> Self {
+impl PostDatasetRecordsFromExplorerBetaObservabilityDatasetsResponse {
+    pub fn raw(&self) -> &DatasetImportTask {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DatasetImportTask {
+        self.raw
+    }
+}
+
+impl From<DatasetImportTask> for PostDatasetRecordsFromExplorerBetaObservabilityDatasetsResponse {
+    fn from(raw: DatasetImportTask) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<PostDatasetRecordsFromExplorerBetaObservabilityDatasetsResponse> for DatasetImportTask {
+    fn from(value: PostDatasetRecordsFromExplorerBetaObservabilityDatasetsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ProcessOcrRequest {
+    raw: OCRRequest,
+}
+
+impl ProcessOcrRequest {
+    pub fn raw(&self) -> &OCRRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> OCRRequest {
+        self.raw
+    }
+}
+
+impl From<OCRRequest> for ProcessOcrRequest {
+    fn from(raw: OCRRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ProcessOcrRequest> for OCRRequest {
+    fn from(value: ProcessOcrRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ProcessOcrResponse {
+    raw: OCRResponse,
+}
+
+impl ProcessOcrResponse {
+    pub fn raw(&self) -> &OCRResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> OCRResponse {
+        self.raw
+    }
+}
+
+impl From<OCRResponse> for ProcessOcrResponse {
+    fn from(raw: OCRResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ProcessOcrResponse> for OCRResponse {
+    fn from(value: ProcessOcrResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct QueryWorkflowExecutionWorkflowsExecutionsRequest {
+    raw: QueryInvocationBody,
+}
+
+impl QueryWorkflowExecutionWorkflowsExecutionsRequest {
+    pub fn new(name: impl Into<String>) -> Self {
         Self {
-            raw: PostDatasetImportFromFileInSchema {
-                file_id: file_id.into(),
+            raw: QueryInvocationBody {
+                input: None,
+                name: name.into(),
             },
         }
     }
-    pub fn from_raw(raw: PostDatasetImportFromFileInSchema) -> Self {
+    #[must_use]
+    pub fn input(mut self, input: QueryInvocationBodyInput) -> Self {
+        self.raw.input = Some(Some(input));
+        self
+    }
+
+    #[must_use]
+    pub fn input_null(mut self) -> Self {
+        self.raw.input = Some(None);
+        self
+    }
+    pub fn from_raw(raw: QueryInvocationBody) -> Self {
         Self { raw }
     }
-    pub fn as_raw(&self) -> &PostDatasetImportFromFileInSchema {
+    pub fn as_raw(&self) -> &QueryInvocationBody {
         &self.raw
     }
-    pub fn into_raw(self) -> PostDatasetImportFromFileInSchema {
+    pub fn into_raw(self) -> QueryInvocationBody {
         self.raw
     }
 }
 
-impl From<PostDatasetImportFromFileInSchema> for PostDatasetImportFromFileInSchemaParams {
-    fn from(raw: PostDatasetImportFromFileInSchema) -> Self {
+impl From<QueryInvocationBody> for QueryWorkflowExecutionWorkflowsExecutionsRequest {
+    fn from(raw: QueryInvocationBody) -> Self {
         Self { raw }
     }
 }
 
-impl From<PostDatasetImportFromFileInSchemaParams> for PostDatasetImportFromFileInSchema {
-    fn from(value: PostDatasetImportFromFileInSchemaParams) -> Self {
+impl From<QueryWorkflowExecutionWorkflowsExecutionsRequest> for QueryInvocationBody {
+    fn from(value: QueryWorkflowExecutionWorkflowsExecutionsRequest) -> Self {
         value.into_raw()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct PostDatasetImportFromPlaygroundInSchemaParams {
-    raw: PostDatasetImportFromPlaygroundInSchema,
-}
-
-impl PostDatasetImportFromPlaygroundInSchemaParams {
-    pub fn new(conversation_ids: Vec<String>) -> Self {
-        Self {
-            raw: PostDatasetImportFromPlaygroundInSchema { conversation_ids },
-        }
-    }
-    pub fn from_raw(raw: PostDatasetImportFromPlaygroundInSchema) -> Self {
-        Self { raw }
-    }
-    pub fn as_raw(&self) -> &PostDatasetImportFromPlaygroundInSchema {
-        &self.raw
-    }
-    pub fn into_raw(self) -> PostDatasetImportFromPlaygroundInSchema {
-        self.raw
-    }
-}
-
-impl From<PostDatasetImportFromPlaygroundInSchema>
-    for PostDatasetImportFromPlaygroundInSchemaParams
-{
-    fn from(raw: PostDatasetImportFromPlaygroundInSchema) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<PostDatasetImportFromPlaygroundInSchemaParams>
-    for PostDatasetImportFromPlaygroundInSchema
-{
-    fn from(value: PostDatasetImportFromPlaygroundInSchemaParams) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct QueryWorkflowResponseView {
+pub struct QueryWorkflowExecutionWorkflowsExecutionsResponse {
     raw: QueryWorkflowResponse,
 }
 
-impl QueryWorkflowResponseView {
-    pub fn query_name(&self) -> &str {
-        &self.raw.query_name
-    }
+impl QueryWorkflowExecutionWorkflowsExecutionsResponse {
     pub fn raw(&self) -> &QueryWorkflowResponse {
         &self.raw
     }
@@ -6312,24 +13698,267 @@ impl QueryWorkflowResponseView {
     }
 }
 
-impl From<QueryWorkflowResponse> for QueryWorkflowResponseView {
+impl From<QueryWorkflowResponse> for QueryWorkflowExecutionWorkflowsExecutionsResponse {
     fn from(raw: QueryWorkflowResponse) -> Self {
         Self { raw }
     }
 }
 
-impl From<QueryWorkflowResponseView> for QueryWorkflowResponse {
-    fn from(value: QueryWorkflowResponseView) -> Self {
+impl From<QueryWorkflowExecutionWorkflowsExecutionsResponse> for QueryWorkflowResponse {
+    fn from(value: QueryWorkflowExecutionWorkflowsExecutionsResponse) -> Self {
         value.into_raw()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct ResetInvocationBodyParams {
+pub struct RateLimitsGetRateLimitsBetaAdminBillingResponse {
+    raw: RateLimitsOUT,
+}
+
+impl RateLimitsGetRateLimitsBetaAdminBillingResponse {
+    pub fn raw(&self) -> &RateLimitsOUT {
+        &self.raw
+    }
+    pub fn into_raw(self) -> RateLimitsOUT {
+        self.raw
+    }
+}
+
+impl From<RateLimitsOUT> for RateLimitsGetRateLimitsBetaAdminBillingResponse {
+    fn from(raw: RateLimitsOUT) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<RateLimitsGetRateLimitsBetaAdminBillingResponse> for RateLimitsOUT {
+    fn from(value: RateLimitsGetRateLimitsBetaAdminBillingResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct RegisterBetaRagIngestionPipelineConfigurationsRequest {
+    raw: CreateIngestionPipelineConfigurationRequest,
+}
+
+impl RegisterBetaRagIngestionPipelineConfigurationsRequest {
+    pub fn new(name: impl Into<String>) -> Self {
+        Self {
+            raw: CreateIngestionPipelineConfigurationRequest {
+                name: name.into(),
+                pipeline_composition: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn pipeline_composition(
+        mut self,
+        pipeline_composition: CreateIngestionPipelineConfigurationRequestPipelineComposition,
+    ) -> Self {
+        self.raw.pipeline_composition = Some(Some(pipeline_composition));
+        self
+    }
+
+    #[must_use]
+    pub fn pipeline_composition_null(mut self) -> Self {
+        self.raw.pipeline_composition = Some(None);
+        self
+    }
+    pub fn from_raw(raw: CreateIngestionPipelineConfigurationRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &CreateIngestionPipelineConfigurationRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CreateIngestionPipelineConfigurationRequest {
+        self.raw
+    }
+}
+
+impl From<CreateIngestionPipelineConfigurationRequest>
+    for RegisterBetaRagIngestionPipelineConfigurationsRequest
+{
+    fn from(raw: CreateIngestionPipelineConfigurationRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<RegisterBetaRagIngestionPipelineConfigurationsRequest>
+    for CreateIngestionPipelineConfigurationRequest
+{
+    fn from(value: RegisterBetaRagIngestionPipelineConfigurationsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct RegisterBetaRagIngestionPipelineConfigurationsResponse {
+    raw: IngestionPipelineConfiguration,
+}
+
+impl RegisterBetaRagIngestionPipelineConfigurationsResponse {
+    pub fn raw(&self) -> &IngestionPipelineConfiguration {
+        &self.raw
+    }
+    pub fn into_raw(self) -> IngestionPipelineConfiguration {
+        self.raw
+    }
+}
+
+impl From<IngestionPipelineConfiguration>
+    for RegisterBetaRagIngestionPipelineConfigurationsResponse
+{
+    fn from(raw: IngestionPipelineConfiguration) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<RegisterBetaRagIngestionPipelineConfigurationsResponse>
+    for IngestionPipelineConfiguration
+{
+    fn from(value: RegisterBetaRagIngestionPipelineConfigurationsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct RegisterDeploymentBetaRagSearchIndexesRequest {
+    raw: RegisterDeploymentRequestDeployment,
+}
+
+impl RegisterDeploymentBetaRagSearchIndexesRequest {
+    pub fn new(
+        name: impl Into<String>,
+        deployment: RegisterDeploymentRequestDeploymentDeployment,
+    ) -> Self {
+        Self {
+            raw: RegisterDeploymentRequestDeployment {
+                deployment,
+                name: name.into(),
+                status: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn status(mut self, status: RegisterDeploymentRequestDeploymentStatus) -> Self {
+        self.raw.status = Some(status);
+        self
+    }
+    pub fn from_raw(raw: RegisterDeploymentRequestDeployment) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &RegisterDeploymentRequestDeployment {
+        &self.raw
+    }
+    pub fn into_raw(self) -> RegisterDeploymentRequestDeployment {
+        self.raw
+    }
+}
+
+impl From<RegisterDeploymentRequestDeployment> for RegisterDeploymentBetaRagSearchIndexesRequest {
+    fn from(raw: RegisterDeploymentRequestDeployment) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<RegisterDeploymentBetaRagSearchIndexesRequest> for RegisterDeploymentRequestDeployment {
+    fn from(value: RegisterDeploymentBetaRagSearchIndexesRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct RegisterDeploymentBetaRagSearchIndexesResponse {
+    raw: RegisterSearchIndexResponseIndex,
+}
+
+impl RegisterDeploymentBetaRagSearchIndexesResponse {
+    pub fn raw(&self) -> &RegisterSearchIndexResponseIndex {
+        &self.raw
+    }
+    pub fn into_raw(self) -> RegisterSearchIndexResponseIndex {
+        self.raw
+    }
+}
+
+impl From<RegisterSearchIndexResponseIndex> for RegisterDeploymentBetaRagSearchIndexesResponse {
+    fn from(raw: RegisterSearchIndexResponseIndex) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<RegisterDeploymentBetaRagSearchIndexesResponse> for RegisterSearchIndexResponseIndex {
+    fn from(value: RegisterDeploymentBetaRagSearchIndexesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct RemoveUsersWorkspacesBetaAdminWorkspacesRequest {
+    raw: RemoveWorkspaceMembersIN,
+}
+
+impl RemoveUsersWorkspacesBetaAdminWorkspacesRequest {
+    pub fn new(members: Vec<BaseWorkspaceMemberIN>) -> Self {
+        Self {
+            raw: RemoveWorkspaceMembersIN { members },
+        }
+    }
+    pub fn from_raw(raw: RemoveWorkspaceMembersIN) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &RemoveWorkspaceMembersIN {
+        &self.raw
+    }
+    pub fn into_raw(self) -> RemoveWorkspaceMembersIN {
+        self.raw
+    }
+}
+
+impl From<RemoveWorkspaceMembersIN> for RemoveUsersWorkspacesBetaAdminWorkspacesRequest {
+    fn from(raw: RemoveWorkspaceMembersIN) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<RemoveUsersWorkspacesBetaAdminWorkspacesRequest> for RemoveWorkspaceMembersIN {
+    fn from(value: RemoveUsersWorkspacesBetaAdminWorkspacesRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct RemoveUsersWorkspacesBetaAdminWorkspacesResponse {
+    raw: RemoveWorkspaceMembersOUT,
+}
+
+impl RemoveUsersWorkspacesBetaAdminWorkspacesResponse {
+    pub fn raw(&self) -> &RemoveWorkspaceMembersOUT {
+        &self.raw
+    }
+    pub fn into_raw(self) -> RemoveWorkspaceMembersOUT {
+        self.raw
+    }
+}
+
+impl From<RemoveWorkspaceMembersOUT> for RemoveUsersWorkspacesBetaAdminWorkspacesResponse {
+    fn from(raw: RemoveWorkspaceMembersOUT) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<RemoveUsersWorkspacesBetaAdminWorkspacesResponse> for RemoveWorkspaceMembersOUT {
+    fn from(value: RemoveUsersWorkspacesBetaAdminWorkspacesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ResetWorkflowWorkflowsExecutionsRequest {
     raw: ResetInvocationBody,
 }
 
-impl ResetInvocationBodyParams {
+impl ResetWorkflowWorkflowsExecutionsRequest {
     pub fn new(event_id: i64) -> Self {
         Self {
             raw: ResetInvocationBody {
@@ -6374,197 +14003,455 @@ impl ResetInvocationBodyParams {
     }
 }
 
-impl From<ResetInvocationBody> for ResetInvocationBodyParams {
+impl From<ResetInvocationBody> for ResetWorkflowWorkflowsExecutionsRequest {
     fn from(raw: ResetInvocationBody) -> Self {
         Self { raw }
     }
 }
 
-impl From<ResetInvocationBodyParams> for ResetInvocationBody {
-    fn from(value: ResetInvocationBodyParams) -> Self {
+impl From<ResetWorkflowWorkflowsExecutionsRequest> for ResetInvocationBody {
+    fn from(value: ResetWorkflowWorkflowsExecutionsRequest) -> Self {
         value.into_raw()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct WorkflowScheduleResponseView {
-    raw: WorkflowScheduleResponse,
+pub struct RestartBetaConversationsRequest {
+    raw: ConversationRestartRequest,
 }
 
-impl WorkflowScheduleResponseView {
-    pub fn schedule_id(&self) -> &str {
-        &self.raw.schedule_id
-    }
-    pub fn raw(&self) -> &WorkflowScheduleResponse {
-        &self.raw
-    }
-    pub fn into_raw(self) -> WorkflowScheduleResponse {
-        self.raw
-    }
-}
-
-impl From<WorkflowScheduleResponse> for WorkflowScheduleResponseView {
-    fn from(raw: WorkflowScheduleResponse) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<WorkflowScheduleResponseView> for WorkflowScheduleResponse {
-    fn from(value: WorkflowScheduleResponseView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct SignalWorkflowResponseView {
-    raw: SignalWorkflowResponse,
-}
-
-impl SignalWorkflowResponseView {
-    pub fn message(&self) -> Option<&str> {
-        self.raw.message.as_deref()
-    }
-    pub fn raw(&self) -> &SignalWorkflowResponse {
-        &self.raw
-    }
-    pub fn into_raw(self) -> SignalWorkflowResponse {
-        self.raw
-    }
-}
-
-impl From<SignalWorkflowResponse> for SignalWorkflowResponseView {
-    fn from(raw: SignalWorkflowResponse) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<SignalWorkflowResponseView> for SignalWorkflowResponse {
-    fn from(value: SignalWorkflowResponseView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct WorkflowUnarchiveResponseView {
-    raw: WorkflowUnarchiveResponse,
-}
-
-impl WorkflowUnarchiveResponseView {
-    pub fn raw(&self) -> &WorkflowUnarchiveResponse {
-        &self.raw
-    }
-    pub fn into_raw(self) -> WorkflowUnarchiveResponse {
-        self.raw
-    }
-}
-
-impl From<WorkflowUnarchiveResponse> for WorkflowUnarchiveResponseView {
-    fn from(raw: WorkflowUnarchiveResponse) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<WorkflowUnarchiveResponseView> for WorkflowUnarchiveResponse {
-    fn from(value: WorkflowUnarchiveResponseView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct PutDatasetRecordPropertiesInSchemaPropertiesMap {
-    values: std::collections::BTreeMap<String, serde_json::Value>,
-}
-
-impl PutDatasetRecordPropertiesInSchemaPropertiesMap {
-    pub fn new(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
-        Self { values }
-    }
-    pub fn as_map(&self) -> &std::collections::BTreeMap<String, serde_json::Value> {
-        &self.values
-    }
-    pub fn into_map(self) -> std::collections::BTreeMap<String, serde_json::Value> {
-        self.values
-    }
-}
-
-impl From<std::collections::BTreeMap<String, serde_json::Value>>
-    for PutDatasetRecordPropertiesInSchemaPropertiesMap
-{
-    fn from(values: std::collections::BTreeMap<String, serde_json::Value>) -> Self {
-        Self { values }
-    }
-}
-
-impl From<PutDatasetRecordPropertiesInSchemaProperties>
-    for PutDatasetRecordPropertiesInSchemaPropertiesMap
-{
-    fn from(value: PutDatasetRecordPropertiesInSchemaProperties) -> Self {
+impl RestartBetaConversationsRequest {
+    pub fn new(from_entry_id: impl Into<String>) -> Self {
         Self {
-            values: value.additional_properties,
-        }
-    }
-}
-
-impl From<PutDatasetRecordPropertiesInSchemaPropertiesMap>
-    for PutDatasetRecordPropertiesInSchemaProperties
-{
-    fn from(value: PutDatasetRecordPropertiesInSchemaPropertiesMap) -> Self {
-        Self {
-            additional_properties: value.values,
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct PutDatasetRecordPropertiesInSchemaParams {
-    raw: PutDatasetRecordPropertiesInSchema,
-}
-
-impl PutDatasetRecordPropertiesInSchemaParams {
-    pub fn new(properties: impl Into<PutDatasetRecordPropertiesInSchemaPropertiesMap>) -> Self {
-        Self {
-            raw: PutDatasetRecordPropertiesInSchema {
-                properties: Into::<PutDatasetRecordPropertiesInSchemaPropertiesMap>::into(
-                    properties,
-                )
-                .into(),
+            raw: ConversationRestartRequest {
+                agent_version: None,
+                completion_args: None,
+                from_entry_id: from_entry_id.into(),
+                guardrails: None,
+                handoff_execution: None,
+                inputs: None,
+                metadata: None,
+                store: None,
+                stream: None,
             },
         }
     }
-    pub fn from_raw(raw: PutDatasetRecordPropertiesInSchema) -> Self {
+    #[must_use]
+    pub fn agent_version(mut self, agent_version: RestartConversationRequestAgentVersion) -> Self {
+        self.raw.agent_version = Some(Some(agent_version));
+        self
+    }
+
+    #[must_use]
+    pub fn agent_version_null(mut self) -> Self {
+        self.raw.agent_version = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn completion_args(
+        mut self,
+        completion_args: impl Into<RestartBetaConversationsRequestCompletionArgs>,
+    ) -> Self {
+        self.raw.completion_args = Some(
+            Into::<RestartBetaConversationsRequestCompletionArgs>::into(completion_args).into(),
+        );
+        self
+    }
+
+    #[must_use]
+    pub fn guardrails(mut self, guardrails: Vec<GuardrailConfig>) -> Self {
+        self.raw.guardrails = Some(Some(guardrails));
+        self
+    }
+
+    #[must_use]
+    pub fn guardrails_null(mut self) -> Self {
+        self.raw.guardrails = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn handoff_execution(
+        mut self,
+        handoff_execution: RestartConversationRequestHandoffExecution,
+    ) -> Self {
+        self.raw.handoff_execution = Some(handoff_execution);
+        self
+    }
+
+    #[must_use]
+    pub fn inputs(mut self, inputs: ConversationInputs) -> Self {
+        self.raw.inputs = Some(inputs);
+        self
+    }
+
+    #[must_use]
+    pub fn metadata(mut self, metadata: MetadataDict) -> Self {
+        self.raw.metadata = Some(Some(metadata));
+        self
+    }
+
+    #[must_use]
+    pub fn metadata_null(mut self) -> Self {
+        self.raw.metadata = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn store(mut self, store: bool) -> Self {
+        self.raw.store = Some(store);
+        self
+    }
+    pub fn from_raw(raw: ConversationRestartRequest) -> Self {
         Self { raw }
     }
-    pub fn as_raw(&self) -> &PutDatasetRecordPropertiesInSchema {
+    pub fn as_raw(&self) -> &ConversationRestartRequest {
         &self.raw
     }
-    pub fn into_raw(self) -> PutDatasetRecordPropertiesInSchema {
+    pub fn into_raw(self) -> ConversationRestartRequest {
         self.raw
     }
 }
 
-impl From<PutDatasetRecordPropertiesInSchema> for PutDatasetRecordPropertiesInSchemaParams {
-    fn from(raw: PutDatasetRecordPropertiesInSchema) -> Self {
+impl From<ConversationRestartRequest> for RestartBetaConversationsRequest {
+    fn from(raw: ConversationRestartRequest) -> Self {
         Self { raw }
     }
 }
 
-impl From<PutDatasetRecordPropertiesInSchemaParams> for PutDatasetRecordPropertiesInSchema {
-    fn from(value: PutDatasetRecordPropertiesInSchemaParams) -> Self {
+impl From<RestartBetaConversationsRequest> for ConversationRestartRequest {
+    fn from(value: RestartBetaConversationsRequest) -> Self {
         value.into_raw()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct PatchDatasetInSchemaParams {
-    raw: PatchDatasetInSchema,
+pub struct RestartBetaConversationsRequestCompletionArgs {
+    raw: CompletionArgs,
 }
 
-impl PatchDatasetInSchemaParams {
+impl RestartBetaConversationsRequestCompletionArgs {
     pub fn new() -> Self {
         Self {
-            raw: PatchDatasetInSchema {
+            raw: CompletionArgs {
+                frequency_penalty: None,
+                max_tokens: None,
+                prediction: None,
+                presence_penalty: None,
+                random_seed: None,
+                reasoning_effort: None,
+                response_format: None,
+                stop: None,
+                temperature: None,
+                tool_choice: None,
+                top_p: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn frequency_penalty(mut self, frequency_penalty: f64) -> Self {
+        self.raw.frequency_penalty = Some(Some(frequency_penalty));
+        self
+    }
+
+    #[must_use]
+    pub fn frequency_penalty_null(mut self) -> Self {
+        self.raw.frequency_penalty = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn max_tokens(mut self, max_tokens: i64) -> Self {
+        self.raw.max_tokens = Some(Some(max_tokens));
+        self
+    }
+
+    #[must_use]
+    pub fn max_tokens_null(mut self) -> Self {
+        self.raw.max_tokens = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn prediction(
+        mut self,
+        prediction: impl Into<RestartBetaConversationsRequestCompletionArgsPrediction>,
+    ) -> Self {
+        self.raw.prediction = Some(Some(
+            Into::<RestartBetaConversationsRequestCompletionArgsPrediction>::into(prediction)
+                .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn prediction_null(mut self) -> Self {
+        self.raw.prediction = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn presence_penalty(mut self, presence_penalty: f64) -> Self {
+        self.raw.presence_penalty = Some(Some(presence_penalty));
+        self
+    }
+
+    #[must_use]
+    pub fn presence_penalty_null(mut self) -> Self {
+        self.raw.presence_penalty = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn random_seed(mut self, random_seed: i64) -> Self {
+        self.raw.random_seed = Some(Some(random_seed));
+        self
+    }
+
+    #[must_use]
+    pub fn random_seed_null(mut self) -> Self {
+        self.raw.random_seed = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn reasoning_effort(mut self, reasoning_effort: ReasoningEffort) -> Self {
+        self.raw.reasoning_effort = Some(Some(reasoning_effort));
+        self
+    }
+
+    #[must_use]
+    pub fn reasoning_effort_null(mut self) -> Self {
+        self.raw.reasoning_effort = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn response_format(
+        mut self,
+        response_format: impl Into<RestartBetaConversationsRequestCompletionArgsResponseFormat>,
+    ) -> Self {
+        self.raw.response_format = Some(Some(
+            Into::<RestartBetaConversationsRequestCompletionArgsResponseFormat>::into(
+                response_format,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn response_format_null(mut self) -> Self {
+        self.raw.response_format = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn stop(mut self, stop: CompletionArgsStop) -> Self {
+        self.raw.stop = Some(Some(stop));
+        self
+    }
+
+    #[must_use]
+    pub fn stop_null(mut self) -> Self {
+        self.raw.stop = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn temperature(mut self, temperature: f64) -> Self {
+        self.raw.temperature = Some(Some(temperature));
+        self
+    }
+
+    #[must_use]
+    pub fn temperature_null(mut self) -> Self {
+        self.raw.temperature = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn tool_choice(mut self, tool_choice: ToolChoiceEnum) -> Self {
+        self.raw.tool_choice = Some(tool_choice);
+        self
+    }
+
+    #[must_use]
+    pub fn top_p(mut self, top_p: f64) -> Self {
+        self.raw.top_p = Some(Some(top_p));
+        self
+    }
+
+    #[must_use]
+    pub fn top_p_null(mut self) -> Self {
+        self.raw.top_p = Some(None);
+        self
+    }
+    pub fn from_raw(raw: CompletionArgs) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &CompletionArgs {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CompletionArgs {
+        self.raw
+    }
+}
+
+impl From<CompletionArgs> for RestartBetaConversationsRequestCompletionArgs {
+    fn from(raw: CompletionArgs) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<RestartBetaConversationsRequestCompletionArgs> for CompletionArgs {
+    fn from(value: RestartBetaConversationsRequestCompletionArgs) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for RestartBetaConversationsRequestCompletionArgs {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct RestartBetaConversationsRequestCompletionArgsPrediction {
+    raw: Prediction,
+}
+
+impl RestartBetaConversationsRequestCompletionArgsPrediction {
+    pub fn new() -> Self {
+        Self {
+            raw: Prediction {
+                content: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn content(mut self, content: impl Into<String>) -> Self {
+        self.raw.content = Some(content.into());
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: PredictionType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: Prediction) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &Prediction {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Prediction {
+        self.raw
+    }
+}
+
+impl From<Prediction> for RestartBetaConversationsRequestCompletionArgsPrediction {
+    fn from(raw: Prediction) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<RestartBetaConversationsRequestCompletionArgsPrediction> for Prediction {
+    fn from(value: RestartBetaConversationsRequestCompletionArgsPrediction) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for RestartBetaConversationsRequestCompletionArgsPrediction {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct RestartBetaConversationsRequestCompletionArgsResponseFormat {
+    raw: ResponseFormat,
+}
+
+impl RestartBetaConversationsRequestCompletionArgsResponseFormat {
+    pub fn new() -> Self {
+        Self {
+            raw: ResponseFormat {
+                json_schema: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn json_schema(
+        mut self,
+        json_schema: impl Into<RestartBetaConversationsRequestCompletionArgsResponseFormatJsonSchema>,
+    ) -> Self {
+        self.raw.json_schema = Some(Some(
+            Into::<RestartBetaConversationsRequestCompletionArgsResponseFormatJsonSchema>::into(
+                json_schema,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn json_schema_null(mut self) -> Self {
+        self.raw.json_schema = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: ResponseFormats) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: ResponseFormat) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ResponseFormat {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ResponseFormat {
+        self.raw
+    }
+}
+
+impl From<ResponseFormat> for RestartBetaConversationsRequestCompletionArgsResponseFormat {
+    fn from(raw: ResponseFormat) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<RestartBetaConversationsRequestCompletionArgsResponseFormat> for ResponseFormat {
+    fn from(value: RestartBetaConversationsRequestCompletionArgsResponseFormat) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for RestartBetaConversationsRequestCompletionArgsResponseFormat {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct RestartBetaConversationsRequestCompletionArgsResponseFormatJsonSchema {
+    raw: JsonSchema,
+}
+
+impl RestartBetaConversationsRequestCompletionArgsResponseFormatJsonSchema {
+    pub fn new(name: impl Into<String>, schema: JsonSchemaSchema) -> Self {
+        Self {
+            raw: JsonSchema {
                 description: None,
-                name: None,
+                name: name.into(),
+                schema,
+                strict: None,
             },
         }
     }
@@ -6581,6 +14468,1880 @@ impl PatchDatasetInSchemaParams {
     }
 
     #[must_use]
+    pub fn strict(mut self, strict: bool) -> Self {
+        self.raw.strict = Some(strict);
+        self
+    }
+    pub fn from_raw(raw: JsonSchema) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &JsonSchema {
+        &self.raw
+    }
+    pub fn into_raw(self) -> JsonSchema {
+        self.raw
+    }
+}
+
+impl From<JsonSchema> for RestartBetaConversationsRequestCompletionArgsResponseFormatJsonSchema {
+    fn from(raw: JsonSchema) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<RestartBetaConversationsRequestCompletionArgsResponseFormatJsonSchema> for JsonSchema {
+    fn from(value: RestartBetaConversationsRequestCompletionArgsResponseFormatJsonSchema) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct RestartBetaConversationsResponse {
+    raw: ConversationResponse,
+}
+
+impl RestartBetaConversationsResponse {
+    pub fn raw(&self) -> &ConversationResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ConversationResponse {
+        self.raw
+    }
+}
+
+impl From<ConversationResponse> for RestartBetaConversationsResponse {
+    fn from(raw: ConversationResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<RestartBetaConversationsResponse> for ConversationResponse {
+    fn from(value: RestartBetaConversationsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct RestartDeploymentWorkflowsDeploymentsResponse {
+    raw: ManagedDeploymentResponse,
+}
+
+impl RestartDeploymentWorkflowsDeploymentsResponse {
+    pub fn raw(&self) -> &ManagedDeploymentResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ManagedDeploymentResponse {
+        self.raw
+    }
+}
+
+impl From<ManagedDeploymentResponse> for RestartDeploymentWorkflowsDeploymentsResponse {
+    fn from(raw: ManagedDeploymentResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<RestartDeploymentWorkflowsDeploymentsResponse> for ManagedDeploymentResponse {
+    fn from(value: RestartDeploymentWorkflowsDeploymentsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct RestartStreamBetaConversationsRequest {
+    raw: ConversationRestartStreamRequest,
+}
+
+impl RestartStreamBetaConversationsRequest {
+    pub fn new(from_entry_id: impl Into<String>) -> Self {
+        Self {
+            raw: ConversationRestartStreamRequest {
+                agent_version: None,
+                completion_args: None,
+                from_entry_id: from_entry_id.into(),
+                guardrails: None,
+                handoff_execution: None,
+                inputs: None,
+                metadata: None,
+                store: None,
+                stream: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn agent_version(mut self, agent_version: RestartConversationRequestAgentVersion) -> Self {
+        self.raw.agent_version = Some(Some(agent_version));
+        self
+    }
+
+    #[must_use]
+    pub fn agent_version_null(mut self) -> Self {
+        self.raw.agent_version = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn completion_args(
+        mut self,
+        completion_args: impl Into<RestartStreamBetaConversationsRequestCompletionArgs>,
+    ) -> Self {
+        self.raw.completion_args = Some(
+            Into::<RestartStreamBetaConversationsRequestCompletionArgs>::into(completion_args)
+                .into(),
+        );
+        self
+    }
+
+    #[must_use]
+    pub fn guardrails(mut self, guardrails: Vec<GuardrailConfig>) -> Self {
+        self.raw.guardrails = Some(Some(guardrails));
+        self
+    }
+
+    #[must_use]
+    pub fn guardrails_null(mut self) -> Self {
+        self.raw.guardrails = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn handoff_execution(
+        mut self,
+        handoff_execution: RestartConversationRequestHandoffExecution,
+    ) -> Self {
+        self.raw.handoff_execution = Some(handoff_execution);
+        self
+    }
+
+    #[must_use]
+    pub fn inputs(mut self, inputs: ConversationInputs) -> Self {
+        self.raw.inputs = Some(inputs);
+        self
+    }
+
+    #[must_use]
+    pub fn metadata(mut self, metadata: MetadataDict) -> Self {
+        self.raw.metadata = Some(Some(metadata));
+        self
+    }
+
+    #[must_use]
+    pub fn metadata_null(mut self) -> Self {
+        self.raw.metadata = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn store(mut self, store: bool) -> Self {
+        self.raw.store = Some(store);
+        self
+    }
+    pub fn from_raw(raw: ConversationRestartStreamRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ConversationRestartStreamRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ConversationRestartStreamRequest {
+        self.raw
+    }
+}
+
+impl From<ConversationRestartStreamRequest> for RestartStreamBetaConversationsRequest {
+    fn from(raw: ConversationRestartStreamRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<RestartStreamBetaConversationsRequest> for ConversationRestartStreamRequest {
+    fn from(value: RestartStreamBetaConversationsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct RestartStreamBetaConversationsRequestCompletionArgs {
+    raw: CompletionArgs,
+}
+
+impl RestartStreamBetaConversationsRequestCompletionArgs {
+    pub fn new() -> Self {
+        Self {
+            raw: CompletionArgs {
+                frequency_penalty: None,
+                max_tokens: None,
+                prediction: None,
+                presence_penalty: None,
+                random_seed: None,
+                reasoning_effort: None,
+                response_format: None,
+                stop: None,
+                temperature: None,
+                tool_choice: None,
+                top_p: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn frequency_penalty(mut self, frequency_penalty: f64) -> Self {
+        self.raw.frequency_penalty = Some(Some(frequency_penalty));
+        self
+    }
+
+    #[must_use]
+    pub fn frequency_penalty_null(mut self) -> Self {
+        self.raw.frequency_penalty = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn max_tokens(mut self, max_tokens: i64) -> Self {
+        self.raw.max_tokens = Some(Some(max_tokens));
+        self
+    }
+
+    #[must_use]
+    pub fn max_tokens_null(mut self) -> Self {
+        self.raw.max_tokens = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn prediction(
+        mut self,
+        prediction: impl Into<RestartStreamBetaConversationsRequestCompletionArgsPrediction>,
+    ) -> Self {
+        self.raw.prediction = Some(Some(
+            Into::<RestartStreamBetaConversationsRequestCompletionArgsPrediction>::into(prediction)
+                .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn prediction_null(mut self) -> Self {
+        self.raw.prediction = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn presence_penalty(mut self, presence_penalty: f64) -> Self {
+        self.raw.presence_penalty = Some(Some(presence_penalty));
+        self
+    }
+
+    #[must_use]
+    pub fn presence_penalty_null(mut self) -> Self {
+        self.raw.presence_penalty = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn random_seed(mut self, random_seed: i64) -> Self {
+        self.raw.random_seed = Some(Some(random_seed));
+        self
+    }
+
+    #[must_use]
+    pub fn random_seed_null(mut self) -> Self {
+        self.raw.random_seed = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn reasoning_effort(mut self, reasoning_effort: ReasoningEffort) -> Self {
+        self.raw.reasoning_effort = Some(Some(reasoning_effort));
+        self
+    }
+
+    #[must_use]
+    pub fn reasoning_effort_null(mut self) -> Self {
+        self.raw.reasoning_effort = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn response_format(
+        mut self,
+        response_format: impl Into<RestartStreamBetaConversationsRequestCompletionArgsResponseFormat>,
+    ) -> Self {
+        self.raw.response_format = Some(Some(
+            Into::<RestartStreamBetaConversationsRequestCompletionArgsResponseFormat>::into(
+                response_format,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn response_format_null(mut self) -> Self {
+        self.raw.response_format = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn stop(mut self, stop: CompletionArgsStop) -> Self {
+        self.raw.stop = Some(Some(stop));
+        self
+    }
+
+    #[must_use]
+    pub fn stop_null(mut self) -> Self {
+        self.raw.stop = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn temperature(mut self, temperature: f64) -> Self {
+        self.raw.temperature = Some(Some(temperature));
+        self
+    }
+
+    #[must_use]
+    pub fn temperature_null(mut self) -> Self {
+        self.raw.temperature = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn tool_choice(mut self, tool_choice: ToolChoiceEnum) -> Self {
+        self.raw.tool_choice = Some(tool_choice);
+        self
+    }
+
+    #[must_use]
+    pub fn top_p(mut self, top_p: f64) -> Self {
+        self.raw.top_p = Some(Some(top_p));
+        self
+    }
+
+    #[must_use]
+    pub fn top_p_null(mut self) -> Self {
+        self.raw.top_p = Some(None);
+        self
+    }
+    pub fn from_raw(raw: CompletionArgs) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &CompletionArgs {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CompletionArgs {
+        self.raw
+    }
+}
+
+impl From<CompletionArgs> for RestartStreamBetaConversationsRequestCompletionArgs {
+    fn from(raw: CompletionArgs) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<RestartStreamBetaConversationsRequestCompletionArgs> for CompletionArgs {
+    fn from(value: RestartStreamBetaConversationsRequestCompletionArgs) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for RestartStreamBetaConversationsRequestCompletionArgs {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct RestartStreamBetaConversationsRequestCompletionArgsPrediction {
+    raw: Prediction,
+}
+
+impl RestartStreamBetaConversationsRequestCompletionArgsPrediction {
+    pub fn new() -> Self {
+        Self {
+            raw: Prediction {
+                content: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn content(mut self, content: impl Into<String>) -> Self {
+        self.raw.content = Some(content.into());
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: PredictionType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: Prediction) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &Prediction {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Prediction {
+        self.raw
+    }
+}
+
+impl From<Prediction> for RestartStreamBetaConversationsRequestCompletionArgsPrediction {
+    fn from(raw: Prediction) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<RestartStreamBetaConversationsRequestCompletionArgsPrediction> for Prediction {
+    fn from(value: RestartStreamBetaConversationsRequestCompletionArgsPrediction) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for RestartStreamBetaConversationsRequestCompletionArgsPrediction {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct RestartStreamBetaConversationsRequestCompletionArgsResponseFormat {
+    raw: ResponseFormat,
+}
+
+impl RestartStreamBetaConversationsRequestCompletionArgsResponseFormat {
+    pub fn new() -> Self {
+        Self {
+            raw: ResponseFormat {
+                json_schema: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn json_schema(
+        mut self,
+        json_schema: impl Into<
+            RestartStreamBetaConversationsRequestCompletionArgsResponseFormatJsonSchema,
+        >,
+    ) -> Self {
+        self.raw.json_schema =
+            Some(
+                Some(
+                    Into::<
+                        RestartStreamBetaConversationsRequestCompletionArgsResponseFormatJsonSchema,
+                    >::into(json_schema)
+                    .into(),
+                ),
+            );
+        self
+    }
+
+    #[must_use]
+    pub fn json_schema_null(mut self) -> Self {
+        self.raw.json_schema = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: ResponseFormats) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: ResponseFormat) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ResponseFormat {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ResponseFormat {
+        self.raw
+    }
+}
+
+impl From<ResponseFormat> for RestartStreamBetaConversationsRequestCompletionArgsResponseFormat {
+    fn from(raw: ResponseFormat) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<RestartStreamBetaConversationsRequestCompletionArgsResponseFormat> for ResponseFormat {
+    fn from(value: RestartStreamBetaConversationsRequestCompletionArgsResponseFormat) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for RestartStreamBetaConversationsRequestCompletionArgsResponseFormat {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct RestartStreamBetaConversationsRequestCompletionArgsResponseFormatJsonSchema {
+    raw: JsonSchema,
+}
+
+impl RestartStreamBetaConversationsRequestCompletionArgsResponseFormatJsonSchema {
+    pub fn new(name: impl Into<String>, schema: JsonSchemaSchema) -> Self {
+        Self {
+            raw: JsonSchema {
+                description: None,
+                name: name.into(),
+                schema,
+                strict: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.raw.description = Some(Some(description.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn description_null(mut self) -> Self {
+        self.raw.description = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn strict(mut self, strict: bool) -> Self {
+        self.raw.strict = Some(strict);
+        self
+    }
+    pub fn from_raw(raw: JsonSchema) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &JsonSchema {
+        &self.raw
+    }
+    pub fn into_raw(self) -> JsonSchema {
+        self.raw
+    }
+}
+
+impl From<JsonSchema>
+    for RestartStreamBetaConversationsRequestCompletionArgsResponseFormatJsonSchema
+{
+    fn from(raw: JsonSchema) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<RestartStreamBetaConversationsRequestCompletionArgsResponseFormatJsonSchema>
+    for JsonSchema
+{
+    fn from(
+        value: RestartStreamBetaConversationsRequestCompletionArgsResponseFormatJsonSchema,
+    ) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct RestartStreamBetaConversationsStreamItem {
+    raw: ConversationEvents,
+}
+
+impl RestartStreamBetaConversationsStreamItem {
+    pub fn raw(&self) -> &ConversationEvents {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ConversationEvents {
+        self.raw
+    }
+}
+
+impl From<ConversationEvents> for RestartStreamBetaConversationsStreamItem {
+    fn from(raw: ConversationEvents) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<RestartStreamBetaConversationsStreamItem> for ConversationEvents {
+    fn from(value: RestartStreamBetaConversationsStreamItem) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ResumeScheduleWorkflowsSchedulesRequest {
+    raw: ResumeScheduleV1WorkflowsSchedulesScheduleIdResumePostRequest,
+}
+
+impl ResumeScheduleWorkflowsSchedulesRequest {
+    pub fn raw(&self) -> &ResumeScheduleV1WorkflowsSchedulesScheduleIdResumePostRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ResumeScheduleV1WorkflowsSchedulesScheduleIdResumePostRequest {
+        self.raw
+    }
+}
+
+impl From<ResumeScheduleV1WorkflowsSchedulesScheduleIdResumePostRequest>
+    for ResumeScheduleWorkflowsSchedulesRequest
+{
+    fn from(raw: ResumeScheduleV1WorkflowsSchedulesScheduleIdResumePostRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ResumeScheduleWorkflowsSchedulesRequest>
+    for ResumeScheduleV1WorkflowsSchedulesScheduleIdResumePostRequest
+{
+    fn from(value: ResumeScheduleWorkflowsSchedulesRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct RetrieveFilesResponse {
+    raw: GetFileResponse,
+}
+
+impl RetrieveFilesResponse {
+    pub fn raw(&self) -> &GetFileResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> GetFileResponse {
+        self.raw
+    }
+}
+
+impl From<GetFileResponse> for RetrieveFilesResponse {
+    fn from(raw: GetFileResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<RetrieveFilesResponse> for GetFileResponse {
+    fn from(value: RetrieveFilesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub enum RetrieveModelsResponse {
+    BaseModelCard(RetrieveModelsResponseBaseModelCard),
+    FTModelCard(RetrieveModelsResponseFTModelCard),
+}
+
+impl From<RetrieveModelsResponseBaseModelCard> for RetrieveModelsResponse {
+    fn from(value: RetrieveModelsResponseBaseModelCard) -> Self {
+        Self::BaseModelCard(value)
+    }
+}
+
+impl From<RetrieveModelsResponseFTModelCard> for RetrieveModelsResponse {
+    fn from(value: RetrieveModelsResponseFTModelCard) -> Self {
+        Self::FTModelCard(value)
+    }
+}
+
+impl From<RetrieveModelsResponse> for RetrieveModelV1ModelsModelIdGetResponse {
+    fn from(value: RetrieveModelsResponse) -> Self {
+        match value {
+            RetrieveModelsResponse::BaseModelCard(value) => Self::BaseModelCard(value.into()),
+            RetrieveModelsResponse::FTModelCard(value) => Self::FTModelCard(value.into()),
+        }
+    }
+}
+
+impl From<RetrieveModelV1ModelsModelIdGetResponse> for RetrieveModelsResponse {
+    fn from(value: RetrieveModelV1ModelsModelIdGetResponse) -> Self {
+        match value {
+            RetrieveModelV1ModelsModelIdGetResponse::BaseModelCard(value) => {
+                Self::BaseModelCard(value.into())
+            }
+            RetrieveModelV1ModelsModelIdGetResponse::FTModelCard(value) => {
+                Self::FTModelCard(value.into())
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct RetrieveModelsResponseBaseModelCard {
+    raw: BaseModelCard,
+}
+
+impl RetrieveModelsResponseBaseModelCard {
+    pub fn raw(&self) -> &BaseModelCard {
+        &self.raw
+    }
+    pub fn into_raw(self) -> BaseModelCard {
+        self.raw
+    }
+}
+
+impl From<BaseModelCard> for RetrieveModelsResponseBaseModelCard {
+    fn from(raw: BaseModelCard) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<RetrieveModelsResponseBaseModelCard> for BaseModelCard {
+    fn from(value: RetrieveModelsResponseBaseModelCard) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct RetrieveModelsResponseFTModelCard {
+    raw: FTModelCard,
+}
+
+impl RetrieveModelsResponseFTModelCard {
+    pub fn raw(&self) -> &FTModelCard {
+        &self.raw
+    }
+    pub fn into_raw(self) -> FTModelCard {
+        self.raw
+    }
+}
+
+impl From<FTModelCard> for RetrieveModelsResponseFTModelCard {
+    fn from(raw: FTModelCard) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<RetrieveModelsResponseFTModelCard> for FTModelCard {
+    fn from(value: RetrieveModelsResponseFTModelCard) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct RolesGetRolesBetaAdminUsersResponse {
+    raw: RolesOut,
+}
+
+impl RolesGetRolesBetaAdminUsersResponse {
+    pub fn raw(&self) -> &RolesOut {
+        &self.raw
+    }
+    pub fn into_raw(self) -> RolesOut {
+        self.raw
+    }
+}
+
+impl From<RolesOut> for RolesGetRolesBetaAdminUsersResponse {
+    fn from(raw: RolesOut) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<RolesGetRolesBetaAdminUsersResponse> for RolesOut {
+    fn from(value: RolesGetRolesBetaAdminUsersResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ScheduleWorkflowWorkflowsSchedulesRequest {
+    raw: WorkflowScheduleRequest,
+}
+
+impl ScheduleWorkflowWorkflowsSchedulesRequest {
+    pub fn new(schedule: impl Into<ScheduleWorkflowWorkflowsSchedulesRequestSchedule>) -> Self {
+        Self {
+            raw: WorkflowScheduleRequest {
+                deployment_name: None,
+                schedule: Into::<ScheduleWorkflowWorkflowsSchedulesRequestSchedule>::into(schedule)
+                    .into(),
+                schedule_id: None,
+                workflow_identifier: None,
+                workflow_registration_id: None,
+                workflow_task_queue: None,
+                workflow_version_id: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn deployment_name(mut self, deployment_name: impl Into<String>) -> Self {
+        self.raw.deployment_name = Some(Some(deployment_name.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn deployment_name_null(mut self) -> Self {
+        self.raw.deployment_name = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn schedule_id(mut self, schedule_id: impl Into<String>) -> Self {
+        self.raw.schedule_id = Some(Some(schedule_id.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn schedule_id_null(mut self) -> Self {
+        self.raw.schedule_id = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn workflow_identifier(mut self, workflow_identifier: impl Into<String>) -> Self {
+        self.raw.workflow_identifier = Some(Some(workflow_identifier.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn workflow_identifier_null(mut self) -> Self {
+        self.raw.workflow_identifier = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn workflow_registration_id(mut self, workflow_registration_id: uuid::Uuid) -> Self {
+        self.raw.workflow_registration_id = Some(Some(workflow_registration_id));
+        self
+    }
+
+    #[must_use]
+    pub fn workflow_registration_id_null(mut self) -> Self {
+        self.raw.workflow_registration_id = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn workflow_task_queue(mut self, workflow_task_queue: impl Into<String>) -> Self {
+        self.raw.workflow_task_queue = Some(Some(workflow_task_queue.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn workflow_task_queue_null(mut self) -> Self {
+        self.raw.workflow_task_queue = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn workflow_version_id(mut self, workflow_version_id: uuid::Uuid) -> Self {
+        self.raw.workflow_version_id = Some(Some(workflow_version_id));
+        self
+    }
+
+    #[must_use]
+    pub fn workflow_version_id_null(mut self) -> Self {
+        self.raw.workflow_version_id = Some(None);
+        self
+    }
+    pub fn from_raw(raw: WorkflowScheduleRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &WorkflowScheduleRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowScheduleRequest {
+        self.raw
+    }
+}
+
+impl From<WorkflowScheduleRequest> for ScheduleWorkflowWorkflowsSchedulesRequest {
+    fn from(raw: WorkflowScheduleRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ScheduleWorkflowWorkflowsSchedulesRequest> for WorkflowScheduleRequest {
+    fn from(value: ScheduleWorkflowWorkflowsSchedulesRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ScheduleWorkflowWorkflowsSchedulesRequestSchedule {
+    raw: ScheduleDefinition,
+}
+
+impl ScheduleWorkflowWorkflowsSchedulesRequestSchedule {
+    pub fn new(input: serde_json::Value) -> Self {
+        Self {
+            raw: ScheduleDefinition {
+                calendars: None,
+                cron_expressions: None,
+                end_at: None,
+                input,
+                intervals: None,
+                jitter: None,
+                max_executions: None,
+                policy: None,
+                schedule_id: None,
+                skip: None,
+                start_at: None,
+                time_zone_name: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn calendars(mut self, calendars: Vec<ScheduleCalendar>) -> Self {
+        self.raw.calendars = Some(calendars);
+        self
+    }
+
+    #[must_use]
+    pub fn cron_expressions(mut self, cron_expressions: Vec<String>) -> Self {
+        self.raw.cron_expressions = Some(cron_expressions);
+        self
+    }
+
+    #[must_use]
+    pub fn end_at(mut self, end_at: chrono::DateTime<chrono::Utc>) -> Self {
+        self.raw.end_at = Some(Some(end_at));
+        self
+    }
+
+    #[must_use]
+    pub fn end_at_null(mut self) -> Self {
+        self.raw.end_at = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn intervals(mut self, intervals: Vec<ScheduleInterval>) -> Self {
+        self.raw.intervals = Some(intervals);
+        self
+    }
+
+    #[must_use]
+    pub fn jitter(mut self, jitter: impl Into<String>) -> Self {
+        self.raw.jitter = Some(Some(jitter.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn jitter_null(mut self) -> Self {
+        self.raw.jitter = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn max_executions(mut self, max_executions: i64) -> Self {
+        self.raw.max_executions = Some(Some(max_executions));
+        self
+    }
+
+    #[must_use]
+    pub fn max_executions_null(mut self) -> Self {
+        self.raw.max_executions = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn policy(
+        mut self,
+        policy: impl Into<ScheduleWorkflowWorkflowsSchedulesRequestSchedulePolicy>,
+    ) -> Self {
+        self.raw.policy = Some(
+            Into::<ScheduleWorkflowWorkflowsSchedulesRequestSchedulePolicy>::into(policy).into(),
+        );
+        self
+    }
+
+    #[must_use]
+    pub fn schedule_id(mut self, schedule_id: impl Into<String>) -> Self {
+        self.raw.schedule_id = Some(Some(schedule_id.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn schedule_id_null(mut self) -> Self {
+        self.raw.schedule_id = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn skip(mut self, skip: Vec<ScheduleCalendar>) -> Self {
+        self.raw.skip = Some(skip);
+        self
+    }
+
+    #[must_use]
+    pub fn start_at(mut self, start_at: chrono::DateTime<chrono::Utc>) -> Self {
+        self.raw.start_at = Some(Some(start_at));
+        self
+    }
+
+    #[must_use]
+    pub fn start_at_null(mut self) -> Self {
+        self.raw.start_at = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn time_zone_name(mut self, time_zone_name: impl Into<String>) -> Self {
+        self.raw.time_zone_name = Some(Some(time_zone_name.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn time_zone_name_null(mut self) -> Self {
+        self.raw.time_zone_name = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ScheduleDefinition) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ScheduleDefinition {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ScheduleDefinition {
+        self.raw
+    }
+}
+
+impl From<ScheduleDefinition> for ScheduleWorkflowWorkflowsSchedulesRequestSchedule {
+    fn from(raw: ScheduleDefinition) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ScheduleWorkflowWorkflowsSchedulesRequestSchedule> for ScheduleDefinition {
+    fn from(value: ScheduleWorkflowWorkflowsSchedulesRequestSchedule) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ScheduleWorkflowWorkflowsSchedulesRequestSchedulePolicy {
+    raw: SchedulePolicy,
+}
+
+impl ScheduleWorkflowWorkflowsSchedulesRequestSchedulePolicy {
+    pub fn new() -> Self {
+        Self {
+            raw: SchedulePolicy {
+                catchup_window_seconds: None,
+                overlap: None,
+                pause_on_failure: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn catchup_window_seconds(mut self, catchup_window_seconds: i64) -> Self {
+        self.raw.catchup_window_seconds = Some(catchup_window_seconds);
+        self
+    }
+
+    #[must_use]
+    pub fn overlap(mut self, overlap: ScheduleOverlapPolicy) -> Self {
+        self.raw.overlap = Some(overlap);
+        self
+    }
+
+    #[must_use]
+    pub fn pause_on_failure(mut self, pause_on_failure: bool) -> Self {
+        self.raw.pause_on_failure = Some(pause_on_failure);
+        self
+    }
+    pub fn from_raw(raw: SchedulePolicy) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &SchedulePolicy {
+        &self.raw
+    }
+    pub fn into_raw(self) -> SchedulePolicy {
+        self.raw
+    }
+}
+
+impl From<SchedulePolicy> for ScheduleWorkflowWorkflowsSchedulesRequestSchedulePolicy {
+    fn from(raw: SchedulePolicy) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ScheduleWorkflowWorkflowsSchedulesRequestSchedulePolicy> for SchedulePolicy {
+    fn from(value: ScheduleWorkflowWorkflowsSchedulesRequestSchedulePolicy) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for ScheduleWorkflowWorkflowsSchedulesRequestSchedulePolicy {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ScheduleWorkflowWorkflowsSchedulesResponse {
+    raw: WorkflowScheduleResponse,
+}
+
+impl ScheduleWorkflowWorkflowsSchedulesResponse {
+    pub fn schedule_id(&self) -> &str {
+        &self.raw.schedule_id
+    }
+    pub fn raw(&self) -> &WorkflowScheduleResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowScheduleResponse {
+        self.raw
+    }
+}
+
+impl From<WorkflowScheduleResponse> for ScheduleWorkflowWorkflowsSchedulesResponse {
+    fn from(raw: WorkflowScheduleResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ScheduleWorkflowWorkflowsSchedulesResponse> for WorkflowScheduleResponse {
+    fn from(value: ScheduleWorkflowWorkflowsSchedulesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SearchBetaObservabilityLogsRequest {
+    raw: LogsRequest,
+}
+
+impl SearchBetaObservabilityLogsRequest {
+    pub fn new() -> Self {
+        Self {
+            raw: LogsRequest {
+                order: None,
+                search_expression: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn order(mut self, order: LogsRequestOrder) -> Self {
+        self.raw.order = Some(order);
+        self
+    }
+
+    #[must_use]
+    pub fn search_expression(mut self, search_expression: impl Into<String>) -> Self {
+        self.raw.search_expression = Some(Some(search_expression.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn search_expression_null(mut self) -> Self {
+        self.raw.search_expression = Some(None);
+        self
+    }
+    pub fn from_raw(raw: LogsRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &LogsRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> LogsRequest {
+        self.raw
+    }
+}
+
+impl From<LogsRequest> for SearchBetaObservabilityLogsRequest {
+    fn from(raw: LogsRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<SearchBetaObservabilityLogsRequest> for LogsRequest {
+    fn from(value: SearchBetaObservabilityLogsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for SearchBetaObservabilityLogsRequest {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SearchBetaObservabilityLogsResponse {
+    raw: GetLogs,
+}
+
+impl SearchBetaObservabilityLogsResponse {
+    pub fn raw(&self) -> &GetLogs {
+        &self.raw
+    }
+    pub fn into_raw(self) -> GetLogs {
+        self.raw
+    }
+}
+
+impl From<GetLogs> for SearchBetaObservabilityLogsResponse {
+    fn from(raw: GetLogs) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<SearchBetaObservabilityLogsResponse> for GetLogs {
+    fn from(value: SearchBetaObservabilityLogsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SearchBetaObservabilityTracesRequest {
+    raw: TracesRequest,
+}
+
+impl SearchBetaObservabilityTracesRequest {
+    pub fn new() -> Self {
+        Self {
+            raw: TracesRequest {
+                search_expression: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn search_expression(mut self, search_expression: impl Into<String>) -> Self {
+        self.raw.search_expression = Some(Some(search_expression.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn search_expression_null(mut self) -> Self {
+        self.raw.search_expression = Some(None);
+        self
+    }
+    pub fn from_raw(raw: TracesRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &TracesRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> TracesRequest {
+        self.raw
+    }
+}
+
+impl From<TracesRequest> for SearchBetaObservabilityTracesRequest {
+    fn from(raw: TracesRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<SearchBetaObservabilityTracesRequest> for TracesRequest {
+    fn from(value: SearchBetaObservabilityTracesRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for SearchBetaObservabilityTracesRequest {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SearchBetaObservabilityTracesResponse {
+    raw: GetTraces,
+}
+
+impl SearchBetaObservabilityTracesResponse {
+    pub fn raw(&self) -> &GetTraces {
+        &self.raw
+    }
+    pub fn into_raw(self) -> GetTraces {
+        self.raw
+    }
+}
+
+impl From<GetTraces> for SearchBetaObservabilityTracesResponse {
+    fn from(raw: GetTraces) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<SearchBetaObservabilityTracesResponse> for GetTraces {
+    fn from(value: SearchBetaObservabilityTracesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SearchLatestSpanEvaluationsBetaObservabilitySpansRequest {
+    raw: SpanEvaluationsRequest,
+}
+
+impl SearchLatestSpanEvaluationsBetaObservabilitySpansRequest {
+    pub fn new() -> Self {
+        Self {
+            raw: SpanEvaluationsRequest {
+                search_expression: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn search_expression(mut self, search_expression: impl Into<String>) -> Self {
+        self.raw.search_expression = Some(Some(search_expression.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn search_expression_null(mut self) -> Self {
+        self.raw.search_expression = Some(None);
+        self
+    }
+    pub fn from_raw(raw: SpanEvaluationsRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &SpanEvaluationsRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> SpanEvaluationsRequest {
+        self.raw
+    }
+}
+
+impl From<SpanEvaluationsRequest> for SearchLatestSpanEvaluationsBetaObservabilitySpansRequest {
+    fn from(raw: SpanEvaluationsRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<SearchLatestSpanEvaluationsBetaObservabilitySpansRequest> for SpanEvaluationsRequest {
+    fn from(value: SearchLatestSpanEvaluationsBetaObservabilitySpansRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for SearchLatestSpanEvaluationsBetaObservabilitySpansRequest {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SearchLatestSpanEvaluationsBetaObservabilitySpansResponse {
+    raw: GetSpanEvaluations,
+}
+
+impl SearchLatestSpanEvaluationsBetaObservabilitySpansResponse {
+    pub fn raw(&self) -> &GetSpanEvaluations {
+        &self.raw
+    }
+    pub fn into_raw(self) -> GetSpanEvaluations {
+        self.raw
+    }
+}
+
+impl From<GetSpanEvaluations> for SearchLatestSpanEvaluationsBetaObservabilitySpansResponse {
+    fn from(raw: GetSpanEvaluations) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<SearchLatestSpanEvaluationsBetaObservabilitySpansResponse> for GetSpanEvaluations {
+    fn from(value: SearchLatestSpanEvaluationsBetaObservabilitySpansResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SearchSpanEvaluationsBetaObservabilitySpansRequest {
+    raw: SpanEvaluationsRequest,
+}
+
+impl SearchSpanEvaluationsBetaObservabilitySpansRequest {
+    pub fn new() -> Self {
+        Self {
+            raw: SpanEvaluationsRequest {
+                search_expression: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn search_expression(mut self, search_expression: impl Into<String>) -> Self {
+        self.raw.search_expression = Some(Some(search_expression.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn search_expression_null(mut self) -> Self {
+        self.raw.search_expression = Some(None);
+        self
+    }
+    pub fn from_raw(raw: SpanEvaluationsRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &SpanEvaluationsRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> SpanEvaluationsRequest {
+        self.raw
+    }
+}
+
+impl From<SpanEvaluationsRequest> for SearchSpanEvaluationsBetaObservabilitySpansRequest {
+    fn from(raw: SpanEvaluationsRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<SearchSpanEvaluationsBetaObservabilitySpansRequest> for SpanEvaluationsRequest {
+    fn from(value: SearchSpanEvaluationsBetaObservabilitySpansRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for SearchSpanEvaluationsBetaObservabilitySpansRequest {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SearchSpanEvaluationsBetaObservabilitySpansResponse {
+    raw: GetSpanEvaluations,
+}
+
+impl SearchSpanEvaluationsBetaObservabilitySpansResponse {
+    pub fn raw(&self) -> &GetSpanEvaluations {
+        &self.raw
+    }
+    pub fn into_raw(self) -> GetSpanEvaluations {
+        self.raw
+    }
+}
+
+impl From<GetSpanEvaluations> for SearchSpanEvaluationsBetaObservabilitySpansResponse {
+    fn from(raw: GetSpanEvaluations) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<SearchSpanEvaluationsBetaObservabilitySpansResponse> for GetSpanEvaluations {
+    fn from(value: SearchSpanEvaluationsBetaObservabilitySpansResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SearchSpansBetaObservabilitySpansRequest {
+    raw: SpansRequest,
+}
+
+impl SearchSpansBetaObservabilitySpansRequest {
+    pub fn new() -> Self {
+        Self {
+            raw: SpansRequest {
+                search_expression: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn search_expression(mut self, search_expression: impl Into<String>) -> Self {
+        self.raw.search_expression = Some(Some(search_expression.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn search_expression_null(mut self) -> Self {
+        self.raw.search_expression = Some(None);
+        self
+    }
+    pub fn from_raw(raw: SpansRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &SpansRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> SpansRequest {
+        self.raw
+    }
+}
+
+impl From<SpansRequest> for SearchSpansBetaObservabilitySpansRequest {
+    fn from(raw: SpansRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<SearchSpansBetaObservabilitySpansRequest> for SpansRequest {
+    fn from(value: SearchSpansBetaObservabilitySpansRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for SearchSpansBetaObservabilitySpansRequest {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SearchSpansBetaObservabilitySpansResponse {
+    raw: GetSpans,
+}
+
+impl SearchSpansBetaObservabilitySpansResponse {
+    pub fn raw(&self) -> &GetSpans {
+        &self.raw
+    }
+    pub fn into_raw(self) -> GetSpans {
+        self.raw
+    }
+}
+
+impl From<GetSpans> for SearchSpansBetaObservabilitySpansResponse {
+    fn from(raw: GetSpans) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<SearchSpansBetaObservabilitySpansResponse> for GetSpans {
+    fn from(value: SearchSpansBetaObservabilitySpansResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct ShareBetaConnectorsResponse {
+    raw: MessageResponse,
+}
+
+impl ShareBetaConnectorsResponse {
+    pub fn message(&self) -> &str {
+        &self.raw.message
+    }
+    pub fn raw(&self) -> &MessageResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> MessageResponse {
+        self.raw
+    }
+}
+
+impl From<MessageResponse> for ShareBetaConnectorsResponse {
+    fn from(raw: MessageResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<ShareBetaConnectorsResponse> for MessageResponse {
+    fn from(value: ShareBetaConnectorsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SignalWorkflowExecutionWorkflowsExecutionsRequest {
+    raw: SignalInvocationBody,
+}
+
+impl SignalWorkflowExecutionWorkflowsExecutionsRequest {
+    pub fn new(name: impl Into<String>) -> Self {
+        Self {
+            raw: SignalInvocationBody {
+                input: None,
+                name: name.into(),
+            },
+        }
+    }
+    #[must_use]
+    pub fn input(mut self, input: SignalInvocationBodyInput) -> Self {
+        self.raw.input = Some(Some(input));
+        self
+    }
+
+    #[must_use]
+    pub fn input_null(mut self) -> Self {
+        self.raw.input = Some(None);
+        self
+    }
+    pub fn from_raw(raw: SignalInvocationBody) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &SignalInvocationBody {
+        &self.raw
+    }
+    pub fn into_raw(self) -> SignalInvocationBody {
+        self.raw
+    }
+}
+
+impl From<SignalInvocationBody> for SignalWorkflowExecutionWorkflowsExecutionsRequest {
+    fn from(raw: SignalInvocationBody) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<SignalWorkflowExecutionWorkflowsExecutionsRequest> for SignalInvocationBody {
+    fn from(value: SignalWorkflowExecutionWorkflowsExecutionsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SignalWorkflowExecutionWorkflowsExecutionsResponse {
+    raw: SignalWorkflowResponse,
+}
+
+impl SignalWorkflowExecutionWorkflowsExecutionsResponse {
+    pub fn message(&self) -> Option<&str> {
+        self.raw.message.as_deref()
+    }
+    pub fn raw(&self) -> &SignalWorkflowResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> SignalWorkflowResponse {
+        self.raw
+    }
+}
+
+impl From<SignalWorkflowResponse> for SignalWorkflowExecutionWorkflowsExecutionsResponse {
+    fn from(raw: SignalWorkflowResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<SignalWorkflowExecutionWorkflowsExecutionsResponse> for SignalWorkflowResponse {
+    fn from(value: SignalWorkflowExecutionWorkflowsExecutionsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SpendLimitsGetSpendLimitsBetaAdminBillingResponse {
+    raw: LimitsOUT,
+}
+
+impl SpendLimitsGetSpendLimitsBetaAdminBillingResponse {
+    pub fn raw(&self) -> &LimitsOUT {
+        &self.raw
+    }
+    pub fn into_raw(self) -> LimitsOUT {
+        self.raw
+    }
+}
+
+impl From<LimitsOUT> for SpendLimitsGetSpendLimitsBetaAdminBillingResponse {
+    fn from(raw: LimitsOUT) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<SpendLimitsGetSpendLimitsBetaAdminBillingResponse> for LimitsOUT {
+    fn from(value: SpendLimitsGetSpendLimitsBetaAdminBillingResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SpendLimitsUpdateSpendLimitsBetaAdminBillingRequest {
+    raw: NewUsageLimitIN,
+}
+
+impl SpendLimitsUpdateSpendLimitsBetaAdminBillingRequest {
+    pub fn new(amount: i64) -> Self {
+        Self {
+            raw: NewUsageLimitIN {
+                amount,
+                no_monthly_limit: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn no_monthly_limit(mut self, no_monthly_limit: bool) -> Self {
+        self.raw.no_monthly_limit = Some(no_monthly_limit);
+        self
+    }
+    pub fn from_raw(raw: NewUsageLimitIN) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &NewUsageLimitIN {
+        &self.raw
+    }
+    pub fn into_raw(self) -> NewUsageLimitIN {
+        self.raw
+    }
+}
+
+impl From<NewUsageLimitIN> for SpendLimitsUpdateSpendLimitsBetaAdminBillingRequest {
+    fn from(raw: NewUsageLimitIN) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<SpendLimitsUpdateSpendLimitsBetaAdminBillingRequest> for NewUsageLimitIN {
+    fn from(value: SpendLimitsUpdateSpendLimitsBetaAdminBillingRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct SpendLimitsUpdateSpendLimitsBetaAdminBillingResponse {
+    raw: LimitsOUT,
+}
+
+impl SpendLimitsUpdateSpendLimitsBetaAdminBillingResponse {
+    pub fn raw(&self) -> &LimitsOUT {
+        &self.raw
+    }
+    pub fn into_raw(self) -> LimitsOUT {
+        self.raw
+    }
+}
+
+impl From<LimitsOUT> for SpendLimitsUpdateSpendLimitsBetaAdminBillingResponse {
+    fn from(raw: LimitsOUT) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<SpendLimitsUpdateSpendLimitsBetaAdminBillingResponse> for LimitsOUT {
+    fn from(value: SpendLimitsUpdateSpendLimitsBetaAdminBillingResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartBetaConversationsRequest {
+    raw: ConversationRequest,
+}
+
+impl StartBetaConversationsRequest {
+    pub fn new(inputs: ConversationInputs) -> Self {
+        Self {
+            raw: ConversationRequest {
+                agent_id: None,
+                agent_version: None,
+                completion_args: None,
+                description: None,
+                guardrails: None,
+                handoff_execution: None,
+                inputs,
+                instructions: None,
+                metadata: None,
+                model: None,
+                name: None,
+                store: None,
+                stream: None,
+                tools: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn agent_id(mut self, agent_id: impl Into<String>) -> Self {
+        self.raw.agent_id = Some(Some(agent_id.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn agent_id_null(mut self) -> Self {
+        self.raw.agent_id = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn agent_version(mut self, agent_version: ConversationRequestBaseAgentVersion) -> Self {
+        self.raw.agent_version = Some(Some(agent_version));
+        self
+    }
+
+    #[must_use]
+    pub fn agent_version_null(mut self) -> Self {
+        self.raw.agent_version = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn completion_args(
+        mut self,
+        completion_args: impl Into<StartBetaConversationsRequestCompletionArgs>,
+    ) -> Self {
+        self.raw.completion_args = Some(Some(
+            Into::<StartBetaConversationsRequestCompletionArgs>::into(completion_args).into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn completion_args_null(mut self) -> Self {
+        self.raw.completion_args = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.raw.description = Some(Some(description.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn description_null(mut self) -> Self {
+        self.raw.description = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn guardrails(mut self, guardrails: Vec<GuardrailConfig>) -> Self {
+        self.raw.guardrails = Some(Some(guardrails));
+        self
+    }
+
+    #[must_use]
+    pub fn guardrails_null(mut self) -> Self {
+        self.raw.guardrails = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn handoff_execution(
+        mut self,
+        handoff_execution: ConversationRequestBaseHandoffExecution,
+    ) -> Self {
+        self.raw.handoff_execution = Some(Some(handoff_execution));
+        self
+    }
+
+    #[must_use]
+    pub fn handoff_execution_null(mut self) -> Self {
+        self.raw.handoff_execution = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn instructions(mut self, instructions: impl Into<String>) -> Self {
+        self.raw.instructions = Some(Some(instructions.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn instructions_null(mut self) -> Self {
+        self.raw.instructions = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn metadata(mut self, metadata: MetadataDict) -> Self {
+        self.raw.metadata = Some(Some(metadata));
+        self
+    }
+
+    #[must_use]
+    pub fn metadata_null(mut self) -> Self {
+        self.raw.metadata = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn model(mut self, model: impl Into<String>) -> Self {
+        self.raw.model = Some(Some(model.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn model_null(mut self) -> Self {
+        self.raw.model = Some(None);
+        self
+    }
+
+    #[must_use]
     pub fn name(mut self, name: impl Into<String>) -> Self {
         self.raw.name = Some(Some(name.into()));
         self
@@ -6591,125 +16352,4440 @@ impl PatchDatasetInSchemaParams {
         self.raw.name = Some(None);
         self
     }
-    pub fn from_raw(raw: PatchDatasetInSchema) -> Self {
+
+    #[must_use]
+    pub fn store(mut self, store: bool) -> Self {
+        self.raw.store = Some(Some(store));
+        self
+    }
+
+    #[must_use]
+    pub fn store_null(mut self) -> Self {
+        self.raw.store = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn tools(
+        mut self,
+        tools: impl IntoIterator<Item = StartBetaConversationsRequestTools>,
+    ) -> Self {
+        self.raw.tools = Some(Some(tools.into_iter().map(Into::into).collect()));
+        self
+    }
+
+    #[must_use]
+    pub fn tools_null(mut self) -> Self {
+        self.raw.tools = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ConversationRequest) -> Self {
         Self { raw }
     }
-    pub fn as_raw(&self) -> &PatchDatasetInSchema {
+    pub fn as_raw(&self) -> &ConversationRequest {
         &self.raw
     }
-    pub fn into_raw(self) -> PatchDatasetInSchema {
+    pub fn into_raw(self) -> ConversationRequest {
         self.raw
     }
 }
 
-impl From<PatchDatasetInSchema> for PatchDatasetInSchemaParams {
-    fn from(raw: PatchDatasetInSchema) -> Self {
+impl From<ConversationRequest> for StartBetaConversationsRequest {
+    fn from(raw: ConversationRequest) -> Self {
         Self { raw }
     }
 }
 
-impl From<PatchDatasetInSchemaParams> for PatchDatasetInSchema {
-    fn from(value: PatchDatasetInSchemaParams) -> Self {
+impl From<StartBetaConversationsRequest> for ConversationRequest {
+    fn from(value: StartBetaConversationsRequest) -> Self {
         value.into_raw()
     }
 }
 
-impl Default for PatchDatasetInSchemaParams {
+#[derive(Debug, Clone)]
+pub struct StartBetaConversationsRequestCompletionArgs {
+    raw: CompletionArgs,
+}
+
+impl StartBetaConversationsRequestCompletionArgs {
+    pub fn new() -> Self {
+        Self {
+            raw: CompletionArgs {
+                frequency_penalty: None,
+                max_tokens: None,
+                prediction: None,
+                presence_penalty: None,
+                random_seed: None,
+                reasoning_effort: None,
+                response_format: None,
+                stop: None,
+                temperature: None,
+                tool_choice: None,
+                top_p: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn frequency_penalty(mut self, frequency_penalty: f64) -> Self {
+        self.raw.frequency_penalty = Some(Some(frequency_penalty));
+        self
+    }
+
+    #[must_use]
+    pub fn frequency_penalty_null(mut self) -> Self {
+        self.raw.frequency_penalty = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn max_tokens(mut self, max_tokens: i64) -> Self {
+        self.raw.max_tokens = Some(Some(max_tokens));
+        self
+    }
+
+    #[must_use]
+    pub fn max_tokens_null(mut self) -> Self {
+        self.raw.max_tokens = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn prediction(
+        mut self,
+        prediction: impl Into<StartBetaConversationsRequestCompletionArgsPrediction>,
+    ) -> Self {
+        self.raw.prediction = Some(Some(
+            Into::<StartBetaConversationsRequestCompletionArgsPrediction>::into(prediction).into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn prediction_null(mut self) -> Self {
+        self.raw.prediction = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn presence_penalty(mut self, presence_penalty: f64) -> Self {
+        self.raw.presence_penalty = Some(Some(presence_penalty));
+        self
+    }
+
+    #[must_use]
+    pub fn presence_penalty_null(mut self) -> Self {
+        self.raw.presence_penalty = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn random_seed(mut self, random_seed: i64) -> Self {
+        self.raw.random_seed = Some(Some(random_seed));
+        self
+    }
+
+    #[must_use]
+    pub fn random_seed_null(mut self) -> Self {
+        self.raw.random_seed = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn reasoning_effort(mut self, reasoning_effort: ReasoningEffort) -> Self {
+        self.raw.reasoning_effort = Some(Some(reasoning_effort));
+        self
+    }
+
+    #[must_use]
+    pub fn reasoning_effort_null(mut self) -> Self {
+        self.raw.reasoning_effort = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn response_format(
+        mut self,
+        response_format: impl Into<StartBetaConversationsRequestCompletionArgsResponseFormat>,
+    ) -> Self {
+        self.raw.response_format = Some(Some(
+            Into::<StartBetaConversationsRequestCompletionArgsResponseFormat>::into(
+                response_format,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn response_format_null(mut self) -> Self {
+        self.raw.response_format = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn stop(mut self, stop: CompletionArgsStop) -> Self {
+        self.raw.stop = Some(Some(stop));
+        self
+    }
+
+    #[must_use]
+    pub fn stop_null(mut self) -> Self {
+        self.raw.stop = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn temperature(mut self, temperature: f64) -> Self {
+        self.raw.temperature = Some(Some(temperature));
+        self
+    }
+
+    #[must_use]
+    pub fn temperature_null(mut self) -> Self {
+        self.raw.temperature = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn tool_choice(mut self, tool_choice: ToolChoiceEnum) -> Self {
+        self.raw.tool_choice = Some(tool_choice);
+        self
+    }
+
+    #[must_use]
+    pub fn top_p(mut self, top_p: f64) -> Self {
+        self.raw.top_p = Some(Some(top_p));
+        self
+    }
+
+    #[must_use]
+    pub fn top_p_null(mut self) -> Self {
+        self.raw.top_p = Some(None);
+        self
+    }
+    pub fn from_raw(raw: CompletionArgs) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &CompletionArgs {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CompletionArgs {
+        self.raw
+    }
+}
+
+impl From<CompletionArgs> for StartBetaConversationsRequestCompletionArgs {
+    fn from(raw: CompletionArgs) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartBetaConversationsRequestCompletionArgs> for CompletionArgs {
+    fn from(value: StartBetaConversationsRequestCompletionArgs) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for StartBetaConversationsRequestCompletionArgs {
     fn default() -> Self {
         Self::new()
     }
 }
 
 #[derive(Debug, Clone)]
-#[non_exhaustive]
-pub enum PutJudgeInSchemaOutputValue {
-    Classification(JudgeClassificationOutputParams),
-    Regression(JudgeRegressionOutputParams),
+pub struct StartBetaConversationsRequestCompletionArgsPrediction {
+    raw: Prediction,
 }
 
-impl From<JudgeClassificationOutputParams> for PutJudgeInSchemaOutputValue {
-    fn from(value: JudgeClassificationOutputParams) -> Self {
-        Self::Classification(value)
-    }
-}
-
-impl From<JudgeRegressionOutputParams> for PutJudgeInSchemaOutputValue {
-    fn from(value: JudgeRegressionOutputParams) -> Self {
-        Self::Regression(value)
-    }
-}
-
-impl From<PutJudgeInSchemaOutputValue> for PutJudgeInSchemaOutput {
-    fn from(value: PutJudgeInSchemaOutputValue) -> Self {
-        match value {
-            PutJudgeInSchemaOutputValue::Classification(value) => {
-                Self::JudgeClassificationOutput(value.into())
-            }
-            PutJudgeInSchemaOutputValue::Regression(value) => {
-                Self::JudgeRegressionOutput(value.into())
-            }
-        }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct PutJudgeInSchemaParams {
-    raw: PutJudgeInSchema,
-}
-
-impl PutJudgeInSchemaParams {
-    pub fn new(
-        name: impl Into<String>,
-        description: impl Into<String>,
-        model_name: impl Into<String>,
-        output: impl Into<PutJudgeInSchemaOutputValue>,
-        instructions: impl Into<String>,
-        tools: Vec<String>,
-    ) -> Self {
+impl StartBetaConversationsRequestCompletionArgsPrediction {
+    pub fn new() -> Self {
         Self {
-            raw: PutJudgeInSchema {
-                description: description.into(),
-                instructions: instructions.into(),
-                model_name: model_name.into(),
-                name: name.into(),
-                output: Into::<PutJudgeInSchemaOutputValue>::into(output).into(),
-                tools,
+            raw: Prediction {
+                content: None,
+                r#type: None,
             },
         }
     }
-    pub fn from_raw(raw: PutJudgeInSchema) -> Self {
+    #[must_use]
+    pub fn content(mut self, content: impl Into<String>) -> Self {
+        self.raw.content = Some(content.into());
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: PredictionType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: Prediction) -> Self {
         Self { raw }
     }
-    pub fn as_raw(&self) -> &PutJudgeInSchema {
+    pub fn as_raw(&self) -> &Prediction {
         &self.raw
     }
-    pub fn into_raw(self) -> PutJudgeInSchema {
+    pub fn into_raw(self) -> Prediction {
         self.raw
     }
 }
 
-impl From<PutJudgeInSchema> for PutJudgeInSchemaParams {
-    fn from(raw: PutJudgeInSchema) -> Self {
+impl From<Prediction> for StartBetaConversationsRequestCompletionArgsPrediction {
+    fn from(raw: Prediction) -> Self {
         Self { raw }
     }
 }
 
-impl From<PutJudgeInSchemaParams> for PutJudgeInSchema {
-    fn from(value: PutJudgeInSchemaParams) -> Self {
+impl From<StartBetaConversationsRequestCompletionArgsPrediction> for Prediction {
+    fn from(value: StartBetaConversationsRequestCompletionArgsPrediction) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for StartBetaConversationsRequestCompletionArgsPrediction {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartBetaConversationsRequestCompletionArgsResponseFormat {
+    raw: ResponseFormat,
+}
+
+impl StartBetaConversationsRequestCompletionArgsResponseFormat {
+    pub fn new() -> Self {
+        Self {
+            raw: ResponseFormat {
+                json_schema: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn json_schema(
+        mut self,
+        json_schema: impl Into<StartBetaConversationsRequestCompletionArgsResponseFormatJsonSchema>,
+    ) -> Self {
+        self.raw.json_schema = Some(Some(
+            Into::<StartBetaConversationsRequestCompletionArgsResponseFormatJsonSchema>::into(
+                json_schema,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn json_schema_null(mut self) -> Self {
+        self.raw.json_schema = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: ResponseFormats) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: ResponseFormat) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ResponseFormat {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ResponseFormat {
+        self.raw
+    }
+}
+
+impl From<ResponseFormat> for StartBetaConversationsRequestCompletionArgsResponseFormat {
+    fn from(raw: ResponseFormat) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartBetaConversationsRequestCompletionArgsResponseFormat> for ResponseFormat {
+    fn from(value: StartBetaConversationsRequestCompletionArgsResponseFormat) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for StartBetaConversationsRequestCompletionArgsResponseFormat {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartBetaConversationsRequestCompletionArgsResponseFormatJsonSchema {
+    raw: JsonSchema,
+}
+
+impl StartBetaConversationsRequestCompletionArgsResponseFormatJsonSchema {
+    pub fn new(name: impl Into<String>, schema: JsonSchemaSchema) -> Self {
+        Self {
+            raw: JsonSchema {
+                description: None,
+                name: name.into(),
+                schema,
+                strict: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.raw.description = Some(Some(description.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn description_null(mut self) -> Self {
+        self.raw.description = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn strict(mut self, strict: bool) -> Self {
+        self.raw.strict = Some(strict);
+        self
+    }
+    pub fn from_raw(raw: JsonSchema) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &JsonSchema {
+        &self.raw
+    }
+    pub fn into_raw(self) -> JsonSchema {
+        self.raw
+    }
+}
+
+impl From<JsonSchema> for StartBetaConversationsRequestCompletionArgsResponseFormatJsonSchema {
+    fn from(raw: JsonSchema) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartBetaConversationsRequestCompletionArgsResponseFormatJsonSchema> for JsonSchema {
+    fn from(value: StartBetaConversationsRequestCompletionArgsResponseFormatJsonSchema) -> Self {
         value.into_raw()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct VoiceUpdateRequestParams {
+#[non_exhaustive]
+pub enum StartBetaConversationsRequestTools {
+    CodeInterpreterTool(StartBetaConversationsRequestToolsCodeInterpreterTool),
+    CustomConnector(StartBetaConversationsRequestToolsCustomConnector),
+    DocumentLibraryTool(StartBetaConversationsRequestToolsDocumentLibraryTool),
+    FunctionTool(StartBetaConversationsRequestToolsFunctionTool),
+    ImageGenerationTool(StartBetaConversationsRequestToolsImageGenerationTool),
+    WebSearchPremiumTool(StartBetaConversationsRequestToolsWebSearchPremiumTool),
+    WebSearchTool(StartBetaConversationsRequestToolsWebSearchTool),
+}
+
+impl From<StartBetaConversationsRequestToolsCodeInterpreterTool>
+    for StartBetaConversationsRequestTools
+{
+    fn from(value: StartBetaConversationsRequestToolsCodeInterpreterTool) -> Self {
+        Self::CodeInterpreterTool(value)
+    }
+}
+
+impl From<StartBetaConversationsRequestToolsCustomConnector>
+    for StartBetaConversationsRequestTools
+{
+    fn from(value: StartBetaConversationsRequestToolsCustomConnector) -> Self {
+        Self::CustomConnector(value)
+    }
+}
+
+impl From<StartBetaConversationsRequestToolsDocumentLibraryTool>
+    for StartBetaConversationsRequestTools
+{
+    fn from(value: StartBetaConversationsRequestToolsDocumentLibraryTool) -> Self {
+        Self::DocumentLibraryTool(value)
+    }
+}
+
+impl From<StartBetaConversationsRequestToolsFunctionTool> for StartBetaConversationsRequestTools {
+    fn from(value: StartBetaConversationsRequestToolsFunctionTool) -> Self {
+        Self::FunctionTool(value)
+    }
+}
+
+impl From<StartBetaConversationsRequestToolsImageGenerationTool>
+    for StartBetaConversationsRequestTools
+{
+    fn from(value: StartBetaConversationsRequestToolsImageGenerationTool) -> Self {
+        Self::ImageGenerationTool(value)
+    }
+}
+
+impl From<StartBetaConversationsRequestToolsWebSearchPremiumTool>
+    for StartBetaConversationsRequestTools
+{
+    fn from(value: StartBetaConversationsRequestToolsWebSearchPremiumTool) -> Self {
+        Self::WebSearchPremiumTool(value)
+    }
+}
+
+impl From<StartBetaConversationsRequestToolsWebSearchTool> for StartBetaConversationsRequestTools {
+    fn from(value: StartBetaConversationsRequestToolsWebSearchTool) -> Self {
+        Self::WebSearchTool(value)
+    }
+}
+
+impl From<StartBetaConversationsRequestTools> for ConversationRequestBaseToolsItemUnion {
+    fn from(value: StartBetaConversationsRequestTools) -> Self {
+        match value {
+            StartBetaConversationsRequestTools::CodeInterpreterTool(value) => {
+                Self::CodeInterpreterTool(value.into())
+            }
+            StartBetaConversationsRequestTools::CustomConnector(value) => {
+                Self::CustomConnector(value.into())
+            }
+            StartBetaConversationsRequestTools::DocumentLibraryTool(value) => {
+                Self::DocumentLibraryTool(value.into())
+            }
+            StartBetaConversationsRequestTools::FunctionTool(value) => {
+                Self::FunctionTool(value.into())
+            }
+            StartBetaConversationsRequestTools::ImageGenerationTool(value) => {
+                Self::ImageGenerationTool(value.into())
+            }
+            StartBetaConversationsRequestTools::WebSearchPremiumTool(value) => {
+                Self::WebSearchPremiumTool(value.into())
+            }
+            StartBetaConversationsRequestTools::WebSearchTool(value) => {
+                Self::WebSearchTool(value.into())
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartBetaConversationsRequestToolsCodeInterpreterTool {
+    raw: CodeInterpreterTool,
+}
+
+impl StartBetaConversationsRequestToolsCodeInterpreterTool {
+    pub fn new() -> Self {
+        Self {
+            raw: CodeInterpreterTool {
+                tool_configuration: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn tool_configuration(
+        mut self,
+        tool_configuration: impl Into<
+            StartBetaConversationsRequestToolsCodeInterpreterToolToolConfiguration,
+        >,
+    ) -> Self {
+        self.raw.tool_configuration = Some(Some(
+            Into::<StartBetaConversationsRequestToolsCodeInterpreterToolToolConfiguration>::into(
+                tool_configuration,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn tool_configuration_null(mut self) -> Self {
+        self.raw.tool_configuration = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: CodeInterpreterToolType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: CodeInterpreterTool) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &CodeInterpreterTool {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CodeInterpreterTool {
+        self.raw
+    }
+}
+
+impl From<CodeInterpreterTool> for StartBetaConversationsRequestToolsCodeInterpreterTool {
+    fn from(raw: CodeInterpreterTool) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartBetaConversationsRequestToolsCodeInterpreterTool> for CodeInterpreterTool {
+    fn from(value: StartBetaConversationsRequestToolsCodeInterpreterTool) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for StartBetaConversationsRequestToolsCodeInterpreterTool {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartBetaConversationsRequestToolsCodeInterpreterToolToolConfiguration {
+    raw: ToolConfiguration,
+}
+
+impl StartBetaConversationsRequestToolsCodeInterpreterToolToolConfiguration {
+    pub fn new() -> Self {
+        Self {
+            raw: ToolConfiguration {
+                exclude: None,
+                include: None,
+                requires_confirmation: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn exclude(mut self, exclude: Vec<String>) -> Self {
+        self.raw.exclude = Some(Some(exclude));
+        self
+    }
+
+    #[must_use]
+    pub fn exclude_null(mut self) -> Self {
+        self.raw.exclude = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn include(mut self, include: Vec<String>) -> Self {
+        self.raw.include = Some(Some(include));
+        self
+    }
+
+    #[must_use]
+    pub fn include_null(mut self) -> Self {
+        self.raw.include = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation(mut self, requires_confirmation: Vec<String>) -> Self {
+        self.raw.requires_confirmation = Some(Some(requires_confirmation));
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation_null(mut self) -> Self {
+        self.raw.requires_confirmation = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ToolConfiguration {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ToolConfiguration {
+        self.raw
+    }
+}
+
+impl From<ToolConfiguration>
+    for StartBetaConversationsRequestToolsCodeInterpreterToolToolConfiguration
+{
+    fn from(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartBetaConversationsRequestToolsCodeInterpreterToolToolConfiguration>
+    for ToolConfiguration
+{
+    fn from(value: StartBetaConversationsRequestToolsCodeInterpreterToolToolConfiguration) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for StartBetaConversationsRequestToolsCodeInterpreterToolToolConfiguration {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartBetaConversationsRequestToolsCustomConnector {
+    raw: CustomConnector,
+}
+
+impl StartBetaConversationsRequestToolsCustomConnector {
+    pub fn new(connector_id: impl Into<String>) -> Self {
+        Self {
+            raw: CustomConnector {
+                authorization: None,
+                connector_id: connector_id.into(),
+                tool_configuration: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn authorization(
+        mut self,
+        authorization: impl Into<StartBetaConversationsRequestToolsCustomConnectorAuthorization>,
+    ) -> Self {
+        self.raw.authorization = Some(Some(
+            Into::<StartBetaConversationsRequestToolsCustomConnectorAuthorization>::into(
+                authorization,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn authorization_null(mut self) -> Self {
+        self.raw.authorization = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn tool_configuration(
+        mut self,
+        tool_configuration: impl Into<
+            StartBetaConversationsRequestToolsCustomConnectorToolConfiguration,
+        >,
+    ) -> Self {
+        self.raw.tool_configuration = Some(Some(
+            Into::<StartBetaConversationsRequestToolsCustomConnectorToolConfiguration>::into(
+                tool_configuration,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn tool_configuration_null(mut self) -> Self {
+        self.raw.tool_configuration = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: CustomConnectorType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: CustomConnector) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &CustomConnector {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CustomConnector {
+        self.raw
+    }
+}
+
+impl From<CustomConnector> for StartBetaConversationsRequestToolsCustomConnector {
+    fn from(raw: CustomConnector) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartBetaConversationsRequestToolsCustomConnector> for CustomConnector {
+    fn from(value: StartBetaConversationsRequestToolsCustomConnector) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub enum StartBetaConversationsRequestToolsCustomConnectorAuthorization {
+    APIKeyAuth(StartBetaConversationsRequestToolsCustomConnectorAuthorizationAPIKeyAuth),
+    OAuth2TokenAuth(StartBetaConversationsRequestToolsCustomConnectorAuthorizationOAuth2TokenAuth),
+}
+
+impl From<StartBetaConversationsRequestToolsCustomConnectorAuthorizationAPIKeyAuth>
+    for StartBetaConversationsRequestToolsCustomConnectorAuthorization
+{
+    fn from(
+        value: StartBetaConversationsRequestToolsCustomConnectorAuthorizationAPIKeyAuth,
+    ) -> Self {
+        Self::APIKeyAuth(value)
+    }
+}
+
+impl From<StartBetaConversationsRequestToolsCustomConnectorAuthorizationOAuth2TokenAuth>
+    for StartBetaConversationsRequestToolsCustomConnectorAuthorization
+{
+    fn from(
+        value: StartBetaConversationsRequestToolsCustomConnectorAuthorizationOAuth2TokenAuth,
+    ) -> Self {
+        Self::OAuth2TokenAuth(value)
+    }
+}
+
+impl From<StartBetaConversationsRequestToolsCustomConnectorAuthorization>
+    for CustomConnectorAuthorizationInline
+{
+    fn from(value: StartBetaConversationsRequestToolsCustomConnectorAuthorization) -> Self {
+        match value {
+            StartBetaConversationsRequestToolsCustomConnectorAuthorization::APIKeyAuth(value) => {
+                Self::APIKeyAuth(value.into())
+            }
+            StartBetaConversationsRequestToolsCustomConnectorAuthorization::OAuth2TokenAuth(
+                value,
+            ) => Self::OAuth2TokenAuth(value.into()),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartBetaConversationsRequestToolsCustomConnectorAuthorizationAPIKeyAuth {
+    raw: APIKeyAuth,
+}
+
+impl StartBetaConversationsRequestToolsCustomConnectorAuthorizationAPIKeyAuth {
+    pub fn new(value: impl Into<String>) -> Self {
+        Self {
+            raw: APIKeyAuth {
+                r#type: None,
+                value: value.into(),
+            },
+        }
+    }
+    #[must_use]
+    pub fn r#type(mut self, r#type: APIKeyAuthType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: APIKeyAuth) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &APIKeyAuth {
+        &self.raw
+    }
+    pub fn into_raw(self) -> APIKeyAuth {
+        self.raw
+    }
+}
+
+impl From<APIKeyAuth> for StartBetaConversationsRequestToolsCustomConnectorAuthorizationAPIKeyAuth {
+    fn from(raw: APIKeyAuth) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartBetaConversationsRequestToolsCustomConnectorAuthorizationAPIKeyAuth> for APIKeyAuth {
+    fn from(
+        value: StartBetaConversationsRequestToolsCustomConnectorAuthorizationAPIKeyAuth,
+    ) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartBetaConversationsRequestToolsCustomConnectorAuthorizationOAuth2TokenAuth {
+    raw: OAuth2TokenAuth,
+}
+
+impl StartBetaConversationsRequestToolsCustomConnectorAuthorizationOAuth2TokenAuth {
+    pub fn new(value: impl Into<String>) -> Self {
+        Self {
+            raw: OAuth2TokenAuth {
+                r#type: None,
+                value: value.into(),
+            },
+        }
+    }
+    #[must_use]
+    pub fn r#type(mut self, r#type: OAuth2TokenAuthType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: OAuth2TokenAuth) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &OAuth2TokenAuth {
+        &self.raw
+    }
+    pub fn into_raw(self) -> OAuth2TokenAuth {
+        self.raw
+    }
+}
+
+impl From<OAuth2TokenAuth>
+    for StartBetaConversationsRequestToolsCustomConnectorAuthorizationOAuth2TokenAuth
+{
+    fn from(raw: OAuth2TokenAuth) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartBetaConversationsRequestToolsCustomConnectorAuthorizationOAuth2TokenAuth>
+    for OAuth2TokenAuth
+{
+    fn from(
+        value: StartBetaConversationsRequestToolsCustomConnectorAuthorizationOAuth2TokenAuth,
+    ) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartBetaConversationsRequestToolsCustomConnectorToolConfiguration {
+    raw: ToolConfiguration,
+}
+
+impl StartBetaConversationsRequestToolsCustomConnectorToolConfiguration {
+    pub fn new() -> Self {
+        Self {
+            raw: ToolConfiguration {
+                exclude: None,
+                include: None,
+                requires_confirmation: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn exclude(mut self, exclude: Vec<String>) -> Self {
+        self.raw.exclude = Some(Some(exclude));
+        self
+    }
+
+    #[must_use]
+    pub fn exclude_null(mut self) -> Self {
+        self.raw.exclude = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn include(mut self, include: Vec<String>) -> Self {
+        self.raw.include = Some(Some(include));
+        self
+    }
+
+    #[must_use]
+    pub fn include_null(mut self) -> Self {
+        self.raw.include = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation(mut self, requires_confirmation: Vec<String>) -> Self {
+        self.raw.requires_confirmation = Some(Some(requires_confirmation));
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation_null(mut self) -> Self {
+        self.raw.requires_confirmation = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ToolConfiguration {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ToolConfiguration {
+        self.raw
+    }
+}
+
+impl From<ToolConfiguration>
+    for StartBetaConversationsRequestToolsCustomConnectorToolConfiguration
+{
+    fn from(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartBetaConversationsRequestToolsCustomConnectorToolConfiguration>
+    for ToolConfiguration
+{
+    fn from(value: StartBetaConversationsRequestToolsCustomConnectorToolConfiguration) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for StartBetaConversationsRequestToolsCustomConnectorToolConfiguration {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartBetaConversationsRequestToolsDocumentLibraryTool {
+    raw: DocumentLibraryTool,
+}
+
+impl StartBetaConversationsRequestToolsDocumentLibraryTool {
+    pub fn new(library_ids: Vec<String>) -> Self {
+        Self {
+            raw: DocumentLibraryTool {
+                library_ids,
+                tool_configuration: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn tool_configuration(
+        mut self,
+        tool_configuration: impl Into<
+            StartBetaConversationsRequestToolsDocumentLibraryToolToolConfiguration,
+        >,
+    ) -> Self {
+        self.raw.tool_configuration = Some(Some(
+            Into::<StartBetaConversationsRequestToolsDocumentLibraryToolToolConfiguration>::into(
+                tool_configuration,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn tool_configuration_null(mut self) -> Self {
+        self.raw.tool_configuration = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: DocumentLibraryToolType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: DocumentLibraryTool) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &DocumentLibraryTool {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DocumentLibraryTool {
+        self.raw
+    }
+}
+
+impl From<DocumentLibraryTool> for StartBetaConversationsRequestToolsDocumentLibraryTool {
+    fn from(raw: DocumentLibraryTool) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartBetaConversationsRequestToolsDocumentLibraryTool> for DocumentLibraryTool {
+    fn from(value: StartBetaConversationsRequestToolsDocumentLibraryTool) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartBetaConversationsRequestToolsDocumentLibraryToolToolConfiguration {
+    raw: ToolConfiguration,
+}
+
+impl StartBetaConversationsRequestToolsDocumentLibraryToolToolConfiguration {
+    pub fn new() -> Self {
+        Self {
+            raw: ToolConfiguration {
+                exclude: None,
+                include: None,
+                requires_confirmation: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn exclude(mut self, exclude: Vec<String>) -> Self {
+        self.raw.exclude = Some(Some(exclude));
+        self
+    }
+
+    #[must_use]
+    pub fn exclude_null(mut self) -> Self {
+        self.raw.exclude = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn include(mut self, include: Vec<String>) -> Self {
+        self.raw.include = Some(Some(include));
+        self
+    }
+
+    #[must_use]
+    pub fn include_null(mut self) -> Self {
+        self.raw.include = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation(mut self, requires_confirmation: Vec<String>) -> Self {
+        self.raw.requires_confirmation = Some(Some(requires_confirmation));
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation_null(mut self) -> Self {
+        self.raw.requires_confirmation = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ToolConfiguration {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ToolConfiguration {
+        self.raw
+    }
+}
+
+impl From<ToolConfiguration>
+    for StartBetaConversationsRequestToolsDocumentLibraryToolToolConfiguration
+{
+    fn from(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartBetaConversationsRequestToolsDocumentLibraryToolToolConfiguration>
+    for ToolConfiguration
+{
+    fn from(value: StartBetaConversationsRequestToolsDocumentLibraryToolToolConfiguration) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for StartBetaConversationsRequestToolsDocumentLibraryToolToolConfiguration {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartBetaConversationsRequestToolsFunctionTool {
+    raw: FunctionTool,
+}
+
+impl StartBetaConversationsRequestToolsFunctionTool {
+    pub fn new(
+        function: impl Into<StartBetaConversationsRequestToolsFunctionToolFunction>,
+    ) -> Self {
+        Self {
+            raw: FunctionTool {
+                function: Into::<StartBetaConversationsRequestToolsFunctionToolFunction>::into(
+                    function,
+                )
+                .into(),
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn r#type(mut self, r#type: FunctionToolType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: FunctionTool) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &FunctionTool {
+        &self.raw
+    }
+    pub fn into_raw(self) -> FunctionTool {
+        self.raw
+    }
+}
+
+impl From<FunctionTool> for StartBetaConversationsRequestToolsFunctionTool {
+    fn from(raw: FunctionTool) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartBetaConversationsRequestToolsFunctionTool> for FunctionTool {
+    fn from(value: StartBetaConversationsRequestToolsFunctionTool) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartBetaConversationsRequestToolsFunctionToolFunction {
+    raw: Function,
+}
+
+impl StartBetaConversationsRequestToolsFunctionToolFunction {
+    pub fn new(name: impl Into<String>, parameters: FunctionParameters) -> Self {
+        Self {
+            raw: Function {
+                description: None,
+                name: name.into(),
+                parameters,
+                strict: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.raw.description = Some(description.into());
+        self
+    }
+
+    #[must_use]
+    pub fn strict(mut self, strict: bool) -> Self {
+        self.raw.strict = Some(strict);
+        self
+    }
+    pub fn from_raw(raw: Function) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &Function {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Function {
+        self.raw
+    }
+}
+
+impl From<Function> for StartBetaConversationsRequestToolsFunctionToolFunction {
+    fn from(raw: Function) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartBetaConversationsRequestToolsFunctionToolFunction> for Function {
+    fn from(value: StartBetaConversationsRequestToolsFunctionToolFunction) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartBetaConversationsRequestToolsImageGenerationTool {
+    raw: ImageGenerationTool,
+}
+
+impl StartBetaConversationsRequestToolsImageGenerationTool {
+    pub fn new() -> Self {
+        Self {
+            raw: ImageGenerationTool {
+                tool_configuration: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn tool_configuration(
+        mut self,
+        tool_configuration: impl Into<
+            StartBetaConversationsRequestToolsImageGenerationToolToolConfiguration,
+        >,
+    ) -> Self {
+        self.raw.tool_configuration = Some(Some(
+            Into::<StartBetaConversationsRequestToolsImageGenerationToolToolConfiguration>::into(
+                tool_configuration,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn tool_configuration_null(mut self) -> Self {
+        self.raw.tool_configuration = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: ImageGenerationToolType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: ImageGenerationTool) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ImageGenerationTool {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ImageGenerationTool {
+        self.raw
+    }
+}
+
+impl From<ImageGenerationTool> for StartBetaConversationsRequestToolsImageGenerationTool {
+    fn from(raw: ImageGenerationTool) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartBetaConversationsRequestToolsImageGenerationTool> for ImageGenerationTool {
+    fn from(value: StartBetaConversationsRequestToolsImageGenerationTool) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for StartBetaConversationsRequestToolsImageGenerationTool {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartBetaConversationsRequestToolsImageGenerationToolToolConfiguration {
+    raw: ToolConfiguration,
+}
+
+impl StartBetaConversationsRequestToolsImageGenerationToolToolConfiguration {
+    pub fn new() -> Self {
+        Self {
+            raw: ToolConfiguration {
+                exclude: None,
+                include: None,
+                requires_confirmation: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn exclude(mut self, exclude: Vec<String>) -> Self {
+        self.raw.exclude = Some(Some(exclude));
+        self
+    }
+
+    #[must_use]
+    pub fn exclude_null(mut self) -> Self {
+        self.raw.exclude = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn include(mut self, include: Vec<String>) -> Self {
+        self.raw.include = Some(Some(include));
+        self
+    }
+
+    #[must_use]
+    pub fn include_null(mut self) -> Self {
+        self.raw.include = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation(mut self, requires_confirmation: Vec<String>) -> Self {
+        self.raw.requires_confirmation = Some(Some(requires_confirmation));
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation_null(mut self) -> Self {
+        self.raw.requires_confirmation = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ToolConfiguration {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ToolConfiguration {
+        self.raw
+    }
+}
+
+impl From<ToolConfiguration>
+    for StartBetaConversationsRequestToolsImageGenerationToolToolConfiguration
+{
+    fn from(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartBetaConversationsRequestToolsImageGenerationToolToolConfiguration>
+    for ToolConfiguration
+{
+    fn from(value: StartBetaConversationsRequestToolsImageGenerationToolToolConfiguration) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for StartBetaConversationsRequestToolsImageGenerationToolToolConfiguration {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartBetaConversationsRequestToolsWebSearchPremiumTool {
+    raw: WebSearchPremiumTool,
+}
+
+impl StartBetaConversationsRequestToolsWebSearchPremiumTool {
+    pub fn new() -> Self {
+        Self {
+            raw: WebSearchPremiumTool {
+                tool_configuration: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn tool_configuration(
+        mut self,
+        tool_configuration: impl Into<
+            StartBetaConversationsRequestToolsWebSearchPremiumToolToolConfiguration,
+        >,
+    ) -> Self {
+        self.raw.tool_configuration = Some(Some(
+            Into::<StartBetaConversationsRequestToolsWebSearchPremiumToolToolConfiguration>::into(
+                tool_configuration,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn tool_configuration_null(mut self) -> Self {
+        self.raw.tool_configuration = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: WebSearchPremiumToolType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: WebSearchPremiumTool) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &WebSearchPremiumTool {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WebSearchPremiumTool {
+        self.raw
+    }
+}
+
+impl From<WebSearchPremiumTool> for StartBetaConversationsRequestToolsWebSearchPremiumTool {
+    fn from(raw: WebSearchPremiumTool) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartBetaConversationsRequestToolsWebSearchPremiumTool> for WebSearchPremiumTool {
+    fn from(value: StartBetaConversationsRequestToolsWebSearchPremiumTool) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for StartBetaConversationsRequestToolsWebSearchPremiumTool {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartBetaConversationsRequestToolsWebSearchPremiumToolToolConfiguration {
+    raw: ToolConfiguration,
+}
+
+impl StartBetaConversationsRequestToolsWebSearchPremiumToolToolConfiguration {
+    pub fn new() -> Self {
+        Self {
+            raw: ToolConfiguration {
+                exclude: None,
+                include: None,
+                requires_confirmation: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn exclude(mut self, exclude: Vec<String>) -> Self {
+        self.raw.exclude = Some(Some(exclude));
+        self
+    }
+
+    #[must_use]
+    pub fn exclude_null(mut self) -> Self {
+        self.raw.exclude = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn include(mut self, include: Vec<String>) -> Self {
+        self.raw.include = Some(Some(include));
+        self
+    }
+
+    #[must_use]
+    pub fn include_null(mut self) -> Self {
+        self.raw.include = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation(mut self, requires_confirmation: Vec<String>) -> Self {
+        self.raw.requires_confirmation = Some(Some(requires_confirmation));
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation_null(mut self) -> Self {
+        self.raw.requires_confirmation = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ToolConfiguration {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ToolConfiguration {
+        self.raw
+    }
+}
+
+impl From<ToolConfiguration>
+    for StartBetaConversationsRequestToolsWebSearchPremiumToolToolConfiguration
+{
+    fn from(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartBetaConversationsRequestToolsWebSearchPremiumToolToolConfiguration>
+    for ToolConfiguration
+{
+    fn from(
+        value: StartBetaConversationsRequestToolsWebSearchPremiumToolToolConfiguration,
+    ) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for StartBetaConversationsRequestToolsWebSearchPremiumToolToolConfiguration {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartBetaConversationsRequestToolsWebSearchTool {
+    raw: WebSearchTool,
+}
+
+impl StartBetaConversationsRequestToolsWebSearchTool {
+    pub fn new() -> Self {
+        Self {
+            raw: WebSearchTool {
+                tool_configuration: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn tool_configuration(
+        mut self,
+        tool_configuration: impl Into<StartBetaConversationsRequestToolsWebSearchToolToolConfiguration>,
+    ) -> Self {
+        self.raw.tool_configuration = Some(Some(
+            Into::<StartBetaConversationsRequestToolsWebSearchToolToolConfiguration>::into(
+                tool_configuration,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn tool_configuration_null(mut self) -> Self {
+        self.raw.tool_configuration = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: WebSearchToolType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: WebSearchTool) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &WebSearchTool {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WebSearchTool {
+        self.raw
+    }
+}
+
+impl From<WebSearchTool> for StartBetaConversationsRequestToolsWebSearchTool {
+    fn from(raw: WebSearchTool) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartBetaConversationsRequestToolsWebSearchTool> for WebSearchTool {
+    fn from(value: StartBetaConversationsRequestToolsWebSearchTool) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for StartBetaConversationsRequestToolsWebSearchTool {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartBetaConversationsRequestToolsWebSearchToolToolConfiguration {
+    raw: ToolConfiguration,
+}
+
+impl StartBetaConversationsRequestToolsWebSearchToolToolConfiguration {
+    pub fn new() -> Self {
+        Self {
+            raw: ToolConfiguration {
+                exclude: None,
+                include: None,
+                requires_confirmation: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn exclude(mut self, exclude: Vec<String>) -> Self {
+        self.raw.exclude = Some(Some(exclude));
+        self
+    }
+
+    #[must_use]
+    pub fn exclude_null(mut self) -> Self {
+        self.raw.exclude = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn include(mut self, include: Vec<String>) -> Self {
+        self.raw.include = Some(Some(include));
+        self
+    }
+
+    #[must_use]
+    pub fn include_null(mut self) -> Self {
+        self.raw.include = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation(mut self, requires_confirmation: Vec<String>) -> Self {
+        self.raw.requires_confirmation = Some(Some(requires_confirmation));
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation_null(mut self) -> Self {
+        self.raw.requires_confirmation = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ToolConfiguration {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ToolConfiguration {
+        self.raw
+    }
+}
+
+impl From<ToolConfiguration> for StartBetaConversationsRequestToolsWebSearchToolToolConfiguration {
+    fn from(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartBetaConversationsRequestToolsWebSearchToolToolConfiguration> for ToolConfiguration {
+    fn from(value: StartBetaConversationsRequestToolsWebSearchToolToolConfiguration) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for StartBetaConversationsRequestToolsWebSearchToolToolConfiguration {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartBetaConversationsResponse {
+    raw: ConversationResponse,
+}
+
+impl StartBetaConversationsResponse {
+    pub fn raw(&self) -> &ConversationResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ConversationResponse {
+        self.raw
+    }
+}
+
+impl From<ConversationResponse> for StartBetaConversationsResponse {
+    fn from(raw: ConversationResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartBetaConversationsResponse> for ConversationResponse {
+    fn from(value: StartBetaConversationsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartDeploymentWorkflowsDeploymentsResponse {
+    raw: ManagedDeploymentResponse,
+}
+
+impl StartDeploymentWorkflowsDeploymentsResponse {
+    pub fn raw(&self) -> &ManagedDeploymentResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ManagedDeploymentResponse {
+        self.raw
+    }
+}
+
+impl From<ManagedDeploymentResponse> for StartDeploymentWorkflowsDeploymentsResponse {
+    fn from(raw: ManagedDeploymentResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartDeploymentWorkflowsDeploymentsResponse> for ManagedDeploymentResponse {
+    fn from(value: StartDeploymentWorkflowsDeploymentsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartStreamBetaConversationsRequest {
+    raw: ConversationStreamRequest,
+}
+
+impl StartStreamBetaConversationsRequest {
+    pub fn new(inputs: ConversationInputs) -> Self {
+        Self {
+            raw: ConversationStreamRequest {
+                agent_id: None,
+                agent_version: None,
+                completion_args: None,
+                description: None,
+                guardrails: None,
+                handoff_execution: None,
+                inputs,
+                instructions: None,
+                metadata: None,
+                model: None,
+                name: None,
+                store: None,
+                stream: None,
+                tools: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn agent_id(mut self, agent_id: impl Into<String>) -> Self {
+        self.raw.agent_id = Some(Some(agent_id.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn agent_id_null(mut self) -> Self {
+        self.raw.agent_id = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn agent_version(mut self, agent_version: ConversationRequestBaseAgentVersion) -> Self {
+        self.raw.agent_version = Some(Some(agent_version));
+        self
+    }
+
+    #[must_use]
+    pub fn agent_version_null(mut self) -> Self {
+        self.raw.agent_version = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn completion_args(
+        mut self,
+        completion_args: impl Into<StartStreamBetaConversationsRequestCompletionArgs>,
+    ) -> Self {
+        self.raw.completion_args = Some(Some(
+            Into::<StartStreamBetaConversationsRequestCompletionArgs>::into(completion_args).into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn completion_args_null(mut self) -> Self {
+        self.raw.completion_args = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.raw.description = Some(Some(description.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn description_null(mut self) -> Self {
+        self.raw.description = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn guardrails(mut self, guardrails: Vec<GuardrailConfig>) -> Self {
+        self.raw.guardrails = Some(Some(guardrails));
+        self
+    }
+
+    #[must_use]
+    pub fn guardrails_null(mut self) -> Self {
+        self.raw.guardrails = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn handoff_execution(
+        mut self,
+        handoff_execution: ConversationRequestBaseHandoffExecution,
+    ) -> Self {
+        self.raw.handoff_execution = Some(Some(handoff_execution));
+        self
+    }
+
+    #[must_use]
+    pub fn handoff_execution_null(mut self) -> Self {
+        self.raw.handoff_execution = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn instructions(mut self, instructions: impl Into<String>) -> Self {
+        self.raw.instructions = Some(Some(instructions.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn instructions_null(mut self) -> Self {
+        self.raw.instructions = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn metadata(mut self, metadata: MetadataDict) -> Self {
+        self.raw.metadata = Some(Some(metadata));
+        self
+    }
+
+    #[must_use]
+    pub fn metadata_null(mut self) -> Self {
+        self.raw.metadata = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn model(mut self, model: impl Into<String>) -> Self {
+        self.raw.model = Some(Some(model.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn model_null(mut self) -> Self {
+        self.raw.model = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn name(mut self, name: impl Into<String>) -> Self {
+        self.raw.name = Some(Some(name.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn name_null(mut self) -> Self {
+        self.raw.name = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn store(mut self, store: bool) -> Self {
+        self.raw.store = Some(Some(store));
+        self
+    }
+
+    #[must_use]
+    pub fn store_null(mut self) -> Self {
+        self.raw.store = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn tools(
+        mut self,
+        tools: impl IntoIterator<Item = StartStreamBetaConversationsRequestTools>,
+    ) -> Self {
+        self.raw.tools = Some(Some(tools.into_iter().map(Into::into).collect()));
+        self
+    }
+
+    #[must_use]
+    pub fn tools_null(mut self) -> Self {
+        self.raw.tools = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ConversationStreamRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ConversationStreamRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ConversationStreamRequest {
+        self.raw
+    }
+}
+
+impl From<ConversationStreamRequest> for StartStreamBetaConversationsRequest {
+    fn from(raw: ConversationStreamRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartStreamBetaConversationsRequest> for ConversationStreamRequest {
+    fn from(value: StartStreamBetaConversationsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartStreamBetaConversationsRequestCompletionArgs {
+    raw: CompletionArgs,
+}
+
+impl StartStreamBetaConversationsRequestCompletionArgs {
+    pub fn new() -> Self {
+        Self {
+            raw: CompletionArgs {
+                frequency_penalty: None,
+                max_tokens: None,
+                prediction: None,
+                presence_penalty: None,
+                random_seed: None,
+                reasoning_effort: None,
+                response_format: None,
+                stop: None,
+                temperature: None,
+                tool_choice: None,
+                top_p: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn frequency_penalty(mut self, frequency_penalty: f64) -> Self {
+        self.raw.frequency_penalty = Some(Some(frequency_penalty));
+        self
+    }
+
+    #[must_use]
+    pub fn frequency_penalty_null(mut self) -> Self {
+        self.raw.frequency_penalty = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn max_tokens(mut self, max_tokens: i64) -> Self {
+        self.raw.max_tokens = Some(Some(max_tokens));
+        self
+    }
+
+    #[must_use]
+    pub fn max_tokens_null(mut self) -> Self {
+        self.raw.max_tokens = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn prediction(
+        mut self,
+        prediction: impl Into<StartStreamBetaConversationsRequestCompletionArgsPrediction>,
+    ) -> Self {
+        self.raw.prediction = Some(Some(
+            Into::<StartStreamBetaConversationsRequestCompletionArgsPrediction>::into(prediction)
+                .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn prediction_null(mut self) -> Self {
+        self.raw.prediction = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn presence_penalty(mut self, presence_penalty: f64) -> Self {
+        self.raw.presence_penalty = Some(Some(presence_penalty));
+        self
+    }
+
+    #[must_use]
+    pub fn presence_penalty_null(mut self) -> Self {
+        self.raw.presence_penalty = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn random_seed(mut self, random_seed: i64) -> Self {
+        self.raw.random_seed = Some(Some(random_seed));
+        self
+    }
+
+    #[must_use]
+    pub fn random_seed_null(mut self) -> Self {
+        self.raw.random_seed = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn reasoning_effort(mut self, reasoning_effort: ReasoningEffort) -> Self {
+        self.raw.reasoning_effort = Some(Some(reasoning_effort));
+        self
+    }
+
+    #[must_use]
+    pub fn reasoning_effort_null(mut self) -> Self {
+        self.raw.reasoning_effort = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn response_format(
+        mut self,
+        response_format: impl Into<StartStreamBetaConversationsRequestCompletionArgsResponseFormat>,
+    ) -> Self {
+        self.raw.response_format = Some(Some(
+            Into::<StartStreamBetaConversationsRequestCompletionArgsResponseFormat>::into(
+                response_format,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn response_format_null(mut self) -> Self {
+        self.raw.response_format = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn stop(mut self, stop: CompletionArgsStop) -> Self {
+        self.raw.stop = Some(Some(stop));
+        self
+    }
+
+    #[must_use]
+    pub fn stop_null(mut self) -> Self {
+        self.raw.stop = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn temperature(mut self, temperature: f64) -> Self {
+        self.raw.temperature = Some(Some(temperature));
+        self
+    }
+
+    #[must_use]
+    pub fn temperature_null(mut self) -> Self {
+        self.raw.temperature = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn tool_choice(mut self, tool_choice: ToolChoiceEnum) -> Self {
+        self.raw.tool_choice = Some(tool_choice);
+        self
+    }
+
+    #[must_use]
+    pub fn top_p(mut self, top_p: f64) -> Self {
+        self.raw.top_p = Some(Some(top_p));
+        self
+    }
+
+    #[must_use]
+    pub fn top_p_null(mut self) -> Self {
+        self.raw.top_p = Some(None);
+        self
+    }
+    pub fn from_raw(raw: CompletionArgs) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &CompletionArgs {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CompletionArgs {
+        self.raw
+    }
+}
+
+impl From<CompletionArgs> for StartStreamBetaConversationsRequestCompletionArgs {
+    fn from(raw: CompletionArgs) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartStreamBetaConversationsRequestCompletionArgs> for CompletionArgs {
+    fn from(value: StartStreamBetaConversationsRequestCompletionArgs) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for StartStreamBetaConversationsRequestCompletionArgs {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartStreamBetaConversationsRequestCompletionArgsPrediction {
+    raw: Prediction,
+}
+
+impl StartStreamBetaConversationsRequestCompletionArgsPrediction {
+    pub fn new() -> Self {
+        Self {
+            raw: Prediction {
+                content: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn content(mut self, content: impl Into<String>) -> Self {
+        self.raw.content = Some(content.into());
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: PredictionType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: Prediction) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &Prediction {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Prediction {
+        self.raw
+    }
+}
+
+impl From<Prediction> for StartStreamBetaConversationsRequestCompletionArgsPrediction {
+    fn from(raw: Prediction) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartStreamBetaConversationsRequestCompletionArgsPrediction> for Prediction {
+    fn from(value: StartStreamBetaConversationsRequestCompletionArgsPrediction) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for StartStreamBetaConversationsRequestCompletionArgsPrediction {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartStreamBetaConversationsRequestCompletionArgsResponseFormat {
+    raw: ResponseFormat,
+}
+
+impl StartStreamBetaConversationsRequestCompletionArgsResponseFormat {
+    pub fn new() -> Self {
+        Self {
+            raw: ResponseFormat {
+                json_schema: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn json_schema(
+        mut self,
+        json_schema: impl Into<
+            StartStreamBetaConversationsRequestCompletionArgsResponseFormatJsonSchema,
+        >,
+    ) -> Self {
+        self.raw.json_schema = Some(Some(Into::<StartStreamBetaConversationsRequestCompletionArgsResponseFormatJsonSchema>::into(json_schema).into()));
+        self
+    }
+
+    #[must_use]
+    pub fn json_schema_null(mut self) -> Self {
+        self.raw.json_schema = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: ResponseFormats) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: ResponseFormat) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ResponseFormat {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ResponseFormat {
+        self.raw
+    }
+}
+
+impl From<ResponseFormat> for StartStreamBetaConversationsRequestCompletionArgsResponseFormat {
+    fn from(raw: ResponseFormat) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartStreamBetaConversationsRequestCompletionArgsResponseFormat> for ResponseFormat {
+    fn from(value: StartStreamBetaConversationsRequestCompletionArgsResponseFormat) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for StartStreamBetaConversationsRequestCompletionArgsResponseFormat {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartStreamBetaConversationsRequestCompletionArgsResponseFormatJsonSchema {
+    raw: JsonSchema,
+}
+
+impl StartStreamBetaConversationsRequestCompletionArgsResponseFormatJsonSchema {
+    pub fn new(name: impl Into<String>, schema: JsonSchemaSchema) -> Self {
+        Self {
+            raw: JsonSchema {
+                description: None,
+                name: name.into(),
+                schema,
+                strict: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.raw.description = Some(Some(description.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn description_null(mut self) -> Self {
+        self.raw.description = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn strict(mut self, strict: bool) -> Self {
+        self.raw.strict = Some(strict);
+        self
+    }
+    pub fn from_raw(raw: JsonSchema) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &JsonSchema {
+        &self.raw
+    }
+    pub fn into_raw(self) -> JsonSchema {
+        self.raw
+    }
+}
+
+impl From<JsonSchema>
+    for StartStreamBetaConversationsRequestCompletionArgsResponseFormatJsonSchema
+{
+    fn from(raw: JsonSchema) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartStreamBetaConversationsRequestCompletionArgsResponseFormatJsonSchema>
+    for JsonSchema
+{
+    fn from(
+        value: StartStreamBetaConversationsRequestCompletionArgsResponseFormatJsonSchema,
+    ) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub enum StartStreamBetaConversationsRequestTools {
+    CodeInterpreterTool(StartStreamBetaConversationsRequestToolsCodeInterpreterTool),
+    CustomConnector(StartStreamBetaConversationsRequestToolsCustomConnector),
+    DocumentLibraryTool(StartStreamBetaConversationsRequestToolsDocumentLibraryTool),
+    FunctionTool(StartStreamBetaConversationsRequestToolsFunctionTool),
+    ImageGenerationTool(StartStreamBetaConversationsRequestToolsImageGenerationTool),
+    WebSearchPremiumTool(StartStreamBetaConversationsRequestToolsWebSearchPremiumTool),
+    WebSearchTool(StartStreamBetaConversationsRequestToolsWebSearchTool),
+}
+
+impl From<StartStreamBetaConversationsRequestToolsCodeInterpreterTool>
+    for StartStreamBetaConversationsRequestTools
+{
+    fn from(value: StartStreamBetaConversationsRequestToolsCodeInterpreterTool) -> Self {
+        Self::CodeInterpreterTool(value)
+    }
+}
+
+impl From<StartStreamBetaConversationsRequestToolsCustomConnector>
+    for StartStreamBetaConversationsRequestTools
+{
+    fn from(value: StartStreamBetaConversationsRequestToolsCustomConnector) -> Self {
+        Self::CustomConnector(value)
+    }
+}
+
+impl From<StartStreamBetaConversationsRequestToolsDocumentLibraryTool>
+    for StartStreamBetaConversationsRequestTools
+{
+    fn from(value: StartStreamBetaConversationsRequestToolsDocumentLibraryTool) -> Self {
+        Self::DocumentLibraryTool(value)
+    }
+}
+
+impl From<StartStreamBetaConversationsRequestToolsFunctionTool>
+    for StartStreamBetaConversationsRequestTools
+{
+    fn from(value: StartStreamBetaConversationsRequestToolsFunctionTool) -> Self {
+        Self::FunctionTool(value)
+    }
+}
+
+impl From<StartStreamBetaConversationsRequestToolsImageGenerationTool>
+    for StartStreamBetaConversationsRequestTools
+{
+    fn from(value: StartStreamBetaConversationsRequestToolsImageGenerationTool) -> Self {
+        Self::ImageGenerationTool(value)
+    }
+}
+
+impl From<StartStreamBetaConversationsRequestToolsWebSearchPremiumTool>
+    for StartStreamBetaConversationsRequestTools
+{
+    fn from(value: StartStreamBetaConversationsRequestToolsWebSearchPremiumTool) -> Self {
+        Self::WebSearchPremiumTool(value)
+    }
+}
+
+impl From<StartStreamBetaConversationsRequestToolsWebSearchTool>
+    for StartStreamBetaConversationsRequestTools
+{
+    fn from(value: StartStreamBetaConversationsRequestToolsWebSearchTool) -> Self {
+        Self::WebSearchTool(value)
+    }
+}
+
+impl From<StartStreamBetaConversationsRequestTools> for ConversationRequestBaseToolsItemUnion {
+    fn from(value: StartStreamBetaConversationsRequestTools) -> Self {
+        match value {
+            StartStreamBetaConversationsRequestTools::CodeInterpreterTool(value) => {
+                Self::CodeInterpreterTool(value.into())
+            }
+            StartStreamBetaConversationsRequestTools::CustomConnector(value) => {
+                Self::CustomConnector(value.into())
+            }
+            StartStreamBetaConversationsRequestTools::DocumentLibraryTool(value) => {
+                Self::DocumentLibraryTool(value.into())
+            }
+            StartStreamBetaConversationsRequestTools::FunctionTool(value) => {
+                Self::FunctionTool(value.into())
+            }
+            StartStreamBetaConversationsRequestTools::ImageGenerationTool(value) => {
+                Self::ImageGenerationTool(value.into())
+            }
+            StartStreamBetaConversationsRequestTools::WebSearchPremiumTool(value) => {
+                Self::WebSearchPremiumTool(value.into())
+            }
+            StartStreamBetaConversationsRequestTools::WebSearchTool(value) => {
+                Self::WebSearchTool(value.into())
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartStreamBetaConversationsRequestToolsCodeInterpreterTool {
+    raw: CodeInterpreterTool,
+}
+
+impl StartStreamBetaConversationsRequestToolsCodeInterpreterTool {
+    pub fn new() -> Self {
+        Self {
+            raw: CodeInterpreterTool {
+                tool_configuration: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn tool_configuration(
+        mut self,
+        tool_configuration: impl Into<
+            StartStreamBetaConversationsRequestToolsCodeInterpreterToolToolConfiguration,
+        >,
+    ) -> Self {
+        self.raw.tool_configuration = Some(Some(Into::<StartStreamBetaConversationsRequestToolsCodeInterpreterToolToolConfiguration>::into(tool_configuration).into()));
+        self
+    }
+
+    #[must_use]
+    pub fn tool_configuration_null(mut self) -> Self {
+        self.raw.tool_configuration = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: CodeInterpreterToolType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: CodeInterpreterTool) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &CodeInterpreterTool {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CodeInterpreterTool {
+        self.raw
+    }
+}
+
+impl From<CodeInterpreterTool> for StartStreamBetaConversationsRequestToolsCodeInterpreterTool {
+    fn from(raw: CodeInterpreterTool) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartStreamBetaConversationsRequestToolsCodeInterpreterTool> for CodeInterpreterTool {
+    fn from(value: StartStreamBetaConversationsRequestToolsCodeInterpreterTool) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for StartStreamBetaConversationsRequestToolsCodeInterpreterTool {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartStreamBetaConversationsRequestToolsCodeInterpreterToolToolConfiguration {
+    raw: ToolConfiguration,
+}
+
+impl StartStreamBetaConversationsRequestToolsCodeInterpreterToolToolConfiguration {
+    pub fn new() -> Self {
+        Self {
+            raw: ToolConfiguration {
+                exclude: None,
+                include: None,
+                requires_confirmation: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn exclude(mut self, exclude: Vec<String>) -> Self {
+        self.raw.exclude = Some(Some(exclude));
+        self
+    }
+
+    #[must_use]
+    pub fn exclude_null(mut self) -> Self {
+        self.raw.exclude = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn include(mut self, include: Vec<String>) -> Self {
+        self.raw.include = Some(Some(include));
+        self
+    }
+
+    #[must_use]
+    pub fn include_null(mut self) -> Self {
+        self.raw.include = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation(mut self, requires_confirmation: Vec<String>) -> Self {
+        self.raw.requires_confirmation = Some(Some(requires_confirmation));
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation_null(mut self) -> Self {
+        self.raw.requires_confirmation = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ToolConfiguration {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ToolConfiguration {
+        self.raw
+    }
+}
+
+impl From<ToolConfiguration>
+    for StartStreamBetaConversationsRequestToolsCodeInterpreterToolToolConfiguration
+{
+    fn from(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartStreamBetaConversationsRequestToolsCodeInterpreterToolToolConfiguration>
+    for ToolConfiguration
+{
+    fn from(
+        value: StartStreamBetaConversationsRequestToolsCodeInterpreterToolToolConfiguration,
+    ) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for StartStreamBetaConversationsRequestToolsCodeInterpreterToolToolConfiguration {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartStreamBetaConversationsRequestToolsCustomConnector {
+    raw: CustomConnector,
+}
+
+impl StartStreamBetaConversationsRequestToolsCustomConnector {
+    pub fn new(connector_id: impl Into<String>) -> Self {
+        Self {
+            raw: CustomConnector {
+                authorization: None,
+                connector_id: connector_id.into(),
+                tool_configuration: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn authorization(
+        mut self,
+        authorization: impl Into<StartStreamBetaConversationsRequestToolsCustomConnectorAuthorization>,
+    ) -> Self {
+        self.raw.authorization = Some(Some(
+            Into::<StartStreamBetaConversationsRequestToolsCustomConnectorAuthorization>::into(
+                authorization,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn authorization_null(mut self) -> Self {
+        self.raw.authorization = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn tool_configuration(
+        mut self,
+        tool_configuration: impl Into<
+            StartStreamBetaConversationsRequestToolsCustomConnectorToolConfiguration,
+        >,
+    ) -> Self {
+        self.raw.tool_configuration = Some(Some(
+            Into::<StartStreamBetaConversationsRequestToolsCustomConnectorToolConfiguration>::into(
+                tool_configuration,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn tool_configuration_null(mut self) -> Self {
+        self.raw.tool_configuration = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: CustomConnectorType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: CustomConnector) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &CustomConnector {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CustomConnector {
+        self.raw
+    }
+}
+
+impl From<CustomConnector> for StartStreamBetaConversationsRequestToolsCustomConnector {
+    fn from(raw: CustomConnector) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartStreamBetaConversationsRequestToolsCustomConnector> for CustomConnector {
+    fn from(value: StartStreamBetaConversationsRequestToolsCustomConnector) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub enum StartStreamBetaConversationsRequestToolsCustomConnectorAuthorization {
+    APIKeyAuth(StartStreamBetaConversationsRequestToolsCustomConnectorAuthorizationAPIKeyAuth),
+    OAuth2TokenAuth(
+        StartStreamBetaConversationsRequestToolsCustomConnectorAuthorizationOAuth2TokenAuth,
+    ),
+}
+
+impl From<StartStreamBetaConversationsRequestToolsCustomConnectorAuthorizationAPIKeyAuth>
+    for StartStreamBetaConversationsRequestToolsCustomConnectorAuthorization
+{
+    fn from(
+        value: StartStreamBetaConversationsRequestToolsCustomConnectorAuthorizationAPIKeyAuth,
+    ) -> Self {
+        Self::APIKeyAuth(value)
+    }
+}
+
+impl From<StartStreamBetaConversationsRequestToolsCustomConnectorAuthorizationOAuth2TokenAuth>
+    for StartStreamBetaConversationsRequestToolsCustomConnectorAuthorization
+{
+    fn from(
+        value: StartStreamBetaConversationsRequestToolsCustomConnectorAuthorizationOAuth2TokenAuth,
+    ) -> Self {
+        Self::OAuth2TokenAuth(value)
+    }
+}
+
+impl From<StartStreamBetaConversationsRequestToolsCustomConnectorAuthorization>
+    for CustomConnectorAuthorizationInline
+{
+    fn from(value: StartStreamBetaConversationsRequestToolsCustomConnectorAuthorization) -> Self {
+        match value {
+        StartStreamBetaConversationsRequestToolsCustomConnectorAuthorization::APIKeyAuth(value) => Self::APIKeyAuth(value.into()),StartStreamBetaConversationsRequestToolsCustomConnectorAuthorization::OAuth2TokenAuth(value) => Self::OAuth2TokenAuth(value.into())
+    }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartStreamBetaConversationsRequestToolsCustomConnectorAuthorizationAPIKeyAuth {
+    raw: APIKeyAuth,
+}
+
+impl StartStreamBetaConversationsRequestToolsCustomConnectorAuthorizationAPIKeyAuth {
+    pub fn new(value: impl Into<String>) -> Self {
+        Self {
+            raw: APIKeyAuth {
+                r#type: None,
+                value: value.into(),
+            },
+        }
+    }
+    #[must_use]
+    pub fn r#type(mut self, r#type: APIKeyAuthType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: APIKeyAuth) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &APIKeyAuth {
+        &self.raw
+    }
+    pub fn into_raw(self) -> APIKeyAuth {
+        self.raw
+    }
+}
+
+impl From<APIKeyAuth>
+    for StartStreamBetaConversationsRequestToolsCustomConnectorAuthorizationAPIKeyAuth
+{
+    fn from(raw: APIKeyAuth) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartStreamBetaConversationsRequestToolsCustomConnectorAuthorizationAPIKeyAuth>
+    for APIKeyAuth
+{
+    fn from(
+        value: StartStreamBetaConversationsRequestToolsCustomConnectorAuthorizationAPIKeyAuth,
+    ) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartStreamBetaConversationsRequestToolsCustomConnectorAuthorizationOAuth2TokenAuth {
+    raw: OAuth2TokenAuth,
+}
+
+impl StartStreamBetaConversationsRequestToolsCustomConnectorAuthorizationOAuth2TokenAuth {
+    pub fn new(value: impl Into<String>) -> Self {
+        Self {
+            raw: OAuth2TokenAuth {
+                r#type: None,
+                value: value.into(),
+            },
+        }
+    }
+    #[must_use]
+    pub fn r#type(mut self, r#type: OAuth2TokenAuthType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: OAuth2TokenAuth) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &OAuth2TokenAuth {
+        &self.raw
+    }
+    pub fn into_raw(self) -> OAuth2TokenAuth {
+        self.raw
+    }
+}
+
+impl From<OAuth2TokenAuth>
+    for StartStreamBetaConversationsRequestToolsCustomConnectorAuthorizationOAuth2TokenAuth
+{
+    fn from(raw: OAuth2TokenAuth) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartStreamBetaConversationsRequestToolsCustomConnectorAuthorizationOAuth2TokenAuth>
+    for OAuth2TokenAuth
+{
+    fn from(
+        value: StartStreamBetaConversationsRequestToolsCustomConnectorAuthorizationOAuth2TokenAuth,
+    ) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartStreamBetaConversationsRequestToolsCustomConnectorToolConfiguration {
+    raw: ToolConfiguration,
+}
+
+impl StartStreamBetaConversationsRequestToolsCustomConnectorToolConfiguration {
+    pub fn new() -> Self {
+        Self {
+            raw: ToolConfiguration {
+                exclude: None,
+                include: None,
+                requires_confirmation: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn exclude(mut self, exclude: Vec<String>) -> Self {
+        self.raw.exclude = Some(Some(exclude));
+        self
+    }
+
+    #[must_use]
+    pub fn exclude_null(mut self) -> Self {
+        self.raw.exclude = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn include(mut self, include: Vec<String>) -> Self {
+        self.raw.include = Some(Some(include));
+        self
+    }
+
+    #[must_use]
+    pub fn include_null(mut self) -> Self {
+        self.raw.include = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation(mut self, requires_confirmation: Vec<String>) -> Self {
+        self.raw.requires_confirmation = Some(Some(requires_confirmation));
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation_null(mut self) -> Self {
+        self.raw.requires_confirmation = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ToolConfiguration {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ToolConfiguration {
+        self.raw
+    }
+}
+
+impl From<ToolConfiguration>
+    for StartStreamBetaConversationsRequestToolsCustomConnectorToolConfiguration
+{
+    fn from(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartStreamBetaConversationsRequestToolsCustomConnectorToolConfiguration>
+    for ToolConfiguration
+{
+    fn from(
+        value: StartStreamBetaConversationsRequestToolsCustomConnectorToolConfiguration,
+    ) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for StartStreamBetaConversationsRequestToolsCustomConnectorToolConfiguration {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartStreamBetaConversationsRequestToolsDocumentLibraryTool {
+    raw: DocumentLibraryTool,
+}
+
+impl StartStreamBetaConversationsRequestToolsDocumentLibraryTool {
+    pub fn new(library_ids: Vec<String>) -> Self {
+        Self {
+            raw: DocumentLibraryTool {
+                library_ids,
+                tool_configuration: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn tool_configuration(
+        mut self,
+        tool_configuration: impl Into<
+            StartStreamBetaConversationsRequestToolsDocumentLibraryToolToolConfiguration,
+        >,
+    ) -> Self {
+        self.raw.tool_configuration = Some(Some(Into::<StartStreamBetaConversationsRequestToolsDocumentLibraryToolToolConfiguration>::into(tool_configuration).into()));
+        self
+    }
+
+    #[must_use]
+    pub fn tool_configuration_null(mut self) -> Self {
+        self.raw.tool_configuration = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: DocumentLibraryToolType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: DocumentLibraryTool) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &DocumentLibraryTool {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DocumentLibraryTool {
+        self.raw
+    }
+}
+
+impl From<DocumentLibraryTool> for StartStreamBetaConversationsRequestToolsDocumentLibraryTool {
+    fn from(raw: DocumentLibraryTool) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartStreamBetaConversationsRequestToolsDocumentLibraryTool> for DocumentLibraryTool {
+    fn from(value: StartStreamBetaConversationsRequestToolsDocumentLibraryTool) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartStreamBetaConversationsRequestToolsDocumentLibraryToolToolConfiguration {
+    raw: ToolConfiguration,
+}
+
+impl StartStreamBetaConversationsRequestToolsDocumentLibraryToolToolConfiguration {
+    pub fn new() -> Self {
+        Self {
+            raw: ToolConfiguration {
+                exclude: None,
+                include: None,
+                requires_confirmation: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn exclude(mut self, exclude: Vec<String>) -> Self {
+        self.raw.exclude = Some(Some(exclude));
+        self
+    }
+
+    #[must_use]
+    pub fn exclude_null(mut self) -> Self {
+        self.raw.exclude = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn include(mut self, include: Vec<String>) -> Self {
+        self.raw.include = Some(Some(include));
+        self
+    }
+
+    #[must_use]
+    pub fn include_null(mut self) -> Self {
+        self.raw.include = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation(mut self, requires_confirmation: Vec<String>) -> Self {
+        self.raw.requires_confirmation = Some(Some(requires_confirmation));
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation_null(mut self) -> Self {
+        self.raw.requires_confirmation = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ToolConfiguration {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ToolConfiguration {
+        self.raw
+    }
+}
+
+impl From<ToolConfiguration>
+    for StartStreamBetaConversationsRequestToolsDocumentLibraryToolToolConfiguration
+{
+    fn from(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartStreamBetaConversationsRequestToolsDocumentLibraryToolToolConfiguration>
+    for ToolConfiguration
+{
+    fn from(
+        value: StartStreamBetaConversationsRequestToolsDocumentLibraryToolToolConfiguration,
+    ) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for StartStreamBetaConversationsRequestToolsDocumentLibraryToolToolConfiguration {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartStreamBetaConversationsRequestToolsFunctionTool {
+    raw: FunctionTool,
+}
+
+impl StartStreamBetaConversationsRequestToolsFunctionTool {
+    pub fn new(
+        function: impl Into<StartStreamBetaConversationsRequestToolsFunctionToolFunction>,
+    ) -> Self {
+        Self {
+            raw: FunctionTool {
+                function:
+                    Into::<StartStreamBetaConversationsRequestToolsFunctionToolFunction>::into(
+                        function,
+                    )
+                    .into(),
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn r#type(mut self, r#type: FunctionToolType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: FunctionTool) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &FunctionTool {
+        &self.raw
+    }
+    pub fn into_raw(self) -> FunctionTool {
+        self.raw
+    }
+}
+
+impl From<FunctionTool> for StartStreamBetaConversationsRequestToolsFunctionTool {
+    fn from(raw: FunctionTool) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartStreamBetaConversationsRequestToolsFunctionTool> for FunctionTool {
+    fn from(value: StartStreamBetaConversationsRequestToolsFunctionTool) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartStreamBetaConversationsRequestToolsFunctionToolFunction {
+    raw: Function,
+}
+
+impl StartStreamBetaConversationsRequestToolsFunctionToolFunction {
+    pub fn new(name: impl Into<String>, parameters: FunctionParameters) -> Self {
+        Self {
+            raw: Function {
+                description: None,
+                name: name.into(),
+                parameters,
+                strict: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.raw.description = Some(description.into());
+        self
+    }
+
+    #[must_use]
+    pub fn strict(mut self, strict: bool) -> Self {
+        self.raw.strict = Some(strict);
+        self
+    }
+    pub fn from_raw(raw: Function) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &Function {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Function {
+        self.raw
+    }
+}
+
+impl From<Function> for StartStreamBetaConversationsRequestToolsFunctionToolFunction {
+    fn from(raw: Function) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartStreamBetaConversationsRequestToolsFunctionToolFunction> for Function {
+    fn from(value: StartStreamBetaConversationsRequestToolsFunctionToolFunction) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartStreamBetaConversationsRequestToolsImageGenerationTool {
+    raw: ImageGenerationTool,
+}
+
+impl StartStreamBetaConversationsRequestToolsImageGenerationTool {
+    pub fn new() -> Self {
+        Self {
+            raw: ImageGenerationTool {
+                tool_configuration: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn tool_configuration(
+        mut self,
+        tool_configuration: impl Into<
+            StartStreamBetaConversationsRequestToolsImageGenerationToolToolConfiguration,
+        >,
+    ) -> Self {
+        self.raw.tool_configuration = Some(Some(Into::<StartStreamBetaConversationsRequestToolsImageGenerationToolToolConfiguration>::into(tool_configuration).into()));
+        self
+    }
+
+    #[must_use]
+    pub fn tool_configuration_null(mut self) -> Self {
+        self.raw.tool_configuration = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: ImageGenerationToolType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: ImageGenerationTool) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ImageGenerationTool {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ImageGenerationTool {
+        self.raw
+    }
+}
+
+impl From<ImageGenerationTool> for StartStreamBetaConversationsRequestToolsImageGenerationTool {
+    fn from(raw: ImageGenerationTool) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartStreamBetaConversationsRequestToolsImageGenerationTool> for ImageGenerationTool {
+    fn from(value: StartStreamBetaConversationsRequestToolsImageGenerationTool) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for StartStreamBetaConversationsRequestToolsImageGenerationTool {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartStreamBetaConversationsRequestToolsImageGenerationToolToolConfiguration {
+    raw: ToolConfiguration,
+}
+
+impl StartStreamBetaConversationsRequestToolsImageGenerationToolToolConfiguration {
+    pub fn new() -> Self {
+        Self {
+            raw: ToolConfiguration {
+                exclude: None,
+                include: None,
+                requires_confirmation: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn exclude(mut self, exclude: Vec<String>) -> Self {
+        self.raw.exclude = Some(Some(exclude));
+        self
+    }
+
+    #[must_use]
+    pub fn exclude_null(mut self) -> Self {
+        self.raw.exclude = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn include(mut self, include: Vec<String>) -> Self {
+        self.raw.include = Some(Some(include));
+        self
+    }
+
+    #[must_use]
+    pub fn include_null(mut self) -> Self {
+        self.raw.include = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation(mut self, requires_confirmation: Vec<String>) -> Self {
+        self.raw.requires_confirmation = Some(Some(requires_confirmation));
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation_null(mut self) -> Self {
+        self.raw.requires_confirmation = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ToolConfiguration {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ToolConfiguration {
+        self.raw
+    }
+}
+
+impl From<ToolConfiguration>
+    for StartStreamBetaConversationsRequestToolsImageGenerationToolToolConfiguration
+{
+    fn from(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartStreamBetaConversationsRequestToolsImageGenerationToolToolConfiguration>
+    for ToolConfiguration
+{
+    fn from(
+        value: StartStreamBetaConversationsRequestToolsImageGenerationToolToolConfiguration,
+    ) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for StartStreamBetaConversationsRequestToolsImageGenerationToolToolConfiguration {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartStreamBetaConversationsRequestToolsWebSearchPremiumTool {
+    raw: WebSearchPremiumTool,
+}
+
+impl StartStreamBetaConversationsRequestToolsWebSearchPremiumTool {
+    pub fn new() -> Self {
+        Self {
+            raw: WebSearchPremiumTool {
+                tool_configuration: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn tool_configuration(
+        mut self,
+        tool_configuration: impl Into<
+            StartStreamBetaConversationsRequestToolsWebSearchPremiumToolToolConfiguration,
+        >,
+    ) -> Self {
+        self.raw.tool_configuration = Some(Some(Into::<StartStreamBetaConversationsRequestToolsWebSearchPremiumToolToolConfiguration>::into(tool_configuration).into()));
+        self
+    }
+
+    #[must_use]
+    pub fn tool_configuration_null(mut self) -> Self {
+        self.raw.tool_configuration = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: WebSearchPremiumToolType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: WebSearchPremiumTool) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &WebSearchPremiumTool {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WebSearchPremiumTool {
+        self.raw
+    }
+}
+
+impl From<WebSearchPremiumTool> for StartStreamBetaConversationsRequestToolsWebSearchPremiumTool {
+    fn from(raw: WebSearchPremiumTool) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartStreamBetaConversationsRequestToolsWebSearchPremiumTool> for WebSearchPremiumTool {
+    fn from(value: StartStreamBetaConversationsRequestToolsWebSearchPremiumTool) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for StartStreamBetaConversationsRequestToolsWebSearchPremiumTool {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartStreamBetaConversationsRequestToolsWebSearchPremiumToolToolConfiguration {
+    raw: ToolConfiguration,
+}
+
+impl StartStreamBetaConversationsRequestToolsWebSearchPremiumToolToolConfiguration {
+    pub fn new() -> Self {
+        Self {
+            raw: ToolConfiguration {
+                exclude: None,
+                include: None,
+                requires_confirmation: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn exclude(mut self, exclude: Vec<String>) -> Self {
+        self.raw.exclude = Some(Some(exclude));
+        self
+    }
+
+    #[must_use]
+    pub fn exclude_null(mut self) -> Self {
+        self.raw.exclude = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn include(mut self, include: Vec<String>) -> Self {
+        self.raw.include = Some(Some(include));
+        self
+    }
+
+    #[must_use]
+    pub fn include_null(mut self) -> Self {
+        self.raw.include = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation(mut self, requires_confirmation: Vec<String>) -> Self {
+        self.raw.requires_confirmation = Some(Some(requires_confirmation));
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation_null(mut self) -> Self {
+        self.raw.requires_confirmation = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ToolConfiguration {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ToolConfiguration {
+        self.raw
+    }
+}
+
+impl From<ToolConfiguration>
+    for StartStreamBetaConversationsRequestToolsWebSearchPremiumToolToolConfiguration
+{
+    fn from(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartStreamBetaConversationsRequestToolsWebSearchPremiumToolToolConfiguration>
+    for ToolConfiguration
+{
+    fn from(
+        value: StartStreamBetaConversationsRequestToolsWebSearchPremiumToolToolConfiguration,
+    ) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for StartStreamBetaConversationsRequestToolsWebSearchPremiumToolToolConfiguration {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartStreamBetaConversationsRequestToolsWebSearchTool {
+    raw: WebSearchTool,
+}
+
+impl StartStreamBetaConversationsRequestToolsWebSearchTool {
+    pub fn new() -> Self {
+        Self {
+            raw: WebSearchTool {
+                tool_configuration: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn tool_configuration(
+        mut self,
+        tool_configuration: impl Into<
+            StartStreamBetaConversationsRequestToolsWebSearchToolToolConfiguration,
+        >,
+    ) -> Self {
+        self.raw.tool_configuration = Some(Some(
+            Into::<StartStreamBetaConversationsRequestToolsWebSearchToolToolConfiguration>::into(
+                tool_configuration,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn tool_configuration_null(mut self) -> Self {
+        self.raw.tool_configuration = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: WebSearchToolType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: WebSearchTool) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &WebSearchTool {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WebSearchTool {
+        self.raw
+    }
+}
+
+impl From<WebSearchTool> for StartStreamBetaConversationsRequestToolsWebSearchTool {
+    fn from(raw: WebSearchTool) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartStreamBetaConversationsRequestToolsWebSearchTool> for WebSearchTool {
+    fn from(value: StartStreamBetaConversationsRequestToolsWebSearchTool) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for StartStreamBetaConversationsRequestToolsWebSearchTool {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartStreamBetaConversationsRequestToolsWebSearchToolToolConfiguration {
+    raw: ToolConfiguration,
+}
+
+impl StartStreamBetaConversationsRequestToolsWebSearchToolToolConfiguration {
+    pub fn new() -> Self {
+        Self {
+            raw: ToolConfiguration {
+                exclude: None,
+                include: None,
+                requires_confirmation: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn exclude(mut self, exclude: Vec<String>) -> Self {
+        self.raw.exclude = Some(Some(exclude));
+        self
+    }
+
+    #[must_use]
+    pub fn exclude_null(mut self) -> Self {
+        self.raw.exclude = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn include(mut self, include: Vec<String>) -> Self {
+        self.raw.include = Some(Some(include));
+        self
+    }
+
+    #[must_use]
+    pub fn include_null(mut self) -> Self {
+        self.raw.include = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation(mut self, requires_confirmation: Vec<String>) -> Self {
+        self.raw.requires_confirmation = Some(Some(requires_confirmation));
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation_null(mut self) -> Self {
+        self.raw.requires_confirmation = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ToolConfiguration {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ToolConfiguration {
+        self.raw
+    }
+}
+
+impl From<ToolConfiguration>
+    for StartStreamBetaConversationsRequestToolsWebSearchToolToolConfiguration
+{
+    fn from(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartStreamBetaConversationsRequestToolsWebSearchToolToolConfiguration>
+    for ToolConfiguration
+{
+    fn from(value: StartStreamBetaConversationsRequestToolsWebSearchToolToolConfiguration) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for StartStreamBetaConversationsRequestToolsWebSearchToolToolConfiguration {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StartStreamBetaConversationsStreamItem {
+    raw: ConversationEvents,
+}
+
+impl StartStreamBetaConversationsStreamItem {
+    pub fn raw(&self) -> &ConversationEvents {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ConversationEvents {
+        self.raw
+    }
+}
+
+impl From<ConversationEvents> for StartStreamBetaConversationsStreamItem {
+    fn from(raw: ConversationEvents) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StartStreamBetaConversationsStreamItem> for ConversationEvents {
+    fn from(value: StartStreamBetaConversationsStreamItem) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StatusBetaLibrariesDocumentsResponse {
+    raw: ProcessingStatus,
+}
+
+impl StatusBetaLibrariesDocumentsResponse {
+    pub fn raw(&self) -> &ProcessingStatus {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ProcessingStatus {
+        self.raw
+    }
+}
+
+impl From<ProcessingStatus> for StatusBetaLibrariesDocumentsResponse {
+    fn from(raw: ProcessingStatus) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StatusBetaLibrariesDocumentsResponse> for ProcessingStatus {
+    fn from(value: StatusBetaLibrariesDocumentsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StopDeploymentWorkflowsDeploymentsResponse {
+    raw: ManagedDeploymentResponse,
+}
+
+impl StopDeploymentWorkflowsDeploymentsResponse {
+    pub fn raw(&self) -> &ManagedDeploymentResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ManagedDeploymentResponse {
+        self.raw
+    }
+}
+
+impl From<ManagedDeploymentResponse> for StopDeploymentWorkflowsDeploymentsResponse {
+    fn from(raw: ManagedDeploymentResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StopDeploymentWorkflowsDeploymentsResponse> for ManagedDeploymentResponse {
+    fn from(value: StopDeploymentWorkflowsDeploymentsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StreamAgentsRequest {
+    raw: AgentsCompletionRequest,
+}
+
+impl StreamAgentsRequest {
+    pub fn raw(&self) -> &AgentsCompletionRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AgentsCompletionRequest {
+        self.raw
+    }
+}
+
+impl From<AgentsCompletionRequest> for StreamAgentsRequest {
+    fn from(raw: AgentsCompletionRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StreamAgentsRequest> for AgentsCompletionRequest {
+    fn from(value: StreamAgentsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StreamAgentsResponse {
+    raw: ChatCompletionResponse,
+}
+
+impl StreamAgentsResponse {
+    pub fn raw(&self) -> &ChatCompletionResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ChatCompletionResponse {
+        self.raw
+    }
+}
+
+impl From<ChatCompletionResponse> for StreamAgentsResponse {
+    fn from(raw: ChatCompletionResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StreamAgentsResponse> for ChatCompletionResponse {
+    fn from(value: StreamAgentsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StreamAudioTranscriptionsRequest {
+    raw: AudioTranscriptionRequestStream,
+}
+
+impl StreamAudioTranscriptionsRequest {
+    pub fn raw(&self) -> &AudioTranscriptionRequestStream {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AudioTranscriptionRequestStream {
+        self.raw
+    }
+}
+
+impl From<AudioTranscriptionRequestStream> for StreamAudioTranscriptionsRequest {
+    fn from(raw: AudioTranscriptionRequestStream) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StreamAudioTranscriptionsRequest> for AudioTranscriptionRequestStream {
+    fn from(value: StreamAudioTranscriptionsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StreamAudioTranscriptionsStreamItem {
+    raw: TranscriptionStreamEvents,
+}
+
+impl StreamAudioTranscriptionsStreamItem {
+    pub fn raw(&self) -> &TranscriptionStreamEvents {
+        &self.raw
+    }
+    pub fn into_raw(self) -> TranscriptionStreamEvents {
+        self.raw
+    }
+}
+
+impl From<TranscriptionStreamEvents> for StreamAudioTranscriptionsStreamItem {
+    fn from(raw: TranscriptionStreamEvents) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StreamAudioTranscriptionsStreamItem> for TranscriptionStreamEvents {
+    fn from(value: StreamAudioTranscriptionsStreamItem) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StreamChatRequest {
+    raw: ChatCompletionRequest,
+}
+
+impl StreamChatRequest {
+    pub fn raw(&self) -> &ChatCompletionRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ChatCompletionRequest {
+        self.raw
+    }
+}
+
+impl From<ChatCompletionRequest> for StreamChatRequest {
+    fn from(raw: ChatCompletionRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StreamChatRequest> for ChatCompletionRequest {
+    fn from(value: StreamChatRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StreamChatStreamItem {
+    raw: CompletionChunk,
+}
+
+impl StreamChatStreamItem {
+    pub fn raw(&self) -> &CompletionChunk {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CompletionChunk {
+        self.raw
+    }
+}
+
+impl From<CompletionChunk> for StreamChatStreamItem {
+    fn from(raw: CompletionChunk) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StreamChatStreamItem> for CompletionChunk {
+    fn from(value: StreamChatStreamItem) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StreamDeploymentLogsWorkflowsDeploymentsStreamItemDeploymentLogRecord {
+    raw: DeploymentLogRecord,
+}
+
+impl StreamDeploymentLogsWorkflowsDeploymentsStreamItemDeploymentLogRecord {
+    pub fn raw(&self) -> &DeploymentLogRecord {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DeploymentLogRecord {
+        self.raw
+    }
+}
+
+impl From<DeploymentLogRecord>
+    for StreamDeploymentLogsWorkflowsDeploymentsStreamItemDeploymentLogRecord
+{
+    fn from(raw: DeploymentLogRecord) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StreamDeploymentLogsWorkflowsDeploymentsStreamItemDeploymentLogRecord>
+    for DeploymentLogRecord
+{
+    fn from(value: StreamDeploymentLogsWorkflowsDeploymentsStreamItemDeploymentLogRecord) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StreamDeploymentLogsWorkflowsDeploymentsStreamItemStreamError {
+    raw: StreamError,
+}
+
+impl StreamDeploymentLogsWorkflowsDeploymentsStreamItemStreamError {
+    pub fn error(&self) -> &str {
+        &self.raw.error
+    }
+    pub fn reason(&self) -> &str {
+        &self.raw.reason
+    }
+    pub fn raw(&self) -> &StreamError {
+        &self.raw
+    }
+    pub fn into_raw(self) -> StreamError {
+        self.raw
+    }
+}
+
+impl From<StreamError> for StreamDeploymentLogsWorkflowsDeploymentsStreamItemStreamError {
+    fn from(raw: StreamError) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StreamDeploymentLogsWorkflowsDeploymentsStreamItemStreamError> for StreamError {
+    fn from(value: StreamDeploymentLogsWorkflowsDeploymentsStreamItemStreamError) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StreamFimRequest {
+    raw: FIMCompletionRequest,
+}
+
+impl StreamFimRequest {
+    pub fn new(prompt: impl Into<String>, model: impl Into<String>) -> Self {
+        Self {
+            raw: FIMCompletionRequest {
+                max_tokens: None,
+                metadata: None,
+                min_tokens: None,
+                model: model.into(),
+                prompt: prompt.into(),
+                prompt_cache_key: None,
+                random_seed: None,
+                stop: None,
+                stream: None,
+                suffix: None,
+                temperature: None,
+                top_p: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn max_tokens(mut self, max_tokens: i64) -> Self {
+        self.raw.max_tokens = Some(Some(max_tokens));
+        self
+    }
+
+    #[must_use]
+    pub fn max_tokens_null(mut self) -> Self {
+        self.raw.max_tokens = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn metadata(mut self, metadata: FIMCompletionRequestMetadata) -> Self {
+        self.raw.metadata = Some(Some(metadata));
+        self
+    }
+
+    #[must_use]
+    pub fn metadata_null(mut self) -> Self {
+        self.raw.metadata = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn min_tokens(mut self, min_tokens: i64) -> Self {
+        self.raw.min_tokens = Some(Some(min_tokens));
+        self
+    }
+
+    #[must_use]
+    pub fn min_tokens_null(mut self) -> Self {
+        self.raw.min_tokens = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn prompt_cache_key(mut self, prompt_cache_key: impl Into<String>) -> Self {
+        self.raw.prompt_cache_key = Some(Some(prompt_cache_key.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn prompt_cache_key_null(mut self) -> Self {
+        self.raw.prompt_cache_key = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn random_seed(mut self, random_seed: i64) -> Self {
+        self.raw.random_seed = Some(Some(random_seed));
+        self
+    }
+
+    #[must_use]
+    pub fn random_seed_null(mut self) -> Self {
+        self.raw.random_seed = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn stop(mut self, stop: FIMCompletionRequestStop) -> Self {
+        self.raw.stop = Some(Some(stop));
+        self
+    }
+
+    #[must_use]
+    pub fn stop_null(mut self) -> Self {
+        self.raw.stop = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn suffix(mut self, suffix: impl Into<String>) -> Self {
+        self.raw.suffix = Some(Some(suffix.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn suffix_null(mut self) -> Self {
+        self.raw.suffix = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn temperature(mut self, temperature: f64) -> Self {
+        self.raw.temperature = Some(Some(temperature));
+        self
+    }
+
+    #[must_use]
+    pub fn temperature_null(mut self) -> Self {
+        self.raw.temperature = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn top_p(mut self, top_p: f64) -> Self {
+        self.raw.top_p = Some(Some(top_p));
+        self
+    }
+
+    #[must_use]
+    pub fn top_p_null(mut self) -> Self {
+        self.raw.top_p = Some(None);
+        self
+    }
+    pub fn from_raw(raw: FIMCompletionRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &FIMCompletionRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> FIMCompletionRequest {
+        self.raw
+    }
+}
+
+impl From<FIMCompletionRequest> for StreamFimRequest {
+    fn from(raw: FIMCompletionRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StreamFimRequest> for FIMCompletionRequest {
+    fn from(value: StreamFimRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StreamFimStreamItem {
+    raw: CompletionChunk,
+}
+
+impl StreamFimStreamItem {
+    pub fn raw(&self) -> &CompletionChunk {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CompletionChunk {
+        self.raw
+    }
+}
+
+impl From<CompletionChunk> for StreamFimStreamItem {
+    fn from(raw: CompletionChunk) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StreamFimStreamItem> for CompletionChunk {
+    fn from(value: StreamFimStreamItem) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StreamWorkflowExecutionLogsWorkflowsExecutionsStreamItemExecutionLogRecord {
+    raw: ExecutionLogRecord,
+}
+
+impl StreamWorkflowExecutionLogsWorkflowsExecutionsStreamItemExecutionLogRecord {
+    pub fn raw(&self) -> &ExecutionLogRecord {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ExecutionLogRecord {
+        self.raw
+    }
+}
+
+impl From<ExecutionLogRecord>
+    for StreamWorkflowExecutionLogsWorkflowsExecutionsStreamItemExecutionLogRecord
+{
+    fn from(raw: ExecutionLogRecord) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StreamWorkflowExecutionLogsWorkflowsExecutionsStreamItemExecutionLogRecord>
+    for ExecutionLogRecord
+{
+    fn from(
+        value: StreamWorkflowExecutionLogsWorkflowsExecutionsStreamItemExecutionLogRecord,
+    ) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StreamWorkflowExecutionLogsWorkflowsExecutionsStreamItemStreamError {
+    raw: StreamError,
+}
+
+impl StreamWorkflowExecutionLogsWorkflowsExecutionsStreamItemStreamError {
+    pub fn error(&self) -> &str {
+        &self.raw.error
+    }
+    pub fn reason(&self) -> &str {
+        &self.raw.reason
+    }
+    pub fn raw(&self) -> &StreamError {
+        &self.raw
+    }
+    pub fn into_raw(self) -> StreamError {
+        self.raw
+    }
+}
+
+impl From<StreamError> for StreamWorkflowExecutionLogsWorkflowsExecutionsStreamItemStreamError {
+    fn from(raw: StreamError) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StreamWorkflowExecutionLogsWorkflowsExecutionsStreamItemStreamError> for StreamError {
+    fn from(value: StreamWorkflowExecutionLogsWorkflowsExecutionsStreamItemStreamError) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StreamWorkflowsExecutionsStreamItemStreamEventSseErrorData {
+    raw: StreamEventSseErrorData,
+}
+
+impl StreamWorkflowsExecutionsStreamItemStreamEventSseErrorData {
+    pub fn error(&self) -> &str {
+        &self.raw.error
+    }
+    pub fn reason(&self) -> &str {
+        &self.raw.reason
+    }
+    pub fn raw(&self) -> &StreamEventSseErrorData {
+        &self.raw
+    }
+    pub fn into_raw(self) -> StreamEventSseErrorData {
+        self.raw
+    }
+}
+
+impl From<StreamEventSseErrorData> for StreamWorkflowsExecutionsStreamItemStreamEventSseErrorData {
+    fn from(raw: StreamEventSseErrorData) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StreamWorkflowsExecutionsStreamItemStreamEventSseErrorData> for StreamEventSseErrorData {
+    fn from(value: StreamWorkflowsExecutionsStreamItemStreamEventSseErrorData) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct StreamWorkflowsExecutionsStreamItemStreamEventSsePayload {
+    raw: StreamEventSsePayload,
+}
+
+impl StreamWorkflowsExecutionsStreamItemStreamEventSsePayload {
+    pub fn raw(&self) -> &StreamEventSsePayload {
+        &self.raw
+    }
+    pub fn into_raw(self) -> StreamEventSsePayload {
+        self.raw
+    }
+}
+
+impl From<StreamEventSsePayload> for StreamWorkflowsExecutionsStreamItemStreamEventSsePayload {
+    fn from(raw: StreamEventSsePayload) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<StreamWorkflowsExecutionsStreamItemStreamEventSsePayload> for StreamEventSsePayload {
+    fn from(value: StreamWorkflowsExecutionsStreamItemStreamEventSsePayload) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct TextContentBetaLibrariesDocumentsResponse {
+    raw: DocumentTextContent,
+}
+
+impl TextContentBetaLibrariesDocumentsResponse {
+    pub fn text(&self) -> &str {
+        &self.raw.text
+    }
+    pub fn raw(&self) -> &DocumentTextContent {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DocumentTextContent {
+        self.raw
+    }
+}
+
+impl From<DocumentTextContent> for TextContentBetaLibrariesDocumentsResponse {
+    fn from(raw: DocumentTextContent) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<TextContentBetaLibrariesDocumentsResponse> for DocumentTextContent {
+    fn from(value: TextContentBetaLibrariesDocumentsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct TriggerScheduleWorkflowsSchedulesRequest {
+    raw: TriggerScheduleV1WorkflowsSchedulesScheduleIdTriggerPostRequest,
+}
+
+impl TriggerScheduleWorkflowsSchedulesRequest {
+    pub fn raw(&self) -> &TriggerScheduleV1WorkflowsSchedulesScheduleIdTriggerPostRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> TriggerScheduleV1WorkflowsSchedulesScheduleIdTriggerPostRequest {
+        self.raw
+    }
+}
+
+impl From<TriggerScheduleV1WorkflowsSchedulesScheduleIdTriggerPostRequest>
+    for TriggerScheduleWorkflowsSchedulesRequest
+{
+    fn from(raw: TriggerScheduleV1WorkflowsSchedulesScheduleIdTriggerPostRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<TriggerScheduleWorkflowsSchedulesRequest>
+    for TriggerScheduleV1WorkflowsSchedulesScheduleIdTriggerPostRequest
+{
+    fn from(value: TriggerScheduleWorkflowsSchedulesRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct TriggerScimSyncBetaAdminScimRequest {
+    raw: AdminScimSyncTriggerIN,
+}
+
+impl TriggerScimSyncBetaAdminScimRequest {
+    pub fn new() -> Self {
+        Self {
+            raw: AdminScimSyncTriggerIN {
+                dry_run: None,
+                sync_config: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn dry_run(mut self, dry_run: bool) -> Self {
+        self.raw.dry_run = Some(dry_run);
+        self
+    }
+
+    #[must_use]
+    pub fn sync_config(
+        mut self,
+        sync_config: impl Into<TriggerScimSyncBetaAdminScimRequestSyncConfig>,
+    ) -> Self {
+        self.raw.sync_config = Some(Some(
+            Into::<TriggerScimSyncBetaAdminScimRequestSyncConfig>::into(sync_config).into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn sync_config_null(mut self) -> Self {
+        self.raw.sync_config = Some(None);
+        self
+    }
+    pub fn from_raw(raw: AdminScimSyncTriggerIN) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &AdminScimSyncTriggerIN {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AdminScimSyncTriggerIN {
+        self.raw
+    }
+}
+
+impl From<AdminScimSyncTriggerIN> for TriggerScimSyncBetaAdminScimRequest {
+    fn from(raw: AdminScimSyncTriggerIN) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<TriggerScimSyncBetaAdminScimRequest> for AdminScimSyncTriggerIN {
+    fn from(value: TriggerScimSyncBetaAdminScimRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for TriggerScimSyncBetaAdminScimRequest {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct TriggerScimSyncBetaAdminScimRequestSyncConfig {
+    raw: AdminScimSyncConfig,
+}
+
+impl TriggerScimSyncBetaAdminScimRequestSyncConfig {
+    pub fn new(sync_users: bool, sync_groups: bool, sync_memberships: bool) -> Self {
+        Self {
+            raw: AdminScimSyncConfig {
+                delete_missing_groups: None,
+                deprovision_users: None,
+                sync_groups,
+                sync_memberships,
+                sync_users,
+            },
+        }
+    }
+    #[must_use]
+    pub fn delete_missing_groups(mut self, delete_missing_groups: bool) -> Self {
+        self.raw.delete_missing_groups = Some(delete_missing_groups);
+        self
+    }
+
+    #[must_use]
+    pub fn deprovision_users(mut self, deprovision_users: bool) -> Self {
+        self.raw.deprovision_users = Some(deprovision_users);
+        self
+    }
+    pub fn from_raw(raw: AdminScimSyncConfig) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &AdminScimSyncConfig {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AdminScimSyncConfig {
+        self.raw
+    }
+}
+
+impl From<AdminScimSyncConfig> for TriggerScimSyncBetaAdminScimRequestSyncConfig {
+    fn from(raw: AdminScimSyncConfig) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<TriggerScimSyncBetaAdminScimRequestSyncConfig> for AdminScimSyncConfig {
+    fn from(value: TriggerScimSyncBetaAdminScimRequestSyncConfig) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct TriggerScimSyncBetaAdminScimResponse {
+    raw: AdminScimSyncTriggerOUT,
+}
+
+impl TriggerScimSyncBetaAdminScimResponse {
+    pub fn raw(&self) -> &AdminScimSyncTriggerOUT {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AdminScimSyncTriggerOUT {
+        self.raw
+    }
+}
+
+impl From<AdminScimSyncTriggerOUT> for TriggerScimSyncBetaAdminScimResponse {
+    fn from(raw: AdminScimSyncTriggerOUT) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<TriggerScimSyncBetaAdminScimResponse> for AdminScimSyncTriggerOUT {
+    fn from(value: TriggerScimSyncBetaAdminScimResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UnarchiveModelsResponse {
+    raw: UnarchiveModelResponse,
+}
+
+impl UnarchiveModelsResponse {
+    pub fn raw(&self) -> &UnarchiveModelResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> UnarchiveModelResponse {
+        self.raw
+    }
+}
+
+impl From<UnarchiveModelResponse> for UnarchiveModelsResponse {
+    fn from(raw: UnarchiveModelResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UnarchiveModelsResponse> for UnarchiveModelResponse {
+    fn from(value: UnarchiveModelsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UnarchiveWorkflowWorkflowsResponse {
+    raw: WorkflowUnarchiveResponse,
+}
+
+impl UnarchiveWorkflowWorkflowsResponse {
+    pub fn raw(&self) -> &WorkflowUnarchiveResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowUnarchiveResponse {
+        self.raw
+    }
+}
+
+impl From<WorkflowUnarchiveResponse> for UnarchiveWorkflowWorkflowsResponse {
+    fn from(raw: WorkflowUnarchiveResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UnarchiveWorkflowWorkflowsResponse> for WorkflowUnarchiveResponse {
+    fn from(value: UnarchiveWorkflowWorkflowsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+pub type UnregisterDeploymentBetaRagSearchIndexesResponse = serde_json::Value;
+
+#[derive(Debug, Clone)]
+pub struct UnshareBetaConnectorsResponse {
+    raw: MessageResponse,
+}
+
+impl UnshareBetaConnectorsResponse {
+    pub fn message(&self) -> &str {
+        &self.raw.message
+    }
+    pub fn raw(&self) -> &MessageResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> MessageResponse {
+        self.raw
+    }
+}
+
+impl From<MessageResponse> for UnshareBetaConnectorsResponse {
+    fn from(raw: MessageResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UnshareBetaConnectorsResponse> for MessageResponse {
+    fn from(value: UnshareBetaConnectorsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateAudioVoicesRequest {
     raw: VoiceUpdateRequest,
 }
 
-impl VoiceUpdateRequestParams {
+impl UpdateAudioVoicesRequest {
     pub fn new() -> Self {
         Self {
             raw: VoiceUpdateRequest {
                 age: None,
+                description: None,
                 gender: None,
                 languages: None,
                 name: None,
@@ -6726,6 +20802,18 @@ impl VoiceUpdateRequestParams {
     #[must_use]
     pub fn age_null(mut self) -> Self {
         self.raw.age = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.raw.description = Some(Some(description.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn description_null(mut self) -> Self {
+        self.raw.description = Some(None);
         self
     }
 
@@ -6787,33 +20875,3724 @@ impl VoiceUpdateRequestParams {
     }
 }
 
-impl From<VoiceUpdateRequest> for VoiceUpdateRequestParams {
+impl From<VoiceUpdateRequest> for UpdateAudioVoicesRequest {
     fn from(raw: VoiceUpdateRequest) -> Self {
         Self { raw }
     }
 }
 
-impl From<VoiceUpdateRequestParams> for VoiceUpdateRequest {
-    fn from(value: VoiceUpdateRequestParams) -> Self {
+impl From<UpdateAudioVoicesRequest> for VoiceUpdateRequest {
+    fn from(value: UpdateAudioVoicesRequest) -> Self {
         value.into_raw()
     }
 }
 
-impl Default for VoiceUpdateRequestParams {
+impl Default for UpdateAudioVoicesRequest {
     fn default() -> Self {
         Self::new()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct UpdateWorkflowResponseView {
+pub struct UpdateAudioVoicesResponse {
+    raw: VoiceResponse,
+}
+
+impl UpdateAudioVoicesResponse {
+    pub fn raw(&self) -> &VoiceResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> VoiceResponse {
+        self.raw
+    }
+}
+
+impl From<VoiceResponse> for UpdateAudioVoicesResponse {
+    fn from(raw: VoiceResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateAudioVoicesResponse> for VoiceResponse {
+    fn from(value: UpdateAudioVoicesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateBetaAgentsRequest {
+    raw: UpdateAgentRequest,
+}
+
+impl UpdateBetaAgentsRequest {
+    pub fn new() -> Self {
+        Self {
+            raw: UpdateAgentRequest {
+                completion_args: None,
+                deployment_chat: None,
+                description: None,
+                guardrails: None,
+                handoffs: None,
+                instructions: None,
+                metadata: None,
+                model: None,
+                name: None,
+                tools: None,
+                version_message: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn completion_args(
+        mut self,
+        completion_args: impl Into<UpdateBetaAgentsRequestCompletionArgs>,
+    ) -> Self {
+        self.raw.completion_args =
+            Some(Into::<UpdateBetaAgentsRequestCompletionArgs>::into(completion_args).into());
+        self
+    }
+
+    #[must_use]
+    pub fn deployment_chat(mut self, deployment_chat: bool) -> Self {
+        self.raw.deployment_chat = Some(Some(deployment_chat));
+        self
+    }
+
+    #[must_use]
+    pub fn deployment_chat_null(mut self) -> Self {
+        self.raw.deployment_chat = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.raw.description = Some(Some(description.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn description_null(mut self) -> Self {
+        self.raw.description = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn guardrails(mut self, guardrails: Vec<GuardrailConfig>) -> Self {
+        self.raw.guardrails = Some(Some(guardrails));
+        self
+    }
+
+    #[must_use]
+    pub fn guardrails_null(mut self) -> Self {
+        self.raw.guardrails = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn handoffs(mut self, handoffs: Vec<String>) -> Self {
+        self.raw.handoffs = Some(Some(handoffs));
+        self
+    }
+
+    #[must_use]
+    pub fn handoffs_null(mut self) -> Self {
+        self.raw.handoffs = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn instructions(mut self, instructions: impl Into<String>) -> Self {
+        self.raw.instructions = Some(Some(instructions.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn instructions_null(mut self) -> Self {
+        self.raw.instructions = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn metadata(mut self, metadata: MetadataDict) -> Self {
+        self.raw.metadata = Some(Some(metadata));
+        self
+    }
+
+    #[must_use]
+    pub fn metadata_null(mut self) -> Self {
+        self.raw.metadata = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn model(mut self, model: impl Into<String>) -> Self {
+        self.raw.model = Some(Some(model.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn model_null(mut self) -> Self {
+        self.raw.model = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn name(mut self, name: impl Into<String>) -> Self {
+        self.raw.name = Some(Some(name.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn name_null(mut self) -> Self {
+        self.raw.name = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn tools(mut self, tools: impl IntoIterator<Item = UpdateBetaAgentsRequestTools>) -> Self {
+        self.raw.tools = Some(tools.into_iter().map(Into::into).collect());
+        self
+    }
+
+    #[must_use]
+    pub fn version_message(mut self, version_message: impl Into<String>) -> Self {
+        self.raw.version_message = Some(Some(version_message.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn version_message_null(mut self) -> Self {
+        self.raw.version_message = Some(None);
+        self
+    }
+    pub fn from_raw(raw: UpdateAgentRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &UpdateAgentRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> UpdateAgentRequest {
+        self.raw
+    }
+}
+
+impl From<UpdateAgentRequest> for UpdateBetaAgentsRequest {
+    fn from(raw: UpdateAgentRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaAgentsRequest> for UpdateAgentRequest {
+    fn from(value: UpdateBetaAgentsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for UpdateBetaAgentsRequest {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateBetaAgentsRequestCompletionArgs {
+    raw: CompletionArgs,
+}
+
+impl UpdateBetaAgentsRequestCompletionArgs {
+    pub fn new() -> Self {
+        Self {
+            raw: CompletionArgs {
+                frequency_penalty: None,
+                max_tokens: None,
+                prediction: None,
+                presence_penalty: None,
+                random_seed: None,
+                reasoning_effort: None,
+                response_format: None,
+                stop: None,
+                temperature: None,
+                tool_choice: None,
+                top_p: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn frequency_penalty(mut self, frequency_penalty: f64) -> Self {
+        self.raw.frequency_penalty = Some(Some(frequency_penalty));
+        self
+    }
+
+    #[must_use]
+    pub fn frequency_penalty_null(mut self) -> Self {
+        self.raw.frequency_penalty = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn max_tokens(mut self, max_tokens: i64) -> Self {
+        self.raw.max_tokens = Some(Some(max_tokens));
+        self
+    }
+
+    #[must_use]
+    pub fn max_tokens_null(mut self) -> Self {
+        self.raw.max_tokens = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn prediction(
+        mut self,
+        prediction: impl Into<UpdateBetaAgentsRequestCompletionArgsPrediction>,
+    ) -> Self {
+        self.raw.prediction = Some(Some(
+            Into::<UpdateBetaAgentsRequestCompletionArgsPrediction>::into(prediction).into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn prediction_null(mut self) -> Self {
+        self.raw.prediction = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn presence_penalty(mut self, presence_penalty: f64) -> Self {
+        self.raw.presence_penalty = Some(Some(presence_penalty));
+        self
+    }
+
+    #[must_use]
+    pub fn presence_penalty_null(mut self) -> Self {
+        self.raw.presence_penalty = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn random_seed(mut self, random_seed: i64) -> Self {
+        self.raw.random_seed = Some(Some(random_seed));
+        self
+    }
+
+    #[must_use]
+    pub fn random_seed_null(mut self) -> Self {
+        self.raw.random_seed = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn reasoning_effort(mut self, reasoning_effort: ReasoningEffort) -> Self {
+        self.raw.reasoning_effort = Some(Some(reasoning_effort));
+        self
+    }
+
+    #[must_use]
+    pub fn reasoning_effort_null(mut self) -> Self {
+        self.raw.reasoning_effort = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn response_format(
+        mut self,
+        response_format: impl Into<UpdateBetaAgentsRequestCompletionArgsResponseFormat>,
+    ) -> Self {
+        self.raw.response_format = Some(Some(
+            Into::<UpdateBetaAgentsRequestCompletionArgsResponseFormat>::into(response_format)
+                .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn response_format_null(mut self) -> Self {
+        self.raw.response_format = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn stop(mut self, stop: CompletionArgsStop) -> Self {
+        self.raw.stop = Some(Some(stop));
+        self
+    }
+
+    #[must_use]
+    pub fn stop_null(mut self) -> Self {
+        self.raw.stop = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn temperature(mut self, temperature: f64) -> Self {
+        self.raw.temperature = Some(Some(temperature));
+        self
+    }
+
+    #[must_use]
+    pub fn temperature_null(mut self) -> Self {
+        self.raw.temperature = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn tool_choice(mut self, tool_choice: ToolChoiceEnum) -> Self {
+        self.raw.tool_choice = Some(tool_choice);
+        self
+    }
+
+    #[must_use]
+    pub fn top_p(mut self, top_p: f64) -> Self {
+        self.raw.top_p = Some(Some(top_p));
+        self
+    }
+
+    #[must_use]
+    pub fn top_p_null(mut self) -> Self {
+        self.raw.top_p = Some(None);
+        self
+    }
+    pub fn from_raw(raw: CompletionArgs) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &CompletionArgs {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CompletionArgs {
+        self.raw
+    }
+}
+
+impl From<CompletionArgs> for UpdateBetaAgentsRequestCompletionArgs {
+    fn from(raw: CompletionArgs) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaAgentsRequestCompletionArgs> for CompletionArgs {
+    fn from(value: UpdateBetaAgentsRequestCompletionArgs) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for UpdateBetaAgentsRequestCompletionArgs {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateBetaAgentsRequestCompletionArgsPrediction {
+    raw: Prediction,
+}
+
+impl UpdateBetaAgentsRequestCompletionArgsPrediction {
+    pub fn new() -> Self {
+        Self {
+            raw: Prediction {
+                content: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn content(mut self, content: impl Into<String>) -> Self {
+        self.raw.content = Some(content.into());
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: PredictionType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: Prediction) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &Prediction {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Prediction {
+        self.raw
+    }
+}
+
+impl From<Prediction> for UpdateBetaAgentsRequestCompletionArgsPrediction {
+    fn from(raw: Prediction) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaAgentsRequestCompletionArgsPrediction> for Prediction {
+    fn from(value: UpdateBetaAgentsRequestCompletionArgsPrediction) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for UpdateBetaAgentsRequestCompletionArgsPrediction {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateBetaAgentsRequestCompletionArgsResponseFormat {
+    raw: ResponseFormat,
+}
+
+impl UpdateBetaAgentsRequestCompletionArgsResponseFormat {
+    pub fn new() -> Self {
+        Self {
+            raw: ResponseFormat {
+                json_schema: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn json_schema(
+        mut self,
+        json_schema: impl Into<UpdateBetaAgentsRequestCompletionArgsResponseFormatJsonSchema>,
+    ) -> Self {
+        self.raw.json_schema = Some(Some(
+            Into::<UpdateBetaAgentsRequestCompletionArgsResponseFormatJsonSchema>::into(
+                json_schema,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn json_schema_null(mut self) -> Self {
+        self.raw.json_schema = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: ResponseFormats) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: ResponseFormat) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ResponseFormat {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ResponseFormat {
+        self.raw
+    }
+}
+
+impl From<ResponseFormat> for UpdateBetaAgentsRequestCompletionArgsResponseFormat {
+    fn from(raw: ResponseFormat) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaAgentsRequestCompletionArgsResponseFormat> for ResponseFormat {
+    fn from(value: UpdateBetaAgentsRequestCompletionArgsResponseFormat) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for UpdateBetaAgentsRequestCompletionArgsResponseFormat {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateBetaAgentsRequestCompletionArgsResponseFormatJsonSchema {
+    raw: JsonSchema,
+}
+
+impl UpdateBetaAgentsRequestCompletionArgsResponseFormatJsonSchema {
+    pub fn new(name: impl Into<String>, schema: JsonSchemaSchema) -> Self {
+        Self {
+            raw: JsonSchema {
+                description: None,
+                name: name.into(),
+                schema,
+                strict: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.raw.description = Some(Some(description.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn description_null(mut self) -> Self {
+        self.raw.description = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn strict(mut self, strict: bool) -> Self {
+        self.raw.strict = Some(strict);
+        self
+    }
+    pub fn from_raw(raw: JsonSchema) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &JsonSchema {
+        &self.raw
+    }
+    pub fn into_raw(self) -> JsonSchema {
+        self.raw
+    }
+}
+
+impl From<JsonSchema> for UpdateBetaAgentsRequestCompletionArgsResponseFormatJsonSchema {
+    fn from(raw: JsonSchema) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaAgentsRequestCompletionArgsResponseFormatJsonSchema> for JsonSchema {
+    fn from(value: UpdateBetaAgentsRequestCompletionArgsResponseFormatJsonSchema) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub enum UpdateBetaAgentsRequestTools {
+    CodeInterpreterTool(UpdateBetaAgentsRequestToolsCodeInterpreterTool),
+    CustomConnector(UpdateBetaAgentsRequestToolsCustomConnector),
+    DocumentLibraryTool(UpdateBetaAgentsRequestToolsDocumentLibraryTool),
+    FunctionTool(UpdateBetaAgentsRequestToolsFunctionTool),
+    ImageGenerationTool(UpdateBetaAgentsRequestToolsImageGenerationTool),
+    WebSearchPremiumTool(UpdateBetaAgentsRequestToolsWebSearchPremiumTool),
+    WebSearchTool(UpdateBetaAgentsRequestToolsWebSearchTool),
+}
+
+impl From<UpdateBetaAgentsRequestToolsCodeInterpreterTool> for UpdateBetaAgentsRequestTools {
+    fn from(value: UpdateBetaAgentsRequestToolsCodeInterpreterTool) -> Self {
+        Self::CodeInterpreterTool(value)
+    }
+}
+
+impl From<UpdateBetaAgentsRequestToolsCustomConnector> for UpdateBetaAgentsRequestTools {
+    fn from(value: UpdateBetaAgentsRequestToolsCustomConnector) -> Self {
+        Self::CustomConnector(value)
+    }
+}
+
+impl From<UpdateBetaAgentsRequestToolsDocumentLibraryTool> for UpdateBetaAgentsRequestTools {
+    fn from(value: UpdateBetaAgentsRequestToolsDocumentLibraryTool) -> Self {
+        Self::DocumentLibraryTool(value)
+    }
+}
+
+impl From<UpdateBetaAgentsRequestToolsFunctionTool> for UpdateBetaAgentsRequestTools {
+    fn from(value: UpdateBetaAgentsRequestToolsFunctionTool) -> Self {
+        Self::FunctionTool(value)
+    }
+}
+
+impl From<UpdateBetaAgentsRequestToolsImageGenerationTool> for UpdateBetaAgentsRequestTools {
+    fn from(value: UpdateBetaAgentsRequestToolsImageGenerationTool) -> Self {
+        Self::ImageGenerationTool(value)
+    }
+}
+
+impl From<UpdateBetaAgentsRequestToolsWebSearchPremiumTool> for UpdateBetaAgentsRequestTools {
+    fn from(value: UpdateBetaAgentsRequestToolsWebSearchPremiumTool) -> Self {
+        Self::WebSearchPremiumTool(value)
+    }
+}
+
+impl From<UpdateBetaAgentsRequestToolsWebSearchTool> for UpdateBetaAgentsRequestTools {
+    fn from(value: UpdateBetaAgentsRequestToolsWebSearchTool) -> Self {
+        Self::WebSearchTool(value)
+    }
+}
+
+impl From<UpdateBetaAgentsRequestTools> for UpdateAgentRequestToolsItemUnion {
+    fn from(value: UpdateBetaAgentsRequestTools) -> Self {
+        match value {
+            UpdateBetaAgentsRequestTools::CodeInterpreterTool(value) => {
+                Self::CodeInterpreterTool(value.into())
+            }
+            UpdateBetaAgentsRequestTools::CustomConnector(value) => {
+                Self::CustomConnector(value.into())
+            }
+            UpdateBetaAgentsRequestTools::DocumentLibraryTool(value) => {
+                Self::DocumentLibraryTool(value.into())
+            }
+            UpdateBetaAgentsRequestTools::FunctionTool(value) => Self::FunctionTool(value.into()),
+            UpdateBetaAgentsRequestTools::ImageGenerationTool(value) => {
+                Self::ImageGenerationTool(value.into())
+            }
+            UpdateBetaAgentsRequestTools::WebSearchPremiumTool(value) => {
+                Self::WebSearchPremiumTool(value.into())
+            }
+            UpdateBetaAgentsRequestTools::WebSearchTool(value) => Self::WebSearchTool(value.into()),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateBetaAgentsRequestToolsCodeInterpreterTool {
+    raw: CodeInterpreterTool,
+}
+
+impl UpdateBetaAgentsRequestToolsCodeInterpreterTool {
+    pub fn new() -> Self {
+        Self {
+            raw: CodeInterpreterTool {
+                tool_configuration: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn tool_configuration(
+        mut self,
+        tool_configuration: impl Into<UpdateBetaAgentsRequestToolsCodeInterpreterToolToolConfiguration>,
+    ) -> Self {
+        self.raw.tool_configuration = Some(Some(
+            Into::<UpdateBetaAgentsRequestToolsCodeInterpreterToolToolConfiguration>::into(
+                tool_configuration,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn tool_configuration_null(mut self) -> Self {
+        self.raw.tool_configuration = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: CodeInterpreterToolType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: CodeInterpreterTool) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &CodeInterpreterTool {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CodeInterpreterTool {
+        self.raw
+    }
+}
+
+impl From<CodeInterpreterTool> for UpdateBetaAgentsRequestToolsCodeInterpreterTool {
+    fn from(raw: CodeInterpreterTool) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaAgentsRequestToolsCodeInterpreterTool> for CodeInterpreterTool {
+    fn from(value: UpdateBetaAgentsRequestToolsCodeInterpreterTool) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for UpdateBetaAgentsRequestToolsCodeInterpreterTool {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateBetaAgentsRequestToolsCodeInterpreterToolToolConfiguration {
+    raw: ToolConfiguration,
+}
+
+impl UpdateBetaAgentsRequestToolsCodeInterpreterToolToolConfiguration {
+    pub fn new() -> Self {
+        Self {
+            raw: ToolConfiguration {
+                exclude: None,
+                include: None,
+                requires_confirmation: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn exclude(mut self, exclude: Vec<String>) -> Self {
+        self.raw.exclude = Some(Some(exclude));
+        self
+    }
+
+    #[must_use]
+    pub fn exclude_null(mut self) -> Self {
+        self.raw.exclude = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn include(mut self, include: Vec<String>) -> Self {
+        self.raw.include = Some(Some(include));
+        self
+    }
+
+    #[must_use]
+    pub fn include_null(mut self) -> Self {
+        self.raw.include = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation(mut self, requires_confirmation: Vec<String>) -> Self {
+        self.raw.requires_confirmation = Some(Some(requires_confirmation));
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation_null(mut self) -> Self {
+        self.raw.requires_confirmation = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ToolConfiguration {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ToolConfiguration {
+        self.raw
+    }
+}
+
+impl From<ToolConfiguration> for UpdateBetaAgentsRequestToolsCodeInterpreterToolToolConfiguration {
+    fn from(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaAgentsRequestToolsCodeInterpreterToolToolConfiguration> for ToolConfiguration {
+    fn from(value: UpdateBetaAgentsRequestToolsCodeInterpreterToolToolConfiguration) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for UpdateBetaAgentsRequestToolsCodeInterpreterToolToolConfiguration {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateBetaAgentsRequestToolsCustomConnector {
+    raw: CustomConnector,
+}
+
+impl UpdateBetaAgentsRequestToolsCustomConnector {
+    pub fn new(connector_id: impl Into<String>) -> Self {
+        Self {
+            raw: CustomConnector {
+                authorization: None,
+                connector_id: connector_id.into(),
+                tool_configuration: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn authorization(
+        mut self,
+        authorization: impl Into<UpdateBetaAgentsRequestToolsCustomConnectorAuthorization>,
+    ) -> Self {
+        self.raw.authorization = Some(Some(
+            Into::<UpdateBetaAgentsRequestToolsCustomConnectorAuthorization>::into(authorization)
+                .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn authorization_null(mut self) -> Self {
+        self.raw.authorization = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn tool_configuration(
+        mut self,
+        tool_configuration: impl Into<UpdateBetaAgentsRequestToolsCustomConnectorToolConfiguration>,
+    ) -> Self {
+        self.raw.tool_configuration = Some(Some(
+            Into::<UpdateBetaAgentsRequestToolsCustomConnectorToolConfiguration>::into(
+                tool_configuration,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn tool_configuration_null(mut self) -> Self {
+        self.raw.tool_configuration = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: CustomConnectorType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: CustomConnector) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &CustomConnector {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CustomConnector {
+        self.raw
+    }
+}
+
+impl From<CustomConnector> for UpdateBetaAgentsRequestToolsCustomConnector {
+    fn from(raw: CustomConnector) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaAgentsRequestToolsCustomConnector> for CustomConnector {
+    fn from(value: UpdateBetaAgentsRequestToolsCustomConnector) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub enum UpdateBetaAgentsRequestToolsCustomConnectorAuthorization {
+    APIKeyAuth(UpdateBetaAgentsRequestToolsCustomConnectorAuthorizationAPIKeyAuth),
+    OAuth2TokenAuth(UpdateBetaAgentsRequestToolsCustomConnectorAuthorizationOAuth2TokenAuth),
+}
+
+impl From<UpdateBetaAgentsRequestToolsCustomConnectorAuthorizationAPIKeyAuth>
+    for UpdateBetaAgentsRequestToolsCustomConnectorAuthorization
+{
+    fn from(value: UpdateBetaAgentsRequestToolsCustomConnectorAuthorizationAPIKeyAuth) -> Self {
+        Self::APIKeyAuth(value)
+    }
+}
+
+impl From<UpdateBetaAgentsRequestToolsCustomConnectorAuthorizationOAuth2TokenAuth>
+    for UpdateBetaAgentsRequestToolsCustomConnectorAuthorization
+{
+    fn from(
+        value: UpdateBetaAgentsRequestToolsCustomConnectorAuthorizationOAuth2TokenAuth,
+    ) -> Self {
+        Self::OAuth2TokenAuth(value)
+    }
+}
+
+impl From<UpdateBetaAgentsRequestToolsCustomConnectorAuthorization>
+    for CustomConnectorAuthorizationInline
+{
+    fn from(value: UpdateBetaAgentsRequestToolsCustomConnectorAuthorization) -> Self {
+        match value {
+            UpdateBetaAgentsRequestToolsCustomConnectorAuthorization::APIKeyAuth(value) => {
+                Self::APIKeyAuth(value.into())
+            }
+            UpdateBetaAgentsRequestToolsCustomConnectorAuthorization::OAuth2TokenAuth(value) => {
+                Self::OAuth2TokenAuth(value.into())
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateBetaAgentsRequestToolsCustomConnectorAuthorizationAPIKeyAuth {
+    raw: APIKeyAuth,
+}
+
+impl UpdateBetaAgentsRequestToolsCustomConnectorAuthorizationAPIKeyAuth {
+    pub fn new(value: impl Into<String>) -> Self {
+        Self {
+            raw: APIKeyAuth {
+                r#type: None,
+                value: value.into(),
+            },
+        }
+    }
+    #[must_use]
+    pub fn r#type(mut self, r#type: APIKeyAuthType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: APIKeyAuth) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &APIKeyAuth {
+        &self.raw
+    }
+    pub fn into_raw(self) -> APIKeyAuth {
+        self.raw
+    }
+}
+
+impl From<APIKeyAuth> for UpdateBetaAgentsRequestToolsCustomConnectorAuthorizationAPIKeyAuth {
+    fn from(raw: APIKeyAuth) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaAgentsRequestToolsCustomConnectorAuthorizationAPIKeyAuth> for APIKeyAuth {
+    fn from(value: UpdateBetaAgentsRequestToolsCustomConnectorAuthorizationAPIKeyAuth) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateBetaAgentsRequestToolsCustomConnectorAuthorizationOAuth2TokenAuth {
+    raw: OAuth2TokenAuth,
+}
+
+impl UpdateBetaAgentsRequestToolsCustomConnectorAuthorizationOAuth2TokenAuth {
+    pub fn new(value: impl Into<String>) -> Self {
+        Self {
+            raw: OAuth2TokenAuth {
+                r#type: None,
+                value: value.into(),
+            },
+        }
+    }
+    #[must_use]
+    pub fn r#type(mut self, r#type: OAuth2TokenAuthType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: OAuth2TokenAuth) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &OAuth2TokenAuth {
+        &self.raw
+    }
+    pub fn into_raw(self) -> OAuth2TokenAuth {
+        self.raw
+    }
+}
+
+impl From<OAuth2TokenAuth>
+    for UpdateBetaAgentsRequestToolsCustomConnectorAuthorizationOAuth2TokenAuth
+{
+    fn from(raw: OAuth2TokenAuth) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaAgentsRequestToolsCustomConnectorAuthorizationOAuth2TokenAuth>
+    for OAuth2TokenAuth
+{
+    fn from(
+        value: UpdateBetaAgentsRequestToolsCustomConnectorAuthorizationOAuth2TokenAuth,
+    ) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateBetaAgentsRequestToolsCustomConnectorToolConfiguration {
+    raw: ToolConfiguration,
+}
+
+impl UpdateBetaAgentsRequestToolsCustomConnectorToolConfiguration {
+    pub fn new() -> Self {
+        Self {
+            raw: ToolConfiguration {
+                exclude: None,
+                include: None,
+                requires_confirmation: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn exclude(mut self, exclude: Vec<String>) -> Self {
+        self.raw.exclude = Some(Some(exclude));
+        self
+    }
+
+    #[must_use]
+    pub fn exclude_null(mut self) -> Self {
+        self.raw.exclude = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn include(mut self, include: Vec<String>) -> Self {
+        self.raw.include = Some(Some(include));
+        self
+    }
+
+    #[must_use]
+    pub fn include_null(mut self) -> Self {
+        self.raw.include = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation(mut self, requires_confirmation: Vec<String>) -> Self {
+        self.raw.requires_confirmation = Some(Some(requires_confirmation));
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation_null(mut self) -> Self {
+        self.raw.requires_confirmation = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ToolConfiguration {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ToolConfiguration {
+        self.raw
+    }
+}
+
+impl From<ToolConfiguration> for UpdateBetaAgentsRequestToolsCustomConnectorToolConfiguration {
+    fn from(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaAgentsRequestToolsCustomConnectorToolConfiguration> for ToolConfiguration {
+    fn from(value: UpdateBetaAgentsRequestToolsCustomConnectorToolConfiguration) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for UpdateBetaAgentsRequestToolsCustomConnectorToolConfiguration {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateBetaAgentsRequestToolsDocumentLibraryTool {
+    raw: DocumentLibraryTool,
+}
+
+impl UpdateBetaAgentsRequestToolsDocumentLibraryTool {
+    pub fn new(library_ids: Vec<String>) -> Self {
+        Self {
+            raw: DocumentLibraryTool {
+                library_ids,
+                tool_configuration: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn tool_configuration(
+        mut self,
+        tool_configuration: impl Into<UpdateBetaAgentsRequestToolsDocumentLibraryToolToolConfiguration>,
+    ) -> Self {
+        self.raw.tool_configuration = Some(Some(
+            Into::<UpdateBetaAgentsRequestToolsDocumentLibraryToolToolConfiguration>::into(
+                tool_configuration,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn tool_configuration_null(mut self) -> Self {
+        self.raw.tool_configuration = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: DocumentLibraryToolType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: DocumentLibraryTool) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &DocumentLibraryTool {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DocumentLibraryTool {
+        self.raw
+    }
+}
+
+impl From<DocumentLibraryTool> for UpdateBetaAgentsRequestToolsDocumentLibraryTool {
+    fn from(raw: DocumentLibraryTool) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaAgentsRequestToolsDocumentLibraryTool> for DocumentLibraryTool {
+    fn from(value: UpdateBetaAgentsRequestToolsDocumentLibraryTool) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateBetaAgentsRequestToolsDocumentLibraryToolToolConfiguration {
+    raw: ToolConfiguration,
+}
+
+impl UpdateBetaAgentsRequestToolsDocumentLibraryToolToolConfiguration {
+    pub fn new() -> Self {
+        Self {
+            raw: ToolConfiguration {
+                exclude: None,
+                include: None,
+                requires_confirmation: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn exclude(mut self, exclude: Vec<String>) -> Self {
+        self.raw.exclude = Some(Some(exclude));
+        self
+    }
+
+    #[must_use]
+    pub fn exclude_null(mut self) -> Self {
+        self.raw.exclude = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn include(mut self, include: Vec<String>) -> Self {
+        self.raw.include = Some(Some(include));
+        self
+    }
+
+    #[must_use]
+    pub fn include_null(mut self) -> Self {
+        self.raw.include = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation(mut self, requires_confirmation: Vec<String>) -> Self {
+        self.raw.requires_confirmation = Some(Some(requires_confirmation));
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation_null(mut self) -> Self {
+        self.raw.requires_confirmation = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ToolConfiguration {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ToolConfiguration {
+        self.raw
+    }
+}
+
+impl From<ToolConfiguration> for UpdateBetaAgentsRequestToolsDocumentLibraryToolToolConfiguration {
+    fn from(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaAgentsRequestToolsDocumentLibraryToolToolConfiguration> for ToolConfiguration {
+    fn from(value: UpdateBetaAgentsRequestToolsDocumentLibraryToolToolConfiguration) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for UpdateBetaAgentsRequestToolsDocumentLibraryToolToolConfiguration {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateBetaAgentsRequestToolsFunctionTool {
+    raw: FunctionTool,
+}
+
+impl UpdateBetaAgentsRequestToolsFunctionTool {
+    pub fn new(function: impl Into<UpdateBetaAgentsRequestToolsFunctionToolFunction>) -> Self {
+        Self {
+            raw: FunctionTool {
+                function: Into::<UpdateBetaAgentsRequestToolsFunctionToolFunction>::into(function)
+                    .into(),
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn r#type(mut self, r#type: FunctionToolType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: FunctionTool) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &FunctionTool {
+        &self.raw
+    }
+    pub fn into_raw(self) -> FunctionTool {
+        self.raw
+    }
+}
+
+impl From<FunctionTool> for UpdateBetaAgentsRequestToolsFunctionTool {
+    fn from(raw: FunctionTool) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaAgentsRequestToolsFunctionTool> for FunctionTool {
+    fn from(value: UpdateBetaAgentsRequestToolsFunctionTool) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateBetaAgentsRequestToolsFunctionToolFunction {
+    raw: Function,
+}
+
+impl UpdateBetaAgentsRequestToolsFunctionToolFunction {
+    pub fn new(name: impl Into<String>, parameters: FunctionParameters) -> Self {
+        Self {
+            raw: Function {
+                description: None,
+                name: name.into(),
+                parameters,
+                strict: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.raw.description = Some(description.into());
+        self
+    }
+
+    #[must_use]
+    pub fn strict(mut self, strict: bool) -> Self {
+        self.raw.strict = Some(strict);
+        self
+    }
+    pub fn from_raw(raw: Function) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &Function {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Function {
+        self.raw
+    }
+}
+
+impl From<Function> for UpdateBetaAgentsRequestToolsFunctionToolFunction {
+    fn from(raw: Function) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaAgentsRequestToolsFunctionToolFunction> for Function {
+    fn from(value: UpdateBetaAgentsRequestToolsFunctionToolFunction) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateBetaAgentsRequestToolsImageGenerationTool {
+    raw: ImageGenerationTool,
+}
+
+impl UpdateBetaAgentsRequestToolsImageGenerationTool {
+    pub fn new() -> Self {
+        Self {
+            raw: ImageGenerationTool {
+                tool_configuration: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn tool_configuration(
+        mut self,
+        tool_configuration: impl Into<UpdateBetaAgentsRequestToolsImageGenerationToolToolConfiguration>,
+    ) -> Self {
+        self.raw.tool_configuration = Some(Some(
+            Into::<UpdateBetaAgentsRequestToolsImageGenerationToolToolConfiguration>::into(
+                tool_configuration,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn tool_configuration_null(mut self) -> Self {
+        self.raw.tool_configuration = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: ImageGenerationToolType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: ImageGenerationTool) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ImageGenerationTool {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ImageGenerationTool {
+        self.raw
+    }
+}
+
+impl From<ImageGenerationTool> for UpdateBetaAgentsRequestToolsImageGenerationTool {
+    fn from(raw: ImageGenerationTool) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaAgentsRequestToolsImageGenerationTool> for ImageGenerationTool {
+    fn from(value: UpdateBetaAgentsRequestToolsImageGenerationTool) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for UpdateBetaAgentsRequestToolsImageGenerationTool {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateBetaAgentsRequestToolsImageGenerationToolToolConfiguration {
+    raw: ToolConfiguration,
+}
+
+impl UpdateBetaAgentsRequestToolsImageGenerationToolToolConfiguration {
+    pub fn new() -> Self {
+        Self {
+            raw: ToolConfiguration {
+                exclude: None,
+                include: None,
+                requires_confirmation: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn exclude(mut self, exclude: Vec<String>) -> Self {
+        self.raw.exclude = Some(Some(exclude));
+        self
+    }
+
+    #[must_use]
+    pub fn exclude_null(mut self) -> Self {
+        self.raw.exclude = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn include(mut self, include: Vec<String>) -> Self {
+        self.raw.include = Some(Some(include));
+        self
+    }
+
+    #[must_use]
+    pub fn include_null(mut self) -> Self {
+        self.raw.include = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation(mut self, requires_confirmation: Vec<String>) -> Self {
+        self.raw.requires_confirmation = Some(Some(requires_confirmation));
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation_null(mut self) -> Self {
+        self.raw.requires_confirmation = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ToolConfiguration {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ToolConfiguration {
+        self.raw
+    }
+}
+
+impl From<ToolConfiguration> for UpdateBetaAgentsRequestToolsImageGenerationToolToolConfiguration {
+    fn from(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaAgentsRequestToolsImageGenerationToolToolConfiguration> for ToolConfiguration {
+    fn from(value: UpdateBetaAgentsRequestToolsImageGenerationToolToolConfiguration) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for UpdateBetaAgentsRequestToolsImageGenerationToolToolConfiguration {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateBetaAgentsRequestToolsWebSearchPremiumTool {
+    raw: WebSearchPremiumTool,
+}
+
+impl UpdateBetaAgentsRequestToolsWebSearchPremiumTool {
+    pub fn new() -> Self {
+        Self {
+            raw: WebSearchPremiumTool {
+                tool_configuration: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn tool_configuration(
+        mut self,
+        tool_configuration: impl Into<UpdateBetaAgentsRequestToolsWebSearchPremiumToolToolConfiguration>,
+    ) -> Self {
+        self.raw.tool_configuration = Some(Some(
+            Into::<UpdateBetaAgentsRequestToolsWebSearchPremiumToolToolConfiguration>::into(
+                tool_configuration,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn tool_configuration_null(mut self) -> Self {
+        self.raw.tool_configuration = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: WebSearchPremiumToolType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: WebSearchPremiumTool) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &WebSearchPremiumTool {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WebSearchPremiumTool {
+        self.raw
+    }
+}
+
+impl From<WebSearchPremiumTool> for UpdateBetaAgentsRequestToolsWebSearchPremiumTool {
+    fn from(raw: WebSearchPremiumTool) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaAgentsRequestToolsWebSearchPremiumTool> for WebSearchPremiumTool {
+    fn from(value: UpdateBetaAgentsRequestToolsWebSearchPremiumTool) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for UpdateBetaAgentsRequestToolsWebSearchPremiumTool {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateBetaAgentsRequestToolsWebSearchPremiumToolToolConfiguration {
+    raw: ToolConfiguration,
+}
+
+impl UpdateBetaAgentsRequestToolsWebSearchPremiumToolToolConfiguration {
+    pub fn new() -> Self {
+        Self {
+            raw: ToolConfiguration {
+                exclude: None,
+                include: None,
+                requires_confirmation: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn exclude(mut self, exclude: Vec<String>) -> Self {
+        self.raw.exclude = Some(Some(exclude));
+        self
+    }
+
+    #[must_use]
+    pub fn exclude_null(mut self) -> Self {
+        self.raw.exclude = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn include(mut self, include: Vec<String>) -> Self {
+        self.raw.include = Some(Some(include));
+        self
+    }
+
+    #[must_use]
+    pub fn include_null(mut self) -> Self {
+        self.raw.include = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation(mut self, requires_confirmation: Vec<String>) -> Self {
+        self.raw.requires_confirmation = Some(Some(requires_confirmation));
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation_null(mut self) -> Self {
+        self.raw.requires_confirmation = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ToolConfiguration {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ToolConfiguration {
+        self.raw
+    }
+}
+
+impl From<ToolConfiguration> for UpdateBetaAgentsRequestToolsWebSearchPremiumToolToolConfiguration {
+    fn from(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaAgentsRequestToolsWebSearchPremiumToolToolConfiguration> for ToolConfiguration {
+    fn from(value: UpdateBetaAgentsRequestToolsWebSearchPremiumToolToolConfiguration) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for UpdateBetaAgentsRequestToolsWebSearchPremiumToolToolConfiguration {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateBetaAgentsRequestToolsWebSearchTool {
+    raw: WebSearchTool,
+}
+
+impl UpdateBetaAgentsRequestToolsWebSearchTool {
+    pub fn new() -> Self {
+        Self {
+            raw: WebSearchTool {
+                tool_configuration: None,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn tool_configuration(
+        mut self,
+        tool_configuration: impl Into<UpdateBetaAgentsRequestToolsWebSearchToolToolConfiguration>,
+    ) -> Self {
+        self.raw.tool_configuration = Some(Some(
+            Into::<UpdateBetaAgentsRequestToolsWebSearchToolToolConfiguration>::into(
+                tool_configuration,
+            )
+            .into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn tool_configuration_null(mut self) -> Self {
+        self.raw.tool_configuration = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: WebSearchToolType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: WebSearchTool) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &WebSearchTool {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WebSearchTool {
+        self.raw
+    }
+}
+
+impl From<WebSearchTool> for UpdateBetaAgentsRequestToolsWebSearchTool {
+    fn from(raw: WebSearchTool) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaAgentsRequestToolsWebSearchTool> for WebSearchTool {
+    fn from(value: UpdateBetaAgentsRequestToolsWebSearchTool) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for UpdateBetaAgentsRequestToolsWebSearchTool {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateBetaAgentsRequestToolsWebSearchToolToolConfiguration {
+    raw: ToolConfiguration,
+}
+
+impl UpdateBetaAgentsRequestToolsWebSearchToolToolConfiguration {
+    pub fn new() -> Self {
+        Self {
+            raw: ToolConfiguration {
+                exclude: None,
+                include: None,
+                requires_confirmation: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn exclude(mut self, exclude: Vec<String>) -> Self {
+        self.raw.exclude = Some(Some(exclude));
+        self
+    }
+
+    #[must_use]
+    pub fn exclude_null(mut self) -> Self {
+        self.raw.exclude = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn include(mut self, include: Vec<String>) -> Self {
+        self.raw.include = Some(Some(include));
+        self
+    }
+
+    #[must_use]
+    pub fn include_null(mut self) -> Self {
+        self.raw.include = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation(mut self, requires_confirmation: Vec<String>) -> Self {
+        self.raw.requires_confirmation = Some(Some(requires_confirmation));
+        self
+    }
+
+    #[must_use]
+    pub fn requires_confirmation_null(mut self) -> Self {
+        self.raw.requires_confirmation = Some(None);
+        self
+    }
+    pub fn from_raw(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &ToolConfiguration {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ToolConfiguration {
+        self.raw
+    }
+}
+
+impl From<ToolConfiguration> for UpdateBetaAgentsRequestToolsWebSearchToolToolConfiguration {
+    fn from(raw: ToolConfiguration) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaAgentsRequestToolsWebSearchToolToolConfiguration> for ToolConfiguration {
+    fn from(value: UpdateBetaAgentsRequestToolsWebSearchToolToolConfiguration) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for UpdateBetaAgentsRequestToolsWebSearchToolToolConfiguration {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateBetaAgentsResponse {
+    raw: Agent,
+}
+
+impl UpdateBetaAgentsResponse {
+    pub fn raw(&self) -> &Agent {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Agent {
+        self.raw
+    }
+}
+
+impl From<Agent> for UpdateBetaAgentsResponse {
+    fn from(raw: Agent) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaAgentsResponse> for Agent {
+    fn from(value: UpdateBetaAgentsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateBetaConnectorsRequest {
+    raw: UpdateConnectorRequest,
+}
+
+impl UpdateBetaConnectorsRequest {
+    pub fn new() -> Self {
+        Self {
+            raw: UpdateConnectorRequest {
+                auth_methods: None,
+                description: None,
+                icon_url: None,
+                name: None,
+                protocol: None,
+                server: None,
+                system_prompt: None,
+                title: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn auth_methods(
+        mut self,
+        auth_methods: Vec<AuthenticationMethodCreateOrUpdateRequest>,
+    ) -> Self {
+        self.raw.auth_methods = Some(Some(auth_methods));
+        self
+    }
+
+    #[must_use]
+    pub fn auth_methods_null(mut self) -> Self {
+        self.raw.auth_methods = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.raw.description = Some(Some(description.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn description_null(mut self) -> Self {
+        self.raw.description = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn icon_url(mut self, icon_url: impl Into<String>) -> Self {
+        self.raw.icon_url = Some(Some(icon_url.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn icon_url_null(mut self) -> Self {
+        self.raw.icon_url = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn name(mut self, name: impl Into<String>) -> Self {
+        self.raw.name = Some(Some(name.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn name_null(mut self) -> Self {
+        self.raw.name = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn protocol(mut self, protocol: UpdateConnectorRequestProtocol) -> Self {
+        self.raw.protocol = Some(protocol);
+        self
+    }
+
+    #[must_use]
+    pub fn server(mut self, server: url::Url) -> Self {
+        self.raw.server = Some(Some(server));
+        self
+    }
+
+    #[must_use]
+    pub fn server_null(mut self) -> Self {
+        self.raw.server = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn system_prompt(mut self, system_prompt: impl Into<String>) -> Self {
+        self.raw.system_prompt = Some(Some(system_prompt.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn system_prompt_null(mut self) -> Self {
+        self.raw.system_prompt = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn title(mut self, title: impl Into<String>) -> Self {
+        self.raw.title = Some(Some(title.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn title_null(mut self) -> Self {
+        self.raw.title = Some(None);
+        self
+    }
+    pub fn from_raw(raw: UpdateConnectorRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &UpdateConnectorRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> UpdateConnectorRequest {
+        self.raw
+    }
+}
+
+impl From<UpdateConnectorRequest> for UpdateBetaConnectorsRequest {
+    fn from(raw: UpdateConnectorRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaConnectorsRequest> for UpdateConnectorRequest {
+    fn from(value: UpdateBetaConnectorsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for UpdateBetaConnectorsRequest {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateBetaConnectorsResponse {
+    raw: Connector,
+}
+
+impl UpdateBetaConnectorsResponse {
+    pub fn raw(&self) -> &Connector {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Connector {
+        self.raw
+    }
+}
+
+impl From<Connector> for UpdateBetaConnectorsResponse {
+    fn from(raw: Connector) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaConnectorsResponse> for Connector {
+    fn from(value: UpdateBetaConnectorsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateBetaLibrariesDocumentsRequest {
+    raw: UpdateDocumentRequest,
+}
+
+impl UpdateBetaLibrariesDocumentsRequest {
+    pub fn new() -> Self {
+        Self {
+            raw: UpdateDocumentRequest {
+                attributes: None,
+                expires_at: None,
+                name: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn attributes(mut self, attributes: UpdateDocumentRequestAttributes) -> Self {
+        self.raw.attributes = Some(Some(attributes));
+        self
+    }
+
+    #[must_use]
+    pub fn attributes_null(mut self) -> Self {
+        self.raw.attributes = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn expires_at(mut self, expires_at: chrono::DateTime<chrono::Utc>) -> Self {
+        self.raw.expires_at = Some(Some(expires_at));
+        self
+    }
+
+    #[must_use]
+    pub fn expires_at_null(mut self) -> Self {
+        self.raw.expires_at = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn name(mut self, name: impl Into<String>) -> Self {
+        self.raw.name = Some(name.into());
+        self
+    }
+    pub fn from_raw(raw: UpdateDocumentRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &UpdateDocumentRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> UpdateDocumentRequest {
+        self.raw
+    }
+}
+
+impl From<UpdateDocumentRequest> for UpdateBetaLibrariesDocumentsRequest {
+    fn from(raw: UpdateDocumentRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaLibrariesDocumentsRequest> for UpdateDocumentRequest {
+    fn from(value: UpdateBetaLibrariesDocumentsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for UpdateBetaLibrariesDocumentsRequest {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateBetaLibrariesDocumentsResponse {
+    raw: Document,
+}
+
+impl UpdateBetaLibrariesDocumentsResponse {
+    pub fn raw(&self) -> &Document {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Document {
+        self.raw
+    }
+}
+
+impl From<Document> for UpdateBetaLibrariesDocumentsResponse {
+    fn from(raw: Document) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaLibrariesDocumentsResponse> for Document {
+    fn from(value: UpdateBetaLibrariesDocumentsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateBetaLibrariesRequest {
+    raw: UpdateLibraryRequest,
+}
+
+impl UpdateBetaLibrariesRequest {
+    pub fn new() -> Self {
+        Self {
+            raw: UpdateLibraryRequest {
+                description: None,
+                name: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.raw.description = Some(Some(description.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn description_null(mut self) -> Self {
+        self.raw.description = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn name(mut self, name: impl Into<String>) -> Self {
+        self.raw.name = Some(name.into());
+        self
+    }
+    pub fn from_raw(raw: UpdateLibraryRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &UpdateLibraryRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> UpdateLibraryRequest {
+        self.raw
+    }
+}
+
+impl From<UpdateLibraryRequest> for UpdateBetaLibrariesRequest {
+    fn from(raw: UpdateLibraryRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaLibrariesRequest> for UpdateLibraryRequest {
+    fn from(value: UpdateBetaLibrariesRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for UpdateBetaLibrariesRequest {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateBetaLibrariesResponse {
+    raw: Library,
+}
+
+impl UpdateBetaLibrariesResponse {
+    pub fn raw(&self) -> &Library {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Library {
+        self.raw
+    }
+}
+
+impl From<Library> for UpdateBetaLibrariesResponse {
+    fn from(raw: Library) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaLibrariesResponse> for Library {
+    fn from(value: UpdateBetaLibrariesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateBetaObservabilityDatasetsRequest {
+    raw: UpdateDatasetRequest,
+}
+
+impl UpdateBetaObservabilityDatasetsRequest {
+    pub fn new() -> Self {
+        Self {
+            raw: UpdateDatasetRequest {
+                description: None,
+                name: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.raw.description = Some(Some(description.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn description_null(mut self) -> Self {
+        self.raw.description = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn name(mut self, name: impl Into<String>) -> Self {
+        self.raw.name = Some(Some(name.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn name_null(mut self) -> Self {
+        self.raw.name = Some(None);
+        self
+    }
+    pub fn from_raw(raw: UpdateDatasetRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &UpdateDatasetRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> UpdateDatasetRequest {
+        self.raw
+    }
+}
+
+impl From<UpdateDatasetRequest> for UpdateBetaObservabilityDatasetsRequest {
+    fn from(raw: UpdateDatasetRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaObservabilityDatasetsRequest> for UpdateDatasetRequest {
+    fn from(value: UpdateBetaObservabilityDatasetsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for UpdateBetaObservabilityDatasetsRequest {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateBetaObservabilityDatasetsResponse {
+    raw: DatasetPreview,
+}
+
+impl UpdateBetaObservabilityDatasetsResponse {
+    pub fn raw(&self) -> &DatasetPreview {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DatasetPreview {
+        self.raw
+    }
+}
+
+impl From<DatasetPreview> for UpdateBetaObservabilityDatasetsResponse {
+    fn from(raw: DatasetPreview) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaObservabilityDatasetsResponse> for DatasetPreview {
+    fn from(value: UpdateBetaObservabilityDatasetsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateBetaObservabilityJudgesRequest {
+    raw: UpdateJudgeRequest,
+}
+
+impl UpdateBetaObservabilityJudgesRequest {
+    pub fn new(
+        name: impl Into<String>,
+        description: impl Into<String>,
+        model_name: impl Into<String>,
+        output: impl Into<UpdateBetaObservabilityJudgesRequestOutput>,
+        instructions: impl Into<String>,
+        tools: Vec<String>,
+    ) -> Self {
+        Self {
+            raw: UpdateJudgeRequest {
+                description: description.into(),
+                instructions: instructions.into(),
+                model_name: model_name.into(),
+                name: name.into(),
+                output: Into::<UpdateBetaObservabilityJudgesRequestOutput>::into(output).into(),
+                tools,
+            },
+        }
+    }
+    pub fn from_raw(raw: UpdateJudgeRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &UpdateJudgeRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> UpdateJudgeRequest {
+        self.raw
+    }
+}
+
+impl From<UpdateJudgeRequest> for UpdateBetaObservabilityJudgesRequest {
+    fn from(raw: UpdateJudgeRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaObservabilityJudgesRequest> for UpdateJudgeRequest {
+    fn from(value: UpdateBetaObservabilityJudgesRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub enum UpdateBetaObservabilityJudgesRequestOutput {
+    JudgeClassificationOutput(UpdateBetaObservabilityJudgesRequestOutputJudgeClassificationOutput),
+    JudgeRegressionOutput(UpdateBetaObservabilityJudgesRequestOutputJudgeRegressionOutput),
+}
+
+impl From<UpdateBetaObservabilityJudgesRequestOutputJudgeClassificationOutput>
+    for UpdateBetaObservabilityJudgesRequestOutput
+{
+    fn from(value: UpdateBetaObservabilityJudgesRequestOutputJudgeClassificationOutput) -> Self {
+        Self::JudgeClassificationOutput(value)
+    }
+}
+
+impl From<UpdateBetaObservabilityJudgesRequestOutputJudgeRegressionOutput>
+    for UpdateBetaObservabilityJudgesRequestOutput
+{
+    fn from(value: UpdateBetaObservabilityJudgesRequestOutputJudgeRegressionOutput) -> Self {
+        Self::JudgeRegressionOutput(value)
+    }
+}
+
+impl From<UpdateBetaObservabilityJudgesRequestOutput> for UpdateJudgeRequestOutput {
+    fn from(value: UpdateBetaObservabilityJudgesRequestOutput) -> Self {
+        match value {
+            UpdateBetaObservabilityJudgesRequestOutput::JudgeClassificationOutput(value) => {
+                Self::JudgeClassificationOutput(value.into())
+            }
+            UpdateBetaObservabilityJudgesRequestOutput::JudgeRegressionOutput(value) => {
+                Self::JudgeRegressionOutput(value.into())
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateBetaObservabilityJudgesRequestOutputJudgeClassificationOutput {
+    raw: JudgeClassificationOutput,
+}
+
+impl UpdateBetaObservabilityJudgesRequestOutputJudgeClassificationOutput {
+    pub fn new(options: Vec<JudgeClassificationOutputOption>) -> Self {
+        Self {
+            raw: JudgeClassificationOutput {
+                options,
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn r#type(mut self, r#type: JudgeClassificationOutputType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: JudgeClassificationOutput) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &JudgeClassificationOutput {
+        &self.raw
+    }
+    pub fn into_raw(self) -> JudgeClassificationOutput {
+        self.raw
+    }
+}
+
+impl From<JudgeClassificationOutput>
+    for UpdateBetaObservabilityJudgesRequestOutputJudgeClassificationOutput
+{
+    fn from(raw: JudgeClassificationOutput) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaObservabilityJudgesRequestOutputJudgeClassificationOutput>
+    for JudgeClassificationOutput
+{
+    fn from(value: UpdateBetaObservabilityJudgesRequestOutputJudgeClassificationOutput) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateBetaObservabilityJudgesRequestOutputJudgeRegressionOutput {
+    raw: JudgeRegressionOutput,
+}
+
+impl UpdateBetaObservabilityJudgesRequestOutputJudgeRegressionOutput {
+    pub fn new(min_description: impl Into<String>, max_description: impl Into<String>) -> Self {
+        Self {
+            raw: JudgeRegressionOutput {
+                max: None,
+                max_description: max_description.into(),
+                min: None,
+                min_description: min_description.into(),
+                r#type: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn max(mut self, max: f64) -> Self {
+        self.raw.max = Some(max);
+        self
+    }
+
+    #[must_use]
+    pub fn min(mut self, min: f64) -> Self {
+        self.raw.min = Some(min);
+        self
+    }
+
+    #[must_use]
+    pub fn r#type(mut self, r#type: JudgeRegressionOutputType) -> Self {
+        self.raw.r#type = Some(r#type);
+        self
+    }
+    pub fn from_raw(raw: JudgeRegressionOutput) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &JudgeRegressionOutput {
+        &self.raw
+    }
+    pub fn into_raw(self) -> JudgeRegressionOutput {
+        self.raw
+    }
+}
+
+impl From<JudgeRegressionOutput>
+    for UpdateBetaObservabilityJudgesRequestOutputJudgeRegressionOutput
+{
+    fn from(raw: JudgeRegressionOutput) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateBetaObservabilityJudgesRequestOutputJudgeRegressionOutput>
+    for JudgeRegressionOutput
+{
+    fn from(value: UpdateBetaObservabilityJudgesRequestOutputJudgeRegressionOutput) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateDeploymentWorkflowsDeploymentsRequest {
+    raw: UpdateDeploymentRequest,
+}
+
+impl UpdateDeploymentWorkflowsDeploymentsRequest {
+    pub fn new() -> Self {
+        Self {
+            raw: UpdateDeploymentRequest {
+                resources: None,
+                spec: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn resources(
+        mut self,
+        resources: impl Into<UpdateDeploymentWorkflowsDeploymentsRequestResources>,
+    ) -> Self {
+        self.raw.resources = Some(Some(
+            Into::<UpdateDeploymentWorkflowsDeploymentsRequestResources>::into(resources).into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn resources_null(mut self) -> Self {
+        self.raw.resources = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn spec(
+        mut self,
+        spec: impl Into<UpdateDeploymentWorkflowsDeploymentsRequestSpec>,
+    ) -> Self {
+        self.raw.spec = Some(Some(
+            Into::<UpdateDeploymentWorkflowsDeploymentsRequestSpec>::into(spec).into(),
+        ));
+        self
+    }
+
+    #[must_use]
+    pub fn spec_null(mut self) -> Self {
+        self.raw.spec = Some(None);
+        self
+    }
+    pub fn from_raw(raw: UpdateDeploymentRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &UpdateDeploymentRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> UpdateDeploymentRequest {
+        self.raw
+    }
+}
+
+impl From<UpdateDeploymentRequest> for UpdateDeploymentWorkflowsDeploymentsRequest {
+    fn from(raw: UpdateDeploymentRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateDeploymentWorkflowsDeploymentsRequest> for UpdateDeploymentRequest {
+    fn from(value: UpdateDeploymentWorkflowsDeploymentsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for UpdateDeploymentWorkflowsDeploymentsRequest {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateDeploymentWorkflowsDeploymentsRequestResources {
+    raw: DeploymentResourceConfigUpdate,
+}
+
+impl UpdateDeploymentWorkflowsDeploymentsRequestResources {
+    pub fn new() -> Self {
+        Self {
+            raw: DeploymentResourceConfigUpdate {
+                cpu_limit: None,
+                cpu_request: None,
+                memory_limit: None,
+                memory_request: None,
+                replicas: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn cpu_limit(mut self, cpu_limit: impl Into<String>) -> Self {
+        self.raw.cpu_limit = Some(Some(cpu_limit.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn cpu_limit_null(mut self) -> Self {
+        self.raw.cpu_limit = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn cpu_request(mut self, cpu_request: impl Into<String>) -> Self {
+        self.raw.cpu_request = Some(Some(cpu_request.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn cpu_request_null(mut self) -> Self {
+        self.raw.cpu_request = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn memory_limit(mut self, memory_limit: impl Into<String>) -> Self {
+        self.raw.memory_limit = Some(Some(memory_limit.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn memory_limit_null(mut self) -> Self {
+        self.raw.memory_limit = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn memory_request(mut self, memory_request: impl Into<String>) -> Self {
+        self.raw.memory_request = Some(Some(memory_request.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn memory_request_null(mut self) -> Self {
+        self.raw.memory_request = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn replicas(mut self, replicas: i64) -> Self {
+        self.raw.replicas = Some(Some(replicas));
+        self
+    }
+
+    #[must_use]
+    pub fn replicas_null(mut self) -> Self {
+        self.raw.replicas = Some(None);
+        self
+    }
+    pub fn from_raw(raw: DeploymentResourceConfigUpdate) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &DeploymentResourceConfigUpdate {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DeploymentResourceConfigUpdate {
+        self.raw
+    }
+}
+
+impl From<DeploymentResourceConfigUpdate> for UpdateDeploymentWorkflowsDeploymentsRequestResources {
+    fn from(raw: DeploymentResourceConfigUpdate) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateDeploymentWorkflowsDeploymentsRequestResources> for DeploymentResourceConfigUpdate {
+    fn from(value: UpdateDeploymentWorkflowsDeploymentsRequestResources) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for UpdateDeploymentWorkflowsDeploymentsRequestResources {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateDeploymentWorkflowsDeploymentsRequestSpec {
+    raw: WorkflowsWorkerSpecUpdate,
+}
+
+impl UpdateDeploymentWorkflowsDeploymentsRequestSpec {
+    pub fn new() -> Self {
+        Self {
+            raw: WorkflowsWorkerSpecUpdate {
+                entrypoint: None,
+                github_url: None,
+                revision: None,
+                working_dir: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn entrypoint(mut self, entrypoint: impl Into<String>) -> Self {
+        self.raw.entrypoint = Some(Some(entrypoint.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn entrypoint_null(mut self) -> Self {
+        self.raw.entrypoint = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn github_url(mut self, github_url: impl Into<String>) -> Self {
+        self.raw.github_url = Some(Some(github_url.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn github_url_null(mut self) -> Self {
+        self.raw.github_url = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn revision(mut self, revision: impl Into<String>) -> Self {
+        self.raw.revision = Some(Some(revision.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn revision_null(mut self) -> Self {
+        self.raw.revision = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn working_dir(mut self, working_dir: impl Into<String>) -> Self {
+        self.raw.working_dir = Some(Some(working_dir.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn working_dir_null(mut self) -> Self {
+        self.raw.working_dir = Some(None);
+        self
+    }
+    pub fn from_raw(raw: WorkflowsWorkerSpecUpdate) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &WorkflowsWorkerSpecUpdate {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowsWorkerSpecUpdate {
+        self.raw
+    }
+}
+
+impl From<WorkflowsWorkerSpecUpdate> for UpdateDeploymentWorkflowsDeploymentsRequestSpec {
+    fn from(raw: WorkflowsWorkerSpecUpdate) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateDeploymentWorkflowsDeploymentsRequestSpec> for WorkflowsWorkerSpecUpdate {
+    fn from(value: UpdateDeploymentWorkflowsDeploymentsRequestSpec) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for UpdateDeploymentWorkflowsDeploymentsRequestSpec {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateDeploymentWorkflowsDeploymentsResponse {
+    raw: ManagedDeploymentResponse,
+}
+
+impl UpdateDeploymentWorkflowsDeploymentsResponse {
+    pub fn raw(&self) -> &ManagedDeploymentResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ManagedDeploymentResponse {
+        self.raw
+    }
+}
+
+impl From<ManagedDeploymentResponse> for UpdateDeploymentWorkflowsDeploymentsResponse {
+    fn from(raw: ManagedDeploymentResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateDeploymentWorkflowsDeploymentsResponse> for ManagedDeploymentResponse {
+    fn from(value: UpdateDeploymentWorkflowsDeploymentsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateIndexMetricsBetaRagSearchIndexesRequest {
+    raw: UpdateIndexMetricsV1RagDeploymentsDeploymentIdMetricsPutRequest,
+}
+
+impl UpdateIndexMetricsBetaRagSearchIndexesRequest {
+    pub fn raw(&self) -> &UpdateIndexMetricsV1RagDeploymentsDeploymentIdMetricsPutRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> UpdateIndexMetricsV1RagDeploymentsDeploymentIdMetricsPutRequest {
+        self.raw
+    }
+}
+
+impl From<UpdateIndexMetricsV1RagDeploymentsDeploymentIdMetricsPutRequest>
+    for UpdateIndexMetricsBetaRagSearchIndexesRequest
+{
+    fn from(raw: UpdateIndexMetricsV1RagDeploymentsDeploymentIdMetricsPutRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateIndexMetricsBetaRagSearchIndexesRequest>
+    for UpdateIndexMetricsV1RagDeploymentsDeploymentIdMetricsPutRequest
+{
+    fn from(value: UpdateIndexMetricsBetaRagSearchIndexesRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+pub type UpdateIndexMetricsBetaRagSearchIndexesResponse = serde_json::Value;
+
+#[derive(Debug, Clone)]
+pub struct UpdateMetadataBetaPromptsRequest {
+    raw: PromptsUpdateRequest,
+}
+
+impl UpdateMetadataBetaPromptsRequest {
+    pub fn raw(&self) -> &PromptsUpdateRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> PromptsUpdateRequest {
+        self.raw
+    }
+}
+
+impl From<PromptsUpdateRequest> for UpdateMetadataBetaPromptsRequest {
+    fn from(raw: PromptsUpdateRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateMetadataBetaPromptsRequest> for PromptsUpdateRequest {
+    fn from(value: UpdateMetadataBetaPromptsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateMetadataBetaPromptsResponse {
+    raw: Prompt,
+}
+
+impl UpdateMetadataBetaPromptsResponse {
+    pub fn raw(&self) -> &Prompt {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Prompt {
+        self.raw
+    }
+}
+
+impl From<Prompt> for UpdateMetadataBetaPromptsResponse {
+    fn from(raw: Prompt) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateMetadataBetaPromptsResponse> for Prompt {
+    fn from(value: UpdateMetadataBetaPromptsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateMetadataBetaSkillsRequest {
+    raw: SkillsUpdateRequest,
+}
+
+impl UpdateMetadataBetaSkillsRequest {
+    pub fn raw(&self) -> &SkillsUpdateRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> SkillsUpdateRequest {
+        self.raw
+    }
+}
+
+impl From<SkillsUpdateRequest> for UpdateMetadataBetaSkillsRequest {
+    fn from(raw: SkillsUpdateRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateMetadataBetaSkillsRequest> for SkillsUpdateRequest {
+    fn from(value: UpdateMetadataBetaSkillsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateMetadataBetaSkillsResponse {
+    raw: Skill,
+}
+
+impl UpdateMetadataBetaSkillsResponse {
+    pub fn raw(&self) -> &Skill {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Skill {
+        self.raw
+    }
+}
+
+impl From<Skill> for UpdateMetadataBetaSkillsResponse {
+    fn from(raw: Skill) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateMetadataBetaSkillsResponse> for Skill {
+    fn from(value: UpdateMetadataBetaSkillsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateModelsRequest {
+    raw: UpdateModelRequest,
+}
+
+impl UpdateModelsRequest {
+    pub fn new() -> Self {
+        Self {
+            raw: UpdateModelRequest {
+                description: None,
+                name: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.raw.description = Some(Some(description.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn description_null(mut self) -> Self {
+        self.raw.description = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn name(mut self, name: impl Into<String>) -> Self {
+        self.raw.name = Some(Some(name.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn name_null(mut self) -> Self {
+        self.raw.name = Some(None);
+        self
+    }
+    pub fn from_raw(raw: UpdateModelRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &UpdateModelRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> UpdateModelRequest {
+        self.raw
+    }
+}
+
+impl From<UpdateModelRequest> for UpdateModelsRequest {
+    fn from(raw: UpdateModelRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateModelsRequest> for UpdateModelRequest {
+    fn from(value: UpdateModelsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for UpdateModelsRequest {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub enum UpdateModelsResponse {
+    ClassifierFineTunedModel(UpdateModelsResponseClassifierFineTunedModel),
+    CompletionFineTunedModel(UpdateModelsResponseCompletionFineTunedModel),
+}
+
+impl From<UpdateModelsResponseClassifierFineTunedModel> for UpdateModelsResponse {
+    fn from(value: UpdateModelsResponseClassifierFineTunedModel) -> Self {
+        Self::ClassifierFineTunedModel(value)
+    }
+}
+
+impl From<UpdateModelsResponseCompletionFineTunedModel> for UpdateModelsResponse {
+    fn from(value: UpdateModelsResponseCompletionFineTunedModel) -> Self {
+        Self::CompletionFineTunedModel(value)
+    }
+}
+
+impl From<UpdateModelsResponse> for JobsApiRoutesFineTuningUpdateFineTunedModelResponse {
+    fn from(value: UpdateModelsResponse) -> Self {
+        match value {
+            UpdateModelsResponse::ClassifierFineTunedModel(value) => {
+                Self::ClassifierFineTunedModel(value.into())
+            }
+            UpdateModelsResponse::CompletionFineTunedModel(value) => {
+                Self::CompletionFineTunedModel(value.into())
+            }
+        }
+    }
+}
+
+impl From<JobsApiRoutesFineTuningUpdateFineTunedModelResponse> for UpdateModelsResponse {
+    fn from(value: JobsApiRoutesFineTuningUpdateFineTunedModelResponse) -> Self {
+        match value {
+            JobsApiRoutesFineTuningUpdateFineTunedModelResponse::ClassifierFineTunedModel(
+                value,
+            ) => Self::ClassifierFineTunedModel(value.into()),
+            JobsApiRoutesFineTuningUpdateFineTunedModelResponse::CompletionFineTunedModel(
+                value,
+            ) => Self::CompletionFineTunedModel(value.into()),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateModelsResponseClassifierFineTunedModel {
+    raw: ClassifierFineTunedModel,
+}
+
+impl UpdateModelsResponseClassifierFineTunedModel {
+    pub fn raw(&self) -> &ClassifierFineTunedModel {
+        &self.raw
+    }
+    pub fn into_raw(self) -> ClassifierFineTunedModel {
+        self.raw
+    }
+}
+
+impl From<ClassifierFineTunedModel> for UpdateModelsResponseClassifierFineTunedModel {
+    fn from(raw: ClassifierFineTunedModel) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateModelsResponseClassifierFineTunedModel> for ClassifierFineTunedModel {
+    fn from(value: UpdateModelsResponseClassifierFineTunedModel) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateModelsResponseCompletionFineTunedModel {
+    raw: CompletionFineTunedModel,
+}
+
+impl UpdateModelsResponseCompletionFineTunedModel {
+    pub fn raw(&self) -> &CompletionFineTunedModel {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CompletionFineTunedModel {
+        self.raw
+    }
+}
+
+impl From<CompletionFineTunedModel> for UpdateModelsResponseCompletionFineTunedModel {
+    fn from(raw: CompletionFineTunedModel) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateModelsResponseCompletionFineTunedModel> for CompletionFineTunedModel {
+    fn from(value: UpdateModelsResponseCompletionFineTunedModel) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateOrCreateBetaLibrariesAccessesRequest {
+    raw: SharingRequest,
+}
+
+impl UpdateOrCreateBetaLibrariesAccessesRequest {
+    pub fn new(share_with_uuid: uuid::Uuid, share_with_type: EntityType, level: ShareEnum) -> Self {
+        Self {
+            raw: SharingRequest {
+                level,
+                org_id: None,
+                share_with_type,
+                share_with_uuid,
+            },
+        }
+    }
+    #[must_use]
+    pub fn org_id(mut self, org_id: uuid::Uuid) -> Self {
+        self.raw.org_id = Some(Some(org_id));
+        self
+    }
+
+    #[must_use]
+    pub fn org_id_null(mut self) -> Self {
+        self.raw.org_id = Some(None);
+        self
+    }
+    pub fn from_raw(raw: SharingRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &SharingRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> SharingRequest {
+        self.raw
+    }
+}
+
+impl From<SharingRequest> for UpdateOrCreateBetaLibrariesAccessesRequest {
+    fn from(raw: SharingRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateOrCreateBetaLibrariesAccessesRequest> for SharingRequest {
+    fn from(value: UpdateOrCreateBetaLibrariesAccessesRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateOrCreateBetaLibrariesAccessesResponse {
+    raw: Sharing,
+}
+
+impl UpdateOrCreateBetaLibrariesAccessesResponse {
+    pub fn raw(&self) -> &Sharing {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Sharing {
+        self.raw
+    }
+}
+
+impl From<Sharing> for UpdateOrCreateBetaLibrariesAccessesResponse {
+    fn from(raw: Sharing) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateOrCreateBetaLibrariesAccessesResponse> for Sharing {
+    fn from(value: UpdateOrCreateBetaLibrariesAccessesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdatePayloadBetaObservabilityDatasetsRecordsRequest {
+    raw: UpdateDatasetRecordPayloadRequest,
+}
+
+impl UpdatePayloadBetaObservabilityDatasetsRecordsRequest {
+    pub fn new(payload: DatasetRecordPayload) -> Self {
+        Self {
+            raw: UpdateDatasetRecordPayloadRequest { payload },
+        }
+    }
+    pub fn from_raw(raw: UpdateDatasetRecordPayloadRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &UpdateDatasetRecordPayloadRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> UpdateDatasetRecordPayloadRequest {
+        self.raw
+    }
+}
+
+impl From<UpdateDatasetRecordPayloadRequest>
+    for UpdatePayloadBetaObservabilityDatasetsRecordsRequest
+{
+    fn from(raw: UpdateDatasetRecordPayloadRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdatePayloadBetaObservabilityDatasetsRecordsRequest>
+    for UpdateDatasetRecordPayloadRequest
+{
+    fn from(value: UpdatePayloadBetaObservabilityDatasetsRecordsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdatePropertiesBetaObservabilityDatasetsRecordsRequest {
+    raw: UpdateDatasetRecordPropertiesRequest,
+}
+
+impl UpdatePropertiesBetaObservabilityDatasetsRecordsRequest {
+    pub fn new(properties: UpdateDatasetRecordPropertiesRequestProperties) -> Self {
+        Self {
+            raw: UpdateDatasetRecordPropertiesRequest { properties },
+        }
+    }
+    pub fn from_raw(raw: UpdateDatasetRecordPropertiesRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &UpdateDatasetRecordPropertiesRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> UpdateDatasetRecordPropertiesRequest {
+        self.raw
+    }
+}
+
+impl From<UpdateDatasetRecordPropertiesRequest>
+    for UpdatePropertiesBetaObservabilityDatasetsRecordsRequest
+{
+    fn from(raw: UpdateDatasetRecordPropertiesRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdatePropertiesBetaObservabilityDatasetsRecordsRequest>
+    for UpdateDatasetRecordPropertiesRequest
+{
+    fn from(value: UpdatePropertiesBetaObservabilityDatasetsRecordsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateRunInfoBetaRagIngestionPipelineConfigurationsRequest {
+    raw: UpdateRunInfo,
+}
+
+impl UpdateRunInfoBetaRagIngestionPipelineConfigurationsRequest {
+    pub fn new(execution_time: chrono::DateTime<chrono::Utc>, chunks_count: i64) -> Self {
+        Self {
+            raw: UpdateRunInfo {
+                chunks_count,
+                execution_time,
+            },
+        }
+    }
+    pub fn from_raw(raw: UpdateRunInfo) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &UpdateRunInfo {
+        &self.raw
+    }
+    pub fn into_raw(self) -> UpdateRunInfo {
+        self.raw
+    }
+}
+
+impl From<UpdateRunInfo> for UpdateRunInfoBetaRagIngestionPipelineConfigurationsRequest {
+    fn from(raw: UpdateRunInfo) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateRunInfoBetaRagIngestionPipelineConfigurationsRequest> for UpdateRunInfo {
+    fn from(value: UpdateRunInfoBetaRagIngestionPipelineConfigurationsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateRunInfoBetaRagIngestionPipelineConfigurationsResponse {
+    raw: IngestionPipelineConfiguration,
+}
+
+impl UpdateRunInfoBetaRagIngestionPipelineConfigurationsResponse {
+    pub fn raw(&self) -> &IngestionPipelineConfiguration {
+        &self.raw
+    }
+    pub fn into_raw(self) -> IngestionPipelineConfiguration {
+        self.raw
+    }
+}
+
+impl From<IngestionPipelineConfiguration>
+    for UpdateRunInfoBetaRagIngestionPipelineConfigurationsResponse
+{
+    fn from(raw: IngestionPipelineConfiguration) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateRunInfoBetaRagIngestionPipelineConfigurationsResponse>
+    for IngestionPipelineConfiguration
+{
+    fn from(value: UpdateRunInfoBetaRagIngestionPipelineConfigurationsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateScheduleWorkflowsSchedulesRequest {
+    raw: WorkflowScheduleUpdateRequest,
+}
+
+impl UpdateScheduleWorkflowsSchedulesRequest {
+    pub fn new(schedule: impl Into<UpdateScheduleWorkflowsSchedulesRequestSchedule>) -> Self {
+        Self {
+            raw: WorkflowScheduleUpdateRequest {
+                schedule: Into::<UpdateScheduleWorkflowsSchedulesRequestSchedule>::into(schedule)
+                    .into(),
+            },
+        }
+    }
+    pub fn from_raw(raw: WorkflowScheduleUpdateRequest) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &WorkflowScheduleUpdateRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowScheduleUpdateRequest {
+        self.raw
+    }
+}
+
+impl From<WorkflowScheduleUpdateRequest> for UpdateScheduleWorkflowsSchedulesRequest {
+    fn from(raw: WorkflowScheduleUpdateRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateScheduleWorkflowsSchedulesRequest> for WorkflowScheduleUpdateRequest {
+    fn from(value: UpdateScheduleWorkflowsSchedulesRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateScheduleWorkflowsSchedulesRequestSchedule {
+    raw: PartialScheduleDefinition,
+}
+
+impl UpdateScheduleWorkflowsSchedulesRequestSchedule {
+    pub fn new() -> Self {
+        Self {
+            raw: PartialScheduleDefinition {
+                calendars: None,
+                cron_expressions: None,
+                end_at: None,
+                input: None,
+                intervals: None,
+                jitter: None,
+                max_executions: None,
+                policy: None,
+                skip: None,
+                start_at: None,
+                time_zone_name: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn calendars(mut self, calendars: Vec<ScheduleCalendar>) -> Self {
+        self.raw.calendars = Some(calendars);
+        self
+    }
+
+    #[must_use]
+    pub fn cron_expressions(mut self, cron_expressions: Vec<String>) -> Self {
+        self.raw.cron_expressions = Some(cron_expressions);
+        self
+    }
+
+    #[must_use]
+    pub fn end_at(mut self, end_at: chrono::DateTime<chrono::Utc>) -> Self {
+        self.raw.end_at = Some(Some(end_at));
+        self
+    }
+
+    #[must_use]
+    pub fn end_at_null(mut self) -> Self {
+        self.raw.end_at = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn input(mut self, input: serde_json::Value) -> Self {
+        self.raw.input = Some(input);
+        self
+    }
+
+    #[must_use]
+    pub fn intervals(mut self, intervals: Vec<ScheduleInterval>) -> Self {
+        self.raw.intervals = Some(intervals);
+        self
+    }
+
+    #[must_use]
+    pub fn jitter(mut self, jitter: impl Into<String>) -> Self {
+        self.raw.jitter = Some(Some(jitter.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn jitter_null(mut self) -> Self {
+        self.raw.jitter = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn max_executions(mut self, max_executions: i64) -> Self {
+        self.raw.max_executions = Some(Some(max_executions));
+        self
+    }
+
+    #[must_use]
+    pub fn max_executions_null(mut self) -> Self {
+        self.raw.max_executions = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn policy(
+        mut self,
+        policy: impl Into<UpdateScheduleWorkflowsSchedulesRequestSchedulePolicy>,
+    ) -> Self {
+        self.raw.policy = Some(
+            Into::<UpdateScheduleWorkflowsSchedulesRequestSchedulePolicy>::into(policy).into(),
+        );
+        self
+    }
+
+    #[must_use]
+    pub fn skip(mut self, skip: Vec<ScheduleCalendar>) -> Self {
+        self.raw.skip = Some(skip);
+        self
+    }
+
+    #[must_use]
+    pub fn start_at(mut self, start_at: chrono::DateTime<chrono::Utc>) -> Self {
+        self.raw.start_at = Some(Some(start_at));
+        self
+    }
+
+    #[must_use]
+    pub fn start_at_null(mut self) -> Self {
+        self.raw.start_at = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn time_zone_name(mut self, time_zone_name: impl Into<String>) -> Self {
+        self.raw.time_zone_name = Some(Some(time_zone_name.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn time_zone_name_null(mut self) -> Self {
+        self.raw.time_zone_name = Some(None);
+        self
+    }
+    pub fn from_raw(raw: PartialScheduleDefinition) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &PartialScheduleDefinition {
+        &self.raw
+    }
+    pub fn into_raw(self) -> PartialScheduleDefinition {
+        self.raw
+    }
+}
+
+impl From<PartialScheduleDefinition> for UpdateScheduleWorkflowsSchedulesRequestSchedule {
+    fn from(raw: PartialScheduleDefinition) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateScheduleWorkflowsSchedulesRequestSchedule> for PartialScheduleDefinition {
+    fn from(value: UpdateScheduleWorkflowsSchedulesRequestSchedule) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for UpdateScheduleWorkflowsSchedulesRequestSchedule {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateScheduleWorkflowsSchedulesRequestSchedulePolicy {
+    raw: SchedulePolicy,
+}
+
+impl UpdateScheduleWorkflowsSchedulesRequestSchedulePolicy {
+    pub fn new() -> Self {
+        Self {
+            raw: SchedulePolicy {
+                catchup_window_seconds: None,
+                overlap: None,
+                pause_on_failure: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn catchup_window_seconds(mut self, catchup_window_seconds: i64) -> Self {
+        self.raw.catchup_window_seconds = Some(catchup_window_seconds);
+        self
+    }
+
+    #[must_use]
+    pub fn overlap(mut self, overlap: ScheduleOverlapPolicy) -> Self {
+        self.raw.overlap = Some(overlap);
+        self
+    }
+
+    #[must_use]
+    pub fn pause_on_failure(mut self, pause_on_failure: bool) -> Self {
+        self.raw.pause_on_failure = Some(pause_on_failure);
+        self
+    }
+    pub fn from_raw(raw: SchedulePolicy) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &SchedulePolicy {
+        &self.raw
+    }
+    pub fn into_raw(self) -> SchedulePolicy {
+        self.raw
+    }
+}
+
+impl From<SchedulePolicy> for UpdateScheduleWorkflowsSchedulesRequestSchedulePolicy {
+    fn from(raw: SchedulePolicy) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateScheduleWorkflowsSchedulesRequestSchedulePolicy> for SchedulePolicy {
+    fn from(value: UpdateScheduleWorkflowsSchedulesRequestSchedulePolicy) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for UpdateScheduleWorkflowsSchedulesRequestSchedulePolicy {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateScheduleWorkflowsSchedulesResponse {
+    raw: WorkflowScheduleResponse,
+}
+
+impl UpdateScheduleWorkflowsSchedulesResponse {
+    pub fn schedule_id(&self) -> &str {
+        &self.raw.schedule_id
+    }
+    pub fn raw(&self) -> &WorkflowScheduleResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowScheduleResponse {
+        self.raw
+    }
+}
+
+impl From<WorkflowScheduleResponse> for UpdateScheduleWorkflowsSchedulesResponse {
+    fn from(raw: WorkflowScheduleResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateScheduleWorkflowsSchedulesResponse> for WorkflowScheduleResponse {
+    fn from(value: UpdateScheduleWorkflowsSchedulesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateVersionBetaAgentsResponse {
+    raw: Agent,
+}
+
+impl UpdateVersionBetaAgentsResponse {
+    pub fn raw(&self) -> &Agent {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Agent {
+        self.raw
+    }
+}
+
+impl From<Agent> for UpdateVersionBetaAgentsResponse {
+    fn from(raw: Agent) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateVersionBetaAgentsResponse> for Agent {
+    fn from(value: UpdateVersionBetaAgentsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateVersionMetadataBetaPromptsRequest {
+    raw: PromptsUpdateVersionMetadataRequest,
+}
+
+impl UpdateVersionMetadataBetaPromptsRequest {
+    pub fn raw(&self) -> &PromptsUpdateVersionMetadataRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> PromptsUpdateVersionMetadataRequest {
+        self.raw
+    }
+}
+
+impl From<PromptsUpdateVersionMetadataRequest> for UpdateVersionMetadataBetaPromptsRequest {
+    fn from(raw: PromptsUpdateVersionMetadataRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateVersionMetadataBetaPromptsRequest> for PromptsUpdateVersionMetadataRequest {
+    fn from(value: UpdateVersionMetadataBetaPromptsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateVersionMetadataBetaPromptsResponse {
+    raw: Prompt,
+}
+
+impl UpdateVersionMetadataBetaPromptsResponse {
+    pub fn raw(&self) -> &Prompt {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Prompt {
+        self.raw
+    }
+}
+
+impl From<Prompt> for UpdateVersionMetadataBetaPromptsResponse {
+    fn from(raw: Prompt) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateVersionMetadataBetaPromptsResponse> for Prompt {
+    fn from(value: UpdateVersionMetadataBetaPromptsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateVersionMetadataBetaSkillsRequest {
+    raw: SkillsUpdateVersionMetadataRequest,
+}
+
+impl UpdateVersionMetadataBetaSkillsRequest {
+    pub fn raw(&self) -> &SkillsUpdateVersionMetadataRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> SkillsUpdateVersionMetadataRequest {
+        self.raw
+    }
+}
+
+impl From<SkillsUpdateVersionMetadataRequest> for UpdateVersionMetadataBetaSkillsRequest {
+    fn from(raw: SkillsUpdateVersionMetadataRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateVersionMetadataBetaSkillsRequest> for SkillsUpdateVersionMetadataRequest {
+    fn from(value: UpdateVersionMetadataBetaSkillsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateVersionMetadataBetaSkillsResponse {
+    raw: Skill,
+}
+
+impl UpdateVersionMetadataBetaSkillsResponse {
+    pub fn raw(&self) -> &Skill {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Skill {
+        self.raw
+    }
+}
+
+impl From<Skill> for UpdateVersionMetadataBetaSkillsResponse {
+    fn from(raw: Skill) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateVersionMetadataBetaSkillsResponse> for Skill {
+    fn from(value: UpdateVersionMetadataBetaSkillsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateWorkflowExecutionWorkflowsExecutionsRequest {
+    raw: UpdateInvocationBody,
+}
+
+impl UpdateWorkflowExecutionWorkflowsExecutionsRequest {
+    pub fn new(name: impl Into<String>) -> Self {
+        Self {
+            raw: UpdateInvocationBody {
+                input: None,
+                name: name.into(),
+            },
+        }
+    }
+    #[must_use]
+    pub fn input(mut self, input: UpdateInvocationBodyInput) -> Self {
+        self.raw.input = Some(Some(input));
+        self
+    }
+
+    #[must_use]
+    pub fn input_null(mut self) -> Self {
+        self.raw.input = Some(None);
+        self
+    }
+    pub fn from_raw(raw: UpdateInvocationBody) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &UpdateInvocationBody {
+        &self.raw
+    }
+    pub fn into_raw(self) -> UpdateInvocationBody {
+        self.raw
+    }
+}
+
+impl From<UpdateInvocationBody> for UpdateWorkflowExecutionWorkflowsExecutionsRequest {
+    fn from(raw: UpdateInvocationBody) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateWorkflowExecutionWorkflowsExecutionsRequest> for UpdateInvocationBody {
+    fn from(value: UpdateWorkflowExecutionWorkflowsExecutionsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateWorkflowExecutionWorkflowsExecutionsResponse {
     raw: UpdateWorkflowResponse,
 }
 
-impl UpdateWorkflowResponseView {
-    pub fn update_name(&self) -> &str {
-        &self.raw.update_name
-    }
+impl UpdateWorkflowExecutionWorkflowsExecutionsResponse {
     pub fn raw(&self) -> &UpdateWorkflowResponse {
         &self.raw
     }
@@ -6822,56 +24601,31 @@ impl UpdateWorkflowResponseView {
     }
 }
 
-impl From<UpdateWorkflowResponse> for UpdateWorkflowResponseView {
+impl From<UpdateWorkflowResponse> for UpdateWorkflowExecutionWorkflowsExecutionsResponse {
     fn from(raw: UpdateWorkflowResponse) -> Self {
         Self { raw }
     }
 }
 
-impl From<UpdateWorkflowResponseView> for UpdateWorkflowResponse {
-    fn from(value: UpdateWorkflowResponseView) -> Self {
+impl From<UpdateWorkflowExecutionWorkflowsExecutionsResponse> for UpdateWorkflowResponse {
+    fn from(value: UpdateWorkflowExecutionWorkflowsExecutionsResponse) -> Self {
         value.into_raw()
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct WorkflowUpdateResponseView {
-    raw: WorkflowUpdateResponse,
-}
-
-impl WorkflowUpdateResponseView {
-    pub fn raw(&self) -> &WorkflowUpdateResponse {
-        &self.raw
-    }
-    pub fn into_raw(self) -> WorkflowUpdateResponse {
-        self.raw
-    }
-}
-
-impl From<WorkflowUpdateResponse> for WorkflowUpdateResponseView {
-    fn from(raw: WorkflowUpdateResponse) -> Self {
-        Self { raw }
-    }
-}
-
-impl From<WorkflowUpdateResponseView> for WorkflowUpdateResponse {
-    fn from(value: WorkflowUpdateResponseView) -> Self {
-        value.into_raw()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct WorkflowUpdateRequestParams {
+pub struct UpdateWorkflowWorkflowsRequest {
     raw: WorkflowUpdateRequest,
 }
 
-impl WorkflowUpdateRequestParams {
+impl UpdateWorkflowWorkflowsRequest {
     pub fn new() -> Self {
         Self {
             raw: WorkflowUpdateRequest {
                 available_in_chat_assistant: None,
                 description: None,
                 display_name: None,
+                tags: None,
             },
         }
     }
@@ -6910,6 +24664,18 @@ impl WorkflowUpdateRequestParams {
         self.raw.display_name = Some(None);
         self
     }
+
+    #[must_use]
+    pub fn tags(mut self, tags: Vec<String>) -> Self {
+        self.raw.tags = Some(Some(tags));
+        self
+    }
+
+    #[must_use]
+    pub fn tags_null(mut self) -> Self {
+        self.raw.tags = Some(None);
+        self
+    }
     pub fn from_raw(raw: WorkflowUpdateRequest) -> Self {
         Self { raw }
     }
@@ -6921,26 +24687,952 @@ impl WorkflowUpdateRequestParams {
     }
 }
 
-impl From<WorkflowUpdateRequest> for WorkflowUpdateRequestParams {
+impl From<WorkflowUpdateRequest> for UpdateWorkflowWorkflowsRequest {
     fn from(raw: WorkflowUpdateRequest) -> Self {
         Self { raw }
     }
 }
 
-impl From<WorkflowUpdateRequestParams> for WorkflowUpdateRequest {
-    fn from(value: WorkflowUpdateRequestParams) -> Self {
+impl From<UpdateWorkflowWorkflowsRequest> for WorkflowUpdateRequest {
+    fn from(value: UpdateWorkflowWorkflowsRequest) -> Self {
         value.into_raw()
     }
 }
 
-impl Default for WorkflowUpdateRequestParams {
+impl Default for UpdateWorkflowWorkflowsRequest {
     fn default() -> Self {
         Self::new()
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct UpdateWorkflowWorkflowsResponse {
+    raw: WorkflowUpdateResponse,
+}
+
+impl UpdateWorkflowWorkflowsResponse {
+    pub fn raw(&self) -> &WorkflowUpdateResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkflowUpdateResponse {
+        self.raw
+    }
+}
+
+impl From<WorkflowUpdateResponse> for UpdateWorkflowWorkflowsResponse {
+    fn from(raw: WorkflowUpdateResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateWorkflowWorkflowsResponse> for WorkflowUpdateResponse {
+    fn from(value: UpdateWorkflowWorkflowsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateWorkspacesBetaAdminWorkspacesRequest {
+    raw: UpdateWorkspaceIN,
+}
+
+impl UpdateWorkspacesBetaAdminWorkspacesRequest {
+    pub fn new() -> Self {
+        Self {
+            raw: UpdateWorkspaceIN {
+                description: None,
+                icon: None,
+                name: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn description(mut self, description: impl Into<String>) -> Self {
+        self.raw.description = Some(Some(description.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn description_null(mut self) -> Self {
+        self.raw.description = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn icon(mut self, icon: impl Into<String>) -> Self {
+        self.raw.icon = Some(Some(icon.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn icon_null(mut self) -> Self {
+        self.raw.icon = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn name(mut self, name: impl Into<String>) -> Self {
+        self.raw.name = Some(Some(name.into()));
+        self
+    }
+
+    #[must_use]
+    pub fn name_null(mut self) -> Self {
+        self.raw.name = Some(None);
+        self
+    }
+    pub fn from_raw(raw: UpdateWorkspaceIN) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &UpdateWorkspaceIN {
+        &self.raw
+    }
+    pub fn into_raw(self) -> UpdateWorkspaceIN {
+        self.raw
+    }
+}
+
+impl From<UpdateWorkspaceIN> for UpdateWorkspacesBetaAdminWorkspacesRequest {
+    fn from(raw: UpdateWorkspaceIN) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateWorkspacesBetaAdminWorkspacesRequest> for UpdateWorkspaceIN {
+    fn from(value: UpdateWorkspacesBetaAdminWorkspacesRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for UpdateWorkspacesBetaAdminWorkspacesRequest {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UpdateWorkspacesBetaAdminWorkspacesResponse {
+    raw: WorkspaceOUT,
+}
+
+impl UpdateWorkspacesBetaAdminWorkspacesResponse {
+    pub fn raw(&self) -> &WorkspaceOUT {
+        &self.raw
+    }
+    pub fn into_raw(self) -> WorkspaceOUT {
+        self.raw
+    }
+}
+
+impl From<WorkspaceOUT> for UpdateWorkspacesBetaAdminWorkspacesResponse {
+    fn from(raw: WorkspaceOUT) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UpdateWorkspacesBetaAdminWorkspacesResponse> for WorkspaceOUT {
+    fn from(value: UpdateWorkspacesBetaAdminWorkspacesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UploadBetaLibrariesDocumentsRequest {
+    raw: LibrariesDocumentsUploadV1Request,
+}
+
+impl UploadBetaLibrariesDocumentsRequest {
+    pub fn raw(&self) -> &LibrariesDocumentsUploadV1Request {
+        &self.raw
+    }
+    pub fn into_raw(self) -> LibrariesDocumentsUploadV1Request {
+        self.raw
+    }
+}
+
+impl From<LibrariesDocumentsUploadV1Request> for UploadBetaLibrariesDocumentsRequest {
+    fn from(raw: LibrariesDocumentsUploadV1Request) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UploadBetaLibrariesDocumentsRequest> for LibrariesDocumentsUploadV1Request {
+    fn from(value: UploadBetaLibrariesDocumentsRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UploadBetaLibrariesDocumentsResponse {
+    raw: Document,
+}
+
+impl UploadBetaLibrariesDocumentsResponse {
+    pub fn raw(&self) -> &Document {
+        &self.raw
+    }
+    pub fn into_raw(self) -> Document {
+        self.raw
+    }
+}
+
+impl From<Document> for UploadBetaLibrariesDocumentsResponse {
+    fn from(raw: Document) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UploadBetaLibrariesDocumentsResponse> for Document {
+    fn from(value: UploadBetaLibrariesDocumentsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UploadFilesRequest {
+    raw: FilesApiRoutesUploadFileRequest,
+}
+
+impl UploadFilesRequest {
+    pub fn raw(&self) -> &FilesApiRoutesUploadFileRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> FilesApiRoutesUploadFileRequest {
+        self.raw
+    }
+}
+
+impl From<FilesApiRoutesUploadFileRequest> for UploadFilesRequest {
+    fn from(raw: FilesApiRoutesUploadFileRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UploadFilesRequest> for FilesApiRoutesUploadFileRequest {
+    fn from(value: UploadFilesRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UploadFilesResponse {
+    raw: CreateFileResponse,
+}
+
+impl UploadFilesResponse {
+    pub fn raw(&self) -> &CreateFileResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> CreateFileResponse {
+        self.raw
+    }
+}
+
+impl From<CreateFileResponse> for UploadFilesResponse {
+    fn from(raw: CreateFileResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UploadFilesResponse> for CreateFileResponse {
+    fn from(value: UploadFilesResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UsageGetUsageBetaAdminBillingResponse {
+    raw: UsageOUTJSON,
+}
+
+impl UsageGetUsageBetaAdminBillingResponse {
+    pub fn raw(&self) -> &UsageOUTJSON {
+        &self.raw
+    }
+    pub fn into_raw(self) -> UsageOUTJSON {
+        self.raw
+    }
+}
+
+impl From<UsageOUTJSON> for UsageGetUsageBetaAdminBillingResponse {
+    fn from(raw: UsageOUTJSON) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UsageGetUsageBetaAdminBillingResponse> for UsageOUTJSON {
+    fn from(value: UsageGetUsageBetaAdminBillingResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UsersApiAdminAuditLogsGetAuditLogsBetaAdminAuditLogsResponse {
+    raw: UsersApiAdminAuditLogsGetAuditLogsResponse,
+}
+
+impl UsersApiAdminAuditLogsGetAuditLogsBetaAdminAuditLogsResponse {
+    pub fn iter(
+        &self,
+    ) -> impl ExactSizeIterator<
+        Item = UsersApiAdminAuditLogsGetAuditLogsBetaAdminAuditLogsResponseItem<'_>,
+    > {
+        self.raw
+            .iter()
+            .map(UsersApiAdminAuditLogsGetAuditLogsBetaAdminAuditLogsResponseItem::new)
+    }
+    pub fn raw(&self) -> &UsersApiAdminAuditLogsGetAuditLogsResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> UsersApiAdminAuditLogsGetAuditLogsResponse {
+        self.raw
+    }
+}
+
+impl From<UsersApiAdminAuditLogsGetAuditLogsResponse>
+    for UsersApiAdminAuditLogsGetAuditLogsBetaAdminAuditLogsResponse
+{
+    fn from(raw: UsersApiAdminAuditLogsGetAuditLogsResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UsersApiAdminAuditLogsGetAuditLogsBetaAdminAuditLogsResponse>
+    for UsersApiAdminAuditLogsGetAuditLogsResponse
+{
+    fn from(value: UsersApiAdminAuditLogsGetAuditLogsBetaAdminAuditLogsResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct UsersApiAdminAuditLogsGetAuditLogsBetaAdminAuditLogsResponseItem<'a> {
+    raw: &'a AuditLogOut,
+}
+
+impl<'a> UsersApiAdminAuditLogsGetAuditLogsBetaAdminAuditLogsResponseItem<'a> {
+    pub(crate) fn new(raw: &'a AuditLogOut) -> Self {
+        Self { raw }
+    }
+
+    pub fn raw(&self) -> &'a AuditLogOut {
+        self.raw
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UsersCreateUsersBetaAdminUsersRequest {
+    raw: UsersApiAdminUsersCreateUsersRequest,
+}
+
+impl UsersCreateUsersBetaAdminUsersRequest {
+    pub fn raw(&self) -> &UsersApiAdminUsersCreateUsersRequest {
+        &self.raw
+    }
+    pub fn into_raw(self) -> UsersApiAdminUsersCreateUsersRequest {
+        self.raw
+    }
+}
+
+impl From<UsersApiAdminUsersCreateUsersRequest> for UsersCreateUsersBetaAdminUsersRequest {
+    fn from(raw: UsersApiAdminUsersCreateUsersRequest) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UsersCreateUsersBetaAdminUsersRequest> for UsersApiAdminUsersCreateUsersRequest {
+    fn from(value: UsersCreateUsersBetaAdminUsersRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UsersCreateUsersBetaAdminUsersResponse {
+    raw: OrganizationUsersCreateOUT,
+}
+
+impl UsersCreateUsersBetaAdminUsersResponse {
+    pub fn raw(&self) -> &OrganizationUsersCreateOUT {
+        &self.raw
+    }
+    pub fn into_raw(self) -> OrganizationUsersCreateOUT {
+        self.raw
+    }
+}
+
+impl From<OrganizationUsersCreateOUT> for UsersCreateUsersBetaAdminUsersResponse {
+    fn from(raw: OrganizationUsersCreateOUT) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UsersCreateUsersBetaAdminUsersResponse> for OrganizationUsersCreateOUT {
+    fn from(value: UsersCreateUsersBetaAdminUsersResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UsersDeleteInviteBetaAdminUsersResponse {
+    raw: DeleteOUT,
+}
+
+impl UsersDeleteInviteBetaAdminUsersResponse {
+    pub fn message(&self) -> &str {
+        &self.raw.message
+    }
+    pub fn raw(&self) -> &DeleteOUT {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DeleteOUT {
+        self.raw
+    }
+}
+
+impl From<DeleteOUT> for UsersDeleteInviteBetaAdminUsersResponse {
+    fn from(raw: DeleteOUT) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UsersDeleteInviteBetaAdminUsersResponse> for DeleteOUT {
+    fn from(value: UsersDeleteInviteBetaAdminUsersResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UsersDeleteUserBetaAdminUsersResponse {
+    raw: DeleteOUT,
+}
+
+impl UsersDeleteUserBetaAdminUsersResponse {
+    pub fn message(&self) -> &str {
+        &self.raw.message
+    }
+    pub fn raw(&self) -> &DeleteOUT {
+        &self.raw
+    }
+    pub fn into_raw(self) -> DeleteOUT {
+        self.raw
+    }
+}
+
+impl From<DeleteOUT> for UsersDeleteUserBetaAdminUsersResponse {
+    fn from(raw: DeleteOUT) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UsersDeleteUserBetaAdminUsersResponse> for DeleteOUT {
+    fn from(value: UsersDeleteUserBetaAdminUsersResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UsersGetInviteBetaAdminUsersResponse {
+    raw: UsersApiAdminUsersGetInviteResponse,
+}
+
+impl UsersGetInviteBetaAdminUsersResponse {
+    pub fn iter(
+        &self,
+    ) -> impl ExactSizeIterator<Item = UsersGetInviteBetaAdminUsersResponseItem<'_>> {
+        self.raw
+            .iter()
+            .map(UsersGetInviteBetaAdminUsersResponseItem::new)
+    }
+    pub fn raw(&self) -> &UsersApiAdminUsersGetInviteResponse {
+        &self.raw
+    }
+    pub fn into_raw(self) -> UsersApiAdminUsersGetInviteResponse {
+        self.raw
+    }
+}
+
+impl From<UsersApiAdminUsersGetInviteResponse> for UsersGetInviteBetaAdminUsersResponse {
+    fn from(raw: UsersApiAdminUsersGetInviteResponse) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UsersGetInviteBetaAdminUsersResponse> for UsersApiAdminUsersGetInviteResponse {
+    fn from(value: UsersGetInviteBetaAdminUsersResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct UsersGetInviteBetaAdminUsersResponseItem<'a> {
+    raw: &'a OrganizationUserInviteOUT,
+}
+
+impl<'a> UsersGetInviteBetaAdminUsersResponseItem<'a> {
+    pub(crate) fn new(raw: &'a OrganizationUserInviteOUT) -> Self {
+        Self { raw }
+    }
+
+    pub fn raw(&self) -> &'a OrganizationUserInviteOUT {
+        self.raw
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UsersGetUserBetaAdminUsersResponse {
+    raw: AdminUserOUT,
+}
+
+impl UsersGetUserBetaAdminUsersResponse {
+    pub fn raw(&self) -> &AdminUserOUT {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AdminUserOUT {
+        self.raw
+    }
+}
+
+impl From<AdminUserOUT> for UsersGetUserBetaAdminUsersResponse {
+    fn from(raw: AdminUserOUT) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UsersGetUserBetaAdminUsersResponse> for AdminUserOUT {
+    fn from(value: UsersGetUserBetaAdminUsersResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UsersGetUsersBetaAdminUsersResponse {
+    raw: OrganizationAdminUsersOUT,
+}
+
+impl UsersGetUsersBetaAdminUsersResponse {
+    pub fn raw(&self) -> &OrganizationAdminUsersOUT {
+        &self.raw
+    }
+    pub fn into_raw(self) -> OrganizationAdminUsersOUT {
+        self.raw
+    }
+}
+
+impl From<OrganizationAdminUsersOUT> for UsersGetUsersBetaAdminUsersResponse {
+    fn from(raw: OrganizationAdminUsersOUT) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UsersGetUsersBetaAdminUsersResponse> for OrganizationAdminUsersOUT {
+    fn from(value: UsersGetUsersBetaAdminUsersResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UsersInviteUsersBetaAdminUsersRequest {
+    raw: OrganizationInviteIN,
+}
+
+impl UsersInviteUsersBetaAdminUsersRequest {
+    pub fn new(email: impl Into<String>) -> Self {
+        Self {
+            raw: OrganizationInviteIN {
+                email: email.into(),
+                email_language: None,
+                role: None,
+                role_name: None,
+                role_names: None,
+                roles: None,
+                subscription_seat_automatic_granting: None,
+                subscription_type: None,
+                subscription_types: None,
+                workspace_uuids: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn email_language(mut self, email_language: OrganizationInviteINEmailLanguage) -> Self {
+        self.raw.email_language = Some(Some(email_language));
+        self
+    }
+
+    #[must_use]
+    pub fn email_language_null(mut self) -> Self {
+        self.raw.email_language = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn role(mut self, role: OrganizationInviteINRole) -> Self {
+        self.raw.role = Some(Some(role));
+        self
+    }
+
+    #[must_use]
+    pub fn role_null(mut self) -> Self {
+        self.raw.role = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn role_name(mut self, role_name: OrganizationInviteINRoleName) -> Self {
+        self.raw.role_name = Some(Some(role_name));
+        self
+    }
+
+    #[must_use]
+    pub fn role_name_null(mut self) -> Self {
+        self.raw.role_name = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn role_names(mut self, role_names: Vec<OrganizationInviteINRoleNamesItem>) -> Self {
+        self.raw.role_names = Some(Some(role_names));
+        self
+    }
+
+    #[must_use]
+    pub fn role_names_null(mut self) -> Self {
+        self.raw.role_names = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn roles(mut self, roles: OrganizationInviteINRoles) -> Self {
+        self.raw.roles = Some(Some(roles));
+        self
+    }
+
+    #[must_use]
+    pub fn roles_null(mut self) -> Self {
+        self.raw.roles = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn subscription_seat_automatic_granting(
+        mut self,
+        subscription_seat_automatic_granting: bool,
+    ) -> Self {
+        self.raw.subscription_seat_automatic_granting = Some(subscription_seat_automatic_granting);
+        self
+    }
+
+    #[must_use]
+    pub fn subscription_type(mut self, subscription_type: PlanType) -> Self {
+        self.raw.subscription_type = Some(Some(subscription_type));
+        self
+    }
+
+    #[must_use]
+    pub fn subscription_type_null(mut self) -> Self {
+        self.raw.subscription_type = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn subscription_types(mut self, subscription_types: Vec<PlanType>) -> Self {
+        self.raw.subscription_types = Some(Some(subscription_types));
+        self
+    }
+
+    #[must_use]
+    pub fn subscription_types_null(mut self) -> Self {
+        self.raw.subscription_types = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn workspace_uuids(mut self, workspace_uuids: Vec<String>) -> Self {
+        self.raw.workspace_uuids = Some(Some(workspace_uuids));
+        self
+    }
+
+    #[must_use]
+    pub fn workspace_uuids_null(mut self) -> Self {
+        self.raw.workspace_uuids = Some(None);
+        self
+    }
+    pub fn from_raw(raw: OrganizationInviteIN) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &OrganizationInviteIN {
+        &self.raw
+    }
+    pub fn into_raw(self) -> OrganizationInviteIN {
+        self.raw
+    }
+}
+
+impl From<OrganizationInviteIN> for UsersInviteUsersBetaAdminUsersRequest {
+    fn from(raw: OrganizationInviteIN) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UsersInviteUsersBetaAdminUsersRequest> for OrganizationInviteIN {
+    fn from(value: UsersInviteUsersBetaAdminUsersRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UsersInviteUsersBetaAdminUsersResponse {
+    raw: OrganizationInvitesCreateOUT,
+}
+
+impl UsersInviteUsersBetaAdminUsersResponse {
+    pub fn raw(&self) -> &OrganizationInvitesCreateOUT {
+        &self.raw
+    }
+    pub fn into_raw(self) -> OrganizationInvitesCreateOUT {
+        self.raw
+    }
+}
+
+impl From<OrganizationInvitesCreateOUT> for UsersInviteUsersBetaAdminUsersResponse {
+    fn from(raw: OrganizationInvitesCreateOUT) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UsersInviteUsersBetaAdminUsersResponse> for OrganizationInvitesCreateOUT {
+    fn from(value: UsersInviteUsersBetaAdminUsersResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UsersUpdateUserBetaAdminUsersRequest {
+    raw: AdminOrganizationMemberUpdate,
+}
+
+impl UsersUpdateUserBetaAdminUsersRequest {
+    pub fn new() -> Self {
+        Self {
+            raw: AdminOrganizationMemberUpdate {
+                role: None,
+                role_name: None,
+                role_names: None,
+                roles: None,
+                subscription_types: None,
+            },
+        }
+    }
+    #[must_use]
+    pub fn role(mut self, role: AdminOrganizationMemberUpdateRole) -> Self {
+        self.raw.role = Some(Some(role));
+        self
+    }
+
+    #[must_use]
+    pub fn role_null(mut self) -> Self {
+        self.raw.role = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn role_name(mut self, role_name: AdminOrganizationMemberUpdateRoleName) -> Self {
+        self.raw.role_name = Some(Some(role_name));
+        self
+    }
+
+    #[must_use]
+    pub fn role_name_null(mut self) -> Self {
+        self.raw.role_name = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn role_names(
+        mut self,
+        role_names: Vec<AdminOrganizationMemberUpdateRoleNamesItem>,
+    ) -> Self {
+        self.raw.role_names = Some(Some(role_names));
+        self
+    }
+
+    #[must_use]
+    pub fn role_names_null(mut self) -> Self {
+        self.raw.role_names = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn roles(mut self, roles: AdminOrganizationMemberUpdateRoles) -> Self {
+        self.raw.roles = Some(Some(roles));
+        self
+    }
+
+    #[must_use]
+    pub fn roles_null(mut self) -> Self {
+        self.raw.roles = Some(None);
+        self
+    }
+
+    #[must_use]
+    pub fn subscription_types(
+        mut self,
+        subscription_types: Vec<AdminOrganizationMemberUpdateSubscriptionTypesItem>,
+    ) -> Self {
+        self.raw.subscription_types = Some(Some(subscription_types));
+        self
+    }
+
+    #[must_use]
+    pub fn subscription_types_null(mut self) -> Self {
+        self.raw.subscription_types = Some(None);
+        self
+    }
+    pub fn from_raw(raw: AdminOrganizationMemberUpdate) -> Self {
+        Self { raw }
+    }
+    pub fn as_raw(&self) -> &AdminOrganizationMemberUpdate {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AdminOrganizationMemberUpdate {
+        self.raw
+    }
+}
+
+impl From<AdminOrganizationMemberUpdate> for UsersUpdateUserBetaAdminUsersRequest {
+    fn from(raw: AdminOrganizationMemberUpdate) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UsersUpdateUserBetaAdminUsersRequest> for AdminOrganizationMemberUpdate {
+    fn from(value: UsersUpdateUserBetaAdminUsersRequest) -> Self {
+        value.into_raw()
+    }
+}
+
+impl Default for UsersUpdateUserBetaAdminUsersRequest {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct UsersUpdateUserBetaAdminUsersResponse {
+    raw: AdminOrganizationMemberOUT,
+}
+
+impl UsersUpdateUserBetaAdminUsersResponse {
+    pub fn raw(&self) -> &AdminOrganizationMemberOUT {
+        &self.raw
+    }
+    pub fn into_raw(self) -> AdminOrganizationMemberOUT {
+        self.raw
+    }
+}
+
+impl From<AdminOrganizationMemberOUT> for UsersUpdateUserBetaAdminUsersResponse {
+    fn from(raw: AdminOrganizationMemberOUT) -> Self {
+        Self { raw }
+    }
+}
+
+impl From<UsersUpdateUserBetaAdminUsersResponse> for AdminOrganizationMemberOUT {
+    fn from(value: UsersUpdateUserBetaAdminUsersResponse) -> Self {
+        value.into_raw()
+    }
+}
+
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub enum GetStreamEventsEventsStreamItem {
+    StreamEventSsePayload(GetStreamEventsEventsStreamItemStreamEventSsePayload),
+    StreamEventSseErrorData(GetStreamEventsEventsStreamItemStreamEventSseErrorData),
+}
+
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub enum StreamDeploymentLogsWorkflowsDeploymentsStreamItem {
+    DeploymentLogRecord(StreamDeploymentLogsWorkflowsDeploymentsStreamItemDeploymentLogRecord),
+    StreamError(StreamDeploymentLogsWorkflowsDeploymentsStreamItemStreamError),
+}
+
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub enum GetStreamEventsWorkflowsEventsStreamItem {
+    StreamEventSsePayload(GetStreamEventsWorkflowsEventsStreamItemStreamEventSsePayload),
+    StreamEventSseErrorData(GetStreamEventsWorkflowsEventsStreamItemStreamEventSseErrorData),
+}
+
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub enum StreamWorkflowsExecutionsStreamItem {
+    StreamEventSsePayload(StreamWorkflowsExecutionsStreamItemStreamEventSsePayload),
+    StreamEventSseErrorData(StreamWorkflowsExecutionsStreamItemStreamEventSseErrorData),
+}
+
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+pub enum StreamWorkflowExecutionLogsWorkflowsExecutionsStreamItem {
+    ExecutionLogRecord(StreamWorkflowExecutionLogsWorkflowsExecutionsStreamItemExecutionLogRecord),
+    StreamError(StreamWorkflowExecutionLogsWorkflowsExecutionsStreamItemStreamError),
+}
+
 pub type BinaryStream =
     Pin<Box<dyn Stream<Item = Result<bytes::Bytes, SdkError>> + Send + 'static>>;
-pub type ChatStream =
-    Pin<Box<dyn Stream<Item = Result<ChatStreamChunk, SdkError>> + Send + 'static>>;
-pub type FimStream = Pin<Box<dyn Stream<Item = Result<FimStreamChunk, SdkError>> + Send + 'static>>;
+pub type StreamAudioTranscriptionsStream = Pin<
+    Box<dyn Stream<Item = Result<StreamAudioTranscriptionsStreamItem, SdkError>> + Send + 'static>,
+>;
+pub type AppendStreamBetaConversationsStream = Pin<
+    Box<
+        dyn Stream<Item = Result<AppendStreamBetaConversationsStreamItem, SdkError>>
+            + Send
+            + 'static,
+    >,
+>;
+pub type RestartStreamBetaConversationsStream = Pin<
+    Box<
+        dyn Stream<Item = Result<RestartStreamBetaConversationsStreamItem, SdkError>>
+            + Send
+            + 'static,
+    >,
+>;
+pub type StartStreamBetaConversationsStream = Pin<
+    Box<
+        dyn Stream<Item = Result<StartStreamBetaConversationsStreamItem, SdkError>>
+            + Send
+            + 'static,
+    >,
+>;
+pub type ParseStreamChatStream =
+    Pin<Box<dyn Stream<Item = Result<ParseStreamChatStreamItem, SdkError>> + Send + 'static>>;
+pub type StreamChatStream =
+    Pin<Box<dyn Stream<Item = Result<StreamChatStreamItem, SdkError>> + Send + 'static>>;
+pub type GetStreamEventsEventsStream =
+    Pin<Box<dyn Stream<Item = Result<GetStreamEventsEventsStreamItem, SdkError>> + Send + 'static>>;
+pub type StreamFimStream =
+    Pin<Box<dyn Stream<Item = Result<StreamFimStreamItem, SdkError>> + Send + 'static>>;
+pub type StreamDeploymentLogsWorkflowsDeploymentsStream = Pin<
+    Box<
+        dyn Stream<Item = Result<StreamDeploymentLogsWorkflowsDeploymentsStreamItem, SdkError>>
+            + Send
+            + 'static,
+    >,
+>;
+pub type GetStreamEventsWorkflowsEventsStream = Pin<
+    Box<
+        dyn Stream<Item = Result<GetStreamEventsWorkflowsEventsStreamItem, SdkError>>
+            + Send
+            + 'static,
+    >,
+>;
+pub type StreamWorkflowsExecutionsStream = Pin<
+    Box<dyn Stream<Item = Result<StreamWorkflowsExecutionsStreamItem, SdkError>> + Send + 'static>,
+>;
+pub type StreamWorkflowExecutionLogsWorkflowsExecutionsStream = Pin<
+    Box<
+        dyn Stream<
+                Item = Result<StreamWorkflowExecutionLogsWorkflowsExecutionsStreamItem, SdkError>,
+            > + Send
+            + 'static,
+    >,
+>;

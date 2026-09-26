@@ -1,30 +1,20 @@
 use futures_util::StreamExt;
-use mistralai::{ChatRequest, Message, Mistral};
+use mistralai::raw::types::ChatCompletionRequest;
+use mistralai::{Mistral, StreamChatRequest};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mistral = Mistral::new(std::env::var("MISTRAL_API_KEY")?);
-    let stream = mistral
-        .chat()
-        .stream(ChatRequest::new(
-            "mistral-small-latest",
-            [Message::user("Say hello in French.")],
-        ))
-        .await?;
+    let raw: ChatCompletionRequest = serde_json::from_value(serde_json::json!({
+        "model": "mistral-small-latest",
+        "messages": [{"role": "user", "content": "Say hello in French."}]
+    }))?;
+    let stream = mistral.chat().stream(StreamChatRequest::from(raw)).await?;
 
     futures_util::pin_mut!(stream);
     while let Some(chunk) = stream.next().await {
         let chunk = chunk?;
-        if let Some(text) = chunk.text() {
-            print!("{text}");
-        }
-        if let Some(usage) = &chunk.raw().usage {
-            println!(
-                "prompt={}, completion={}",
-                usage.prompt_tokens, usage.completion_tokens
-            );
-        }
+        println!("{}", serde_json::to_string(chunk.raw())?);
     }
-    println!();
     Ok(())
 }

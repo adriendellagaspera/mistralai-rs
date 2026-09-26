@@ -10,6 +10,10 @@ impl<'a> Beta<'a> {
     pub(crate) fn new(raw: &'a HttpClient) -> Self {
         Self { raw }
     }
+    pub fn admin(&self) -> BetaAdmin<'a> {
+        BetaAdmin::new(self.raw)
+    }
+
     pub fn agents(&self) -> BetaAgents<'a> {
         BetaAgents::new(self.raw)
     }
@@ -28,5 +32,21 @@ impl<'a> Beta<'a> {
 
     pub fn observability(&self) -> BetaObservability<'a> {
         BetaObservability::new(self.raw)
+    }
+
+    pub fn prompts(&self) -> BetaPrompts<'a> {
+        BetaPrompts::new(self.raw)
+    }
+
+    pub fn rag(&self) -> BetaRag<'a> {
+        BetaRag::new(self.raw)
+    }
+
+    pub fn skills(&self) -> BetaSkills<'a> {
+        BetaSkills::new(self.raw)
+    }
+
+    pub fn users(&self) -> BetaUsers<'a> {
+        BetaUsers::new(self.raw)
     }
 }

@@ -22,6 +22,72 @@ impl GetBetaAgentsRequest {
 }
 
 #[derive(Debug, Clone, Default)]
+pub struct ListBetaAgentsRequest {
+    page: Option<i64>,
+    page_size: Option<i64>,
+    deployment_chat: Option<String>,
+    sources: Option<String>,
+    name: Option<String>,
+    search: Option<String>,
+    id: Option<String>,
+    metadata: Option<String>,
+}
+impl ListBetaAgentsRequest {
+    pub fn new() -> Self {
+        Self {
+            page: None,
+            page_size: None,
+            deployment_chat: None,
+            sources: None,
+            name: None,
+            search: None,
+            id: None,
+            metadata: None,
+        }
+    }
+    #[must_use]
+    pub fn page(mut self, page: i64) -> Self {
+        self.page = Some(page);
+        self
+    }
+    #[must_use]
+    pub fn page_size(mut self, page_size: i64) -> Self {
+        self.page_size = Some(page_size);
+        self
+    }
+    #[must_use]
+    pub fn deployment_chat(mut self, deployment_chat: impl Into<String>) -> Self {
+        self.deployment_chat = Some(deployment_chat.into());
+        self
+    }
+    #[must_use]
+    pub fn sources(mut self, sources: impl Into<String>) -> Self {
+        self.sources = Some(sources.into());
+        self
+    }
+    #[must_use]
+    pub fn name(mut self, name: impl Into<String>) -> Self {
+        self.name = Some(name.into());
+        self
+    }
+    #[must_use]
+    pub fn search(mut self, search: impl Into<String>) -> Self {
+        self.search = Some(search.into());
+        self
+    }
+    #[must_use]
+    pub fn id(mut self, id: impl Into<String>) -> Self {
+        self.id = Some(id.into());
+        self
+    }
+    #[must_use]
+    pub fn metadata(mut self, metadata: impl Into<String>) -> Self {
+        self.metadata = Some(metadata.into());
+        self
+    }
+}
+
+#[derive(Debug, Clone, Default)]
 pub struct ListPagesBetaAgentsRequest {
     page_size: Option<i64>,
     deployment_chat: Option<String>,
@@ -87,6 +153,32 @@ impl ListPagesBetaAgentsRequest {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct ListVersionsBetaAgentsRequest {
+    agent_id: String,
+    page: Option<i64>,
+    page_size: Option<i64>,
+}
+impl ListVersionsBetaAgentsRequest {
+    pub fn new(agent_id: impl Into<String>) -> Self {
+        Self {
+            agent_id: agent_id.into(),
+            page: None,
+            page_size: None,
+        }
+    }
+    #[must_use]
+    pub fn page(mut self, page: i64) -> Self {
+        self.page = Some(page);
+        self
+    }
+    #[must_use]
+    pub fn page_size(mut self, page_size: i64) -> Self {
+        self.page_size = Some(page_size);
+        self
+    }
+}
+
 #[derive(Clone, Copy)]
 pub struct BetaAgents<'a> {
     raw: &'a HttpClient,
@@ -96,12 +188,23 @@ impl<'a> BetaAgents<'a> {
     pub(crate) fn new(raw: &'a HttpClient) -> Self {
         Self { raw }
     }
+    pub async fn create(
+        &self,
+        request: CreateBetaAgentsRequest,
+    ) -> Result<CreateBetaAgentsResponse, SdkError> {
+        self.raw
+            .agents_api_v1_agents_create(request.into_raw())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
     pub async fn create_version_alias(
         &self,
         agent_id: impl AsRef<str>,
         alias: impl AsRef<str>,
         version: i64,
-    ) -> Result<AgentAliasResponseView, SdkError> {
+    ) -> Result<CreateVersionAliasBetaAgentsResponse, SdkError> {
         self.raw
             .agents_api_v1_agents_create_or_update_alias(agent_id.as_ref(), alias.as_ref(), version)
             .await
@@ -127,7 +230,10 @@ impl<'a> BetaAgents<'a> {
             .map_err(Into::into)
     }
 
-    pub async fn get(&self, request: GetBetaAgentsRequest) -> Result<AgentView, SdkError> {
+    pub async fn get(
+        &self,
+        request: GetBetaAgentsRequest,
+    ) -> Result<GetBetaAgentsResponse, SdkError> {
         self.raw
             .agents_api_v1_agents_get(request.agent_id.as_str(), request.agent_version.as_deref())
             .await
@@ -139,7 +245,7 @@ impl<'a> BetaAgents<'a> {
         &self,
         agent_id: impl AsRef<str>,
         version: impl AsRef<str>,
-    ) -> Result<AgentView, SdkError> {
+    ) -> Result<GetVersionBetaAgentsResponse, SdkError> {
         self.raw
             .agents_api_v1_agents_get_version(agent_id.as_ref(), version.as_ref())
             .await
@@ -147,7 +253,44 @@ impl<'a> BetaAgents<'a> {
             .map_err(Into::into)
     }
 
-    pub async fn list_pages(&self) -> Result<AgentListPageView, SdkError> {
+    pub async fn list(&self) -> Result<ListBetaAgentsResponse, SdkError> {
+        self.raw
+            .agents_api_v1_agents_list(
+                None,
+                None,
+                None::<&str>,
+                None::<&str>,
+                None::<&str>,
+                None::<&str>,
+                None::<&str>,
+                None::<&str>,
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn list_with(
+        &self,
+        request: ListBetaAgentsRequest,
+    ) -> Result<ListBetaAgentsResponse, SdkError> {
+        self.raw
+            .agents_api_v1_agents_list(
+                request.page,
+                request.page_size,
+                request.deployment_chat.as_deref(),
+                request.sources.as_deref(),
+                request.name.as_deref(),
+                request.search.as_deref(),
+                request.id.as_deref(),
+                request.metadata.as_deref(),
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn list_pages(&self) -> Result<ListPagesBetaAgentsResponse, SdkError> {
         self.raw
             .agents_api_v1_agents_list_pages(
                 None,
@@ -167,7 +310,7 @@ impl<'a> BetaAgents<'a> {
     pub async fn list_pages_with(
         &self,
         request: ListPagesBetaAgentsRequest,
-    ) -> Result<AgentListPageView, SdkError> {
+    ) -> Result<ListPagesBetaAgentsResponse, SdkError> {
         self.raw
             .agents_api_v1_agents_list_pages(
                 request.page_size,
@@ -184,11 +327,49 @@ impl<'a> BetaAgents<'a> {
             .map_err(Into::into)
     }
 
+    pub async fn list_version_aliases(
+        &self,
+        agent_id: impl AsRef<str>,
+    ) -> Result<ListVersionAliasesBetaAgentsResponse, SdkError> {
+        self.raw
+            .agents_api_v1_agents_list_version_aliases(agent_id.as_ref())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn list_versions(
+        &self,
+        request: ListVersionsBetaAgentsRequest,
+    ) -> Result<ListVersionsBetaAgentsResponse, SdkError> {
+        self.raw
+            .agents_api_v1_agents_list_versions(
+                request.agent_id.as_str(),
+                request.page,
+                request.page_size,
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn update(
+        &self,
+        agent_id: impl AsRef<str>,
+        request: UpdateBetaAgentsRequest,
+    ) -> Result<UpdateBetaAgentsResponse, SdkError> {
+        self.raw
+            .agents_api_v1_agents_update(agent_id.as_ref(), request.into_raw())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
     pub async fn update_version(
         &self,
         agent_id: impl AsRef<str>,
         version: i64,
-    ) -> Result<AgentView, SdkError> {
+    ) -> Result<UpdateVersionBetaAgentsResponse, SdkError> {
         self.raw
             .agents_api_v1_agents_update_version(agent_id.as_ref(), version)
             .await

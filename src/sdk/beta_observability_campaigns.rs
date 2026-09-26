@@ -67,6 +67,17 @@ impl<'a> BetaObservabilityCampaigns<'a> {
     pub(crate) fn new(raw: &'a HttpClient) -> Self {
         Self { raw }
     }
+    pub async fn create_campaign(
+        &self,
+        request: CreateCampaignBetaObservabilityCampaignsRequest,
+    ) -> Result<CreateCampaignBetaObservabilityCampaignsResponse, SdkError> {
+        self.raw
+            .create_campaign_v1_observability_campaigns_post(request.into_raw())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
     pub async fn delete_campaign(&self, campaign_id: impl AsRef<str>) -> Result<(), SdkError> {
         self.raw
             .delete_campaign_v1_observability_campaigns_campaign_id_delete(campaign_id.as_ref())
@@ -77,7 +88,7 @@ impl<'a> BetaObservabilityCampaigns<'a> {
     pub async fn get_campaign_by_id(
         &self,
         campaign_id: impl AsRef<str>,
-    ) -> Result<CampaignPreviewView, SdkError> {
+    ) -> Result<GetCampaignByIdBetaObservabilityCampaignsResponse, SdkError> {
         self.raw
             .get_campaign_by_id_v1_observability_campaigns_campaign_id_get(campaign_id.as_ref())
             .await
@@ -88,14 +99,14 @@ impl<'a> BetaObservabilityCampaigns<'a> {
     pub async fn get_campaign_selected_events(
         &self,
         request: GetCampaignSelectedEventsBetaObservabilityCampaignsRequest,
-    ) -> Result<CampaignSelectedEventsView, SdkError> {
+    ) -> Result<GetCampaignSelectedEventsBetaObservabilityCampaignsResponse, SdkError> {
         self.raw.get_campaign_selected_events_v1_observability_campaigns_campaign_id_selected_events_get(request.campaign_id.as_str(), request.page_size, request.page).await.map(Into::into).map_err(Into::into)
     }
 
     pub async fn get_campaign_status_by_id(
         &self,
         campaign_id: impl AsRef<str>,
-    ) -> Result<CampaignStatusView, SdkError> {
+    ) -> Result<GetCampaignStatusByIdBetaObservabilityCampaignsResponse, SdkError> {
         self.raw
             .get_campaign_status_by_id_v1_observability_campaigns_campaign_id_status_get(
                 campaign_id.as_ref(),
@@ -105,7 +116,9 @@ impl<'a> BetaObservabilityCampaigns<'a> {
             .map_err(Into::into)
     }
 
-    pub async fn get_campaigns(&self) -> Result<CampaignPreviewsView, SdkError> {
+    pub async fn get_campaigns(
+        &self,
+    ) -> Result<GetCampaignsBetaObservabilityCampaignsResponse, SdkError> {
         self.raw
             .get_campaigns_v1_observability_campaigns_get(None, None, None::<&str>)
             .await
@@ -116,7 +129,7 @@ impl<'a> BetaObservabilityCampaigns<'a> {
     pub async fn get_campaigns_with(
         &self,
         request: GetCampaignsBetaObservabilityCampaignsRequest,
-    ) -> Result<CampaignPreviewsView, SdkError> {
+    ) -> Result<GetCampaignsBetaObservabilityCampaignsResponse, SdkError> {
         self.raw
             .get_campaigns_v1_observability_campaigns_get(
                 request.page_size,

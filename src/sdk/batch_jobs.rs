@@ -105,7 +105,10 @@ impl<'a> BatchJobs<'a> {
     pub(crate) fn new(raw: &'a HttpClient) -> Self {
         Self { raw }
     }
-    pub async fn cancel(&self, job_id: impl AsRef<str>) -> Result<BatchJobOutView, SdkError> {
+    pub async fn cancel(
+        &self,
+        job_id: impl AsRef<str>,
+    ) -> Result<CancelBatchJobsResponse, SdkError> {
         self.raw
             .jobs_api_routes_batch_cancel_batch_job(job_id.as_ref())
             .await
@@ -113,7 +116,10 @@ impl<'a> BatchJobs<'a> {
             .map_err(Into::into)
     }
 
-    pub async fn create(&self, request: BatchJobInParams) -> Result<BatchJobOutView, SdkError> {
+    pub async fn create(
+        &self,
+        request: CreateBatchJobsRequest,
+    ) -> Result<CreateBatchJobsResponse, SdkError> {
         self.raw
             .jobs_api_routes_batch_create_batch_job(request.into_raw())
             .await
@@ -121,7 +127,21 @@ impl<'a> BatchJobs<'a> {
             .map_err(Into::into)
     }
 
-    pub async fn get(&self, request: GetBatchJobsRequest) -> Result<BatchJobOutView, SdkError> {
+    pub async fn delete(
+        &self,
+        job_id: impl AsRef<str>,
+    ) -> Result<DeleteBatchJobsResponse, SdkError> {
+        self.raw
+            .jobs_api_routes_batch_delete_batch_job(job_id.as_ref())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn get(
+        &self,
+        request: GetBatchJobsRequest,
+    ) -> Result<GetBatchJobsResponse, SdkError> {
         self.raw
             .jobs_api_routes_batch_get_batch_job(request.job_id.as_str(), request.inline.as_deref())
             .await
@@ -129,7 +149,7 @@ impl<'a> BatchJobs<'a> {
             .map_err(Into::into)
     }
 
-    pub async fn list(&self) -> Result<BatchJobsOutView, SdkError> {
+    pub async fn list(&self) -> Result<ListBatchJobsResponseView, SdkError> {
         self.raw
             .jobs_api_routes_batch_get_batch_jobs(
                 None,
@@ -150,7 +170,7 @@ impl<'a> BatchJobs<'a> {
     pub async fn list_with(
         &self,
         request: ListBatchJobsRequest,
-    ) -> Result<BatchJobsOutView, SdkError> {
+    ) -> Result<ListBatchJobsResponseView, SdkError> {
         self.raw
             .jobs_api_routes_batch_get_batch_jobs(
                 request.page,

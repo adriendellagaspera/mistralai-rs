@@ -10,7 +10,10 @@ impl<'a> Ocr<'a> {
     pub(crate) fn new(raw: &'a HttpClient) -> Self {
         Self { raw }
     }
-    pub async fn process(&self, request: OcrRequest) -> Result<OcrResponse, SdkError> {
+    pub async fn process(
+        &self,
+        request: ProcessOcrRequest,
+    ) -> Result<ProcessOcrResponse, SdkError> {
         self.raw
             .ocr_v1_ocr_post(request.into_raw())
             .await

@@ -11,32 +11,10 @@ impl<'a> Classifiers<'a> {
     pub(crate) fn new(raw: &'a HttpClient) -> Self {
         Self { raw }
     }
-    pub async fn moderate(
-        &self,
-        request: ClassificationParams,
-    ) -> Result<ModerationResultSet, SdkError> {
-        self.raw
-            .moderations_v1_moderations_post(request.into_raw())
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
-    }
-
-    pub async fn moderate_chat(
-        &self,
-        request: ChatModerationParams,
-    ) -> Result<ModerationResultSet, SdkError> {
-        self.raw
-            .chat_moderations_v1_chat_moderations_post(request.into_raw())
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
-    }
-
     pub async fn classify(
         &self,
-        request: ClassificationParams,
-    ) -> Result<ClassificationResultSet, SdkError> {
+        request: ClassifyClassifiersRequest,
+    ) -> Result<ClassifyClassifiersResponse, SdkError> {
         self.raw
             .classifications_v1_classifications_post(request.into_raw())
             .await
@@ -46,10 +24,32 @@ impl<'a> Classifiers<'a> {
 
     pub async fn classify_chat(
         &self,
-        request: ChatClassificationParams,
-    ) -> Result<ClassificationResultSet, SdkError> {
+        request: ClassifyChatClassifiersRequest,
+    ) -> Result<ClassifyChatClassifiersResponse, SdkError> {
         self.raw
             .chat_classifications_v1_chat_classifications_post(request.into_raw())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn moderate(
+        &self,
+        request: ModerateClassifiersRequest,
+    ) -> Result<ModerateClassifiersResponse, SdkError> {
+        self.raw
+            .moderations_v1_moderations_post(request.into_raw())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn moderate_chat(
+        &self,
+        request: ModerateChatClassifiersRequest,
+    ) -> Result<ModerateChatClassifiersResponse, SdkError> {
+        self.raw
+            .chat_moderations_v1_chat_moderations_post(request.into_raw())
             .await
             .map(Into::into)
             .map_err(Into::into)

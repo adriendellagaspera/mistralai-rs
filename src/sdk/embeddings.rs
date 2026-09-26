@@ -10,7 +10,10 @@ impl<'a> Embeddings<'a> {
     pub(crate) fn new(raw: &'a HttpClient) -> Self {
         Self { raw }
     }
-    pub async fn create(&self, request: EmbeddingParams) -> Result<EmbeddingResult, SdkError> {
+    pub async fn create(
+        &self,
+        request: CreateEmbeddingsRequest,
+    ) -> Result<CreateEmbeddingsResponse, SdkError> {
         self.raw
             .embeddings_v1_embeddings_post(request.into_raw())
             .await

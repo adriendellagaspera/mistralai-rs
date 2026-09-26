@@ -13,7 +13,10 @@ impl<'a> Chat<'a> {
     pub(crate) fn new(raw: &'a HttpClient) -> Self {
         Self { raw }
     }
-    pub async fn complete(&self, request: ChatRequest) -> Result<ChatResponse, SdkError> {
+    pub async fn complete(
+        &self,
+        request: CompleteChatRequest,
+    ) -> Result<CompleteChatResponse, SdkError> {
         self.raw
             .chat_completion_v1_chat_completions_post({
                 let mut raw = request.into_raw();
@@ -25,7 +28,22 @@ impl<'a> Chat<'a> {
             .map_err(Into::into)
     }
 
-    pub async fn stream(&self, request: ChatRequest) -> Result<ChatStream, SdkError> {
+    pub async fn parse(&self, request: ParseChatRequest) -> Result<ParseChatResponse, SdkError> {
+        self.raw
+            .chat_completion_v1_chat_completions_post({
+                let mut raw = request.into_raw();
+                raw.stream = Some(false);
+                raw
+            })
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn parse_stream(
+        &self,
+        request: ParseStreamChatRequest,
+    ) -> Result<ParseStreamChatStream, SdkError> {
         let bytes = self
             .raw
             .chat_completion_v1_chat_completions_post_stream({
@@ -37,7 +55,25 @@ impl<'a> Chat<'a> {
             .map_err(SdkError::from)?;
         let events = crate::streaming::json_events::<_, _, CompletionChunk>(bytes).map(|event| {
             event
-                .map(|event| ChatStreamChunk::from(event.data))
+                .map(|event| ParseStreamChatStreamItem::from(event.data))
+                .map_err(Into::into)
+        });
+        Ok(Box::pin(events))
+    }
+
+    pub async fn stream(&self, request: StreamChatRequest) -> Result<StreamChatStream, SdkError> {
+        let bytes = self
+            .raw
+            .chat_completion_v1_chat_completions_post_stream({
+                let mut raw = request.into_raw();
+                raw.stream = Some(true);
+                raw
+            })
+            .await
+            .map_err(SdkError::from)?;
+        let events = crate::streaming::json_events::<_, _, CompletionChunk>(bytes).map(|event| {
+            event
+                .map(|event| StreamChatStreamItem::from(event.data))
                 .map_err(Into::into)
         });
         Ok(Box::pin(events))

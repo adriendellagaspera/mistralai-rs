@@ -56,6 +56,34 @@ impl ListBetaLibrariesDocumentsRequest {
     }
 }
 
+#[derive(Debug, Clone)]
+pub struct TextContentBetaLibrariesDocumentsRequest {
+    library_id: String,
+    document_id: String,
+    page_start: Option<String>,
+    page_end: Option<String>,
+}
+impl TextContentBetaLibrariesDocumentsRequest {
+    pub fn new(library_id: impl Into<String>, document_id: impl Into<String>) -> Self {
+        Self {
+            library_id: library_id.into(),
+            document_id: document_id.into(),
+            page_start: None,
+            page_end: None,
+        }
+    }
+    #[must_use]
+    pub fn page_start(mut self, page_start: impl Into<String>) -> Self {
+        self.page_start = Some(page_start.into());
+        self
+    }
+    #[must_use]
+    pub fn page_end(mut self, page_end: impl Into<String>) -> Self {
+        self.page_end = Some(page_end.into());
+        self
+    }
+}
+
 #[derive(Clone, Copy)]
 pub struct BetaLibrariesDocuments<'a> {
     raw: &'a HttpClient,
@@ -76,25 +104,16 @@ impl<'a> BetaLibrariesDocuments<'a> {
             .map_err(Into::into)
     }
 
-    pub async fn status(
+    pub async fn extracted_text_signed_url(
         &self,
         library_id: impl AsRef<str>,
         document_id: impl AsRef<str>,
-    ) -> Result<ProcessingStatusOutView, SdkError> {
+    ) -> Result<ExtractedTextSignedUrlBetaLibrariesDocumentsResponse, SdkError> {
         self.raw
-            .libraries_documents_get_status_v1(library_id.as_ref(), document_id.as_ref())
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
-    }
-
-    pub async fn text_content(
-        &self,
-        library_id: impl AsRef<str>,
-        document_id: impl AsRef<str>,
-    ) -> Result<DocumentTextContentView, SdkError> {
-        self.raw
-            .libraries_documents_get_text_content_v1(library_id.as_ref(), document_id.as_ref())
+            .libraries_documents_get_extracted_text_signed_url_v1(
+                library_id.as_ref(),
+                document_id.as_ref(),
+            )
             .await
             .map(Into::into)
             .map_err(Into::into)
@@ -104,9 +123,38 @@ impl<'a> BetaLibrariesDocuments<'a> {
         &self,
         library_id: impl AsRef<str>,
         document_id: impl AsRef<str>,
-    ) -> Result<DocumentOutView, SdkError> {
+    ) -> Result<GetBetaLibrariesDocumentsResponse, SdkError> {
         self.raw
             .libraries_documents_get_v1(library_id.as_ref(), document_id.as_ref())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn get_signed_url(
+        &self,
+        library_id: impl AsRef<str>,
+        document_id: impl AsRef<str>,
+    ) -> Result<GetSignedUrlBetaLibrariesDocumentsResponse, SdkError> {
+        self.raw
+            .libraries_documents_get_signed_url_v1(library_id.as_ref(), document_id.as_ref())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn libraries_documents_update_v1(
+        &self,
+        library_id: impl AsRef<str>,
+        document_id: impl AsRef<str>,
+        request: LibrariesDocumentsUpdateV1BetaLibrariesDocumentsRequest,
+    ) -> Result<LibrariesDocumentsUpdateV1BetaLibrariesDocumentsResponse, SdkError> {
+        self.raw
+            .libraries_documents_update_v1(
+                library_id.as_ref(),
+                document_id.as_ref(),
+                request.into_raw(),
+            )
             .await
             .map(Into::into)
             .map_err(Into::into)
@@ -115,7 +163,7 @@ impl<'a> BetaLibrariesDocuments<'a> {
     pub async fn list(
         &self,
         request: ListBetaLibrariesDocumentsRequest,
-    ) -> Result<ListDocumentOutView, SdkError> {
+    ) -> Result<ListBetaLibrariesDocumentsResponse, SdkError> {
         self.raw
             .libraries_documents_list_v1(
                 request.library_id.as_str(),
@@ -142,17 +190,74 @@ impl<'a> BetaLibrariesDocuments<'a> {
             .map_err(Into::into)
     }
 
-    pub async fn libraries_documents_update_v1(
+    pub async fn status(
         &self,
         library_id: impl AsRef<str>,
         document_id: impl AsRef<str>,
-        request: DocumentUpdateInParams,
-    ) -> Result<DocumentOutView, SdkError> {
+    ) -> Result<StatusBetaLibrariesDocumentsResponse, SdkError> {
         self.raw
-            .libraries_documents_update_v1(
+            .libraries_documents_get_status_v1(library_id.as_ref(), document_id.as_ref())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn text_content(
+        &self,
+        request: TextContentBetaLibrariesDocumentsRequest,
+    ) -> Result<TextContentBetaLibrariesDocumentsResponse, SdkError> {
+        self.raw
+            .libraries_documents_get_text_content_v1(
+                request.library_id.as_str(),
+                request.document_id.as_str(),
+                request.page_start.as_deref(),
+                request.page_end.as_deref(),
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn update(
+        &self,
+        library_id: impl AsRef<str>,
+        document_id: impl AsRef<str>,
+        request: UpdateBetaLibrariesDocumentsRequest,
+    ) -> Result<UpdateBetaLibrariesDocumentsResponse, SdkError> {
+        self.raw
+            .libraries_documents_patch_v1(
                 library_id.as_ref(),
                 document_id.as_ref(),
                 request.into_raw(),
+            )
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn upload(
+        &self,
+        library_id: impl AsRef<str>,
+        request: UploadBetaLibrariesDocumentsRequest,
+    ) -> Result<UploadBetaLibrariesDocumentsResponse, SdkError> {
+        self.raw
+            .libraries_documents_upload_v1(library_id.as_ref(), request.into_raw())
+            .await
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+
+    pub async fn upload_with_filenames(
+        &self,
+        library_id: impl AsRef<str>,
+        request: UploadBetaLibrariesDocumentsRequest,
+        multipart_filenames: &[(&str, &str)],
+    ) -> Result<UploadBetaLibrariesDocumentsResponse, SdkError> {
+        self.raw
+            .libraries_documents_upload_v1_with_multipart_filenames(
+                library_id.as_ref(),
+                request.into_raw(),
+                multipart_filenames,
             )
             .await
             .map(Into::into)
