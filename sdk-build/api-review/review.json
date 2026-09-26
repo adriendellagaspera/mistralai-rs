@@ -4,6 +4,7 @@
   "changed_rust_files": [
     "src/generated/client.rs",
     "src/generated/types.rs",
+    "src/lib.rs",
     "src/sdk/agents.rs",
     "src/sdk/audio.rs",
     "src/sdk/audio_speech.rs",
