@@ -8,7 +8,10 @@
     "StopSequences",
     "FimRequest",
     "FimResponse",
-    "FimStreamChunk"
+    "FimStreamChunk",
+    "OcrRequest",
+    "OcrResponse",
+    "OcrPage"
   ],
   "accessor_paths": {
     "ChatResponse.text": [
@@ -38,6 +41,9 @@
     "fim": [
       "complete",
       "stream"
+    ],
+    "ocr": [
+      "process"
     ]
   }
 }
