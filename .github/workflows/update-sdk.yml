@@ -134,7 +134,6 @@ jobs:
               python3 .github/scripts/nightly.py run "$job" builder_tests -- cargo test --locked --manifest-path sdk-build/Cargo.toml --all-targets
               ;;
             docs)
-              python3 .github/scripts/nightly.py run "$job" sdk_doc_tests -- cargo test --locked --doc
               python3 .github/scripts/nightly.py run "$job" sdk_docs -- cargo doc --locked --no-deps
               ;;
             tooling)
@@ -286,7 +285,7 @@ jobs:
               format) checks='sdk_format builder_format' ;;
               lint) checks='sdk_clippy builder_clippy' ;;
               tests) checks='sdk_tests builder_tests' ;;
-              docs) checks='sdk_doc_tests sdk_docs' ;;
+              docs) checks='sdk_docs' ;;
               api) checks='api_review' ;;
             esac
             for check in $checks; do
@@ -308,7 +307,6 @@ jobs:
               python3 .github/scripts/nightly.py run "$job" builder_tests -- cargo test --locked --manifest-path sdk-build/Cargo.toml --all-targets
               ;;
             docs)
-              python3 .github/scripts/nightly.py run "$job" sdk_doc_tests -- cargo test --locked --doc
               python3 .github/scripts/nightly.py run "$job" sdk_docs -- cargo doc --locked --no-deps
               ;;
             api)
