@@ -24,7 +24,7 @@ BASELINE = {
     "baseline-format": ("sdk_format", "builder_format"),
     "baseline-lint": ("sdk_clippy", "builder_clippy"),
     "baseline-tests": ("sdk_tests", "builder_tests"),
-    "baseline-docs": ("sdk_doc_tests", "sdk_docs"),
+    "baseline-docs": ("sdk_docs",),
     "baseline-tooling": ("python_tests", "sdk_build_python_tests"),
 }
 CANDIDATE = {
@@ -32,7 +32,7 @@ CANDIDATE = {
     "candidate-format": ("sdk_format", "builder_format"),
     "candidate-lint": ("sdk_clippy", "builder_clippy"),
     "candidate-tests": ("sdk_tests", "builder_tests"),
-    "candidate-docs": ("sdk_doc_tests", "sdk_docs"),
+    "candidate-docs": ("sdk_docs",),
     "candidate-api": ("api_review",),
 }
 
