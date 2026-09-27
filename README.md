@@ -5,7 +5,7 @@ Unofficial asynchronous Rust SDK for Mistral AI, generated from a pinned OpenAPI
 Install [`mistralai-sdk`](https://crates.io/crates/mistralai-sdk) from crates.io. The package name is `mistralai-sdk`; the library is imported as `mistralai`:
 
 ```sh
-cargo add mistralai-sdk@0.4 --rename mistralai
+cargo add mistralai-sdk@0.4
 cargo add tokio --features macros,rt-multi-thread
 cargo add serde_json
 ```
@@ -14,7 +14,7 @@ Or add these dependencies to `Cargo.toml`:
 
 ```toml
 [dependencies]
-mistralai = { package = "mistralai-sdk", version = "0.4" }
+mistralai-sdk = "0.4"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 serde_json = "1"
 ```
