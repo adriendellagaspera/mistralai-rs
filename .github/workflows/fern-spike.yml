@@ -75,6 +75,10 @@ jobs:
         working-directory: sdk-build/fern-spike
         run: fern generate --group rust-sdk --local --no-prompt --force --log-level info
 
+      - name: Compare current and Fern public surfaces
+        run: |
+          python sdk-build/fern-spike/compare_surfaces.py             sdk-build/fern-spike/generated             sdk-build/fern-spike/fern-surface-comparison.json
+
       - name: Prepare patched validation copy
         run: |
           rm -rf sdk-build/fern-spike/generated-patched
@@ -149,5 +153,6 @@ jobs:
             sdk-build/fern-spike/generated
             sdk-build/fern-spike/generated-patched
             sdk-build/fern-spike/fern-spike-report.json
+            sdk-build/fern-spike/fern-surface-comparison.json
             sdk-build/fern-spike/fern-clippy.log
             sdk-build/fern-spike/diagnostics
