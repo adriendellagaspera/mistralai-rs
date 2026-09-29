@@ -13,11 +13,12 @@ concurrency:
 
 jobs:
   update:
+    name: update
     runs-on: ubuntu-24.04
     timeout-minutes: 75
     permissions:
-      contents: write
-      pull-requests: write
+      contents: write # Commit regenerated source pins and Fern SDK output.
+      pull-requests: write # Open or update the generated source review PR.
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
