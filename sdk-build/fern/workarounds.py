@@ -42,7 +42,9 @@ METHOD = r'''    /// Temporary workaround for Fern multipart/form-data + SSE gen
             self.apply_custom_headers(&mut req, &options)?;
             req.headers_mut().insert(
                 "Accept",
-                "text/event-stream".parse().map_err(|_| ApiError::InvalidHeader)?,
+                "text/event-stream"
+                    .parse()
+                    .map_err(|_| ApiError::InvalidHeader)?,
             );
             req.headers_mut().insert(
                 "Cache-Control",
@@ -54,7 +56,9 @@ METHOD = r'''    /// Temporary workaround for Fern multipart/form-data + SSE gen
             self.apply_custom_headers(&mut req, &options)?;
             req.headers_mut().insert(
                 "Accept",
-                "text/event-stream".parse().map_err(|_| ApiError::InvalidHeader)?,
+                "text/event-stream"
+                    .parse()
+                    .map_err(|_| ApiError::InvalidHeader)?,
             );
             req.headers_mut().insert(
                 "Cache-Control",
