@@ -96,8 +96,8 @@ Keep in `mistralai-rs` where useful:
 
 ## Architectural direction supported so far
 
-Evidence supports Outcome A unless determinism/publication checks uncover a new architectural blocker:
+Evidence supports **Outcome A**. The explicit deterministic-regeneration gate passes: two consecutive Fern generations are byte-for-byte identical for all generated files outside `.fern` metadata.
 
 > Fern becomes the primary Rust generator; `rust-sdk-generator` contracts to a backend-independent SDK surface-policy and verification/compiler layer.
 
-Do not port Fern mechanism gaps into `rust-sdk-generator`.
+This is the final architecture decision for the spike. Do not port Fern mechanism gaps into `rust-sdk-generator`.
