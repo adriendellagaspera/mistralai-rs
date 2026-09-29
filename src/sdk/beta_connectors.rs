@@ -32,7 +32,7 @@ impl GetBetaConnectorsRequest {
 pub struct GetAuthUrlBetaConnectorsRequest {
     connector_id_or_name: String,
     app_return_url: Option<String>,
-    method_type: Option<crate::generated::types::OutboundAuthenticationType>,
+    method_type: Option<GetAuthUrlBetaConnectorsRequestMethodType>,
     credentials_name: Option<String>,
     credentials_title: Option<String>,
     github_installation_link: Option<bool>,
@@ -54,10 +54,7 @@ impl GetAuthUrlBetaConnectorsRequest {
         self
     }
     #[must_use]
-    pub fn method_type(
-        mut self,
-        method_type: crate::generated::types::OutboundAuthenticationType,
-    ) -> Self {
+    pub fn method_type(mut self, method_type: GetAuthUrlBetaConnectorsRequestMethodType) -> Self {
         self.method_type = Some(method_type);
         self
     }
@@ -80,7 +77,7 @@ impl GetAuthUrlBetaConnectorsRequest {
 
 #[derive(Debug, Clone, Default)]
 pub struct ListBetaConnectorsRequest {
-    query_filters: Option<crate::generated::types::ConnectorsQueryFilters>,
+    query_filters: Option<ListBetaConnectorsRequestQueryFilters>,
     cursor: Option<String>,
     page_size: Option<i64>,
 }
@@ -93,10 +90,7 @@ impl ListBetaConnectorsRequest {
         }
     }
     #[must_use]
-    pub fn query_filters(
-        mut self,
-        query_filters: crate::generated::types::ConnectorsQueryFilters,
-    ) -> Self {
+    pub fn query_filters(mut self, query_filters: ListBetaConnectorsRequestQueryFilters) -> Self {
         self.query_filters = Some(query_filters);
         self
     }
@@ -249,12 +243,15 @@ impl<'a> BetaConnectors<'a> {
     pub async fn activate_for_consumer(
         &self,
         connector_id: impl AsRef<str>,
-        consumer_scope: crate::generated::client::ConnectorActivateForConsumerV1ConsumerScope,
+        consumer_scope: ActivateForConsumerBetaConnectorsRequestConsumerScope,
     ) -> Result<ActivateForConsumerBetaConnectorsResponse, SdkError> {
         self.raw
-            .connector_activate_for_consumer_v1(connector_id.as_ref(), consumer_scope)
+            .connector_activate_for_consumer_v1(
+                connector_id.as_ref(),
+                __RustSdkIntoRaw::into_raw(consumer_scope),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -270,10 +267,12 @@ impl<'a> BetaConnectors<'a> {
                 tool_name.as_ref(),
                 connector_id_or_name.as_ref(),
                 credentials_name,
-                request.into_raw(),
+                <CallToolBetaConnectorsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::ConnectorCallToolRequest,
+                >>::into_raw(request),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -282,9 +281,11 @@ impl<'a> BetaConnectors<'a> {
         request: CreateBetaConnectorsRequest,
     ) -> Result<CreateBetaConnectorsResponse, SdkError> {
         self.raw
-            .connector_create_v1(request.into_raw())
+            .connector_create_v1(<CreateBetaConnectorsRequest as __RustSdkIntoRaw<
+                crate::generated::types::CreateConnectorRequest,
+            >>::into_raw(request))
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -296,10 +297,12 @@ impl<'a> BetaConnectors<'a> {
         self.raw
             .connector_create_or_update_organization_credentials_v1(
                 connector_id_or_name.as_ref(),
-                request.into_raw(),
+                <CreateOrUpdateOrganizationCredentialsBetaConnectorsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::CredentialsCreateOrUpdate,
+                >>::into_raw(request),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -311,10 +314,12 @@ impl<'a> BetaConnectors<'a> {
         self.raw
             .connector_create_or_update_user_credentials_v1(
                 connector_id_or_name.as_ref(),
-                request.into_raw(),
+                <CreateOrUpdateUserCredentialsBetaConnectorsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::CredentialsCreateOrUpdate,
+                >>::into_raw(request),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -326,22 +331,27 @@ impl<'a> BetaConnectors<'a> {
         self.raw
             .connector_create_or_update_workspace_credentials_v1(
                 connector_id_or_name.as_ref(),
-                request.into_raw(),
+                <CreateOrUpdateWorkspaceCredentialsBetaConnectorsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::CredentialsCreateOrUpdate,
+                >>::into_raw(request),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
     pub async fn deactivate_for_consumer(
         &self,
         connector_id: impl AsRef<str>,
-        consumer_scope: crate::generated::client::ConnectorDeactivateForConsumerV1ConsumerScope,
+        consumer_scope: DeactivateForConsumerBetaConnectorsRequestConsumerScope,
     ) -> Result<DeactivateForConsumerBetaConnectorsResponse, SdkError> {
         self.raw
-            .connector_deactivate_for_consumer_v1(connector_id.as_ref(), consumer_scope)
+            .connector_deactivate_for_consumer_v1(
+                connector_id.as_ref(),
+                __RustSdkIntoRaw::into_raw(consumer_scope),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -352,7 +362,7 @@ impl<'a> BetaConnectors<'a> {
         self.raw
             .connector_delete_v1(connector_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -363,7 +373,7 @@ impl<'a> BetaConnectors<'a> {
         self.raw
             .connector_delete_all_user_credentials_v1(connector_id_or_name.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -378,7 +388,7 @@ impl<'a> BetaConnectors<'a> {
                 connector_id_or_name.as_ref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -393,7 +403,7 @@ impl<'a> BetaConnectors<'a> {
                 connector_id_or_name.as_ref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -408,7 +418,7 @@ impl<'a> BetaConnectors<'a> {
                 connector_id_or_name.as_ref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -423,7 +433,7 @@ impl<'a> BetaConnectors<'a> {
                 request.fetch_customer_data,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -435,13 +445,13 @@ impl<'a> BetaConnectors<'a> {
             .connector_get_auth_url_v1(
                 request.connector_id_or_name.as_str(),
                 request.app_return_url.as_deref(),
-                request.method_type,
+                request.method_type.map(__RustSdkIntoRaw::into_raw),
                 request.credentials_name.as_deref(),
                 request.credentials_title.as_deref(),
                 request.github_installation_link,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -452,7 +462,7 @@ impl<'a> BetaConnectors<'a> {
         self.raw
             .connector_get_authentication_methods_v1(connector_id_or_name.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -460,7 +470,7 @@ impl<'a> BetaConnectors<'a> {
         self.raw
             .connector_list_v1(None, None::<&str>, None)
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -470,12 +480,12 @@ impl<'a> BetaConnectors<'a> {
     ) -> Result<ListBetaConnectorsResponse, SdkError> {
         self.raw
             .connector_list_v1(
-                request.query_filters,
+                request.query_filters.map(__RustSdkIntoRaw::into_raw),
                 request.cursor.as_deref(),
                 request.page_size,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -490,7 +500,7 @@ impl<'a> BetaConnectors<'a> {
                 request.fetch_default,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -508,7 +518,7 @@ impl<'a> BetaConnectors<'a> {
                 request.credentials_name.as_deref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -523,7 +533,7 @@ impl<'a> BetaConnectors<'a> {
                 request.fetch_default,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -538,7 +548,7 @@ impl<'a> BetaConnectors<'a> {
                 request.fetch_default,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -549,7 +559,7 @@ impl<'a> BetaConnectors<'a> {
         self.raw
             .connector_share_v1(connector_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -560,7 +570,7 @@ impl<'a> BetaConnectors<'a> {
         self.raw
             .connector_unshare_v1(connector_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -570,9 +580,14 @@ impl<'a> BetaConnectors<'a> {
         request: UpdateBetaConnectorsRequest,
     ) -> Result<UpdateBetaConnectorsResponse, SdkError> {
         self.raw
-            .connector_update_v1(connector_id.as_ref(), request.into_raw())
+            .connector_update_v1(
+                connector_id.as_ref(),
+                <UpdateBetaConnectorsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::UpdateConnectorRequest,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

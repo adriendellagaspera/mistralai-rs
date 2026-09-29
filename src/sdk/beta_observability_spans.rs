@@ -70,9 +70,15 @@ impl<'a> BetaObservabilitySpans<'a> {
         request: AggregateBetaObservabilitySpansRequest,
     ) -> Result<AggregateBetaObservabilitySpansResponse, SdkError> {
         self.raw
-            .aggregate_spans_v1_observability_spans_aggregate_post(from, to, request.into_raw())
+            .aggregate_spans_v1_observability_spans_aggregate_post(
+                from,
+                to,
+                <AggregateBetaObservabilitySpansRequest as __RustSdkIntoRaw<
+                    crate::generated::types::AggregationRequest,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -80,7 +86,7 @@ impl<'a> BetaObservabilitySpans<'a> {
         &self,
         request: FetchSpanEvalFieldOptionsBetaObservabilitySpansRequest,
     ) -> Result<FetchSpanEvalFieldOptionsBetaObservabilitySpansResponse, SdkError> {
-        self.raw.get_span_evaluation_field_options_v1_observability_spans_evaluations_fields_field_name_options_get(request.field_name.as_str(), request.from.as_deref(), request.to.as_deref()).await.map(Into::into).map_err(Into::into)
+        self.raw.get_span_evaluation_field_options_v1_observability_spans_evaluations_fields_field_name_options_get(request.field_name.as_str(), request.from.as_deref(), request.to.as_deref()).await.map(__RustSdkFromRaw::from_raw).map_err(Into::into)
     }
 
     pub async fn fetch_span_field_options(
@@ -94,7 +100,7 @@ impl<'a> BetaObservabilitySpans<'a> {
                 request.to.as_deref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -104,7 +110,7 @@ impl<'a> BetaObservabilitySpans<'a> {
         self.raw
             .get_span_evaluation_fields_v1_observability_spans_evaluations_fields_get()
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -114,7 +120,7 @@ impl<'a> BetaObservabilitySpans<'a> {
         self.raw
             .get_span_fields_v1_observability_spans_fields_get()
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -132,10 +138,12 @@ impl<'a> BetaObservabilitySpans<'a> {
                 to,
                 page_size,
                 cursor,
-                request.into_raw(),
+                <SearchLatestSpanEvaluationsBetaObservabilitySpansRequest as __RustSdkIntoRaw<
+                    crate::generated::types::SpanEvaluationsRequest,
+                >>::into_raw(request),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -153,10 +161,12 @@ impl<'a> BetaObservabilitySpans<'a> {
                 to,
                 page_size,
                 cursor,
-                request.into_raw(),
+                <SearchSpanEvaluationsBetaObservabilitySpansRequest as __RustSdkIntoRaw<
+                    crate::generated::types::SpanEvaluationsRequest,
+                >>::into_raw(request),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -174,10 +184,12 @@ impl<'a> BetaObservabilitySpans<'a> {
                 to,
                 page_size,
                 cursor,
-                request.into_raw(),
+                <SearchSpansBetaObservabilitySpansRequest as __RustSdkIntoRaw<
+                    crate::generated::types::SpansRequest,
+                >>::into_raw(request),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

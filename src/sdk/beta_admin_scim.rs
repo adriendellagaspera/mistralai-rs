@@ -18,7 +18,7 @@ impl<'a> BetaAdminScim<'a> {
         self.raw
             .users_api_admin_scim_sync_get_scim_sync_run(run_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -27,9 +27,13 @@ impl<'a> BetaAdminScim<'a> {
         request: TriggerScimSyncBetaAdminScimRequest,
     ) -> Result<TriggerScimSyncBetaAdminScimResponse, SdkError> {
         self.raw
-            .users_api_admin_scim_sync_trigger_scim_sync(request.into_raw())
+            .users_api_admin_scim_sync_trigger_scim_sync(
+                <TriggerScimSyncBetaAdminScimRequest as __RustSdkIntoRaw<
+                    crate::generated::types::AdminScimSyncTriggerIN,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

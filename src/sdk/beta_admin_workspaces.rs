@@ -57,10 +57,12 @@ impl<'a> BetaAdminWorkspaces<'a> {
         self.raw
             .users_api_admin_workspaces_add_or_update_users_workspaces(
                 workspace_uuid.as_ref(),
-                request.into_raw(),
+                <AddOrUpdateUsersWorkspacesBetaAdminWorkspacesRequest as __RustSdkIntoRaw<
+                    crate::generated::types::WorkspaceMemberIN,
+                >>::into_raw(request),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -72,10 +74,12 @@ impl<'a> BetaAdminWorkspaces<'a> {
         self.raw
             .users_api_admin_workspaces_add_users_workspaces(
                 workspace_uuid.as_ref(),
-                request.into_raw(),
+                <AddUsersWorkspacesBetaAdminWorkspacesRequest as __RustSdkIntoRaw<
+                    crate::generated::types::WorkspaceMemberIN,
+                >>::into_raw(request),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -84,9 +88,13 @@ impl<'a> BetaAdminWorkspaces<'a> {
         request: CreateWorkspaceBetaAdminWorkspacesRequest,
     ) -> Result<CreateWorkspaceBetaAdminWorkspacesResponse, SdkError> {
         self.raw
-            .users_api_admin_workspaces_create_workspace(request.into_raw())
+            .users_api_admin_workspaces_create_workspace(
+                <CreateWorkspaceBetaAdminWorkspacesRequest as __RustSdkIntoRaw<
+                    crate::generated::types::AdminWorkspaceIn,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -103,7 +111,7 @@ impl<'a> BetaAdminWorkspaces<'a> {
         self.raw
             .users_api_admin_workspaces_get_workspaces(None, None, None, None::<&str>)
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -119,7 +127,7 @@ impl<'a> BetaAdminWorkspaces<'a> {
                 request.search.as_deref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -131,10 +139,12 @@ impl<'a> BetaAdminWorkspaces<'a> {
         self.raw
             .users_api_admin_workspaces_remove_users_workspaces(
                 workspace_uuid.as_ref(),
-                request.into_raw(),
+                <RemoveUsersWorkspacesBetaAdminWorkspacesRequest as __RustSdkIntoRaw<
+                    crate::generated::types::RemoveWorkspaceMembersIN,
+                >>::into_raw(request),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -146,10 +156,12 @@ impl<'a> BetaAdminWorkspaces<'a> {
         self.raw
             .users_api_admin_workspaces_update_workspaces(
                 workspace_uuid.as_ref(),
-                request.into_raw(),
+                <UpdateWorkspacesBetaAdminWorkspacesRequest as __RustSdkIntoRaw<
+                    crate::generated::types::UpdateWorkspaceIN,
+                >>::into_raw(request),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

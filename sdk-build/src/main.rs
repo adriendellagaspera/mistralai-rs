@@ -449,6 +449,16 @@ fn execute(root: &Path, args: &Options) -> Result<()> {
     let report = field(&derivation, "report")?;
     write_json(&work.join("sdk-definition.json"), definition)?;
     write_json(&work.join("derivation-report.json"), report)?;
+    if let Some(operations) = report.get("operations").and_then(Value::as_object) {
+        for (id, outcome) in operations {
+            if outcome.get("status").and_then(Value::as_str) == Some("rejected") {
+                eprintln!(
+                    "DERIVATION_REJECTION {id}: {}",
+                    serde_json::to_string(outcome)?
+                );
+            }
+        }
+    }
     let baseline = read_json(&build.join("coverage-baseline.json"))?;
     let counts = validate_coverage(report, &baseline, &spec)?;
     println!(

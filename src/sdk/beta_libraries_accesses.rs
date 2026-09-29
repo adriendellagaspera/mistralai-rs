@@ -17,9 +17,14 @@ impl<'a> BetaLibrariesAccesses<'a> {
         request: DeleteBetaLibrariesAccessesRequest,
     ) -> Result<DeleteBetaLibrariesAccessesResponse, SdkError> {
         self.raw
-            .libraries_share_delete_v1(library_id.as_ref(), request.into_raw())
+            .libraries_share_delete_v1(
+                library_id.as_ref(),
+                <DeleteBetaLibrariesAccessesRequest as __RustSdkIntoRaw<
+                    crate::generated::types::SharingDelete,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -30,7 +35,7 @@ impl<'a> BetaLibrariesAccesses<'a> {
         self.raw
             .libraries_share_list_v1(library_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -40,9 +45,14 @@ impl<'a> BetaLibrariesAccesses<'a> {
         request: UpdateOrCreateBetaLibrariesAccessesRequest,
     ) -> Result<UpdateOrCreateBetaLibrariesAccessesResponse, SdkError> {
         self.raw
-            .libraries_share_create_v1(library_id.as_ref(), request.into_raw())
+            .libraries_share_create_v1(
+                library_id.as_ref(),
+                <UpdateOrCreateBetaLibrariesAccessesRequest as __RustSdkIntoRaw<
+                    crate::generated::types::SharingRequest,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

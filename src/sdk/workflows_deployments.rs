@@ -36,7 +36,7 @@ pub struct GetDeploymentLogsWorkflowsDeploymentsRequest {
     workflow_name: Option<String>,
     after: Option<String>,
     before: Option<String>,
-    order: Option<crate::generated::client::GetDeploymentLogsOrder>,
+    order: Option<GetDeploymentLogsWorkflowsDeploymentsRequestOrder>,
     cursor: Option<String>,
     limit: Option<i64>,
 }
@@ -74,7 +74,7 @@ impl GetDeploymentLogsWorkflowsDeploymentsRequest {
         self
     }
     #[must_use]
-    pub fn order(mut self, order: crate::generated::client::GetDeploymentLogsOrder) -> Self {
+    pub fn order(mut self, order: GetDeploymentLogsWorkflowsDeploymentsRequestOrder) -> Self {
         self.order = Some(order);
         self
     }
@@ -130,7 +130,7 @@ pub struct ListDeploymentsWorkflowsDeploymentsRequest {
     workflow_name: Option<String>,
     search: Option<String>,
     order_by: Option<String>,
-    order: Option<crate::generated::client::ListDeploymentsV1WorkflowsDeploymentsGetOrder>,
+    order: Option<ListDeploymentsWorkflowsDeploymentsRequestOrder>,
     limit: Option<String>,
     cursor: Option<String>,
     workspace_id: Option<String>,
@@ -175,10 +175,7 @@ impl ListDeploymentsWorkflowsDeploymentsRequest {
         self
     }
     #[must_use]
-    pub fn order(
-        mut self,
-        order: crate::generated::client::ListDeploymentsV1WorkflowsDeploymentsGetOrder,
-    ) -> Self {
+    pub fn order(mut self, order: ListDeploymentsWorkflowsDeploymentsRequestOrder) -> Self {
         self.order = Some(order);
         self
     }
@@ -260,9 +257,13 @@ impl<'a> WorkflowsDeployments<'a> {
         request: CreateDeploymentWorkflowsDeploymentsRequest,
     ) -> Result<CreateDeploymentWorkflowsDeploymentsResponse, SdkError> {
         self.raw
-            .create_deployment_v1_workflows_deployments_post(request.into_raw())
+            .create_deployment_v1_workflows_deployments_post(
+                <CreateDeploymentWorkflowsDeploymentsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::CreateDeploymentRequest,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -273,7 +274,7 @@ impl<'a> WorkflowsDeployments<'a> {
         self.raw
             .delete_deployment_v1_workflows_deployments_name_delete(name.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -287,7 +288,7 @@ impl<'a> WorkflowsDeployments<'a> {
                 request.workflow_name.as_deref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -302,12 +303,12 @@ impl<'a> WorkflowsDeployments<'a> {
                 request.workflow_name.as_deref(),
                 request.after.as_deref(),
                 request.before.as_deref(),
-                request.order,
+                request.order.map(__RustSdkIntoRaw::into_raw),
                 request.cursor.as_deref(),
                 request.limit,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -323,7 +324,7 @@ impl<'a> WorkflowsDeployments<'a> {
                 request.cursor.as_deref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -343,7 +344,7 @@ impl<'a> WorkflowsDeployments<'a> {
                 None::<&str>,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -358,13 +359,13 @@ impl<'a> WorkflowsDeployments<'a> {
                 request.workflow_name.as_deref(),
                 request.search.as_deref(),
                 request.order_by.as_deref(),
-                request.order,
+                request.order.map(__RustSdkIntoRaw::into_raw),
                 request.limit.as_deref(),
                 request.cursor.as_deref(),
                 request.workspace_id.as_deref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -375,7 +376,7 @@ impl<'a> WorkflowsDeployments<'a> {
         self.raw
             .restart_deployment_v1_workflows_deployments_name_restart_post(name.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -386,7 +387,7 @@ impl<'a> WorkflowsDeployments<'a> {
         self.raw
             .start_deployment_v1_workflows_deployments_name_start_post(name.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -397,7 +398,7 @@ impl<'a> WorkflowsDeployments<'a> {
         self.raw
             .stop_deployment_v1_workflows_deployments_name_stop_post(name.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -418,7 +419,7 @@ impl<'a> WorkflowsDeployments<'a> {
             .await
             .map_err(SdkError::from)?;
         let events = crate::streaming::json_events::<_, _, __StreamDeploymentLogsWorkflowsDeploymentsStreamItemRaw>(bytes)
-            .map(|event| event.map(|event| match event.data { __StreamDeploymentLogsWorkflowsDeploymentsStreamItemRaw::DeploymentLogRecord(value) => StreamDeploymentLogsWorkflowsDeploymentsStreamItem::DeploymentLogRecord(StreamDeploymentLogsWorkflowsDeploymentsStreamItemDeploymentLogRecord::from(value)),__StreamDeploymentLogsWorkflowsDeploymentsStreamItemRaw::StreamError(value) => StreamDeploymentLogsWorkflowsDeploymentsStreamItem::StreamError(StreamDeploymentLogsWorkflowsDeploymentsStreamItemStreamError::from(value)) }).map_err(Into::into));
+            .map(|event| event.map(|event| match event.data { __StreamDeploymentLogsWorkflowsDeploymentsStreamItemRaw::DeploymentLogRecord(value) => StreamDeploymentLogsWorkflowsDeploymentsStreamItem::DeploymentLogRecord(__RustSdkFromRaw::from_raw(value)),__StreamDeploymentLogsWorkflowsDeploymentsStreamItemRaw::StreamError(value) => StreamDeploymentLogsWorkflowsDeploymentsStreamItem::StreamError(__RustSdkFromRaw::from_raw(value)) }).map_err(Into::into));
         Ok(Box::pin(events))
     }
 
@@ -430,10 +431,12 @@ impl<'a> WorkflowsDeployments<'a> {
         self.raw
             .update_deployment_v1_workflows_deployments_name_patch(
                 name.as_ref(),
-                request.into_raw(),
+                <UpdateDeploymentWorkflowsDeploymentsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::UpdateDeploymentRequest,
+                >>::into_raw(request),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

@@ -100,7 +100,7 @@ impl<'a> Files<'a> {
         self.raw
             .files_api_routes_delete_file(file_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -118,7 +118,7 @@ impl<'a> Files<'a> {
         self.raw
             .files_api_routes_get_signed_url(request.file_id.as_str(), request.expiry)
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -135,7 +135,7 @@ impl<'a> Files<'a> {
                 None::<&str>,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -155,7 +155,7 @@ impl<'a> Files<'a> {
                 request.mimetypes.as_deref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -166,7 +166,7 @@ impl<'a> Files<'a> {
         self.raw
             .files_api_routes_retrieve_file(file_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -175,9 +175,11 @@ impl<'a> Files<'a> {
         request: UploadFilesRequest,
     ) -> Result<UploadFilesResponse, SdkError> {
         self.raw
-            .files_api_routes_upload_file(request.into_raw())
+            .files_api_routes_upload_file(<UploadFilesRequest as __RustSdkIntoRaw<
+                crate::generated::types::FilesApiRoutesUploadFileRequest,
+            >>::into_raw(request))
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -188,11 +190,13 @@ impl<'a> Files<'a> {
     ) -> Result<UploadFilesResponse, SdkError> {
         self.raw
             .files_api_routes_upload_file_with_multipart_filenames(
-                request.into_raw(),
+                <UploadFilesRequest as __RustSdkIntoRaw<
+                    crate::generated::types::FilesApiRoutesUploadFileRequest,
+                >>::into_raw(request),
                 multipart_filenames,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

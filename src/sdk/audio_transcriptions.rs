@@ -19,12 +19,14 @@ impl<'a> AudioTranscriptions<'a> {
     ) -> Result<CompleteAudioTranscriptionsResponse, SdkError> {
         self.raw
             .audio_api_v1_transcriptions_post({
-                let mut raw = request.into_raw();
+                let mut raw = <CompleteAudioTranscriptionsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::AudioTranscriptionRequest,
+                >>::into_raw(request);
                 raw.stream = Some(false);
                 raw
             })
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -36,14 +38,16 @@ impl<'a> AudioTranscriptions<'a> {
         self.raw
             .audio_api_v1_transcriptions_post_with_multipart_filenames(
                 {
-                    let mut raw = request.into_raw();
+                    let mut raw = <CompleteAudioTranscriptionsRequest as __RustSdkIntoRaw<
+                        crate::generated::types::AudioTranscriptionRequest,
+                    >>::into_raw(request);
                     raw.stream = Some(false);
                     raw
                 },
                 multipart_filenames,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -54,7 +58,9 @@ impl<'a> AudioTranscriptions<'a> {
         let bytes = self
             .raw
             .audio_api_v1_transcriptions_post_stream({
-                let mut raw = request.into_raw();
+                let mut raw = <StreamAudioTranscriptionsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::AudioTranscriptionRequestStream,
+                >>::into_raw(request);
                 raw.stream = Some(true);
                 raw
             })
@@ -63,7 +69,7 @@ impl<'a> AudioTranscriptions<'a> {
         let events =
             crate::streaming::json_events::<_, _, TranscriptionStreamEvents>(bytes).map(|event| {
                 event
-                    .map(|event| StreamAudioTranscriptionsStreamItem::from(event.data))
+                    .map(|event| __RustSdkFromRaw::from_raw(event.data))
                     .map_err(Into::into)
             });
         Ok(Box::pin(events))
@@ -78,7 +84,9 @@ impl<'a> AudioTranscriptions<'a> {
             .raw
             .audio_api_v1_transcriptions_post_stream_with_multipart_filenames(
                 {
-                    let mut raw = request.into_raw();
+                    let mut raw = <StreamAudioTranscriptionsRequest as __RustSdkIntoRaw<
+                        crate::generated::types::AudioTranscriptionRequestStream,
+                    >>::into_raw(request);
                     raw.stream = Some(true);
                     raw
                 },
@@ -89,7 +97,7 @@ impl<'a> AudioTranscriptions<'a> {
         let events =
             crate::streaming::json_events::<_, _, TranscriptionStreamEvents>(bytes).map(|event| {
                 event
-                    .map(|event| StreamAudioTranscriptionsStreamItem::from(event.data))
+                    .map(|event| __RustSdkFromRaw::from_raw(event.data))
                     .map_err(Into::into)
             });
         Ok(Box::pin(events))

@@ -17,12 +17,14 @@ impl<'a> Agents<'a> {
     ) -> Result<CompleteAgentsResponse, SdkError> {
         self.raw
             .agents_completion_v1_agents_completions_post({
-                let mut raw = request.into_raw();
+                let mut raw = <CompleteAgentsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::AgentsCompletionRequest,
+                >>::into_raw(request);
                 raw.stream = Some(false);
                 raw
             })
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -32,12 +34,14 @@ impl<'a> Agents<'a> {
     ) -> Result<StreamAgentsResponse, SdkError> {
         self.raw
             .agents_completion_v1_agents_completions_post({
-                let mut raw = request.into_raw();
+                let mut raw = <StreamAgentsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::AgentsCompletionRequest,
+                >>::into_raw(request);
                 raw.stream = Some(false);
                 raw
             })
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

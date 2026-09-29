@@ -15,9 +15,11 @@ impl<'a> Ocr<'a> {
         request: ProcessOcrRequest,
     ) -> Result<ProcessOcrResponse, SdkError> {
         self.raw
-            .ocr_v1_ocr_post(request.into_raw())
+            .ocr_v1_ocr_post(<ProcessOcrRequest as __RustSdkIntoRaw<
+                crate::generated::types::OCRRequest,
+            >>::into_raw(request))
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

@@ -1,7 +1,7 @@
 //! Unofficial Mistral AI SDK generated from the official OpenAPI specification.
 //!
 //! The primary API is resource-oriented and intentionally hides mechanical
-//! OpenAPI naming. The complete generated API remains available through `raw`.
+//! OpenAPI naming. Mechanical OpenAPI bindings remain a crate-private implementation detail.
 
 #![forbid(unsafe_code)]
 #![warn(
@@ -32,10 +32,13 @@
 )]
 mod generated;
 
-/// Complete generated OpenAPI bindings and transport client.
-pub mod raw {
-    pub use crate::generated::{client, types};
-    pub use client::HttpClient as Client;
+#[allow(
+    unused_imports,
+    reason = "crate-private compatibility boundary for generated transport bindings"
+)]
+pub(crate) mod raw {
+    pub(crate) use crate::generated::{client, types};
+    pub(crate) use client::HttpClient as Client;
 }
 
 #[allow(

@@ -193,9 +193,11 @@ impl<'a> BetaAgents<'a> {
         request: CreateBetaAgentsRequest,
     ) -> Result<CreateBetaAgentsResponse, SdkError> {
         self.raw
-            .agents_api_v1_agents_create(request.into_raw())
+            .agents_api_v1_agents_create(<CreateBetaAgentsRequest as __RustSdkIntoRaw<
+                crate::generated::types::CreateAgentRequest,
+            >>::into_raw(request))
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -208,7 +210,7 @@ impl<'a> BetaAgents<'a> {
         self.raw
             .agents_api_v1_agents_create_or_update_alias(agent_id.as_ref(), alias.as_ref(), version)
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -237,7 +239,7 @@ impl<'a> BetaAgents<'a> {
         self.raw
             .agents_api_v1_agents_get(request.agent_id.as_str(), request.agent_version.as_deref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -249,7 +251,7 @@ impl<'a> BetaAgents<'a> {
         self.raw
             .agents_api_v1_agents_get_version(agent_id.as_ref(), version.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -266,7 +268,7 @@ impl<'a> BetaAgents<'a> {
                 None::<&str>,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -286,7 +288,7 @@ impl<'a> BetaAgents<'a> {
                 request.metadata.as_deref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -303,7 +305,7 @@ impl<'a> BetaAgents<'a> {
                 None::<&str>,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -323,7 +325,7 @@ impl<'a> BetaAgents<'a> {
                 request.page_token.as_deref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -334,7 +336,7 @@ impl<'a> BetaAgents<'a> {
         self.raw
             .agents_api_v1_agents_list_version_aliases(agent_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -349,7 +351,7 @@ impl<'a> BetaAgents<'a> {
                 request.page_size,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -359,9 +361,14 @@ impl<'a> BetaAgents<'a> {
         request: UpdateBetaAgentsRequest,
     ) -> Result<UpdateBetaAgentsResponse, SdkError> {
         self.raw
-            .agents_api_v1_agents_update(agent_id.as_ref(), request.into_raw())
+            .agents_api_v1_agents_update(
+                agent_id.as_ref(),
+                <UpdateBetaAgentsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::UpdateAgentRequest,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -373,7 +380,7 @@ impl<'a> BetaAgents<'a> {
         self.raw
             .agents_api_v1_agents_update_version(agent_id.as_ref(), version)
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

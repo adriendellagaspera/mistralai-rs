@@ -14,12 +14,12 @@ impl<'a> BetaObservabilityChatCompletionEventsFields<'a> {
     pub async fn get_chat_completion_field_options(
         &self,
         field_name: impl AsRef<str>,
-        operator: crate::generated::client::GetChatCompletionFieldOptionsV1ObservabilityChatCompletionFieldsFieldNameOptionsGetOperator,
+        operator: GetChatCompletionFieldOptionsBetaObservabilityChatCompletionEventsFieldsRequestOperator,
     ) -> Result<
         GetChatCompletionFieldOptionsBetaObservabilityChatCompletionEventsFieldsResponse,
         SdkError,
     > {
-        self.raw.get_chat_completion_field_options_v1_observability_chat_completion_fields_field_name_options_get(field_name.as_ref(), operator).await.map(Into::into).map_err(Into::into)
+        self.raw.get_chat_completion_field_options_v1_observability_chat_completion_fields_field_name_options_get(field_name.as_ref(), __RustSdkIntoRaw::into_raw(operator)).await.map(__RustSdkFromRaw::from_raw).map_err(Into::into)
     }
 
     pub async fn get_chat_completion_field_options_counts(
@@ -30,7 +30,7 @@ impl<'a> BetaObservabilityChatCompletionEventsFields<'a> {
         GetChatCompletionFieldOptionsCountsBetaObservabilityChatCompletionEventsFieldsResponse,
         SdkError,
     > {
-        self.raw.get_chat_completion_field_options_counts_v1_observability_chat_completion_fields_field_name_options_counts_post(field_name.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
+        self.raw.get_chat_completion_field_options_counts_v1_observability_chat_completion_fields_field_name_options_counts_post(field_name.as_ref(), <GetChatCompletionFieldOptionsCountsBetaObservabilityChatCompletionEventsFieldsRequest as __RustSdkIntoRaw<crate::generated::types::FetchFieldOptionCountsRequest>>::into_raw(request)).await.map(__RustSdkFromRaw::from_raw).map_err(Into::into)
     }
 
     pub async fn get_chat_completion_fields(
@@ -40,7 +40,7 @@ impl<'a> BetaObservabilityChatCompletionEventsFields<'a> {
         self.raw
             .get_chat_completion_fields_v1_observability_chat_completion_fields_get()
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

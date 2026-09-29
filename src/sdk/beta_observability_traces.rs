@@ -112,9 +112,15 @@ impl<'a> BetaObservabilityTraces<'a> {
         request: AggregateBetaObservabilityTracesRequest,
     ) -> Result<AggregateBetaObservabilityTracesResponse, SdkError> {
         self.raw
-            .aggregate_traces_v1_observability_traces_aggregate_post(from, to, request.into_raw())
+            .aggregate_traces_v1_observability_traces_aggregate_post(
+                from,
+                to,
+                <AggregateBetaObservabilityTracesRequest as __RustSdkIntoRaw<
+                    crate::generated::types::AggregationRequest,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -129,7 +135,7 @@ impl<'a> BetaObservabilityTraces<'a> {
                 request.to.as_deref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -145,7 +151,7 @@ impl<'a> BetaObservabilityTraces<'a> {
                 request.to.as_deref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -156,7 +162,7 @@ impl<'a> BetaObservabilityTraces<'a> {
         self.raw
             .get_trace_by_id_v1_observability_traces_trace_id_get(trace_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -166,7 +172,7 @@ impl<'a> BetaObservabilityTraces<'a> {
         self.raw
             .get_trace_fields_v1_observability_traces_fields_get()
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -183,7 +189,7 @@ impl<'a> BetaObservabilityTraces<'a> {
                 request.cursor.as_deref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -201,10 +207,12 @@ impl<'a> BetaObservabilityTraces<'a> {
                 to,
                 page_size,
                 cursor,
-                request.into_raw(),
+                <SearchBetaObservabilityTracesRequest as __RustSdkIntoRaw<
+                    crate::generated::types::TracesRequest,
+                >>::into_raw(request),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

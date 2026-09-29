@@ -17,7 +17,7 @@ impl<'a> BetaRagIngestionPipelineConfigurations<'a> {
         self.raw
             .get_configs_v1_rag_ingestion_pipeline_configurations_get()
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -26,9 +26,13 @@ impl<'a> BetaRagIngestionPipelineConfigurations<'a> {
         request: RegisterBetaRagIngestionPipelineConfigurationsRequest,
     ) -> Result<RegisterBetaRagIngestionPipelineConfigurationsResponse, SdkError> {
         self.raw
-            .register_config_v1_rag_ingestion_pipeline_configurations_put(request.into_raw())
+            .register_config_v1_rag_ingestion_pipeline_configurations_put(
+                <RegisterBetaRagIngestionPipelineConfigurationsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::CreateIngestionPipelineConfigurationRequest,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -40,10 +44,12 @@ impl<'a> BetaRagIngestionPipelineConfigurations<'a> {
         self.raw
             .update_run_info_v1_rag_ingestion_pipeline_configurations_id_run_info_put(
                 id.as_ref(),
-                request.into_raw(),
+                <UpdateRunInfoBetaRagIngestionPipelineConfigurationsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::UpdateRunInfo,
+                >>::into_raw(request),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

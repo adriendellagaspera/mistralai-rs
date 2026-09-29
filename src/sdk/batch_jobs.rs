@@ -31,7 +31,7 @@ pub struct ListBatchJobsRequest {
     created_after: Option<String>,
     created_by_me: Option<bool>,
     status: Option<String>,
-    order_by: Option<crate::generated::client::JobsApiRoutesBatchGetBatchJobsOrderBy>,
+    order_by: Option<ListBatchJobsRequestOrderBy>,
 }
 impl ListBatchJobsRequest {
     pub fn new() -> Self {
@@ -88,10 +88,7 @@ impl ListBatchJobsRequest {
         self
     }
     #[must_use]
-    pub fn order_by(
-        mut self,
-        order_by: crate::generated::client::JobsApiRoutesBatchGetBatchJobsOrderBy,
-    ) -> Self {
+    pub fn order_by(mut self, order_by: ListBatchJobsRequestOrderBy) -> Self {
         self.order_by = Some(order_by);
         self
     }
@@ -112,7 +109,7 @@ impl<'a> BatchJobs<'a> {
         self.raw
             .jobs_api_routes_batch_cancel_batch_job(job_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -121,9 +118,11 @@ impl<'a> BatchJobs<'a> {
         request: CreateBatchJobsRequest,
     ) -> Result<CreateBatchJobsResponse, SdkError> {
         self.raw
-            .jobs_api_routes_batch_create_batch_job(request.into_raw())
+            .jobs_api_routes_batch_create_batch_job(<CreateBatchJobsRequest as __RustSdkIntoRaw<
+                crate::generated::types::CreateBatchJobRequest,
+            >>::into_raw(request))
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -134,7 +133,7 @@ impl<'a> BatchJobs<'a> {
         self.raw
             .jobs_api_routes_batch_delete_batch_job(job_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -145,7 +144,7 @@ impl<'a> BatchJobs<'a> {
         self.raw
             .jobs_api_routes_batch_get_batch_job(request.job_id.as_str(), request.inline.as_deref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -163,7 +162,7 @@ impl<'a> BatchJobs<'a> {
                 None,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -181,10 +180,10 @@ impl<'a> BatchJobs<'a> {
                 request.created_after.as_deref(),
                 request.created_by_me,
                 request.status.as_deref(),
-                request.order_by,
+                request.order_by.map(__RustSdkIntoRaw::into_raw),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

@@ -121,7 +121,7 @@ pub struct GetWorkflowsWorkflowsRequest {
     archived: Option<String>,
     tags: Option<String>,
     sort_by: Option<String>,
-    order: Option<crate::generated::client::GetWorkflowsV1WorkflowsGetOrder>,
+    order: Option<GetWorkflowsWorkflowsRequestOrder>,
     cursor: Option<String>,
     limit: Option<i64>,
     active_only: Option<bool>,
@@ -189,10 +189,7 @@ impl GetWorkflowsWorkflowsRequest {
         self
     }
     #[must_use]
-    pub fn order(
-        mut self,
-        order: crate::generated::client::GetWorkflowsV1WorkflowsGetOrder,
-    ) -> Self {
+    pub fn order(mut self, order: GetWorkflowsWorkflowsRequestOrder) -> Self {
         self.order = Some(order);
         self
     }
@@ -260,7 +257,7 @@ impl<'a> Workflows<'a> {
                 workflow_identifier.as_ref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -269,9 +266,13 @@ impl<'a> Workflows<'a> {
         request: BulkArchiveWorkflowsWorkflowsRequest,
     ) -> Result<BulkArchiveWorkflowsWorkflowsResponse, SdkError> {
         self.raw
-            .bulk_archive_workflows_v1_workflows_archive_put(request.into_raw())
+            .bulk_archive_workflows_v1_workflows_archive_put(
+                <BulkArchiveWorkflowsWorkflowsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::WorkflowBulkArchiveRequest,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -280,9 +281,13 @@ impl<'a> Workflows<'a> {
         request: BulkUnarchiveWorkflowsWorkflowsRequest,
     ) -> Result<BulkUnarchiveWorkflowsWorkflowsResponse, SdkError> {
         self.raw
-            .bulk_unarchive_workflows_v1_workflows_unarchive_put(request.into_raw())
+            .bulk_unarchive_workflows_v1_workflows_unarchive_put(
+                <BulkUnarchiveWorkflowsWorkflowsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::WorkflowBulkUnarchiveRequest,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -294,10 +299,12 @@ impl<'a> Workflows<'a> {
         self.raw
             .execute_workflow_v1_workflows_workflow_identifier_execute_post(
                 workflow_identifier.as_ref(),
-                request.into_raw(),
+                <ExecuteWorkflowWorkflowsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::WorkflowExecutionRequest,
+                >>::into_raw(request),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -306,7 +313,7 @@ impl<'a> Workflows<'a> {
         workflow_registration_id: impl AsRef<str>,
         request: ExecuteWorkflowRegistrationWorkflowsRequest,
     ) -> Result<ExecuteWorkflowRegistrationWorkflowsResponse, SdkError> {
-        self.raw.execute_workflow_registration_v1_workflows_registrations_workflow_registration_id_execute_post(workflow_registration_id.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
+        self.raw.execute_workflow_registration_v1_workflows_registrations_workflow_registration_id_execute_post(workflow_registration_id.as_ref(), <ExecuteWorkflowRegistrationWorkflowsRequest as __RustSdkIntoRaw<crate::generated::types::WorkflowExecutionRequest>>::into_raw(request)).await.map(__RustSdkFromRaw::from_raw).map_err(Into::into)
     }
 
     pub async fn get_workflow(
@@ -316,7 +323,7 @@ impl<'a> Workflows<'a> {
         self.raw
             .get_workflow_v1_workflows_workflow_identifier_get(workflow_identifier.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -331,7 +338,7 @@ impl<'a> Workflows<'a> {
                 request.include_shared,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -352,7 +359,7 @@ impl<'a> Workflows<'a> {
                 None::<&str>,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -374,7 +381,7 @@ impl<'a> Workflows<'a> {
                 request.cursor.as_deref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -396,7 +403,7 @@ impl<'a> Workflows<'a> {
                 None::<&str>,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -414,14 +421,14 @@ impl<'a> Workflows<'a> {
                 request.archived.as_deref(),
                 request.tags.as_deref(),
                 request.sort_by.as_deref(),
-                request.order,
+                request.order.map(__RustSdkIntoRaw::into_raw),
                 request.cursor.as_deref(),
                 request.limit,
                 request.active_only,
                 request.search.as_deref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -434,7 +441,7 @@ impl<'a> Workflows<'a> {
                 workflow_identifier.as_ref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -446,10 +453,12 @@ impl<'a> Workflows<'a> {
         self.raw
             .update_workflow_v1_workflows_workflow_identifier_put(
                 workflow_identifier.as_ref(),
-                request.into_raw(),
+                <UpdateWorkflowWorkflowsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::WorkflowUpdateRequest,
+                >>::into_raw(request),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

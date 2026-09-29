@@ -46,7 +46,7 @@ impl<'a> BetaAdminUsers<'a> {
         self.raw
             .users_api_admin_roles_get_roles()
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -55,9 +55,13 @@ impl<'a> BetaAdminUsers<'a> {
         request: UsersCreateUsersBetaAdminUsersRequest,
     ) -> Result<UsersCreateUsersBetaAdminUsersResponse, SdkError> {
         self.raw
-            .users_api_admin_users_create_users(request.into_raw())
+            .users_api_admin_users_create_users(
+                <UsersCreateUsersBetaAdminUsersRequest as __RustSdkIntoRaw<
+                    crate::generated::types::UsersApiAdminUsersCreateUsersRequest,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -68,7 +72,7 @@ impl<'a> BetaAdminUsers<'a> {
         self.raw
             .users_api_admin_users_delete_invite(invite_uuid.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -79,7 +83,7 @@ impl<'a> BetaAdminUsers<'a> {
         self.raw
             .users_api_admin_users_delete_user(user_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -87,7 +91,7 @@ impl<'a> BetaAdminUsers<'a> {
         self.raw
             .users_api_admin_users_get_invite()
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -98,7 +102,7 @@ impl<'a> BetaAdminUsers<'a> {
         self.raw
             .users_api_admin_users_get_user(user_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -106,7 +110,7 @@ impl<'a> BetaAdminUsers<'a> {
         self.raw
             .users_api_admin_users_get_users(None, None, None::<&str>)
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -121,7 +125,7 @@ impl<'a> BetaAdminUsers<'a> {
                 request.email.as_deref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -130,9 +134,13 @@ impl<'a> BetaAdminUsers<'a> {
         request: UsersInviteUsersBetaAdminUsersRequest,
     ) -> Result<UsersInviteUsersBetaAdminUsersResponse, SdkError> {
         self.raw
-            .users_api_admin_users_invite_users(request.into_raw())
+            .users_api_admin_users_invite_users(
+                <UsersInviteUsersBetaAdminUsersRequest as __RustSdkIntoRaw<
+                    crate::generated::types::OrganizationInviteIN,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -142,9 +150,14 @@ impl<'a> BetaAdminUsers<'a> {
         request: UsersUpdateUserBetaAdminUsersRequest,
     ) -> Result<UsersUpdateUserBetaAdminUsersResponse, SdkError> {
         self.raw
-            .users_api_admin_users_update_user(user_id.as_ref(), request.into_raw())
+            .users_api_admin_users_update_user(
+                user_id.as_ref(),
+                <UsersUpdateUserBetaAdminUsersRequest as __RustSdkIntoRaw<
+                    crate::generated::types::AdminOrganizationMemberUpdate,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

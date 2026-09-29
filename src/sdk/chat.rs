@@ -19,24 +19,28 @@ impl<'a> Chat<'a> {
     ) -> Result<CompleteChatResponse, SdkError> {
         self.raw
             .chat_completion_v1_chat_completions_post({
-                let mut raw = request.into_raw();
+                let mut raw = <CompleteChatRequest as __RustSdkIntoRaw<
+                    crate::generated::types::ChatCompletionRequest,
+                >>::into_raw(request);
                 raw.stream = Some(false);
                 raw
             })
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
     pub async fn parse(&self, request: ParseChatRequest) -> Result<ParseChatResponse, SdkError> {
         self.raw
             .chat_completion_v1_chat_completions_post({
-                let mut raw = request.into_raw();
+                let mut raw = <ParseChatRequest as __RustSdkIntoRaw<
+                    crate::generated::types::ChatCompletionRequest,
+                >>::into_raw(request);
                 raw.stream = Some(false);
                 raw
             })
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -47,7 +51,9 @@ impl<'a> Chat<'a> {
         let bytes = self
             .raw
             .chat_completion_v1_chat_completions_post_stream({
-                let mut raw = request.into_raw();
+                let mut raw = <ParseStreamChatRequest as __RustSdkIntoRaw<
+                    crate::generated::types::ChatCompletionRequest,
+                >>::into_raw(request);
                 raw.stream = Some(true);
                 raw
             })
@@ -55,7 +61,7 @@ impl<'a> Chat<'a> {
             .map_err(SdkError::from)?;
         let events = crate::streaming::json_events::<_, _, CompletionChunk>(bytes).map(|event| {
             event
-                .map(|event| ParseStreamChatStreamItem::from(event.data))
+                .map(|event| __RustSdkFromRaw::from_raw(event.data))
                 .map_err(Into::into)
         });
         Ok(Box::pin(events))
@@ -65,7 +71,9 @@ impl<'a> Chat<'a> {
         let bytes = self
             .raw
             .chat_completion_v1_chat_completions_post_stream({
-                let mut raw = request.into_raw();
+                let mut raw = <StreamChatRequest as __RustSdkIntoRaw<
+                    crate::generated::types::ChatCompletionRequest,
+                >>::into_raw(request);
                 raw.stream = Some(true);
                 raw
             })
@@ -73,7 +81,7 @@ impl<'a> Chat<'a> {
             .map_err(SdkError::from)?;
         let events = crate::streaming::json_events::<_, _, CompletionChunk>(bytes).map(|event| {
             event
-                .map(|event| StreamChatStreamItem::from(event.data))
+                .map(|event| __RustSdkFromRaw::from_raw(event.data))
                 .map_err(Into::into)
         });
         Ok(Box::pin(events))

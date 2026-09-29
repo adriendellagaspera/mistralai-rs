@@ -16,12 +16,14 @@ impl<'a> AudioSpeech<'a> {
     ) -> Result<CompleteAudioSpeechResponse, SdkError> {
         self.raw
             .speech_v1_audio_speech_post({
-                let mut raw = request.into_raw();
+                let mut raw = <CompleteAudioSpeechRequest as __RustSdkIntoRaw<
+                    crate::generated::types::SpeechRequest,
+                >>::into_raw(request);
                 raw.stream = Some(false);
                 raw
             })
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

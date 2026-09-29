@@ -24,7 +24,7 @@ impl<'a> BetaObservabilityChatCompletionEvents<'a> {
                 event_id.as_ref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -33,13 +33,7 @@ impl<'a> BetaObservabilityChatCompletionEvents<'a> {
         request: GetChatCompletionEventIdsBetaObservabilityChatCompletionEventsRequest,
     ) -> Result<GetChatCompletionEventIdsBetaObservabilityChatCompletionEventsResponse, SdkError>
     {
-        self.raw
-            .get_chat_completion_event_ids_v1_observability_chat_completion_events_search_ids_post(
-                request.into_raw(),
-            )
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+        self.raw.get_chat_completion_event_ids_v1_observability_chat_completion_events_search_ids_post(<GetChatCompletionEventIdsBetaObservabilityChatCompletionEventsRequest as __RustSdkIntoRaw<crate::generated::types::SearchChatCompletionEventIdsRequest>>::into_raw(request)).await.map(__RustSdkFromRaw::from_raw).map_err(Into::into)
     }
 
     pub async fn get_chat_completion_events(
@@ -49,15 +43,7 @@ impl<'a> BetaObservabilityChatCompletionEvents<'a> {
         request: GetChatCompletionEventsBetaObservabilityChatCompletionEventsRequest,
     ) -> Result<GetChatCompletionEventsBetaObservabilityChatCompletionEventsResponse, SdkError>
     {
-        self.raw
-            .get_chat_completion_events_v1_observability_chat_completion_events_search_post(
-                page_size,
-                cursor,
-                request.into_raw(),
-            )
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+        self.raw.get_chat_completion_events_v1_observability_chat_completion_events_search_post(page_size, cursor, <GetChatCompletionEventsBetaObservabilityChatCompletionEventsRequest as __RustSdkIntoRaw<crate::generated::types::SearchChatCompletionEventsRequest>>::into_raw(request)).await.map(__RustSdkFromRaw::from_raw).map_err(Into::into)
     }
 
     pub async fn get_similar_chat_completion_events(
@@ -65,7 +51,7 @@ impl<'a> BetaObservabilityChatCompletionEvents<'a> {
         event_id: impl AsRef<str>,
     ) -> Result<GetSimilarChatCompletionEventsBetaObservabilityChatCompletionEventsResponse, SdkError>
     {
-        self.raw.get_similar_chat_completion_events_v1_observability_chat_completion_events_event_id_similar_events_get(event_id.as_ref()).await.map(Into::into).map_err(Into::into)
+        self.raw.get_similar_chat_completion_events_v1_observability_chat_completion_events_event_id_similar_events_get(event_id.as_ref()).await.map(__RustSdkFromRaw::from_raw).map_err(Into::into)
     }
 
     pub async fn judge_chat_completion_event(
@@ -74,6 +60,6 @@ impl<'a> BetaObservabilityChatCompletionEvents<'a> {
         request: JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequest,
     ) -> Result<JudgeChatCompletionEventBetaObservabilityChatCompletionEventsResponse, SdkError>
     {
-        self.raw.judge_chat_completion_event_v1_observability_chat_completion_events_event_id_live_judging_post(event_id.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
+        self.raw.judge_chat_completion_event_v1_observability_chat_completion_events_event_id_live_judging_post(event_id.as_ref(), <JudgeChatCompletionEventBetaObservabilityChatCompletionEventsRequest as __RustSdkIntoRaw<crate::generated::types::JudgeChatCompletionEventRequest>>::into_raw(request)).await.map(__RustSdkFromRaw::from_raw).map_err(Into::into)
     }
 }

@@ -90,7 +90,7 @@ impl<'a> BetaAdminAuditLogs<'a> {
                 None,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -110,7 +110,7 @@ impl<'a> BetaAdminAuditLogs<'a> {
                 request.limit,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

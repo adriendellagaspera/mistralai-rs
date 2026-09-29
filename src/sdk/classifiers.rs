@@ -16,9 +16,13 @@ impl<'a> Classifiers<'a> {
         request: ClassifyClassifiersRequest,
     ) -> Result<ClassifyClassifiersResponse, SdkError> {
         self.raw
-            .classifications_v1_classifications_post(request.into_raw())
+            .classifications_v1_classifications_post(
+                <ClassifyClassifiersRequest as __RustSdkIntoRaw<
+                    crate::generated::types::ClassificationRequest,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -27,9 +31,13 @@ impl<'a> Classifiers<'a> {
         request: ClassifyChatClassifiersRequest,
     ) -> Result<ClassifyChatClassifiersResponse, SdkError> {
         self.raw
-            .chat_classifications_v1_chat_classifications_post(request.into_raw())
+            .chat_classifications_v1_chat_classifications_post(
+                <ClassifyChatClassifiersRequest as __RustSdkIntoRaw<
+                    crate::generated::types::ChatClassificationRequest,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -38,9 +46,11 @@ impl<'a> Classifiers<'a> {
         request: ModerateClassifiersRequest,
     ) -> Result<ModerateClassifiersResponse, SdkError> {
         self.raw
-            .moderations_v1_moderations_post(request.into_raw())
+            .moderations_v1_moderations_post(<ModerateClassifiersRequest as __RustSdkIntoRaw<
+                crate::generated::types::ClassificationRequest,
+            >>::into_raw(request))
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -49,9 +59,13 @@ impl<'a> Classifiers<'a> {
         request: ModerateChatClassifiersRequest,
     ) -> Result<ModerateChatClassifiersResponse, SdkError> {
         self.raw
-            .chat_moderations_v1_chat_moderations_post(request.into_raw())
+            .chat_moderations_v1_chat_moderations_post(
+                <ModerateChatClassifiersRequest as __RustSdkIntoRaw<
+                    crate::generated::types::ChatModerationRequest,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

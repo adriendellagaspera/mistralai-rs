@@ -19,12 +19,14 @@ impl<'a> Fim<'a> {
     ) -> Result<CompleteFimResponse, SdkError> {
         self.raw
             .fim_completion_v1_fim_completions_post({
-                let mut raw = request.into_raw();
+                let mut raw = <CompleteFimRequest as __RustSdkIntoRaw<
+                    crate::generated::types::FIMCompletionRequest,
+                >>::into_raw(request);
                 raw.stream = Some(false);
                 raw
             })
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -32,7 +34,9 @@ impl<'a> Fim<'a> {
         let bytes = self
             .raw
             .fim_completion_v1_fim_completions_post_stream({
-                let mut raw = request.into_raw();
+                let mut raw = <StreamFimRequest as __RustSdkIntoRaw<
+                    crate::generated::types::FIMCompletionRequest,
+                >>::into_raw(request);
                 raw.stream = Some(true);
                 raw
             })
@@ -40,7 +44,7 @@ impl<'a> Fim<'a> {
             .map_err(SdkError::from)?;
         let events = crate::streaming::json_events::<_, _, CompletionChunk>(bytes).map(|event| {
             event
-                .map(|event| StreamFimStreamItem::from(event.data))
+                .map(|event| __RustSdkFromRaw::from_raw(event.data))
                 .map_err(Into::into)
         });
         Ok(Box::pin(events))

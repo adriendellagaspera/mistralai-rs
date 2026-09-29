@@ -54,7 +54,7 @@ impl<'a> BetaAdminBilling<'a> {
         self.raw
             .users_api_admin_rate_limits_get_rate_limits()
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -64,7 +64,7 @@ impl<'a> BetaAdminBilling<'a> {
         self.raw
             .users_api_admin_spend_limits_get_spend_limits()
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -73,9 +73,13 @@ impl<'a> BetaAdminBilling<'a> {
         request: SpendLimitsUpdateSpendLimitsBetaAdminBillingRequest,
     ) -> Result<SpendLimitsUpdateSpendLimitsBetaAdminBillingResponse, SdkError> {
         self.raw
-            .users_api_admin_spend_limits_update_spend_limits(request.into_raw())
+            .users_api_admin_spend_limits_update_spend_limits(
+                <SpendLimitsUpdateSpendLimitsBetaAdminBillingRequest as __RustSdkIntoRaw<
+                    crate::generated::types::NewUsageLimitIN,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -83,7 +87,7 @@ impl<'a> BetaAdminBilling<'a> {
         self.raw
             .users_api_admin_usage_get_usage(None::<&str>, None::<&str>, None::<&str>, None::<&str>)
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -99,7 +103,7 @@ impl<'a> BetaAdminBilling<'a> {
                 request.api_zone.as_deref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

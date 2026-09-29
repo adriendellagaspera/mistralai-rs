@@ -47,7 +47,7 @@ impl<'a> BetaObservabilityLogs<'a> {
                 request.to.as_deref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -55,7 +55,7 @@ impl<'a> BetaObservabilityLogs<'a> {
         self.raw
             .get_log_fields_v1_observability_logs_fields_get()
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -73,10 +73,12 @@ impl<'a> BetaObservabilityLogs<'a> {
                 to,
                 page_size,
                 cursor,
-                request.into_raw(),
+                <SearchBetaObservabilityLogsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::LogsRequest,
+                >>::into_raw(request),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

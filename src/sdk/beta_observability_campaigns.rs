@@ -72,9 +72,13 @@ impl<'a> BetaObservabilityCampaigns<'a> {
         request: CreateCampaignBetaObservabilityCampaignsRequest,
     ) -> Result<CreateCampaignBetaObservabilityCampaignsResponse, SdkError> {
         self.raw
-            .create_campaign_v1_observability_campaigns_post(request.into_raw())
+            .create_campaign_v1_observability_campaigns_post(
+                <CreateCampaignBetaObservabilityCampaignsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::CreateCampaignRequest,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -92,7 +96,7 @@ impl<'a> BetaObservabilityCampaigns<'a> {
         self.raw
             .get_campaign_by_id_v1_observability_campaigns_campaign_id_get(campaign_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -100,7 +104,7 @@ impl<'a> BetaObservabilityCampaigns<'a> {
         &self,
         request: GetCampaignSelectedEventsBetaObservabilityCampaignsRequest,
     ) -> Result<GetCampaignSelectedEventsBetaObservabilityCampaignsResponse, SdkError> {
-        self.raw.get_campaign_selected_events_v1_observability_campaigns_campaign_id_selected_events_get(request.campaign_id.as_str(), request.page_size, request.page).await.map(Into::into).map_err(Into::into)
+        self.raw.get_campaign_selected_events_v1_observability_campaigns_campaign_id_selected_events_get(request.campaign_id.as_str(), request.page_size, request.page).await.map(__RustSdkFromRaw::from_raw).map_err(Into::into)
     }
 
     pub async fn get_campaign_status_by_id(
@@ -112,7 +116,7 @@ impl<'a> BetaObservabilityCampaigns<'a> {
                 campaign_id.as_ref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -122,7 +126,7 @@ impl<'a> BetaObservabilityCampaigns<'a> {
         self.raw
             .get_campaigns_v1_observability_campaigns_get(None, None, None::<&str>)
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -137,7 +141,7 @@ impl<'a> BetaObservabilityCampaigns<'a> {
                 request.q.as_deref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

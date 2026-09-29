@@ -15,9 +15,11 @@ impl<'a> Embeddings<'a> {
         request: CreateEmbeddingsRequest,
     ) -> Result<CreateEmbeddingsResponse, SdkError> {
         self.raw
-            .embeddings_v1_embeddings_post(request.into_raw())
+            .embeddings_v1_embeddings_post(<CreateEmbeddingsRequest as __RustSdkIntoRaw<
+                crate::generated::types::EmbeddingRequest,
+            >>::into_raw(request))
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

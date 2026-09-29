@@ -69,9 +69,11 @@ impl<'a> BetaLibraries<'a> {
         request: CreateBetaLibrariesRequest,
     ) -> Result<CreateBetaLibrariesResponse, SdkError> {
         self.raw
-            .libraries_create_v1(request.into_raw())
+            .libraries_create_v1(<CreateBetaLibrariesRequest as __RustSdkIntoRaw<
+                crate::generated::types::CreateLibraryRequest,
+            >>::into_raw(request))
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -82,7 +84,7 @@ impl<'a> BetaLibraries<'a> {
         self.raw
             .libraries_delete_v1(library_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -93,7 +95,7 @@ impl<'a> BetaLibraries<'a> {
         self.raw
             .libraries_get_v1(library_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -103,9 +105,14 @@ impl<'a> BetaLibraries<'a> {
         request: LibrariesUpdateV1BetaLibrariesRequest,
     ) -> Result<LibrariesUpdateV1BetaLibrariesResponse, SdkError> {
         self.raw
-            .libraries_update_v1(library_id.as_ref(), request.into_raw())
+            .libraries_update_v1(
+                library_id.as_ref(),
+                <LibrariesUpdateV1BetaLibrariesRequest as __RustSdkIntoRaw<
+                    crate::generated::types::UpdateLibraryRequest,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -113,7 +120,7 @@ impl<'a> BetaLibraries<'a> {
         self.raw
             .libraries_list_v1(None, None::<&str>, None, None::<&str>, None::<&str>)
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -130,7 +137,7 @@ impl<'a> BetaLibraries<'a> {
                 request.filter_owned_by_me.as_deref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -140,9 +147,14 @@ impl<'a> BetaLibraries<'a> {
         request: UpdateBetaLibrariesRequest,
     ) -> Result<UpdateBetaLibrariesResponse, SdkError> {
         self.raw
-            .libraries_patch_v1(library_id.as_ref(), request.into_raw())
+            .libraries_patch_v1(
+                library_id.as_ref(),
+                <UpdateBetaLibrariesRequest as __RustSdkIntoRaw<
+                    crate::generated::types::UpdateLibraryRequest,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

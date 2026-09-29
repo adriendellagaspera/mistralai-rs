@@ -45,7 +45,7 @@ impl GetVersionBetaSkillsRequest {
     pub fn new(skill_id: impl Into<String>, version: i32) -> Self {
         Self {
             skill_id: skill_id.into(),
-            version: version,
+            version,
             fields: None,
         }
     }
@@ -62,8 +62,8 @@ pub struct ListBetaSkillsRequest {
     page_token: Option<String>,
     alias: Option<String>,
     fields: Option<Vec<String>>,
-    sort_field: Option<crate::generated::types::ListSortField>,
-    sort_direction: Option<crate::generated::types::ListSortDirection>,
+    sort_field: Option<ListBetaSkillsRequestSortField>,
+    sort_direction: Option<ListBetaSkillsRequestSortDirection>,
     sort_by: Option<String>,
     sort_direction_2: Option<String>,
 }
@@ -101,15 +101,12 @@ impl ListBetaSkillsRequest {
         self
     }
     #[must_use]
-    pub fn sort_field(mut self, sort_field: crate::generated::types::ListSortField) -> Self {
+    pub fn sort_field(mut self, sort_field: ListBetaSkillsRequestSortField) -> Self {
         self.sort_field = Some(sort_field);
         self
     }
     #[must_use]
-    pub fn sort_direction(
-        mut self,
-        sort_direction: crate::generated::types::ListSortDirection,
-    ) -> Self {
+    pub fn sort_direction(mut self, sort_direction: ListBetaSkillsRequestSortDirection) -> Self {
         self.sort_direction = Some(sort_direction);
         self
     }
@@ -139,9 +136,11 @@ impl<'a> BetaSkills<'a> {
         request: CreateBetaSkillsRequest,
     ) -> Result<CreateBetaSkillsResponse, SdkError> {
         self.raw
-            .skills_create(request.into_raw())
+            .skills_create(<CreateBetaSkillsRequest as __RustSdkIntoRaw<
+                crate::generated::types::CreateSkillRequest,
+            >>::into_raw(request))
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -151,9 +150,14 @@ impl<'a> BetaSkills<'a> {
         request: CreateVersionBetaSkillsRequest,
     ) -> Result<CreateVersionBetaSkillsResponse, SdkError> {
         self.raw
-            .skills_create_version(skill_id.as_ref(), request.into_raw())
+            .skills_create_version(
+                skill_id.as_ref(),
+                <CreateVersionBetaSkillsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::SkillsCreateVersionRequest,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -164,7 +168,7 @@ impl<'a> BetaSkills<'a> {
         self.raw
             .skills_delete(skill_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -180,7 +184,7 @@ impl<'a> BetaSkills<'a> {
                 request.fields,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -191,7 +195,7 @@ impl<'a> BetaSkills<'a> {
         self.raw
             .skills_get_version(request.skill_id.as_str(), request.version, request.fields)
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -208,7 +212,7 @@ impl<'a> BetaSkills<'a> {
                 None::<&str>,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -222,13 +226,13 @@ impl<'a> BetaSkills<'a> {
                 request.page_token.as_deref(),
                 request.alias.as_deref(),
                 request.fields,
-                request.sort_field,
-                request.sort_direction,
+                request.sort_field.map(__RustSdkIntoRaw::into_raw),
+                request.sort_direction.map(__RustSdkIntoRaw::into_raw),
                 request.sort_by.as_deref(),
                 request.sort_direction_2.as_deref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -239,7 +243,7 @@ impl<'a> BetaSkills<'a> {
         self.raw
             .skills_list_versions(skill_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -249,9 +253,14 @@ impl<'a> BetaSkills<'a> {
         request: UpdateMetadataBetaSkillsRequest,
     ) -> Result<UpdateMetadataBetaSkillsResponse, SdkError> {
         self.raw
-            .skills_update(skill_id.as_ref(), request.into_raw())
+            .skills_update(
+                skill_id.as_ref(),
+                <UpdateMetadataBetaSkillsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::SkillsUpdateRequest,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -262,9 +271,15 @@ impl<'a> BetaSkills<'a> {
         request: UpdateVersionMetadataBetaSkillsRequest,
     ) -> Result<UpdateVersionMetadataBetaSkillsResponse, SdkError> {
         self.raw
-            .skills_update_version_metadata(skill_id.as_ref(), version, request.into_raw())
+            .skills_update_version_metadata(
+                skill_id.as_ref(),
+                version,
+                <UpdateVersionMetadataBetaSkillsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::SkillsUpdateVersionMetadataRequest,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

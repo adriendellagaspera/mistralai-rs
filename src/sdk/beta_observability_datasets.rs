@@ -103,9 +103,13 @@ impl<'a> BetaObservabilityDatasets<'a> {
         request: CreateBetaObservabilityDatasetsRequest,
     ) -> Result<CreateBetaObservabilityDatasetsResponse, SdkError> {
         self.raw
-            .create_dataset_v1_observability_datasets_post(request.into_raw())
+            .create_dataset_v1_observability_datasets_post(
+                <CreateBetaObservabilityDatasetsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::CreateDatasetRequest,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -117,10 +121,12 @@ impl<'a> BetaObservabilityDatasets<'a> {
         self.raw
             .create_dataset_record_v1_observability_datasets_dataset_id_records_post(
                 dataset_id.as_ref(),
-                request.into_raw(),
+                <CreateRecordBetaObservabilityDatasetsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::CreateDatasetRecordRequest,
+                >>::into_raw(request),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -140,7 +146,7 @@ impl<'a> BetaObservabilityDatasets<'a> {
                 dataset_id.as_ref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -151,7 +157,7 @@ impl<'a> BetaObservabilityDatasets<'a> {
         self.raw
             .get_dataset_by_id_v1_observability_datasets_dataset_id_get(dataset_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -166,7 +172,7 @@ impl<'a> BetaObservabilityDatasets<'a> {
                 task_id.as_ref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -175,7 +181,7 @@ impl<'a> BetaObservabilityDatasets<'a> {
         dataset_id: impl AsRef<str>,
         request: ImportFromDatasetRecordsBetaObservabilityDatasetsRequest,
     ) -> Result<ImportFromDatasetRecordsBetaObservabilityDatasetsResponse, SdkError> {
-        self.raw.post_dataset_records_from_dataset_v1_observability_datasets_dataset_id_imports_from_dataset_post(dataset_id.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
+        self.raw.post_dataset_records_from_dataset_v1_observability_datasets_dataset_id_imports_from_dataset_post(dataset_id.as_ref(), <ImportFromDatasetRecordsBetaObservabilityDatasetsRequest as __RustSdkIntoRaw<crate::generated::types::ImportDatasetFromDatasetRequest>>::into_raw(request)).await.map(__RustSdkFromRaw::from_raw).map_err(Into::into)
     }
 
     pub async fn import_from_file(
@@ -183,7 +189,7 @@ impl<'a> BetaObservabilityDatasets<'a> {
         dataset_id: impl AsRef<str>,
         request: ImportFromFileBetaObservabilityDatasetsRequest,
     ) -> Result<ImportFromFileBetaObservabilityDatasetsResponse, SdkError> {
-        self.raw.post_dataset_records_from_file_v1_observability_datasets_dataset_id_imports_from_file_post(dataset_id.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
+        self.raw.post_dataset_records_from_file_v1_observability_datasets_dataset_id_imports_from_file_post(dataset_id.as_ref(), <ImportFromFileBetaObservabilityDatasetsRequest as __RustSdkIntoRaw<crate::generated::types::ImportDatasetFromFileRequest>>::into_raw(request)).await.map(__RustSdkFromRaw::from_raw).map_err(Into::into)
     }
 
     pub async fn import_from_playground(
@@ -191,14 +197,14 @@ impl<'a> BetaObservabilityDatasets<'a> {
         dataset_id: impl AsRef<str>,
         request: ImportFromPlaygroundBetaObservabilityDatasetsRequest,
     ) -> Result<ImportFromPlaygroundBetaObservabilityDatasetsResponse, SdkError> {
-        self.raw.post_dataset_records_from_playground_v1_observability_datasets_dataset_id_imports_from_playground_post(dataset_id.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
+        self.raw.post_dataset_records_from_playground_v1_observability_datasets_dataset_id_imports_from_playground_post(dataset_id.as_ref(), <ImportFromPlaygroundBetaObservabilityDatasetsRequest as __RustSdkIntoRaw<crate::generated::types::ImportDatasetFromPlaygroundRequest>>::into_raw(request)).await.map(__RustSdkFromRaw::from_raw).map_err(Into::into)
     }
 
     pub async fn list(&self) -> Result<ListBetaObservabilityDatasetsResponse, SdkError> {
         self.raw
             .get_datasets_v1_observability_datasets_get(None, None, None::<&str>)
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -213,7 +219,7 @@ impl<'a> BetaObservabilityDatasets<'a> {
                 request.q.as_deref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -228,7 +234,7 @@ impl<'a> BetaObservabilityDatasets<'a> {
                 request.page,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -243,7 +249,7 @@ impl<'a> BetaObservabilityDatasets<'a> {
                 request.page,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -252,7 +258,7 @@ impl<'a> BetaObservabilityDatasets<'a> {
         dataset_id: impl AsRef<str>,
         request: PostDatasetRecordsFromCampaignBetaObservabilityDatasetsRequest,
     ) -> Result<PostDatasetRecordsFromCampaignBetaObservabilityDatasetsResponse, SdkError> {
-        self.raw.post_dataset_records_from_campaign_v1_observability_datasets_dataset_id_imports_from_campaign_post(dataset_id.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
+        self.raw.post_dataset_records_from_campaign_v1_observability_datasets_dataset_id_imports_from_campaign_post(dataset_id.as_ref(), <PostDatasetRecordsFromCampaignBetaObservabilityDatasetsRequest as __RustSdkIntoRaw<crate::generated::types::ImportDatasetFromCampaignRequest>>::into_raw(request)).await.map(__RustSdkFromRaw::from_raw).map_err(Into::into)
     }
 
     pub async fn post_dataset_records_from_explorer(
@@ -260,7 +266,7 @@ impl<'a> BetaObservabilityDatasets<'a> {
         dataset_id: impl AsRef<str>,
         request: PostDatasetRecordsFromExplorerBetaObservabilityDatasetsRequest,
     ) -> Result<PostDatasetRecordsFromExplorerBetaObservabilityDatasetsResponse, SdkError> {
-        self.raw.post_dataset_records_from_explorer_v1_observability_datasets_dataset_id_imports_from_explorer_post(dataset_id.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
+        self.raw.post_dataset_records_from_explorer_v1_observability_datasets_dataset_id_imports_from_explorer_post(dataset_id.as_ref(), <PostDatasetRecordsFromExplorerBetaObservabilityDatasetsRequest as __RustSdkIntoRaw<crate::generated::types::ImportDatasetFromExplorerRequest>>::into_raw(request)).await.map(__RustSdkFromRaw::from_raw).map_err(Into::into)
     }
 
     pub async fn update(
@@ -271,10 +277,12 @@ impl<'a> BetaObservabilityDatasets<'a> {
         self.raw
             .update_dataset_v1_observability_datasets_dataset_id_patch(
                 dataset_id.as_ref(),
-                request.into_raw(),
+                <UpdateBetaObservabilityDatasetsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::UpdateDatasetRequest,
+                >>::into_raw(request),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

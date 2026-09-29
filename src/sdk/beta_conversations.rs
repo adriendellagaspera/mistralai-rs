@@ -51,12 +51,14 @@ impl<'a> BetaConversations<'a> {
     ) -> Result<AppendBetaConversationsResponse, SdkError> {
         self.raw
             .agents_api_v1_conversations_append(conversation_id.as_ref(), {
-                let mut raw = request.into_raw();
+                let mut raw = <AppendBetaConversationsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::ConversationAppendRequest,
+                >>::into_raw(request);
                 raw.stream = Some(false);
                 raw
             })
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -68,7 +70,9 @@ impl<'a> BetaConversations<'a> {
         let bytes = self
             .raw
             .agents_api_v1_conversations_append_stream(conversation_id.as_ref(), {
-                let mut raw = request.into_raw();
+                let mut raw = <AppendStreamBetaConversationsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::ConversationAppendStreamRequest,
+                >>::into_raw(request);
                 raw.stream = Some(true);
                 raw
             })
@@ -77,7 +81,7 @@ impl<'a> BetaConversations<'a> {
         let events =
             crate::streaming::json_events::<_, _, ConversationEvents>(bytes).map(|event| {
                 event
-                    .map(|event| AppendStreamBetaConversationsStreamItem::from(event.data))
+                    .map(|event| __RustSdkFromRaw::from_raw(event.data))
                     .map_err(Into::into)
             });
         Ok(Box::pin(events))
@@ -97,7 +101,7 @@ impl<'a> BetaConversations<'a> {
         self.raw
             .agents_api_v1_conversations_get(conversation_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -108,7 +112,7 @@ impl<'a> BetaConversations<'a> {
         self.raw
             .agents_api_v1_conversations_history(conversation_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -119,7 +123,7 @@ impl<'a> BetaConversations<'a> {
         self.raw
             .agents_api_v1_conversations_messages(conversation_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -127,7 +131,7 @@ impl<'a> BetaConversations<'a> {
         self.raw
             .agents_api_v1_conversations_list(None, None, None::<&str>)
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -142,7 +146,7 @@ impl<'a> BetaConversations<'a> {
                 request.metadata.as_deref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -153,12 +157,14 @@ impl<'a> BetaConversations<'a> {
     ) -> Result<RestartBetaConversationsResponse, SdkError> {
         self.raw
             .agents_api_v1_conversations_restart(conversation_id.as_ref(), {
-                let mut raw = request.into_raw();
+                let mut raw = <RestartBetaConversationsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::ConversationRestartRequest,
+                >>::into_raw(request);
                 raw.stream = Some(false);
                 raw
             })
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -170,7 +176,9 @@ impl<'a> BetaConversations<'a> {
         let bytes = self
             .raw
             .agents_api_v1_conversations_restart_stream(conversation_id.as_ref(), {
-                let mut raw = request.into_raw();
+                let mut raw = <RestartStreamBetaConversationsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::ConversationRestartStreamRequest,
+                >>::into_raw(request);
                 raw.stream = Some(true);
                 raw
             })
@@ -179,7 +187,7 @@ impl<'a> BetaConversations<'a> {
         let events =
             crate::streaming::json_events::<_, _, ConversationEvents>(bytes).map(|event| {
                 event
-                    .map(|event| RestartStreamBetaConversationsStreamItem::from(event.data))
+                    .map(|event| __RustSdkFromRaw::from_raw(event.data))
                     .map_err(Into::into)
             });
         Ok(Box::pin(events))
@@ -191,12 +199,14 @@ impl<'a> BetaConversations<'a> {
     ) -> Result<StartBetaConversationsResponse, SdkError> {
         self.raw
             .agents_api_v1_conversations_start({
-                let mut raw = request.into_raw();
+                let mut raw = <StartBetaConversationsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::ConversationRequest,
+                >>::into_raw(request);
                 raw.stream = Some(false);
                 raw
             })
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -207,7 +217,9 @@ impl<'a> BetaConversations<'a> {
         let bytes = self
             .raw
             .agents_api_v1_conversations_start_stream({
-                let mut raw = request.into_raw();
+                let mut raw = <StartStreamBetaConversationsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::ConversationStreamRequest,
+                >>::into_raw(request);
                 raw.stream = Some(true);
                 raw
             })
@@ -216,7 +228,7 @@ impl<'a> BetaConversations<'a> {
         let events =
             crate::streaming::json_events::<_, _, ConversationEvents>(bytes).map(|event| {
                 event
-                    .map(|event| StartStreamBetaConversationsStreamItem::from(event.data))
+                    .map(|event| __RustSdkFromRaw::from_raw(event.data))
                     .map_err(Into::into)
             });
         Ok(Box::pin(events))

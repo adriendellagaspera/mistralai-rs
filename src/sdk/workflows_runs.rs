@@ -29,7 +29,7 @@ pub struct ListRunsWorkflowsRunsRequest {
     status: Option<String>,
     deployment_name: Option<String>,
     sort_by: Option<String>,
-    order: Option<crate::generated::client::ListRunsV1WorkflowsRunsGetOrder>,
+    order: Option<ListRunsWorkflowsRunsRequestOrder>,
     start_time_after: Option<String>,
     start_time_before: Option<String>,
     end_time_after: Option<String>,
@@ -94,10 +94,7 @@ impl ListRunsWorkflowsRunsRequest {
         self
     }
     #[must_use]
-    pub fn order(
-        mut self,
-        order: crate::generated::client::ListRunsV1WorkflowsRunsGetOrder,
-    ) -> Self {
+    pub fn order(mut self, order: ListRunsWorkflowsRunsRequestOrder) -> Self {
         self.order = Some(order);
         self
     }
@@ -168,7 +165,7 @@ impl<'a> WorkflowsRuns<'a> {
         self.raw
             .get_run_v1_workflows_runs_run_id_get(run_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -182,7 +179,7 @@ impl<'a> WorkflowsRuns<'a> {
                 request.decode_payloads,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -208,7 +205,7 @@ impl<'a> WorkflowsRuns<'a> {
                 None::<&str>,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -224,7 +221,7 @@ impl<'a> WorkflowsRuns<'a> {
                 request.status.as_deref(),
                 request.deployment_name.as_deref(),
                 request.sort_by.as_deref(),
-                request.order,
+                request.order.map(__RustSdkIntoRaw::into_raw),
                 request.start_time_after.as_deref(),
                 request.start_time_before.as_deref(),
                 request.end_time_after.as_deref(),
@@ -237,7 +234,7 @@ impl<'a> WorkflowsRuns<'a> {
                 request.search_key.as_deref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

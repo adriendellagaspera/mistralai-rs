@@ -105,7 +105,7 @@ impl<'a> BetaAdminUserGroups<'a> {
                 request.page_size,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -129,14 +129,7 @@ impl<'a> BetaAdminUserGroups<'a> {
         workspace_uuid: impl AsRef<str>,
         request: AdminUserGroupsUpdateGroupWorkspaceAssignmentBetaAdminUserGroupsRequest,
     ) -> Result<(), SdkError> {
-        self.raw
-            .users_admin_user_groups_update_group_workspace_assignment(
-                group_uuid.as_ref(),
-                workspace_uuid.as_ref(),
-                request.into_raw(),
-            )
-            .await
-            .map_err(Into::into)
+        self.raw.users_admin_user_groups_update_group_workspace_assignment(group_uuid.as_ref(), workspace_uuid.as_ref(), <AdminUserGroupsUpdateGroupWorkspaceAssignmentBetaAdminUserGroupsRequest as __RustSdkIntoRaw<crate::generated::types::UpdateGroupWorkspaceAssignmentIn>>::into_raw(request)).await.map_err(Into::into)
     }
 
     pub async fn admin_user_groups_update_user_group_organization_role(
@@ -144,13 +137,7 @@ impl<'a> BetaAdminUserGroups<'a> {
         group_uuid: impl AsRef<str>,
         request: AdminUserGroupsUpdateUserGroupOrganizationRoleBetaAdminUserGroupsRequest,
     ) -> Result<(), SdkError> {
-        self.raw
-            .users_admin_user_groups_update_user_group_organization_role(
-                group_uuid.as_ref(),
-                request.into_raw(),
-            )
-            .await
-            .map_err(Into::into)
+        self.raw.users_admin_user_groups_update_user_group_organization_role(group_uuid.as_ref(), <AdminUserGroupsUpdateUserGroupOrganizationRoleBetaAdminUserGroupsRequest as __RustSdkIntoRaw<crate::generated::types::UpdateUserGroupOrganizationRoleIn>>::into_raw(request)).await.map_err(Into::into)
     }
 
     pub async fn api_admin_user_groups_assign_group_to_workspace(
@@ -158,13 +145,7 @@ impl<'a> BetaAdminUserGroups<'a> {
         group_uuid: impl AsRef<str>,
         request: ApiAdminUserGroupsAssignGroupToWorkspaceBetaAdminUserGroupsRequest,
     ) -> Result<(), SdkError> {
-        self.raw
-            .users_api_admin_user_groups_assign_group_to_workspace(
-                group_uuid.as_ref(),
-                request.into_raw(),
-            )
-            .await
-            .map_err(Into::into)
+        self.raw.users_api_admin_user_groups_assign_group_to_workspace(group_uuid.as_ref(), <ApiAdminUserGroupsAssignGroupToWorkspaceBetaAdminUserGroupsRequest as __RustSdkIntoRaw<crate::generated::types::AssignGroupToWorkspaceIn>>::into_raw(request)).await.map_err(Into::into)
     }
 
     pub async fn api_admin_user_groups_assign_users_to_group(
@@ -172,13 +153,7 @@ impl<'a> BetaAdminUserGroups<'a> {
         group_uuid: impl AsRef<str>,
         request: ApiAdminUserGroupsAssignUsersToGroupBetaAdminUserGroupsRequest,
     ) -> Result<(), SdkError> {
-        self.raw
-            .users_api_admin_user_groups_assign_users_to_group(
-                group_uuid.as_ref(),
-                request.into_raw(),
-            )
-            .await
-            .map_err(Into::into)
+        self.raw.users_api_admin_user_groups_assign_users_to_group(group_uuid.as_ref(), <ApiAdminUserGroupsAssignUsersToGroupBetaAdminUserGroupsRequest as __RustSdkIntoRaw<crate::generated::types::AdminAssignUsersToGroupIn>>::into_raw(request)).await.map_err(Into::into)
     }
 
     pub async fn api_admin_user_groups_create_user_group(
@@ -186,9 +161,13 @@ impl<'a> BetaAdminUserGroups<'a> {
         request: ApiAdminUserGroupsCreateUserGroupBetaAdminUserGroupsRequest,
     ) -> Result<ApiAdminUserGroupsCreateUserGroupBetaAdminUserGroupsResponse, SdkError> {
         self.raw
-            .users_api_admin_user_groups_create_user_group(request.into_raw())
+            .users_api_admin_user_groups_create_user_group(
+                <ApiAdminUserGroupsCreateUserGroupBetaAdminUserGroupsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::AdminUserGroupIn,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -209,7 +188,7 @@ impl<'a> BetaAdminUserGroups<'a> {
         self.raw
             .users_api_admin_user_groups_get_nested_groups(group_uuid.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -220,7 +199,7 @@ impl<'a> BetaAdminUserGroups<'a> {
         self.raw
             .users_api_admin_user_groups_get_user_group(group_uuid.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -235,7 +214,7 @@ impl<'a> BetaAdminUserGroups<'a> {
                 request.page_size,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -245,7 +224,7 @@ impl<'a> BetaAdminUserGroups<'a> {
         self.raw
             .users_api_admin_user_groups_get_user_groups(None, None, None::<&str>)
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -260,7 +239,7 @@ impl<'a> BetaAdminUserGroups<'a> {
                 request.search.as_deref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -268,10 +247,7 @@ impl<'a> BetaAdminUserGroups<'a> {
         &self,
         request: ApiAdminUserGroupsProvisionGroupToWorkspaceBetaAdminUserGroupsRequest,
     ) -> Result<(), SdkError> {
-        self.raw
-            .users_api_admin_user_groups_provision_group_to_workspace(request.into_raw())
-            .await
-            .map_err(Into::into)
+        self.raw.users_api_admin_user_groups_provision_group_to_workspace(<ApiAdminUserGroupsProvisionGroupToWorkspaceBetaAdminUserGroupsRequest as __RustSdkIntoRaw<crate::generated::types::AdminProvisionGroupToWorkspaceIn>>::into_raw(request)).await.map_err(Into::into)
     }
 
     pub async fn api_admin_user_groups_remove_users_from_group(
@@ -279,13 +255,7 @@ impl<'a> BetaAdminUserGroups<'a> {
         group_uuid: impl AsRef<str>,
         request: ApiAdminUserGroupsRemoveUsersFromGroupBetaAdminUserGroupsRequest,
     ) -> Result<(), SdkError> {
-        self.raw
-            .users_api_admin_user_groups_remove_users_from_group(
-                group_uuid.as_ref(),
-                request.into_raw(),
-            )
-            .await
-            .map_err(Into::into)
+        self.raw.users_api_admin_user_groups_remove_users_from_group(group_uuid.as_ref(), <ApiAdminUserGroupsRemoveUsersFromGroupBetaAdminUserGroupsRequest as __RustSdkIntoRaw<crate::generated::types::AdminAssignUsersToGroupIn>>::into_raw(request)).await.map_err(Into::into)
     }
 
     pub async fn api_admin_user_groups_set_nested_groups(
@@ -294,7 +264,12 @@ impl<'a> BetaAdminUserGroups<'a> {
         request: ApiAdminUserGroupsSetNestedGroupsBetaAdminUserGroupsRequest,
     ) -> Result<(), SdkError> {
         self.raw
-            .users_api_admin_user_groups_set_nested_groups(group_uuid.as_ref(), request.into_raw())
+            .users_api_admin_user_groups_set_nested_groups(
+                group_uuid.as_ref(),
+                <ApiAdminUserGroupsSetNestedGroupsBetaAdminUserGroupsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::SetNestedGroupsIn,
+                >>::into_raw(request),
+            )
             .await
             .map_err(Into::into)
     }
@@ -305,9 +280,14 @@ impl<'a> BetaAdminUserGroups<'a> {
         request: ApiAdminUserGroupsUpdateUserGroupBetaAdminUserGroupsRequest,
     ) -> Result<ApiAdminUserGroupsUpdateUserGroupBetaAdminUserGroupsResponse, SdkError> {
         self.raw
-            .users_api_admin_user_groups_update_user_group(group_uuid.as_ref(), request.into_raw())
+            .users_api_admin_user_groups_update_user_group(
+                group_uuid.as_ref(),
+                <ApiAdminUserGroupsUpdateUserGroupBetaAdminUserGroupsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::AdminUpdateUserGroupIn,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

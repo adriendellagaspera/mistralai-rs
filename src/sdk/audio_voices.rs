@@ -7,7 +7,7 @@ use futures_util::StreamExt;
 pub struct ListAudioVoicesRequest {
     limit: Option<i64>,
     offset: Option<i64>,
-    r#type: Option<crate::generated::client::ListVoicesV1AudioVoicesGetType>,
+    r#type: Option<ListAudioVoicesRequestType>,
 }
 impl ListAudioVoicesRequest {
     pub fn new() -> Self {
@@ -28,10 +28,7 @@ impl ListAudioVoicesRequest {
         self
     }
     #[must_use]
-    pub fn r#type(
-        mut self,
-        r#type: crate::generated::client::ListVoicesV1AudioVoicesGetType,
-    ) -> Self {
+    pub fn r#type(mut self, r#type: ListAudioVoicesRequestType) -> Self {
         self.r#type = Some(r#type);
         self
     }
@@ -51,9 +48,11 @@ impl<'a> AudioVoices<'a> {
         request: CreateAudioVoicesRequest,
     ) -> Result<CreateAudioVoicesResponse, SdkError> {
         self.raw
-            .create_voice_v1_audio_voices_post(request.into_raw())
+            .create_voice_v1_audio_voices_post(<CreateAudioVoicesRequest as __RustSdkIntoRaw<
+                crate::generated::types::VoiceCreateRequest,
+            >>::into_raw(request))
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -64,7 +63,7 @@ impl<'a> AudioVoices<'a> {
         self.raw
             .delete_voice_v1_audio_voices_voice_id_delete(voice_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -72,7 +71,7 @@ impl<'a> AudioVoices<'a> {
         self.raw
             .get_voice_v1_audio_voices_voice_id_get(voice_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -93,7 +92,7 @@ impl<'a> AudioVoices<'a> {
         self.raw
             .list_voices_v1_audio_voices_get(None, None, None)
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -102,9 +101,13 @@ impl<'a> AudioVoices<'a> {
         request: ListAudioVoicesRequest,
     ) -> Result<ListAudioVoicesResponse, SdkError> {
         self.raw
-            .list_voices_v1_audio_voices_get(request.limit, request.offset, request.r#type)
+            .list_voices_v1_audio_voices_get(
+                request.limit,
+                request.offset,
+                request.r#type.map(__RustSdkIntoRaw::into_raw),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -114,9 +117,14 @@ impl<'a> AudioVoices<'a> {
         request: UpdateAudioVoicesRequest,
     ) -> Result<UpdateAudioVoicesResponse, SdkError> {
         self.raw
-            .update_voice_v1_audio_voices_voice_id_patch(voice_id.as_ref(), request.into_raw())
+            .update_voice_v1_audio_voices_voice_id_patch(
+                voice_id.as_ref(),
+                <UpdateAudioVoicesRequest as __RustSdkIntoRaw<
+                    crate::generated::types::VoiceUpdateRequest,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

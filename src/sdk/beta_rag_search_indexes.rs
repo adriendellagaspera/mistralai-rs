@@ -17,7 +17,7 @@ impl<'a> BetaRagSearchIndexes<'a> {
         self.raw
             .get_deployment_summaries_v1_rag_deployments_get()
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -26,9 +26,13 @@ impl<'a> BetaRagSearchIndexes<'a> {
         request: RegisterDeploymentBetaRagSearchIndexesRequest,
     ) -> Result<RegisterDeploymentBetaRagSearchIndexesResponse, SdkError> {
         self.raw
-            .register_deployment_v1_rag_deployments_put(request.into_raw())
+            .register_deployment_v1_rag_deployments_put(
+                <RegisterDeploymentBetaRagSearchIndexesRequest as __RustSdkIntoRaw<
+                    crate::generated::types::RegisterDeploymentRequestDeployment,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -39,7 +43,7 @@ impl<'a> BetaRagSearchIndexes<'a> {
         self.raw
             .unregister_deployment_v1_rag_deployments_deployment_id_delete(deployment_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -48,13 +52,6 @@ impl<'a> BetaRagSearchIndexes<'a> {
         deployment_id: impl AsRef<str>,
         request: UpdateIndexMetricsBetaRagSearchIndexesRequest,
     ) -> Result<UpdateIndexMetricsBetaRagSearchIndexesResponse, SdkError> {
-        self.raw
-            .update_index_metrics_v1_rag_deployments_deployment_id_metrics_put(
-                deployment_id.as_ref(),
-                request.into_raw(),
-            )
-            .await
-            .map(Into::into)
-            .map_err(Into::into)
+        self.raw.update_index_metrics_v1_rag_deployments_deployment_id_metrics_put(deployment_id.as_ref(), <UpdateIndexMetricsBetaRagSearchIndexesRequest as __RustSdkIntoRaw<crate::generated::types::UpdateIndexMetricsV1RagDeploymentsDeploymentIdMetricsPutRequest>>::into_raw(request)).await.map(__RustSdkFromRaw::from_raw).map_err(Into::into)
     }
 }

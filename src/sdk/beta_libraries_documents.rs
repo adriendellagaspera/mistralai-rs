@@ -115,7 +115,7 @@ impl<'a> BetaLibrariesDocuments<'a> {
                 document_id.as_ref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -127,7 +127,7 @@ impl<'a> BetaLibrariesDocuments<'a> {
         self.raw
             .libraries_documents_get_v1(library_id.as_ref(), document_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -139,7 +139,7 @@ impl<'a> BetaLibrariesDocuments<'a> {
         self.raw
             .libraries_documents_get_signed_url_v1(library_id.as_ref(), document_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -153,10 +153,12 @@ impl<'a> BetaLibrariesDocuments<'a> {
             .libraries_documents_update_v1(
                 library_id.as_ref(),
                 document_id.as_ref(),
-                request.into_raw(),
+                <LibrariesDocumentsUpdateV1BetaLibrariesDocumentsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::UpdateDocumentRequest,
+                >>::into_raw(request),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -175,7 +177,7 @@ impl<'a> BetaLibrariesDocuments<'a> {
                 request.sort_order.as_deref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -198,7 +200,7 @@ impl<'a> BetaLibrariesDocuments<'a> {
         self.raw
             .libraries_documents_get_status_v1(library_id.as_ref(), document_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -214,7 +216,7 @@ impl<'a> BetaLibrariesDocuments<'a> {
                 request.page_end.as_deref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -228,10 +230,12 @@ impl<'a> BetaLibrariesDocuments<'a> {
             .libraries_documents_patch_v1(
                 library_id.as_ref(),
                 document_id.as_ref(),
-                request.into_raw(),
+                <UpdateBetaLibrariesDocumentsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::UpdateDocumentRequest,
+                >>::into_raw(request),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -241,9 +245,14 @@ impl<'a> BetaLibrariesDocuments<'a> {
         request: UploadBetaLibrariesDocumentsRequest,
     ) -> Result<UploadBetaLibrariesDocumentsResponse, SdkError> {
         self.raw
-            .libraries_documents_upload_v1(library_id.as_ref(), request.into_raw())
+            .libraries_documents_upload_v1(
+                library_id.as_ref(),
+                <UploadBetaLibrariesDocumentsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::LibrariesDocumentsUploadV1Request,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -256,11 +265,13 @@ impl<'a> BetaLibrariesDocuments<'a> {
         self.raw
             .libraries_documents_upload_v1_with_multipart_filenames(
                 library_id.as_ref(),
-                request.into_raw(),
+                <UploadBetaLibrariesDocumentsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::LibrariesDocumentsUploadV1Request,
+                >>::into_raw(request),
                 multipart_filenames,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

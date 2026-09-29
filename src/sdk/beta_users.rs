@@ -69,7 +69,7 @@ impl<'a> BetaUsers<'a> {
         self.raw
             .users_api_get_identity()
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -77,7 +77,7 @@ impl<'a> BetaUsers<'a> {
         self.raw
             .users_api_list_organizations(None, None)
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -88,7 +88,7 @@ impl<'a> BetaUsers<'a> {
         self.raw
             .users_api_list_organizations(request.offset, request.limit)
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -96,7 +96,7 @@ impl<'a> BetaUsers<'a> {
         self.raw
             .users_api_list_workspaces(None::<&str>, None, None)
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -111,7 +111,7 @@ impl<'a> BetaUsers<'a> {
                 request.limit,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

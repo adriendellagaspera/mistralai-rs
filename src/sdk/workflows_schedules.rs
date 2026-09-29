@@ -70,7 +70,7 @@ impl<'a> WorkflowsSchedules<'a> {
         self.raw
             .get_schedule_v1_workflows_schedules_schedule_id_get(schedule_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -85,7 +85,7 @@ impl<'a> WorkflowsSchedules<'a> {
                 None::<&str>,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -103,7 +103,7 @@ impl<'a> WorkflowsSchedules<'a> {
                 request.next_page_token.as_deref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -112,13 +112,7 @@ impl<'a> WorkflowsSchedules<'a> {
         schedule_id: impl AsRef<str>,
         request: Option<Option<PauseScheduleWorkflowsSchedulesRequest>>,
     ) -> Result<(), SdkError> {
-        self.raw
-            .pause_schedule_v1_workflows_schedules_schedule_id_pause_post(
-                schedule_id.as_ref(),
-                request.map(|request| request.map(|request| request.into_raw())),
-            )
-            .await
-            .map_err(Into::into)
+        self.raw.pause_schedule_v1_workflows_schedules_schedule_id_pause_post(schedule_id.as_ref(), request.map(|request| request.map(|request| <PauseScheduleWorkflowsSchedulesRequest as __RustSdkIntoRaw<crate::generated::types::PauseScheduleV1WorkflowsSchedulesScheduleIdPausePostRequest>>::into_raw(request)))).await.map_err(Into::into)
     }
 
     pub async fn resume_schedule(
@@ -126,13 +120,7 @@ impl<'a> WorkflowsSchedules<'a> {
         schedule_id: impl AsRef<str>,
         request: Option<Option<ResumeScheduleWorkflowsSchedulesRequest>>,
     ) -> Result<(), SdkError> {
-        self.raw
-            .resume_schedule_v1_workflows_schedules_schedule_id_resume_post(
-                schedule_id.as_ref(),
-                request.map(|request| request.map(|request| request.into_raw())),
-            )
-            .await
-            .map_err(Into::into)
+        self.raw.resume_schedule_v1_workflows_schedules_schedule_id_resume_post(schedule_id.as_ref(), request.map(|request| request.map(|request| <ResumeScheduleWorkflowsSchedulesRequest as __RustSdkIntoRaw<crate::generated::types::ResumeScheduleV1WorkflowsSchedulesScheduleIdResumePostRequest>>::into_raw(request)))).await.map_err(Into::into)
     }
 
     pub async fn schedule_workflow(
@@ -140,9 +128,13 @@ impl<'a> WorkflowsSchedules<'a> {
         request: ScheduleWorkflowWorkflowsSchedulesRequest,
     ) -> Result<ScheduleWorkflowWorkflowsSchedulesResponse, SdkError> {
         self.raw
-            .schedule_workflow_v1_workflows_schedules_post(request.into_raw())
+            .schedule_workflow_v1_workflows_schedules_post(
+                <ScheduleWorkflowWorkflowsSchedulesRequest as __RustSdkIntoRaw<
+                    crate::generated::types::WorkflowScheduleRequest,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -151,13 +143,7 @@ impl<'a> WorkflowsSchedules<'a> {
         schedule_id: impl AsRef<str>,
         request: Option<Option<TriggerScheduleWorkflowsSchedulesRequest>>,
     ) -> Result<(), SdkError> {
-        self.raw
-            .trigger_schedule_v1_workflows_schedules_schedule_id_trigger_post(
-                schedule_id.as_ref(),
-                request.map(|request| request.map(|request| request.into_raw())),
-            )
-            .await
-            .map_err(Into::into)
+        self.raw.trigger_schedule_v1_workflows_schedules_schedule_id_trigger_post(schedule_id.as_ref(), request.map(|request| request.map(|request| <TriggerScheduleWorkflowsSchedulesRequest as __RustSdkIntoRaw<crate::generated::types::TriggerScheduleV1WorkflowsSchedulesScheduleIdTriggerPostRequest>>::into_raw(request)))).await.map_err(Into::into)
     }
 
     pub async fn unschedule_workflow(&self, schedule_id: impl AsRef<str>) -> Result<(), SdkError> {
@@ -175,10 +161,12 @@ impl<'a> WorkflowsSchedules<'a> {
         self.raw
             .update_schedule_v1_workflows_schedules_schedule_id_patch(
                 schedule_id.as_ref(),
-                request.into_raw(),
+                <UpdateScheduleWorkflowsSchedulesRequest as __RustSdkIntoRaw<
+                    crate::generated::types::WorkflowScheduleUpdateRequest,
+                >>::into_raw(request),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

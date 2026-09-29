@@ -11,8 +11,8 @@ pub struct GetByTimeStatsBetaAdminVibeWorkAnalyticsRequest {
 impl GetByTimeStatsBetaAdminVibeWorkAnalyticsRequest {
     pub fn new(start_time: i64, end_time: i64) -> Self {
         Self {
-            start_time: start_time,
-            end_time: end_time,
+            start_time,
+            end_time,
             granularity: None,
         }
     }
@@ -42,7 +42,7 @@ impl<'a> BetaAdminVibeWorkAnalytics<'a> {
                 start_time, end_time,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -57,7 +57,7 @@ impl<'a> BetaAdminVibeWorkAnalytics<'a> {
                 request.granularity.as_deref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -71,7 +71,7 @@ impl<'a> BetaAdminVibeWorkAnalytics<'a> {
                 start_time, end_time,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

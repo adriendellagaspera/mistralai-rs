@@ -17,7 +17,9 @@ impl<'a> BetaObservabilityDatasetsRecords<'a> {
     ) -> Result<(), SdkError> {
         self.raw
             .delete_dataset_records_v1_observability_dataset_records_bulk_delete_post(
-                request.into_raw(),
+                <BulkDeleteBetaObservabilityDatasetsRecordsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::DeleteDatasetRecordsRequest,
+                >>::into_raw(request),
             )
             .await
             .map_err(Into::into)
@@ -41,7 +43,7 @@ impl<'a> BetaObservabilityDatasetsRecords<'a> {
                 dataset_record_id.as_ref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -50,7 +52,7 @@ impl<'a> BetaObservabilityDatasetsRecords<'a> {
         dataset_record_id: impl AsRef<str>,
         request: JudgeBetaObservabilityDatasetsRecordsRequest,
     ) -> Result<JudgeBetaObservabilityDatasetsRecordsResponse, SdkError> {
-        self.raw.judge_dataset_record_v1_observability_dataset_records_dataset_record_id_live_judging_post(dataset_record_id.as_ref(), request.into_raw()).await.map(Into::into).map_err(Into::into)
+        self.raw.judge_dataset_record_v1_observability_dataset_records_dataset_record_id_live_judging_post(dataset_record_id.as_ref(), <JudgeBetaObservabilityDatasetsRecordsRequest as __RustSdkIntoRaw<crate::generated::types::JudgeDatasetRecordRequest>>::into_raw(request)).await.map(__RustSdkFromRaw::from_raw).map_err(Into::into)
     }
 
     pub async fn update_payload(
@@ -58,7 +60,7 @@ impl<'a> BetaObservabilityDatasetsRecords<'a> {
         dataset_record_id: impl AsRef<str>,
         request: UpdatePayloadBetaObservabilityDatasetsRecordsRequest,
     ) -> Result<(), SdkError> {
-        self.raw.update_dataset_record_payload_v1_observability_dataset_records_dataset_record_id_payload_put(dataset_record_id.as_ref(), request.into_raw()).await.map_err(Into::into)
+        self.raw.update_dataset_record_payload_v1_observability_dataset_records_dataset_record_id_payload_put(dataset_record_id.as_ref(), <UpdatePayloadBetaObservabilityDatasetsRecordsRequest as __RustSdkIntoRaw<crate::generated::types::UpdateDatasetRecordPayloadRequest>>::into_raw(request)).await.map_err(Into::into)
     }
 
     pub async fn update_properties(
@@ -66,6 +68,6 @@ impl<'a> BetaObservabilityDatasetsRecords<'a> {
         dataset_record_id: impl AsRef<str>,
         request: UpdatePropertiesBetaObservabilityDatasetsRecordsRequest,
     ) -> Result<(), SdkError> {
-        self.raw.update_dataset_record_properties_v1_observability_dataset_records_dataset_record_id_properties_put(dataset_record_id.as_ref(), request.into_raw()).await.map_err(Into::into)
+        self.raw.update_dataset_record_properties_v1_observability_dataset_records_dataset_record_id_properties_put(dataset_record_id.as_ref(), <UpdatePropertiesBetaObservabilityDatasetsRecordsRequest as __RustSdkIntoRaw<crate::generated::types::UpdateDatasetRecordPropertiesRequest>>::into_raw(request)).await.map_err(Into::into)
     }
 }

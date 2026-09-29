@@ -46,9 +46,13 @@ impl<'a> BetaAdminApiKeys<'a> {
         request: CreateApiKeyBetaAdminApiKeysRequest,
     ) -> Result<CreateApiKeyBetaAdminApiKeysResponse, SdkError> {
         self.raw
-            .users_api_admin_api_keys_create_api_key(request.into_raw())
+            .users_api_admin_api_keys_create_api_key(
+                <CreateApiKeyBetaAdminApiKeysRequest as __RustSdkIntoRaw<
+                    crate::generated::types::AdminCreateAPIKeyIN,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -59,7 +63,7 @@ impl<'a> BetaAdminApiKeys<'a> {
         self.raw
             .users_api_admin_api_keys_delete_api_key(key_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -67,7 +71,7 @@ impl<'a> BetaAdminApiKeys<'a> {
         self.raw
             .users_api_admin_api_keys_get_api_keys(None, None, None::<&str>)
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -82,7 +86,7 @@ impl<'a> BetaAdminApiKeys<'a> {
                 request.name.as_deref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

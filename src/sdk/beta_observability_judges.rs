@@ -61,9 +61,13 @@ impl<'a> BetaObservabilityJudges<'a> {
         request: CreateBetaObservabilityJudgesRequest,
     ) -> Result<CreateBetaObservabilityJudgesResponse, SdkError> {
         self.raw
-            .create_judge_v1_observability_judges_post(request.into_raw())
+            .create_judge_v1_observability_judges_post(
+                <CreateBetaObservabilityJudgesRequest as __RustSdkIntoRaw<
+                    crate::generated::types::CreateJudgeRequest,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -81,7 +85,7 @@ impl<'a> BetaObservabilityJudges<'a> {
         self.raw
             .get_judge_by_id_v1_observability_judges_judge_id_get(judge_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -93,10 +97,12 @@ impl<'a> BetaObservabilityJudges<'a> {
         self.raw
             .judge_conversation_v1_observability_judges_judge_id_live_judging_post(
                 judge_id.as_ref(),
-                request.into_raw(),
+                <JudgeConversationBetaObservabilityJudgesRequest as __RustSdkIntoRaw<
+                    crate::generated::types::JudgeConversationRequest,
+                >>::into_raw(request),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -110,7 +116,7 @@ impl<'a> BetaObservabilityJudges<'a> {
                 None::<&str>,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -127,7 +133,7 @@ impl<'a> BetaObservabilityJudges<'a> {
                 request.q.as_deref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -139,7 +145,9 @@ impl<'a> BetaObservabilityJudges<'a> {
         self.raw
             .update_judge_v1_observability_judges_judge_id_put(
                 judge_id.as_ref(),
-                request.into_raw(),
+                <UpdateBetaObservabilityJudgesRequest as __RustSdkIntoRaw<
+                    crate::generated::types::UpdateJudgeRequest,
+                >>::into_raw(request),
             )
             .await
             .map_err(Into::into)

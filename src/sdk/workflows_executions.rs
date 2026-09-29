@@ -43,7 +43,7 @@ pub struct GetWorkflowExecutionLogsWorkflowsExecutionsRequest {
     activity_id: Option<String>,
     after: Option<String>,
     before: Option<String>,
-    order: Option<crate::generated::client::GetWorkflowExecutionLogsOrder>,
+    order: Option<GetWorkflowExecutionLogsWorkflowsExecutionsRequestOrder>,
     cursor: Option<String>,
     limit: Option<i64>,
 }
@@ -81,7 +81,7 @@ impl GetWorkflowExecutionLogsWorkflowsExecutionsRequest {
         self
     }
     #[must_use]
-    pub fn order(mut self, order: crate::generated::client::GetWorkflowExecutionLogsOrder) -> Self {
+    pub fn order(mut self, order: GetWorkflowExecutionLogsWorkflowsExecutionsRequestOrder) -> Self {
         self.order = Some(order);
         self
     }
@@ -211,10 +211,12 @@ impl<'a> WorkflowsExecutions<'a> {
     ) -> Result<BatchCancelWorkflowExecutionsWorkflowsExecutionsResponse, SdkError> {
         self.raw
             .batch_cancel_workflow_executions_v1_workflows_executions_cancel_post(
-                request.into_raw(),
+                <BatchCancelWorkflowExecutionsWorkflowsExecutionsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::BatchExecutionBody,
+                >>::into_raw(request),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -224,10 +226,12 @@ impl<'a> WorkflowsExecutions<'a> {
     ) -> Result<BatchTerminateWorkflowExecutionsWorkflowsExecutionsResponse, SdkError> {
         self.raw
             .batch_terminate_workflow_executions_v1_workflows_executions_terminate_post(
-                request.into_raw(),
+                <BatchTerminateWorkflowExecutionsWorkflowsExecutionsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::BatchExecutionBody,
+                >>::into_raw(request),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -250,7 +254,7 @@ impl<'a> WorkflowsExecutions<'a> {
         self.raw
             .get_workflow_execution_v1_workflows_executions_execution_id_get(execution_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -264,7 +268,7 @@ impl<'a> WorkflowsExecutions<'a> {
                 request.decode_payloads,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -279,12 +283,12 @@ impl<'a> WorkflowsExecutions<'a> {
                 request.activity_id.as_deref(),
                 request.after.as_deref(),
                 request.before.as_deref(),
-                request.order,
+                request.order.map(__RustSdkIntoRaw::into_raw),
                 request.cursor.as_deref(),
                 request.limit,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -299,7 +303,7 @@ impl<'a> WorkflowsExecutions<'a> {
                 request.include_internal_events,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -310,7 +314,7 @@ impl<'a> WorkflowsExecutions<'a> {
         self.raw
             .get_workflow_execution_trace_info(execution_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -321,7 +325,7 @@ impl<'a> WorkflowsExecutions<'a> {
         self.raw
             .get_workflow_execution_trace_otel(execution_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -332,7 +336,7 @@ impl<'a> WorkflowsExecutions<'a> {
         self.raw
             .get_workflow_execution_trace_summary(execution_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -344,10 +348,12 @@ impl<'a> WorkflowsExecutions<'a> {
         self.raw
             .query_workflow_execution_v1_workflows_executions_execution_id_queries_post(
                 execution_id.as_ref(),
-                request.into_raw(),
+                <QueryWorkflowExecutionWorkflowsExecutionsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::QueryInvocationBody,
+                >>::into_raw(request),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -359,7 +365,9 @@ impl<'a> WorkflowsExecutions<'a> {
         self.raw
             .reset_workflow_v1_workflows_executions_execution_id_reset_post(
                 execution_id.as_ref(),
-                request.into_raw(),
+                <ResetWorkflowWorkflowsExecutionsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::ResetInvocationBody,
+                >>::into_raw(request),
             )
             .await
             .map_err(Into::into)
@@ -373,10 +381,12 @@ impl<'a> WorkflowsExecutions<'a> {
         self.raw
             .signal_workflow_execution_v1_workflows_executions_execution_id_signals_post(
                 execution_id.as_ref(),
-                request.into_raw(),
+                <SignalWorkflowExecutionWorkflowsExecutionsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::SignalInvocationBody,
+                >>::into_raw(request),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -401,16 +411,12 @@ impl<'a> WorkflowsExecutions<'a> {
                             __StreamWorkflowsExecutionsStreamItemRaw::StreamEventSsePayload(
                                 value,
                             ) => StreamWorkflowsExecutionsStreamItem::StreamEventSsePayload(
-                                StreamWorkflowsExecutionsStreamItemStreamEventSsePayload::from(
-                                    value,
-                                ),
+                                __RustSdkFromRaw::from_raw(value),
                             ),
                             __StreamWorkflowsExecutionsStreamItemRaw::StreamEventSseErrorData(
                                 value,
                             ) => StreamWorkflowsExecutionsStreamItem::StreamEventSseErrorData(
-                                StreamWorkflowsExecutionsStreamItemStreamEventSseErrorData::from(
-                                    value,
-                                ),
+                                __RustSdkFromRaw::from_raw(value),
                             ),
                         })
                         .map_err(Into::into)
@@ -435,7 +441,7 @@ impl<'a> WorkflowsExecutions<'a> {
             .await
             .map_err(SdkError::from)?;
         let events = crate::streaming::json_events::<_, _, __StreamWorkflowExecutionLogsWorkflowsExecutionsStreamItemRaw>(bytes)
-            .map(|event| event.map(|event| match event.data { __StreamWorkflowExecutionLogsWorkflowsExecutionsStreamItemRaw::ExecutionLogRecord(value) => StreamWorkflowExecutionLogsWorkflowsExecutionsStreamItem::ExecutionLogRecord(StreamWorkflowExecutionLogsWorkflowsExecutionsStreamItemExecutionLogRecord::from(value)),__StreamWorkflowExecutionLogsWorkflowsExecutionsStreamItemRaw::StreamError(value) => StreamWorkflowExecutionLogsWorkflowsExecutionsStreamItem::StreamError(StreamWorkflowExecutionLogsWorkflowsExecutionsStreamItemStreamError::from(value)) }).map_err(Into::into));
+            .map(|event| event.map(|event| match event.data { __StreamWorkflowExecutionLogsWorkflowsExecutionsStreamItemRaw::ExecutionLogRecord(value) => StreamWorkflowExecutionLogsWorkflowsExecutionsStreamItem::ExecutionLogRecord(__RustSdkFromRaw::from_raw(value)),__StreamWorkflowExecutionLogsWorkflowsExecutionsStreamItemRaw::StreamError(value) => StreamWorkflowExecutionLogsWorkflowsExecutionsStreamItem::StreamError(__RustSdkFromRaw::from_raw(value)) }).map_err(Into::into));
         Ok(Box::pin(events))
     }
 
@@ -459,10 +465,12 @@ impl<'a> WorkflowsExecutions<'a> {
         self.raw
             .update_workflow_execution_v1_workflows_executions_execution_id_updates_post(
                 execution_id.as_ref(),
-                request.into_raw(),
+                <UpdateWorkflowExecutionWorkflowsExecutionsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::UpdateInvocationBody,
+                >>::into_raw(request),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

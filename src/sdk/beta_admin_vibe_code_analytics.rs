@@ -11,8 +11,8 @@ pub struct GetWorkspaceStatsBetaAdminVibeCodeAnalyticsRequest {
 impl GetWorkspaceStatsBetaAdminVibeCodeAnalyticsRequest {
     pub fn new(start_time: i64, end_time: i64) -> Self {
         Self {
-            start_time: start_time,
-            end_time: end_time,
+            start_time,
+            end_time,
             workspace_id: None,
         }
     }
@@ -41,7 +41,7 @@ impl<'a> BetaAdminVibeCodeAnalytics<'a> {
                 start_time, end_time,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -56,7 +56,7 @@ impl<'a> BetaAdminVibeCodeAnalytics<'a> {
                 request.workspace_id.as_deref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

@@ -45,7 +45,7 @@ impl GetVersionBetaPromptsRequest {
     pub fn new(prompt_id: impl Into<String>, version: i32) -> Self {
         Self {
             prompt_id: prompt_id.into(),
-            version: version,
+            version,
             fields: None,
         }
     }
@@ -62,8 +62,8 @@ pub struct ListBetaPromptsRequest {
     page_token: Option<String>,
     alias: Option<String>,
     fields: Option<Vec<String>>,
-    sort_field: Option<crate::generated::types::ListSortField>,
-    sort_direction: Option<crate::generated::types::ListSortDirection>,
+    sort_field: Option<ListBetaPromptsRequestSortField>,
+    sort_direction: Option<ListBetaPromptsRequestSortDirection>,
     sort_by: Option<String>,
     sort_direction_2: Option<String>,
 }
@@ -101,15 +101,12 @@ impl ListBetaPromptsRequest {
         self
     }
     #[must_use]
-    pub fn sort_field(mut self, sort_field: crate::generated::types::ListSortField) -> Self {
+    pub fn sort_field(mut self, sort_field: ListBetaPromptsRequestSortField) -> Self {
         self.sort_field = Some(sort_field);
         self
     }
     #[must_use]
-    pub fn sort_direction(
-        mut self,
-        sort_direction: crate::generated::types::ListSortDirection,
-    ) -> Self {
+    pub fn sort_direction(mut self, sort_direction: ListBetaPromptsRequestSortDirection) -> Self {
         self.sort_direction = Some(sort_direction);
         self
     }
@@ -139,9 +136,11 @@ impl<'a> BetaPrompts<'a> {
         request: CreateBetaPromptsRequest,
     ) -> Result<CreateBetaPromptsResponse, SdkError> {
         self.raw
-            .prompts_create(request.into_raw())
+            .prompts_create(<CreateBetaPromptsRequest as __RustSdkIntoRaw<
+                crate::generated::types::CreatePromptRequest,
+            >>::into_raw(request))
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -151,9 +150,14 @@ impl<'a> BetaPrompts<'a> {
         request: CreateVersionBetaPromptsRequest,
     ) -> Result<CreateVersionBetaPromptsResponse, SdkError> {
         self.raw
-            .prompts_create_version(prompt_id.as_ref(), request.into_raw())
+            .prompts_create_version(
+                prompt_id.as_ref(),
+                <CreateVersionBetaPromptsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::PromptsCreateVersionRequest,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -164,7 +168,7 @@ impl<'a> BetaPrompts<'a> {
         self.raw
             .prompts_delete(prompt_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -180,7 +184,7 @@ impl<'a> BetaPrompts<'a> {
                 request.fields,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -191,7 +195,7 @@ impl<'a> BetaPrompts<'a> {
         self.raw
             .prompts_get_version(request.prompt_id.as_str(), request.version, request.fields)
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -208,7 +212,7 @@ impl<'a> BetaPrompts<'a> {
                 None::<&str>,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -222,13 +226,13 @@ impl<'a> BetaPrompts<'a> {
                 request.page_token.as_deref(),
                 request.alias.as_deref(),
                 request.fields,
-                request.sort_field,
-                request.sort_direction,
+                request.sort_field.map(__RustSdkIntoRaw::into_raw),
+                request.sort_direction.map(__RustSdkIntoRaw::into_raw),
                 request.sort_by.as_deref(),
                 request.sort_direction_2.as_deref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -239,7 +243,7 @@ impl<'a> BetaPrompts<'a> {
         self.raw
             .prompts_list_versions(prompt_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -249,9 +253,14 @@ impl<'a> BetaPrompts<'a> {
         request: UpdateMetadataBetaPromptsRequest,
     ) -> Result<UpdateMetadataBetaPromptsResponse, SdkError> {
         self.raw
-            .prompts_update(prompt_id.as_ref(), request.into_raw())
+            .prompts_update(
+                prompt_id.as_ref(),
+                <UpdateMetadataBetaPromptsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::PromptsUpdateRequest,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -262,9 +271,15 @@ impl<'a> BetaPrompts<'a> {
         request: UpdateVersionMetadataBetaPromptsRequest,
     ) -> Result<UpdateVersionMetadataBetaPromptsResponse, SdkError> {
         self.raw
-            .prompts_update_version_metadata(prompt_id.as_ref(), version, request.into_raw())
+            .prompts_update_version_metadata(
+                prompt_id.as_ref(),
+                version,
+                <UpdateVersionMetadataBetaPromptsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::PromptsUpdateVersionMetadataRequest,
+                >>::into_raw(request),
+            )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

@@ -12,7 +12,7 @@ enum __GetStreamEventsEventsStreamItemRaw {
 
 #[derive(Debug, Clone, Default)]
 pub struct GetStreamEventsEventsRequest {
-    scope: Option<crate::generated::client::GetStreamEventsV1WorkflowsEventsStreamGetScope>,
+    scope: Option<GetStreamEventsEventsRequestScope>,
     activity_name: Option<String>,
     activity_id: Option<String>,
     workflow_name: Option<String>,
@@ -43,10 +43,7 @@ impl GetStreamEventsEventsRequest {
         }
     }
     #[must_use]
-    pub fn scope(
-        mut self,
-        scope: crate::generated::client::GetStreamEventsV1WorkflowsEventsStreamGetScope,
-    ) -> Self {
+    pub fn scope(mut self, scope: GetStreamEventsEventsRequestScope) -> Self {
         self.scope = Some(scope);
         self
     }
@@ -167,7 +164,7 @@ impl<'a> Events<'a> {
         let bytes = self
             .raw
             .get_stream_events_v1_workflows_events_stream_get(
-                request.scope,
+                request.scope.map(__RustSdkIntoRaw::into_raw),
                 request.activity_name.as_deref(),
                 request.activity_id.as_deref(),
                 request.workflow_name.as_deref(),
@@ -190,12 +187,12 @@ impl<'a> Events<'a> {
                 .map(|event| match event.data {
                     __GetStreamEventsEventsStreamItemRaw::StreamEventSsePayload(value) => {
                         GetStreamEventsEventsStreamItem::StreamEventSsePayload(
-                            GetStreamEventsEventsStreamItemStreamEventSsePayload::from(value),
+                            __RustSdkFromRaw::from_raw(value),
                         )
                     }
                     __GetStreamEventsEventsStreamItemRaw::StreamEventSseErrorData(value) => {
                         GetStreamEventsEventsStreamItem::StreamEventSseErrorData(
-                            GetStreamEventsEventsStreamItemStreamEventSseErrorData::from(value),
+                            __RustSdkFromRaw::from_raw(value),
                         )
                     }
                 })
@@ -214,7 +211,7 @@ impl<'a> Events<'a> {
                 None::<&str>,
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -231,7 +228,7 @@ impl<'a> Events<'a> {
                 request.cursor.as_deref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

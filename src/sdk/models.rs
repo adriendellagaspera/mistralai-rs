@@ -42,7 +42,7 @@ impl<'a> Models<'a> {
         self.raw
             .jobs_api_routes_fine_tuning_archive_fine_tuned_model(model_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -53,7 +53,7 @@ impl<'a> Models<'a> {
         self.raw
             .delete_model_v1_models_model_id_delete(model_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -61,7 +61,7 @@ impl<'a> Models<'a> {
         self.raw
             .list_models_v1_models_get(None::<&str>, None::<&str>)
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -72,7 +72,7 @@ impl<'a> Models<'a> {
         self.raw
             .list_models_v1_models_get(request.provider.as_deref(), request.model.as_deref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -83,7 +83,7 @@ impl<'a> Models<'a> {
         self.raw
             .retrieve_model_v1_models_model_id_get(model_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -94,7 +94,7 @@ impl<'a> Models<'a> {
         self.raw
             .jobs_api_routes_fine_tuning_unarchive_fine_tuned_model(model_id.as_ref())
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 
@@ -106,10 +106,12 @@ impl<'a> Models<'a> {
         self.raw
             .jobs_api_routes_fine_tuning_update_fine_tuned_model(
                 model_id.as_ref(),
-                request.into_raw(),
+                <UpdateModelsRequest as __RustSdkIntoRaw<
+                    crate::generated::types::UpdateModelRequest,
+                >>::into_raw(request),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }

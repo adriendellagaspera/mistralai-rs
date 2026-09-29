@@ -46,7 +46,7 @@ impl<'a> WorkflowsMetrics<'a> {
                 request.end_time.as_deref(),
             )
             .await
-            .map(Into::into)
+            .map(__RustSdkFromRaw::from_raw)
             .map_err(Into::into)
     }
 }
