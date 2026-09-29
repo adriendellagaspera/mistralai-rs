@@ -1,0 +1,47 @@
+name: Validate Private Raw Boundary
+
+on:
+  push:
+    branches: [feat/private-raw-boundary]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: private-raw-compile
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      RUSTDOCFLAGS: -D warnings
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install pinned Rust toolchain
+        run: rustup show
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        with:
+          shared-key: private-raw-validation
+          save-if: false
+      - name: Validate private transport boundary
+        run: |
+          cargo fmt --all --check
+          cargo clippy --locked --all-targets -- -D warnings
+          cargo test --locked --all-targets
+          cargo doc --locked --no-deps
+          cargo publish --dry-run --locked
+      - name: Remove one-shot workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          rm .github/workflows/private-raw-compile.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .github/workflows/private-raw-compile.yml
+          git commit -m 'chore: remove private raw validation workflow'
+          gh auth setup-git
+          git push origin HEAD:feat/private-raw-boundary
