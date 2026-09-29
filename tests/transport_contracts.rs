@@ -47,7 +47,13 @@ async fn json_transport_round_trip() {
     )
     .await;
     let value: serde_json::Value = client(base_url)
-        .execute_request(Method::POST, "json", Some(json!({"hello": "world"})), None, None)
+        .execute_request(
+            Method::POST,
+            "json",
+            Some(json!({"hello": "world"})),
+            None,
+            None,
+        )
         .await
         .unwrap();
     assert_eq!(value, json!({"ok": true}));
