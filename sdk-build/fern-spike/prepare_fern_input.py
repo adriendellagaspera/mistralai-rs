@@ -68,59 +68,12 @@ for item in doc["paths"].values():
             if parameter.get("name") == "order_by":
                 parameter.get("schema", {}).pop("default", None)
 
-# Fern 5.112 does not propagate generator-level disable-examples into the
-# OpenAPI importer. The importer therefore synthesizes endpoint examples before
-# the generator-level flag can clear them. Its synthesized examples for these
-# three live-judging endpoints are invalid (the request contains a discriminated
-# union and the generated response is validated against the wrong union).
-# Supplying complete x-fern-examples prevents that importer autogeneration.
-judge_examples = {
-    "judge_chat_completion_event_v1_observability_chat_completion_events__event_id__live_judging_post": {
-        "path-parameters": {"event_id": "00000000-0000-0000-0000-000000000000"},
-        "request": {
-            "judge_definition": {
-                "name": "judge",
-                "description": "judge",
-                "model_name": "model",
-                "output": {
-                    "type": "CLASSIFICATION",
-                    "options": [{"value": "ok", "description": "ok"}],
-                },
-                "instructions": "judge",
-                "tools": [],
-            }
-        },
-        "response": {"body": {"analysis": "ok", "answer": "ok"}},
-    },
-    "judge_conversation_v1_observability_judges__judge_id__live_judging_post": {
-        "path-parameters": {"judge_id": "00000000-0000-0000-0000-000000000000"},
-        "request": {"messages": []},
-        "response": {"body": {"analysis": "ok", "answer": "ok"}},
-    },
-    "judge_dataset_record_v1_observability_dataset_records__dataset_record_id__live_judging_post": {
-        "path-parameters": {"dataset_record_id": "00000000-0000-0000-0000-000000000000"},
-        "request": {
-            "judge_definition": {
-                "name": "judge",
-                "description": "judge",
-                "model_name": "model",
-                "output": {
-                    "type": "CLASSIFICATION",
-                    "options": [{"value": "ok", "description": "ok"}],
-                },
-                "instructions": "judge",
-                "tools": [],
-            }
-        },
-        "response": {"body": {"analysis": "ok", "answer": "ok"}},
-    },
-}
-for item in doc["paths"].values():
-    for op in item.values():
-        if not isinstance(op, dict):
-            continue
-        example = judge_examples.get(op.get("operationId"))
-        if example is not None:
-            op["x-fern-examples"] = [example]
+# Fern derives the inline type name for Judge.output from the containing
+# schema + property title, producing "JudgeOutput". That collides with the
+# existing top-level JudgeOutput response model ({analysis, answer}) and causes
+# the inline discriminated union to replace it in Fern's type table.
+# Override only the generated SDK type name; the OpenAPI wire shape is unchanged.
+judge_output = schemas["Judge"]["properties"]["output"]
+judge_output["x-fern-type-name"] = "JudgeOutputConfig"
 
 dst.write_text(yaml.safe_dump(doc, sort_keys=False))
