@@ -49,6 +49,18 @@ assert inventory["public_method_count"] >= 288, inventory["public_method_count"]
 assert not any(inventory["verification"].values()), inventory["verification"]
 PY
 
+normalize_generated_manifest() {
+  python3 - "$FERN_ROOT/generated/Cargo.toml" <<'PY'
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+text = path.read_text()
+if "\n[workspace]\n" not in f"\n{text}":
+    path.write_text(text.rstrip() + "\n\n[workspace]\n")
+PY
+}
+
 generate() {
   rm -rf "$FERN_ROOT/generated"
   (
@@ -61,6 +73,10 @@ generate() {
       --log-level info
   )
   python3 "$FERN_ROOT/patch_fern_output.py" "$FERN_ROOT/generated"
+  # The generated crate lives below sdk-build/, whose retired Rust builder is
+  # still a workspace during this one-time cutover. Keep the Fern crate
+  # standalone; remove this normalization once that parent manifest is gone.
+  normalize_generated_manifest
 }
 
 generate
