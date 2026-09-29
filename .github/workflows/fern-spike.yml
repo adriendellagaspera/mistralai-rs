@@ -99,9 +99,9 @@ jobs:
 
       - name: Compare current and Fern public surfaces
         run: |
-          python sdk-build/fern-spike/compare_surfaces.py             sdk-build/fern-spike/generated             sdk-build/fern-spike/fern-surface-comparison.json
-            sdk-build/fern-spike/fern-product-surface-comparison.json
-            sdk-build/fern-spike/product/generated-product
+          python sdk-build/fern-spike/compare_surfaces.py \
+            sdk-build/fern-spike/generated \
+            sdk-build/fern-spike/fern-surface-comparison.json
 
       - name: Prepare patched validation copy
         run: |
@@ -178,5 +178,7 @@ jobs:
             sdk-build/fern-spike/generated-patched
             sdk-build/fern-spike/fern-spike-report.json
             sdk-build/fern-spike/fern-surface-comparison.json
+            sdk-build/fern-spike/fern-product-surface-comparison.json
+            sdk-build/fern-spike/product/generated-product
             sdk-build/fern-spike/fern-clippy.log
             sdk-build/fern-spike/diagnostics
