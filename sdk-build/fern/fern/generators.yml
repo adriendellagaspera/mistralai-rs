@@ -1,0 +1,17 @@
+api:
+  specs:
+    - openapi: ./openapi.yaml
+
+default-group: rust-sdk
+
+groups:
+  rust-sdk:
+    generators:
+      - name: fernapi/fern-rust-sdk
+        version: 0.48.0
+        config:
+          packageName: mistralai-sdk
+          packageVersion: "0.4.0"
+        output:
+          location: local-file-system
+          path: ../generated
