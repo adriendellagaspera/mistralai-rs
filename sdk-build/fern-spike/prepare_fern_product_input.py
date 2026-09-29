@@ -21,6 +21,11 @@ for path_item in doc.get("paths", {}).values():
         tags = op.get("tags") or []
         if tags and isinstance(tags[0], str):
             op["x-fern-sdk-group-name"] = tags[0].split(".")
+            # Fern only applies the SDK group when a method override is present.
+            # Preserve the source operation identity by default; representative
+            # product verbs below replace this where desired.
+            if isinstance(op.get("operationId"), str):
+                op["x-fern-sdk-method-name"] = op["operationId"]
 
 # Representative product-level method names. This is deliberately not an
 # exhaustive migration map; it proves Fern can own naming without a Rust facade.
