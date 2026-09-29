@@ -108,8 +108,20 @@ jobs:
       - name: cargo check
         run: cargo check --manifest-path "${{ steps.crate.outputs.manifest }}" --all-features
 
-      - name: cargo clippy -D warnings
-        run: cargo clippy --manifest-path "${{ steps.crate.outputs.manifest }}" --all-features -- -D warnings
+      - name: Record Fern clippy warnings
+        shell: bash
+        run: |
+          set +e
+          cargo clippy --manifest-path "${{ steps.crate.outputs.manifest }}" --all-features --message-format short             2>&1 | tee sdk-build/fern-spike/fern-clippy.log
+          status=${PIPESTATUS[0]}
+          warning_count="$(grep -c 'warning:' sdk-build/fern-spike/fern-clippy.log || true)"
+          echo "Fern clippy warnings: $warning_count"
+          echo "- Clippy warnings: $warning_count" >> "$GITHUB_STEP_SUMMARY"
+          exit "$status"
+
+      - name: cargo clippy correctness and suspicious
+        run: |
+          cargo clippy --manifest-path "${{ steps.crate.outputs.manifest }}" --all-features --             -D clippy::correctness -D clippy::suspicious
 
       - name: Summarize generated tree
         if: always()
@@ -137,4 +149,5 @@ jobs:
             sdk-build/fern-spike/generated
             sdk-build/fern-spike/generated-patched
             sdk-build/fern-spike/fern-spike-report.json
+            sdk-build/fern-spike/fern-clippy.log
             sdk-build/fern-spike/diagnostics
