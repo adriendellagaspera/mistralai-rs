@@ -12,7 +12,7 @@ pub mod resources;
 pub mod types;
 
 pub use resources::{
-    AgentsClient, ApiClient, AudioClient, BatchClient, BetaClient, ChatClient, ClassifiersClient,
+    AgentsClient, Mistral, AudioClient, BatchClient, BetaClient, ChatClient, ClassifiersClient,
     EmbeddingsClient, EventsClient, FilesClient, FimClient, ModelsClient, OcrClient,
     WorkflowsClient,
 };
