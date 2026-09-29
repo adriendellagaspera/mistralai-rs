@@ -75,6 +75,12 @@ jobs:
         working-directory: sdk-build/fern-spike
         run: fern generate --group rust-sdk --local --no-prompt --force --log-level info
 
+      - name: Prepare patched validation copy
+        run: |
+          rm -rf sdk-build/fern-spike/generated-patched
+          cp -R sdk-build/fern-spike/generated sdk-build/fern-spike/generated-patched
+          python sdk-build/fern-spike/patch_fern_output.py sdk-build/fern-spike/generated-patched
+
       - name: Record source and generated-surface metrics
         run: |
           python sdk-build/fern-spike/analyze.py \
@@ -85,7 +91,7 @@ jobs:
         id: crate
         shell: bash
         run: |
-          manifest="$(find sdk-build/fern-spike/generated -name Cargo.toml -print -quit)"
+          manifest="$(find sdk-build/fern-spike/generated-patched -name Cargo.toml -print -quit)"
           if [[ -z "$manifest" ]]; then
             echo "No generated Cargo.toml found" >&2
             exit 1
@@ -129,5 +135,6 @@ jobs:
           if-no-files-found: warn
           path: |
             sdk-build/fern-spike/generated
+            sdk-build/fern-spike/generated-patched
             sdk-build/fern-spike/fern-spike-report.json
             sdk-build/fern-spike/diagnostics
