@@ -84,14 +84,14 @@ def validate_transport_contracts(generated: Path) -> None:
         "pub async fn complete(",
         "pub async fn complete_stream(",
         ".execute_request(",
-        ".execute_sse_request::<CompletionChunk>(",
+        ".execute_sse_request(",
     )
     require_contains(
         generated / "src/api/resources/fim/fim.rs",
         "pub async fn complete(",
         "pub async fn complete_stream(",
         ".execute_request(",
-        ".execute_sse_request::<CompletionChunk>(",
+        ".execute_sse_request(",
     )
     require_contains(
         generated / "src/api/resources/files/files.rs",
