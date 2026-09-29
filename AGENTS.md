@@ -1,66 +1,49 @@
 # Agent contract
 
-This repository is the Mistral-specific consumer of the standalone Rust SDK
-generator toolchain. Keep this file short: it indexes boundaries, commands and
-executable contracts; implementation detail belongs beside the code that owns it.
+This repository publishes a Mistral-specific Rust SDK generated directly by Fern from a pinned OpenAPI source.
 
 ## Repository map
 
-- `src/generated/`: raw `openapi-to-rust` output; generated, never hand-maintained.
-- `src/sdk/`: generated idiomatic Mistral facade and Mistral-owned error runtime.
-- `src/streaming.rs`: handwritten runtime integration for streaming responses.
-- `sdk-build/src/main.rs`: private Rust build orchestration; `src/sources.rs`: pinned OpenAPI verification; `src/gates.rs`: coverage and exact parity.
-- `sdk-build/openapi/`: immutable upstream source, reviewed overlays and updates.
-- `sdk-build/official-sdks/`: pinned Mistral SDK source discovery and evidence (Python, independent of routine build).
-- `sdk-build/api-review/`: independent Python public API and compiler-aware semver review.
-- `sdk-build/`: Mistral transport overrides, pinned provenance and coverage inputs.
-- `.github/scripts/`: repository policy, PR-title validation and scheduled-update PR reporting.
+- `src/`: canonical Fern-generated Rust SDK, checked in for publication and never hand-edited.
+- `sdk-build/openapi/`: pinned upstream OpenAPI source and source-update tooling.
+- `sdk-build/fern/policy.yaml`: reviewed Mistral resource, method, type and representation policy.
+- `sdk-build/fern/prepare_fern_source.py`: temporary input compatibility for identified Fern importer bugs.
+- `sdk-build/fern/patch_fern_output.py`: narrow multipart+SSE output workaround for fern-api/fern#17928.
+- `sdk-build/fern/build.sh`: compile policy, generate twice, verify closure/provenance/collisions and build generated Rust.
+- `sdk-build/fern/check.sh`: require generated Rust and semantic inventory to match the committed production SDK.
+- `sdk-build/official-sdks/`: independent pinned Python/TypeScript source evidence.
+- `.github/scripts/`: repository policy, PR-title validation and update reporting.
 
 ## Canonical local checks
 
-Use the repository commands rather than reproducing CI logic by hand:
-
 ```sh
 just policy
+just check-generated
+just check-source-evidence
 just format
 just lint
 just test-tooling
-just check-generated
-just check-source-evidence
 just test
 just docs
 just validate
 ```
 
-API compatibility and the pinned dependency-security audit additionally run in CI;
-the API check needs the PR base revision and the dependency audit owns its tool pin.
+Generation additionally requires Fern CLI 5.112.0, PyYAML 6.0.3 and the pinned SDK surface compiler from `adriendellagaspera/rust-sdk-generator@394d12ee893a256123545b75ba5e4a0f8f354ad7` at `.tools/sdk-surface`.
 
 ## Gated invariants
 
-- [policy] `CLAUDE.md` MUST contain only `@AGENTS.md`, and root agent instruction files MUST stay within the combined 150-line budget.
-- [policy] Nested `AGENTS.md` or `CLAUDE.md` files MUST NOT be added; put durable detail in code, tests, contributor docs, or an executable gate.
-- [policy] Third-party GitHub Actions MUST use immutable full commit SHAs.
-- [policy] Workflows MUST NOT use `pull_request_target`.
-- [policy] Pull-request titles MUST follow the repository conventional title grammar.
-- [generation] Files under `src/generated/` and generated `src/sdk/` output MUST NOT be edited by hand; change an owning input/tool and regenerate.
-- [generation] Mistral OpenAPI, official-SDK taxonomy and generator inputs MUST remain pinned and reproducible through `sdk-build/provenance.lock.json` and its pinned build pipeline.
-- [lint] Handwritten Rust MUST remain free of `unsafe`; lint exceptions MUST carry an explicit reason, with generated-code exceptions scoped at module boundaries.
-- [dependencies] Locked Rust dependencies MUST pass the advisory, license, source and TLS-backend policy in `deny.toml`.
-- [docs] Handwritten public Rust API MUST have rustdoc that builds warning-free; fallible public helpers MUST document their error contract.
-- [tooling] Private Rust build gates and remaining Python SDK-build/GitHub scripts MUST have their respective test suites executed in CI.
-- [api] Changes to the actual public Rust sources MUST pass the repository API compatibility review against the PR base.
-- [gate] Required CI jobs MUST converge on the single `gate` conclusion job before merge.
+- [policy] `CLAUDE.md` MUST contain only `@AGENTS.md`, root agent instructions MUST fit the repository line budget, third-party actions MUST be SHA-pinned, and workflows MUST NOT use `pull_request_target`.
+- [generation] Fern 0.48.0 MUST deterministically account for all 288 pinned operations and reproduce committed `src/`.
+- [generation] Surface inventory, closure, source provenance and collisions MUST remain verified by the pinned policy compiler/verifier.
+- [lint] Generated Rust MUST pass Clippy correctness and suspicious gates.
+- [dependencies] Locked Rust dependencies MUST pass advisory, license, source and TLS policy; cargo-shear MUST not report unused direct dependencies.
+- [docs] The public Rust documentation and publish dry-run MUST succeed.
+- [tooling] Remaining Python build/update scripts and repository scripts MUST keep their tests green.
+- [api] Breaking public changes MUST remain explicit in `sdk-build/fern/API_COMPATIBILITY.md`.
+- [gate] Required CI jobs MUST converge on the single `gate` conclusion job.
 
 ## Working guidance
 
-Put a change at the narrowest owning boundary. Generic Rust SDK generation belongs in `rust-sdk-generator`, raw OpenAPI
-code generation in `openapi-to-rust`, and bindings adaptation in
-`openapi-to-rust-bindings`; none belongs in this consumer.
-Mistral naming/projection, source tracking, runtime integration and compatibility
-policy belong here. Preserve deterministic generated output unless the issue
-explicitly owns an output migration.
+Fern is the sole production Rust generator. Do not restore `openapi-to-rust`, raw Bindings, the former raw-to-public converter, or a second Rust facade. Product policy belongs in `policy.yaml`; generic Fern defects belong upstream and may have only the smallest ticketed workaround here.
 
-Comments should explain constraints, provenance, invariants or non-obvious reasons,
-not narrate straightforward code. Prefer regression fixtures to prose reminders.
-Normal tests use fixtures/local servers; live Mistral calls are explicit developer
-operations and credentials or response dumps do not belong in the repository.
+Comments should explain constraints, provenance or non-obvious reasons. Prefer executable gates and local HTTP fixtures to prose reminders. Live Mistral calls are explicit developer operations; credentials and response dumps do not belong in the repository.
