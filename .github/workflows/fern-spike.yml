@@ -75,6 +75,18 @@ jobs:
         working-directory: sdk-build/fern-spike
         run: fern generate --group rust-sdk --local --no-prompt --force --log-level info
 
+      - name: Verify deterministic Fern Rust generation
+        working-directory: sdk-build/fern-spike
+        shell: bash
+        run: |
+          find generated -type f ! -path '*/.fern/*' -print0 | sort -z \
+            | xargs -0 sha256sum > /tmp/fern-first.sha256
+          rm -rf generated
+          fern generate --group rust-sdk --local --no-prompt --force --log-level info
+          find generated -type f ! -path '*/.fern/*' -print0 | sort -z \
+            | xargs -0 sha256sum > /tmp/fern-second.sha256
+          diff -u /tmp/fern-first.sha256 /tmp/fern-second.sha256
+
       - name: Generate product-shaped Fern variant
         run: |
           python sdk-build/fern-spike/prepare_fern_product_input.py \
