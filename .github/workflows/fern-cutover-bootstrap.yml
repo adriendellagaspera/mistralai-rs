@@ -36,6 +36,8 @@ jobs:
           bash sdk-build/fern/generate.sh
           cargo generate-lockfile
       - name: Commit generated production tree to this cutover branch
+        env:
+          HEAD_REF: ${{ github.head_ref }}
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
@@ -45,4 +47,4 @@ jobs:
           git add sdk-build/fern/resolution.json
           git diff --cached --stat
           git commit -m 'feat(sdk): materialize Fern production SDK [fern-materialized]'
-          git push origin HEAD:${{ github.head_ref }}
+          git push origin "HEAD:${HEAD_REF}"
