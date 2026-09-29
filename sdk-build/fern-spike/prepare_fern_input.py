@@ -68,6 +68,17 @@ for item in doc["paths"].values():
             if parameter.get("name") == "order_by":
                 parameter.get("schema", {}).pop("default", None)
 
+# Fern's generated endpoint examples omit optional discriminator fields even
+# when the field has a const/default, then its validator rejects those examples.
+# For these tagged-union variants, make the discriminator explicit. This
+# tightens validation to the discriminator semantics already required by the
+# oneOf mapping and does not change serialized successful requests.
+for name in ("JudgeClassificationOutput", "JudgeRegressionOutput"):
+    schema = schemas[name]
+    required = schema.setdefault("required", [])
+    if "type" not in required:
+        required.append("type")
+
 # Examples are documentation, not wire semantics. Fern validates discriminator
 # completeness in response examples more strictly than the source producer.
 # Remove response examples only from the three known judge operations.
