@@ -75,7 +75,11 @@ for item in doc["paths"].values():
     for op in item.values():
         if not isinstance(op, dict):
             continue
-        if op.get("operationId") not in {"judgeChatCompletionEvent", "judgeConversation", "judgeDatasetRecord"}:
+        if op.get("operationId") not in {
+            "judge_chat_completion_event_v1_observability_chat_completion_events__event_id__live_judging_post",
+            "judge_conversation_v1_observability_judges__judge_id__live_judging_post",
+            "judge_dataset_record_v1_observability_dataset_records__dataset_record_id__live_judging_post",
+        }:
             continue
         # Fern promotes OpenAPI operation examples into endpoint examples and
         # validates response unions more strictly than the producer. They can
