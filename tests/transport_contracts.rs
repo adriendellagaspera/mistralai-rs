@@ -20,9 +20,7 @@ async fn serve_once(response: &'static [u8]) -> (String, oneshot::Receiver<Strin
                 break;
             }
             used += n;
-            if bytes[..used].windows(4).any(|window| window == b"\r\n\r\n")
-                || used == bytes.len()
-            {
+            if bytes[..used].windows(4).any(|window| window == b"\r\n\r\n") || used == bytes.len() {
                 break;
             }
         }

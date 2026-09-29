@@ -97,10 +97,7 @@ def main() -> int:
         if !response.status().is_success() {
             let status_code = response.status().as_u16();
             let body = response.text().await.ok();
-            return Err(ApiError::from_response(
-                status_code,
-                body.as_deref(),
-            ));
+            return Err(ApiError::from_response(status_code, body.as_deref()));
         }
 
         crate::SseStream::new(response, terminator, timeout).await
