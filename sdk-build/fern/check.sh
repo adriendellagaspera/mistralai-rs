@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-"$ROOT/sdk-build/fern/build.sh"
+bash "$ROOT/sdk-build/fern/build.sh"
 
 diff -qr "$ROOT/sdk-build/fern/generated/src" "$ROOT/src"
 cmp \
