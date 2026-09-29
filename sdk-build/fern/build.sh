@@ -3,8 +3,8 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 FERN_ROOT="$ROOT/sdk-build/fern"
-SURFACE_TOOL="\${SDK_SURFACE_TOOL:-$ROOT/.tools/sdk-surface/surface/sdk_surface.py}"
-FERN_BIN="\${FERN_BIN:-fern}"
+SURFACE_TOOL="$ROOT/.tools/sdk-surface/surface/sdk_surface.py"
+FERN_BIN="fern"
 
 if [[ ! -f "$SURFACE_TOOL" ]]; then
   echo "SDK surface compiler not found: $SURFACE_TOOL" >&2
