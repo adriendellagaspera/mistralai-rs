@@ -1,0 +1,55 @@
+schema_version: 1
+defaults:
+  resource: first_tag_segments
+  method: operation_id
+
+operations:
+  operationId:chat_completion_v1_chat_completions_post:
+    method: complete
+    representation: conditional-json-sse
+    streaming:
+      format: sse
+      condition: $request.stream
+      response_schema: ChatCompletionResponse
+      stream_schema: CompletionChunk
+
+  operationId:fim_completion_v1_fim_completions_post:
+    method: complete
+    representation: conditional-json-sse
+    streaming:
+      format: sse
+      condition: $request.stream
+      response_schema: FIMCompletionResponse
+      stream_schema: CompletionChunk
+
+  operationId:embeddings_v1_embeddings_post:
+    method: create
+
+  operationId:files_api_routes_list_files:
+    method: list
+  operationId:files_api_routes_upload_file:
+    method: upload
+  operationId:files_api_routes_retrieve_file:
+    method: retrieve
+  operationId:files_api_routes_delete_file:
+    method: delete
+  operationId:files_api_routes_download_file:
+    method: download
+    representation: native-byte-stream
+  operationId:files_api_routes_get_signed_url:
+    method: get_signed_url
+
+  operationId:ocr_v1_ocr_post:
+    method: process
+
+  operationId:speech_v1_audio_speech_post:
+    method: complete
+    representation: native-json-audio-data
+
+  operationId:get_voice_sample_audio_v1_audio_voices__voice_id__sample_get:
+    method: get_sample_audio
+    representation: native-byte-stream
+
+types:
+  '#/components/schemas/Judge/properties/output':
+    name: JudgeOutputConfig
