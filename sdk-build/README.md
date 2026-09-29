@@ -1,39 +1,40 @@
-# SDK build: responsibility map
+# SDK build: Fern production path
 
-The public crate is generated reproducibly from the pinned Mistral OpenAPI source. The private `sdk-build` workspace invokes pinned generic Rust generators and does not add build-time dependencies to SDK consumers.
-
-## Canonical build path
+Fern is the sole production Rust generator.
 
 ```text
-provenance.lock.json + openapi/published.yaml (288 operations)
-   │ byte-level SHA-256 + reviewed overlay assumptions
-   ▼
-openapi-to-rust
-   │ deterministic raw bindings + exact source coverage
-   ▼
-openapi-to-rust-bindings (Bindings v3)
-   ▼
-rust-sdk-generator
-   │ canonical derivation: 283 derived + 5 reviewed transport/representation overrides
-   ▼
-src/generated + src/sdk
+pinned Mistral OpenAPI (288 operations)
+        +
+reviewed Mistral product policy
+        | x-fern-sdk-group-name / x-fern-sdk-method-name / x-fern-streaming
+        +
+temporary Fern input compatibility fixes
+        |
+        v
+Fern CLI 5.112.0 + fernapi/fern-rust-sdk 0.48.0
+        |
+        v
+small multipart+SSE workaround (#17928)
+        |
+        v
+288/288 closure + collision + transport + determinism + inventory gates
+        |
+        v
+checked-in src/ + publishable mistralai-sdk
 ```
 
-`check` regenerates everything in isolation and requires exact parity with the checked-in raw bindings and facade. `generate` runs the same gates and atomically publishes the canonical outputs. No legacy compatibility definition participates in the canonical build.
+The canonical source is `openapi/published.yaml`. The product policy is `fern/product-policy.json`. Generic Fern importer compatibility is isolated in `fern/compat.py`; generated-output compatibility is isolated in `fern/workarounds.py`. Neither layer is a second generator or a compatibility facade.
 
-| Command | Scope |
-| --- | --- |
-| `cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- check` | Verify pinned source, generation, coverage and public facade parity without mutating the checkout. |
-| `cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- generate` | Run the same gates and publish canonical raw + facade outputs atomically. |
-| `cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- raw` | Explicitly refresh the reviewed raw baseline before a full generation. |
-| `cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- probe` | Inspect canonical derivation without publishing. |
+`python3 sdk-build/fern/build.py generate` writes the projected Fern input, generates the SDK, applies the one output workaround, executes production gates, refreshes `fern/public-inventory.json`, and replaces `src/`. `check` repeats generation twice, proves determinism, validates the inventory, and verifies exact parity with committed `src/`.
 
-The active source is `mistralai/platform-docs-public/public/openapi.yaml`, vendored as `openapi/published.yaml` and pinned in `provenance.lock.json`. Source discovery remains an explicit Python maintenance action via `openapi/update.py`; routine generation is Rust-only and network-independent apart from installing immutable pinned tools when absent.
+Production gates require all 288 source operations to be recoverable from emitted Rust by HTTP method/path, no public resource/method collision, no duplicate generated public type names, the known `JudgeOutput` collision to remain disambiguated, and the five historical transport/representation contracts to stay explicit.
 
-`coverage-baseline.json` is fail-closed: all 288 source operations must be accounted for, no rejected operation is allowed, and only the five reviewed overrides may be classified as overridden. Those overrides model response/transport representations; they are not compatibility shims.
+## Temporary upstream Fern issues
 
-## API review and 0.x semver
+- fern-api/fern#17928 — multipart/form-data + SSE Rust generation; the only generated-output shim.
+- fern-api/fern#17929 — inline generated type collision with a top-level component.
+- fern-api/fern#17930 — intentional `allOf` property narrowing rejected.
+- fern-api/fern#17931 — leading-hyphen enum default rejected.
+- fern-api/fern#17932 — `x-fern-sdk-group-name` ignored without an explicit SDK method name.
 
-`api-review/check.py` compares the actual Rust sources against the PR base and always runs the pinned `cargo-semver-checks`. Breaking changes normally fail the gate. A reviewed 0.x migration may set `allow_breaking_changes` in `api-review/review.json`; the semver report is still produced, but known breaking changes do not block that reviewed release.
-
-`openapi-to-rust` owns generic OpenAPI-to-Rust emission, `openapi-to-rust-bindings` owns normalized bindings, and `rust-sdk-generator` owns generic SDK derivation/facade generation. This repository owns only Mistral-specific pins, overlays, transport overrides, runtime conventions and publication gates.
+The first migration commit separately repointed the identical legacy `openapi-to-rust` commit from the personal fork to `gpu-cli/openapi-to-rust` and passed the complete old CI, including generation and Rust-build parity. The final Fern path contains no `openapi-to-rust` dependency at all.

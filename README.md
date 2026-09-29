@@ -1,60 +1,48 @@
 # mistralai-rs
 
-Unofficial asynchronous Rust SDK for Mistral AI, generated from a pinned OpenAPI source. This project is not affiliated with Mistral AI.
+Unofficial asynchronous Rust SDK for Mistral AI, generated reproducibly with Fern from a pinned official OpenAPI source. This project is not affiliated with Mistral AI.
 
-Install [`mistralai-sdk`](https://crates.io/crates/mistralai-sdk) from crates.io. The package name is `mistralai-sdk`; the library is imported as `mistralai`:
+Install the `mistralai-sdk` package from crates.io; the Rust library name is `mistralai_sdk`:
 
 ```sh
 cargo add mistralai-sdk@0.4
-cargo add tokio --features macros,rt-multi-thread
-cargo add serde_json
-```
-
-Or add these dependencies to `Cargo.toml`:
-
-```toml
-[dependencies]
-mistralai-sdk = "0.4"
-tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
-serde_json = "1"
 ```
 
 ```rust,no_run
-use mistralai::raw::types::ChatCompletionRequest;
-use mistralai::{CompleteChatRequest, Mistral};
+use mistralai_sdk::{ApiClient, ClientConfig};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mistral = Mistral::new(std::env::var("MISTRAL_API_KEY")?);
-    let raw: ChatCompletionRequest = serde_json::from_value(serde_json::json!({
-        "model": "mistral-small-latest",
-        "messages": [{"role": "user", "content": "Say hello in French."}],
-        "max_tokens": 64
-    }))?;
-    let response = mistral.chat().complete(CompleteChatRequest::from(raw)).await?;
-    println!("{}", serde_json::to_string_pretty(response.raw())?);
+    let client = ApiClient::new(ClientConfig {
+        api_key: Some(std::env::var("MISTRAL_API_KEY")?),
+        ..Default::default()
+    })?;
+
+    // Resources include client.chat, client.files, client.audio,
+    // client.workflows, client.beta, and the remaining API groups.
+    let _ = client;
     Ok(())
 }
 ```
 
-The client defaults to `https://api.mistral.ai`. It does not automatically retry billable requests. `with_base_url(...)` selects another compatible endpoint.
+The canonical input is `sdk-build/openapi/published.yaml` with 288 operations. Fern CLI `5.112.0` and `fernapi/fern-rust-sdk` `0.48.0` are the only production Rust-generation path. Mistral product naming and streaming policy is compiled to Fern OpenAPI extensions; temporary Fern bugs are isolated separately and linked to upstream issues.
 
-## API
-
-The resource-oriented facade is in `mistralai`; the complete generated transport for the pinned source is in `mistralai::raw`. See [`src/generated/coverage.json`](src/generated/coverage.json) for raw operation coverage. The public facade is derived canonically from the pinned OpenAPI source; no legacy compatibility definition is applied by default. Streaming, multipart and binary download examples are in [`examples/`](examples/).
-
-The published generation input is [`sdk-build/openapi/published.yaml`](sdk-build/openapi/published.yaml), pinned to `mistralai/platform-docs-public/public/openapi.yaml` with 288 source operations. The 0.4.0 cutover intentionally permits reviewed breaking API changes rather than carrying compatibility shims from the previous 0.x surface.
+The 0.4 Fern cutover intentionally accepts reviewed pre-1.0 breaking changes instead of preserving the previous raw/facade architecture. See `sdk-build/fern/API_COMPATIBILITY.md` and the machine-readable `sdk-build/fern/public-inventory.json`.
 
 ## Development
 
 ```sh
+python3 -m pip install 'PyYAML==6.0.2'
+npm install --global 'fern-api@5.112.0'
 just generate
 just check-generated
 just validate
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for source updates and validation, and the [build responsibility map](sdk-build/README.md) for toolchain boundaries. Generated `src/generated/` and `src/sdk/` files are checked for deterministic regeneration; edit their owning inputs instead.
+`just check-generated` regenerates twice, proves deterministic output, accounts for all 288 source operations in emitted Rust, checks type collisions and the reviewed transport representations, and compares the result with committed `src/`.
+
+See `CONTRIBUTING.md` and `sdk-build/README.md` for source updates, ownership boundaries, and release gates.
 
 ## License
 
-Original contributions are MIT OR Apache-2.0. The upstream specification and generated material retain their applicable notices; see [NOTICE](NOTICE) and the license files in this repository.
+Original contributions are MIT OR Apache-2.0. Upstream specification and generated material retain their applicable notices; see `NOTICE` and the license files in this repository.
