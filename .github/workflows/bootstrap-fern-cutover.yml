@@ -1,0 +1,44 @@
+name: Bootstrap Fern production cutover
+
+on:
+  push:
+    branches: [cutover/fern-production]
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: rustup show
+      - run: python3 -m pip install --disable-pip-version-check 'PyYAML==6.0.2'
+      - run: npm install --global 'fern-api@5.112.0'
+      - name: Generate the canonical Fern SDK
+        run: python3 sdk-build/fern/build.py generate
+      - name: Remove the retired production pipeline
+        run: |
+          rm -rf sdk-build/src sdk-build/api-review
+          rm -f sdk-build/Cargo.toml sdk-build/Cargo.lock sdk-build/openapi-to-rust.toml sdk-build/openapi-to-rust-MIT.txt
+          rm -f sdk-build/coverage-baseline.json sdk-build/sdk-overrides.json sdk-build/test_sources_pinning.py
+          rm -f sdk-build/openapi/overlays/rust-sdk.overlay.yaml
+      - name: Refresh Rust lockfile and execute cutover checks
+        run: |
+          cargo generate-lockfile
+          cargo fmt --all --check
+          cargo check --locked --all-features
+          cargo clippy --locked --all-features --all-targets -- -D clippy::correctness -D clippy::suspicious
+          cargo test --locked --all-features --all-targets
+          python3 sdk-build/fern/build.py check
+          python3 sdk-build/fern/api_check.py
+      - name: Commit generated SDK and retirement deletions
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A src Cargo.lock sdk-build
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'build: check in canonical Fern SDK'
+          git push
