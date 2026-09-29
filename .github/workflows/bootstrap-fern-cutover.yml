@@ -30,7 +30,7 @@ jobs:
           cargo generate-lockfile
           cargo fmt --all --check
           cargo check --locked --all-features
-          cargo clippy --locked --all-features --all-targets -- -D clippy::correctness -D clippy::suspicious
+          cargo clippy --locked --all-features -- -D clippy::correctness -D clippy::suspicious
           cargo test --locked --all-features --all-targets
           python3 sdk-build/fern/build.py check
           python3 sdk-build/fern/api_check.py

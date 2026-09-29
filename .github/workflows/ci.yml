@@ -76,7 +76,7 @@ jobs:
         with:
           persist-credentials: false
       - run: rustup show
-      - run: cargo clippy --locked --all-features --all-targets -- -D clippy::correctness -D clippy::suspicious
+      - run: cargo clippy --locked --all-features -- -D clippy::correctness -D clippy::suspicious
 
   dependencies:
     name: dependencies

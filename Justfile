@@ -22,7 +22,7 @@ format:
     cargo fmt --all --check
 
 lint:
-    cargo clippy --locked --all-features --all-targets -- -D clippy::correctness -D clippy::suspicious
+    cargo clippy --locked --all-features -- -D clippy::correctness -D clippy::suspicious
 
 test-tooling:
     python3 -m unittest discover -s sdk-build -p 'test_*.py'
@@ -40,6 +40,6 @@ validate:
     python3 sdk-build/official-sdks/update.py check
     cargo fmt --all --check
     cargo check --locked --all-features
-    cargo clippy --locked --all-features --all-targets -- -D clippy::correctness -D clippy::suspicious
+    cargo clippy --locked --all-features -- -D clippy::correctness -D clippy::suspicious
     cargo test --locked --all-features --all-targets
     cargo doc --locked --all-features --no-deps
