@@ -30,8 +30,12 @@ jobs:
       - name: Install pinned Fern CLI
         run: npm install --global fern-api@5.112.0
 
-      - name: Prepare exact Mistral 288 source
-        run: cp sdk-build/openapi/published.yaml sdk-build/fern-spike/fern/openapi.yaml
+      - name: Prepare Fern-compatible Mistral 288 source
+        run: |
+          python -m pip install --disable-pip-version-check pyyaml
+          python sdk-build/fern-spike/prepare_fern_input.py \
+            sdk-build/openapi/published.yaml \
+            sdk-build/fern-spike/fern/openapi.yaml
 
       - name: Generate Rust SDK with Fern 0.48.0
         working-directory: sdk-build/fern-spike
@@ -39,7 +43,6 @@ jobs:
 
       - name: Record source and generated-surface metrics
         run: |
-          python -m pip install --disable-pip-version-check pyyaml
           python sdk-build/fern-spike/analyze.py \
             sdk-build/openapi/published.yaml \
             sdk-build/fern-spike/generated
