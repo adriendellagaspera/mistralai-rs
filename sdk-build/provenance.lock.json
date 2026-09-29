@@ -11,7 +11,7 @@
   "tools": {
     "openapi_to_rust": {
       "name": "openapi-to-rust",
-      "repository": "adriendellagaspera/openapi-to-rust",
+      "repository": "gpu-cli/openapi-to-rust",
       "commit": "b9b8f55d352510234c4161af56d05f8d3f80485c",
       "version": "0.17.0",
       "tree_sha": "81f6a6a45a7daadee1fc6eea9371147c0a989034"
