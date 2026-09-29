@@ -1,0 +1,2 @@
+pub mod beta_observability_datasets_records;
+pub use beta_observability_datasets_records::RecordsClient;

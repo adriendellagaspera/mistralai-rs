@@ -1,0 +1,87 @@
+pub use crate::prelude::*;
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
+pub struct FunctionResultEntry {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub object: Option<FunctionResultEntryObject>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    #[serde(with = "crate::core::flexible_datetime::offset::option")]
+    pub created_at: Option<DateTime<FixedOffset>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub completed_at: Option<DateTime<FixedOffset>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub id: Option<String>,
+    #[serde(default)]
+    pub tool_call_id: String,
+    #[serde(default)]
+    pub result: String,
+}
+
+impl FunctionResultEntry {
+    pub fn builder() -> FunctionResultEntryBuilder {
+        <FunctionResultEntryBuilder as Default>::default()
+    }
+}
+
+#[derive(Clone, PartialEq, Default, Debug)]
+#[non_exhaustive]
+pub struct FunctionResultEntryBuilder {
+    object: Option<FunctionResultEntryObject>,
+    created_at: Option<DateTime<FixedOffset>>,
+    completed_at: Option<DateTime<FixedOffset>>,
+    id: Option<String>,
+    tool_call_id: Option<String>,
+    result: Option<String>,
+}
+
+impl FunctionResultEntryBuilder {
+    pub fn object(mut self, value: FunctionResultEntryObject) -> Self {
+        self.object = Some(value);
+        self
+    }
+
+    pub fn created_at(mut self, value: DateTime<FixedOffset>) -> Self {
+        self.created_at = Some(value);
+        self
+    }
+
+    pub fn completed_at(mut self, value: DateTime<FixedOffset>) -> Self {
+        self.completed_at = Some(value);
+        self
+    }
+
+    pub fn id(mut self, value: impl Into<String>) -> Self {
+        self.id = Some(value.into());
+        self
+    }
+
+    pub fn tool_call_id(mut self, value: impl Into<String>) -> Self {
+        self.tool_call_id = Some(value.into());
+        self
+    }
+
+    pub fn result(mut self, value: impl Into<String>) -> Self {
+        self.result = Some(value.into());
+        self
+    }
+
+    /// Consumes the builder and constructs a [`FunctionResultEntry`].
+    /// This method will fail if any of the following fields are not set:
+    /// - [`tool_call_id`](FunctionResultEntryBuilder::tool_call_id)
+    /// - [`result`](FunctionResultEntryBuilder::result)
+    pub fn build(self) -> Result<FunctionResultEntry, BuildError> {
+        Ok(FunctionResultEntry {
+            object: self.object,
+            created_at: self.created_at,
+            completed_at: self.completed_at,
+            id: self.id,
+            tool_call_id: self
+                .tool_call_id
+                .ok_or_else(|| BuildError::missing_field("tool_call_id"))?,
+            result: self
+                .result
+                .ok_or_else(|| BuildError::missing_field("result"))?,
+        })
+    }
+}
