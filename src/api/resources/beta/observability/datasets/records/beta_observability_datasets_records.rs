@@ -34,7 +34,7 @@ impl RecordsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .beta
     ///         .observability
@@ -86,7 +86,7 @@ impl RecordsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .beta
     ///         .observability
@@ -136,7 +136,7 @@ impl RecordsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .beta
     ///         .observability
@@ -186,7 +186,7 @@ impl RecordsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .beta
     ///         .observability
@@ -259,7 +259,7 @@ impl RecordsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client.beta.observability.datasets.records.update_dataset_record_payload_v1observability_dataset_records_dataset_record_id_payload_put(&"dataset_record_id".to_string(), &UpdateDatasetRecordPayloadRequest {
     ///         payload: DatasetRecordPayload(HashMap::from([("key".to_string(), serde_json::json!("value"))]))
     ///     }, None).await;
@@ -306,7 +306,7 @@ impl RecordsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client.beta.observability.datasets.records.update_dataset_record_properties_v1observability_dataset_records_dataset_record_id_properties_put(&"dataset_record_id".to_string(), &UpdateDatasetRecordPropertiesRequest {
     ///         properties: HashMap::from([("key".to_string(), serde_json::json!("value"))])
     ///     }, None).await;
