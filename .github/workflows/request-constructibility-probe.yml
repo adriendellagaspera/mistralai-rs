@@ -1,0 +1,30 @@
+name: Probe Request Constructibility
+
+on:
+  push:
+    branches: [feat/private-raw-boundary]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: request-constructibility-probe
+  cancel-in-progress: true
+
+jobs:
+  generate:
+    name: Regenerate with pinned generator
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install pinned Rust toolchain
+        run: rustup show
+      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+        with:
+          shared-key: request-constructibility-probe
+          save-if: false
+      - name: Regenerate SDK
+        run: cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- generate
