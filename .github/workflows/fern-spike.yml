@@ -1,0 +1,95 @@
+name: Fern Mistral 288 spike
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/fern-spike.yml"
+      - "sdk-build/fern-spike/**"
+      - "sdk-build/openapi/published.yaml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fern-rust:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Install pinned Fern CLI
+        run: npm install --global fern-api@5.112.0
+
+      - name: Prepare exact Mistral 288 source
+        run: cp sdk-build/openapi/published.yaml sdk-build/fern-spike/fern/openapi.yaml
+
+      - name: Generate Rust SDK with Fern 0.48.0
+        working-directory: sdk-build/fern-spike
+        run: fern generate --group rust-sdk --local --no-prompt --force --log-level info
+
+      - name: Record source and generated-surface metrics
+        run: |
+          python -m pip install --disable-pip-version-check pyyaml
+          python sdk-build/fern-spike/analyze.py \
+            sdk-build/openapi/published.yaml \
+            sdk-build/fern-spike/generated
+
+      - name: Locate generated crate
+        id: crate
+        shell: bash
+        run: |
+          manifest="$(find sdk-build/fern-spike/generated -name Cargo.toml -print -quit)"
+          if [[ -z "$manifest" ]]; then
+            echo "No generated Cargo.toml found" >&2
+            exit 1
+          fi
+          echo "manifest=$manifest" >> "$GITHUB_OUTPUT"
+          echo "Generated manifest: $manifest"
+
+      - name: cargo fmt --check
+        continue-on-error: true
+        run: cargo fmt --manifest-path "${{ steps.crate.outputs.manifest }}" -- --check
+
+      - name: cargo check
+        continue-on-error: true
+        run: cargo check --manifest-path "${{ steps.crate.outputs.manifest }}" --all-features
+
+      - name: cargo clippy -D warnings
+        continue-on-error: true
+        run: cargo clippy --manifest-path "${{ steps.crate.outputs.manifest }}" --all-features -- -D warnings
+
+      - name: Summarize generated tree
+        if: always()
+        shell: bash
+        run: |
+          echo "## Fern Mistral 288 spike" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Fern CLI: 5.112.0" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Rust generator: 0.48.0" >> "$GITHUB_STEP_SUMMARY"
+          if [[ -f sdk-build/fern-spike/fern-spike-report.json ]]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo '\`\`\`json' >> "$GITHUB_STEP_SUMMARY"
+            cat sdk-build/fern-spike/fern-spike-report.json | jq 'del(.operations)' >> "$GITHUB_STEP_SUMMARY"
+            echo '\`\`\`' >> "$GITHUB_STEP_SUMMARY"
+          fi
+          find sdk-build/fern-spike/generated -maxdepth 3 -type f 2>/dev/null | sort | head -200 || true
+
+      - name: Upload raw Fern output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fern-mistral-288
+          if-no-files-found: warn
+          path: |
+            sdk-build/fern-spike/generated
+            sdk-build/fern-spike/fern-spike-report.json
