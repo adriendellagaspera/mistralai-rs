@@ -34,7 +34,7 @@ impl SpansClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .beta
     ///         .observability
@@ -100,7 +100,7 @@ impl SpansClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .beta
     ///         .observability
@@ -145,7 +145,7 @@ impl SpansClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client.beta.observability.spans.get_span_evaluation_field_options_v1observability_spans_evaluations_fields_field_name_options_get(&"field_name".to_string(), &GetSpanEvaluationFieldOptionsV1ObservabilitySpansEvaluationsFieldsFieldNameOptionsGetQueryRequest {
     ///         ..Default::default()
     ///     }, None).await;
@@ -195,7 +195,7 @@ impl SpansClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .beta
     ///         .observability
@@ -257,7 +257,7 @@ impl SpansClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .beta
     ///         .observability
@@ -319,7 +319,7 @@ impl SpansClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .beta
     ///         .observability
@@ -364,7 +364,7 @@ impl SpansClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .beta
     ///         .observability
@@ -420,7 +420,7 @@ impl SpansClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .beta
     ///         .observability
