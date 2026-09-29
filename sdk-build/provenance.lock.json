@@ -35,7 +35,7 @@
   "official_sdks": {
     "python": {
       "repository": "mistralai/client-python",
-      "commit": "80e32d2d9a6ac784a16e50f351e869822637a658"
+      "commit": "e8dfa1c8a2d0975cebfc0136b2d9060ff555494d"
     },
     "typescript": {
       "repository": "mistralai/client-ts",
