@@ -1,0 +1,2 @@
+pub mod beta_admin_vibe_code_analytics;
+pub use beta_admin_vibe_code_analytics::VibeCodeAnalyticsClient;

@@ -1,0 +1,3473 @@
+{
+  "excluded_operation_count": 0,
+  "operations": [
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/admin/analytics/vibe/code/usage/by_organization",
+      "operation_id": "get_organization_stats_v1_admin_analytics_vibe_code_usage_by_organization",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.vibe-code-analytics.get_organization_stats_v1_admin_analytics_vibe_code_usage_by_organization"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_organization_stats_v1_admin_analytics_vibe_code_usage_by_organization"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/admin/analytics/vibe/code/usage/by_workspace",
+      "operation_id": "get_workspace_stats_v1_admin_analytics_vibe_code_usage_by_workspace",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.vibe-code-analytics.get_workspace_stats_v1_admin_analytics_vibe_code_usage_by_workspace"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_workspace_stats_v1_admin_analytics_vibe_code_usage_by_workspace"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/admin/analytics/vibe/work/usage/by_agent_stats",
+      "operation_id": "get_by_agent_stats_v1_admin_analytics_vibe_work_usage_by_agent_stats",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.vibe-work-analytics.get_by_agent_stats_v1_admin_analytics_vibe_work_usage_by_agent_stats"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_by_agent_stats_v1_admin_analytics_vibe_work_usage_by_agent_stats"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/admin/analytics/vibe/work/usage/by_time_stats",
+      "operation_id": "get_by_time_stats_v1_admin_analytics_vibe_work_usage_by_time_stats",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.vibe-work-analytics.get_by_time_stats_v1_admin_analytics_vibe_work_usage_by_time_stats"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_by_time_stats_v1_admin_analytics_vibe_work_usage_by_time_stats"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/admin/analytics/vibe/work/usage/by_user_stats",
+      "operation_id": "get_by_user_stats_v1_admin_analytics_vibe_work_usage_by_user_stats",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.vibe-work-analytics.get_by_user_stats_v1_admin_analytics_vibe_work_usage_by_user_stats"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_by_user_stats_v1_admin_analytics_vibe_work_usage_by_user_stats"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/admin/api-keys",
+      "operation_id": "users_api_admin_api_keys_get_api_keys",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.api-keys.users_api_admin_api_keys_get_api_keys"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_api_keys_get_api_keys"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/admin/api-keys",
+      "operation_id": "users_api_admin_api_keys_create_api_key",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.api-keys.users_api_admin_api_keys_create_api_key"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_api_keys_create_api_key"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/admin/api-keys/{key_id}",
+      "operation_id": "users_api_admin_api_keys_delete_api_key",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.api-keys.users_api_admin_api_keys_delete_api_key"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_api_keys_delete_api_key"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/admin/audit-logs",
+      "operation_id": "users_api_admin_audit_logs_get_audit_logs",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.audit-logs.users_api_admin_audit_logs_get_audit_logs"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_audit_logs_get_audit_logs"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/admin/rate-limit",
+      "operation_id": "users_api_admin_rate_limits_get_rate_limits",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.billing.users_api_admin_rate_limits_get_rate_limits"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_rate_limits_get_rate_limits"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/admin/roles",
+      "operation_id": "users_api_admin_roles_get_roles",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.users.users_api_admin_roles_get_roles"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_roles_get_roles"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/admin/scim/sync",
+      "operation_id": "users_api_admin_scim_sync_trigger_scim_sync",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.scim.users_api_admin_scim_sync_trigger_scim_sync"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_scim_sync_trigger_scim_sync"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/admin/scim/sync/{run_id}",
+      "operation_id": "users_api_admin_scim_sync_get_scim_sync_run",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.scim.users_api_admin_scim_sync_get_scim_sync_run"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_scim_sync_get_scim_sync_run"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/admin/spend-limit",
+      "operation_id": "users_api_admin_spend_limits_get_spend_limits",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.billing.users_api_admin_spend_limits_get_spend_limits"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_spend_limits_get_spend_limits"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/admin/spend-limit",
+      "operation_id": "users_api_admin_spend_limits_update_spend_limits",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.billing.users_api_admin_spend_limits_update_spend_limits"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_spend_limits_update_spend_limits"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/admin/usage",
+      "operation_id": "users_api_admin_usage_get_usage",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.billing.users_api_admin_usage_get_usage"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_usage_get_usage"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/admin/user-groups",
+      "operation_id": "users_api_admin_user_groups_get_user_groups",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.user-groups.users_api_admin_user_groups_get_user_groups"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_user_groups_get_user_groups"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/admin/user-groups",
+      "operation_id": "users_api_admin_user_groups_create_user_group",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.user-groups.users_api_admin_user_groups_create_user_group"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_user_groups_create_user_group"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/admin/user-groups/provision-workspace",
+      "operation_id": "users_api_admin_user_groups_provision_group_to_workspace",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.user-groups.users_api_admin_user_groups_provision_group_to_workspace"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_user_groups_provision_group_to_workspace"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/admin/user-groups/{group_uuid}",
+      "operation_id": "users_api_admin_user_groups_delete_user_group",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.user-groups.users_api_admin_user_groups_delete_user_group"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_user_groups_delete_user_group"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/admin/user-groups/{group_uuid}",
+      "operation_id": "users_api_admin_user_groups_get_user_group",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.user-groups.users_api_admin_user_groups_get_user_group"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_user_groups_get_user_group"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PATCH",
+      "http_path": "/v1/admin/user-groups/{group_uuid}",
+      "operation_id": "users_api_admin_user_groups_update_user_group",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.user-groups.users_api_admin_user_groups_update_user_group"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_user_groups_update_user_group"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/admin/user-groups/{group_uuid}/members",
+      "operation_id": "users_api_admin_user_groups_remove_users_from_group",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.user-groups.users_api_admin_user_groups_remove_users_from_group"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_user_groups_remove_users_from_group"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/admin/user-groups/{group_uuid}/members",
+      "operation_id": "users_api_admin_user_groups_get_user_group_members",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.user-groups.users_api_admin_user_groups_get_user_group_members"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_user_groups_get_user_group_members"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/admin/user-groups/{group_uuid}/members",
+      "operation_id": "users_api_admin_user_groups_assign_users_to_group",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.user-groups.users_api_admin_user_groups_assign_users_to_group"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_user_groups_assign_users_to_group"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/admin/user-groups/{group_uuid}/nested",
+      "operation_id": "users_api_admin_user_groups_get_nested_groups",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.user-groups.users_api_admin_user_groups_get_nested_groups"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_user_groups_get_nested_groups"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PATCH",
+      "http_path": "/v1/admin/user-groups/{group_uuid}/nested",
+      "operation_id": "users_api_admin_user_groups_set_nested_groups",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.user-groups.users_api_admin_user_groups_set_nested_groups"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_user_groups_set_nested_groups"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PATCH",
+      "http_path": "/v1/admin/user-groups/{group_uuid}/organization-role",
+      "operation_id": "users_admin_user_groups_update_user_group_organization_role",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.user-groups.users_admin_user_groups_update_user_group_organization_role"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_admin_user_groups_update_user_group_organization_role"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/admin/user-groups/{group_uuid}/workspaces",
+      "operation_id": "users_admin_user_groups_get_group_workspace_assignments",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.user-groups.users_admin_user_groups_get_group_workspace_assignments"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_admin_user_groups_get_group_workspace_assignments"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/admin/user-groups/{group_uuid}/workspaces",
+      "operation_id": "users_api_admin_user_groups_assign_group_to_workspace",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.user-groups.users_api_admin_user_groups_assign_group_to_workspace"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_user_groups_assign_group_to_workspace"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/admin/user-groups/{group_uuid}/workspaces/{workspace_uuid}",
+      "operation_id": "users_admin_user_groups_remove_group_from_workspace",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.user-groups.users_admin_user_groups_remove_group_from_workspace"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_admin_user_groups_remove_group_from_workspace"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PATCH",
+      "http_path": "/v1/admin/user-groups/{group_uuid}/workspaces/{workspace_uuid}",
+      "operation_id": "users_admin_user_groups_update_group_workspace_assignment",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.user-groups.users_admin_user_groups_update_group_workspace_assignment"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_admin_user_groups_update_group_workspace_assignment"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/admin/users",
+      "operation_id": "users_api_admin_users_get_users",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.users.users_api_admin_users_get_users"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_users_get_users"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/admin/users",
+      "operation_id": "users_api_admin_users_create_users",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.users.users_api_admin_users_create_users"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_users_create_users"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/admin/users-invite",
+      "operation_id": "users_api_admin_users_get_invite",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.users.users_api_admin_users_get_invite"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_users_get_invite"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/admin/users-invite",
+      "operation_id": "users_api_admin_users_invite_users",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.users.users_api_admin_users_invite_users"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_users_invite_users"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/admin/users-invite/{invite_uuid}",
+      "operation_id": "users_api_admin_users_delete_invite",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.users.users_api_admin_users_delete_invite"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_users_delete_invite"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/admin/users/{user_id}",
+      "operation_id": "users_api_admin_users_delete_user",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.users.users_api_admin_users_delete_user"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_users_delete_user"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/admin/users/{user_id}",
+      "operation_id": "users_api_admin_users_get_user",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.users.users_api_admin_users_get_user"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_users_get_user"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PATCH",
+      "http_path": "/v1/admin/users/{user_id}",
+      "operation_id": "users_api_admin_users_update_user",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.users.users_api_admin_users_update_user"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_users_update_user"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/admin/workspaces",
+      "operation_id": "users_api_admin_workspaces_get_workspaces",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.workspaces.users_api_admin_workspaces_get_workspaces"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_workspaces_get_workspaces"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/admin/workspaces",
+      "operation_id": "users_api_admin_workspaces_create_workspace",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.workspaces.users_api_admin_workspaces_create_workspace"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_workspaces_create_workspace"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/admin/workspaces/{workspace_uuid}",
+      "operation_id": "users_api_admin_workspaces_delete_workspaces",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.workspaces.users_api_admin_workspaces_delete_workspaces"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_workspaces_delete_workspaces"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PATCH",
+      "http_path": "/v1/admin/workspaces/{workspace_uuid}",
+      "operation_id": "users_api_admin_workspaces_update_workspaces",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.workspaces.users_api_admin_workspaces_update_workspaces"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_workspaces_update_workspaces"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/admin/workspaces/{workspace_uuid}/add-users",
+      "operation_id": "users_api_admin_workspaces_add_users_workspaces",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.workspaces.users_api_admin_workspaces_add_users_workspaces"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_workspaces_add_users_workspaces"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/admin/workspaces/{workspace_uuid}/remove-users",
+      "operation_id": "users_api_admin_workspaces_remove_users_workspaces",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.workspaces.users_api_admin_workspaces_remove_users_workspaces"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_workspaces_remove_users_workspaces"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PATCH",
+      "http_path": "/v1/admin/workspaces/{workspace_uuid}/users",
+      "operation_id": "users_api_admin_workspaces_add_or_update_users_workspaces",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.workspaces.users_api_admin_workspaces_add_or_update_users_workspaces"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_workspaces_add_or_update_users_workspaces"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/agents",
+      "operation_id": "agents_api_v1_agents_list",
+      "outcome": "published",
+      "public_paths": [
+        "beta.agents.agents_api_v1_agents_list"
+      ],
+      "representation": null,
+      "source_identity": "operationId:agents_api_v1_agents_list"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/agents",
+      "operation_id": "agents_api_v1_agents_create",
+      "outcome": "published",
+      "public_paths": [
+        "beta.agents.agents_api_v1_agents_create"
+      ],
+      "representation": null,
+      "source_identity": "operationId:agents_api_v1_agents_create"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/agents/completions",
+      "operation_id": "agents_completion_v1_agents_completions_post",
+      "outcome": "published",
+      "public_paths": [
+        "agents.agents_completion_v1_agents_completions_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:agents_completion_v1_agents_completions_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/agents/pages",
+      "operation_id": "agents_api_v1_agents_list_pages",
+      "outcome": "published",
+      "public_paths": [
+        "beta.agents.agents_api_v1_agents_list_pages"
+      ],
+      "representation": null,
+      "source_identity": "operationId:agents_api_v1_agents_list_pages"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/agents/{agent_id}",
+      "operation_id": "agents_api_v1_agents_delete",
+      "outcome": "published",
+      "public_paths": [
+        "beta.agents.agents_api_v1_agents_delete"
+      ],
+      "representation": null,
+      "source_identity": "operationId:agents_api_v1_agents_delete"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/agents/{agent_id}",
+      "operation_id": "agents_api_v1_agents_get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.agents.agents_api_v1_agents_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:agents_api_v1_agents_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PATCH",
+      "http_path": "/v1/agents/{agent_id}",
+      "operation_id": "agents_api_v1_agents_update",
+      "outcome": "published",
+      "public_paths": [
+        "beta.agents.agents_api_v1_agents_update"
+      ],
+      "representation": null,
+      "source_identity": "operationId:agents_api_v1_agents_update"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/agents/{agent_id}/aliases",
+      "operation_id": "agents_api_v1_agents_delete_alias",
+      "outcome": "published",
+      "public_paths": [
+        "beta.agents.agents_api_v1_agents_delete_alias"
+      ],
+      "representation": null,
+      "source_identity": "operationId:agents_api_v1_agents_delete_alias"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/agents/{agent_id}/aliases",
+      "operation_id": "agents_api_v1_agents_list_version_aliases",
+      "outcome": "published",
+      "public_paths": [
+        "beta.agents.agents_api_v1_agents_list_version_aliases"
+      ],
+      "representation": null,
+      "source_identity": "operationId:agents_api_v1_agents_list_version_aliases"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PUT",
+      "http_path": "/v1/agents/{agent_id}/aliases",
+      "operation_id": "agents_api_v1_agents_create_or_update_alias",
+      "outcome": "published",
+      "public_paths": [
+        "beta.agents.agents_api_v1_agents_create_or_update_alias"
+      ],
+      "representation": null,
+      "source_identity": "operationId:agents_api_v1_agents_create_or_update_alias"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PATCH",
+      "http_path": "/v1/agents/{agent_id}/version",
+      "operation_id": "agents_api_v1_agents_update_version",
+      "outcome": "published",
+      "public_paths": [
+        "beta.agents.agents_api_v1_agents_update_version"
+      ],
+      "representation": null,
+      "source_identity": "operationId:agents_api_v1_agents_update_version"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/agents/{agent_id}/versions",
+      "operation_id": "agents_api_v1_agents_list_versions",
+      "outcome": "published",
+      "public_paths": [
+        "beta.agents.agents_api_v1_agents_list_versions"
+      ],
+      "representation": null,
+      "source_identity": "operationId:agents_api_v1_agents_list_versions"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/agents/{agent_id}/versions/{version}",
+      "operation_id": "agents_api_v1_agents_get_version",
+      "outcome": "published",
+      "public_paths": [
+        "beta.agents.agents_api_v1_agents_get_version"
+      ],
+      "representation": null,
+      "source_identity": "operationId:agents_api_v1_agents_get_version"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/audio/speech",
+      "operation_id": "speech_v1_audio_speech_post",
+      "outcome": "published",
+      "public_paths": [
+        "audio.speech.complete"
+      ],
+      "representation": "native-json-audio-data",
+      "source_identity": "operationId:speech_v1_audio_speech_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/audio/transcriptions",
+      "operation_id": "audio_api_v1_transcriptions_post",
+      "outcome": "published",
+      "public_paths": [
+        "audio.transcriptions.audio_api_v1_transcriptions_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:audio_api_v1_transcriptions_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/audio/transcriptions#stream",
+      "operation_id": "audio_api_v1_transcriptions_post_stream",
+      "outcome": "published",
+      "public_paths": [
+        "audio.transcriptions.audio_api_v1_transcriptions_post_stream"
+      ],
+      "representation": null,
+      "source_identity": "operationId:audio_api_v1_transcriptions_post_stream"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/audio/voices",
+      "operation_id": "list_voices_v1_audio_voices_get",
+      "outcome": "published",
+      "public_paths": [
+        "audio.voices.list_voices_v1_audio_voices_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:list_voices_v1_audio_voices_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/audio/voices",
+      "operation_id": "create_voice_v1_audio_voices_post",
+      "outcome": "published",
+      "public_paths": [
+        "audio.voices.create_voice_v1_audio_voices_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:create_voice_v1_audio_voices_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/audio/voices/{voice_id}",
+      "operation_id": "delete_voice_v1_audio_voices__voice_id__delete",
+      "outcome": "published",
+      "public_paths": [
+        "audio.voices.delete_voice_v1_audio_voices__voice_id__delete"
+      ],
+      "representation": null,
+      "source_identity": "operationId:delete_voice_v1_audio_voices__voice_id__delete"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/audio/voices/{voice_id}",
+      "operation_id": "get_voice_v1_audio_voices__voice_id__get",
+      "outcome": "published",
+      "public_paths": [
+        "audio.voices.get_voice_v1_audio_voices__voice_id__get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_voice_v1_audio_voices__voice_id__get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PATCH",
+      "http_path": "/v1/audio/voices/{voice_id}",
+      "operation_id": "update_voice_v1_audio_voices__voice_id__patch",
+      "outcome": "published",
+      "public_paths": [
+        "audio.voices.update_voice_v1_audio_voices__voice_id__patch"
+      ],
+      "representation": null,
+      "source_identity": "operationId:update_voice_v1_audio_voices__voice_id__patch"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/audio/voices/{voice_id}/sample",
+      "operation_id": "get_voice_sample_audio_v1_audio_voices__voice_id__sample_get",
+      "outcome": "published",
+      "public_paths": [
+        "audio.voices.get_sample_audio"
+      ],
+      "representation": "native-byte-stream",
+      "source_identity": "operationId:get_voice_sample_audio_v1_audio_voices__voice_id__sample_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/batch/jobs",
+      "operation_id": "jobs_api_routes_batch_get_batch_jobs",
+      "outcome": "published",
+      "public_paths": [
+        "batch.jobs_api_routes_batch_get_batch_jobs"
+      ],
+      "representation": null,
+      "source_identity": "operationId:jobs_api_routes_batch_get_batch_jobs"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/batch/jobs",
+      "operation_id": "jobs_api_routes_batch_create_batch_job",
+      "outcome": "published",
+      "public_paths": [
+        "batch.jobs_api_routes_batch_create_batch_job"
+      ],
+      "representation": null,
+      "source_identity": "operationId:jobs_api_routes_batch_create_batch_job"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/batch/jobs/{job_id}",
+      "operation_id": "jobs_api_routes_batch_delete_batch_job",
+      "outcome": "published",
+      "public_paths": [
+        "batch.jobs_api_routes_batch_delete_batch_job"
+      ],
+      "representation": null,
+      "source_identity": "operationId:jobs_api_routes_batch_delete_batch_job"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/batch/jobs/{job_id}",
+      "operation_id": "jobs_api_routes_batch_get_batch_job",
+      "outcome": "published",
+      "public_paths": [
+        "batch.jobs_api_routes_batch_get_batch_job"
+      ],
+      "representation": null,
+      "source_identity": "operationId:jobs_api_routes_batch_get_batch_job"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/batch/jobs/{job_id}/cancel",
+      "operation_id": "jobs_api_routes_batch_cancel_batch_job",
+      "outcome": "published",
+      "public_paths": [
+        "batch.jobs_api_routes_batch_cancel_batch_job"
+      ],
+      "representation": null,
+      "source_identity": "operationId:jobs_api_routes_batch_cancel_batch_job"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/chat/classifications",
+      "operation_id": "chat_classifications_v1_chat_classifications_post",
+      "outcome": "published",
+      "public_paths": [
+        "classifiers.chat_classifications_v1_chat_classifications_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:chat_classifications_v1_chat_classifications_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/chat/completions",
+      "operation_id": "chat_completion_v1_chat_completions_post",
+      "outcome": "published",
+      "public_paths": [
+        "chat.complete",
+        "chat.complete_stream"
+      ],
+      "representation": "conditional-json-sse",
+      "source_identity": "operationId:chat_completion_v1_chat_completions_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/chat/moderations",
+      "operation_id": "chat_moderations_v1_chat_moderations_post",
+      "outcome": "published",
+      "public_paths": [
+        "classifiers.chat_moderations_v1_chat_moderations_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:chat_moderations_v1_chat_moderations_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/classifications",
+      "operation_id": "classifications_v1_classifications_post",
+      "outcome": "published",
+      "public_paths": [
+        "classifiers.classifications_v1_classifications_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:classifications_v1_classifications_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/connectors",
+      "operation_id": "connector_list_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.connectors.connector_list_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:connector_list_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/connectors",
+      "operation_id": "connector_create_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.connectors.connector_create_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:connector_create_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/connectors/{connector_id_or_name}#idOrName",
+      "operation_id": "connector_get_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.connectors.connector_get_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:connector_get_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/connectors/{connector_id_or_name}/auth_url",
+      "operation_id": "connector_get_auth_url_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.connectors.connector_get_auth_url_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:connector_get_auth_url_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/connectors/{connector_id_or_name}/authentication_methods",
+      "operation_id": "connector_get_authentication_methods_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.connectors.connector_get_authentication_methods_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:connector_get_authentication_methods_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/connectors/{connector_id_or_name}/organization/credentials",
+      "operation_id": "connector_list_organization_credentials_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.connectors.connector_list_organization_credentials_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:connector_list_organization_credentials_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/connectors/{connector_id_or_name}/organization/credentials",
+      "operation_id": "connector_create_or_update_organization_credentials_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.connectors.connector_create_or_update_organization_credentials_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:connector_create_or_update_organization_credentials_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/connectors/{connector_id_or_name}/organization/credentials/{credentials_name}",
+      "operation_id": "connector_delete_organization_credentials_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.connectors.connector_delete_organization_credentials_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:connector_delete_organization_credentials_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/connectors/{connector_id_or_name}/tools",
+      "operation_id": "connector_list_tools_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.connectors.connector_list_tools_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:connector_list_tools_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/connectors/{connector_id_or_name}/tools/{tool_name}/call",
+      "operation_id": "connector_call_tool_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.connectors.connector_call_tool_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:connector_call_tool_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/connectors/{connector_id_or_name}/user/credentials",
+      "operation_id": "connector_delete_all_user_credentials_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.connectors.connector_delete_all_user_credentials_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:connector_delete_all_user_credentials_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/connectors/{connector_id_or_name}/user/credentials",
+      "operation_id": "connector_list_user_credentials_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.connectors.connector_list_user_credentials_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:connector_list_user_credentials_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/connectors/{connector_id_or_name}/user/credentials",
+      "operation_id": "connector_create_or_update_user_credentials_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.connectors.connector_create_or_update_user_credentials_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:connector_create_or_update_user_credentials_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/connectors/{connector_id_or_name}/user/credentials/{credentials_name}",
+      "operation_id": "connector_delete_user_credentials_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.connectors.connector_delete_user_credentials_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:connector_delete_user_credentials_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/connectors/{connector_id_or_name}/workspace/credentials",
+      "operation_id": "connector_list_workspace_credentials_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.connectors.connector_list_workspace_credentials_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:connector_list_workspace_credentials_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/connectors/{connector_id_or_name}/workspace/credentials",
+      "operation_id": "connector_create_or_update_workspace_credentials_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.connectors.connector_create_or_update_workspace_credentials_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:connector_create_or_update_workspace_credentials_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/connectors/{connector_id_or_name}/workspace/credentials/{credentials_name}",
+      "operation_id": "connector_delete_workspace_credentials_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.connectors.connector_delete_workspace_credentials_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:connector_delete_workspace_credentials_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/connectors/{connector_id}#id",
+      "operation_id": "connector_delete_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.connectors.connector_delete_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:connector_delete_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PATCH",
+      "http_path": "/v1/connectors/{connector_id}#id",
+      "operation_id": "connector_update_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.connectors.connector_update_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:connector_update_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/connectors/{connector_id}/share",
+      "operation_id": "connector_unshare_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.connectors.connector_unshare_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:connector_unshare_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PUT",
+      "http_path": "/v1/connectors/{connector_id}/share",
+      "operation_id": "connector_share_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.connectors.connector_share_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:connector_share_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/connectors/{connector_id}/{consumer_scope}/activate",
+      "operation_id": "connector_activate_for_consumer_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.connectors.connector_activate_for_consumer_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:connector_activate_for_consumer_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/connectors/{connector_id}/{consumer_scope}/deactivate",
+      "operation_id": "connector_deactivate_for_consumer_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.connectors.connector_deactivate_for_consumer_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:connector_deactivate_for_consumer_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/conversations",
+      "operation_id": "agents_api_v1_conversations_list",
+      "outcome": "published",
+      "public_paths": [
+        "beta.conversations.agents_api_v1_conversations_list"
+      ],
+      "representation": null,
+      "source_identity": "operationId:agents_api_v1_conversations_list"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/conversations",
+      "operation_id": "agents_api_v1_conversations_start",
+      "outcome": "published",
+      "public_paths": [
+        "beta.conversations.agents_api_v1_conversations_start"
+      ],
+      "representation": null,
+      "source_identity": "operationId:agents_api_v1_conversations_start"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/conversations#stream",
+      "operation_id": "agents_api_v1_conversations_start_stream",
+      "outcome": "published",
+      "public_paths": [
+        "beta.conversations.agents_api_v1_conversations_start_stream"
+      ],
+      "representation": null,
+      "source_identity": "operationId:agents_api_v1_conversations_start_stream"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/conversations/{conversation_id}",
+      "operation_id": "agents_api_v1_conversations_delete",
+      "outcome": "published",
+      "public_paths": [
+        "beta.conversations.agents_api_v1_conversations_delete"
+      ],
+      "representation": null,
+      "source_identity": "operationId:agents_api_v1_conversations_delete"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/conversations/{conversation_id}",
+      "operation_id": "agents_api_v1_conversations_get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.conversations.agents_api_v1_conversations_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:agents_api_v1_conversations_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/conversations/{conversation_id}",
+      "operation_id": "agents_api_v1_conversations_append",
+      "outcome": "published",
+      "public_paths": [
+        "beta.conversations.agents_api_v1_conversations_append"
+      ],
+      "representation": null,
+      "source_identity": "operationId:agents_api_v1_conversations_append"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/conversations/{conversation_id}#stream",
+      "operation_id": "agents_api_v1_conversations_append_stream",
+      "outcome": "published",
+      "public_paths": [
+        "beta.conversations.agents_api_v1_conversations_append_stream"
+      ],
+      "representation": null,
+      "source_identity": "operationId:agents_api_v1_conversations_append_stream"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/conversations/{conversation_id}/history",
+      "operation_id": "agents_api_v1_conversations_history",
+      "outcome": "published",
+      "public_paths": [
+        "beta.conversations.agents_api_v1_conversations_history"
+      ],
+      "representation": null,
+      "source_identity": "operationId:agents_api_v1_conversations_history"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/conversations/{conversation_id}/messages",
+      "operation_id": "agents_api_v1_conversations_messages",
+      "outcome": "published",
+      "public_paths": [
+        "beta.conversations.agents_api_v1_conversations_messages"
+      ],
+      "representation": null,
+      "source_identity": "operationId:agents_api_v1_conversations_messages"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/conversations/{conversation_id}/restart",
+      "operation_id": "agents_api_v1_conversations_restart",
+      "outcome": "published",
+      "public_paths": [
+        "beta.conversations.agents_api_v1_conversations_restart"
+      ],
+      "representation": null,
+      "source_identity": "operationId:agents_api_v1_conversations_restart"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/conversations/{conversation_id}/restart#stream",
+      "operation_id": "agents_api_v1_conversations_restart_stream",
+      "outcome": "published",
+      "public_paths": [
+        "beta.conversations.agents_api_v1_conversations_restart_stream"
+      ],
+      "representation": null,
+      "source_identity": "operationId:agents_api_v1_conversations_restart_stream"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/embeddings",
+      "operation_id": "embeddings_v1_embeddings_post",
+      "outcome": "published",
+      "public_paths": [
+        "embeddings.create"
+      ],
+      "representation": null,
+      "source_identity": "operationId:embeddings_v1_embeddings_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/files",
+      "operation_id": "files_api_routes_list_files",
+      "outcome": "published",
+      "public_paths": [
+        "files.list"
+      ],
+      "representation": null,
+      "source_identity": "operationId:files_api_routes_list_files"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/files",
+      "operation_id": "files_api_routes_upload_file",
+      "outcome": "published",
+      "public_paths": [
+        "files.upload"
+      ],
+      "representation": null,
+      "source_identity": "operationId:files_api_routes_upload_file"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/files/{file_id}",
+      "operation_id": "files_api_routes_delete_file",
+      "outcome": "published",
+      "public_paths": [
+        "files.delete"
+      ],
+      "representation": null,
+      "source_identity": "operationId:files_api_routes_delete_file"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/files/{file_id}",
+      "operation_id": "files_api_routes_retrieve_file",
+      "outcome": "published",
+      "public_paths": [
+        "files.retrieve"
+      ],
+      "representation": null,
+      "source_identity": "operationId:files_api_routes_retrieve_file"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/files/{file_id}/content",
+      "operation_id": "files_api_routes_download_file",
+      "outcome": "published",
+      "public_paths": [
+        "files.download"
+      ],
+      "representation": "native-byte-stream",
+      "source_identity": "operationId:files_api_routes_download_file"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/files/{file_id}/url",
+      "operation_id": "files_api_routes_get_signed_url",
+      "outcome": "published",
+      "public_paths": [
+        "files.get_signed_url"
+      ],
+      "representation": null,
+      "source_identity": "operationId:files_api_routes_get_signed_url"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/fim/completions",
+      "operation_id": "fim_completion_v1_fim_completions_post",
+      "outcome": "published",
+      "public_paths": [
+        "fim.complete",
+        "fim.complete_stream"
+      ],
+      "representation": "conditional-json-sse",
+      "source_identity": "operationId:fim_completion_v1_fim_completions_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PATCH",
+      "http_path": "/v1/fine_tuning/models/{model_id}",
+      "operation_id": "jobs_api_routes_fine_tuning_update_fine_tuned_model",
+      "outcome": "published",
+      "public_paths": [
+        "models.jobs_api_routes_fine_tuning_update_fine_tuned_model"
+      ],
+      "representation": null,
+      "source_identity": "operationId:jobs_api_routes_fine_tuning_update_fine_tuned_model"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/fine_tuning/models/{model_id}/archive",
+      "operation_id": "jobs_api_routes_fine_tuning_unarchive_fine_tuned_model",
+      "outcome": "published",
+      "public_paths": [
+        "models.jobs_api_routes_fine_tuning_unarchive_fine_tuned_model"
+      ],
+      "representation": null,
+      "source_identity": "operationId:jobs_api_routes_fine_tuning_unarchive_fine_tuned_model"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/fine_tuning/models/{model_id}/archive",
+      "operation_id": "jobs_api_routes_fine_tuning_archive_fine_tuned_model",
+      "outcome": "published",
+      "public_paths": [
+        "models.jobs_api_routes_fine_tuning_archive_fine_tuned_model"
+      ],
+      "representation": null,
+      "source_identity": "operationId:jobs_api_routes_fine_tuning_archive_fine_tuned_model"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/libraries",
+      "operation_id": "libraries_list_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.libraries.libraries_list_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:libraries_list_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/libraries",
+      "operation_id": "libraries_create_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.libraries.libraries_create_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:libraries_create_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/libraries/{library_id}",
+      "operation_id": "libraries_delete_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.libraries.libraries_delete_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:libraries_delete_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/libraries/{library_id}",
+      "operation_id": "libraries_get_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.libraries.libraries_get_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:libraries_get_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PATCH",
+      "http_path": "/v1/libraries/{library_id}",
+      "operation_id": "libraries_patch_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.libraries.libraries_patch_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:libraries_patch_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PUT",
+      "http_path": "/v1/libraries/{library_id}",
+      "operation_id": "libraries_update_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.libraries.libraries_update_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:libraries_update_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/libraries/{library_id}/documents",
+      "operation_id": "libraries_documents_list_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.libraries.documents.libraries_documents_list_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:libraries_documents_list_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/libraries/{library_id}/documents",
+      "operation_id": "libraries_documents_upload_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.libraries.documents.libraries_documents_upload_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:libraries_documents_upload_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/libraries/{library_id}/documents/{document_id}",
+      "operation_id": "libraries_documents_delete_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.libraries.documents.libraries_documents_delete_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:libraries_documents_delete_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/libraries/{library_id}/documents/{document_id}",
+      "operation_id": "libraries_documents_get_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.libraries.documents.libraries_documents_get_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:libraries_documents_get_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PATCH",
+      "http_path": "/v1/libraries/{library_id}/documents/{document_id}",
+      "operation_id": "libraries_documents_patch_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.libraries.documents.libraries_documents_patch_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:libraries_documents_patch_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PUT",
+      "http_path": "/v1/libraries/{library_id}/documents/{document_id}",
+      "operation_id": "libraries_documents_update_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.libraries.documents.libraries_documents_update_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:libraries_documents_update_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/libraries/{library_id}/documents/{document_id}/extracted-text-signed-url",
+      "operation_id": "libraries_documents_get_extracted_text_signed_url_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.libraries.documents.libraries_documents_get_extracted_text_signed_url_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:libraries_documents_get_extracted_text_signed_url_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/libraries/{library_id}/documents/{document_id}/reprocess",
+      "operation_id": "libraries_documents_reprocess_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.libraries.documents.libraries_documents_reprocess_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:libraries_documents_reprocess_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/libraries/{library_id}/documents/{document_id}/signed-url",
+      "operation_id": "libraries_documents_get_signed_url_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.libraries.documents.libraries_documents_get_signed_url_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:libraries_documents_get_signed_url_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/libraries/{library_id}/documents/{document_id}/status",
+      "operation_id": "libraries_documents_get_status_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.libraries.documents.libraries_documents_get_status_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:libraries_documents_get_status_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/libraries/{library_id}/documents/{document_id}/text_content",
+      "operation_id": "libraries_documents_get_text_content_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.libraries.documents.libraries_documents_get_text_content_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:libraries_documents_get_text_content_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/libraries/{library_id}/share",
+      "operation_id": "libraries_share_delete_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.libraries.accesses.libraries_share_delete_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:libraries_share_delete_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/libraries/{library_id}/share",
+      "operation_id": "libraries_share_list_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.libraries.accesses.libraries_share_list_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:libraries_share_list_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PUT",
+      "http_path": "/v1/libraries/{library_id}/share",
+      "operation_id": "libraries_share_create_v1",
+      "outcome": "published",
+      "public_paths": [
+        "beta.libraries.accesses.libraries_share_create_v1"
+      ],
+      "representation": null,
+      "source_identity": "operationId:libraries_share_create_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/models",
+      "operation_id": "list_models_v1_models_get",
+      "outcome": "published",
+      "public_paths": [
+        "models.list_models_v1_models_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:list_models_v1_models_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/models/{model_id}",
+      "operation_id": "delete_model_v1_models__model_id__delete",
+      "outcome": "published",
+      "public_paths": [
+        "models.delete_model_v1_models__model_id__delete"
+      ],
+      "representation": null,
+      "source_identity": "operationId:delete_model_v1_models__model_id__delete"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/models/{model_id}",
+      "operation_id": "retrieve_model_v1_models__model_id__get",
+      "outcome": "published",
+      "public_paths": [
+        "models.retrieve_model_v1_models__model_id__get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:retrieve_model_v1_models__model_id__get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/moderations",
+      "operation_id": "moderations_v1_moderations_post",
+      "outcome": "published",
+      "public_paths": [
+        "classifiers.moderations_v1_moderations_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:moderations_v1_moderations_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/observability/campaigns",
+      "operation_id": "get_campaigns_v1_observability_campaigns_get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.campaigns.get_campaigns_v1_observability_campaigns_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_campaigns_v1_observability_campaigns_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/observability/campaigns",
+      "operation_id": "create_campaign_v1_observability_campaigns_post",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.campaigns.create_campaign_v1_observability_campaigns_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:create_campaign_v1_observability_campaigns_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/observability/campaigns/{campaign_id}",
+      "operation_id": "delete_campaign_v1_observability_campaigns__campaign_id__delete",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.campaigns.delete_campaign_v1_observability_campaigns__campaign_id__delete"
+      ],
+      "representation": null,
+      "source_identity": "operationId:delete_campaign_v1_observability_campaigns__campaign_id__delete"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/observability/campaigns/{campaign_id}",
+      "operation_id": "get_campaign_by_id_v1_observability_campaigns__campaign_id__get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.campaigns.get_campaign_by_id_v1_observability_campaigns__campaign_id__get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_campaign_by_id_v1_observability_campaigns__campaign_id__get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/observability/campaigns/{campaign_id}/selected-events",
+      "operation_id": "get_campaign_selected_events_v1_observability_campaigns__campaign_id__selected_events_get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.campaigns.get_campaign_selected_events_v1_observability_campaigns__campaign_id__selected_events_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_campaign_selected_events_v1_observability_campaigns__campaign_id__selected_events_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/observability/campaigns/{campaign_id}/status",
+      "operation_id": "get_campaign_status_by_id_v1_observability_campaigns__campaign_id__status_get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.campaigns.get_campaign_status_by_id_v1_observability_campaigns__campaign_id__status_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_campaign_status_by_id_v1_observability_campaigns__campaign_id__status_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/observability/chat-completion-events/search",
+      "operation_id": "get_chat_completion_events_v1_observability_chat_completion_events_search_post",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.chat_completion_events.get_chat_completion_events_v1_observability_chat_completion_events_search_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_chat_completion_events_v1_observability_chat_completion_events_search_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/observability/chat-completion-events/search-ids",
+      "operation_id": "get_chat_completion_event_ids_v1_observability_chat_completion_events_search_ids_post",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.chat_completion_events.get_chat_completion_event_ids_v1_observability_chat_completion_events_search_ids_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_chat_completion_event_ids_v1_observability_chat_completion_events_search_ids_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/observability/chat-completion-events/{event_id}",
+      "operation_id": "get_chat_completion_event_v1_observability_chat_completion_events__event_id__get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.chat_completion_events.get_chat_completion_event_v1_observability_chat_completion_events__event_id__get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_chat_completion_event_v1_observability_chat_completion_events__event_id__get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/observability/chat-completion-events/{event_id}/live-judging",
+      "operation_id": "judge_chat_completion_event_v1_observability_chat_completion_events__event_id__live_judging_post",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.chat_completion_events.judge_chat_completion_event_v1_observability_chat_completion_events__event_id__live_judging_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:judge_chat_completion_event_v1_observability_chat_completion_events__event_id__live_judging_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/observability/chat-completion-events/{event_id}/similar-events",
+      "operation_id": "get_similar_chat_completion_events_v1_observability_chat_completion_events__event_id__similar_events_get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.chat_completion_events.get_similar_chat_completion_events_v1_observability_chat_completion_events__event_id__similar_events_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_similar_chat_completion_events_v1_observability_chat_completion_events__event_id__similar_events_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/observability/chat-completion-fields",
+      "operation_id": "get_chat_completion_fields_v1_observability_chat_completion_fields_get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.chat_completion_events.fields.get_chat_completion_fields_v1_observability_chat_completion_fields_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_chat_completion_fields_v1_observability_chat_completion_fields_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/observability/chat-completion-fields/{field_name}/options",
+      "operation_id": "get_chat_completion_field_options_v1_observability_chat_completion_fields__field_name__options_get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.chat_completion_events.fields.get_chat_completion_field_options_v1_observability_chat_completion_fields__field_name__options_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_chat_completion_field_options_v1_observability_chat_completion_fields__field_name__options_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/observability/chat-completion-fields/{field_name}/options-counts",
+      "operation_id": "get_chat_completion_field_options_counts_v1_observability_chat_completion_fields__field_name__options_counts_post",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.chat_completion_events.fields.get_chat_completion_field_options_counts_v1_observability_chat_completion_fields__field_name__options_counts_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_chat_completion_field_options_counts_v1_observability_chat_completion_fields__field_name__options_counts_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/observability/dataset-records/bulk-delete",
+      "operation_id": "delete_dataset_records_v1_observability_dataset_records_bulk_delete_post",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.datasets.records.delete_dataset_records_v1_observability_dataset_records_bulk_delete_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:delete_dataset_records_v1_observability_dataset_records_bulk_delete_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/observability/dataset-records/{dataset_record_id}",
+      "operation_id": "delete_dataset_record_v1_observability_dataset_records__dataset_record_id__delete",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.datasets.records.delete_dataset_record_v1_observability_dataset_records__dataset_record_id__delete"
+      ],
+      "representation": null,
+      "source_identity": "operationId:delete_dataset_record_v1_observability_dataset_records__dataset_record_id__delete"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/observability/dataset-records/{dataset_record_id}",
+      "operation_id": "get_dataset_record_v1_observability_dataset_records__dataset_record_id__get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.datasets.records.get_dataset_record_v1_observability_dataset_records__dataset_record_id__get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_dataset_record_v1_observability_dataset_records__dataset_record_id__get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/observability/dataset-records/{dataset_record_id}/live-judging",
+      "operation_id": "judge_dataset_record_v1_observability_dataset_records__dataset_record_id__live_judging_post",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.datasets.records.judge_dataset_record_v1_observability_dataset_records__dataset_record_id__live_judging_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:judge_dataset_record_v1_observability_dataset_records__dataset_record_id__live_judging_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PUT",
+      "http_path": "/v1/observability/dataset-records/{dataset_record_id}/payload",
+      "operation_id": "update_dataset_record_payload_v1_observability_dataset_records__dataset_record_id__payload_put",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.datasets.records.update_dataset_record_payload_v1_observability_dataset_records__dataset_record_id__payload_put"
+      ],
+      "representation": null,
+      "source_identity": "operationId:update_dataset_record_payload_v1_observability_dataset_records__dataset_record_id__payload_put"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PUT",
+      "http_path": "/v1/observability/dataset-records/{dataset_record_id}/properties",
+      "operation_id": "update_dataset_record_properties_v1_observability_dataset_records__dataset_record_id__properties_put",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.datasets.records.update_dataset_record_properties_v1_observability_dataset_records__dataset_record_id__properties_put"
+      ],
+      "representation": null,
+      "source_identity": "operationId:update_dataset_record_properties_v1_observability_dataset_records__dataset_record_id__properties_put"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/observability/datasets",
+      "operation_id": "get_datasets_v1_observability_datasets_get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.datasets.get_datasets_v1_observability_datasets_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_datasets_v1_observability_datasets_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/observability/datasets",
+      "operation_id": "create_dataset_v1_observability_datasets_post",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.datasets.create_dataset_v1_observability_datasets_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:create_dataset_v1_observability_datasets_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/observability/datasets/{dataset_id}",
+      "operation_id": "delete_dataset_v1_observability_datasets__dataset_id__delete",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.datasets.delete_dataset_v1_observability_datasets__dataset_id__delete"
+      ],
+      "representation": null,
+      "source_identity": "operationId:delete_dataset_v1_observability_datasets__dataset_id__delete"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/observability/datasets/{dataset_id}",
+      "operation_id": "get_dataset_by_id_v1_observability_datasets__dataset_id__get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.datasets.get_dataset_by_id_v1_observability_datasets__dataset_id__get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_dataset_by_id_v1_observability_datasets__dataset_id__get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PATCH",
+      "http_path": "/v1/observability/datasets/{dataset_id}",
+      "operation_id": "update_dataset_v1_observability_datasets__dataset_id__patch",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.datasets.update_dataset_v1_observability_datasets__dataset_id__patch"
+      ],
+      "representation": null,
+      "source_identity": "operationId:update_dataset_v1_observability_datasets__dataset_id__patch"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/observability/datasets/{dataset_id}/exports/to-jsonl",
+      "operation_id": "export_dataset_to_jsonl_v1_observability_datasets__dataset_id__exports_to_jsonl_get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.datasets.export_dataset_to_jsonl_v1_observability_datasets__dataset_id__exports_to_jsonl_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:export_dataset_to_jsonl_v1_observability_datasets__dataset_id__exports_to_jsonl_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/observability/datasets/{dataset_id}/imports/from-campaign",
+      "operation_id": "post_dataset_records_from_campaign_v1_observability_datasets__dataset_id__imports_from_campaign_post",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.datasets.post_dataset_records_from_campaign_v1_observability_datasets__dataset_id__imports_from_campaign_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:post_dataset_records_from_campaign_v1_observability_datasets__dataset_id__imports_from_campaign_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/observability/datasets/{dataset_id}/imports/from-dataset",
+      "operation_id": "post_dataset_records_from_dataset_v1_observability_datasets__dataset_id__imports_from_dataset_post",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.datasets.post_dataset_records_from_dataset_v1_observability_datasets__dataset_id__imports_from_dataset_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:post_dataset_records_from_dataset_v1_observability_datasets__dataset_id__imports_from_dataset_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/observability/datasets/{dataset_id}/imports/from-explorer",
+      "operation_id": "post_dataset_records_from_explorer_v1_observability_datasets__dataset_id__imports_from_explorer_post",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.datasets.post_dataset_records_from_explorer_v1_observability_datasets__dataset_id__imports_from_explorer_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:post_dataset_records_from_explorer_v1_observability_datasets__dataset_id__imports_from_explorer_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/observability/datasets/{dataset_id}/imports/from-file",
+      "operation_id": "post_dataset_records_from_file_v1_observability_datasets__dataset_id__imports_from_file_post",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.datasets.post_dataset_records_from_file_v1_observability_datasets__dataset_id__imports_from_file_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:post_dataset_records_from_file_v1_observability_datasets__dataset_id__imports_from_file_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/observability/datasets/{dataset_id}/imports/from-playground",
+      "operation_id": "post_dataset_records_from_playground_v1_observability_datasets__dataset_id__imports_from_playground_post",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.datasets.post_dataset_records_from_playground_v1_observability_datasets__dataset_id__imports_from_playground_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:post_dataset_records_from_playground_v1_observability_datasets__dataset_id__imports_from_playground_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/observability/datasets/{dataset_id}/records",
+      "operation_id": "get_dataset_records_v1_observability_datasets__dataset_id__records_get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.datasets.get_dataset_records_v1_observability_datasets__dataset_id__records_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_dataset_records_v1_observability_datasets__dataset_id__records_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/observability/datasets/{dataset_id}/records",
+      "operation_id": "create_dataset_record_v1_observability_datasets__dataset_id__records_post",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.datasets.create_dataset_record_v1_observability_datasets__dataset_id__records_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:create_dataset_record_v1_observability_datasets__dataset_id__records_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/observability/datasets/{dataset_id}/tasks",
+      "operation_id": "get_dataset_import_tasks_v1_observability_datasets__dataset_id__tasks_get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.datasets.get_dataset_import_tasks_v1_observability_datasets__dataset_id__tasks_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_dataset_import_tasks_v1_observability_datasets__dataset_id__tasks_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/observability/datasets/{dataset_id}/tasks/{task_id}",
+      "operation_id": "get_dataset_import_task_v1_observability_datasets__dataset_id__tasks__task_id__get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.datasets.get_dataset_import_task_v1_observability_datasets__dataset_id__tasks__task_id__get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_dataset_import_task_v1_observability_datasets__dataset_id__tasks__task_id__get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/observability/judges",
+      "operation_id": "get_judges_v1_observability_judges_get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.judges.get_judges_v1_observability_judges_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_judges_v1_observability_judges_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/observability/judges",
+      "operation_id": "create_judge_v1_observability_judges_post",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.judges.create_judge_v1_observability_judges_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:create_judge_v1_observability_judges_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/observability/judges/{judge_id}",
+      "operation_id": "delete_judge_v1_observability_judges__judge_id__delete",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.judges.delete_judge_v1_observability_judges__judge_id__delete"
+      ],
+      "representation": null,
+      "source_identity": "operationId:delete_judge_v1_observability_judges__judge_id__delete"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/observability/judges/{judge_id}",
+      "operation_id": "get_judge_by_id_v1_observability_judges__judge_id__get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.judges.get_judge_by_id_v1_observability_judges__judge_id__get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_judge_by_id_v1_observability_judges__judge_id__get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PUT",
+      "http_path": "/v1/observability/judges/{judge_id}",
+      "operation_id": "update_judge_v1_observability_judges__judge_id__put",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.judges.update_judge_v1_observability_judges__judge_id__put"
+      ],
+      "representation": null,
+      "source_identity": "operationId:update_judge_v1_observability_judges__judge_id__put"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/observability/judges/{judge_id}/live-judging",
+      "operation_id": "judge_conversation_v1_observability_judges__judge_id__live_judging_post",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.judges.judge_conversation_v1_observability_judges__judge_id__live_judging_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:judge_conversation_v1_observability_judges__judge_id__live_judging_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/observability/logs/fields",
+      "operation_id": "get_log_fields_v1_observability_logs_fields_get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.logs.get_log_fields_v1_observability_logs_fields_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_log_fields_v1_observability_logs_fields_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/observability/logs/fields/{field_name}/options",
+      "operation_id": "get_log_field_options_v1_observability_logs_fields__field_name__options_get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.logs.get_log_field_options_v1_observability_logs_fields__field_name__options_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_log_field_options_v1_observability_logs_fields__field_name__options_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/observability/logs/search",
+      "operation_id": "search_logs_v1_observability_logs_search_post",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.logs.search_logs_v1_observability_logs_search_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:search_logs_v1_observability_logs_search_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/observability/spans/aggregate",
+      "operation_id": "aggregate_spans_v1_observability_spans_aggregate_post",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.spans.aggregate_spans_v1_observability_spans_aggregate_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:aggregate_spans_v1_observability_spans_aggregate_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/observability/spans/evaluations/fields",
+      "operation_id": "get_span_evaluation_fields_v1_observability_spans_evaluations_fields_get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.spans.get_span_evaluation_fields_v1_observability_spans_evaluations_fields_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_span_evaluation_fields_v1_observability_spans_evaluations_fields_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/observability/spans/evaluations/fields/{field_name}/options",
+      "operation_id": "get_span_evaluation_field_options_v1_observability_spans_evaluations_fields__field_name__options_get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.spans.get_span_evaluation_field_options_v1_observability_spans_evaluations_fields__field_name__options_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_span_evaluation_field_options_v1_observability_spans_evaluations_fields__field_name__options_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/observability/spans/evaluations/search",
+      "operation_id": "search_span_evaluations_v1_observability_spans_evaluations_search_post",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.spans.search_span_evaluations_v1_observability_spans_evaluations_search_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:search_span_evaluations_v1_observability_spans_evaluations_search_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/observability/spans/evaluations/search/latest",
+      "operation_id": "search_latest_span_evaluations_v1_observability_spans_evaluations_search_latest_post",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.spans.search_latest_span_evaluations_v1_observability_spans_evaluations_search_latest_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:search_latest_span_evaluations_v1_observability_spans_evaluations_search_latest_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/observability/spans/fields",
+      "operation_id": "get_span_fields_v1_observability_spans_fields_get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.spans.get_span_fields_v1_observability_spans_fields_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_span_fields_v1_observability_spans_fields_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/observability/spans/fields/{field_name}/options",
+      "operation_id": "get_span_field_options_v1_observability_spans_fields__field_name__options_get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.spans.get_span_field_options_v1_observability_spans_fields__field_name__options_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_span_field_options_v1_observability_spans_fields__field_name__options_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/observability/spans/search",
+      "operation_id": "search_spans_v1_observability_spans_search_post",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.spans.search_spans_v1_observability_spans_search_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:search_spans_v1_observability_spans_search_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/observability/traces/aggregate",
+      "operation_id": "aggregate_traces_v1_observability_traces_aggregate_post",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.traces.aggregate_traces_v1_observability_traces_aggregate_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:aggregate_traces_v1_observability_traces_aggregate_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/observability/traces/fields",
+      "operation_id": "get_trace_fields_v1_observability_traces_fields_get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.traces.get_trace_fields_v1_observability_traces_fields_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_trace_fields_v1_observability_traces_fields_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/observability/traces/fields/{field_name}/options",
+      "operation_id": "get_trace_field_options_v1_observability_traces_fields__field_name__options_get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.traces.get_trace_field_options_v1_observability_traces_fields__field_name__options_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_trace_field_options_v1_observability_traces_fields__field_name__options_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/observability/traces/search",
+      "operation_id": "search_traces_v1_observability_traces_search_post",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.traces.search_traces_v1_observability_traces_search_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:search_traces_v1_observability_traces_search_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/observability/traces/{trace_id}",
+      "operation_id": "get_trace_by_id_v1_observability_traces__trace_id__get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.traces.get_trace_by_id_v1_observability_traces__trace_id__get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_trace_by_id_v1_observability_traces__trace_id__get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/observability/traces/{trace_id}/spans",
+      "operation_id": "get_trace_spans_v1_observability_traces__trace_id__spans_get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.traces.get_trace_spans_v1_observability_traces__trace_id__spans_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_trace_spans_v1_observability_traces__trace_id__spans_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/observability/traces/{trace_id}/spans/{span_id}",
+      "operation_id": "get_span_by_id_v1_observability_traces__trace_id__spans__span_id__get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.traces.get_span_by_id_v1_observability_traces__trace_id__spans__span_id__get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_span_by_id_v1_observability_traces__trace_id__spans__span_id__get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/ocr",
+      "operation_id": "ocr_v1_ocr_post",
+      "outcome": "published",
+      "public_paths": [
+        "ocr.process"
+      ],
+      "representation": null,
+      "source_identity": "operationId:ocr_v1_ocr_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/rag/deployments",
+      "operation_id": "get_deployment_summaries_v1_rag_deployments_get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.rag.search_indexes.get_deployment_summaries_v1_rag_deployments_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_deployment_summaries_v1_rag_deployments_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PUT",
+      "http_path": "/v1/rag/deployments",
+      "operation_id": "register_deployment_v1_rag_deployments_put",
+      "outcome": "published",
+      "public_paths": [
+        "beta.rag.search_indexes.register_deployment_v1_rag_deployments_put"
+      ],
+      "representation": null,
+      "source_identity": "operationId:register_deployment_v1_rag_deployments_put"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/rag/deployments/{deployment_id}",
+      "operation_id": "unregister_deployment_v1_rag_deployments__deployment_id__delete",
+      "outcome": "published",
+      "public_paths": [
+        "beta.rag.search_indexes.unregister_deployment_v1_rag_deployments__deployment_id__delete"
+      ],
+      "representation": null,
+      "source_identity": "operationId:unregister_deployment_v1_rag_deployments__deployment_id__delete"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PUT",
+      "http_path": "/v1/rag/deployments/{deployment_id}/metrics",
+      "operation_id": "update_index_metrics_v1_rag_deployments__deployment_id__metrics_put",
+      "outcome": "published",
+      "public_paths": [
+        "beta.rag.search_indexes.update_index_metrics_v1_rag_deployments__deployment_id__metrics_put"
+      ],
+      "representation": null,
+      "source_identity": "operationId:update_index_metrics_v1_rag_deployments__deployment_id__metrics_put"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/rag/ingestion_pipeline_configurations",
+      "operation_id": "get_configs_v1_rag_ingestion_pipeline_configurations_get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.rag.ingestion_pipeline_configurations.get_configs_v1_rag_ingestion_pipeline_configurations_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_configs_v1_rag_ingestion_pipeline_configurations_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PUT",
+      "http_path": "/v1/rag/ingestion_pipeline_configurations",
+      "operation_id": "register_config_v1_rag_ingestion_pipeline_configurations_put",
+      "outcome": "published",
+      "public_paths": [
+        "beta.rag.ingestion_pipeline_configurations.register_config_v1_rag_ingestion_pipeline_configurations_put"
+      ],
+      "representation": null,
+      "source_identity": "operationId:register_config_v1_rag_ingestion_pipeline_configurations_put"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PUT",
+      "http_path": "/v1/rag/ingestion_pipeline_configurations/{id}/run_info",
+      "operation_id": "update_run_info_v1_rag_ingestion_pipeline_configurations__id__run_info_put",
+      "outcome": "published",
+      "public_paths": [
+        "beta.rag.ingestion_pipeline_configurations.update_run_info_v1_rag_ingestion_pipeline_configurations__id__run_info_put"
+      ],
+      "representation": null,
+      "source_identity": "operationId:update_run_info_v1_rag_ingestion_pipeline_configurations__id__run_info_put"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/users/me",
+      "operation_id": "users_api_get_identity",
+      "outcome": "published",
+      "public_paths": [
+        "beta.users.users_api_get_identity"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_get_identity"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/users/me/organizations",
+      "operation_id": "users_api_list_organizations",
+      "outcome": "published",
+      "public_paths": [
+        "beta.users.users_api_list_organizations"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_list_organizations"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/users/me/workspaces",
+      "operation_id": "users_api_list_workspaces",
+      "outcome": "published",
+      "public_paths": [
+        "beta.users.users_api_list_workspaces"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_list_workspaces"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/workflows",
+      "operation_id": "get_workflows_v1_workflows_get",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.get_workflows_v1_workflows_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_workflows_v1_workflows_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PUT",
+      "http_path": "/v1/workflows/archive",
+      "operation_id": "bulk_archive_workflows_v1_workflows_archive_put",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.bulk_archive_workflows_v1_workflows_archive_put"
+      ],
+      "representation": null,
+      "source_identity": "operationId:bulk_archive_workflows_v1_workflows_archive_put"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/workflows/deployments",
+      "operation_id": "list_deployments_v1_workflows_deployments_get",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.deployments.list_deployments_v1_workflows_deployments_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:list_deployments_v1_workflows_deployments_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/workflows/deployments",
+      "operation_id": "create_deployment_v1_workflows_deployments_post",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.deployments.create_deployment_v1_workflows_deployments_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:create_deployment_v1_workflows_deployments_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/workflows/deployments/{name}",
+      "operation_id": "delete_deployment_v1_workflows_deployments__name__delete",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.deployments.delete_deployment_v1_workflows_deployments__name__delete"
+      ],
+      "representation": null,
+      "source_identity": "operationId:delete_deployment_v1_workflows_deployments__name__delete"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/workflows/deployments/{name}",
+      "operation_id": "get_deployment_v1_workflows_deployments__name__get",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.deployments.get_deployment_v1_workflows_deployments__name__get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_deployment_v1_workflows_deployments__name__get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PATCH",
+      "http_path": "/v1/workflows/deployments/{name}",
+      "operation_id": "update_deployment_v1_workflows_deployments__name__patch",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.deployments.update_deployment_v1_workflows_deployments__name__patch"
+      ],
+      "representation": null,
+      "source_identity": "operationId:update_deployment_v1_workflows_deployments__name__patch"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/workflows/deployments/{name}/logs",
+      "operation_id": "get_deployment_logs",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.deployments.get_deployment_logs"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_deployment_logs"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/workflows/deployments/{name}/logs/stream",
+      "operation_id": "stream_deployment_logs",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.deployments.stream_deployment_logs"
+      ],
+      "representation": null,
+      "source_identity": "operationId:stream_deployment_logs"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/workflows/deployments/{name}/restart",
+      "operation_id": "restart_deployment_v1_workflows_deployments__name__restart_post",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.deployments.restart_deployment_v1_workflows_deployments__name__restart_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:restart_deployment_v1_workflows_deployments__name__restart_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/workflows/deployments/{name}/start",
+      "operation_id": "start_deployment_v1_workflows_deployments__name__start_post",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.deployments.start_deployment_v1_workflows_deployments__name__start_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:start_deployment_v1_workflows_deployments__name__start_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/workflows/deployments/{name}/stop",
+      "operation_id": "stop_deployment_v1_workflows_deployments__name__stop_post",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.deployments.stop_deployment_v1_workflows_deployments__name__stop_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:stop_deployment_v1_workflows_deployments__name__stop_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/workflows/deployments/{name}/workers",
+      "operation_id": "list_deployment_workers_v1_workflows_deployments__name__workers_get",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.deployments.list_deployment_workers_v1_workflows_deployments__name__workers_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:list_deployment_workers_v1_workflows_deployments__name__workers_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/workflows/events/list",
+      "operation_id": "get_workflow_events_v1_workflows_events_list_get",
+      "outcome": "published",
+      "public_paths": [
+        "events.get_workflow_events_v1_workflows_events_list_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_workflow_events_v1_workflows_events_list_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/workflows/events/stream",
+      "operation_id": "get_stream_events_v1_workflows_events_stream_get",
+      "outcome": "published",
+      "public_paths": [
+        "events.get_stream_events_v1_workflows_events_stream_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_stream_events_v1_workflows_events_stream_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/workflows/executions/cancel",
+      "operation_id": "batch_cancel_workflow_executions_v1_workflows_executions_cancel_post",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.executions.batch_cancel_workflow_executions_v1_workflows_executions_cancel_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:batch_cancel_workflow_executions_v1_workflows_executions_cancel_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/workflows/executions/terminate",
+      "operation_id": "batch_terminate_workflow_executions_v1_workflows_executions_terminate_post",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.executions.batch_terminate_workflow_executions_v1_workflows_executions_terminate_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:batch_terminate_workflow_executions_v1_workflows_executions_terminate_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/workflows/executions/{execution_id}",
+      "operation_id": "get_workflow_execution_v1_workflows_executions__execution_id__get",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.executions.get_workflow_execution_v1_workflows_executions__execution_id__get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_workflow_execution_v1_workflows_executions__execution_id__get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/workflows/executions/{execution_id}/cancel",
+      "operation_id": "cancel_workflow_execution_v1_workflows_executions__execution_id__cancel_post",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.executions.cancel_workflow_execution_v1_workflows_executions__execution_id__cancel_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:cancel_workflow_execution_v1_workflows_executions__execution_id__cancel_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/workflows/executions/{execution_id}/history",
+      "operation_id": "get_workflow_execution_history_v1_workflows_executions__execution_id__history_get",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.executions.get_workflow_execution_history_v1_workflows_executions__execution_id__history_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_workflow_execution_history_v1_workflows_executions__execution_id__history_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/workflows/executions/{execution_id}/logs",
+      "operation_id": "get_workflow_execution_logs",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.executions.get_workflow_execution_logs"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_workflow_execution_logs"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/workflows/executions/{execution_id}/logs/stream",
+      "operation_id": "stream_workflow_execution_logs",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.executions.stream_workflow_execution_logs"
+      ],
+      "representation": null,
+      "source_identity": "operationId:stream_workflow_execution_logs"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/workflows/executions/{execution_id}/queries",
+      "operation_id": "query_workflow_execution_v1_workflows_executions__execution_id__queries_post",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.executions.query_workflow_execution_v1_workflows_executions__execution_id__queries_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:query_workflow_execution_v1_workflows_executions__execution_id__queries_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/workflows/executions/{execution_id}/reset",
+      "operation_id": "reset_workflow_v1_workflows_executions__execution_id__reset_post",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.executions.reset_workflow_v1_workflows_executions__execution_id__reset_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:reset_workflow_v1_workflows_executions__execution_id__reset_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/workflows/executions/{execution_id}/signals",
+      "operation_id": "signal_workflow_execution_v1_workflows_executions__execution_id__signals_post",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.executions.signal_workflow_execution_v1_workflows_executions__execution_id__signals_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:signal_workflow_execution_v1_workflows_executions__execution_id__signals_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/workflows/executions/{execution_id}/stream",
+      "operation_id": "stream_v1_workflows_executions__execution_id__stream_get",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.executions.stream_v1_workflows_executions__execution_id__stream_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:stream_v1_workflows_executions__execution_id__stream_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/workflows/executions/{execution_id}/terminate",
+      "operation_id": "terminate_workflow_execution_v1_workflows_executions__execution_id__terminate_post",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.executions.terminate_workflow_execution_v1_workflows_executions__execution_id__terminate_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:terminate_workflow_execution_v1_workflows_executions__execution_id__terminate_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/workflows/executions/{execution_id}/trace/events",
+      "operation_id": "get_workflow_execution_trace_events",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.executions.get_workflow_execution_trace_events"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_workflow_execution_trace_events"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/workflows/executions/{execution_id}/trace/info",
+      "operation_id": "get_workflow_execution_trace_info",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.executions.get_workflow_execution_trace_info"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_workflow_execution_trace_info"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/workflows/executions/{execution_id}/trace/otel",
+      "operation_id": "get_workflow_execution_trace_otel",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.executions.get_workflow_execution_trace_otel"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_workflow_execution_trace_otel"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/workflows/executions/{execution_id}/trace/summary",
+      "operation_id": "get_workflow_execution_trace_summary",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.executions.get_workflow_execution_trace_summary"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_workflow_execution_trace_summary"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/workflows/executions/{execution_id}/updates",
+      "operation_id": "update_workflow_execution_v1_workflows_executions__execution_id__updates_post",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.executions.update_workflow_execution_v1_workflows_executions__execution_id__updates_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:update_workflow_execution_v1_workflows_executions__execution_id__updates_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/workflows/registrations",
+      "operation_id": "get_workflow_registrations_v1_workflows_registrations_get",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.get_workflow_registrations_v1_workflows_registrations_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_workflow_registrations_v1_workflows_registrations_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/workflows/registrations/{workflow_registration_id}",
+      "operation_id": "get_workflow_registration_v1_workflows_registrations__workflow_registration_id__get",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.get_workflow_registration_v1_workflows_registrations__workflow_registration_id__get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_workflow_registration_v1_workflows_registrations__workflow_registration_id__get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/workflows/registrations/{workflow_registration_id}/execute",
+      "operation_id": "execute_workflow_registration_v1_workflows_registrations__workflow_registration_id__execute_post",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.execute_workflow_registration_v1_workflows_registrations__workflow_registration_id__execute_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:execute_workflow_registration_v1_workflows_registrations__workflow_registration_id__execute_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/workflows/runs",
+      "operation_id": "list_runs_v1_workflows_runs_get",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.runs.list_runs_v1_workflows_runs_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:list_runs_v1_workflows_runs_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/workflows/runs/{run_id}",
+      "operation_id": "get_run_v1_workflows_runs__run_id__get",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.runs.get_run_v1_workflows_runs__run_id__get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_run_v1_workflows_runs__run_id__get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/workflows/runs/{run_id}/history",
+      "operation_id": "get_run_history_v1_workflows_runs__run_id__history_get",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.runs.get_run_history_v1_workflows_runs__run_id__history_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_run_history_v1_workflows_runs__run_id__history_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/workflows/schedules",
+      "operation_id": "get_schedules_v1_workflows_schedules_get",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.schedules.get_schedules_v1_workflows_schedules_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_schedules_v1_workflows_schedules_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/workflows/schedules",
+      "operation_id": "schedule_workflow_v1_workflows_schedules_post",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.schedules.schedule_workflow_v1_workflows_schedules_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:schedule_workflow_v1_workflows_schedules_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/workflows/schedules/{schedule_id}",
+      "operation_id": "unschedule_workflow_v1_workflows_schedules__schedule_id__delete",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.schedules.unschedule_workflow_v1_workflows_schedules__schedule_id__delete"
+      ],
+      "representation": null,
+      "source_identity": "operationId:unschedule_workflow_v1_workflows_schedules__schedule_id__delete"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/workflows/schedules/{schedule_id}",
+      "operation_id": "get_schedule_v1_workflows_schedules__schedule_id__get",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.schedules.get_schedule_v1_workflows_schedules__schedule_id__get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_schedule_v1_workflows_schedules__schedule_id__get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PATCH",
+      "http_path": "/v1/workflows/schedules/{schedule_id}",
+      "operation_id": "update_schedule_v1_workflows_schedules__schedule_id__patch",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.schedules.update_schedule_v1_workflows_schedules__schedule_id__patch"
+      ],
+      "representation": null,
+      "source_identity": "operationId:update_schedule_v1_workflows_schedules__schedule_id__patch"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/workflows/schedules/{schedule_id}/pause",
+      "operation_id": "pause_schedule_v1_workflows_schedules__schedule_id__pause_post",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.schedules.pause_schedule_v1_workflows_schedules__schedule_id__pause_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:pause_schedule_v1_workflows_schedules__schedule_id__pause_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/workflows/schedules/{schedule_id}/resume",
+      "operation_id": "resume_schedule_v1_workflows_schedules__schedule_id__resume_post",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.schedules.resume_schedule_v1_workflows_schedules__schedule_id__resume_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:resume_schedule_v1_workflows_schedules__schedule_id__resume_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/workflows/schedules/{schedule_id}/trigger",
+      "operation_id": "trigger_schedule_v1_workflows_schedules__schedule_id__trigger_post",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.schedules.trigger_schedule_v1_workflows_schedules__schedule_id__trigger_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:trigger_schedule_v1_workflows_schedules__schedule_id__trigger_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PUT",
+      "http_path": "/v1/workflows/unarchive",
+      "operation_id": "bulk_unarchive_workflows_v1_workflows_unarchive_put",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.bulk_unarchive_workflows_v1_workflows_unarchive_put"
+      ],
+      "representation": null,
+      "source_identity": "operationId:bulk_unarchive_workflows_v1_workflows_unarchive_put"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/workflows/{workflow_identifier}",
+      "operation_id": "get_workflow_v1_workflows__workflow_identifier__get",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.get_workflow_v1_workflows__workflow_identifier__get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_workflow_v1_workflows__workflow_identifier__get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PUT",
+      "http_path": "/v1/workflows/{workflow_identifier}",
+      "operation_id": "update_workflow_v1_workflows__workflow_identifier__put",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.update_workflow_v1_workflows__workflow_identifier__put"
+      ],
+      "representation": null,
+      "source_identity": "operationId:update_workflow_v1_workflows__workflow_identifier__put"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PUT",
+      "http_path": "/v1/workflows/{workflow_identifier}/archive",
+      "operation_id": "archive_workflow_v1_workflows__workflow_identifier__archive_put",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.archive_workflow_v1_workflows__workflow_identifier__archive_put"
+      ],
+      "representation": null,
+      "source_identity": "operationId:archive_workflow_v1_workflows__workflow_identifier__archive_put"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/workflows/{workflow_identifier}/execute",
+      "operation_id": "execute_workflow_v1_workflows__workflow_identifier__execute_post",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.execute_workflow_v1_workflows__workflow_identifier__execute_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:execute_workflow_v1_workflows__workflow_identifier__execute_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PUT",
+      "http_path": "/v1/workflows/{workflow_identifier}/unarchive",
+      "operation_id": "unarchive_workflow_v1_workflows__workflow_identifier__unarchive_put",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.unarchive_workflow_v1_workflows__workflow_identifier__unarchive_put"
+      ],
+      "representation": null,
+      "source_identity": "operationId:unarchive_workflow_v1_workflows__workflow_identifier__unarchive_put"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/workflows/{workflow_name}/metrics",
+      "operation_id": "get_workflow_metrics_v1_workflows__workflow_name__metrics_get",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.metrics.get_workflow_metrics_v1_workflows__workflow_name__metrics_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_workflow_metrics_v1_workflows__workflow_name__metrics_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v2/prompts",
+      "operation_id": "prompts_list",
+      "outcome": "published",
+      "public_paths": [
+        "beta.prompts.prompts_list"
+      ],
+      "representation": null,
+      "source_identity": "operationId:prompts_list"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v2/prompts",
+      "operation_id": "prompts_create",
+      "outcome": "published",
+      "public_paths": [
+        "beta.prompts.prompts_create"
+      ],
+      "representation": null,
+      "source_identity": "operationId:prompts_create"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v2/prompts/{prompt_id}",
+      "operation_id": "prompts_delete",
+      "outcome": "published",
+      "public_paths": [
+        "beta.prompts.prompts_delete"
+      ],
+      "representation": null,
+      "source_identity": "operationId:prompts_delete"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v2/prompts/{prompt_id}",
+      "operation_id": "prompts_get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.prompts.prompts_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:prompts_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PATCH",
+      "http_path": "/v2/prompts/{prompt_id}",
+      "operation_id": "prompts_update",
+      "outcome": "published",
+      "public_paths": [
+        "beta.prompts.prompts_update"
+      ],
+      "representation": null,
+      "source_identity": "operationId:prompts_update"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v2/prompts/{prompt_id}/versions",
+      "operation_id": "prompts_list_versions",
+      "outcome": "published",
+      "public_paths": [
+        "beta.prompts.prompts_list_versions"
+      ],
+      "representation": null,
+      "source_identity": "operationId:prompts_list_versions"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v2/prompts/{prompt_id}/versions",
+      "operation_id": "prompts_create_version",
+      "outcome": "published",
+      "public_paths": [
+        "beta.prompts.prompts_create_version"
+      ],
+      "representation": null,
+      "source_identity": "operationId:prompts_create_version"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v2/prompts/{prompt_id}/versions/{version}",
+      "operation_id": "prompts_get_version",
+      "outcome": "published",
+      "public_paths": [
+        "beta.prompts.prompts_get_version"
+      ],
+      "representation": null,
+      "source_identity": "operationId:prompts_get_version"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PATCH",
+      "http_path": "/v2/prompts/{prompt_id}/versions/{version}",
+      "operation_id": "prompts_update_version_metadata",
+      "outcome": "published",
+      "public_paths": [
+        "beta.prompts.prompts_update_version_metadata"
+      ],
+      "representation": null,
+      "source_identity": "operationId:prompts_update_version_metadata"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v2/skills",
+      "operation_id": "skills_list",
+      "outcome": "published",
+      "public_paths": [
+        "beta.skills.skills_list"
+      ],
+      "representation": null,
+      "source_identity": "operationId:skills_list"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v2/skills",
+      "operation_id": "skills_create",
+      "outcome": "published",
+      "public_paths": [
+        "beta.skills.skills_create"
+      ],
+      "representation": null,
+      "source_identity": "operationId:skills_create"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v2/skills/{skill_id}",
+      "operation_id": "skills_delete",
+      "outcome": "published",
+      "public_paths": [
+        "beta.skills.skills_delete"
+      ],
+      "representation": null,
+      "source_identity": "operationId:skills_delete"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v2/skills/{skill_id}",
+      "operation_id": "skills_get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.skills.skills_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:skills_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PATCH",
+      "http_path": "/v2/skills/{skill_id}",
+      "operation_id": "skills_update",
+      "outcome": "published",
+      "public_paths": [
+        "beta.skills.skills_update"
+      ],
+      "representation": null,
+      "source_identity": "operationId:skills_update"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v2/skills/{skill_id}/versions",
+      "operation_id": "skills_list_versions",
+      "outcome": "published",
+      "public_paths": [
+        "beta.skills.skills_list_versions"
+      ],
+      "representation": null,
+      "source_identity": "operationId:skills_list_versions"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v2/skills/{skill_id}/versions",
+      "operation_id": "skills_create_version",
+      "outcome": "published",
+      "public_paths": [
+        "beta.skills.skills_create_version"
+      ],
+      "representation": null,
+      "source_identity": "operationId:skills_create_version"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v2/skills/{skill_id}/versions/{version}",
+      "operation_id": "skills_get_version",
+      "outcome": "published",
+      "public_paths": [
+        "beta.skills.skills_get_version"
+      ],
+      "representation": null,
+      "source_identity": "operationId:skills_get_version"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PATCH",
+      "http_path": "/v2/skills/{skill_id}/versions/{version}",
+      "operation_id": "skills_update_version_metadata",
+      "outcome": "published",
+      "public_paths": [
+        "beta.skills.skills_update_version_metadata"
+      ],
+      "representation": null,
+      "source_identity": "operationId:skills_update_version_metadata"
+    }
+  ],
+  "published_operation_count": 288,
+  "schema_version": 1,
+  "source_operation_count": 288,
+  "type_policy": [
+    {
+      "public_name": "JudgeOutputConfig",
+      "representation": null,
+      "source_schema": "#/components/schemas/Judge/properties/output"
+    }
+  ]
+}

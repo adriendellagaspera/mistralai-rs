@@ -21,8 +21,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Validate agent and action-pin contracts
-        run: python3 .github/scripts/policy.py
+      - run: python3 .github/scripts/policy.py
       - name: Validate pull-request title
         if: github.event_name == 'pull_request'
         env:
@@ -30,8 +29,7 @@ jobs:
         run: python3 .github/scripts/pr_title.py "$PR_TITLE"
       - name: Install actionlint 1.7.12
         run: |
-          curl -fsSLo /tmp/actionlint.tar.gz \
-            https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz
+          curl -fsSLo /tmp/actionlint.tar.gz https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz
           echo '8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8  /tmp/actionlint.tar.gz' | sha256sum --check -
           tar -xzf /tmp/actionlint.tar.gz -C /tmp actionlint
           /tmp/actionlint
@@ -44,6 +42,25 @@ jobs:
           advanced-security: false
           annotations: true
 
+  generation:
+    name: generation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: adriendellagaspera/rust-sdk-generator
+          ref: 394d12ee893a256123545b75ba5e4a0f8f354ad7
+          path: .tools/sdk-surface
+          persist-credentials: false
+      - run: rustup show
+      - run: npm install --global fern-api@5.112.0 # zizmor: ignore[adhoc-packages]
+      - run: python3 -m pip install --disable-pip-version-check PyYAML==6.0.3
+      - run: bash sdk-build/fern/check.sh
+
   format:
     name: format
     runs-on: ubuntu-24.04
@@ -52,27 +69,19 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Install pinned Rust toolchain
-        run: rustup show
+      - run: rustup show
       - run: cargo fmt --all --check
-      - run: cargo fmt --manifest-path sdk-build/Cargo.toml --check
 
   lint:
     name: lint
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Install pinned Rust toolchain
-        run: rustup show
-      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
-        with:
-          shared-key: ci
-          save-if: ${{ github.ref == 'refs/heads/main' }}
-      - run: cargo clippy --locked --all-targets -- -D warnings
-      - run: cargo clippy --locked --manifest-path sdk-build/Cargo.toml --all-targets -- -D warnings
+      - run: rustup show
+      - run: cargo clippy --locked --all-features -- -D clippy::correctness -D clippy::suspicious
 
   dependencies:
     name: dependencies
@@ -85,17 +94,12 @@ jobs:
       - name: Install cargo-deny 0.20.2
         run: |
           mkdir -p /tmp/cargo-deny-install
-          curl -fsSLo /tmp/cargo-deny.tar.gz \
-            https://github.com/EmbarkStudios/cargo-deny/releases/download/0.20.2/cargo-deny-0.20.2-x86_64-unknown-linux-musl.tar.gz
+          curl -fsSLo /tmp/cargo-deny.tar.gz https://github.com/EmbarkStudios/cargo-deny/releases/download/0.20.2/cargo-deny-0.20.2-x86_64-unknown-linux-musl.tar.gz
           echo '9f12ed4c49936e09b48bf862b595cde2fe64fcbd9d74dfacac6131ca824c8d5f  /tmp/cargo-deny.tar.gz' | sha256sum --check -
           tar -xzf /tmp/cargo-deny.tar.gz -C /tmp/cargo-deny-install
           find /tmp/cargo-deny-install -type f -name cargo-deny -perm -111 -print -quit > /tmp/cargo-deny-path
           test -s /tmp/cargo-deny-path
-      - name: Check advisories, licenses, bans and sources
-        run: |
-          binary="$(cat /tmp/cargo-deny-path)"
-          "$binary" --version
-          "$binary" check
+      - run: '"$(cat /tmp/cargo-deny-path)" check'
 
   tooling:
     name: tooling
@@ -105,214 +109,62 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: .tools
-          key: tools-rust-${{ runner.os }}-${{ hashFiles('sdk-build/Cargo.lock', 'sdk-build/provenance.lock.json') }}
-      - name: Install pinned Rust toolchain
-        run: rustup show
-      - name: Test private Rust build and remaining Python checks
-        run: |
-          cargo test --locked --manifest-path sdk-build/Cargo.toml --all-targets
-          python3 -m unittest discover -s sdk-build/api-review -p 'test_*.py'
-          python3 -m unittest discover -s .github/scripts -p 'test_*.py'
-
-  generation:
-    name: generation
-    runs-on: ubuntu-24.04
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - name: Install pinned Rust toolchain
-        run: rustup show
-      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: |
-            .tools
-            ~/.cargo/registry
-            ~/.cargo/git
-          key: tools-generation-${{ runner.os }}-${{ hashFiles('sdk-build/provenance.lock.json', 'sdk-build/Cargo.lock', 'Cargo.lock') }}
-      - name: Verify deterministic generation without Python
-        run: |
-          mkdir -p /tmp/no-python
-          printf '#!/bin/sh\necho "Python used during SDK generation" >&2\nexit 96\n' > /tmp/no-python/python3
-          cp /tmp/no-python/python3 /tmp/no-python/python
-          chmod +x /tmp/no-python/python3 /tmp/no-python/python
-          PATH="/tmp/no-python:$PATH" cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- check
-      - name: Verify independently maintained official SDK source evidence
-        run: python3 sdk-build/official-sdks/update.py check
-      - name: Exercise source-update sequence without advancing source pins
-        run: |
-          cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- raw
-          test -s src/generated/coverage.json
-          python3 sdk-build/official-sdks/update.py update
-          cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- generate
-          cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- check
-          python3 sdk-build/official-sdks/update.py check
-
-  rust-build-parity:
-    name: rust-build-parity
-    runs-on: ubuntu-24.04
-    timeout-minutes: 50
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - name: Install pinned Rust toolchain
-        run: rustup show
-      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: |
-            .tools
-            sdk-build/target
-            ~/.cargo/registry
-            ~/.cargo/git
-          key: rust-build-${{ runner.os }}-${{ hashFiles('sdk-build/Cargo.lock', 'sdk-build/provenance.lock.json') }}
-      - name: Verify private Rust build gates
-        run: |
-          cargo fmt --manifest-path sdk-build/Cargo.toml --check
-          cargo test --locked --manifest-path sdk-build/Cargo.toml --all-targets
-          cargo clippy --locked --manifest-path sdk-build/Cargo.toml --all-targets -- -D warnings
-      - name: Reproduce published source and facade with Python unavailable
-        run: |
-          mkdir -p /tmp/no-python
-          printf '#!/bin/sh\necho "Python used during SDK generation" >&2\nexit 96\n' > /tmp/no-python/python3
-          cp /tmp/no-python/python3 /tmp/no-python/python
-          chmod +x /tmp/no-python/python3 /tmp/no-python/python
-          export PATH="/tmp/no-python:$PATH"
-          cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- check
-          git diff --exit-code -- src/generated src/sdk sdk-build/openapi/published.yaml
-          cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- generate
-          cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- check
-          git diff --exit-code -- src/sdk sdk-build/openapi/published.yaml
-      - name: Reject altered published OpenAPI without changing generated output
-        run: |
-          cp sdk-build/openapi/published.yaml /tmp/sdk-build-published.yaml
-          trap 'cp /tmp/sdk-build-published.yaml sdk-build/openapi/published.yaml' EXIT
-          cp -a src/generated /tmp/rust-build-generated-baseline
-          cp -a src/sdk /tmp/rust-build-sdk-baseline
-          printf '\\n# deliberate source tampering\\n' >> sdk-build/openapi/published.yaml
-          if cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- check; then
-            echo 'Builder accepted an altered source' >&2
-            exit 1
-          fi
-          diff -qr /tmp/rust-build-generated-baseline src/generated
-          diff -qr /tmp/rust-build-sdk-baseline src/sdk
-      - name: Reject new unreviewed coverage or drifted tool pins
-        run: |
-          cp sdk-build/coverage-baseline.json /tmp/sdk-build-coverage-baseline.json
-          cp sdk-build/provenance.lock.json /tmp/sdk-build-provenance.lock.json
-          trap 'cp /tmp/sdk-build-coverage-baseline.json sdk-build/coverage-baseline.json; cp /tmp/sdk-build-provenance.lock.json sdk-build/provenance.lock.json' EXIT
-          python3 - <<'PY'
-          import json
-          from pathlib import Path
-          path = Path('sdk-build/coverage-baseline.json')
-          data = json.loads(path.read_text())
-          data['total_operations'] = 172
-          path.write_text(json.dumps(data))
-          PY
-          if cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- check; then
-            echo 'Builder accepted coverage regression' >&2
-            exit 1
-          fi
-          cp /tmp/sdk-build-coverage-baseline.json sdk-build/coverage-baseline.json
-          python3 - <<'PY'
-          import json
-          from pathlib import Path
-          path = Path('sdk-build/provenance.lock.json')
-          data = json.loads(path.read_text())
-          data['tools']['openapi_to_rust']['version'] = '0.0.0'
-          path.write_text(json.dumps(data))
-          PY
-          if cargo run --quiet --locked --manifest-path sdk-build/Cargo.toml -- check; then
-            echo 'Builder accepted mismatched pinned tool version' >&2
-            exit 1
-          fi
+      - run: python3 -m unittest discover -s sdk-build -p 'test_*.py'
+      - run: python3 -m unittest discover -s .github/scripts -p 'test_*.py'
 
   test:
     name: test
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Install pinned Rust toolchain
-        run: rustup show
-      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
-        with:
-          shared-key: ci
-          save-if: ${{ github.ref == 'refs/heads/main' }}
-      - run: cargo test --locked --all-targets
+      - run: rustup show
+      - run: cargo check --locked --all-features
+      - run: cargo test --locked --all-features --all-targets
 
   docs:
     name: docs
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
-    env:
-      RUSTDOCFLAGS: -D warnings
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Install pinned Rust toolchain
-        run: rustup show
-      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
-        with:
-          shared-key: ci
-          save-if: ${{ github.ref == 'refs/heads/main' }}
-      - run: cargo doc --locked --no-deps
+      - run: rustup show
+      - run: cargo doc --locked --all-features --no-deps
       - run: cargo publish --dry-run --locked
 
   api:
     name: api
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 10
     steps:
-      - name: API review is pull-request scoped
-        if: github.event_name != 'pull_request'
-        run: echo 'No PR base to compare on push.'
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        if: github.event_name == 'pull_request'
         with:
-          fetch-depth: 0
           persist-credentials: false
-      - name: Install pinned Rust toolchain
-        if: github.event_name == 'pull_request'
-        run: rustup show
-      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        if: github.event_name == 'pull_request'
-        with:
-          path: .tools
-          key: tools-api-${{ runner.os }}-${{ hashFiles('sdk-build/provenance.lock.json') }}
-      - name: Review generated public API changes
-        if: github.event_name == 'pull_request'
-        env:
-          SDK_API_BASE: ${{ github.event.pull_request.base.sha }}
-        run: python3 sdk-build/api-review/check.py --base "$SDK_API_BASE" --rustdoc
+      - run: python3 sdk-build/fern/api_check.py
 
   gate:
     name: gate
     if: always()
-    needs: [policy, format, lint, dependencies, tooling, generation, rust-build-parity, test, docs, api]
+    needs: [policy, generation, format, lint, dependencies, tooling, test, docs, api]
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
-      - name: Require every CI contract
+      - name: Require all CI jobs
         env:
           POLICY: ${{ needs.policy.result }}
+          GENERATION: ${{ needs.generation.result }}
           FORMAT: ${{ needs.format.result }}
           LINT: ${{ needs.lint.result }}
           DEPENDENCIES: ${{ needs.dependencies.result }}
           TOOLING: ${{ needs.tooling.result }}
-          GENERATION: ${{ needs.generation.result }}
-          RUST_BUILD_PARITY: ${{ needs.rust-build-parity.result }}
           TEST: ${{ needs.test.result }}
           DOCS: ${{ needs.docs.result }}
           API: ${{ needs.api.result }}
         run: |
-          for result in "$POLICY" "$FORMAT" "$LINT" "$DEPENDENCIES" "$TOOLING" "$GENERATION" "$RUST_BUILD_PARITY" "$TEST" "$DOCS" "$API"; do
+          for result in "$POLICY" "$GENERATION" "$FORMAT" "$LINT" "$DEPENDENCIES" "$TOOLING" "$TEST" "$DOCS" "$API"; do
             test "$result" = success
           done

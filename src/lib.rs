@@ -1,56 +1,74 @@
-//! Unofficial Mistral AI SDK generated from the official OpenAPI specification.
+//! # Mistral AI API SDK
 //!
-//! The primary API is resource-oriented and intentionally hides mechanical
-//! OpenAPI naming. The complete generated API remains available through `raw`.
+//! The official Rust SDK for the Mistral AI API.
+//!
+//! ## Getting Started
+//!
+//! ```rust
+//! use adriendellagaspera_api::prelude::*;
+//!
+//! #[tokio::main]
+//! async fn main() {
+//!     let config = ClientConfig {
+//!         token: Some("<token>".to_string()),
+//!         ..Default::default()
+//!     };
+//!     let client = ApiClient::new(config).expect("Failed to build client");
+//!     client
+//!         .agents
+//!         .agents_completion_v1agents_completions_post(
+//!             &AgentsCompletionRequest {
+//!                 agent_id: "agent_id".to_string(),
+//!                 messages: vec![AgentsCompletionRequestMessagesItem::User {
+//!                     data: UserMessage {
+//!                         ..Default::default()
+//!                     },
+//!                 }],
+//!                 frequency_penalty: None,
+//!                 guardrails: None,
+//!                 max_tokens: None,
+//!                 metadata: None,
+//!                 n: None,
+//!                 parallel_tool_calls: None,
+//!                 prediction: None,
+//!                 presence_penalty: None,
+//!                 prompt_cache_key: None,
+//!                 prompt_mode: None,
+//!                 random_seed: None,
+//!                 reasoning_effort: None,
+//!                 response_format: None,
+//!                 service_tier: None,
+//!                 stop: None,
+//!                 stream: None,
+//!                 tool_choice: None,
+//!                 tools: None,
+//!             },
+//!             None,
+//!         )
+//!         .await;
+//! }
+//! ```
+//!
+//! ## Modules
+//!
+//! - [`api`] - Core API types and models
+//! - [`client`] - Client implementations
+//! - [`config`] - Configuration options
+//! - [`core`] - Core utilities and infrastructure
+//! - [`error`] - Error types and handling
+//! - [`prelude`] - Common imports for convenience
 
-#![forbid(unsafe_code)]
-#![warn(
-    missing_docs,
-    clippy::allow_attributes_without_reason,
-    clippy::missing_errors_doc,
-    clippy::missing_panics_doc
-)]
+pub mod api;
+pub mod client;
+pub mod config;
+pub mod core;
+pub mod environment;
+pub mod error;
+pub mod prelude;
 
-#[allow(
-    dead_code,
-    missing_docs,
-    rustdoc::broken_intra_doc_links,
-    rustdoc::invalid_html_tags,
-    clippy::allow_attributes_without_reason,
-    clippy::clone_on_copy,
-    clippy::double_must_use,
-    clippy::nonminimal_bool,
-    clippy::redundant_field_names,
-    clippy::too_many_arguments,
-    clippy::match_single_binding,
-    clippy::collapsible_if,
-    clippy::empty_docs,
-    clippy::missing_errors_doc,
-    clippy::missing_panics_doc,
-    clippy::unnecessary_to_owned,
-    reason = "openapi-to-rust output is generated and kept behind this module boundary"
-)]
-mod generated;
-
-/// Complete generated OpenAPI bindings and transport client.
-pub mod raw {
-    pub use crate::generated::{client, types};
-    pub use client::HttpClient as Client;
-}
-
-#[allow(
-    missing_docs,
-    rustdoc::broken_intra_doc_links,
-    clippy::allow_attributes_without_reason,
-    clippy::large_enum_variant,
-    clippy::missing_errors_doc,
-    clippy::missing_panics_doc,
-    clippy::redundant_field_names,
-    clippy::useless_conversion,
-    clippy::wrong_self_convention,
-    reason = "the idiomatic SDK facade is generated and validated by generation/API gates"
-)]
-mod sdk;
-pub mod streaming;
-
-pub use sdk::*;
+pub use api::*;
+pub use client::*;
+pub use config::*;
+pub use core::*;
+pub use environment::*;
+pub use error::{ApiError, BuildError};

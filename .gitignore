@@ -1,8 +1,12 @@
 /target/
 /.tools/
-/.tooling-build-*/
 /update-report.md
 __pycache__/
 *.pyc
-/sdk-build/target/
-/.sdk-build-probe-*/
+/sdk-build/fern/generated/
+/sdk-build/fern/compatible.yaml
+/sdk-build/fern/fern-ir.json
+/sdk-build/fern/fern/openapi.json
+/sdk-build/fern/digest.first.json
+/sdk-build/fern/digest.second.json
+/sdk-build/fern/inventory.candidate.json
