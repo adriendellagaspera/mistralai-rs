@@ -31,7 +31,7 @@ pub mod fim;
 pub mod models;
 pub mod ocr;
 pub mod workflows;
-pub struct ApiClient {
+pub struct Mistral {
     pub config: ClientConfig,
     pub agents: AgentsClient,
     pub batch: BatchClient,
@@ -48,7 +48,7 @@ pub struct ApiClient {
     pub beta: BetaClient,
 }
 
-impl ApiClient {
+impl Mistral {
     pub fn new(config: ClientConfig) -> Result<Self, ApiError> {
         Ok(Self {
             config: config.clone(),
