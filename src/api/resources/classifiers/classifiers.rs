@@ -34,7 +34,7 @@ impl ClassifiersClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .classifiers
     ///         .chat_classifications_v1chat_classifications_post(
@@ -91,7 +91,7 @@ impl ClassifiersClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .classifiers
     ///         .chat_moderations_v1chat_moderations_post(
@@ -147,7 +147,7 @@ impl ClassifiersClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .classifiers
     ///         .classifications_v1classifications_post(
@@ -198,7 +198,7 @@ impl ClassifiersClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .classifiers
     ///         .moderations_v1moderations_post(

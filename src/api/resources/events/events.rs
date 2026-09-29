@@ -39,7 +39,7 @@ impl EventsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .events
     ///         .get_workflow_events_v1workflows_events_list_get(
@@ -97,7 +97,7 @@ impl EventsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .events
     ///         .get_stream_events_v1workflows_events_stream_get(
