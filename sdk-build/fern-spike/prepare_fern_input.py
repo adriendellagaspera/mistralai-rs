@@ -18,6 +18,8 @@ schemas = doc["components"]["schemas"]
 for name in (
     "ConversationRequest",
     "ConversationStreamRequest",
+    "ConversationAppendRequest",
+    "ConversationRestartRequest",
     "ConversationAppendStreamRequest",
     "ConversationRestartStreamRequest",
 ):
@@ -75,9 +77,19 @@ for item in doc["paths"].values():
             continue
         if op.get("operationId") not in {"judgeChatCompletionEvent", "judgeConversation", "judgeDatasetRecord"}:
             continue
-        for response in op.get("responses", {}).values():
-            for media in response.get("content", {}).values():
-                media.pop("examples", None)
-                media.pop("example", None)
+        # Fern promotes OpenAPI operation examples into endpoint examples and
+        # validates response unions more strictly than the producer. They can
+        # originate from either request or response examples, so strip examples
+        # recursively from these three operations only.
+        def strip_examples(node):
+            if isinstance(node, dict):
+                node.pop("examples", None)
+                node.pop("example", None)
+                for value in node.values():
+                    strip_examples(value)
+            elif isinstance(node, list):
+                for value in node:
+                    strip_examples(value)
+        strip_examples(op)
 
 dst.write_text(yaml.safe_dump(doc, sort_keys=False))
