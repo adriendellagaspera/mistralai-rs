@@ -1,9 +1,9 @@
 [package]
 name = "mistralai-sdk"
 version = "0.4.0"
-edition = "2024"
+edition = "2021"
 rust-version = "1.94"
-description = "Unofficial Mistral AI SDK reproducibly generated from the official OpenAPI specification"
+description = "Unofficial Mistral AI Rust SDK generated reproducibly with Fern from the official OpenAPI specification"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/adriendellagaspera/mistralai-rs"
 readme = "README.md"
@@ -12,26 +12,22 @@ keywords = ["mistral", "openapi", "sdk", "ai"]
 categories = ["api-bindings", "asynchronous"]
 
 [lib]
-name = "mistralai"
-# Upstream OpenAPI descriptions are documentation, not executable Rust examples.
 doctest = false
 
-# Keep aligned with src/generated/REQUIRED_DEPS.toml.
 [dependencies]
-base64 = "0.23"
+base64 = "0.22"
+bytes = "1"
 chrono = { version = "0.4", features = ["serde"] }
-reqwest = { version = "0.13", default-features = false, features = ["query", "rustls", "stream", "multipart"] }
-reqwest-middleware = { version = "0.5", features = ["query", "multipart"] }
-reqwest-retry = "0.9"
-reqwest-tracing = "0.7"
+futures = "0.3"
+pin-project = { version = "1.1", optional = true }
+reqwest = { version = "0.12", default-features = false, features = ["json", "stream", "gzip", "rustls-tls"] }
+reqwest-sse = { version = "0.1", optional = true }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-thiserror = "2"
-uuid = { version = "1", features = ["serde"] }
-bytes = { version = "1", features = ["serde"] }
-futures-util = "0.3"
-async-stream = "0.3"
-url = { version = "2", features = ["serde"] }
+thiserror = "1"
+tokio = { version = "1", features = ["full"] }
 
-[dev-dependencies]
-tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+[features]
+default = ["multipart", "sse"]
+multipart = ["reqwest/multipart"]
+sse = ["reqwest-sse", "pin-project"]

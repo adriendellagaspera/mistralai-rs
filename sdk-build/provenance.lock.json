@@ -1,7 +1,6 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "rust_toolchain": "1.94.0",
-  "cargo_semver_checks_version": "0.50.0",
   "openapi": {
     "repository": "mistralai/platform-docs-public",
     "path": "public/openapi.yaml",
@@ -9,27 +8,15 @@
     "sha256": "86b89916f38b14d4452654938ec51ad5337c860c19db03f37d86921d639fb36f"
   },
   "tools": {
-    "openapi_to_rust": {
-      "name": "openapi-to-rust",
-      "repository": "gpu-cli/openapi-to-rust",
-      "commit": "b9b8f55d352510234c4161af56d05f8d3f80485c",
-      "version": "0.17.0",
-      "tree_sha": "81f6a6a45a7daadee1fc6eea9371147c0a989034"
+    "fern_cli": {
+      "name": "fern-api",
+      "repository": "fern-api/fern",
+      "version": "5.112.0"
     },
-    "rust_sdk_generator": {
-      "name": "rust-sdk-generator",
-      "repository": "adriendellagaspera/rust-sdk-generator",
-      "commit": "cd2a97aa6d26a31e8b5dc884b62f801d6490c079",
-      "tree_sha": "ae3e4c86a6103b856a478c9a26a91d1e377c5213",
-      "version": "0.2.8"
-    },
-    "openapi_to_rust_bindings": {
-      "name": "openapi-to-rust-bindings",
-      "repository": "adriendellagaspera/rust-sdk-generator",
-      "commit": "cd2a97aa6d26a31e8b5dc884b62f801d6490c079",
-      "tree_sha": "ae3e4c86a6103b856a478c9a26a91d1e377c5213",
-      "version": "0.3.0",
-      "subdirectory": "openapi-to-rust-bindings"
+    "fern_rust_sdk": {
+      "name": "fernapi/fern-rust-sdk",
+      "repository": "fern-api/fern",
+      "version": "0.48.0"
     }
   },
   "official_sdks": {

@@ -1,8 +1,7 @@
 /target/
 /.tools/
-/.tooling-build-*/
 /update-report.md
 __pycache__/
 *.pyc
-/sdk-build/target/
-/.sdk-build-probe-*/
+/sdk-build/fern/generated/
+/sdk-build/fern/fern/openapi.yaml
