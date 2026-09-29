@@ -79,6 +79,22 @@ for name in ("JudgeClassificationOutput", "JudgeRegressionOutput"):
     if "type" not in required:
         required.append("type")
 
+# Fern 5.112 synthesizes endpoint examples for these live-judging operations
+# and validates their JudgeOutput response as if it were a discriminated union,
+# although JudgeOutput itself has no discriminator. Suppress example generation
+# for the spike by adding a minimal explicit response example that matches the
+# actual JudgeOutput schema.
+for item in doc["paths"].values():
+    for op in item.values():
+        if not isinstance(op, dict) or op.get("operationId") not in {
+            "judge_chat_completion_event_v1_observability_chat_completion_events__event_id__live_judging_post",
+            "judge_conversation_v1_observability_judges__judge_id__live_judging_post",
+            "judge_dataset_record_v1_observability_dataset_records__dataset_record_id__live_judging_post",
+        }:
+            continue
+        media = op["responses"]["200"]["content"]["application/json"]
+        media["example"] = {"analysis": "", "answer": ""}
+
 # Examples are documentation, not wire semantics. Fern validates discriminator
 # completeness in response examples more strictly than the source producer.
 # Remove response examples only from the three known judge operations.
