@@ -20,7 +20,7 @@ def main() -> int:
     source = http_client.read_text()
     marker = (
         "    /// Execute a multipart/form-data request and return a "
-        "streaming response (ByteStream).\\n"
+        "streaming response (ByteStream).\n"
     )
     if marker not in source:
         raise SystemExit(
