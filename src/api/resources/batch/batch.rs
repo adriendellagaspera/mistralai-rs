@@ -34,7 +34,7 @@ impl BatchClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .batch
     ///         .jobs_api_routes_batch_get_batch_jobs(
@@ -93,7 +93,7 @@ impl BatchClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .batch
     ///         .jobs_api_routes_batch_create_batch_job(
@@ -151,7 +151,7 @@ impl BatchClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .batch
     ///         .jobs_api_routes_batch_get_batch_job(
@@ -204,7 +204,7 @@ impl BatchClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .batch
     ///         .jobs_api_routes_batch_delete_batch_job(&"job_id".to_string(), None)
@@ -248,7 +248,7 @@ impl BatchClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .batch
     ///         .jobs_api_routes_batch_cancel_batch_job(&"job_id".to_string(), None)
