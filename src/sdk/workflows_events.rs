@@ -6,8 +6,8 @@ use futures_util::StreamExt;
 #[derive(Debug, serde::Deserialize)]
 #[serde(untagged)]
 enum __GetStreamEventsWorkflowsEventsStreamItemRaw {
-    StreamEventSsePayload(StreamEventSsePayload),
-    StreamEventSseErrorData(StreamEventSseErrorData),
+    StreamEventSsePayload(crate::generated::types::StreamEventSsePayload),
+    StreamEventSseErrorData(crate::generated::types::StreamEventSseErrorData),
 }
 
 #[derive(Debug, Clone, Default)]

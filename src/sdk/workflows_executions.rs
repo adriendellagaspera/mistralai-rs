@@ -6,15 +6,15 @@ use futures_util::StreamExt;
 #[derive(Debug, serde::Deserialize)]
 #[serde(untagged)]
 enum __StreamWorkflowsExecutionsStreamItemRaw {
-    StreamEventSsePayload(StreamEventSsePayload),
-    StreamEventSseErrorData(StreamEventSseErrorData),
+    StreamEventSsePayload(crate::generated::types::StreamEventSsePayload),
+    StreamEventSseErrorData(crate::generated::types::StreamEventSseErrorData),
 }
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(untagged)]
 enum __StreamWorkflowExecutionLogsWorkflowsExecutionsStreamItemRaw {
-    ExecutionLogRecord(ExecutionLogRecord),
-    StreamError(StreamError),
+    ExecutionLogRecord(crate::generated::types::ExecutionLogRecord),
+    StreamError(crate::generated::types::StreamError),
 }
 
 #[derive(Debug, Clone)]

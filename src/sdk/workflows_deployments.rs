@@ -6,8 +6,8 @@ use futures_util::StreamExt;
 #[derive(Debug, serde::Deserialize)]
 #[serde(untagged)]
 enum __StreamDeploymentLogsWorkflowsDeploymentsStreamItemRaw {
-    DeploymentLogRecord(DeploymentLogRecord),
-    StreamError(StreamError),
+    DeploymentLogRecord(crate::generated::types::DeploymentLogRecord),
+    StreamError(crate::generated::types::StreamError),
 }
 
 #[derive(Debug, Clone)]
