@@ -75,9 +75,33 @@ jobs:
         working-directory: sdk-build/fern-spike
         run: fern generate --group rust-sdk --local --no-prompt --force --log-level info
 
+      - name: Generate product-shaped Fern variant
+        run: |
+          python sdk-build/fern-spike/prepare_fern_product_input.py \
+            sdk-build/fern-spike/fern/openapi.yaml \
+            sdk-build/fern-spike/product/fern/openapi.yaml
+          (
+            cd sdk-build/fern-spike/product
+            fern generate --group rust-sdk --local --no-prompt --force --log-level info
+          )
+
+      - name: Compare product-shaped Fern surface
+        run: |
+          python sdk-build/fern-spike/compare_surfaces.py \
+            sdk-build/fern-spike/product/generated-product \
+            sdk-build/fern-spike/fern-product-surface-comparison.json
+          echo "## Product-shaped Fern proof" >> "$GITHUB_STEP_SUMMARY"
+          for needle in 'pub async fn complete' 'pub async fn complete_stream' 'pub async fn create' 'pub async fn process' 'pub async fn list' 'pub async fn download'; do
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "`$needle`" >> "$GITHUB_STEP_SUMMARY"
+            grep -R -n -m 8 "$needle" sdk-build/fern-spike/product/generated-product/src               | sed 's#^#- #' >> "$GITHUB_STEP_SUMMARY" || true
+          done
+
       - name: Compare current and Fern public surfaces
         run: |
           python sdk-build/fern-spike/compare_surfaces.py             sdk-build/fern-spike/generated             sdk-build/fern-spike/fern-surface-comparison.json
+            sdk-build/fern-spike/fern-product-surface-comparison.json
+            sdk-build/fern-spike/product/generated-product
 
       - name: Prepare patched validation copy
         run: |
