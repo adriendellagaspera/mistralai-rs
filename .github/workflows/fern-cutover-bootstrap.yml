@@ -45,3 +45,5 @@ jobs:
           git diff --cached --stat
           git commit -m 'feat(sdk): materialize Fern production SDK [fern-materialized]'
           git push origin HEAD:${GITHUB_REF_NAME}
+
+# branch bootstrap trigger
