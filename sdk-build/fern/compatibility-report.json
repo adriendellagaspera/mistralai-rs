@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "supported_parameter_annotations": 4,
+  "temporary_workarounds": [
+    {
+      "kind": "temporary_fern_workaround",
+      "remove_when": "the pinned Fern CLI accepts compatible allOf property narrowing without flattening",
+      "source": "#/components/schemas/ConversationRequest",
+      "upstream": "https://github.com/fern-api/fern/issues/17930"
+    },
+    {
+      "kind": "temporary_fern_workaround",
+      "remove_when": "the pinned Fern CLI accepts compatible allOf property narrowing without flattening",
+      "source": "#/components/schemas/ConversationStreamRequest",
+      "upstream": "https://github.com/fern-api/fern/issues/17930"
+    },
+    {
+      "kind": "temporary_fern_workaround",
+      "remove_when": "the pinned Fern CLI accepts compatible allOf property narrowing without flattening",
+      "source": "#/components/schemas/ConversationAppendRequest",
+      "upstream": "https://github.com/fern-api/fern/issues/17930"
+    },
+    {
+      "kind": "temporary_fern_workaround",
+      "remove_when": "the pinned Fern CLI accepts compatible allOf property narrowing without flattening",
+      "source": "#/components/schemas/ConversationRestartRequest",
+      "upstream": "https://github.com/fern-api/fern/issues/17930"
+    },
+    {
+      "kind": "temporary_fern_workaround",
+      "remove_when": "the pinned Fern CLI accepts compatible allOf property narrowing without flattening",
+      "source": "#/components/schemas/ConversationAppendStreamRequest",
+      "upstream": "https://github.com/fern-api/fern/issues/17930"
+    },
+    {
+      "kind": "temporary_fern_workaround",
+      "remove_when": "the pinned Fern CLI accepts compatible allOf property narrowing without flattening",
+      "source": "#/components/schemas/ConversationRestartStreamRequest",
+      "upstream": "https://github.com/fern-api/fern/issues/17930"
+    },
+    {
+      "kind": "temporary_fern_workaround",
+      "remove_when": "the pinned Fern CLI accepts '-created' as a string-enum default",
+      "source": "operationId:jobs_api_routes_batch_get_batch_jobs/parameter:order_by",
+      "upstream": "https://github.com/fern-api/fern/issues/17931"
+    }
+  ]
+}

@@ -1,0 +1,2 @@
+pub mod beta_admin_vibe_work_analytics;
+pub use beta_admin_vibe_work_analytics::VibeWorkAnalyticsClient;

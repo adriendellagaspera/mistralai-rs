@@ -1,0 +1,2 @@
+pub mod beta_rag_ingestion_pipeline_configurations;
+pub use beta_rag_ingestion_pipeline_configurations::IngestionPipelineConfigurationsClient;
