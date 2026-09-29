@@ -37,6 +37,40 @@ jobs:
             sdk-build/openapi/published.yaml \
             sdk-build/fern-spike/fern/openapi.yaml
 
+      - name: Diagnose Fern IR paths
+        working-directory: sdk-build/fern-spike
+        continue-on-error: true
+        shell: bash
+        run: |
+          mkdir -p diagnostics
+          set +e
+          fern ir diagnostics/normal-ir.json --language rust --disable-examples             > diagnostics/normal-ir.log 2>&1
+          echo $? > diagnostics/normal-ir.exit
+          fern ir diagnostics/direct-openapi-ir.json --language rust --disable-examples --from-openapi             > diagnostics/direct-openapi-ir.log 2>&1
+          echo $? > diagnostics/direct-openapi-ir.exit
+          echo "normal IR exit: $(cat diagnostics/normal-ir.exit)"
+          echo "direct OpenAPI IR exit: $(cat diagnostics/direct-openapi-ir.exit)"
+          for file in diagnostics/*-ir.json; do
+            [[ -f "$file" ]] || continue
+            python - "$file" <<'PY'
+          import json, sys
+          p = sys.argv[1]
+          data = json.load(open(p))
+          needles = ("judgeChatCompletionEvent", "judgeConversation", "judgeDatasetRecord", "JudgeOutput")
+          def walk(x, path=()):
+              if isinstance(x, dict):
+                  blob = json.dumps(x, separators=(",", ":"))
+                  if any(n in blob for n in needles):
+                      print("/".join(map(str, path)), json.dumps(x)[:12000])
+                  for k, v in x.items():
+                      walk(v, path + (k,))
+              elif isinstance(x, list):
+                  for i, v in enumerate(x):
+                      walk(v, path + (i,))
+          walk(data)
+          PY
+          done
+
       - name: Generate Rust SDK with Fern 0.48.0
         working-directory: sdk-build/fern-spike
         run: fern generate --group rust-sdk --local --no-prompt --force --log-level info
@@ -96,3 +130,4 @@ jobs:
           path: |
             sdk-build/fern-spike/generated
             sdk-build/fern-spike/fern-spike-report.json
+            sdk-build/fern-spike/diagnostics
