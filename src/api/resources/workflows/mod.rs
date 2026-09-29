@@ -67,7 +67,7 @@ impl WorkflowsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .workflows
     ///         .get_workflows_v1workflows_get(
@@ -133,7 +133,7 @@ impl WorkflowsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .workflows
     ///         .bulk_archive_workflows_v1workflows_archive_put(
@@ -192,7 +192,7 @@ impl WorkflowsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .workflows
     ///         .get_workflow_registrations_v1workflows_registrations_get(
@@ -257,7 +257,7 @@ impl WorkflowsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .workflows
     ///         .get_workflow_registration_v1workflows_registrations_workflow_registration_id_get(
@@ -311,7 +311,7 @@ impl WorkflowsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client.workflows.execute_workflow_registration_v1workflows_registrations_workflow_registration_id_execute_post(&"workflow_registration_id".to_string(), &WorkflowExecutionRequest {
     ///         ..Default::default()
     ///     }, None).await;
@@ -353,7 +353,7 @@ impl WorkflowsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .workflows
     ///         .bulk_unarchive_workflows_v1workflows_unarchive_put(
@@ -402,7 +402,7 @@ impl WorkflowsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .workflows
     ///         .get_workflow_v1workflows_workflow_identifier_get(&"workflow_identifier".to_string(), None)
@@ -446,7 +446,7 @@ impl WorkflowsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .workflows
     ///         .update_workflow_v1workflows_workflow_identifier_put(
@@ -497,7 +497,7 @@ impl WorkflowsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .workflows
     ///         .archive_workflow_v1workflows_workflow_identifier_archive_put(
@@ -544,7 +544,7 @@ impl WorkflowsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .workflows
     ///         .execute_workflow_v1workflows_workflow_identifier_execute_post(
@@ -596,7 +596,7 @@ impl WorkflowsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .workflows
     ///         .unarchive_workflow_v1workflows_workflow_identifier_unarchive_put(
