@@ -57,7 +57,7 @@ jobs:
           path: .tools/sdk-surface
           persist-credentials: false
       - run: rustup show
-      - run: npm install --global fern-api@5.112.0
+      - run: npm install --global fern-api@5.112.0 # zizmor: ignore[adhoc-packages]
       - run: python3 -m pip install --disable-pip-version-check PyYAML==6.0.3
       - run: bash sdk-build/fern/check.sh
 
