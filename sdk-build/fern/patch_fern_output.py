@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 
 UPSTREAM = "https://github.com/fern-api/fern/issues/17928"
+DOCS_UPSTREAM = "https://github.com/fern-api/fern/issues/17941"
 REMOVE_WHEN = (
     "Remove this file when the pinned fern-rust-sdk release supports "
     "multipart/form-data requests with SSE responses natively."
@@ -133,8 +134,28 @@ def main() -> int:
             f"re-check {UPSTREAM} before changing this patch"
         )
     client.write_text(source.replace(old, new, 1))
+
+    lib = root / "src/lib.rs"
+    source = lib.read_text()
+    old_docs = "//! The official Rust SDK for the Mistral AI API.\n"
+    new_docs = (
+        "//! Unofficial asynchronous Rust SDK for Mistral AI. "
+        "This project is not affiliated with Mistral AI.\n"
+    )
+    if old_docs not in source:
+        raise SystemExit(
+            "Fern official-SDK documentation marker not found; "
+            f"re-check {DOCS_UPSTREAM} before changing this patch"
+        )
+    lib.write_text(source.replace(old_docs, new_docs, 1))
+
     print(f"temporary Fern patch: {UPSTREAM}")
     print(REMOVE_WHEN)
+    print(f"temporary Fern patch: {DOCS_UPSTREAM}")
+    print(
+        "Remove the crate-doc wording patch when the pinned Fern Rust "
+        "generator uses neutral fallback wording."
+    )
     return 0
 
 
