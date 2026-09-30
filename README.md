@@ -5,7 +5,7 @@ Unofficial asynchronous Rust SDK for Mistral AI, generated reproducibly with Fer
 Install the `mistralai-sdk` package from crates.io; the Rust library is imported as `mistralai_sdk`:
 
 ```sh
-cargo add mistralai-sdk@0.4
+cargo add mistralai-sdk@0.5
 ```
 
 ```rust,no_run
@@ -25,7 +25,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 The canonical input is `sdk-build/openapi/published.yaml` with 288 operations. Fern CLI 5.112.0 and `fernapi/fern-rust-sdk` 0.48.0 are the sole production Rust generator. Mistral surface policy is compiled to deterministic Fern extensions by the repository-local compiler/verifier in `sdk-build/sdk_surface/`.
 
-The 0.4 Fern cutover intentionally accepts reviewed pre-1.0 breaking changes instead of preserving the previous raw/facade architecture. See `sdk-build/fern/API_COMPATIBILITY.md` and `sdk-build/fern/inventory.json`.
+The 0.5 Fern cutover intentionally accepts reviewed pre-1.0 breaking changes instead of preserving the previous raw/facade architecture. See `sdk-build/fern/API_COMPATIBILITY.md` and `sdk-build/fern/inventory.json`.
 
 ## Development
 
