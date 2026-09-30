@@ -15,15 +15,16 @@ pinned Mistral OpenAPI
   -> published src/
 ```
 
-Pins are in `../provenance.lock.json`. The SDK surface compiler is pinned to
-`adriendellagaspera/rust-sdk-generator@394d12ee893a256123545b75ba5e4a0f8f354ad7`.
-It consumes OpenAPI/Fern IR; it does not parse generated Rust.
+Pins are in `../provenance.lock.json`. The SDK surface compiler/verifier lives
+in `../sdk_surface/`. It consumes OpenAPI/Fern IR; it does not parse generated
+Rust and has no external project dependency.
 
 Temporary Fern workarounds are deliberately isolated:
 
 - allOf property narrowing: https://github.com/fern-api/fern/issues/17930
 - leading-hyphen enum default: https://github.com/fern-api/fern/issues/17931
 - multipart + SSE Rust generation: https://github.com/fern-api/fern/issues/17928
+- generated crate docs claiming the SDK is official: https://github.com/fern-api/fern/issues/17941
 
 The inline `JudgeOutput` collision is handled as reviewed type policy via
 `x-fern-type-name`; the generic Fern defect is tracked at
