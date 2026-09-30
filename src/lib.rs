@@ -1,11 +1,11 @@
 //! # Mistral AI API SDK
 //!
-//! The official Rust SDK for the Mistral AI API.
+//! Unofficial asynchronous Rust SDK for Mistral AI. This project is not affiliated with Mistral AI.
 //!
 //! ## Getting Started
 //!
 //! ```rust
-//! use adriendellagaspera_api::prelude::*;
+//! use mistralai_sdk::prelude::*;
 //!
 //! #[tokio::main]
 //! async fn main() {

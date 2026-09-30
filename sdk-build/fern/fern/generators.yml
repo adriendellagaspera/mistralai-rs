@@ -11,6 +11,11 @@ groups:
         version: 0.48.0
         config:
           clientClassName: Mistral
+          crateName: mistralai_sdk
+          crateVersion: "0.5.0"
+          packageDescription: "Unofficial asynchronous Rust SDK for Mistral AI"
+          packageLicense: "MIT OR Apache-2.0"
+          packageRepository: "https://github.com/adriendellagaspera/mistralai-rs"
         output:
           location: local-file-system
           path: ../generated
