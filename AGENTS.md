@@ -11,6 +11,7 @@ This repository publishes a Mistral-specific Rust SDK generated directly by Fern
 - `sdk-build/fern/patch_fern_output.py`: narrow multipart+SSE output workaround for fern-api/fern#17928.
 - `sdk-build/fern/build.sh`: compile policy, generate twice, verify closure/provenance/collisions and build generated Rust.
 - `sdk-build/fern/check.sh`: require generated Rust and semantic inventory to match the committed production SDK.
+- `sdk-build/sdk_surface/`: local Fern surface policy compiler, verifier and tests.
 - `sdk-build/official-sdks/`: independent pinned Python/TypeScript source evidence.
 - `.github/scripts/`: repository policy, PR-title validation and update reporting.
 
@@ -28,13 +29,13 @@ just docs
 just validate
 ```
 
-Generation additionally requires Fern CLI 5.112.0, PyYAML 6.0.3 and the pinned SDK surface compiler from `adriendellagaspera/rust-sdk-generator@394d12ee893a256123545b75ba5e4a0f8f354ad7` at `.tools/sdk-surface`.
+Generation additionally requires Fern CLI 5.112.0 and PyYAML 6.0.3; all project-specific tooling is versioned in this repository.
 
 ## Gated invariants
 
 - [policy] `CLAUDE.md` MUST contain only `@AGENTS.md`, root agent instructions MUST fit the repository line budget, third-party actions MUST be SHA-pinned, and workflows MUST NOT use `pull_request_target`.
 - [generation] Fern 0.48.0 MUST deterministically account for all 288 pinned operations and reproduce committed `src/`.
-- [generation] Surface inventory, closure, source provenance and collisions MUST remain verified by the pinned policy compiler/verifier.
+- [generation] Surface inventory, closure, source provenance and collisions MUST remain verified by the local policy compiler/verifier.
 - [lint] Generated Rust MUST pass Clippy correctness and suspicious gates.
 - [dependencies] Locked Rust dependencies MUST pass advisory, license, source and TLS policy; cargo-shear MUST not report unused direct dependencies.
 - [docs] The public Rust documentation and publish dry-run MUST succeed.
