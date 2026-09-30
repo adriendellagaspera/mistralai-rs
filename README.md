@@ -23,13 +23,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
-The canonical input is `sdk-build/openapi/published.yaml` with 288 operations. Fern CLI 5.112.0 and `fernapi/fern-rust-sdk` 0.48.0 are the sole production Rust generator. Mistral surface policy is compiled to deterministic Fern extensions by the policy compiler/verifier from `rust-sdk-generator#240`.
+The canonical input is `sdk-build/openapi/published.yaml` with 288 operations. Fern CLI 5.112.0 and `fernapi/fern-rust-sdk` 0.48.0 are the sole production Rust generator. Mistral surface policy is compiled to deterministic Fern extensions by the repository-local compiler/verifier in `sdk-build/sdk_surface/`.
 
 The 0.4 Fern cutover intentionally accepts reviewed pre-1.0 breaking changes instead of preserving the previous raw/facade architecture. See `sdk-build/fern/API_COMPATIBILITY.md` and `sdk-build/fern/inventory.json`.
 
 ## Development
 
-Install Fern 5.112.0 and PyYAML 6.0.3, and check out `adriendellagaspera/rust-sdk-generator@394d12ee893a256123545b75ba5e4a0f8f354ad7` as `.tools/sdk-surface`.
+Install Fern 5.112.0 and PyYAML 6.0.3. All project-specific generation and verification tooling is versioned in this repository.
 
 ```sh
 just generate
