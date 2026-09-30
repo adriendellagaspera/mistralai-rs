@@ -8,7 +8,7 @@ pinned Mistral OpenAPI (288 operations)
 small reviewed surface policy
         |
         v
-rust-sdk-generator#240 policy compiler/verifier
+repository-local surface policy compiler/verifier
         |
         v
 deterministic Fern extensions + Fern IR verification
@@ -30,7 +30,7 @@ The canonical source is `openapi/published.yaml`. The Mistral-specific policy is
 
 `bash sdk-build/fern/generate.sh` materializes the production SDK. `bash sdk-build/fern/check.sh` regenerates twice, proves deterministic output, requires 288/288 accounting, verifies semantic inventory and exact parity with committed `src/`.
 
-The policy compiler/verifier is pinned to `adriendellagaspera/rust-sdk-generator@394d12ee893a256123545b75ba5e4a0f8f354ad7`, the merge commit of rust-sdk-generator#240. It consumes OpenAPI and Fern IR; it does not parse generated Rust.
+The policy compiler/verifier lives in `sdk_surface/`. It consumes OpenAPI and Fern IR; it does not parse generated Rust and has no external project dependency.
 
 ## Temporary upstream Fern issues
 
