@@ -5,7 +5,7 @@
 //! ## Getting Started
 //!
 //! ```rust
-//! use adriendellagaspera_api::prelude::*;
+//! use mistralai_sdk::prelude::*;
 //!
 //! #[tokio::main]
 //! async fn main() {

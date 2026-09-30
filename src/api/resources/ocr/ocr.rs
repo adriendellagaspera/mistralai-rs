@@ -26,7 +26,7 @@ impl OcrClient {
     /// # Examples
     ///
     /// ```no_run
-    /// use adriendellagaspera_api::prelude::*;
+    /// use mistralai_sdk::prelude::*;
     ///
     /// #[tokio::main]
     /// async fn main() {
