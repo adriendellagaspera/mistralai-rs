@@ -1,11 +1,8 @@
 # Development
 
-Production generation requires Rust 1.94, Python 3.11+ with `PyYAML==6.0.3`, Node/npm, Fern CLI `5.112.0`, Just, and the pinned SDK surface compiler.
+Production generation requires Rust 1.94, Python 3.11+ with `PyYAML==6.0.3`, Node/npm, Fern CLI `5.112.0`, and Just.
 
 ```sh
-mkdir -p .tools
-git clone https://github.com/adriendellagaspera/rust-sdk-generator.git .tools/sdk-surface
-git -C .tools/sdk-surface checkout 394d12ee893a256123545b75ba5e4a0f8f354ad7
 npm install --global fern-api@5.112.0
 python3 -m pip install PyYAML==6.0.3
 
@@ -18,7 +15,7 @@ SDK consumers need only Rust.
 
 ## Generation boundaries
 
-`sdk-build/openapi/published.yaml` is the canonical 288-operation source. `sdk-build/fern/policy.yaml` owns Mistral resource/method/type identity and representation policy. The pinned compiler from `rust-sdk-generator#240` turns that policy into deterministic Fern extensions and verifies the resulting Fern IR.
+`sdk-build/openapi/published.yaml` is the canonical 288-operation source. `sdk-build/fern/policy.yaml` owns Mistral resource/method/type identity and representation policy. The repository-local compiler in `sdk-build/sdk_surface/` turns that policy into deterministic Fern extensions and verifies the resulting Fern IR.
 
 `prepare_fern_source.py` owns only temporary input compatibility for identified Fern importer bugs. `patch_fern_output.py` owns only the multipart+SSE generated-output workaround tracked by fern-api/fern#17928.
 

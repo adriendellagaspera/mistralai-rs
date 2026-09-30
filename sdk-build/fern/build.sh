@@ -3,7 +3,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 FERN_ROOT="$ROOT/sdk-build/fern"
-SURFACE_TOOL="$ROOT/.tools/sdk-surface/surface/sdk_surface.py"
+SURFACE_TOOL="$ROOT/sdk-build/sdk_surface/sdk_surface.py"
 FERN_BIN="fern"
 
 if [[ ! -f "$SURFACE_TOOL" ]]; then
