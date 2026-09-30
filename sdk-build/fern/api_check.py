@@ -21,7 +21,7 @@ for marker in (
     "Mistral",
     "mistralai::raw",
     "mistralai_sdk",
-    "ApiClient",
+    "ClientConfig",
     "ByteStream",
     "audio_data",
     "fern-api/fern#17928",
