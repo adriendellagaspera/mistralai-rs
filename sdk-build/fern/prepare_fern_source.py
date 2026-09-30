@@ -22,6 +22,13 @@ def main() -> int:
     schemas = doc["components"]["schemas"]
     applied: list[dict[str, str]] = []
 
+    # Presentation metadata for the generated Rust crate. This does not alter
+    # the API wire contract; it prevents Fern's generic "official SDK" fallback.
+    doc.setdefault("info", {})["description"] = (
+        "Unofficial asynchronous Rust SDK for Mistral AI. "
+        "This project is not affiliated with Mistral AI."
+    )
+
     # Temporary Fern importer compatibility only. Remove this rewrite as soon
     # as the pinned Fern CLI contains the fix tracked by #17930.
     for name in (
