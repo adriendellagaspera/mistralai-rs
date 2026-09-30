@@ -50,12 +50,6 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          repository: adriendellagaspera/rust-sdk-generator
-          ref: 394d12ee893a256123545b75ba5e4a0f8f354ad7
-          path: .tools/sdk-surface
-          persist-credentials: false
       - run: rustup show
       - run: npm install --global fern-api@5.112.0 # zizmor: ignore[adhoc-packages]
       - run: python3 -m pip install --disable-pip-version-check PyYAML==6.0.3
