@@ -34,7 +34,7 @@ impl UsersClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client.beta.users.users_api_get_identity(None).await;
     /// }
     /// ```
@@ -73,7 +73,7 @@ impl UsersClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .beta
     ///         .users
@@ -132,7 +132,7 @@ impl UsersClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .beta
     ///         .users

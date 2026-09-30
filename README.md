@@ -9,11 +9,11 @@ cargo add mistralai-sdk@0.4
 ```
 
 ```rust,no_run
-use mistralai_sdk::{ApiClient, ClientConfig};
+use mistralai_sdk::{ClientConfig, Mistral};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let client = ApiClient::new(ClientConfig {
+    let client = Mistral::new(ClientConfig {
         api_key: Some(std::env::var("MISTRAL_API_KEY")?),
         ..Default::default()
     })?;

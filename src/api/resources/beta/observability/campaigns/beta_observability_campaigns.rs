@@ -34,7 +34,7 @@ impl CampaignsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .beta
     ///         .observability
@@ -89,7 +89,7 @@ impl CampaignsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .beta
     ///         .observability
@@ -146,7 +146,7 @@ impl CampaignsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .beta
     ///         .observability
@@ -195,7 +195,7 @@ impl CampaignsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .beta
     ///         .observability
@@ -244,7 +244,7 @@ impl CampaignsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client.beta.observability.campaigns.get_campaign_selected_events_v1observability_campaigns_campaign_id_selected_events_get(&"campaign_id".to_string(), &GetCampaignSelectedEventsV1ObservabilityCampaignsCampaignIDSelectedEventsGetQueryRequest {
     ///         ..Default::default()
     ///     }, None).await;
@@ -291,7 +291,7 @@ impl CampaignsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .beta
     ///         .observability

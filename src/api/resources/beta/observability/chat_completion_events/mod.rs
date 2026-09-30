@@ -38,7 +38,7 @@ impl ChatCompletionEventsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .beta
     ///         .observability
@@ -97,7 +97,7 @@ impl ChatCompletionEventsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .beta
     ///         .observability
@@ -151,7 +151,7 @@ impl ChatCompletionEventsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .beta
     ///         .observability
@@ -200,7 +200,7 @@ impl ChatCompletionEventsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client.beta.observability.chat_completion_events.judge_chat_completion_event_v1observability_chat_completion_events_event_id_live_judging_post(&"event_id".to_string(), &JudgeChatCompletionEventRequest {
     ///         judge_definition: CreateJudgeRequest {
     ///             description: "description".to_string(),
@@ -263,7 +263,7 @@ impl ChatCompletionEventsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client.beta.observability.chat_completion_events.get_similar_chat_completion_events_v1observability_chat_completion_events_event_id_similar_events_get(&"event_id".to_string(), None).await;
     /// }
     /// ```

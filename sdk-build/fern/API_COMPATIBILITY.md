@@ -4,8 +4,8 @@ This pre-1.0 migration intentionally replaces the former raw-bindings plus gener
 
 ## Intentional public changes
 
-- The former `Mistral` facade and `mistralai::raw` namespace are removed.
-- The crate's Fern-native library import is `mistralai_sdk`; the root client is `ApiClient`, configured with `ClientConfig`.
+- The former handwritten `Mistral` facade and `mistralai::raw` namespace are removed.
+- The crate's Fern-native library import is `mistralai_sdk`; the generated root client is `Mistral`, configured with `ClientConfig`.
 - The old `src/generated` / `src/sdk` split is removed. Fern modules under `src/api`, `src/client`, `src/core` and related root modules are the published SDK.
 - Fern-native request types and `Option<RequestOptions>` are exposed directly instead of being wrapped by the old facade.
 - Reviewed high-value operations keep product-oriented resource/method names from `policy.yaml`; other operations use deterministic operation-derived names.

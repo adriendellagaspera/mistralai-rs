@@ -37,7 +37,7 @@ impl VoicesClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .audio
     ///         .voices
@@ -91,7 +91,7 @@ impl VoicesClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .audio
     ///         .voices
@@ -151,7 +151,7 @@ impl VoicesClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .audio
     ///         .voices
@@ -196,7 +196,7 @@ impl VoicesClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .audio
     ///         .voices
@@ -241,7 +241,7 @@ impl VoicesClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .audio
     ///         .voices
@@ -293,7 +293,7 @@ impl VoicesClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .audio
     ///         .voices

@@ -34,7 +34,7 @@ impl SearchIndexesClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .beta
     ///         .rag
@@ -73,7 +73,7 @@ impl SearchIndexesClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .beta
     ///         .rag
@@ -145,7 +145,7 @@ impl SearchIndexesClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .beta
     ///         .rag
@@ -194,7 +194,7 @@ impl SearchIndexesClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client.beta.rag.search_indexes.update_index_metrics_v1rag_deployments_deployment_id_metrics_put(&"deployment_id".to_string(), &UpdateIndexMetricsV1RagDeploymentsDeploymentIDMetricsPutSearchIndexesRequestBody::Online {
     ///         data: UpdateMetricsRequestDeploymentMetricsOnline {
     ///             document_count: 1,

@@ -38,7 +38,7 @@ impl DatasetsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .beta
     ///         .observability
@@ -93,7 +93,7 @@ impl DatasetsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .beta
     ///         .observability
@@ -145,7 +145,7 @@ impl DatasetsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .beta
     ///         .observability
@@ -191,7 +191,7 @@ impl DatasetsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .beta
     ///         .observability
@@ -237,7 +237,7 @@ impl DatasetsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .beta
     ///         .observability
@@ -290,7 +290,7 @@ impl DatasetsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .beta
     ///         .observability
@@ -339,7 +339,7 @@ impl DatasetsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client.beta.observability.datasets.post_dataset_records_from_campaign_v1observability_datasets_dataset_id_imports_from_campaign_post(&"dataset_id".to_string(), &ImportDatasetFromCampaignRequest {
     ///         campaign_id: "campaign_id".to_string()
     ///     }, None).await;
@@ -386,7 +386,7 @@ impl DatasetsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client.beta.observability.datasets.post_dataset_records_from_dataset_v1observability_datasets_dataset_id_imports_from_dataset_post(&"dataset_id".to_string(), &ImportDatasetFromDatasetRequest {
     ///         dataset_record_ids: vec!["dataset_record_ids".to_string()]
     ///     }, None).await;
@@ -433,7 +433,7 @@ impl DatasetsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client.beta.observability.datasets.post_dataset_records_from_explorer_v1observability_datasets_dataset_id_imports_from_explorer_post(&"dataset_id".to_string(), &ImportDatasetFromExplorerRequest {
     ///         completion_event_ids: vec!["completion_event_ids".to_string()]
     ///     }, None).await;
@@ -480,7 +480,7 @@ impl DatasetsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .beta
     ///         .observability
@@ -533,7 +533,7 @@ impl DatasetsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client.beta.observability.datasets.post_dataset_records_from_playground_v1observability_datasets_dataset_id_imports_from_playground_post(&"dataset_id".to_string(), &ImportDatasetFromPlaygroundRequest {
     ///         conversation_ids: vec!["conversation_ids".to_string()]
     ///     }, None).await;
@@ -580,7 +580,7 @@ impl DatasetsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .beta
     ///         .observability
@@ -636,7 +636,7 @@ impl DatasetsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .beta
     ///         .observability
@@ -693,7 +693,7 @@ impl DatasetsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .beta
     ///         .observability
@@ -749,7 +749,7 @@ impl DatasetsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .beta
     ///         .observability

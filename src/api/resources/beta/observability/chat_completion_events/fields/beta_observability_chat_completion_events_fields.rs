@@ -34,7 +34,7 @@ impl FieldsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .beta
     ///         .observability
@@ -81,7 +81,7 @@ impl FieldsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client.beta.observability.chat_completion_events.fields.get_chat_completion_field_options_v1observability_chat_completion_fields_field_name_options_get(&"field_name".to_string(), &GetChatCompletionFieldOptionsV1ObservabilityChatCompletionFieldsFieldNameOptionsGetQueryRequest {
     ///         operator: GetChatCompletionFieldOptionsV1ObservabilityChatCompletionFieldsFieldNameOptionsGetFieldsRequestOperator::Lt
     ///     }, None).await;
@@ -130,7 +130,7 @@ impl FieldsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client.beta.observability.chat_completion_events.fields.get_chat_completion_field_options_counts_v1observability_chat_completion_fields_field_name_options_counts_post(&"field_name".to_string(), &FetchFieldOptionCountsRequest {
     ///         ..Default::default()
     ///     }, None).await;

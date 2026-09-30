@@ -35,7 +35,7 @@ impl ModelsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .models
     ///         .jobs_api_routes_fine_tuning_update_fine_tuned_model(
@@ -87,7 +87,7 @@ impl ModelsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .models
     ///         .jobs_api_routes_fine_tuning_archive_fine_tuned_model(
@@ -135,7 +135,7 @@ impl ModelsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .models
     ///         .jobs_api_routes_fine_tuning_unarchive_fine_tuned_model(
@@ -182,7 +182,7 @@ impl ModelsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .models
     ///         .list_models_v1models_get(
@@ -235,7 +235,7 @@ impl ModelsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .models
     ///         .retrieve_model_v1models_model_id_get(
@@ -283,7 +283,7 @@ impl ModelsClient {
     ///         token: Some("<token>".to_string()),
     ///         ..Default::default()
     ///     };
-    ///     let client = ApiClient::new(config).expect("Failed to build client");
+    ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .models
     ///         .delete_model_v1models_model_id_delete(
