@@ -11,6 +11,6 @@ jobs:
   public-catalog:
     name: Weekly upstream drift and remediation check
     permissions:
-      contents: write
-      pull-requests: write
+      contents: write # Commit reviewed upstream candidates on the automation branch.
+      pull-requests: write # Create or update the single upstream remediation PR.
     uses: ./.github/workflows/update-sdk.yml
