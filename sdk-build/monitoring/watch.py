@@ -183,80 +183,159 @@ def prepare() -> None:
     }, indent=2))
 
 
+def _code(value: object) -> str:
+    """Display upstream-controlled labels without breaking Markdown."""
+    import html
+    escaped = html.escape(str(value).replace(chr(96), "'").replace("\n", " ").replace("\r", " "))
+    return chr(96) + escaped + chr(96)
+
+
+def _rev(name: str, revision: str) -> str:
+    if revision == "unavailable":
+        return "Unavailable"
+    label = _code(revision[:12])
+    if name in SOURCES and len(revision) == 40:
+        return f"[{label}](https://github.com/{SOURCES[name]}/commit/{revision})"
+    return label
+
+
+def _details(title: str, values: list[str]) -> list[str]:
+    if not values:
+        return []
+    result = ["<details>", f"<summary>{title} ({len(values)})</summary>", ""]
+    result.extend("- " + _code(value) for value in values)
+    return result + ["", "</details>", ""]
+
+
+def _api_area(operation: str) -> str:
+    path = operation.split(" ", 1)[-1].split("#", 1)[0]
+    parts = [p for p in path.split("/") if p]
+    return "/" + "/".join(parts[:2]) if parts else "Other"
+
+
+def render_report(state: dict, generation_result: str) -> str:
+    from collections import Counter
+
+    info = state.get("details", {}).get("openapi", {})
+    delta = info.get("diff")
+    errors = state.get("errors", {})
+    passed = generation_result.lower() == "success"
+    source_names = {"openapi": "OpenAPI catalog", "python": "Python SDK", "typescript": "TypeScript SDK"}
+    lines = [
+        "# Mistral upstream synchronization", "",
+        "**Human review required** | **Generation: " + ("PASSED**" if passed else "FAILED / INCOMPLETE**"),
+        "",
+        "> Automated candidate only. CI verifies technical consistency; a separate",
+        "> GitHub PR approval is required to accept API and compatibility changes.",
+        "", "## Summary", "",
+        "| Source | State | Previously pinned → observed |",
+        "| --- | --- | --- |",
+    ]
+    for name in ("openapi", "python", "typescript"):
+        revision = state.get("details", {}).get(name, {}).get(
+            "sha256" if name == "openapi" else "commit", "unavailable"
+        )
+        status = (
+            "Unavailable" if name in errors
+            else "Changed" if state["changes"].get(name) else "Unchanged"
+        )
+        lines.append(
+            f"| {source_names[name]} | **{status}** | "
+            f"{_rev(name, state['previous'][name])} → {_rev(name, revision)} |"
+        )
+    lines.append("")
+    if delta:
+        operations = delta["operations"]
+        lines.extend([
+            f"**Endpoints:** {operations['count_before']} → {operations['count_after']} "
+            f"({len(operations['added'])} added, {len(operations['removed'])} removed, "
+            f"{len(operations['changed'])} modified).", "",
+        ])
+    lines += [
+        "## Review checklist", "",
+        "- [ ] Verify the public OpenAPI catalog and official SDK source revisions.",
+        "- [ ] Inspect removed/modified operations and schemas for breaking changes.",
+        "- [ ] Require regenerated Rust sources and a green CI " + _code("gate") + " check.",
+        "- [ ] Approve this PR in GitHub after the final push (never via a lockfile flag).",
+        "", "**Generation attempt:** " +
+        ("successful." if passed else generation_result.upper() + "; the source update is not validated as a Rust SDK."),
+        "",
+    ]
+    if errors:
+        lines += ["### Source acquisition errors", ""]
+        for name in ("openapi", "python", "typescript"):
+            if name in errors:
+                lines.append("- **" + source_names[name] + ":** " + _code(errors[name]))
+        lines.append("")
+    if delta:
+        lines += [
+            "## OpenAPI surface changes", "",
+            "| | Before | After | Added | Removed | Modified |",
+            "| --- | ---: | ---: | ---: | ---: | ---: |",
+        ]
+        for name, item in (("Endpoints", delta["operations"]), ("Schemas", delta["schemas"])):
+            lines.append(
+                f"| {name} | {item['count_before']} | {item['count_after']} | "
+                f"{len(item['added'])} | {len(item['removed'])} | {len(item['changed'])} |"
+            )
+        lines += [
+            "", "A modified schema fingerprint does not necessarily indicate a breaking change.",
+            "Removed operations and changed schemas should be reviewed first.", "",
+            "### Most affected API areas", "",
+            "| Area | Added | Removed | Modified |",
+            "| --- | ---: | ---: | ---: |",
+        ]
+        areas: dict[str, Counter] = {}
+        for action in ("added", "removed", "changed"):
+            for op in delta["operations"][action]:
+                areas.setdefault(_api_area(op), Counter())[action] += 1
+        for area, counts in sorted(areas.items(), key=lambda item: (-sum(item[1].values()), item[0]))[:15]:
+            lines.append(
+                f"| {_code(area)} | {counts['added']} | {counts['removed']} | {counts['changed']} |"
+            )
+        lines += ["", "### Changes needing compatibility review", ""]
+        for kind, action, title in (
+            ("operations", "removed", "Removed endpoints"),
+            ("operations", "changed", "Modified endpoints"),
+            ("schemas", "removed", "Removed schemas"),
+            ("schemas", "changed", "Modified schemas"),
+        ):
+            lines += _details(title, delta[kind][action])
+        lines += ["### Additions", ""]
+        lines += _details("Added endpoints", delta["operations"]["added"])
+        lines += _details("Added schemas", delta["schemas"]["added"])
+    lines += ["## Provenance", "", f"- OpenAPI source: <{PUBLIC_URL}>"]
+    if info:
+        lines.extend([
+            "- Proposed SHA-256: " + _code(info["sha256"]),
+            "- Previously pinned public SHA-256: " + _code(info["previous_public_sha256"]),
+            f"- Catalog size: {info['bytes']:,} bytes",
+        ])
+    for name in ("python", "typescript"):
+        if name in state.get("details", {}) and name not in errors:
+            old = state["previous"][name]
+            new = state["details"][name]["commit"]
+            lines.append(
+                f"- {source_names[name]}: [compare commits]"
+                f"(https://github.com/{SOURCES[name]}/compare/{old}...{new})"
+            )
+    lines += [
+        "", "## Acceptance", "",
+        "The protected main branch requires a GitHub approving review and the CI "
+        + _code("gate") + " check.",
+        "If source generation fails, this PR is a **drift report, not a mergeable SDK update**.",
+        "",
+    ]
+    return "\n".join(lines)
+
+
 def finish(generation_result: str) -> None:
     state = load(STATE)
     if not state["changed"]:
-        print("No upstream drift detected; reviewed pins remain current.")
+        print("No upstream drift detected; pinned revisions remain current.")
         return
-    lines = [
-        "# Automatic Mistral upstream synchronization",
-        "",
-        "This is an **unreviewed candidate**. Do not merge until CI, provenance,",
-        "source licensing, and any breaking API changes have been reviewed.",
-        "",
-        "## Source status",
-        "",
-        "| Source | Status | Previous pin | Observed revision |",
-        "| --- | --- | --- | --- |",
-    ]
-    for name in ("openapi", "python", "typescript"):
-        error = state["errors"].get(name)
-        changed = state["changes"].get(name, False)
-        observed = state["details"].get(name, {}).get(
-            "sha256" if name == "openapi" else "commit", "unavailable"
-        )
-        status = "UNAVAILABLE" if error else "DRIFT" if changed else "MATCH"
-        lines.append(f"| {name} | {status} | \`{state['previous'][name]}\` | \`{observed}\` |")
-    lines += ["", "## Candidate validation", "", f"Fern/Rust regeneration: **{generation_result.upper()}**.", ""]
-    if state["errors"]:
-        lines += ["## Acquisition errors", ""]
-        for name, error in state["errors"].items():
-            lines.append(f"- **{name}:** \`{error.replace(chr(96), chr(39))}\`")
-        lines.append("")
-    if "openapi" in state["details"]:
-        d = state["details"]["openapi"]
-        lines += [
-            "## OpenAPI semantic changes relative to committed Rust input",
-            "",
-            f"Public SHA-256: \`{d['sha256']}\`; downloaded bytes: {d['bytes']}.",
-            f"Previously pinned public SHA-256: \`{d['previous_public_sha256']}\`.",
-            "",
-        ]
-        for kind in ("operations", "schemas"):
-            changes = d["diff"][kind]
-            lines += [f"### {kind.title()} ({changes['count_before']} → {changes['count_after']})", ""]
-            for action in ("added", "removed", "changed"):
-                values = changes[action]
-                lines.append(f"- {action}: **{len(values)}**")
-                for value in values[:35]:
-                    lines.append(f"  - \`{value}\`")
-                if len(values) > 35:
-                    lines.append(f"  - … and {len(values)-35} more")
-            lines.append("")
-    lines += [
-        "## Approval through GitHub PR review",
-        "",
-        "This branch contains a proposed update, never a pre-approved source.",
-        "Review the upstream provenance, semantic differences and breaking",
-        "changes before approving in GitHub. The main-branch ruleset enforces",
-        "a separate approving review, last-push approval and a passing CI gate.",
-        "GitHub records approvals; no lockfile approval marker is needed.",
-        "",
-        "## What this PR does",
-        "",
-        "When the published spec changes, the PR proposes replacing the pinned source",
-        "with the deployed Mistral OpenAPI catalog. This is an explicit source",
-        "migration, **not** an assumed byte mirror of the previous GitHub source.",
-        "The Fern candidate is regenerated, checked for complete operation accounting,",
-        "and tested. Official Python and TypeScript commits advance independently.",
-        "",
-        "If generation is failing, this is a remediation PR, **not** a claim of compatibility.",
-        "Check its CI logs and correct the generator or policy before merging.",
-        "",
-    ]
-    REPORT.write_text("\n".join(lines))
+    REPORT.write_text(render_report(state, generation_result), encoding="utf-8")
     print(f"Wrote {REPORT}")
-
 
 
 def assert_healthy(scope: str) -> None:

@@ -89,8 +89,51 @@ class UpstreamWatchTests(unittest.TestCase):
         report = self.report.read_text()
         self.assertIn("POST /v1/new", report)
         self.assertIn("FAILURE", report)
-        self.assertIn("GitHub records approvals", report)
+        self.assertIn("Approve this PR in GitHub", report)
+        self.assertIn("<details>", report)
+        self.assertIn("<summary>Added endpoints (1)</summary>", report)
+        self.assertNotIn("\\\\`", report)
+        self.assertIn("compare/" + OLD_PY + "..." + NEW_PY, report)
         self.assertIn("changed=true", self.outputs.read_text())
+
+    def test_report_is_deterministic_and_safe_for_markdown(self) -> None:
+        with patch.object(watch, "download", return_value=CHANGED), patch.object(
+            watch, "latest_commit", side_effect=[NEW_PY, NEW_TS]
+        ):
+            watch.prepare()
+        watch.finish("failure")
+        first = self.report.read_text()
+        watch.finish("failure")
+        self.assertEqual(first, self.report.read_text())
+        self.assertIn("## Summary", first)
+        self.assertIn("## Review checklist", first)
+        self.assertIn("## OpenAPI surface changes", first)
+        self.assertIn("## Acceptance", first)
+        self.assertIn("<details>", first)
+        self.assertIn("</details>", first)
+
+    def test_removed_operations_are_explicit_and_collapsible(self) -> None:
+        state = {
+            "previous": {"openapi": "a" * 64, "python": OLD_PY, "typescript": OLD_TS},
+            "changes": {"openapi": True, "python": False, "typescript": False},
+            "details": {"openapi": {
+                "sha256": "b" * 64, "bytes": 1024,
+                "previous_public_sha256": "c" * 64,
+                "diff": {
+                    "operations": {"count_before": 2, "count_after": 1,
+                                   "added": [], "removed": ["DELETE /v1/files/{file_id}"],
+                                   "changed": []},
+                    "schemas": {"count_before": 2, "count_after": 2,
+                                "added": [], "removed": [], "changed": ["File"]},
+                },
+            }},
+            "errors": {},
+        }
+        report = watch.render_report(state, "failure")
+        self.assertIn("<summary>Removed endpoints (1)</summary>", report)
+        self.assertIn("DELETE /v1/files/{file_id}", report)
+        self.assertIn("<summary>Modified schemas (1)</summary>", report)
+        self.assertNotIn("unreviewed source lock", report.lower())
 
     def test_source_failure_does_not_suppress_sdk_updates(self) -> None:
         with patch.object(watch, "download", side_effect=OSError("catalog unavailable")), patch.object(

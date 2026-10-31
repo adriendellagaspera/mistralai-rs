@@ -45,3 +45,24 @@ last-push approval, and successful `gate` CI. An OpenAPI source pin is a
 review date in a lockfile: GitHub tracks the actual approval and reviewer.
 Review the semantic diff and source provenance, then select **Review changes →
 Approve** in the pull request. Any subsequent push invalidates the approval.
+
+
+## Human-readable automatic PRs
+
+The generated PR description starts with a status summary and source revision
+links, followed by a GitHub review checklist, a compact summary of changes
+by API area, and collapsible lists containing the changed endpoints/schemas.
+Removed or modified items appear before additions. Full SHA-256 provenance is
+retained; GitHub approval is never encoded in the source lock.
+
+The same Markdown is written to `STATUS.md` on the candidate branch and used as
+the PR body, so the human-readable report is reproducible from the scan.
+For drift that cannot be generated or tested, the report explicitly labels
+the PR as an unvalidated SDK candidate.
+
+### Protect in-progress reviews
+
+The nightly update can replace an all-bot candidate, but will not force-push
+over a commit whose author is not the GitHub Actions bot or over an existing
+approved PR. Such cases require manual reconciliation; the upstream drift
+check remains red so that the pending action is still visible.

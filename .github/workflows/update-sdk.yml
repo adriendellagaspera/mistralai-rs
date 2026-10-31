@@ -70,6 +70,25 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           branch=automation/update-mistral-sources
+          # Do not force-push over developer fixes or an approved PR. If
+          # review is underway, raise drift via the existing health check
+          # and leave the human candidate unchanged.
+          remote_ref="refs/remotes/origin/$branch"
+          if git show-ref --verify --quiet "$remote_ref"; then
+            human_authors="$(git log --format='%ae' "origin/main..$remote_ref" | grep -vFx '41898282+github-actions[bot]@users.noreply.github.com' || true)"
+            if [ -n "$human_authors" ]; then
+              echo "::warning::Human changes exist on $branch; refusing to overwrite them. Update the candidate manually."
+              exit 0
+            fi
+            existing_pr="$(gh pr list --base main --head "$branch" --state open --json number --jq '.[0].number // empty')"
+            if [ -n "$existing_pr" ]; then
+              approval_count="$(gh pr view "$existing_pr" --json reviews --jq '[.reviews[] | select(.state == "APPROVED")] | length')"
+              if [ "$approval_count" -gt 0 ]; then
+                echo "::warning::PR #$existing_pr has an approval; refusing to invalidate it with an automatic push."
+                exit 0
+              fi
+            fi
+          fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -A sdk-build/openapi sdk-build/official-sdks sdk-build/provenance.lock.json sdk-build/fern sdk-build/monitoring/STATUS.md src Cargo.lock
