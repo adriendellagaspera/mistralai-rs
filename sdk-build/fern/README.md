@@ -33,6 +33,6 @@ emits an explicit method extension as required by Fern 5.112.0; the importer
 limitation is tracked at https://github.com/fern-api/fern/issues/17932.
 
 `generate.sh` regenerates and materializes `src/`. `check.sh` regenerates
-twice, proves deterministic output, verifies all 288 source operations, builds
+twice, proves deterministic output, verifies all source operations, builds
 the generated crate, and requires byte-equivalent committed Rust sources plus
 the reviewed semantic inventory.
