@@ -13,6 +13,8 @@ pub struct VoiceUpdateRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub retention_notice: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<String>>,
 }
 
@@ -30,6 +32,7 @@ pub struct VoiceUpdateRequestBuilder {
     gender: Option<String>,
     languages: Option<Vec<String>>,
     name: Option<String>,
+    retention_notice: Option<i64>,
     tags: Option<Vec<String>>,
 }
 
@@ -59,6 +62,11 @@ impl VoiceUpdateRequestBuilder {
         self
     }
 
+    pub fn retention_notice(mut self, value: i64) -> Self {
+        self.retention_notice = Some(value);
+        self
+    }
+
     pub fn tags(mut self, value: Vec<String>) -> Self {
         self.tags = Some(value);
         self
@@ -72,6 +80,7 @@ impl VoiceUpdateRequestBuilder {
             gender: self.gender,
             languages: self.languages,
             name: self.name,
+            retention_notice: self.retention_notice,
             tags: self.tags,
         })
     }

@@ -1,16 +1,13 @@
 pub use crate::prelude::*;
 
 /// Capability for resources operations.
-#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
 pub struct ResourcesCapability {
     #[serde(rename = "listChanged")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub list_changed: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subscribe: Option<bool>,
-    /// Additional properties that are not part of the defined schema.
-    #[serde(flatten)]
-    pub extra: std::collections::HashMap<String, serde_json::Value>,
 }
 
 impl ResourcesCapability {
@@ -42,7 +39,6 @@ impl ResourcesCapabilityBuilder {
         Ok(ResourcesCapability {
             list_changed: self.list_changed,
             subscribe: self.subscribe,
-            extra: Default::default(),
         })
     }
 }

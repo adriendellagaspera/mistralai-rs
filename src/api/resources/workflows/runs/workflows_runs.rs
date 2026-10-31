@@ -2,11 +2,11 @@ use crate::api::*;
 use crate::{ApiError, ClientConfig, HttpClient, QueryBuilder, RequestOptions};
 use reqwest::Method;
 
-pub struct RunsClient {
+pub struct RunsClient2 {
     pub http_client: HttpClient,
 }
 
-impl RunsClient {
+impl RunsClient2 {
     pub fn new(config: ClientConfig) -> Result<Self, ApiError> {
         Ok(Self {
             http_client: HttpClient::new(config.clone())?,
@@ -33,7 +33,7 @@ impl RunsClient {
     /// * `include_internal` - Include runs of internal/technical workflows (e.g. parallel-execution)
     /// * `page_size` - Number of items per page
     /// * `next_page_token` - Token for the next page of results
-    /// * `search_key` - Filter executions by search key as repeated 'key:value' entries. Each entry matches an exact key and a similar value; multiple entries are AND'd together (max 3).
+    /// * `search_key` - Filter executions by search key as repeated entries (max 3, AND'd together). 'key:value' matches a similar value, 'key==:value' matches the exact value, a bare 'key' matches executions that have the key set at all, and 'key==' matches executions whose value for the key is null.
     /// * `options` - Additional request options such as headers, timeout, etc.
     ///
     /// # Returns

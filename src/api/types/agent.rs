@@ -29,6 +29,8 @@ pub struct Agent {
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub object: Option<AgentObject>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub owner_id: Option<String>,
     #[serde(default)]
     pub source: String,
     /// List of tools which are available to the model during the conversation.
@@ -66,6 +68,7 @@ pub struct AgentBuilder {
     model: Option<String>,
     name: Option<String>,
     object: Option<AgentObject>,
+    owner_id: Option<String>,
     source: Option<String>,
     tools: Option<Vec<AgentToolsItem>>,
     updated_at: Option<DateTime<FixedOffset>>,
@@ -135,6 +138,11 @@ impl AgentBuilder {
         self
     }
 
+    pub fn owner_id(mut self, value: impl Into<String>) -> Self {
+        self.owner_id = Some(value.into());
+        self
+    }
+
     pub fn source(mut self, value: impl Into<String>) -> Self {
         self.source = Some(value.into());
         self
@@ -196,6 +204,7 @@ impl AgentBuilder {
                 .ok_or_else(|| BuildError::missing_field("model"))?,
             name: self.name.ok_or_else(|| BuildError::missing_field("name"))?,
             object: self.object,
+            owner_id: self.owner_id,
             source: self
                 .source
                 .ok_or_else(|| BuildError::missing_field("source"))?,

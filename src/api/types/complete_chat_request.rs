@@ -7,6 +7,8 @@ pub struct CompleteChatRequest {
     pub frequency_penalty: Option<f64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub guardrails: Option<Vec<GuardrailConfig>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub logprobs: Option<bool>,
     /// The maximum number of tokens to generate in the completion. The token count of your prompt plus `max_tokens` cannot exceed the model's context length.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub max_tokens: Option<i64>,
@@ -15,6 +17,8 @@ pub struct CompleteChatRequest {
     pub messages: Vec<CompleteChatRequestMessagesItem>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<HashMap<String, serde_json::Value>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub min_tokens: Option<i64>,
     /// ID of the model to use. You can use the [List Available Models](/api/#tag/models/operation/list_models_v1_models_get) API to see all of your available models, or see our [Model overview](/models) for model descriptions.
     #[serde(default)]
     pub model: String,
@@ -32,6 +36,8 @@ pub struct CompleteChatRequest {
     pub presence_penalty: Option<f64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub prompt_cache_key: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub prompt_logprobs: Option<bool>,
     /// Allows toggling between the reasoning mode and no system prompt. When set to `reasoning` the system prompt for reasoning models will be used.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub prompt_mode: Option<MistralPromptMode>,
@@ -40,6 +46,8 @@ pub struct CompleteChatRequest {
     pub random_seed: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reasoning_effort: Option<ReasoningEffort>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub repetition_penalty: Option<f64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub response_format: Option<ResponseFormat>,
     /// Whether to inject a safety prompt before all conversations.
@@ -62,9 +70,15 @@ pub struct CompleteChatRequest {
     /// A list of tools the model may call. Use this to provide a list of functions the model may generate JSON inputs for.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tools: Option<Vec<CompleteChatRequestToolsItem>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub top_k: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub top_logprobs: Option<i64>,
     /// Nucleus sampling, where the model considers the results of the tokens with `top_p` probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered. We generally recommend altering this or `temperature` but not both.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub top_p: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub top_prompt_logprobs: Option<i64>,
 }
 
 impl CompleteChatRequest {
@@ -78,18 +92,22 @@ impl CompleteChatRequest {
 pub struct CompleteChatRequestBuilder {
     frequency_penalty: Option<f64>,
     guardrails: Option<Vec<GuardrailConfig>>,
+    logprobs: Option<bool>,
     max_tokens: Option<i64>,
     messages: Option<Vec<CompleteChatRequestMessagesItem>>,
     metadata: Option<HashMap<String, serde_json::Value>>,
+    min_tokens: Option<i64>,
     model: Option<String>,
     n: Option<i64>,
     parallel_tool_calls: Option<bool>,
     prediction: Option<Prediction>,
     presence_penalty: Option<f64>,
     prompt_cache_key: Option<String>,
+    prompt_logprobs: Option<bool>,
     prompt_mode: Option<MistralPromptMode>,
     random_seed: Option<i64>,
     reasoning_effort: Option<ReasoningEffort>,
+    repetition_penalty: Option<f64>,
     response_format: Option<ResponseFormat>,
     safe_prompt: Option<bool>,
     service_tier: Option<RequestedServiceTier>,
@@ -98,7 +116,10 @@ pub struct CompleteChatRequestBuilder {
     temperature: Option<f64>,
     tool_choice: Option<CompleteChatRequestToolChoice>,
     tools: Option<Vec<CompleteChatRequestToolsItem>>,
+    top_k: Option<i64>,
+    top_logprobs: Option<i64>,
     top_p: Option<f64>,
+    top_prompt_logprobs: Option<i64>,
 }
 
 impl CompleteChatRequestBuilder {
@@ -109,6 +130,11 @@ impl CompleteChatRequestBuilder {
 
     pub fn guardrails(mut self, value: Vec<GuardrailConfig>) -> Self {
         self.guardrails = Some(value);
+        self
+    }
+
+    pub fn logprobs(mut self, value: bool) -> Self {
+        self.logprobs = Some(value);
         self
     }
 
@@ -124,6 +150,11 @@ impl CompleteChatRequestBuilder {
 
     pub fn metadata(mut self, value: HashMap<String, serde_json::Value>) -> Self {
         self.metadata = Some(value);
+        self
+    }
+
+    pub fn min_tokens(mut self, value: i64) -> Self {
+        self.min_tokens = Some(value);
         self
     }
 
@@ -157,6 +188,11 @@ impl CompleteChatRequestBuilder {
         self
     }
 
+    pub fn prompt_logprobs(mut self, value: bool) -> Self {
+        self.prompt_logprobs = Some(value);
+        self
+    }
+
     pub fn prompt_mode(mut self, value: MistralPromptMode) -> Self {
         self.prompt_mode = Some(value);
         self
@@ -169,6 +205,11 @@ impl CompleteChatRequestBuilder {
 
     pub fn reasoning_effort(mut self, value: ReasoningEffort) -> Self {
         self.reasoning_effort = Some(value);
+        self
+    }
+
+    pub fn repetition_penalty(mut self, value: f64) -> Self {
+        self.repetition_penalty = Some(value);
         self
     }
 
@@ -212,8 +253,23 @@ impl CompleteChatRequestBuilder {
         self
     }
 
+    pub fn top_k(mut self, value: i64) -> Self {
+        self.top_k = Some(value);
+        self
+    }
+
+    pub fn top_logprobs(mut self, value: i64) -> Self {
+        self.top_logprobs = Some(value);
+        self
+    }
+
     pub fn top_p(mut self, value: f64) -> Self {
         self.top_p = Some(value);
+        self
+    }
+
+    pub fn top_prompt_logprobs(mut self, value: i64) -> Self {
+        self.top_prompt_logprobs = Some(value);
         self
     }
 
@@ -226,11 +282,13 @@ impl CompleteChatRequestBuilder {
         Ok(CompleteChatRequest {
             frequency_penalty: self.frequency_penalty,
             guardrails: self.guardrails,
+            logprobs: self.logprobs,
             max_tokens: self.max_tokens,
             messages: self
                 .messages
                 .ok_or_else(|| BuildError::missing_field("messages"))?,
             metadata: self.metadata,
+            min_tokens: self.min_tokens,
             model: self
                 .model
                 .ok_or_else(|| BuildError::missing_field("model"))?,
@@ -239,9 +297,11 @@ impl CompleteChatRequestBuilder {
             prediction: self.prediction,
             presence_penalty: self.presence_penalty,
             prompt_cache_key: self.prompt_cache_key,
+            prompt_logprobs: self.prompt_logprobs,
             prompt_mode: self.prompt_mode,
             random_seed: self.random_seed,
             reasoning_effort: self.reasoning_effort,
+            repetition_penalty: self.repetition_penalty,
             response_format: self.response_format,
             safe_prompt: self.safe_prompt,
             service_tier: self.service_tier,
@@ -252,7 +312,10 @@ impl CompleteChatRequestBuilder {
             temperature: self.temperature,
             tool_choice: self.tool_choice,
             tools: self.tools,
+            top_k: self.top_k,
+            top_logprobs: self.top_logprobs,
             top_p: self.top_p,
+            top_prompt_logprobs: self.top_prompt_logprobs,
         })
     }
 }

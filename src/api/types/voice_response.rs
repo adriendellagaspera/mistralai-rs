@@ -16,6 +16,9 @@ pub struct VoiceResponse {
     pub gender: Option<String>,
     #[serde(default)]
     pub id: String,
+    /// Cloning technology behind the voice: ivc for instant cloning, pvc for professional cloning.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub kind: Option<VoiceKind>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub languages: Option<Vec<String>>,
     #[serde(default)]
@@ -28,6 +31,8 @@ pub struct VoiceResponse {
     pub tags: Option<Vec<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub trimmed_seconds: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub r#type: Option<VoiceResponseType>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
 }
@@ -47,12 +52,14 @@ pub struct VoiceResponseBuilder {
     description: Option<String>,
     gender: Option<String>,
     id: Option<String>,
+    kind: Option<VoiceKind>,
     languages: Option<Vec<String>>,
     name: Option<String>,
     retention_notice: Option<i64>,
     slug: Option<String>,
     tags: Option<Vec<String>>,
     trimmed_seconds: Option<f64>,
+    r#type: Option<VoiceResponseType>,
     user_id: Option<String>,
 }
 
@@ -87,6 +94,11 @@ impl VoiceResponseBuilder {
         self
     }
 
+    pub fn kind(mut self, value: VoiceKind) -> Self {
+        self.kind = Some(value);
+        self
+    }
+
     pub fn languages(mut self, value: Vec<String>) -> Self {
         self.languages = Some(value);
         self
@@ -117,6 +129,11 @@ impl VoiceResponseBuilder {
         self
     }
 
+    pub fn r#type(mut self, value: VoiceResponseType) -> Self {
+        self.r#type = Some(value);
+        self
+    }
+
     pub fn user_id(mut self, value: impl Into<String>) -> Self {
         self.user_id = Some(value.into());
         self
@@ -137,12 +154,14 @@ impl VoiceResponseBuilder {
             description: self.description,
             gender: self.gender,
             id: self.id.ok_or_else(|| BuildError::missing_field("id"))?,
+            kind: self.kind,
             languages: self.languages,
             name: self.name.ok_or_else(|| BuildError::missing_field("name"))?,
             retention_notice: self.retention_notice,
             slug: self.slug,
             tags: self.tags,
             trimmed_seconds: self.trimmed_seconds,
+            r#type: self.r#type,
             user_id: self.user_id,
         })
     }

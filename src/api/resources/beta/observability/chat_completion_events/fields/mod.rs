@@ -1,2 +1,0 @@
-pub mod beta_observability_chat_completion_events_fields;
-pub use beta_observability_chat_completion_events_fields::FieldsClient;

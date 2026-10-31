@@ -7,7 +7,7 @@ pub struct ListLibrariesResponse {
     /// Opaque continuation token for the next page. Pass it back as `page_token` to fetch the next page. Null when there are no more results. Prefer this over the deprecated offset `page` parameter.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub next_page_token: Option<String>,
-    /// Deprecated: offset pagination metadata. Only populated for callers using the deprecated `page` parameter; omitted when `page_token` is used. While RBAC filtering is being rolled out `total_items` is a rough estimate (candidate count before per-library checks). Use `next_page_token` instead — this field will be removed once offset paging is retired.
+    /// Deprecated: offset pagination metadata. Only returned for requests using the deprecated `page` parameter; omitted when `page_token` is used. Use `next_page_token` instead — this field will be removed once offset paging is retired.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pagination: Option<PaginationInfo>,
 }

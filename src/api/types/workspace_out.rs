@@ -5,6 +5,9 @@ pub struct WorkspaceOut {
     /// Workspace description.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
+    /// Number of groups assigned to the Workspace.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub groups_count: Option<i64>,
     /// Workspace icon.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub icon: Option<String>,
@@ -35,6 +38,7 @@ impl WorkspaceOut {
 #[non_exhaustive]
 pub struct WorkspaceOutBuilder {
     description: Option<String>,
+    groups_count: Option<i64>,
     icon: Option<String>,
     is_default: Option<bool>,
     members_count: Option<i64>,
@@ -46,6 +50,11 @@ pub struct WorkspaceOutBuilder {
 impl WorkspaceOutBuilder {
     pub fn description(mut self, value: impl Into<String>) -> Self {
         self.description = Some(value.into());
+        self
+    }
+
+    pub fn groups_count(mut self, value: i64) -> Self {
+        self.groups_count = Some(value);
         self
     }
 
@@ -87,6 +96,7 @@ impl WorkspaceOutBuilder {
     pub fn build(self) -> Result<WorkspaceOut, BuildError> {
         Ok(WorkspaceOut {
             description: self.description,
+            groups_count: self.groups_count,
             icon: self.icon,
             is_default: self
                 .is_default

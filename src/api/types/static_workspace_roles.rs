@@ -10,10 +10,13 @@ pub enum StaticWorkspaceRoles {
     D79B30274Eb245218722825Acfee7D8B,
     TwoHundredFiftyTwoA082540B94B98Be807658956F13E9,
     SeventeenAa61C51C61477Ea40Ae52C8Ccd74B9,
+    ThreeHundredFortyEightFc8DaF6Da4464Ad3EAf7Bc137E221,
     B23Cd6E091Cd4A8A9869B30366Bf3966,
     SevenHundredThirtyOneEb2BeA74F4070B79735Bf7009E553,
     Ff86D4327F2747F8B02Fb5C102Ef6A55,
     ZeroF9Acbf693B542C7A227Fc7652755F65,
+    NinetyFourEf59Cf56Bf43839Dd61Fee77D370Af,
+    SevenE69E493Caf64671Af6084951754D9Fc,
     /// This variant is used for forward compatibility.
     /// If the server sends a value not recognized by the current SDK version,
     /// it will be captured here with the raw string value.
@@ -43,6 +46,9 @@ impl Serialize for StaticWorkspaceRoles {
             Self::SeventeenAa61C51C61477Ea40Ae52C8Ccd74B9 => {
                 serializer.serialize_str("17aa61c5-1c61-477e-a40a-e52c8ccd74b9")
             }
+            Self::ThreeHundredFortyEightFc8DaF6Da4464Ad3EAf7Bc137E221 => {
+                serializer.serialize_str("348fc8da-f6da-4464-ad3e-af7bc137e221")
+            }
             Self::B23Cd6E091Cd4A8A9869B30366Bf3966 => {
                 serializer.serialize_str("b23cd6e0-91cd-4a8a-9869-b30366bf3966")
             }
@@ -54,6 +60,12 @@ impl Serialize for StaticWorkspaceRoles {
             }
             Self::ZeroF9Acbf693B542C7A227Fc7652755F65 => {
                 serializer.serialize_str("0f9acbf6-93b5-42c7-a227-fc7652755f65")
+            }
+            Self::NinetyFourEf59Cf56Bf43839Dd61Fee77D370Af => {
+                serializer.serialize_str("94ef59cf-56bf-4383-9dd6-1fee77d370af")
+            }
+            Self::SevenE69E493Caf64671Af6084951754D9Fc => {
+                serializer.serialize_str("7e69e493-caf6-4671-af60-84951754d9fc")
             }
             Self::__Unknown(val) => serializer.serialize_str(val),
         }
@@ -77,12 +89,21 @@ impl<'de> Deserialize<'de> for StaticWorkspaceRoles {
             "17aa61c5-1c61-477e-a40a-e52c8ccd74b9" => {
                 Ok(Self::SeventeenAa61C51C61477Ea40Ae52C8Ccd74B9)
             }
+            "348fc8da-f6da-4464-ad3e-af7bc137e221" => {
+                Ok(Self::ThreeHundredFortyEightFc8DaF6Da4464Ad3EAf7Bc137E221)
+            }
             "b23cd6e0-91cd-4a8a-9869-b30366bf3966" => Ok(Self::B23Cd6E091Cd4A8A9869B30366Bf3966),
             "731eb2be-a74f-4070-b797-35bf7009e553" => {
                 Ok(Self::SevenHundredThirtyOneEb2BeA74F4070B79735Bf7009E553)
             }
             "ff86d432-7f27-47f8-b02f-b5c102ef6a55" => Ok(Self::Ff86D4327F2747F8B02Fb5C102Ef6A55),
             "0f9acbf6-93b5-42c7-a227-fc7652755f65" => Ok(Self::ZeroF9Acbf693B542C7A227Fc7652755F65),
+            "94ef59cf-56bf-4383-9dd6-1fee77d370af" => {
+                Ok(Self::NinetyFourEf59Cf56Bf43839Dd61Fee77D370Af)
+            }
+            "7e69e493-caf6-4671-af60-84951754d9fc" => {
+                Ok(Self::SevenE69E493Caf64671Af6084951754D9Fc)
+            }
             _ => Ok(Self::__Unknown(value)),
         }
     }
@@ -112,6 +133,9 @@ impl fmt::Display for StaticWorkspaceRoles {
             Self::SeventeenAa61C51C61477Ea40Ae52C8Ccd74B9 => {
                 write!(f, "17aa61c5-1c61-477e-a40a-e52c8ccd74b9")
             }
+            Self::ThreeHundredFortyEightFc8DaF6Da4464Ad3EAf7Bc137E221 => {
+                write!(f, "348fc8da-f6da-4464-ad3e-af7bc137e221")
+            }
             Self::B23Cd6E091Cd4A8A9869B30366Bf3966 => {
                 write!(f, "b23cd6e0-91cd-4a8a-9869-b30366bf3966")
             }
@@ -123,6 +147,12 @@ impl fmt::Display for StaticWorkspaceRoles {
             }
             Self::ZeroF9Acbf693B542C7A227Fc7652755F65 => {
                 write!(f, "0f9acbf6-93b5-42c7-a227-fc7652755f65")
+            }
+            Self::NinetyFourEf59Cf56Bf43839Dd61Fee77D370Af => {
+                write!(f, "94ef59cf-56bf-4383-9dd6-1fee77d370af")
+            }
+            Self::SevenE69E493Caf64671Af6084951754D9Fc => {
+                write!(f, "7e69e493-caf6-4671-af60-84951754d9fc")
             }
             Self::__Unknown(val) => write!(f, "{}", val),
         }

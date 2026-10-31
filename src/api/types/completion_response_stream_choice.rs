@@ -8,6 +8,10 @@ pub struct CompletionResponseStreamChoice {
     pub finish_reason: Option<CompletionResponseStreamChoiceFinishReason>,
     #[serde(default)]
     pub index: i64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub logprobs: Option<ChatCompletionResponseChoiceLogprobs>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub prompt_logprobs: Option<ChatCompletionResponseChoiceLogprobs>,
 }
 
 impl CompletionResponseStreamChoice {
@@ -22,6 +26,8 @@ pub struct CompletionResponseStreamChoiceBuilder {
     delta: Option<DeltaMessage>,
     finish_reason: Option<CompletionResponseStreamChoiceFinishReason>,
     index: Option<i64>,
+    logprobs: Option<ChatCompletionResponseChoiceLogprobs>,
+    prompt_logprobs: Option<ChatCompletionResponseChoiceLogprobs>,
 }
 
 impl CompletionResponseStreamChoiceBuilder {
@@ -40,6 +46,16 @@ impl CompletionResponseStreamChoiceBuilder {
         self
     }
 
+    pub fn logprobs(mut self, value: ChatCompletionResponseChoiceLogprobs) -> Self {
+        self.logprobs = Some(value);
+        self
+    }
+
+    pub fn prompt_logprobs(mut self, value: ChatCompletionResponseChoiceLogprobs) -> Self {
+        self.prompt_logprobs = Some(value);
+        self
+    }
+
     /// Consumes the builder and constructs a [`CompletionResponseStreamChoice`].
     /// This method will fail if any of the following fields are not set:
     /// - [`delta`](CompletionResponseStreamChoiceBuilder::delta)
@@ -53,6 +69,8 @@ impl CompletionResponseStreamChoiceBuilder {
             index: self
                 .index
                 .ok_or_else(|| BuildError::missing_field("index"))?,
+            logprobs: self.logprobs,
+            prompt_logprobs: self.prompt_logprobs,
         })
     }
 }

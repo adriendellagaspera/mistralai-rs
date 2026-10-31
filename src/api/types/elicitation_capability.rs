@@ -3,15 +3,12 @@ pub use crate::prelude::*;
 /// Capability for elicitation operations.
 ///
 /// Clients must support at least one mode (form or url).
-#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
 pub struct ElicitationCapability {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub form: Option<FormElicitationCapability>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<UrlElicitationCapability>,
-    /// Additional properties that are not part of the defined schema.
-    #[serde(flatten)]
-    pub extra: std::collections::HashMap<String, serde_json::Value>,
 }
 
 impl ElicitationCapability {
@@ -43,7 +40,6 @@ impl ElicitationCapabilityBuilder {
         Ok(ElicitationCapability {
             form: self.form,
             url: self.url,
-            extra: Default::default(),
         })
     }
 }

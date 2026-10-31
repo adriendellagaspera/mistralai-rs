@@ -2,7 +2,9 @@ pub use crate::prelude::*;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub struct AuthenticationConfiguration {
-    pub authentication_type: OutboundAuthenticationType,
+    pub authentication_type: AuthenticationType,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub creator_id: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub is_default: Option<bool>,
     #[serde(default)]
@@ -23,7 +25,8 @@ impl AuthenticationConfiguration {
 #[derive(Clone, PartialEq, Default, Debug)]
 #[non_exhaustive]
 pub struct AuthenticationConfigurationBuilder {
-    authentication_type: Option<OutboundAuthenticationType>,
+    authentication_type: Option<AuthenticationType>,
+    creator_id: Option<String>,
     is_default: Option<bool>,
     name: Option<String>,
     scope: Option<ConsumerType>,
@@ -32,8 +35,13 @@ pub struct AuthenticationConfigurationBuilder {
 }
 
 impl AuthenticationConfigurationBuilder {
-    pub fn authentication_type(mut self, value: OutboundAuthenticationType) -> Self {
+    pub fn authentication_type(mut self, value: AuthenticationType) -> Self {
         self.authentication_type = Some(value);
+        self
+    }
+
+    pub fn creator_id(mut self, value: impl Into<String>) -> Self {
+        self.creator_id = Some(value.into());
         self
     }
 
@@ -72,6 +80,7 @@ impl AuthenticationConfigurationBuilder {
             authentication_type: self
                 .authentication_type
                 .ok_or_else(|| BuildError::missing_field("authentication_type"))?,
+            creator_id: self.creator_id,
             is_default: self.is_default,
             name: self.name.ok_or_else(|| BuildError::missing_field("name"))?,
             scope: self

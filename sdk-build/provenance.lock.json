@@ -3,10 +3,9 @@
   "rust_toolchain": "1.94.0",
   "cargo_semver_checks_version": "0.50.0",
   "openapi": {
-    "repository": "mistralai/platform-docs-public",
-    "path": "public/openapi.yaml",
-    "commit": "ff846cf93d91df6fe04d0a5e540ecbe1e0ecc691",
-    "sha256": "86b89916f38b14d4452654938ec51ad5337c860c19db03f37d86921d639fb36f"
+    "sha256": "08a585fb75bcfa6ff968773134ee00060e0db283fc6b16f421f544e78ba8db92",
+    "source_kind": "published_catalog",
+    "url": "https://docs.mistral.ai/openapi.yaml"
   },
   "tools": {
     "fern_cli": {
@@ -28,11 +27,11 @@
   "official_sdks": {
     "python": {
       "repository": "mistralai/client-python",
-      "commit": "e8dfa1c8a2d0975cebfc0136b2d9060ff555494d"
+      "commit": "8fdbff0b1bcb0c9c3e5b803080a20ac820c2905c"
     },
     "typescript": {
       "repository": "mistralai/client-ts",
-      "commit": "d8f2d2539cf00d13d429653ab891b66a3524a2a9"
+      "commit": "50b2bc105cce327d3bd2ccee86240c4b0f6f2d6c"
     }
   }
 }

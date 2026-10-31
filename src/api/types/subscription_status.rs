@@ -5,10 +5,12 @@ pub use crate::prelude::*;
 pub enum SubscriptionStatus {
     Ns,
     S,
+    Ic,
     A,
     Cf,
     Cg,
     C,
+    Pc,
     Gp,
     /// This variant is used for forward compatibility.
     /// If the server sends a value not recognized by the current SDK version,
@@ -20,10 +22,12 @@ impl Serialize for SubscriptionStatus {
         match self {
             Self::Ns => serializer.serialize_str("NS"),
             Self::S => serializer.serialize_str("S"),
+            Self::Ic => serializer.serialize_str("IC"),
             Self::A => serializer.serialize_str("A"),
             Self::Cf => serializer.serialize_str("CF"),
             Self::Cg => serializer.serialize_str("CG"),
             Self::C => serializer.serialize_str("C"),
+            Self::Pc => serializer.serialize_str("PC"),
             Self::Gp => serializer.serialize_str("GP"),
             Self::__Unknown(val) => serializer.serialize_str(val),
         }
@@ -36,10 +40,12 @@ impl<'de> Deserialize<'de> for SubscriptionStatus {
         match value.as_str() {
             "NS" => Ok(Self::Ns),
             "S" => Ok(Self::S),
+            "IC" => Ok(Self::Ic),
             "A" => Ok(Self::A),
             "CF" => Ok(Self::Cf),
             "CG" => Ok(Self::Cg),
             "C" => Ok(Self::C),
+            "PC" => Ok(Self::Pc),
             "GP" => Ok(Self::Gp),
             _ => Ok(Self::__Unknown(value)),
         }
@@ -51,10 +57,12 @@ impl fmt::Display for SubscriptionStatus {
         match self {
             Self::Ns => write!(f, "NS"),
             Self::S => write!(f, "S"),
+            Self::Ic => write!(f, "IC"),
             Self::A => write!(f, "A"),
             Self::Cf => write!(f, "CF"),
             Self::Cg => write!(f, "CG"),
             Self::C => write!(f, "C"),
+            Self::Pc => write!(f, "PC"),
             Self::Gp => write!(f, "GP"),
             Self::__Unknown(val) => write!(f, "{}", val),
         }

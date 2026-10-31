@@ -8,6 +8,8 @@ pub mod conversations;
 pub use conversations::ConversationsClient;
 pub mod libraries;
 pub use libraries::LibrariesClient;
+pub mod service_accounts;
+pub use service_accounts::ServiceAccountsClient;
 pub mod users;
 pub use users::UsersClient;
 pub mod prompts;
@@ -26,6 +28,7 @@ pub struct BetaClient {
     pub connectors: ConnectorsClient,
     pub conversations: ConversationsClient,
     pub libraries: LibrariesClient,
+    pub service_accounts: ServiceAccountsClient,
     pub users: UsersClient,
     pub prompts: PromptsClient,
     pub skills: SkillsClient,
@@ -42,6 +45,7 @@ impl BetaClient {
             connectors: ConnectorsClient::new(config.clone())?,
             conversations: ConversationsClient::new(config.clone())?,
             libraries: LibrariesClient::new(config.clone())?,
+            service_accounts: ServiceAccountsClient::new(config.clone())?,
             users: UsersClient::new(config.clone())?,
             prompts: PromptsClient::new(config.clone())?,
             skills: SkillsClient::new(config.clone())?,

@@ -12,6 +12,8 @@ pub enum ConnectorSupportedLanguage {
     PtBr,
     It,
     Nl,
+    Uk,
+    Ko,
     /// This variant is used for forward compatibility.
     /// If the server sends a value not recognized by the current SDK version,
     /// it will be captured here with the raw string value.
@@ -29,6 +31,8 @@ impl Serialize for ConnectorSupportedLanguage {
             Self::PtBr => serializer.serialize_str("pt-BR"),
             Self::It => serializer.serialize_str("it"),
             Self::Nl => serializer.serialize_str("nl"),
+            Self::Uk => serializer.serialize_str("uk"),
+            Self::Ko => serializer.serialize_str("ko"),
             Self::__Unknown(val) => serializer.serialize_str(val),
         }
     }
@@ -47,6 +51,8 @@ impl<'de> Deserialize<'de> for ConnectorSupportedLanguage {
             "pt-BR" => Ok(Self::PtBr),
             "it" => Ok(Self::It),
             "nl" => Ok(Self::Nl),
+            "uk" => Ok(Self::Uk),
+            "ko" => Ok(Self::Ko),
             _ => Ok(Self::__Unknown(value)),
         }
     }
@@ -64,6 +70,8 @@ impl fmt::Display for ConnectorSupportedLanguage {
             Self::PtBr => write!(f, "pt-BR"),
             Self::It => write!(f, "it"),
             Self::Nl => write!(f, "nl"),
+            Self::Uk => write!(f, "uk"),
+            Self::Ko => write!(f, "ko"),
             Self::__Unknown(val) => write!(f, "{}", val),
         }
     }

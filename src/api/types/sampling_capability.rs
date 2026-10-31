@@ -1,15 +1,12 @@
 pub use crate::prelude::*;
 
-/// Sampling capability structure, allowing fine-grained capability advertisement.
-#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
+/// Sampling capability structure. Deprecated in 2026-07-28 (SEP-2577); shape unchanged.
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
 pub struct SamplingCapability {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub context: Option<SamplingContextCapability>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tools: Option<SamplingToolsCapability>,
-    /// Additional properties that are not part of the defined schema.
-    #[serde(flatten)]
-    pub extra: std::collections::HashMap<String, serde_json::Value>,
 }
 
 impl SamplingCapability {
@@ -41,7 +38,6 @@ impl SamplingCapabilityBuilder {
         Ok(SamplingCapability {
             context: self.context,
             tools: self.tools,
-            extra: Default::default(),
         })
     }
 }

@@ -1,14 +1,14 @@
 pub use crate::prelude::*;
 
 /// Capability for root operations.
-#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
+///
+/// Deprecated in protocol 2026-07-28 (SEP-2577) but still carried there as an
+/// empty object (`list_changed` exists only through 2025-11-25).
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
 pub struct RootsCapability {
     #[serde(rename = "listChanged")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub list_changed: Option<bool>,
-    /// Additional properties that are not part of the defined schema.
-    #[serde(flatten)]
-    pub extra: std::collections::HashMap<String, serde_json::Value>,
 }
 
 impl RootsCapability {
@@ -33,7 +33,6 @@ impl RootsCapabilityBuilder {
     pub fn build(self) -> Result<RootsCapability, BuildError> {
         Ok(RootsCapability {
             list_changed: self.list_changed,
-            extra: Default::default(),
         })
     }
 }

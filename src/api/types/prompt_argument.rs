@@ -1,7 +1,7 @@
 pub use crate::prelude::*;
 
-/// An argument for a prompt template.
-#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
+/// Describes an argument that a prompt can accept.
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
 pub struct PromptArgument {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
@@ -9,9 +9,8 @@ pub struct PromptArgument {
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub required: Option<bool>,
-    /// Additional properties that are not part of the defined schema.
-    #[serde(flatten)]
-    pub extra: std::collections::HashMap<String, serde_json::Value>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub title: Option<String>,
 }
 
 impl PromptArgument {
@@ -26,6 +25,7 @@ pub struct PromptArgumentBuilder {
     description: Option<String>,
     name: Option<String>,
     required: Option<bool>,
+    title: Option<String>,
 }
 
 impl PromptArgumentBuilder {
@@ -44,6 +44,11 @@ impl PromptArgumentBuilder {
         self
     }
 
+    pub fn title(mut self, value: impl Into<String>) -> Self {
+        self.title = Some(value.into());
+        self
+    }
+
     /// Consumes the builder and constructs a [`PromptArgument`].
     /// This method will fail if any of the following fields are not set:
     /// - [`name`](PromptArgumentBuilder::name)
@@ -52,7 +57,7 @@ impl PromptArgumentBuilder {
             description: self.description,
             name: self.name.ok_or_else(|| BuildError::missing_field("name"))?,
             required: self.required,
-            extra: Default::default(),
+            title: self.title,
         })
     }
 }

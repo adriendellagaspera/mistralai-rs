@@ -5,6 +5,9 @@ pub struct UsageOutjson {
     /// Audio usage data.
     #[serde(default)]
     pub audio: BasicModelUsageDataJson,
+    /// Audio Agent session duration usage data.
+    #[serde(default)]
+    pub audio_agents: BasicModelUsageDataJson,
     /// Text-to-speech (audio characters) usage data.
     #[serde(default)]
     pub audio_characters: BasicModelUsageDataJson,
@@ -72,6 +75,7 @@ impl UsageOutjson {
 #[non_exhaustive]
 pub struct UsageOutjsonBuilder {
     audio: Option<BasicModelUsageDataJson>,
+    audio_agents: Option<BasicModelUsageDataJson>,
     audio_characters: Option<BasicModelUsageDataJson>,
     chat: Option<BasicModelUsageDataJson>,
     completion: Option<BasicModelUsageDataJson>,
@@ -94,6 +98,11 @@ pub struct UsageOutjsonBuilder {
 impl UsageOutjsonBuilder {
     pub fn audio(mut self, value: BasicModelUsageDataJson) -> Self {
         self.audio = Some(value);
+        self
+    }
+
+    pub fn audio_agents(mut self, value: BasicModelUsageDataJson) -> Self {
+        self.audio_agents = Some(value);
         self
     }
 
@@ -185,6 +194,7 @@ impl UsageOutjsonBuilder {
     /// Consumes the builder and constructs a [`UsageOutjson`].
     /// This method will fail if any of the following fields are not set:
     /// - [`audio`](UsageOutjsonBuilder::audio)
+    /// - [`audio_agents`](UsageOutjsonBuilder::audio_agents)
     /// - [`audio_characters`](UsageOutjsonBuilder::audio_characters)
     /// - [`chat`](UsageOutjsonBuilder::chat)
     /// - [`completion`](UsageOutjsonBuilder::completion)
@@ -202,6 +212,9 @@ impl UsageOutjsonBuilder {
             audio: self
                 .audio
                 .ok_or_else(|| BuildError::missing_field("audio"))?,
+            audio_agents: self
+                .audio_agents
+                .ok_or_else(|| BuildError::missing_field("audio_agents"))?,
             audio_characters: self
                 .audio_characters
                 .ok_or_else(|| BuildError::missing_field("audio_characters"))?,

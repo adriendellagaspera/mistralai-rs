@@ -88,6 +88,7 @@ impl IngestionPipelineConfigurationsClient {
     ///             &CreateIngestionPipelineConfigurationRequest {
     ///                 name: "name".to_string(),
     ///                 pipeline_composition: None,
+    ///                 target_indexes: None,
     ///             },
     ///             None,
     ///         )

@@ -1,7 +1,7 @@
 pub use crate::prelude::*;
 
-/// Capability for client tasks operations.
-#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
+/// Capability for client tasks operations (2025-11-25 only).
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
 pub struct ClientTasksCapability {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cancel: Option<TasksCancelCapability>,
@@ -9,9 +9,6 @@ pub struct ClientTasksCapability {
     pub list: Option<TasksListCapability>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub requests: Option<ClientTasksRequestsCapability>,
-    /// Additional properties that are not part of the defined schema.
-    #[serde(flatten)]
-    pub extra: std::collections::HashMap<String, serde_json::Value>,
 }
 
 impl ClientTasksCapability {
@@ -50,7 +47,6 @@ impl ClientTasksCapabilityBuilder {
             cancel: self.cancel,
             list: self.list,
             requests: self.requests,
-            extra: Default::default(),
         })
     }
 }

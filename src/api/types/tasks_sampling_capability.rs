@@ -1,14 +1,11 @@
 pub use crate::prelude::*;
 
-/// Capability for tasks sampling operations.
-#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
+/// Capability for task-augmented sampling operations (2025-11-25 only).
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
 pub struct TasksSamplingCapability {
     #[serde(rename = "createMessage")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub create_message: Option<TasksCreateMessageCapability>,
-    /// Additional properties that are not part of the defined schema.
-    #[serde(flatten)]
-    pub extra: std::collections::HashMap<String, serde_json::Value>,
 }
 
 impl TasksSamplingCapability {
@@ -33,7 +30,6 @@ impl TasksSamplingCapabilityBuilder {
     pub fn build(self) -> Result<TasksSamplingCapability, BuildError> {
         Ok(TasksSamplingCapability {
             create_message: self.create_message,
-            extra: Default::default(),
         })
     }
 }

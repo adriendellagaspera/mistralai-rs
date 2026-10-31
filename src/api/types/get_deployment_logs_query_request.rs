@@ -3,6 +3,9 @@ pub use crate::prelude::*;
 /// Query parameters for get_deployment_logs
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
 pub struct GetDeploymentLogsQueryRequest {
+    /// Which stream to read. 'runtime' is the workers' own logs; 'build' reads the image build output and requires a managed deployment.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub log_type: Option<DeploymentLogType>,
     /// Filter logs by worker name
     #[serde(skip_serializing_if = "Option::is_none")]
     pub worker_name: Option<String>,
@@ -35,6 +38,7 @@ impl GetDeploymentLogsQueryRequest {
 #[derive(Clone, PartialEq, Default, Debug)]
 #[non_exhaustive]
 pub struct GetDeploymentLogsQueryRequestBuilder {
+    log_type: Option<DeploymentLogType>,
     worker_name: Option<String>,
     workflow_name: Option<String>,
     after: Option<DateTime<FixedOffset>>,
@@ -45,6 +49,11 @@ pub struct GetDeploymentLogsQueryRequestBuilder {
 }
 
 impl GetDeploymentLogsQueryRequestBuilder {
+    pub fn log_type(mut self, value: DeploymentLogType) -> Self {
+        self.log_type = Some(value);
+        self
+    }
+
     pub fn worker_name(mut self, value: impl Into<String>) -> Self {
         self.worker_name = Some(value.into());
         self
@@ -83,6 +92,7 @@ impl GetDeploymentLogsQueryRequestBuilder {
     /// Consumes the builder and constructs a [`GetDeploymentLogsQueryRequest`].
     pub fn build(self) -> Result<GetDeploymentLogsQueryRequest, BuildError> {
         Ok(GetDeploymentLogsQueryRequest {
+            log_type: self.log_type,
             worker_name: self.worker_name,
             workflow_name: self.workflow_name,
             after: self.after,

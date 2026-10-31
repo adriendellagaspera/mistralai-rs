@@ -1,6 +1,6 @@
 pub use crate::prelude::*;
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct ManagedDeploymentResponse {
     #[serde(default)]
     #[serde(with = "crate::core::flexible_datetime::offset")]
@@ -19,9 +19,12 @@ pub struct ManagedDeploymentResponse {
     pub resources: DeploymentResourceConfig,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rollout_status: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub runtime_credential_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub runtime_principal_type: Option<PrincipalType>,
     #[serde(default)]
     pub service_id: String,
-    #[serde(default)]
     pub spec: DeploymentWorkerSpecResponse,
     #[serde(default)]
     pub status: DeploymentObservedState,
@@ -51,6 +54,8 @@ pub struct ManagedDeploymentResponseBuilder {
     name: Option<String>,
     resources: Option<DeploymentResourceConfig>,
     rollout_status: Option<String>,
+    runtime_credential_id: Option<String>,
+    runtime_principal_type: Option<PrincipalType>,
     service_id: Option<String>,
     spec: Option<DeploymentWorkerSpecResponse>,
     status: Option<DeploymentObservedState>,
@@ -97,6 +102,16 @@ impl ManagedDeploymentResponseBuilder {
 
     pub fn rollout_status(mut self, value: impl Into<String>) -> Self {
         self.rollout_status = Some(value.into());
+        self
+    }
+
+    pub fn runtime_credential_id(mut self, value: impl Into<String>) -> Self {
+        self.runtime_credential_id = Some(value.into());
+        self
+    }
+
+    pub fn runtime_principal_type(mut self, value: PrincipalType) -> Self {
+        self.runtime_principal_type = Some(value);
         self
     }
 
@@ -153,6 +168,8 @@ impl ManagedDeploymentResponseBuilder {
                 .resources
                 .ok_or_else(|| BuildError::missing_field("resources"))?,
             rollout_status: self.rollout_status,
+            runtime_credential_id: self.runtime_credential_id,
+            runtime_principal_type: self.runtime_principal_type,
             service_id: self
                 .service_id
                 .ok_or_else(|| BuildError::missing_field("service_id"))?,

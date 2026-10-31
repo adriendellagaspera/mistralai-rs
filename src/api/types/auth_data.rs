@@ -5,6 +5,8 @@ pub struct AuthData {
     #[serde(default)]
     pub client_id: String,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub client_scopes: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub client_secret: Option<String>,
 }
 
@@ -18,12 +20,18 @@ impl AuthData {
 #[non_exhaustive]
 pub struct AuthDataBuilder {
     client_id: Option<String>,
+    client_scopes: Option<Vec<String>>,
     client_secret: Option<String>,
 }
 
 impl AuthDataBuilder {
     pub fn client_id(mut self, value: impl Into<String>) -> Self {
         self.client_id = Some(value.into());
+        self
+    }
+
+    pub fn client_scopes(mut self, value: Vec<String>) -> Self {
+        self.client_scopes = Some(value);
         self
     }
 
@@ -40,6 +48,7 @@ impl AuthDataBuilder {
             client_id: self
                 .client_id
                 .ok_or_else(|| BuildError::missing_field("client_id"))?,
+            client_scopes: self.client_scopes,
             client_secret: self.client_secret,
         })
     }

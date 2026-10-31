@@ -1,13 +1,10 @@
 pub use crate::prelude::*;
 
-/// Capability for tasks elicitation operations.
-#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
+/// Capability for task-augmented elicitation operations (2025-11-25 only).
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
 pub struct TasksElicitationCapability {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub create: Option<TasksCreateElicitationCapability>,
-    /// Additional properties that are not part of the defined schema.
-    #[serde(flatten)]
-    pub extra: std::collections::HashMap<String, serde_json::Value>,
 }
 
 impl TasksElicitationCapability {
@@ -32,7 +29,6 @@ impl TasksElicitationCapabilityBuilder {
     pub fn build(self) -> Result<TasksElicitationCapability, BuildError> {
         Ok(TasksElicitationCapability {
             create: self.create,
-            extra: Default::default(),
         })
     }
 }

@@ -10,6 +10,15 @@ pub struct ListDeploymentsV1WorkflowsDeploymentsGetQueryRequest {
     pub is_hardened: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub workflow_name: Option<String>,
+    /// Filter deployments by creator's user id
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_by: Option<String>,
+    /// Filter deployments by owner's user id
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub owner: Option<String>,
+    /// Filter deployments with at least one worker on any of these location types (OR)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub location_types: Option<Vec<LocationType>>,
     /// Filter deployments by name or ID prefix
     #[serde(skip_serializing_if = "Option::is_none")]
     pub search: Option<String>,
@@ -42,6 +51,9 @@ pub struct ListDeploymentsV1WorkflowsDeploymentsGetQueryRequestBuilder {
     active_only: Option<bool>,
     is_hardened: Option<bool>,
     workflow_name: Option<String>,
+    created_by: Option<String>,
+    owner: Option<String>,
+    location_types: Option<Vec<LocationType>>,
     search: Option<String>,
     order_by: Option<ListDeploymentsV1WorkflowsDeploymentsGetDeploymentsRequestOrderBy>,
     order: Option<ListDeploymentsV1WorkflowsDeploymentsGetDeploymentsRequestOrder>,
@@ -63,6 +75,21 @@ impl ListDeploymentsV1WorkflowsDeploymentsGetQueryRequestBuilder {
 
     pub fn workflow_name(mut self, value: impl Into<String>) -> Self {
         self.workflow_name = Some(value.into());
+        self
+    }
+
+    pub fn created_by(mut self, value: impl Into<String>) -> Self {
+        self.created_by = Some(value.into());
+        self
+    }
+
+    pub fn owner(mut self, value: impl Into<String>) -> Self {
+        self.owner = Some(value.into());
+        self
+    }
+
+    pub fn location_types(mut self, value: Vec<LocationType>) -> Self {
+        self.location_types = Some(value);
         self
     }
 
@@ -108,6 +135,9 @@ impl ListDeploymentsV1WorkflowsDeploymentsGetQueryRequestBuilder {
             active_only: self.active_only,
             is_hardened: self.is_hardened,
             workflow_name: self.workflow_name,
+            created_by: self.created_by,
+            owner: self.owner,
+            location_types: self.location_types,
             search: self.search,
             order_by: self.order_by,
             order: self.order,

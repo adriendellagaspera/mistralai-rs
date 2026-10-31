@@ -2,14 +2,13 @@ pub use crate::prelude::*;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
 pub struct WorkflowsWorkerSpecUpdate {
+    /// Backend-specific configuration for the Mistral Cloud backend.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub entrypoint: Option<String>,
+    pub backend_spec: Option<DeploymentMistralCloudBackendSpec>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub github_url: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub revision: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub working_dir: Option<String>,
 }
 
 impl WorkflowsWorkerSpecUpdate {
@@ -21,15 +20,14 @@ impl WorkflowsWorkerSpecUpdate {
 #[derive(Clone, PartialEq, Default, Debug)]
 #[non_exhaustive]
 pub struct WorkflowsWorkerSpecUpdateBuilder {
-    entrypoint: Option<String>,
+    backend_spec: Option<DeploymentMistralCloudBackendSpec>,
     github_url: Option<String>,
     revision: Option<String>,
-    working_dir: Option<String>,
 }
 
 impl WorkflowsWorkerSpecUpdateBuilder {
-    pub fn entrypoint(mut self, value: impl Into<String>) -> Self {
-        self.entrypoint = Some(value.into());
+    pub fn backend_spec(mut self, value: DeploymentMistralCloudBackendSpec) -> Self {
+        self.backend_spec = Some(value);
         self
     }
 
@@ -43,18 +41,12 @@ impl WorkflowsWorkerSpecUpdateBuilder {
         self
     }
 
-    pub fn working_dir(mut self, value: impl Into<String>) -> Self {
-        self.working_dir = Some(value.into());
-        self
-    }
-
     /// Consumes the builder and constructs a [`WorkflowsWorkerSpecUpdate`].
     pub fn build(self) -> Result<WorkflowsWorkerSpecUpdate, BuildError> {
         Ok(WorkflowsWorkerSpecUpdate {
-            entrypoint: self.entrypoint,
+            backend_spec: self.backend_spec,
             github_url: self.github_url,
             revision: self.revision,
-            working_dir: self.working_dir,
         })
     }
 }

@@ -4,7 +4,7 @@ pub use crate::prelude::*;
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
 pub struct ConnectorListOrganizationCredentialsV1QueryRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub auth_type: Option<OutboundAuthenticationType>,
+    pub auth_type: Option<AuthenticationType>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub fetch_default: Option<bool>,
 }
@@ -18,12 +18,12 @@ impl ConnectorListOrganizationCredentialsV1QueryRequest {
 #[derive(Clone, PartialEq, Default, Debug)]
 #[non_exhaustive]
 pub struct ConnectorListOrganizationCredentialsV1QueryRequestBuilder {
-    auth_type: Option<OutboundAuthenticationType>,
+    auth_type: Option<AuthenticationType>,
     fetch_default: Option<bool>,
 }
 
 impl ConnectorListOrganizationCredentialsV1QueryRequestBuilder {
-    pub fn auth_type(mut self, value: OutboundAuthenticationType) -> Self {
+    pub fn auth_type(mut self, value: AuthenticationType) -> Self {
         self.auth_type = Some(value);
         self
     }

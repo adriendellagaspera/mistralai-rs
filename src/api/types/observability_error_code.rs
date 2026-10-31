@@ -12,10 +12,7 @@ pub enum ObservabilityErrorCode {
     AuthUnauthorized,
     FeatureNotSupported,
     FieldsBadRequest,
-    FieldsNotFound,
-    SearchNotFound,
     SearchBadRequest,
-    SearchServiceUnavailable,
     DatabaseError,
     DatabaseTimeout,
     DatabaseUnavailable,
@@ -26,11 +23,7 @@ pub enum ObservabilityErrorCode {
     JudgeMistralApiTimeout,
     JudgeNameAlreadyExists,
     JudgeNotFound,
-    JudgeAlreadyHasNewVersion,
-    JudgeUsedInCampaignCannotBeUpdated,
     JudgeDidNotChange,
-    CampaignNotFound,
-    CampaignNoMatchingEvents,
     DatasetNotFound,
     DatasetTaskNotFound,
     DatasetRecordNotFound,
@@ -44,10 +37,20 @@ pub enum ObservabilityErrorCode {
     EvaluationRunTransitionIsInvalid,
     EvaluationRunTransitionIsRunningAlready,
     EvaluationRunTransitionError,
+    EvaluationRunOutputRecordConflict,
     TemplateError,
     TemplateSyntaxError,
+    ProjectNotFound,
     ProjectNameAlreadyExists,
+    PipelineConfigNotFound,
+    PipelineConfigAlreadyExists,
+    PipelineNotFound,
+    PipelineAlreadyExists,
+    ScorerNotFound,
+    ScorerAlreadyExists,
+    ScorerConfigKindMismatch,
     EvaluationNameAlreadyExists,
+    OptimizationNotFound,
     OptimizationTrialKeyAlreadyExists,
     TracesFilterQueryParseError,
     TraceNotFound,
@@ -75,12 +78,7 @@ impl Serialize for ObservabilityErrorCode {
             Self::AuthUnauthorized => serializer.serialize_str("AUTH_UNAUTHORIZED"),
             Self::FeatureNotSupported => serializer.serialize_str("FEATURE_NOT_SUPPORTED"),
             Self::FieldsBadRequest => serializer.serialize_str("FIELDS_BAD_REQUEST"),
-            Self::FieldsNotFound => serializer.serialize_str("FIELDS_NOT_FOUND"),
-            Self::SearchNotFound => serializer.serialize_str("SEARCH_NOT_FOUND"),
             Self::SearchBadRequest => serializer.serialize_str("SEARCH_BAD_REQUEST"),
-            Self::SearchServiceUnavailable => {
-                serializer.serialize_str("SEARCH_SERVICE_UNAVAILABLE")
-            }
             Self::DatabaseError => serializer.serialize_str("DATABASE_ERROR"),
             Self::DatabaseTimeout => serializer.serialize_str("DATABASE_TIMEOUT"),
             Self::DatabaseUnavailable => serializer.serialize_str("DATABASE_UNAVAILABLE"),
@@ -95,17 +93,7 @@ impl Serialize for ObservabilityErrorCode {
             Self::JudgeMistralApiTimeout => serializer.serialize_str("JUDGE_MISTRAL_API_TIMEOUT"),
             Self::JudgeNameAlreadyExists => serializer.serialize_str("JUDGE_NAME_ALREADY_EXISTS"),
             Self::JudgeNotFound => serializer.serialize_str("JUDGE_NOT_FOUND"),
-            Self::JudgeAlreadyHasNewVersion => {
-                serializer.serialize_str("JUDGE_ALREADY_HAS_NEW_VERSION")
-            }
-            Self::JudgeUsedInCampaignCannotBeUpdated => {
-                serializer.serialize_str("JUDGE_USED_IN_CAMPAIGN_CANNOT_BE_UPDATED")
-            }
             Self::JudgeDidNotChange => serializer.serialize_str("JUDGE_DID_NOT_CHANGE"),
-            Self::CampaignNotFound => serializer.serialize_str("CAMPAIGN_NOT_FOUND"),
-            Self::CampaignNoMatchingEvents => {
-                serializer.serialize_str("CAMPAIGN_NO_MATCHING_EVENTS")
-            }
             Self::DatasetNotFound => serializer.serialize_str("DATASET_NOT_FOUND"),
             Self::DatasetTaskNotFound => serializer.serialize_str("DATASET_TASK_NOT_FOUND"),
             Self::DatasetRecordNotFound => serializer.serialize_str("DATASET_RECORD_NOT_FOUND"),
@@ -131,14 +119,30 @@ impl Serialize for ObservabilityErrorCode {
             Self::EvaluationRunTransitionError => {
                 serializer.serialize_str("EVALUATION_RUN_TRANSITION_ERROR")
             }
+            Self::EvaluationRunOutputRecordConflict => {
+                serializer.serialize_str("EVALUATION_RUN_OUTPUT_RECORD_CONFLICT")
+            }
             Self::TemplateError => serializer.serialize_str("TEMPLATE_ERROR"),
             Self::TemplateSyntaxError => serializer.serialize_str("TEMPLATE_SYNTAX_ERROR"),
+            Self::ProjectNotFound => serializer.serialize_str("PROJECT_NOT_FOUND"),
             Self::ProjectNameAlreadyExists => {
                 serializer.serialize_str("PROJECT_NAME_ALREADY_EXISTS")
+            }
+            Self::PipelineConfigNotFound => serializer.serialize_str("PIPELINE_CONFIG_NOT_FOUND"),
+            Self::PipelineConfigAlreadyExists => {
+                serializer.serialize_str("PIPELINE_CONFIG_ALREADY_EXISTS")
+            }
+            Self::PipelineNotFound => serializer.serialize_str("PIPELINE_NOT_FOUND"),
+            Self::PipelineAlreadyExists => serializer.serialize_str("PIPELINE_ALREADY_EXISTS"),
+            Self::ScorerNotFound => serializer.serialize_str("SCORER_NOT_FOUND"),
+            Self::ScorerAlreadyExists => serializer.serialize_str("SCORER_ALREADY_EXISTS"),
+            Self::ScorerConfigKindMismatch => {
+                serializer.serialize_str("SCORER_CONFIG_KIND_MISMATCH")
             }
             Self::EvaluationNameAlreadyExists => {
                 serializer.serialize_str("EVALUATION_NAME_ALREADY_EXISTS")
             }
+            Self::OptimizationNotFound => serializer.serialize_str("OPTIMIZATION_NOT_FOUND"),
             Self::OptimizationTrialKeyAlreadyExists => {
                 serializer.serialize_str("OPTIMIZATION_TRIAL_KEY_ALREADY_EXISTS")
             }
@@ -165,10 +169,7 @@ impl<'de> Deserialize<'de> for ObservabilityErrorCode {
             "AUTH_UNAUTHORIZED" => Ok(Self::AuthUnauthorized),
             "FEATURE_NOT_SUPPORTED" => Ok(Self::FeatureNotSupported),
             "FIELDS_BAD_REQUEST" => Ok(Self::FieldsBadRequest),
-            "FIELDS_NOT_FOUND" => Ok(Self::FieldsNotFound),
-            "SEARCH_NOT_FOUND" => Ok(Self::SearchNotFound),
             "SEARCH_BAD_REQUEST" => Ok(Self::SearchBadRequest),
-            "SEARCH_SERVICE_UNAVAILABLE" => Ok(Self::SearchServiceUnavailable),
             "DATABASE_ERROR" => Ok(Self::DatabaseError),
             "DATABASE_TIMEOUT" => Ok(Self::DatabaseTimeout),
             "DATABASE_UNAVAILABLE" => Ok(Self::DatabaseUnavailable),
@@ -179,13 +180,7 @@ impl<'de> Deserialize<'de> for ObservabilityErrorCode {
             "JUDGE_MISTRAL_API_TIMEOUT" => Ok(Self::JudgeMistralApiTimeout),
             "JUDGE_NAME_ALREADY_EXISTS" => Ok(Self::JudgeNameAlreadyExists),
             "JUDGE_NOT_FOUND" => Ok(Self::JudgeNotFound),
-            "JUDGE_ALREADY_HAS_NEW_VERSION" => Ok(Self::JudgeAlreadyHasNewVersion),
-            "JUDGE_USED_IN_CAMPAIGN_CANNOT_BE_UPDATED" => {
-                Ok(Self::JudgeUsedInCampaignCannotBeUpdated)
-            }
             "JUDGE_DID_NOT_CHANGE" => Ok(Self::JudgeDidNotChange),
-            "CAMPAIGN_NOT_FOUND" => Ok(Self::CampaignNotFound),
-            "CAMPAIGN_NO_MATCHING_EVENTS" => Ok(Self::CampaignNoMatchingEvents),
             "DATASET_NOT_FOUND" => Ok(Self::DatasetNotFound),
             "DATASET_TASK_NOT_FOUND" => Ok(Self::DatasetTaskNotFound),
             "DATASET_RECORD_NOT_FOUND" => Ok(Self::DatasetRecordNotFound),
@@ -201,10 +196,20 @@ impl<'de> Deserialize<'de> for ObservabilityErrorCode {
                 Ok(Self::EvaluationRunTransitionIsRunningAlready)
             }
             "EVALUATION_RUN_TRANSITION_ERROR" => Ok(Self::EvaluationRunTransitionError),
+            "EVALUATION_RUN_OUTPUT_RECORD_CONFLICT" => Ok(Self::EvaluationRunOutputRecordConflict),
             "TEMPLATE_ERROR" => Ok(Self::TemplateError),
             "TEMPLATE_SYNTAX_ERROR" => Ok(Self::TemplateSyntaxError),
+            "PROJECT_NOT_FOUND" => Ok(Self::ProjectNotFound),
             "PROJECT_NAME_ALREADY_EXISTS" => Ok(Self::ProjectNameAlreadyExists),
+            "PIPELINE_CONFIG_NOT_FOUND" => Ok(Self::PipelineConfigNotFound),
+            "PIPELINE_CONFIG_ALREADY_EXISTS" => Ok(Self::PipelineConfigAlreadyExists),
+            "PIPELINE_NOT_FOUND" => Ok(Self::PipelineNotFound),
+            "PIPELINE_ALREADY_EXISTS" => Ok(Self::PipelineAlreadyExists),
+            "SCORER_NOT_FOUND" => Ok(Self::ScorerNotFound),
+            "SCORER_ALREADY_EXISTS" => Ok(Self::ScorerAlreadyExists),
+            "SCORER_CONFIG_KIND_MISMATCH" => Ok(Self::ScorerConfigKindMismatch),
             "EVALUATION_NAME_ALREADY_EXISTS" => Ok(Self::EvaluationNameAlreadyExists),
+            "OPTIMIZATION_NOT_FOUND" => Ok(Self::OptimizationNotFound),
             "OPTIMIZATION_TRIAL_KEY_ALREADY_EXISTS" => Ok(Self::OptimizationTrialKeyAlreadyExists),
             "TRACES_FILTER_QUERY_PARSE_ERROR" => Ok(Self::TracesFilterQueryParseError),
             "TRACE_NOT_FOUND" => Ok(Self::TraceNotFound),
@@ -226,10 +231,7 @@ impl fmt::Display for ObservabilityErrorCode {
             Self::AuthUnauthorized => write!(f, "AUTH_UNAUTHORIZED"),
             Self::FeatureNotSupported => write!(f, "FEATURE_NOT_SUPPORTED"),
             Self::FieldsBadRequest => write!(f, "FIELDS_BAD_REQUEST"),
-            Self::FieldsNotFound => write!(f, "FIELDS_NOT_FOUND"),
-            Self::SearchNotFound => write!(f, "SEARCH_NOT_FOUND"),
             Self::SearchBadRequest => write!(f, "SEARCH_BAD_REQUEST"),
-            Self::SearchServiceUnavailable => write!(f, "SEARCH_SERVICE_UNAVAILABLE"),
             Self::DatabaseError => write!(f, "DATABASE_ERROR"),
             Self::DatabaseTimeout => write!(f, "DATABASE_TIMEOUT"),
             Self::DatabaseUnavailable => write!(f, "DATABASE_UNAVAILABLE"),
@@ -242,13 +244,7 @@ impl fmt::Display for ObservabilityErrorCode {
             Self::JudgeMistralApiTimeout => write!(f, "JUDGE_MISTRAL_API_TIMEOUT"),
             Self::JudgeNameAlreadyExists => write!(f, "JUDGE_NAME_ALREADY_EXISTS"),
             Self::JudgeNotFound => write!(f, "JUDGE_NOT_FOUND"),
-            Self::JudgeAlreadyHasNewVersion => write!(f, "JUDGE_ALREADY_HAS_NEW_VERSION"),
-            Self::JudgeUsedInCampaignCannotBeUpdated => {
-                write!(f, "JUDGE_USED_IN_CAMPAIGN_CANNOT_BE_UPDATED")
-            }
             Self::JudgeDidNotChange => write!(f, "JUDGE_DID_NOT_CHANGE"),
-            Self::CampaignNotFound => write!(f, "CAMPAIGN_NOT_FOUND"),
-            Self::CampaignNoMatchingEvents => write!(f, "CAMPAIGN_NO_MATCHING_EVENTS"),
             Self::DatasetNotFound => write!(f, "DATASET_NOT_FOUND"),
             Self::DatasetTaskNotFound => write!(f, "DATASET_TASK_NOT_FOUND"),
             Self::DatasetRecordNotFound => write!(f, "DATASET_RECORD_NOT_FOUND"),
@@ -266,10 +262,22 @@ impl fmt::Display for ObservabilityErrorCode {
                 write!(f, "EVALUATION_RUN_TRANSITION_IS_RUNNING_ALREADY")
             }
             Self::EvaluationRunTransitionError => write!(f, "EVALUATION_RUN_TRANSITION_ERROR"),
+            Self::EvaluationRunOutputRecordConflict => {
+                write!(f, "EVALUATION_RUN_OUTPUT_RECORD_CONFLICT")
+            }
             Self::TemplateError => write!(f, "TEMPLATE_ERROR"),
             Self::TemplateSyntaxError => write!(f, "TEMPLATE_SYNTAX_ERROR"),
+            Self::ProjectNotFound => write!(f, "PROJECT_NOT_FOUND"),
             Self::ProjectNameAlreadyExists => write!(f, "PROJECT_NAME_ALREADY_EXISTS"),
+            Self::PipelineConfigNotFound => write!(f, "PIPELINE_CONFIG_NOT_FOUND"),
+            Self::PipelineConfigAlreadyExists => write!(f, "PIPELINE_CONFIG_ALREADY_EXISTS"),
+            Self::PipelineNotFound => write!(f, "PIPELINE_NOT_FOUND"),
+            Self::PipelineAlreadyExists => write!(f, "PIPELINE_ALREADY_EXISTS"),
+            Self::ScorerNotFound => write!(f, "SCORER_NOT_FOUND"),
+            Self::ScorerAlreadyExists => write!(f, "SCORER_ALREADY_EXISTS"),
+            Self::ScorerConfigKindMismatch => write!(f, "SCORER_CONFIG_KIND_MISMATCH"),
             Self::EvaluationNameAlreadyExists => write!(f, "EVALUATION_NAME_ALREADY_EXISTS"),
+            Self::OptimizationNotFound => write!(f, "OPTIMIZATION_NOT_FOUND"),
             Self::OptimizationTrialKeyAlreadyExists => {
                 write!(f, "OPTIMIZATION_TRIAL_KEY_ALREADY_EXISTS")
             }

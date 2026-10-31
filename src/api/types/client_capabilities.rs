@@ -1,6 +1,9 @@
 pub use crate::prelude::*;
 
 /// Capabilities a client may support.
+///
+/// Not a closed set: any client can define additional capabilities. Sent once in
+/// `initialize` through 2025-11-25; per-request in `_meta` on 2026-07-28.
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
 pub struct ClientCapabilities {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -8,14 +11,13 @@ pub struct ClientCapabilities {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub experimental: Option<HashMap<String, Option<HashMap<String, serde_json::Value>>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub extensions: Option<HashMap<String, Option<HashMap<String, serde_json::Value>>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub roots: Option<RootsCapability>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sampling: Option<SamplingCapability>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tasks: Option<ClientTasksCapability>,
-    /// Additional properties that are not part of the defined schema.
-    #[serde(flatten)]
-    pub extra: std::collections::HashMap<String, serde_json::Value>,
 }
 
 impl ClientCapabilities {
@@ -29,6 +31,7 @@ impl ClientCapabilities {
 pub struct ClientCapabilitiesBuilder {
     elicitation: Option<ElicitationCapability>,
     experimental: Option<HashMap<String, Option<HashMap<String, serde_json::Value>>>>,
+    extensions: Option<HashMap<String, Option<HashMap<String, serde_json::Value>>>>,
     roots: Option<RootsCapability>,
     sampling: Option<SamplingCapability>,
     tasks: Option<ClientTasksCapability>,
@@ -45,6 +48,14 @@ impl ClientCapabilitiesBuilder {
         value: HashMap<String, Option<HashMap<String, serde_json::Value>>>,
     ) -> Self {
         self.experimental = Some(value);
+        self
+    }
+
+    pub fn extensions(
+        mut self,
+        value: HashMap<String, Option<HashMap<String, serde_json::Value>>>,
+    ) -> Self {
+        self.extensions = Some(value);
         self
     }
 
@@ -68,10 +79,10 @@ impl ClientCapabilitiesBuilder {
         Ok(ClientCapabilities {
             elicitation: self.elicitation,
             experimental: self.experimental,
+            extensions: self.extensions,
             roots: self.roots,
             sampling: self.sampling,
             tasks: self.tasks,
-            extra: Default::default(),
         })
     }
 }

@@ -1,12 +1,14 @@
 pub use crate::prelude::*;
 
-/// Capabilities that a server may support.
+/// Capabilities that a server may support. Not a closed set.
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
 pub struct ServerCapabilities {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub completions: Option<CompletionsCapability>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub experimental: Option<HashMap<String, Option<HashMap<String, serde_json::Value>>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub extensions: Option<HashMap<String, Option<HashMap<String, serde_json::Value>>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub logging: Option<LoggingCapability>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -17,9 +19,6 @@ pub struct ServerCapabilities {
     pub tasks: Option<ServerTasksCapability>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tools: Option<ToolsCapability>,
-    /// Additional properties that are not part of the defined schema.
-    #[serde(flatten)]
-    pub extra: std::collections::HashMap<String, serde_json::Value>,
 }
 
 impl ServerCapabilities {
@@ -33,6 +32,7 @@ impl ServerCapabilities {
 pub struct ServerCapabilitiesBuilder {
     completions: Option<CompletionsCapability>,
     experimental: Option<HashMap<String, Option<HashMap<String, serde_json::Value>>>>,
+    extensions: Option<HashMap<String, Option<HashMap<String, serde_json::Value>>>>,
     logging: Option<LoggingCapability>,
     prompts: Option<PromptsCapability>,
     resources: Option<ResourcesCapability>,
@@ -51,6 +51,14 @@ impl ServerCapabilitiesBuilder {
         value: HashMap<String, Option<HashMap<String, serde_json::Value>>>,
     ) -> Self {
         self.experimental = Some(value);
+        self
+    }
+
+    pub fn extensions(
+        mut self,
+        value: HashMap<String, Option<HashMap<String, serde_json::Value>>>,
+    ) -> Self {
+        self.extensions = Some(value);
         self
     }
 
@@ -84,12 +92,12 @@ impl ServerCapabilitiesBuilder {
         Ok(ServerCapabilities {
             completions: self.completions,
             experimental: self.experimental,
+            extensions: self.extensions,
             logging: self.logging,
             prompts: self.prompts,
             resources: self.resources,
             tasks: self.tasks,
             tools: self.tools,
-            extra: Default::default(),
         })
     }
 }

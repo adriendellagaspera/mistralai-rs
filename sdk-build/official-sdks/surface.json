@@ -75,6 +75,9 @@
       "agents.complete",
       "agents.stream"
     ],
+    "aggregate_span_evaluations_v1_observability_spans_evaluations_aggregate_post": [
+      "beta.observability.spans.aggregate_span_evaluations"
+    ],
     "aggregate_spans_v1_observability_spans_aggregate_post": [
       "beta.observability.spans.aggregate"
     ],
@@ -89,6 +92,9 @@
     ],
     "audio_api_v1_transcriptions_post_stream": [
       "audio.transcriptions.stream"
+    ],
+    "audio_v2_voices_list": [
+      "audio.voices.search"
     ],
     "batch_cancel_workflow_executions_v1_workflows_executions_cancel_post": [
       "workflows.executions.batch_cancel_workflow_executions"
@@ -120,11 +126,17 @@
     "classifications_v1_classifications_post": [
       "classifiers.classify"
     ],
+    "compute_filtered_run_statistics_v2_v1_observability_evaluation_runs_v2__run_id__statistics_compute_post": [
+      "beta.observability.evaluations.runs.compute_statistics"
+    ],
     "connector_activate_for_consumer_v1": [
       "beta.connectors.activate_for_consumer"
     ],
     "connector_call_tool_v1": [
       "beta.connectors.call_tool"
+    ],
+    "connector_create_credentials_v1": [
+      "beta.connectors.create_credentials"
     ],
     "connector_create_v1": [
       "beta.connectors.create"
@@ -135,17 +147,11 @@
     "connector_delete_all_user_credentials_v1": [
       "beta.connectors.delete_all_user_credentials"
     ],
-    "connector_delete_organization_credentials_v1": [
-      "beta.connectors.delete_organization_credentials"
-    ],
-    "connector_delete_user_credentials_v1": [
-      "beta.connectors.delete_user_credentials"
+    "connector_delete_credentials": [
+      "beta.connectors.delete_credentials"
     ],
     "connector_delete_v1": [
       "beta.connectors.delete"
-    ],
-    "connector_delete_workspace_credentials_v1": [
-      "beta.connectors.delete_workspace_credentials"
     ],
     "connector_get_auth_url_v1": [
       "beta.connectors.get_auth_url"
@@ -171,14 +177,29 @@
     "connector_list_workspace_credentials_v1": [
       "beta.connectors.list_workspace_credentials"
     ],
+    "connector_share_to_organization_v1": [
+      "beta.connectors.share_to_organization"
+    ],
     "connector_share_v1": [
       "beta.connectors.share"
+    ],
+    "connector_unshare_from_organization_v1": [
+      "beta.connectors.unshare_from_organization"
     ],
     "connector_unshare_v1": [
       "beta.connectors.unshare"
     ],
+    "connector_update_credentials": [
+      "beta.connectors.update_credentials"
+    ],
     "connector_update_v1": [
       "beta.connectors.update"
+    ],
+    "count_input_tokens_v1_responses_input_tokens_post": [
+      "responses.count_input_tokens"
+    ],
+    "create_client_session_v1_client_sessions_post": [
+      "realtime.sessions.create"
     ],
     "create_dataset_record_v1_observability_datasets__dataset_id__records_post": [
       "beta.observability.datasets.create_record"
@@ -191,6 +212,15 @@
     ],
     "create_judge_v1_observability_judges_post": [
       "beta.observability.judges.create"
+    ],
+    "create_pipeline_v1_observability_pipelines_post": [
+      "beta.observability.evaluations.create_pipeline"
+    ],
+    "create_response_v1_responses_post": [
+      "responses.create"
+    ],
+    "create_service_account_v1_service_accounts_post": [
+      "beta.service_accounts.create"
     ],
     "create_voice_v1_audio_voices_post": [
       "audio.voices.create"
@@ -212,6 +242,12 @@
     ],
     "delete_model_v1_models__model_id__delete": [
       "models.delete"
+    ],
+    "delete_pipeline_v1_observability_pipelines__pipeline_id__delete": [
+      "beta.observability.evaluations.delete_pipeline"
+    ],
+    "delete_service_account_v1_service_accounts__service_account_id__delete": [
+      "beta.service_accounts.delete"
     ],
     "delete_voice_v1_audio_voices__voice_id__delete": [
       "audio.voices.delete"
@@ -280,6 +316,15 @@
     "get_deployment_v1_workflows_deployments__name__get": [
       "workflows.deployments.get_deployment"
     ],
+    "get_evaluation_run_record_v2_v1_observability_evaluation_runs_v2__run_id__records__record_id__get": [
+      "beta.observability.evaluations.records.get"
+    ],
+    "get_evaluation_run_v2_v1_observability_evaluation_runs_v2__run_id__get": [
+      "beta.observability.evaluations.runs.get"
+    ],
+    "get_evaluation_v2_v1_observability_evaluations_v2__evaluation_slug__get": [
+      "beta.observability.evaluations.get"
+    ],
     "get_judge_by_id_v1_observability_judges__judge_id__get": [
       "beta.observability.judges.fetch"
     ],
@@ -292,6 +337,21 @@
     "get_log_fields_v1_observability_logs_fields_get": [
       "beta.observability.logs.list"
     ],
+    "get_optimization_v1_observability_optimizations__optimization_id__get": [
+      "beta.observability.evaluations.optimizations.get"
+    ],
+    "get_pipeline_v1_observability_pipelines__pipeline_id__get": [
+      "beta.observability.evaluations.get_pipeline"
+    ],
+    "get_project_evaluations_v2_v1_observability_projects__project_slug__evaluations_v2_get": [
+      "beta.observability.evaluations.list"
+    ],
+    "get_project_v1_observability_projects__project_slug__get": [
+      "beta.observability.evaluations.projects.get"
+    ],
+    "get_projects_v1_observability_projects_get": [
+      "beta.observability.evaluations.projects.list"
+    ],
     "get_run_history_v1_workflows_runs__run_id__history_get": [
       "workflows.runs.get_run_history"
     ],
@@ -303,6 +363,12 @@
     ],
     "get_schedules_v1_workflows_schedules_get": [
       "workflows.schedules.get_schedules"
+    ],
+    "get_service_account_v1_service_accounts__service_account_id__get": [
+      "beta.service_accounts.get"
+    ],
+    "get_single_evaluation_run_statistics_v2_v1_observability_evaluation_runs_v2__run_id__statistics_get": [
+      "beta.observability.evaluations.runs.get_statistics"
     ],
     "get_span_by_id_v1_observability_traces__trace_id__spans__span_id__get": [
       "beta.observability.traces.get_span_by_id"
@@ -471,6 +537,9 @@
     "libraries_update_v1": [
       "beta.libraries.libraries_update_v1"
     ],
+    "list_assignable_service_account_roles_v1_service_accounts_assignable_roles_get": [
+      "beta.service_accounts.list_assignable_roles"
+    ],
     "list_deployment_workers_v1_workflows_deployments__name__workers_get": [
       "workflows.deployments.list_deployment_workers"
     ],
@@ -480,8 +549,23 @@
     "list_models_v1_models_get": [
       "models.list"
     ],
+    "list_optimization_trials_v1_observability_optimizations__optimization_id__trials_get": [
+      "beta.observability.evaluations.optimizations.list_trials"
+    ],
+    "list_optimizations_v1_observability_optimizations_get": [
+      "beta.observability.evaluations.optimizations.list"
+    ],
+    "list_pipelines_v1_observability_pipelines_get": [
+      "beta.observability.evaluations.list_pipelines"
+    ],
     "list_runs_v1_workflows_runs_get": [
       "workflows.runs.list_runs"
+    ],
+    "list_service_account_roles_v1_service_accounts__service_account_id__roles_get": [
+      "beta.service_accounts.list_roles"
+    ],
+    "list_service_accounts_v1_service_accounts_get": [
+      "beta.service_accounts.list"
     ],
     "list_voices_v1_audio_voices_get": [
       "audio.voices.list"
@@ -503,6 +587,9 @@
     ],
     "post_dataset_records_from_playground_v1_observability_datasets__dataset_id__imports_from_playground_post": [
       "beta.observability.datasets.import_from_playground"
+    ],
+    "post_dataset_records_from_spans_v1_observability_datasets__dataset_id__imports_from_spans_post": [
+      "beta.observability.datasets.import_from_spans"
     ],
     "prompts_create": [
       "beta.prompts.create"
@@ -555,11 +642,23 @@
     "schedule_workflow_v1_workflows_schedules_post": [
       "workflows.schedules.schedule_workflow"
     ],
+    "search_all_evaluation_runs_v2_v1_observability_evaluation_runs_v2_search_post": [
+      "beta.observability.evaluations.runs.search_all"
+    ],
+    "search_evaluation_run_records_v2_v1_observability_evaluation_runs_v2__run_id__records_search_post": [
+      "beta.observability.evaluations.records.search"
+    ],
+    "search_evaluation_runs_v2_v1_observability_evaluations_v2__evaluation_slug__runs_search_post": [
+      "beta.observability.evaluations.runs.search"
+    ],
     "search_latest_span_evaluations_v1_observability_spans_evaluations_search_latest_post": [
       "beta.observability.spans.search_latest_span_evaluations"
     ],
     "search_logs_v1_observability_logs_search_post": [
       "beta.observability.logs.search"
+    ],
+    "search_pipeline_results_v1_observability_pipeline_results_search_post": [
+      "beta.observability.spans.search_pipeline_results"
     ],
     "search_span_evaluations_v1_observability_spans_evaluations_search_post": [
       "beta.observability.spans.search_span_evaluations"
@@ -569,6 +668,9 @@
     ],
     "search_traces_v1_observability_traces_search_post": [
       "beta.observability.traces.search"
+    ],
+    "set_service_account_roles_v1_service_accounts__service_account_id__roles_put": [
+      "beta.service_accounts.set_roles"
     ],
     "signal_workflow_execution_v1_workflows_executions__execution_id__signals_post": [
       "workflows.executions.signal_workflow_execution"
@@ -627,6 +729,9 @@
     "unarchive_workflow_v1_workflows__workflow_identifier__unarchive_put": [
       "workflows.unarchive_workflow"
     ],
+    "unharden_deployment_v1_workflows_deployments__deployment_id__unharden_post": [
+      "workflows.deployments.unharden_deployment"
+    ],
     "unregister_deployment_v1_rag_deployments__deployment_id__delete": [
       "beta.rag.search_indexes.unregister_deployment"
     ],
@@ -651,11 +756,17 @@
     "update_judge_v1_observability_judges__judge_id__put": [
       "beta.observability.judges.update"
     ],
+    "update_pipeline_v1_observability_pipelines__pipeline_id__put": [
+      "beta.observability.evaluations.update_pipeline"
+    ],
     "update_run_info_v1_rag_ingestion_pipeline_configurations__id__run_info_put": [
       "beta.rag.ingestion_pipeline_configurations.update_run_info"
     ],
     "update_schedule_v1_workflows_schedules__schedule_id__patch": [
       "workflows.schedules.update_schedule"
+    ],
+    "update_service_account_v1_service_accounts__service_account_id__patch": [
+      "beta.service_accounts.update"
     ],
     "update_voice_v1_audio_voices__voice_id__patch": [
       "audio.voices.update"
@@ -674,6 +785,9 @@
     ],
     "users_api_list_workspaces": [
       "beta.users.list_workspaces"
+    ],
+    "users_api_whoami": [
+      "beta.users.whoami"
     ]
   }
 }

@@ -15,6 +15,9 @@ pub struct GetWorkflowRegistrationsV1WorkflowsRegistrationsGetQueryRequest {
     /// Whether to include shared workflow versions
     #[serde(skip_serializing_if = "Option::is_none")]
     pub include_shared: Option<bool>,
+    /// Exact workflow name to filter by
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub workflow_name: Option<String>,
     /// The workflow name to filter by
     #[serde(skip_serializing_if = "Option::is_none")]
     pub workflow_search: Option<String>,
@@ -49,6 +52,7 @@ pub struct GetWorkflowRegistrationsV1WorkflowsRegistrationsGetQueryRequestBuilde
     task_queue: Option<String>,
     active_only: Option<bool>,
     include_shared: Option<bool>,
+    workflow_name: Option<String>,
     workflow_search: Option<String>,
     archived: Option<bool>,
     with_workflow: Option<bool>,
@@ -75,6 +79,11 @@ impl GetWorkflowRegistrationsV1WorkflowsRegistrationsGetQueryRequestBuilder {
 
     pub fn include_shared(mut self, value: bool) -> Self {
         self.include_shared = Some(value);
+        self
+    }
+
+    pub fn workflow_name(mut self, value: impl Into<String>) -> Self {
+        self.workflow_name = Some(value.into());
         self
     }
 
@@ -118,6 +127,7 @@ impl GetWorkflowRegistrationsV1WorkflowsRegistrationsGetQueryRequestBuilder {
                 task_queue: self.task_queue,
                 active_only: self.active_only,
                 include_shared: self.include_shared,
+                workflow_name: self.workflow_name,
                 workflow_search: self.workflow_search,
                 archived: self.archived,
                 with_workflow: self.with_workflow,

@@ -7,6 +7,7 @@ pub enum DatasetRecordSource {
     UploadedFile,
     DirectInput,
     Playground,
+    TelemetrySpan,
     /// This variant is used for forward compatibility.
     /// If the server sends a value not recognized by the current SDK version,
     /// it will be captured here with the raw string value.
@@ -19,6 +20,7 @@ impl Serialize for DatasetRecordSource {
             Self::UploadedFile => serializer.serialize_str("UPLOADED_FILE"),
             Self::DirectInput => serializer.serialize_str("DIRECT_INPUT"),
             Self::Playground => serializer.serialize_str("PLAYGROUND"),
+            Self::TelemetrySpan => serializer.serialize_str("TELEMETRY_SPAN"),
             Self::__Unknown(val) => serializer.serialize_str(val),
         }
     }
@@ -32,6 +34,7 @@ impl<'de> Deserialize<'de> for DatasetRecordSource {
             "UPLOADED_FILE" => Ok(Self::UploadedFile),
             "DIRECT_INPUT" => Ok(Self::DirectInput),
             "PLAYGROUND" => Ok(Self::Playground),
+            "TELEMETRY_SPAN" => Ok(Self::TelemetrySpan),
             _ => Ok(Self::__Unknown(value)),
         }
     }
@@ -44,6 +47,7 @@ impl fmt::Display for DatasetRecordSource {
             Self::UploadedFile => write!(f, "UPLOADED_FILE"),
             Self::DirectInput => write!(f, "DIRECT_INPUT"),
             Self::Playground => write!(f, "PLAYGROUND"),
+            Self::TelemetrySpan => write!(f, "TELEMETRY_SPAN"),
             Self::__Unknown(val) => write!(f, "{}", val),
         }
     }

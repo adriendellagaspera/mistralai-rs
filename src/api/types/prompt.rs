@@ -9,6 +9,9 @@ pub struct Prompt {
     #[serde(rename = "createdAt")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Timestamp>,
+    #[serde(rename = "createdBy")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub created_by: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub definition: Option<PromptDefinition>,
     /// Display description.
@@ -39,6 +42,9 @@ pub struct Prompt {
     pub updated_at: Option<Timestamp>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub version: Option<i64>,
+    #[serde(rename = "versionCreatedAt")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub version_created_at: Option<Timestamp>,
 }
 
 impl Prompt {
@@ -52,6 +58,7 @@ impl Prompt {
 pub struct PromptBuilder {
     aliases: Option<Vec<String>>,
     created_at: Option<Timestamp>,
+    created_by: Option<String>,
     definition: Option<PromptDefinition>,
     description: Option<String>,
     id: Option<String>,
@@ -62,6 +69,7 @@ pub struct PromptBuilder {
     title: Option<String>,
     updated_at: Option<Timestamp>,
     version: Option<i64>,
+    version_created_at: Option<Timestamp>,
 }
 
 impl PromptBuilder {
@@ -72,6 +80,11 @@ impl PromptBuilder {
 
     pub fn created_at(mut self, value: Timestamp) -> Self {
         self.created_at = Some(value);
+        self
+    }
+
+    pub fn created_by(mut self, value: impl Into<String>) -> Self {
+        self.created_by = Some(value.into());
         self
     }
 
@@ -125,11 +138,17 @@ impl PromptBuilder {
         self
     }
 
+    pub fn version_created_at(mut self, value: Timestamp) -> Self {
+        self.version_created_at = Some(value);
+        self
+    }
+
     /// Consumes the builder and constructs a [`Prompt`].
     pub fn build(self) -> Result<Prompt, BuildError> {
         Ok(Prompt {
             aliases: self.aliases,
             created_at: self.created_at,
+            created_by: self.created_by,
             definition: self.definition,
             description: self.description,
             id: self.id,
@@ -140,6 +159,7 @@ impl PromptBuilder {
             title: self.title,
             updated_at: self.updated_at,
             version: self.version,
+            version_created_at: self.version_created_at,
         })
     }
 }

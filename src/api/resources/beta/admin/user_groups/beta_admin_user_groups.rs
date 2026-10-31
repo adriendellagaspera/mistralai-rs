@@ -102,7 +102,6 @@ impl UserGroupsClient {
     ///                 name: "Engineering Team".to_string(),
     ///                 description: None,
     ///                 parent_group_ids: None,
-    ///                 target_type: None,
     ///             },
     ///             None,
     ///         )
@@ -125,7 +124,10 @@ impl UserGroupsClient {
             .await
     }
 
-    /// Provision all users from a user group to a workspace with a specific role.
+    /// Deprecated: provision all users from a user group to a workspace with a specific role.
+    ///
+    /// Use `POST /user-groups/{group_uuid}/workspaces` with `role_names` to assign the group to a workspace, and
+    /// `PATCH /user-groups/{group_uuid}/workspaces/{workspace_uuid}` to change the roles of an existing assignment.
     ///
     /// # Arguments
     ///
@@ -273,7 +275,7 @@ impl UserGroupsClient {
             .await
     }
 
-    /// Update a user group.
+    /// Update User Group
     ///
     /// # Arguments
     ///
@@ -617,26 +619,15 @@ impl UserGroupsClient {
     ///         ..Default::default()
     ///     };
     ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client
-    ///         .beta
-    ///         .admin
-    ///         .user_groups
-    ///         .users_admin_user_groups_update_user_group_organization_role(
-    ///             &"group_uuid".to_string(),
-    ///             &UpdateUserGroupOrganizationRoleIn {
-    ///                 organization_role: UpdateUserGroupOrganizationRoleInOrganizationRole::UserRole(
-    ///                     UserRole::A,
-    ///                 ),
-    ///             },
-    ///             None,
-    ///         )
-    ///         .await;
+    ///     client.beta.admin.user_groups.users_admin_user_groups_update_user_group_organization_role(&"group_uuid".to_string(), &AdminUpdateUserGroupOrganizationRoleIn {
+    ///         organization_role: AdminUpdateUserGroupOrganizationRoleInOrganizationRole::AdminUpdateUserGroupOrganizationRoleInOrganizationRoleZero(AdminUpdateUserGroupOrganizationRoleInOrganizationRoleZero::Member)
+    ///     }, None).await;
     /// }
     /// ```
     pub async fn users_admin_user_groups_update_user_group_organization_role(
         &self,
         group_uuid: &str,
-        request: &UpdateUserGroupOrganizationRoleIn,
+        request: &AdminUpdateUserGroupOrganizationRoleIn,
         options: Option<RequestOptions>,
     ) -> Result<(), ApiError> {
         self.http_client
@@ -738,7 +729,7 @@ impl UserGroupsClient {
     ///         .user_groups
     ///         .users_api_admin_user_groups_assign_group_to_workspace(
     ///             &"group_uuid".to_string(),
-    ///             &AssignGroupToWorkspaceIn {
+    ///             &AdminAssignGroupToWorkspaceIn {
     ///                 workspace_uuid: "workspace_uuid".to_string(),
     ///                 role: None,
     ///                 role_names: None,
@@ -752,7 +743,7 @@ impl UserGroupsClient {
     pub async fn users_api_admin_user_groups_assign_group_to_workspace(
         &self,
         group_uuid: &str,
-        request: &AssignGroupToWorkspaceIn,
+        request: &AdminAssignGroupToWorkspaceIn,
         options: Option<RequestOptions>,
     ) -> Result<(), ApiError> {
         self.http_client
@@ -853,7 +844,7 @@ impl UserGroupsClient {
     ///         .users_admin_user_groups_update_group_workspace_assignment(
     ///             &"group_uuid".to_string(),
     ///             &"workspace_uuid".to_string(),
-    ///             &UpdateGroupWorkspaceAssignmentIn {
+    ///             &AdminUpdateGroupWorkspaceAssignmentIn {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -865,7 +856,7 @@ impl UserGroupsClient {
         &self,
         group_uuid: &str,
         workspace_uuid: &str,
-        request: &UpdateGroupWorkspaceAssignmentIn,
+        request: &AdminUpdateGroupWorkspaceAssignmentIn,
         options: Option<RequestOptions>,
     ) -> Result<(), ApiError> {
         self.http_client

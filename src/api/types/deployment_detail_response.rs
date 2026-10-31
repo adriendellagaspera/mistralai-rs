@@ -1,6 +1,6 @@
 pub use crate::prelude::*;
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
 pub struct DeploymentDetailResponse {
     /// Number of workers currently live within the liveness cutoff
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -15,9 +15,13 @@ pub struct DeploymentDetailResponse {
     /// Whether at least one worker is currently live
     #[serde(default)]
     pub is_active: bool,
-    /// Whether the deployment has at least one authorized credential
+    /// Whether the deployment only accepts registrations from authorized principals
     #[serde(skip_serializing_if = "Option::is_none")]
     pub is_hardened: Option<bool>,
+    /// When the deployment last saw a worker registration
+    #[serde(default)]
+    #[serde(with = "crate::core::flexible_datetime::offset")]
+    pub last_heartbeat: DateTime<FixedOffset>,
     /// Where the deployment is running
     #[serde(skip_serializing_if = "Option::is_none")]
     pub location: Option<DeploymentLocation>,
@@ -30,7 +34,10 @@ pub struct DeploymentDetailResponse {
     /// Deployment name
     #[serde(default)]
     pub name: String,
-    /// When the deployment was last updated
+    /// User id that owns the deployment, or null when it is administrator-managed
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub owner: Option<String>,
+    /// Deprecated alias of last_heartbeat
     #[serde(default)]
     #[serde(with = "crate::core::flexible_datetime::offset")]
     pub updated_at: DateTime<FixedOffset>,
@@ -56,10 +63,12 @@ pub struct DeploymentDetailResponseBuilder {
     id: Option<String>,
     is_active: Option<bool>,
     is_hardened: Option<bool>,
+    last_heartbeat: Option<DateTime<FixedOffset>>,
     location: Option<DeploymentLocation>,
     locations: Option<Vec<LocationType>>,
     managed: Option<ManagedDeploymentResponse>,
     name: Option<String>,
+    owner: Option<String>,
     updated_at: Option<DateTime<FixedOffset>>,
     worker_count: Option<i64>,
     workers: Option<Vec<DeploymentWorkerResponse>>,
@@ -91,6 +100,11 @@ impl DeploymentDetailResponseBuilder {
         self
     }
 
+    pub fn last_heartbeat(mut self, value: DateTime<FixedOffset>) -> Self {
+        self.last_heartbeat = Some(value);
+        self
+    }
+
     pub fn location(mut self, value: DeploymentLocation) -> Self {
         self.location = Some(value);
         self
@@ -108,6 +122,11 @@ impl DeploymentDetailResponseBuilder {
 
     pub fn name(mut self, value: impl Into<String>) -> Self {
         self.name = Some(value.into());
+        self
+    }
+
+    pub fn owner(mut self, value: impl Into<String>) -> Self {
+        self.owner = Some(value.into());
         self
     }
 
@@ -131,6 +150,7 @@ impl DeploymentDetailResponseBuilder {
     /// - [`created_at`](DeploymentDetailResponseBuilder::created_at)
     /// - [`id`](DeploymentDetailResponseBuilder::id)
     /// - [`is_active`](DeploymentDetailResponseBuilder::is_active)
+    /// - [`last_heartbeat`](DeploymentDetailResponseBuilder::last_heartbeat)
     /// - [`name`](DeploymentDetailResponseBuilder::name)
     /// - [`updated_at`](DeploymentDetailResponseBuilder::updated_at)
     /// - [`workers`](DeploymentDetailResponseBuilder::workers)
@@ -145,10 +165,14 @@ impl DeploymentDetailResponseBuilder {
                 .is_active
                 .ok_or_else(|| BuildError::missing_field("is_active"))?,
             is_hardened: self.is_hardened,
+            last_heartbeat: self
+                .last_heartbeat
+                .ok_or_else(|| BuildError::missing_field("last_heartbeat"))?,
             location: self.location,
             locations: self.locations,
             managed: self.managed,
             name: self.name.ok_or_else(|| BuildError::missing_field("name"))?,
+            owner: self.owner,
             updated_at: self
                 .updated_at
                 .ok_or_else(|| BuildError::missing_field("updated_at"))?,

@@ -4,16 +4,19 @@ pub use crate::prelude::*;
 #[serde(tag = "type")]
 #[non_exhaustive]
 pub enum ConnectorToolCallResponseContentItem {
-    #[serde(rename = "text")]
+    #[serde(rename = "audio")]
     #[non_exhaustive]
-    Text {
+    Audio {
         #[serde(rename = "_meta")]
         #[serde(skip_serializing_if = "Option::is_none")]
         meta: Option<HashMap<String, serde_json::Value>>,
         #[serde(skip_serializing_if = "Option::is_none")]
         annotations: Option<Annotations>,
         #[serde(default)]
-        text: String,
+        data: String,
+        #[serde(rename = "mimeType")]
+        #[serde(default)]
+        mime_type: String,
     },
 
     #[serde(rename = "image")]
@@ -31,19 +34,15 @@ pub enum ConnectorToolCallResponseContentItem {
         mime_type: String,
     },
 
-    #[serde(rename = "audio")]
+    #[serde(rename = "resource")]
     #[non_exhaustive]
-    Audio {
+    Resource {
         #[serde(rename = "_meta")]
         #[serde(skip_serializing_if = "Option::is_none")]
         meta: Option<HashMap<String, serde_json::Value>>,
         #[serde(skip_serializing_if = "Option::is_none")]
         annotations: Option<Annotations>,
-        #[serde(default)]
-        data: String,
-        #[serde(rename = "mimeType")]
-        #[serde(default)]
-        mime_type: String,
+        resource: EmbeddedResourceResource,
     },
 
     #[serde(rename = "resource_link")]
@@ -71,15 +70,16 @@ pub enum ConnectorToolCallResponseContentItem {
         uri: String,
     },
 
-    #[serde(rename = "resource")]
+    #[serde(rename = "text")]
     #[non_exhaustive]
-    Resource {
+    Text {
         #[serde(rename = "_meta")]
         #[serde(skip_serializing_if = "Option::is_none")]
         meta: Option<HashMap<String, serde_json::Value>>,
         #[serde(skip_serializing_if = "Option::is_none")]
         annotations: Option<Annotations>,
-        resource: EmbeddedResourceResource,
+        #[serde(default)]
+        text: String,
     },
 
     /// Catch-all variant for unrecognized discriminant values.
@@ -90,11 +90,12 @@ pub enum ConnectorToolCallResponseContentItem {
 }
 
 impl ConnectorToolCallResponseContentItem {
-    pub fn text(text: String) -> Self {
-        Self::Text {
+    pub fn audio(data: String, mime_type: String) -> Self {
+        Self::Audio {
             meta: None,
             annotations: None,
-            text,
+            data,
+            mime_type,
         }
     }
 
@@ -107,12 +108,11 @@ impl ConnectorToolCallResponseContentItem {
         }
     }
 
-    pub fn audio(data: String, mime_type: String) -> Self {
-        Self::Audio {
+    pub fn resource(resource: EmbeddedResourceResource) -> Self {
+        Self::Resource {
             meta: None,
             annotations: None,
-            data,
-            mime_type,
+            resource,
         }
     }
 
@@ -130,35 +130,39 @@ impl ConnectorToolCallResponseContentItem {
         }
     }
 
-    pub fn resource(resource: EmbeddedResourceResource) -> Self {
-        Self::Resource {
+    pub fn text(text: String) -> Self {
+        Self::Text {
             meta: None,
             annotations: None,
-            resource,
+            text,
         }
     }
 
-    pub fn text_with_meta(
+    pub fn audio_with_meta(
         meta: HashMap<String, serde_json::Value>,
         annotations: Option<Annotations>,
-        text: String,
+        data: String,
+        mime_type: String,
     ) -> Self {
-        Self::Text {
+        Self::Audio {
             meta: Some(meta),
             annotations,
-            text,
+            data,
+            mime_type,
         }
     }
 
-    pub fn text_with_annotations(
+    pub fn audio_with_annotations(
         meta: Option<HashMap<String, serde_json::Value>>,
         annotations: Annotations,
-        text: String,
+        data: String,
+        mime_type: String,
     ) -> Self {
-        Self::Text {
+        Self::Audio {
             meta,
             annotations: Some(annotations),
-            text,
+            data,
+            mime_type,
         }
     }
 
@@ -190,31 +194,27 @@ impl ConnectorToolCallResponseContentItem {
         }
     }
 
-    pub fn audio_with_meta(
+    pub fn resource_with_meta(
         meta: HashMap<String, serde_json::Value>,
         annotations: Option<Annotations>,
-        data: String,
-        mime_type: String,
+        resource: EmbeddedResourceResource,
     ) -> Self {
-        Self::Audio {
+        Self::Resource {
             meta: Some(meta),
             annotations,
-            data,
-            mime_type,
+            resource,
         }
     }
 
-    pub fn audio_with_annotations(
+    pub fn resource_with_annotations(
         meta: Option<HashMap<String, serde_json::Value>>,
         annotations: Annotations,
-        data: String,
-        mime_type: String,
+        resource: EmbeddedResourceResource,
     ) -> Self {
-        Self::Audio {
+        Self::Resource {
             meta,
             annotations: Some(annotations),
-            data,
-            mime_type,
+            resource,
         }
     }
 
@@ -386,27 +386,27 @@ impl ConnectorToolCallResponseContentItem {
         }
     }
 
-    pub fn resource_with_meta(
+    pub fn text_with_meta(
         meta: HashMap<String, serde_json::Value>,
         annotations: Option<Annotations>,
-        resource: EmbeddedResourceResource,
+        text: String,
     ) -> Self {
-        Self::Resource {
+        Self::Text {
             meta: Some(meta),
             annotations,
-            resource,
+            text,
         }
     }
 
-    pub fn resource_with_annotations(
+    pub fn text_with_annotations(
         meta: Option<HashMap<String, serde_json::Value>>,
         annotations: Annotations,
-        resource: EmbeddedResourceResource,
+        text: String,
     ) -> Self {
-        Self::Resource {
+        Self::Text {
             meta,
             annotations: Some(annotations),
-            resource,
+            text,
         }
     }
 

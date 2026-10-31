@@ -1,11 +1,13 @@
 pub use crate::prelude::*;
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(untagged)]
 pub enum TempoTraceAttributeValue {
     TempoTraceAttributeStringValue(TempoTraceAttributeStringValue),
 
     TempoTraceAttributeIntValue(TempoTraceAttributeIntValue),
+
+    TempoTraceAttributeDoubleValue(TempoTraceAttributeDoubleValue),
 
     TempoTraceAttributeBoolValue(TempoTraceAttributeBoolValue),
 
@@ -19,6 +21,10 @@ impl TempoTraceAttributeValue {
 
     pub fn is_tempo_trace_attribute_int_value(&self) -> bool {
         matches!(self, Self::TempoTraceAttributeIntValue(_))
+    }
+
+    pub fn is_tempo_trace_attribute_double_value(&self) -> bool {
+        matches!(self, Self::TempoTraceAttributeDoubleValue(_))
     }
 
     pub fn is_tempo_trace_attribute_bool_value(&self) -> bool {
@@ -53,6 +59,20 @@ impl TempoTraceAttributeValue {
     pub fn into_tempo_trace_attribute_int_value(self) -> Option<TempoTraceAttributeIntValue> {
         match self {
             Self::TempoTraceAttributeIntValue(value) => Some(value),
+            _ => None,
+        }
+    }
+
+    pub fn as_tempo_trace_attribute_double_value(&self) -> Option<&TempoTraceAttributeDoubleValue> {
+        match self {
+            Self::TempoTraceAttributeDoubleValue(value) => Some(value),
+            _ => None,
+        }
+    }
+
+    pub fn into_tempo_trace_attribute_double_value(self) -> Option<TempoTraceAttributeDoubleValue> {
+        match self {
+            Self::TempoTraceAttributeDoubleValue(value) => Some(value),
             _ => None,
         }
     }
@@ -95,6 +115,11 @@ impl fmt::Display for TempoTraceAttributeValue {
                 serde_json::to_string(value).unwrap_or_else(|_| format!("{:?}", value))
             ),
             Self::TempoTraceAttributeIntValue(value) => write!(
+                f,
+                "{}",
+                serde_json::to_string(value).unwrap_or_else(|_| format!("{:?}", value))
+            ),
+            Self::TempoTraceAttributeDoubleValue(value) => write!(
                 f,
                 "{}",
                 serde_json::to_string(value).unwrap_or_else(|_| format!("{:?}", value))

@@ -18,6 +18,8 @@ pub struct Dataset {
     #[serde(default)]
     pub owner_id: String,
     #[serde(default)]
+    pub slug: String,
+    #[serde(default)]
     #[serde(with = "crate::core::flexible_datetime::offset")]
     pub updated_at: DateTime<FixedOffset>,
     #[serde(default)]
@@ -39,6 +41,7 @@ pub struct DatasetBuilder {
     id: Option<String>,
     name: Option<String>,
     owner_id: Option<String>,
+    slug: Option<String>,
     updated_at: Option<DateTime<FixedOffset>>,
     workspace_id: Option<String>,
 }
@@ -74,6 +77,11 @@ impl DatasetBuilder {
         self
     }
 
+    pub fn slug(mut self, value: impl Into<String>) -> Self {
+        self.slug = Some(value.into());
+        self
+    }
+
     pub fn updated_at(mut self, value: DateTime<FixedOffset>) -> Self {
         self.updated_at = Some(value);
         self
@@ -91,6 +99,7 @@ impl DatasetBuilder {
     /// - [`id`](DatasetBuilder::id)
     /// - [`name`](DatasetBuilder::name)
     /// - [`owner_id`](DatasetBuilder::owner_id)
+    /// - [`slug`](DatasetBuilder::slug)
     /// - [`updated_at`](DatasetBuilder::updated_at)
     /// - [`workspace_id`](DatasetBuilder::workspace_id)
     pub fn build(self) -> Result<Dataset, BuildError> {
@@ -107,6 +116,7 @@ impl DatasetBuilder {
             owner_id: self
                 .owner_id
                 .ok_or_else(|| BuildError::missing_field("owner_id"))?,
+            slug: self.slug.ok_or_else(|| BuildError::missing_field("slug"))?,
             updated_at: self
                 .updated_at
                 .ok_or_else(|| BuildError::missing_field("updated_at"))?,

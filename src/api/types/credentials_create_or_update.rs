@@ -1,11 +1,11 @@
 pub use crate::prelude::*;
 
-/// Request to create or update non-OAuth2 credentials for a connector.
+/// Request to create or update credentials for a connector.
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
 pub struct CredentialsCreateOrUpdate {
-    /// The credential data (headers, bearer_token).
+    /// The credential data (headers, bearer_token, or OAuth2 client credentials).
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub credentials: Option<ConnectionCredentials>,
+    pub credentials: Option<ConnectionCredentialsInput>,
     /// Controls whether this credential is the default for its auth method. On creation: if no credential exists yet for this auth method, the credential is automatically set as default when is_default is true or omitted; setting is_default to false is rejected because a default must exist. If other credentials already exist, setting is_default to true promotes this credential (demoting the previous default); false or omitted creates it as non-default. On update: true promotes this credential, false is rejected if it is currently the default (promote another credential first), omitted leaves the default status unchanged.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub is_default: Option<bool>,
@@ -26,14 +26,14 @@ impl CredentialsCreateOrUpdate {
 #[derive(Clone, PartialEq, Default, Debug)]
 #[non_exhaustive]
 pub struct CredentialsCreateOrUpdateBuilder {
-    credentials: Option<ConnectionCredentials>,
+    credentials: Option<ConnectionCredentialsInput>,
     is_default: Option<bool>,
     name: Option<String>,
     title: Option<String>,
 }
 
 impl CredentialsCreateOrUpdateBuilder {
-    pub fn credentials(mut self, value: ConnectionCredentials) -> Self {
+    pub fn credentials(mut self, value: ConnectionCredentialsInput) -> Self {
         self.credentials = Some(value);
         self
     }
