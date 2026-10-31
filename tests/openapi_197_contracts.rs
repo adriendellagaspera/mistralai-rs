@@ -13,8 +13,8 @@ fn recursive_filter_unions_preserve_nested_discriminators() {
         json!({"type": "not", "match": {"type": "or", "matches": []}}),
     ];
     for input in cases {
-        let parsed: AndMatchesItem = from_value(input.clone())
-            .expect("known recursive filter variant must parse");
+        let parsed: AndMatchesItem =
+            from_value(input.clone()).expect("known recursive filter variant must parse");
         let wire = to_value(&parsed).expect("recursive filter must serialize");
         assert_eq!(wire, input, "known filter discriminators must be lossless");
         let second: AndMatchesItem = from_value(wire).expect("roundtrip must parse");
@@ -25,8 +25,8 @@ fn recursive_filter_unions_preserve_nested_discriminators() {
 #[test]
 fn unknown_recursive_filter_variant_remains_inspectable() {
     let input = json!({"type": "future-filter", "wire": {"enabled": true}});
-    let parsed: AndMatchesItem = from_value(input.clone())
-        .expect("unknown filters are preserved, not discarded");
+    let parsed: AndMatchesItem =
+        from_value(input.clone()).expect("unknown filters are preserved, not discarded");
     assert_eq!(to_value(parsed).unwrap(), input);
 }
 
