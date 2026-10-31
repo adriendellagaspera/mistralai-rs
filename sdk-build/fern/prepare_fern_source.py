@@ -69,6 +69,139 @@ def main() -> int:
             }
         )
 
+    # The published catalog contains a recursively discriminated And/Or/Not
+    # filter tree. Fern's importer's discriminator recursion overflows on the
+    # recursive oneOf. The six oneOf branches and their distinct wire tags are
+    # sufficient: omit ONLY the discriminator hint on these three nodes.
+    filter_tags = {
+        "And": "and", "Or": "or", "Not": "not",
+        "Equal": "equal", "Range": "range", "In": "in",
+    }
+    for name in ("And", "Or", "Not"):
+        schema = schemas.get(name)
+        if schema is None:
+            continue
+        prop = "match" if name == "Not" else "matches"
+        node = schema["properties"][prop]
+        if name != "Not":
+            node = node["items"]
+        mapping = {tag: f"#/components/schemas/{variant}"
+                   for variant, tag in filter_tags.items()}
+        references = [x.get("$ref") for x in node.get("oneOf", [])]
+        if (
+            node.get("discriminator") != {"propertyName": "type", "mapping": mapping}
+            or set(references) != set(mapping.values())
+            or len(references) != len(mapping)
+            or schema["properties"]["type"].get("const") != filter_tags[name]
+        ):
+            raise ValueError(f"Unexpected recursive filter union: {name}")
+        for variant, tag in filter_tags.items():
+            if schemas[variant]["properties"]["type"].get("const") != tag:
+                raise ValueError(f"Non-unique filter tag: {variant}")
+        del node["discriminator"]
+        applied.append({
+            "kind": "temporary_fern_workaround",
+            "source": f"#/components/schemas/{name}/properties/{prop}",
+            "upstream": "https://github.com/fern-api/fern",
+            "remove_when": "Fern parses recursively discriminated oneOf filters",
+        })
+
+    # Fern's Rust generator cannot give valid identifiers to IPA phoneme
+    # Unicode values in an inline enum, even with explicit x-fern-enum names.
+    # Represent them as wire-compatible strings. The pinned published source
+    # retains the complete enum, and the report records the exact values.
+    def normalize_ipa(node: object, pointer: str) -> None:
+        if isinstance(node, list):
+            for index, value in enumerate(node):
+                normalize_ipa(value, f"{pointer}/{index}")
+            return
+        if not isinstance(node, dict):
+            return
+        variants = node.get("enum")
+        if isinstance(variants, list) and any(
+            isinstance(variant, str)
+            and any(0x0250 <= ord(char) <= 0x02AF for char in variant)
+            for variant in variants
+        ):
+            if node.get("type") != "string" or not variants or not all(
+                isinstance(variant, str) for variant in variants
+            ) or len(variants) != len(set(variants)):
+                raise ValueError(f"Unexpected IPA enum: {pointer}")
+            node.pop("enum")
+            node.pop("x-fern-enum", None)
+            node["description"] = (
+                node.get("description", "") +
+                " Fern Rust compatibility: IPA string; permissible phonemes "
+                "are specified by the pinned original OpenAPI."
+            )
+            applied.append({
+                "kind": "temporary_fern_workaround",
+                "source": pointer,
+                "upstream": "https://github.com/fern-api/fern",
+                "remove_when": "Fern Rust generates Unicode-valued inline IPA enums",
+                "wire_values": variants,
+            })
+            return
+        for key, value in node.items():
+            normalize_ipa(value, f"{pointer}/{key}")
+
+    normalize_ipa(doc, "#")
+
+    # The published ResponsesStreamFrame union's discriminator still points
+    # to deprecated Response* aliases, whereas oneOf lists actual Responses*
+    # events. Build the mapping from the event type consts rather than
+    # silently losing the new stream event variants.
+    def normalize_responses(node: object) -> None:
+        if isinstance(node, list):
+            for value in node:
+                normalize_responses(value)
+            return
+        if not isinstance(node, dict):
+            return
+        variants = node.get("oneOf")
+        if isinstance(variants, list) and any(
+            isinstance(value, dict)
+            and value.get("$ref") == "#/components/schemas/ResponsesErrorEvent"
+            for value in variants
+        ):
+            discriminator = node.get("discriminator")
+            if not isinstance(discriminator, dict):
+                raise ValueError("Responses union discriminator is missing")
+            key = discriminator.get("propertyName")
+            mapping = discriminator.get("mapping")
+            if key != "type" or not isinstance(mapping, dict):
+                raise ValueError("Responses discriminator changed")
+            expected = {}
+            for value in variants:
+                ref = value.get("$ref") if isinstance(value, dict) else None
+                if not isinstance(ref, str) or not ref.startswith("#/components/schemas/"):
+                    raise ValueError("Unexpected Responses variant")
+                target = schemas.get(ref.rsplit("/", 1)[-1])
+                if not isinstance(target, dict):
+                    raise ValueError(f"Unknown Responses variant {ref}")
+                tag_schema = target.get("properties", {}).get(key, {})
+                tag = tag_schema.get("const")
+                if tag is None and len(tag_schema.get("enum", [])) == 1:
+                    tag = tag_schema["enum"][0]
+                if not isinstance(tag, str) or tag in expected:
+                    raise ValueError(f"Ambiguous Responses event tag: {ref}")
+                expected[tag] = ref
+            if set(mapping) != set(expected):
+                raise ValueError("Responses event tag set changed")
+            if mapping != expected:
+                discriminator["mapping"] = expected
+                applied.append({
+                    "kind": "temporary_fern_workaround",
+                    "source": "#/components/schemas/ResponsesStreamFrame",
+                    "upstream": "https://github.com/fern-api/fern",
+                    "remove_when": "published Responses discriminator matches its oneOf members",
+                })
+            return
+        for value in node.values():
+            normalize_responses(value)
+
+    normalize_responses(doc)
+
     # These are supported Fern source annotations that disambiguate source
     # parameter identities after Rust identifier normalization. They are not
     # transport/runtime patches and do not alter wire names.
