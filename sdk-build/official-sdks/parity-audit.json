@@ -1,0 +1,790 @@
+{
+  "cross_sdk_public_path_divergences": [
+    {
+      "operation_id": "chat_completion_v1_chat_completions_post",
+      "python": [
+        "chat.complete",
+        "chat.stream"
+      ],
+      "reason": "public_path_mismatch",
+      "typescript": [
+        "chat.complete",
+        "chat.parse",
+        "chat.parse_stream",
+        "chat.stream"
+      ]
+    }
+  ],
+  "evidence": {
+    "protocol": {
+      "artifact": "sdk-build/fern/inventory.json",
+      "commit": "08a585fb75bcfa6ff968773134ee00060e0db283fc6b16f421f544e78ba8db92",
+      "repository": "https://docs.mistral.ai/openapi.yaml"
+    },
+    "python": {
+      "commit": "8fdbff0b1bcb0c9c3e5b803080a20ac820c2905c",
+      "repository": "mistralai/client-python"
+    },
+    "typescript": {
+      "commit": "50b2bc105cce327d3bd2ccee86240c4b0f6f2d6c",
+      "repository": "mistralai/client-ts"
+    }
+  },
+  "methodology": {
+    "caveat": "SDK-observed routes are candidates, not validated wire contracts. Placeholder renames and transport aliases can cause false positives.",
+    "identity": "exact normalized HTTP method/path; operation IDs reconciled by harvest.py",
+    "source": "sdk-build/fern/inventory.json",
+    "typescript_non_http": "not exhaustively covered by the current parser"
+  },
+  "non_http_resources": {
+    "python": [
+      {
+        "class": "RealtimeTranscription",
+        "normalized_public_path": "audio.realtime",
+        "public_path": "audio.realtime",
+        "reason": "non_http_resource",
+        "source_file": "src/mistralai/extra/realtime/transcription.py"
+      },
+      {
+        "class": "RealtimeSpeech",
+        "normalized_public_path": "audio.realtime_speech",
+        "public_path": "audio.realtime_speech",
+        "reason": "non_http_resource",
+        "source_file": "src/mistralai/extra/realtime/speech.py"
+      }
+    ],
+    "typescript": []
+  },
+  "openapi_only_operation_ids": [
+    "create_index_v1_rag_managed_indexes_post",
+    "delete_documents_v1_rag_managed_indexes__index_name__documents_delete",
+    "delete_index_v1_rag_managed_indexes__index_name__delete",
+    "get_by_agent_stats_v1_admin_analytics_vibe_work_usage_by_agent_stats",
+    "get_by_time_stats_v1_admin_analytics_vibe_work_usage_by_time_stats",
+    "get_by_user_stats_v1_admin_analytics_vibe_work_usage_by_user_stats",
+    "get_chunk_index_v1_rag_managed_indexes__index_name__chunks__chunk_id__get",
+    "get_index_v1_rag_managed_indexes__index_name__get",
+    "get_organization_stats_v1_admin_analytics_vibe_code_usage_by_organization",
+    "get_workspace_stats_v1_admin_analytics_vibe_code_usage_by_workspace",
+    "grep_index_v1_rag_managed_indexes__index_name__grep_post",
+    "ingest_documents_v1_rag_managed_indexes__index_name__documents_post",
+    "list_indexes_v1_rag_managed_indexes_get",
+    "navigate_index_v1_rag_managed_indexes__index_name__navigate_post",
+    "read_index_v1_rag_managed_indexes__index_name__read_post",
+    "search_index_v1_rag_managed_indexes__index_name__search_post",
+    "update_index_v1_rag_managed_indexes__index_name__put",
+    "users_admin_user_groups_get_group_workspace_assignments",
+    "users_admin_user_groups_remove_group_from_workspace",
+    "users_admin_user_groups_update_group_workspace_assignment",
+    "users_admin_user_groups_update_user_group_organization_role",
+    "users_api_admin_api_keys_create_api_key",
+    "users_api_admin_api_keys_delete_api_key",
+    "users_api_admin_api_keys_get_api_keys",
+    "users_api_admin_audit_logs_get_audit_logs",
+    "users_api_admin_rate_limits_get_rate_limits",
+    "users_api_admin_roles_get_roles",
+    "users_api_admin_scim_sync_get_scim_sync_run",
+    "users_api_admin_scim_sync_trigger_scim_sync",
+    "users_api_admin_spend_limits_get_spend_limits",
+    "users_api_admin_spend_limits_update_spend_limits",
+    "users_api_admin_usage_get_usage",
+    "users_api_admin_usage_query_usage",
+    "users_api_admin_user_groups_assign_group_to_workspace",
+    "users_api_admin_user_groups_assign_users_to_group",
+    "users_api_admin_user_groups_create_user_group",
+    "users_api_admin_user_groups_delete_user_group",
+    "users_api_admin_user_groups_get_nested_groups",
+    "users_api_admin_user_groups_get_user_group",
+    "users_api_admin_user_groups_get_user_group_members",
+    "users_api_admin_user_groups_get_user_groups",
+    "users_api_admin_user_groups_provision_group_to_workspace",
+    "users_api_admin_user_groups_remove_users_from_group",
+    "users_api_admin_user_groups_set_nested_groups",
+    "users_api_admin_user_groups_update_user_group",
+    "users_api_admin_users_create_users",
+    "users_api_admin_users_deactivate_user",
+    "users_api_admin_users_delete_invite",
+    "users_api_admin_users_delete_user",
+    "users_api_admin_users_get_invite",
+    "users_api_admin_users_get_user",
+    "users_api_admin_users_get_users",
+    "users_api_admin_users_invite_users",
+    "users_api_admin_users_update_user",
+    "users_api_admin_workspaces_add_or_update_users_workspaces",
+    "users_api_admin_workspaces_add_users_workspaces",
+    "users_api_admin_workspaces_create_workspace",
+    "users_api_admin_workspaces_delete_workspaces",
+    "users_api_admin_workspaces_get_workspaces",
+    "users_api_admin_workspaces_remove_users_workspaces",
+    "users_api_admin_workspaces_update_workspaces"
+  ],
+  "schema_version": 1,
+  "sdk_only_http": [
+    {
+      "classification": "sdk_observed_both",
+      "http_method": "DELETE",
+      "http_path": "/v1/audio/agents/{agent_id}",
+      "sdk_evidence": {
+        "python": [
+          {
+            "normalized_public_path": "audio.agents.delete",
+            "operation_id": "delete_agent_v1_audio_agents__agent_id__delete",
+            "public_path": "audio.agents.delete",
+            "reason": "no_http_match",
+            "source_file": "src/mistralai/client/audio_agents.py",
+            "transport_variant": "default"
+          }
+        ],
+        "typescript": [
+          {
+            "normalized_public_path": "audio.agents.delete",
+            "operation_id": "delete_agent_v1_audio_agents__agent_id__delete",
+            "public_path": "audio.agents.delete",
+            "reason": "no_http_match",
+            "transport_variant": "default"
+          }
+        ]
+      }
+    },
+    {
+      "classification": "sdk_observed_both",
+      "http_method": "DELETE",
+      "http_path": "/v1/audio/sessions/{session_id}",
+      "sdk_evidence": {
+        "python": [
+          {
+            "normalized_public_path": "audio.sessions.close",
+            "operation_id": "delete_session_v1_audio_sessions__session_id__delete",
+            "public_path": "audio.sessions.close",
+            "reason": "no_http_match",
+            "source_file": "src/mistralai/client/audio_sessions.py",
+            "transport_variant": "default"
+          }
+        ],
+        "typescript": [
+          {
+            "normalized_public_path": "audio.sessions.close",
+            "operation_id": "delete_session_v1_audio_sessions__session_id__delete",
+            "public_path": "audio.sessions.close",
+            "reason": "no_http_match",
+            "transport_variant": "default"
+          }
+        ]
+      }
+    },
+    {
+      "classification": "sdk_observed_both",
+      "http_method": "DELETE",
+      "http_path": "/v1/context/search-indexes/{index_name}",
+      "sdk_evidence": {
+        "python": [
+          {
+            "normalized_public_path": "beta.rag.managed_indexes.delete",
+            "operation_id": "delete_index_v1_context_search_indexes__index_name__delete",
+            "public_path": "beta.rag.managed_indexes.delete",
+            "reason": "no_http_match",
+            "source_file": "src/mistralai/client/managed_indexes.py",
+            "transport_variant": "default"
+          }
+        ],
+        "typescript": [
+          {
+            "normalized_public_path": "beta.rag.managed_indexes.delete",
+            "operation_id": "delete_index_v1_context_search_indexes__index_name__delete",
+            "public_path": "beta.rag.managedIndexes.delete",
+            "reason": "no_http_match",
+            "transport_variant": "default"
+          }
+        ]
+      }
+    },
+    {
+      "classification": "sdk_observed_both",
+      "http_method": "DELETE",
+      "http_path": "/v1/context/search-indexes/{index_name}/documents",
+      "sdk_evidence": {
+        "python": [
+          {
+            "normalized_public_path": "beta.rag.managed_indexes.delete_documents",
+            "operation_id": "delete_documents_v1_context_search_indexes__index_name__documents_delete",
+            "public_path": "beta.rag.managed_indexes.delete_documents",
+            "reason": "no_http_match",
+            "source_file": "src/mistralai/client/managed_indexes.py",
+            "transport_variant": "default"
+          }
+        ],
+        "typescript": [
+          {
+            "normalized_public_path": "beta.rag.managed_indexes.delete_documents",
+            "operation_id": "delete_documents_v1_context_search_indexes__index_name__documents_delete",
+            "public_path": "beta.rag.managedIndexes.deleteDocuments",
+            "reason": "no_http_match",
+            "transport_variant": "default"
+          }
+        ]
+      }
+    },
+    {
+      "classification": "sdk_observed_both",
+      "http_method": "GET",
+      "http_path": "/v1/audio/agents",
+      "sdk_evidence": {
+        "python": [
+          {
+            "normalized_public_path": "audio.agents.list",
+            "operation_id": "list_agents_v1_audio_agents_get",
+            "public_path": "audio.agents.list",
+            "reason": "no_http_match",
+            "source_file": "src/mistralai/client/audio_agents.py",
+            "transport_variant": "default"
+          }
+        ],
+        "typescript": [
+          {
+            "normalized_public_path": "audio.agents.list",
+            "operation_id": "list_agents_v1_audio_agents_get",
+            "public_path": "audio.agents.list",
+            "reason": "no_http_match",
+            "transport_variant": "default"
+          }
+        ]
+      }
+    },
+    {
+      "classification": "sdk_observed_both",
+      "http_method": "GET",
+      "http_path": "/v1/audio/agents/{agent_id}",
+      "sdk_evidence": {
+        "python": [
+          {
+            "normalized_public_path": "audio.agents.get",
+            "operation_id": "get_agent_v1_audio_agents__agent_id__get",
+            "public_path": "audio.agents.get",
+            "reason": "no_http_match",
+            "source_file": "src/mistralai/client/audio_agents.py",
+            "transport_variant": "default"
+          }
+        ],
+        "typescript": [
+          {
+            "normalized_public_path": "audio.agents.get",
+            "operation_id": "get_agent_v1_audio_agents__agent_id__get",
+            "public_path": "audio.agents.get",
+            "reason": "no_http_match",
+            "transport_variant": "default"
+          }
+        ]
+      }
+    },
+    {
+      "classification": "sdk_observed_both",
+      "http_method": "GET",
+      "http_path": "/v1/audio/agents/{agent_id}/sessions",
+      "sdk_evidence": {
+        "python": [
+          {
+            "normalized_public_path": "audio.agents.list_sessions",
+            "operation_id": "list_agent_sessions_v1_audio_agents__agent_id__sessions_get",
+            "public_path": "audio.agents.list_sessions",
+            "reason": "no_http_match",
+            "source_file": "src/mistralai/client/audio_agents.py",
+            "transport_variant": "default"
+          }
+        ],
+        "typescript": [
+          {
+            "normalized_public_path": "audio.agents.list_sessions",
+            "operation_id": "list_agent_sessions_v1_audio_agents__agent_id__sessions_get",
+            "public_path": "audio.agents.listSessions",
+            "reason": "no_http_match",
+            "transport_variant": "default"
+          }
+        ]
+      }
+    },
+    {
+      "classification": "sdk_observed_both",
+      "http_method": "GET",
+      "http_path": "/v1/audio/agents/{agent_id}/versions",
+      "sdk_evidence": {
+        "python": [
+          {
+            "normalized_public_path": "audio.agents.list_versions",
+            "operation_id": "list_agent_versions_v1_audio_agents__agent_id__versions_get",
+            "public_path": "audio.agents.list_versions",
+            "reason": "no_http_match",
+            "source_file": "src/mistralai/client/audio_agents.py",
+            "transport_variant": "default"
+          }
+        ],
+        "typescript": [
+          {
+            "normalized_public_path": "audio.agents.list_versions",
+            "operation_id": "list_agent_versions_v1_audio_agents__agent_id__versions_get",
+            "public_path": "audio.agents.listVersions",
+            "reason": "no_http_match",
+            "transport_variant": "default"
+          }
+        ]
+      }
+    },
+    {
+      "classification": "sdk_observed_both",
+      "http_method": "GET",
+      "http_path": "/v1/audio/sessions/{session_id}",
+      "sdk_evidence": {
+        "python": [
+          {
+            "normalized_public_path": "audio.sessions.get",
+            "operation_id": "get_session_v1_audio_sessions__session_id__get",
+            "public_path": "audio.sessions.get",
+            "reason": "no_http_match",
+            "source_file": "src/mistralai/client/audio_sessions.py",
+            "transport_variant": "default"
+          }
+        ],
+        "typescript": [
+          {
+            "normalized_public_path": "audio.sessions.get",
+            "operation_id": "get_session_v1_audio_sessions__session_id__get",
+            "public_path": "audio.sessions.get",
+            "reason": "no_http_match",
+            "transport_variant": "default"
+          }
+        ]
+      }
+    },
+    {
+      "classification": "sdk_observed_both",
+      "http_method": "GET",
+      "http_path": "/v1/context/search-indexes",
+      "sdk_evidence": {
+        "python": [
+          {
+            "normalized_public_path": "beta.rag.managed_indexes.list",
+            "operation_id": "list_indexes_v1_context_search_indexes_get",
+            "public_path": "beta.rag.managed_indexes.list",
+            "reason": "no_http_match",
+            "source_file": "src/mistralai/client/managed_indexes.py",
+            "transport_variant": "default"
+          }
+        ],
+        "typescript": [
+          {
+            "normalized_public_path": "beta.rag.managed_indexes.list",
+            "operation_id": "list_indexes_v1_context_search_indexes_get",
+            "public_path": "beta.rag.managedIndexes.list",
+            "reason": "no_http_match",
+            "transport_variant": "default"
+          }
+        ]
+      }
+    },
+    {
+      "classification": "sdk_observed_both",
+      "http_method": "GET",
+      "http_path": "/v1/context/search-indexes/{index_name}",
+      "sdk_evidence": {
+        "python": [
+          {
+            "normalized_public_path": "beta.rag.managed_indexes.get",
+            "operation_id": "get_index_v1_context_search_indexes__index_name__get",
+            "public_path": "beta.rag.managed_indexes.get",
+            "reason": "no_http_match",
+            "source_file": "src/mistralai/client/managed_indexes.py",
+            "transport_variant": "default"
+          }
+        ],
+        "typescript": [
+          {
+            "normalized_public_path": "beta.rag.managed_indexes.get",
+            "operation_id": "get_index_v1_context_search_indexes__index_name__get",
+            "public_path": "beta.rag.managedIndexes.get",
+            "reason": "no_http_match",
+            "transport_variant": "default"
+          }
+        ]
+      }
+    },
+    {
+      "classification": "sdk_observed_both",
+      "http_method": "GET",
+      "http_path": "/v1/context/search-indexes/{index_name}/chunks/{chunk_id}",
+      "sdk_evidence": {
+        "python": [
+          {
+            "normalized_public_path": "beta.rag.managed_indexes.get_chunk",
+            "operation_id": "get_chunk_index_v1_context_search_indexes__index_name__chunks__chunk_id__get",
+            "public_path": "beta.rag.managed_indexes.get_chunk",
+            "reason": "no_http_match",
+            "source_file": "src/mistralai/client/managed_indexes.py",
+            "transport_variant": "default"
+          }
+        ],
+        "typescript": [
+          {
+            "normalized_public_path": "beta.rag.managed_indexes.get_chunk",
+            "operation_id": "get_chunk_index_v1_context_search_indexes__index_name__chunks__chunk_id__get",
+            "public_path": "beta.rag.managedIndexes.getChunk",
+            "reason": "no_http_match",
+            "transport_variant": "default"
+          }
+        ]
+      }
+    },
+    {
+      "classification": "sdk_observed_both",
+      "http_method": "GET",
+      "http_path": "/v1/context/search-indexes/{index_name}/summary_field/{language}",
+      "sdk_evidence": {
+        "python": [
+          {
+            "normalized_public_path": "beta.rag.managed_indexes.get_index_summary",
+            "operation_id": "get_managed_index_summary_v1_context_search_indexes__index_name__summary_field__language__get",
+            "public_path": "beta.rag.managed_indexes.get_index_summary",
+            "reason": "no_http_match",
+            "source_file": "src/mistralai/client/managed_indexes.py",
+            "transport_variant": "default"
+          }
+        ],
+        "typescript": [
+          {
+            "normalized_public_path": "beta.rag.managed_indexes.get_index_summary",
+            "operation_id": "get_managed_index_summary_v1_context_search_indexes__index_name__summary_field__language__get",
+            "public_path": "beta.rag.managedIndexes.getIndexSummary",
+            "reason": "no_http_match",
+            "transport_variant": "default"
+          }
+        ]
+      }
+    },
+    {
+      "classification": "sdk_observed_both",
+      "http_method": "POST",
+      "http_path": "/v1/audio/agents",
+      "sdk_evidence": {
+        "python": [
+          {
+            "normalized_public_path": "audio.agents.create",
+            "operation_id": "create_agent_v1_audio_agents_post",
+            "public_path": "audio.agents.create",
+            "reason": "no_http_match",
+            "source_file": "src/mistralai/client/audio_agents.py",
+            "transport_variant": "default"
+          }
+        ],
+        "typescript": [
+          {
+            "normalized_public_path": "audio.agents.create",
+            "operation_id": "create_agent_v1_audio_agents_post",
+            "public_path": "audio.agents.create",
+            "reason": "no_http_match",
+            "transport_variant": "default"
+          }
+        ]
+      }
+    },
+    {
+      "classification": "sdk_observed_both",
+      "http_method": "POST",
+      "http_path": "/v1/audio/sessions",
+      "sdk_evidence": {
+        "python": [
+          {
+            "normalized_public_path": "audio.sessions.create",
+            "operation_id": "create_session_v1_audio_sessions_post",
+            "public_path": "audio.sessions.create",
+            "reason": "no_http_match",
+            "source_file": "src/mistralai/client/audio_sessions.py",
+            "transport_variant": "default"
+          }
+        ],
+        "typescript": [
+          {
+            "normalized_public_path": "audio.sessions.create",
+            "operation_id": "create_session_v1_audio_sessions_post",
+            "public_path": "audio.sessions.create",
+            "reason": "no_http_match",
+            "transport_variant": "default"
+          }
+        ]
+      }
+    },
+    {
+      "classification": "sdk_observed_both",
+      "http_method": "POST",
+      "http_path": "/v1/context/search-indexes",
+      "sdk_evidence": {
+        "python": [
+          {
+            "normalized_public_path": "beta.rag.managed_indexes.create",
+            "operation_id": "create_index_v1_context_search_indexes_post",
+            "public_path": "beta.rag.managed_indexes.create",
+            "reason": "no_http_match",
+            "source_file": "src/mistralai/client/managed_indexes.py",
+            "transport_variant": "default"
+          }
+        ],
+        "typescript": [
+          {
+            "normalized_public_path": "beta.rag.managed_indexes.create",
+            "operation_id": "create_index_v1_context_search_indexes_post",
+            "public_path": "beta.rag.managedIndexes.create",
+            "reason": "no_http_match",
+            "transport_variant": "default"
+          }
+        ]
+      }
+    },
+    {
+      "classification": "sdk_observed_both",
+      "http_method": "POST",
+      "http_path": "/v1/context/search-indexes/{index_name}/documents",
+      "sdk_evidence": {
+        "python": [
+          {
+            "normalized_public_path": "beta.rag.managed_indexes.ingest_documents",
+            "operation_id": "ingest_documents_v1_context_search_indexes__index_name__documents_post",
+            "public_path": "beta.rag.managed_indexes.ingest_documents",
+            "reason": "no_http_match",
+            "source_file": "src/mistralai/client/managed_indexes.py",
+            "transport_variant": "default"
+          }
+        ],
+        "typescript": [
+          {
+            "normalized_public_path": "beta.rag.managed_indexes.ingest_documents",
+            "operation_id": "ingest_documents_v1_context_search_indexes__index_name__documents_post",
+            "public_path": "beta.rag.managedIndexes.ingestDocuments",
+            "reason": "no_http_match",
+            "transport_variant": "default"
+          }
+        ]
+      }
+    },
+    {
+      "classification": "sdk_observed_both",
+      "http_method": "POST",
+      "http_path": "/v1/context/search-indexes/{index_name}/grep",
+      "sdk_evidence": {
+        "python": [
+          {
+            "normalized_public_path": "beta.rag.managed_indexes.grep",
+            "operation_id": "grep_index_v1_context_search_indexes__index_name__grep_post",
+            "public_path": "beta.rag.managed_indexes.grep",
+            "reason": "no_http_match",
+            "source_file": "src/mistralai/client/managed_indexes.py",
+            "transport_variant": "default"
+          }
+        ],
+        "typescript": [
+          {
+            "normalized_public_path": "beta.rag.managed_indexes.grep",
+            "operation_id": "grep_index_v1_context_search_indexes__index_name__grep_post",
+            "public_path": "beta.rag.managedIndexes.grep",
+            "reason": "no_http_match",
+            "transport_variant": "default"
+          }
+        ]
+      }
+    },
+    {
+      "classification": "sdk_observed_both",
+      "http_method": "POST",
+      "http_path": "/v1/context/search-indexes/{index_name}/navigate",
+      "sdk_evidence": {
+        "python": [
+          {
+            "normalized_public_path": "beta.rag.managed_indexes.navigate",
+            "operation_id": "navigate_index_v1_context_search_indexes__index_name__navigate_post",
+            "public_path": "beta.rag.managed_indexes.navigate",
+            "reason": "no_http_match",
+            "source_file": "src/mistralai/client/managed_indexes.py",
+            "transport_variant": "default"
+          }
+        ],
+        "typescript": [
+          {
+            "normalized_public_path": "beta.rag.managed_indexes.navigate",
+            "operation_id": "navigate_index_v1_context_search_indexes__index_name__navigate_post",
+            "public_path": "beta.rag.managedIndexes.navigate",
+            "reason": "no_http_match",
+            "transport_variant": "default"
+          }
+        ]
+      }
+    },
+    {
+      "classification": "sdk_observed_both",
+      "http_method": "POST",
+      "http_path": "/v1/context/search-indexes/{index_name}/read",
+      "sdk_evidence": {
+        "python": [
+          {
+            "normalized_public_path": "beta.rag.managed_indexes.read",
+            "operation_id": "read_index_v1_context_search_indexes__index_name__read_post",
+            "public_path": "beta.rag.managed_indexes.read",
+            "reason": "no_http_match",
+            "source_file": "src/mistralai/client/managed_indexes.py",
+            "transport_variant": "default"
+          }
+        ],
+        "typescript": [
+          {
+            "normalized_public_path": "beta.rag.managed_indexes.read",
+            "operation_id": "read_index_v1_context_search_indexes__index_name__read_post",
+            "public_path": "beta.rag.managedIndexes.read",
+            "reason": "no_http_match",
+            "transport_variant": "default"
+          }
+        ]
+      }
+    },
+    {
+      "classification": "sdk_observed_both",
+      "http_method": "POST",
+      "http_path": "/v1/context/search-indexes/{index_name}/search",
+      "sdk_evidence": {
+        "python": [
+          {
+            "normalized_public_path": "beta.rag.managed_indexes.search",
+            "operation_id": "search_index_v1_context_search_indexes__index_name__search_post",
+            "public_path": "beta.rag.managed_indexes.search",
+            "reason": "no_http_match",
+            "source_file": "src/mistralai/client/managed_indexes.py",
+            "transport_variant": "default"
+          }
+        ],
+        "typescript": [
+          {
+            "normalized_public_path": "beta.rag.managed_indexes.search",
+            "operation_id": "search_index_v1_context_search_indexes__index_name__search_post",
+            "public_path": "beta.rag.managedIndexes.search",
+            "reason": "no_http_match",
+            "transport_variant": "default"
+          }
+        ]
+      }
+    },
+    {
+      "classification": "sdk_observed_both",
+      "http_method": "POST",
+      "http_path": "/v1/context/search-indexes/{index_name}/summary_field/{language}",
+      "sdk_evidence": {
+        "python": [
+          {
+            "normalized_public_path": "beta.rag.managed_indexes.generate_index_summary",
+            "operation_id": "generate_managed_index_summary_post_v1_context_search_indexes__index_name__summary_field__language__post",
+            "public_path": "beta.rag.managed_indexes.generate_index_summary",
+            "reason": "no_http_match",
+            "source_file": "src/mistralai/client/managed_indexes.py",
+            "transport_variant": "default"
+          }
+        ],
+        "typescript": [
+          {
+            "normalized_public_path": "beta.rag.managed_indexes.generate_index_summary",
+            "operation_id": "generate_managed_index_summary_post_v1_context_search_indexes__index_name__summary_field__language__post",
+            "public_path": "beta.rag.managedIndexes.generateIndexSummary",
+            "reason": "no_http_match",
+            "transport_variant": "default"
+          }
+        ]
+      }
+    },
+    {
+      "classification": "sdk_observed_both",
+      "http_method": "PUT",
+      "http_path": "/v1/audio/agents/{agent_id}",
+      "sdk_evidence": {
+        "python": [
+          {
+            "normalized_public_path": "audio.agents.update",
+            "operation_id": "update_agent_v1_audio_agents__agent_id__put",
+            "public_path": "audio.agents.update",
+            "reason": "no_http_match",
+            "source_file": "src/mistralai/client/audio_agents.py",
+            "transport_variant": "default"
+          }
+        ],
+        "typescript": [
+          {
+            "normalized_public_path": "audio.agents.update",
+            "operation_id": "update_agent_v1_audio_agents__agent_id__put",
+            "public_path": "audio.agents.update",
+            "reason": "no_http_match",
+            "transport_variant": "default"
+          }
+        ]
+      }
+    },
+    {
+      "classification": "sdk_observed_both",
+      "http_method": "PUT",
+      "http_path": "/v1/context/search-indexes/{index_name}",
+      "sdk_evidence": {
+        "python": [
+          {
+            "normalized_public_path": "beta.rag.managed_indexes.update",
+            "operation_id": "update_index_v1_context_search_indexes__index_name__put",
+            "public_path": "beta.rag.managed_indexes.update",
+            "reason": "no_http_match",
+            "source_file": "src/mistralai/client/managed_indexes.py",
+            "transport_variant": "default"
+          }
+        ],
+        "typescript": [
+          {
+            "normalized_public_path": "beta.rag.managed_indexes.update",
+            "operation_id": "update_index_v1_context_search_indexes__index_name__put",
+            "public_path": "beta.rag.managedIndexes.update",
+            "reason": "no_http_match",
+            "transport_variant": "default"
+          }
+        ]
+      }
+    },
+    {
+      "classification": "sdk_observed_both",
+      "http_method": "PUT",
+      "http_path": "/v1/context/search-indexes/{index_name}/summary_field/{language}",
+      "sdk_evidence": {
+        "python": [
+          {
+            "normalized_public_path": "beta.rag.managed_indexes.set_index_summary",
+            "operation_id": "set_managed_index_summary_v1_context_search_indexes__index_name__summary_field__language__put",
+            "public_path": "beta.rag.managed_indexes.set_index_summary",
+            "reason": "no_http_match",
+            "source_file": "src/mistralai/client/managed_indexes.py",
+            "transport_variant": "default"
+          }
+        ],
+        "typescript": [
+          {
+            "normalized_public_path": "beta.rag.managed_indexes.set_index_summary",
+            "operation_id": "set_managed_index_summary_v1_context_search_indexes__index_name__summary_field__language__put",
+            "public_path": "beta.rag.managedIndexes.setIndexSummary",
+            "reason": "no_http_match",
+            "transport_variant": "default"
+          }
+        ]
+      }
+    }
+  ],
+  "summary": {
+    "candidate_sdk_only_routes_both": 25,
+    "candidate_sdk_only_routes_one": 0,
+    "cross_sdk_divergences": 1,
+    "existing_source_routes_unresolved": 0,
+    "openapi_only": 61,
+    "python_methods": 290,
+    "python_non_http_resources": 2,
+    "python_unresolved": 25,
+    "raw_operations": 321,
+    "typescript_methods": 292,
+    "typescript_unresolved": 25,
+    "unmatched_distinct_routes": 25,
+    "upstream_operations": 321,
+    "upstream_with_official_taxonomy": 260
+  }
+}
