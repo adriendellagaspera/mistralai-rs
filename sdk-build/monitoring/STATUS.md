@@ -1,6 +1,6 @@
 # Mistral upstream synchronization
 
-**Human review required** | **Generation: FAILED / INCOMPLETE**
+**Human review required** | **Regeneration: PASSED** · **Final CI: pending**
 
 > Automated candidate only. CI verifies technical consistency; a separate
 > GitHub PR approval is required to accept API and compatibility changes.
@@ -22,7 +22,7 @@
 - [ ] Require regenerated Rust sources and a green CI `gate` check.
 - [ ] Approve this PR in GitHub after the final push (never via a lockfile flag).
 
-**Generation attempt:** FAILURE; the source update is not validated as a Rust SDK.
+**Regeneration validation:** passed in [GitHub Actions run #41223191956](https://github.com/adriendellagaspera/mistralai-rs/actions/runs/41223191956): Fern reproducibility, Cargo checks, Clippy, tests, and publish dry-run. Final protected-branch CI is tracked separately.
 
 ## OpenAPI surface changes
 
