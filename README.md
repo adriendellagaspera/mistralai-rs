@@ -27,7 +27,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
-The canonical input is `sdk-build/openapi/published.yaml` with 288 operations. Fern CLI 5.112.0 and `fernapi/fern-rust-sdk` 0.48.0 are the sole production Rust generator. Mistral surface policy is compiled to deterministic Fern extensions by the repository-local compiler/verifier in `sdk-build/sdk_surface/`.
+The canonical input is `sdk-build/openapi/published.yaml` with an explicitly reviewed operation inventory. Fern CLI 5.112.0 and `fernapi/fern-rust-sdk` 0.48.0 are the sole production Rust generator. Mistral surface policy is compiled to deterministic Fern extensions by the repository-local compiler/verifier in `sdk-build/sdk_surface/`.
 
 The 0.5 Fern cutover intentionally accepts reviewed pre-1.0 breaking changes instead of preserving the previous raw/facade architecture. See `sdk-build/fern/API_COMPATIBILITY.md` and `sdk-build/fern/inventory.json`.
 
@@ -41,7 +41,7 @@ just check-generated
 just validate
 ```
 
-`check-generated` regenerates twice, proves deterministic output, accounts for all 288 source operations, verifies surface closure/provenance/collisions, compiles the generated crate and compares it with committed `src/`.
+`check-generated` regenerates twice, proves deterministic output, accounts for all source operations, verifies surface closure/provenance/collisions, compiles the generated crate and compares it with committed `src/`.
 
 See `CONTRIBUTING.md` and `sdk-build/README.md` for source updates and ownership boundaries.
 
