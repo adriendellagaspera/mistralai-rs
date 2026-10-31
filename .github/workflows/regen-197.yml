@@ -27,6 +27,7 @@ jobs:
         run: python3 -m unittest discover -s sdk-build -p 'test_*.py'
       - name: Regenerate canonical Rust SDK
         run: bash sdk-build/fern/generate.sh
+      # Re-run after formatting the committed protocol regression tests.
       - name: Validate typed output
         run: |
           echo "Generated IPAPhoneme:"
