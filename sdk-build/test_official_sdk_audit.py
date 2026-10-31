@@ -42,8 +42,11 @@ def fixture() -> dict:
             "python_unresolved": 3, "cross_sdk_divergences": 0,
         },
         "operations": [
-            {"http_method": "GET", "http_path": "/v1/already", "operation_id": "existing"},
-            {"http_method": "POST", "http_path": "/v1/other", "operation_id": "other"},
+            {"http_method": "GET", "http_path": "/v1/already", "operation_id": "existing",
+             "typescript": [{"normalized_public_path": "beta.already"}],
+             "python": [{"normalized_public_path": "beta.already"}]},
+            {"http_method": "POST", "http_path": "/v1/other", "operation_id": "other",
+             "typescript": [], "python": []},
         ],
         "sdk_only": {
             "python": [
