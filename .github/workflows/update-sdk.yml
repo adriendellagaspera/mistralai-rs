@@ -31,7 +31,7 @@ jobs:
     timeout-minutes: 90
     permissions:
       actions: write # Explicitly dispatch CI for commits created with GITHUB_TOKEN.
-      contents: write # Commit reviewed upstream candidates on the automation branch.
+      contents: write # Commit unapproved candidate sources, subject to GitHub PR review.
       pull-requests: write # Create or update the single upstream remediation PR.
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
