@@ -248,15 +248,32 @@ def finish(generation_result: str) -> None:
     print(f"Wrote {REPORT}")
 
 
+
+def assert_healthy(scope: str) -> None:
+    """Keep badges independent while both schedules update the same remediation PR."""
+    state = load(STATE)
+    sources = ("openapi",) if scope == "spec" else ("python", "typescript")
+    invalid = [
+        name for name in sources
+        if state["changes"].get(name) or name in state["errors"]
+    ]
+    if invalid:
+        raise SystemExit(f"Unreviewed {scope} drift or acquisition failure: {', '.join(invalid)}")
+    print(f"{scope} upstream alignment: pinned revisions match live sources")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("command", choices=("prepare", "finish"))
+    parser.add_argument("command", choices=("prepare", "finish", "health"))
     parser.add_argument("--generation", default="skipped")
+    parser.add_argument("--scope", choices=("spec", "sdk"), default="sdk")
     args = parser.parse_args()
     if args.command == "prepare":
         prepare()
-    else:
+    elif args.command == "finish":
         finish(args.generation)
+    else:
+        assert_healthy(args.scope)
 
 
 if __name__ == "__main__":
