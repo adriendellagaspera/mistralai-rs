@@ -4,7 +4,9 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 import sys
+import tempfile
 import unittest
+from unittest.mock import patch
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE / "official-sdks"))
@@ -95,6 +97,40 @@ class AuditTests(unittest.TestCase):
         f["sdk_only"]["python"].append(candidate("POST", "/v1/new", "py_new_post"))
         report = audit.build_report(f)
         self.assertEqual(report["summary"]["candidate_sdk_only_routes_one"], 2)
+
+
+class UpstreamSyncIntegrationTests(unittest.TestCase):
+    def test_surface_and_parity_report_refresh_and_fail_closed(self) -> None:
+        update_spec = importlib.util.spec_from_file_location(
+            "official_sdk_updater", HERE / "official-sdks" / "update.py"
+        )
+        assert update_spec is not None and update_spec.loader is not None
+        updater = importlib.util.module_from_spec(update_spec)
+        update_spec.loader.exec_module(updater)
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            surface = root / "surface.json"
+            json_report = root / "parity-audit.json"
+            md_report = root / "PARITY_AUDIT.md"
+            with (
+                patch.object(updater, "SURFACE", surface),
+                patch.object(audit, "REPORT_JSON", json_report),
+                patch.object(audit, "REPORT_MD", md_report),
+                patch.object(updater.harvest, "load_json", return_value={}),
+                patch.object(updater.harvest, "generate", return_value=fixture()) as harvest,
+            ):
+                with patch.object(sys, "argv", ["update.py", "update"]):
+                    updater.main()
+                self.assertEqual(harvest.call_count, 1)
+                self.assertTrue(json_report.exists())
+                self.assertTrue(md_report.exists())
+                with patch.object(sys, "argv", ["update.py", "check"]):
+                    updater.main()
+                json_report.write_text("{}\n")
+                with patch.object(sys, "argv", ["update.py", "check"]):
+                    with self.assertRaisesRegex(SystemExit, "parity-audit"):
+                        updater.main()
 
 
 if __name__ == "__main__":
