@@ -61,7 +61,7 @@
       "kind": "temporary_fern_workaround",
       "remove_when": "published Responses discriminator matches its oneOf members",
       "source": "#/components/schemas/ResponsesStreamFrame",
-      "upstream": "https://github.com/fern-api/fern"
+      "upstream": "https://docs.mistral.ai/openapi.yaml"
     },
     {
       "kind": "temporary_fern_workaround",
