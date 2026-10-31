@@ -11,10 +11,19 @@ raw=yaml.safe_load((ROOT/"sdk-build/openapi/published.yaml").read_text())
 a=schema["components"]["schemas"]
 b=raw["components"]["schemas"]
 mode=os.environ["FERN_197_PROBE_MODE"]
-assert mode in ("ipa", "responses")
-if mode=="ipa":
+assert mode in ("ipa", "ipa-named", "responses")
+if mode in ("ipa", "ipa-named"):
     assert a["IPAPhoneme"]!=b["IPAPhoneme"]
     a["IPAPhoneme"]=b["IPAPhoneme"]
+    if mode=="ipa-named":
+        values=a["IPAPhoneme"]["enum"]
+        assert len(set(values))==len(values)
+        import re
+        a["IPAPhoneme"]["x-fern-enum"]={
+            value: {"name": "Ipa" + "".join(f"U{ord(ch):04X}" for ch in value)}
+            for value in values if not re.fullmatch(r"[a-zA-Z]+",value)
+        }
+        print("Named IPA variants:",len(a["IPAPhoneme"]["x-fern-enum"]),flush=True)
 if mode=="responses":
     def find(node):
         if isinstance(node,dict):
