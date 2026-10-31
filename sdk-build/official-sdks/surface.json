@@ -135,17 +135,8 @@
     "connector_delete_all_user_credentials_v1": [
       "beta.connectors.delete_all_user_credentials"
     ],
-    "connector_delete_organization_credentials_v1": [
-      "beta.connectors.delete_organization_credentials"
-    ],
-    "connector_delete_user_credentials_v1": [
-      "beta.connectors.delete_user_credentials"
-    ],
     "connector_delete_v1": [
       "beta.connectors.delete"
-    ],
-    "connector_delete_workspace_credentials_v1": [
-      "beta.connectors.delete_workspace_credentials"
     ],
     "connector_get_auth_url_v1": [
       "beta.connectors.get_auth_url"
