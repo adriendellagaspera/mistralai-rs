@@ -124,5 +124,47 @@ class UpstreamWatchTests(unittest.TestCase):
         self.assertFalse(changes["operations"]["removed"])
 
 
+class FernInventoryAdapterTests(unittest.TestCase):
+    def test_fern_inventory_is_the_only_taxonomy_source(self) -> None:
+        spec = importlib.util.spec_from_file_location(
+            "official_sdk_harvest", HERE / "official-sdks" / "harvest.py"
+        )
+        assert spec is not None and spec.loader is not None
+        harvest = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(harvest)
+        with tempfile.TemporaryDirectory() as temp:
+            fixture = Path(temp) / "inventory.json"
+            fixture.write_text(json.dumps({
+                "operations": [{
+                    "operation_id": "hello",
+                    "http_method": "GET",
+                    "http_path": "/v1/hello",
+                    "outcome": "published",
+                }],
+            }))
+            with patch.object(harvest, "FERN_INVENTORY_PATH", fixture):
+                coverage = harvest.fern_coverage()
+        self.assertEqual(coverage["operations"], [{
+            "operation_id": "hello",
+            "method": "GET",
+            "path": "/v1/hello",
+            "upstream": True,
+        }])
+
+    def test_incomplete_inventory_fails_closed(self) -> None:
+        spec = importlib.util.spec_from_file_location(
+            "official_sdk_harvest", HERE / "official-sdks" / "harvest.py"
+        )
+        assert spec is not None and spec.loader is not None
+        harvest = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(harvest)
+        with tempfile.TemporaryDirectory() as temp:
+            fixture = Path(temp) / "inventory.json"
+            fixture.write_text(json.dumps({"operations": [{"http_method": "GET"}]}))
+            with patch.object(harvest, "FERN_INVENTORY_PATH", fixture):
+                with self.assertRaisesRegex(ValueError, "Incomplete Fern"):
+                    harvest.fern_coverage()
+
+
 if __name__ == "__main__":
     unittest.main()
