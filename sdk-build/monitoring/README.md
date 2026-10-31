@@ -35,3 +35,13 @@ Actions. The automation branch is \`automation/update-mistral-sources\`;
 the PR is reused, not multiplied. If GitHub Actions does not have
 "Read and write permissions" / "Allow GitHub Actions to create and approve
 pull requests" enabled, publishing the candidate will fail visibly.
+
+## GitHub approval is the only human acceptance record
+
+CI validates source identity, generator reproducibility, coverage, and Rust tests.
+The protected `main` ruleset separately requires one human PR approval,
+last-push approval, and successful `gate` CI. An OpenAPI source pin is a
+**proposal**, not an approval. Never set `PENDING_PR_REVIEW` or a synthetic
+review date in a lockfile: GitHub tracks the actual approval and reviewer.
+Review the semantic diff and source provenance, then select **Review changes →
+Approve** in the pull request. Any subsequent push invalidates the approval.
