@@ -147,7 +147,9 @@ def prepare() -> None:
             # Remove provenance that no longer describes the candidate source.
             for obsolete in ("repository", "path", "commit"):
                 pinned["openapi"].pop(obsolete, None)
-            catalog.update({"sha256": digest, "reviewed_at": "PENDING_PR_REVIEW"})
+            # GitHub PR approval governs acceptance, not a mutable lockfile flag.
+            catalog["sha256"] = digest
+            catalog.pop("reviewed_at", None)
             save(CATALOG_LOCK, catalog)
     except Exception as exc:
         state["errors"]["openapi"] = f"{type(exc).__name__}: {exc}"
@@ -217,7 +219,7 @@ def finish(generation_result: str) -> None:
             "## OpenAPI semantic changes relative to committed Rust input",
             "",
             f"Public SHA-256: \`{d['sha256']}\`; downloaded bytes: {d['bytes']}.",
-            f"Previously reviewed public SHA-256: \`{d['previous_public_sha256']}\`.",
+            f"Previously pinned public SHA-256: \`{d['previous_public_sha256']}\`.",
             "",
         ]
         for kind in ("operations", "schemas"):
@@ -232,6 +234,14 @@ def finish(generation_result: str) -> None:
                     lines.append(f"  - … and {len(values)-35} more")
             lines.append("")
     lines += [
+        "## Approval through GitHub PR review",
+        "",
+        "This branch contains a proposed update, never a pre-approved source.",
+        "Review the upstream provenance, semantic differences and breaking",
+        "changes before approving in GitHub. The main-branch ruleset enforces",
+        "a separate approving review, last-push approval and a passing CI gate.",
+        "GitHub records approvals; no lockfile approval marker is needed.",
+        "",
         "## What this PR does",
         "",
         "When the published spec changes, the PR proposes replacing the pinned source",
