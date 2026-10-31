@@ -5,6 +5,9 @@ on:
     paths: ['.github/workflows/regen-197.yml']
   workflow_dispatch:
 permissions: {}
+concurrency:
+  group: fix-remove-197-regenerate
+  cancel-in-progress: true
 jobs:
   regenerate:
     name: Validate and commit fully typed IPA model
@@ -49,5 +52,7 @@ jobs:
           fi
           git commit -m 'fix(fern): generate exhaustively typed IPA phonemes without String fallback'
           gh auth setup-git
+          git fetch origin refs/heads/fix/remove-197-workarounds
+          git rebase FETCH_HEAD
           git push origin HEAD:refs/heads/fix/remove-197-workarounds
           gh workflow run ci.yml --ref fix/remove-197-workarounds
