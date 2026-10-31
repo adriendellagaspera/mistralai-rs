@@ -464,7 +464,7 @@ def build_inventory(
             "protocol": {
                 "repository": lock["openapi"].get("url", lock["openapi"].get("repository")),
                 "commit": lock["openapi"]["sha256"] if lock["openapi"].get("source_kind") == "published_catalog" else lock["openapi"]["commit"],
-                "artifact": "src/generated/coverage.json",
+                "artifact": "sdk-build/fern/inventory.json",
             },
             "typescript": {
                 "repository": lock["official_sdks"]["typescript"]["repository"],
