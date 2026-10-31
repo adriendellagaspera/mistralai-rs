@@ -118,8 +118,8 @@ class UpstreamSyncIntegrationTests(unittest.TestCase):
             md_report = root / "PARITY_AUDIT.md"
             with (
                 patch.object(updater, "SURFACE", surface),
-                patch.object(audit, "REPORT_JSON", json_report),
-                patch.object(audit, "REPORT_MD", md_report),
+                patch.object(updater.audit, "REPORT_JSON", json_report),
+                patch.object(updater.audit, "REPORT_MD", md_report),
                 patch.object(updater.harvest, "load_json", return_value={}),
                 patch.object(updater.harvest, "generate", return_value=fixture()) as harvest,
             ):
