@@ -1,5 +1,9 @@
 # mistralai-rs
 
+[![OpenAPI compatibility check](https://github.com/adriendellagaspera/mistralai-rs/actions/workflows/monitor-public-openapi.yml/badge.svg?branch=main)](https://github.com/adriendellagaspera/mistralai-rs/actions/workflows/monitor-public-openapi.yml) [![Official SDK synchronization](https://github.com/adriendellagaspera/mistralai-rs/actions/workflows/update-sdk.yml/badge.svg?branch=main)](https://github.com/adriendellagaspera/mistralai-rs/actions/workflows/update-sdk.yml)
+
+These badges reflect the latest scheduled checks on `main`, not a claim of API compatibility. Red means that upstream drift, an unavailable source, or a failed update/validation needs attention. The automation keeps [one synchronization PR](https://github.com/adriendellagaspera/mistralai-rs/pulls?q=is%3Apr+is%3Aopen+head%3Aautomation%2Fupdate-mistral-sources) current and includes a [source-difference report](sdk-build/monitoring/README.md). A passing check means the reviewed pins match the sampled upstream sources; it does not prove runtime behavior against the hosted API.
+
 Unofficial asynchronous Rust SDK for Mistral AI, generated reproducibly with Fern from a pinned official OpenAPI source. This project is not affiliated with Mistral AI.
 
 Install the `mistralai-sdk` package from crates.io; the Rust library is imported as `mistralai_sdk`:
