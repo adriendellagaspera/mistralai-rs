@@ -118,6 +118,15 @@ class UpstreamWatchTests(unittest.TestCase):
         self.assertIn("python", result["errors"])
         self.assertTrue(result["changes"]["typescript"])
 
+    def test_badges_are_independent_for_spec_and_sdks(self) -> None:
+        with patch.object(watch, "download", return_value=CHANGED), patch.object(
+            watch, "latest_commit", side_effect=[OLD_PY, OLD_TS]
+        ):
+            watch.prepare()
+        watch.assert_healthy("sdk")
+        with self.assertRaisesRegex(SystemExit, "Unreviewed spec drift"):
+            watch.assert_healthy("spec")
+
     def test_semantic_diff_detects_shape_changes(self) -> None:
         changes = watch.diff(watch.surface(BASE), watch.surface(CHANGED))
         self.assertEqual(changes["operations"]["added"], ["POST /v1/new"])
