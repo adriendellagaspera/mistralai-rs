@@ -106,46 +106,48 @@ def main() -> int:
             "remove_when": "Fern parses recursively discriminated oneOf filters",
         })
 
-    # Fern's Rust generator cannot give valid identifiers to IPA phoneme
-    # Unicode values in an inline enum, even with explicit x-fern-enum names.
-    # Represent them as wire-compatible strings. The pinned published source
-    # retains the complete enum, and the report records the exact values.
-    def normalize_ipa(node: object, pointer: str) -> None:
+    # Give Unicode IPA values explicit, stable Rust identifiers through
+    # Fern's supported x-fern-enum extension. Preserve every original enum
+    # member, enforcing the exact set of accepted serialized wire values.
+    # This is normal public naming policy, not an importer workaround.
+    enum_annotations = 0
+
+    def annotate_unicode_enum(node: object, pointer: str) -> None:
+        nonlocal enum_annotations
         if isinstance(node, list):
             for index, value in enumerate(node):
-                normalize_ipa(value, f"{pointer}/{index}")
+                annotate_unicode_enum(value, f"{pointer}/{index}")
             return
         if not isinstance(node, dict):
             return
         variants = node.get("enum")
         if isinstance(variants, list) and any(
-            isinstance(variant, str)
-            and any(0x0250 <= ord(char) <= 0x02AF for char in variant)
+            isinstance(variant, str) and not variant.isascii()
             for variant in variants
         ):
-            if node.get("type") != "string" or not variants or not all(
-                isinstance(variant, str) for variant in variants
-            ) or len(variants) != len(set(variants)):
-                raise ValueError(f"Unexpected IPA enum: {pointer}")
-            node.pop("enum")
-            node.pop("x-fern-enum", None)
-            node["description"] = (
-                node.get("description", "") +
-                " Fern Rust compatibility: IPA string; permissible phonemes "
-                "are specified by the pinned original OpenAPI."
-            )
-            applied.append({
-                "kind": "temporary_fern_workaround",
-                "source": pointer,
-                "upstream": "https://github.com/fern-api/fern",
-                "remove_when": "Fern Rust generates Unicode-valued inline IPA enums",
-                "wire_values": variants,
-            })
+            if (
+                node.get("type") != "string"
+                or not variants
+                or not all(isinstance(variant, str) for variant in variants)
+                or len(variants) != len(set(variants))
+            ):
+                raise ValueError(f"Unexpected Unicode enum: {pointer}")
+            names = {
+                value: {
+                    "name": "Ipa" + "".join(f"U{ord(char):04X}" for char in value)
+                }
+                for value in variants
+                if not value.isascii()
+            }
+            if "x-fern-enum" in node and node["x-fern-enum"] != names:
+                raise ValueError(f"Upstream enum annotations changed: {pointer}")
+            node["x-fern-enum"] = names
+            enum_annotations += 1
             return
         for key, value in node.items():
-            normalize_ipa(value, f"{pointer}/{key}")
+            annotate_unicode_enum(value, f"{pointer}/{key}")
 
-    normalize_ipa(doc, "#")
+    annotate_unicode_enum(doc, "#")
 
     # The published ResponsesStreamFrame union's discriminator still points
     # to deprecated Response* aliases, whereas oneOf lists actual Responses*
@@ -280,6 +282,7 @@ def main() -> int:
         "schema_version": 1,
         "temporary_workarounds": applied,
         "supported_parameter_annotations": parameter_annotations,
+        "supported_enum_annotations": enum_annotations,
     }
     report_path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
     return 0

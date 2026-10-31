@@ -139,11 +139,16 @@ class FernCatalogCompatibilityTests(unittest.TestCase):
 
         ipa = generated_schemas["PhonemeHolder"]["properties"]["phoneme"]
         self.assertEqual(ipa["type"], "string")
-        self.assertNotIn("enum", ipa)
-        workarounds = report["temporary_workarounds"]
-        ipa_entries = [w for w in workarounds if "wire_values" in w]
-        self.assertEqual(len(ipa_entries), 1)
-        self.assertEqual(ipa_entries[0]["wire_values"], ["aɪ", "tʃ", "θ", "plain"])
+        self.assertEqual(ipa["enum"], ["aɪ", "tʃ", "θ", "plain"])
+        self.assertEqual(ipa["x-fern-enum"], {
+            "aɪ": {"name": "IpaU0061U026A"},
+            "tʃ": {"name": "IpaU0074U0283"},
+            "θ": {"name": "IpaU03B8"},
+        })
+        self.assertEqual(report["supported_enum_annotations"], 1)
+        self.assertFalse(any(
+            "wire_values" in entry for entry in report["temporary_workarounds"]
+        ))
 
     def test_changed_filter_mapping_fails_closed(self) -> None:
         original = fixture()
