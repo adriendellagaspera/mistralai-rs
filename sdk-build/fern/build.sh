@@ -16,11 +16,6 @@ python3 "$FERN_ROOT/prepare_fern_source.py" \
   "$FERN_ROOT/compatible.yaml" \
   "$FERN_ROOT/compatibility-report.json"
 
-# Temporary diagnostic: do not keep this hook in the production build.
-if [[ -n "${FERN_197_PROBE_MODE:-}" ]]; then
-  python3 "$FERN_ROOT/probe_native_197.py"
-fi
-
 python3 "$SURFACE_TOOL" compile \
   --source "$FERN_ROOT/compatible.yaml" \
   --policy "$FERN_ROOT/policy.yaml" \
