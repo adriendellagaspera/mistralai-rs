@@ -9,6 +9,9 @@ pub struct SpeechRequest {
     pub metadata: Option<MetadataDict>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub model: Option<String>,
+    /// Optional pronunciation hints mapping a (case-sensitive) word to its ordered list of IPA phones.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub phoneme_hints: Option<HashMap<String, Option<Vec<IpaPhoneme>>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub prompt_cache_key: Option<String>,
     /// The audio reference for generating the speech.
@@ -36,6 +39,7 @@ pub struct SpeechRequestBuilder {
     input: Option<String>,
     metadata: Option<MetadataDict>,
     model: Option<String>,
+    phoneme_hints: Option<HashMap<String, Option<Vec<IpaPhoneme>>>>,
     prompt_cache_key: Option<String>,
     ref_audio: Option<String>,
     response_format: Option<SpeechOutputFormat>,
@@ -56,6 +60,11 @@ impl SpeechRequestBuilder {
 
     pub fn model(mut self, value: impl Into<String>) -> Self {
         self.model = Some(value.into());
+        self
+    }
+
+    pub fn phoneme_hints(mut self, value: HashMap<String, Option<Vec<IpaPhoneme>>>) -> Self {
+        self.phoneme_hints = Some(value);
         self
     }
 
@@ -94,6 +103,7 @@ impl SpeechRequestBuilder {
                 .ok_or_else(|| BuildError::missing_field("input"))?,
             metadata: self.metadata,
             model: self.model,
+            phoneme_hints: self.phoneme_hints,
             prompt_cache_key: self.prompt_cache_key,
             ref_audio: self.ref_audio,
             response_format: self.response_format,

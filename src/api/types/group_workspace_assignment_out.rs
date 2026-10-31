@@ -5,8 +5,10 @@ pub struct GroupWorkspaceAssignmentOut {
     #[serde(default)]
     #[serde(with = "crate::core::flexible_datetime::offset")]
     pub created: DateTime<FixedOffset>,
+    /// Deprecated: Workspace assignments now support multiple roles. This field only contains the name of the first entry in `roles`; use `roles` instead.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub role_name: Option<String>,
+    /// Deprecated: Workspace assignments now support multiple roles. This field only contains the UUID of the first entry in `roles`; use `roles` instead.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub role_uuid: Option<String>,
     #[serde(default)]

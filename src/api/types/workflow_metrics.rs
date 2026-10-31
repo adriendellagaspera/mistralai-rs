@@ -10,6 +10,7 @@ pub struct WorkflowMetrics {
     pub execution_count: ScalarMetric,
     #[serde(default)]
     pub latency_over_time: TimeSeriesMetric,
+    /// Deprecated, always -1. Never measured retries; use error_count instead.
     pub retry_rate: ScalarMetric,
     pub success_count: ScalarMetric,
 }

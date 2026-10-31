@@ -18,6 +18,9 @@ impl DeploymentsClient {
     /// # Arguments
     ///
     /// * `is_hardened` - Filter deployments by hardened status
+    /// * `created_by` - Filter deployments by creator's user id
+    /// * `owner` - Filter deployments by owner's user id
+    /// * `location_types` - Filter deployments with at least one worker on any of these location types (OR)
     /// * `search` - Filter deployments by name or ID prefix
     /// * `order_by` - Field to sort by. When omitted, active and managed deployments are grouped first, then sorted by created_at. When set, results are sorted purely by the specified field with no grouping.
     /// * `order` - Sort direction. Applied to order_by when set, or within each activity group when omitted.
@@ -68,6 +71,9 @@ impl DeploymentsClient {
                     .bool("active_only", request.active_only.clone())
                     .serialize("is_hardened", request.is_hardened.clone())
                     .serialize("workflow_name", request.workflow_name.clone())
+                    .serialize("created_by", request.created_by.clone())
+                    .serialize("owner", request.owner.clone())
+                    .serialize("location_types", request.location_types.clone())
                     .serialize("search", request.search.clone())
                     .serialize("order_by", request.order_by.clone())
                     .serialize("order", request.order.clone())
@@ -131,6 +137,61 @@ impl DeploymentsClient {
                 "v1/workflows/deployments",
                 Some(serde_json::to_value(request).map_err(ApiError::Serialization)?),
                 None,
+                options,
+            )
+            .await
+    }
+
+    /// Unharden Deployment
+    ///
+    /// # Arguments
+    ///
+    /// * `workspace_id` - Workspace ID to scope the request to. Defaults to the caller's context.
+    /// * `options` - Additional request options such as headers, timeout, etc.
+    ///
+    /// # Returns
+    ///
+    /// Empty response
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use mistralai_sdk::prelude::*;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let config = ClientConfig {
+    ///         token: Some("<token>".to_string()),
+    ///         ..Default::default()
+    ///     };
+    ///     let client = Mistral::new(config).expect("Failed to build client");
+    ///     client
+    ///         .workflows
+    ///         .deployments
+    ///         .unharden_deployment_v1workflows_deployments_deployment_id_unharden_post(
+    ///             &"deployment_id".to_string(),
+    ///             &UnhardenDeploymentV1WorkflowsDeploymentsDeploymentIDUnhardenPostQueryRequest {
+    ///                 ..Default::default()
+    ///             },
+    ///             None,
+    ///         )
+    ///         .await;
+    /// }
+    /// ```
+    pub async fn unharden_deployment_v1workflows_deployments_deployment_id_unharden_post(
+        &self,
+        deployment_id: &str,
+        request: &UnhardenDeploymentV1WorkflowsDeploymentsDeploymentIdUnhardenPostQueryRequest,
+        options: Option<RequestOptions>,
+    ) -> Result<(), ApiError> {
+        self.http_client
+            .execute_request(
+                Method::POST,
+                &format!("v1/workflows/deployments/{}/unharden", deployment_id),
+                None,
+                QueryBuilder::new()
+                    .serialize("workspace_id", request.workspace_id.clone())
+                    .build(),
                 options,
             )
             .await
@@ -293,8 +354,12 @@ impl DeploymentsClient {
     /// Use `after`/`before`/`order` on the first request to set the time range and sort order; for
     /// the next pages pass the `cursor` from the previous response (it remembers the range and order).
     ///
+    /// `log_type=build` serves the managed build pipeline's output instead. It pages the same way,
+    /// and a null `next_cursor` means the window is drained.
+    ///
     /// # Arguments
     ///
+    /// * `log_type` - Which stream to read. 'runtime' is the workers' own logs; 'build' reads the image build output and requires a managed deployment.
     /// * `worker_name` - Filter logs by worker name
     /// * `workflow_name` - Filter logs by workflow name
     /// * `after` - Only return logs at or after this timestamp
@@ -345,6 +410,7 @@ impl DeploymentsClient {
                 &format!("v1/workflows/deployments/{}/logs", name),
                 None,
                 QueryBuilder::new()
+                    .serialize("log_type", request.log_type.clone())
                     .serialize("worker_name", request.worker_name.clone())
                     .serialize("workflow_name", request.workflow_name.clone())
                     .serialize("after", request.after.clone())

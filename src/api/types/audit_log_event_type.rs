@@ -14,6 +14,7 @@ pub enum AuditLogEventType {
     UserOrganizationDelete,
     UserOrganizationJoin,
     OrganizationCreate,
+    OrganizationDelete,
     OrganizationUpdate,
     OrganizationInviteSend,
     OrganizationInviteResend,
@@ -28,6 +29,7 @@ pub enum AuditLogEventType {
     OrganizationSamlAuthenticationDisable,
     OrganizationSamlAuthenticationSsoUserProvisioningUpdate,
     OrganizationScimSyncTrigger,
+    OrganizationScimSecretRotate,
     OrganizationSeatAutoAssignEnable,
     OrganizationSeatAutoAssignDisable,
     OrganizationKindUpdate,
@@ -60,6 +62,8 @@ pub enum AuditLogEventType {
     BillingSubscriptionTerminationDateUpdated,
     BillingCreditsAdded,
     BillingGiftCodeUsed,
+    BillingCreditCouponUsed,
+    BillingSubscriptionCouponUsed,
     BillingMonthlyLimitUpdated,
     BillingWorkspaceMonthlyLimitUpdated,
     BillingSharedBudgetOverrideUpdated,
@@ -69,6 +73,8 @@ pub enum AuditLogEventType {
     BillingPriorityServiceTierUpdated,
     BillingPriorityServiceTierRemoved,
     LeChatConversationCreated,
+    LeChatTemporaryConversationCreated,
+    LeChatTemporaryConversationConverted,
     LeChatConversationDeleted,
     LeChatConversationBatchDeleted,
     LeChatConversationPublicSharingEnabled,
@@ -115,6 +121,9 @@ pub enum AuditLogEventType {
     SkillLoad,
     SkillForceLoad,
     SkillVersionCreate,
+    PluginCreate,
+    PluginUpdate,
+    PluginDelete,
     PromptCreate,
     PromptDelete,
     PromptUpdate,
@@ -194,6 +203,8 @@ pub enum AuditLogEventType {
     IntegrationUpdated,
     IntegrationDeleted,
     IntegrationToolCalled,
+    IntegrationToolActivated,
+    IntegrationToolDeactivated,
     IntegrationCredentialsCreatedOrUpdated,
     IntegrationCredentialsDeleted,
     IntegrationCredentialsRevoked,
@@ -211,9 +222,39 @@ pub enum AuditLogEventType {
     CrawlerConfigDelete,
     CrawlerRunCreate,
     CrawlerRunCancel,
+    WebSearchFilterConfigUpdate,
+    WebSearchFilterDomainAdd,
+    WebSearchFilterDomainRemove,
+    WebFiltersConfigUpdate,
+    WebFiltersDomainAdd,
+    WebFiltersDomainRemove,
+    SecretsManagerSecretCreated,
+    SecretsManagerSecretUpdated,
+    SecretsManagerSecretRevealed,
+    SecretsManagerSecretMetadataUpdated,
+    SecretsManagerSecretDeleted,
+    SecretsManagerSecretVersionDeleted,
+    SecretsManagerSecretVersionRestored,
     RateLimitRuleCreate,
     RateLimitRuleUpdate,
     RateLimitRuleDelete,
+    WorkflowExecutionStarted,
+    WorkflowExecutionCanceled,
+    WorkflowExecutionTerminated,
+    WorkflowExecutionSignal,
+    WorkflowExecutionQuery,
+    WorkflowExecutionUpdate,
+    WorkflowWorkerRegistered,
+    WorkflowScheduleCreated,
+    WorkflowScheduleUpdated,
+    WorkflowSchedulePaused,
+    WorkflowScheduleResumed,
+    WorkflowScheduleDeleted,
+    WorkflowScheduleTriggered,
+    WorkflowArchived,
+    WorkflowUnarchived,
+    WorkflowDeploymentAuthorizedCredentialGranted,
+    WorkflowDeploymentAuthorizedCredentialRevoked,
     /// This variant is used for forward compatibility.
     /// If the server sends a value not recognized by the current SDK version,
     /// it will be captured here with the raw string value.
@@ -235,6 +276,7 @@ impl Serialize for AuditLogEventType {
             Self::UserOrganizationDelete => serializer.serialize_str("user.organization.delete"),
             Self::UserOrganizationJoin => serializer.serialize_str("user.organization.join"),
             Self::OrganizationCreate => serializer.serialize_str("organization.create"),
+            Self::OrganizationDelete => serializer.serialize_str("organization.delete"),
             Self::OrganizationUpdate => serializer.serialize_str("organization.update"),
             Self::OrganizationInviteSend => serializer.serialize_str("organization.invite.send"),
             Self::OrganizationInviteResend => {
@@ -271,6 +313,9 @@ impl Serialize for AuditLogEventType {
                 .serialize_str("organization.saml_authentication.sso_user_provisioning.update"),
             Self::OrganizationScimSyncTrigger => {
                 serializer.serialize_str("organization.scim_sync.trigger")
+            }
+            Self::OrganizationScimSecretRotate => {
+                serializer.serialize_str("organization.scim.secret.rotate")
             }
             Self::OrganizationSeatAutoAssignEnable => {
                 serializer.serialize_str("organization.seat_auto_assign.enable")
@@ -340,6 +385,10 @@ impl Serialize for AuditLogEventType {
             }
             Self::BillingCreditsAdded => serializer.serialize_str("billing.credits.added"),
             Self::BillingGiftCodeUsed => serializer.serialize_str("billing.gift_code.used"),
+            Self::BillingCreditCouponUsed => serializer.serialize_str("billing.credit_coupon.used"),
+            Self::BillingSubscriptionCouponUsed => {
+                serializer.serialize_str("billing.subscription_coupon.used")
+            }
             Self::BillingMonthlyLimitUpdated => {
                 serializer.serialize_str("billing.monthly_limit.updated")
             }
@@ -362,6 +411,12 @@ impl Serialize for AuditLogEventType {
             }
             Self::LeChatConversationCreated => {
                 serializer.serialize_str("le_chat.conversation.created")
+            }
+            Self::LeChatTemporaryConversationCreated => {
+                serializer.serialize_str("le_chat.temporary_conversation.created")
+            }
+            Self::LeChatTemporaryConversationConverted => {
+                serializer.serialize_str("le_chat.temporary_conversation.converted")
             }
             Self::LeChatConversationDeleted => {
                 serializer.serialize_str("le_chat.conversation.deleted")
@@ -439,6 +494,9 @@ impl Serialize for AuditLogEventType {
             Self::SkillLoad => serializer.serialize_str("skill.load"),
             Self::SkillForceLoad => serializer.serialize_str("skill.force_load"),
             Self::SkillVersionCreate => serializer.serialize_str("skill.version.create"),
+            Self::PluginCreate => serializer.serialize_str("plugin.create"),
+            Self::PluginUpdate => serializer.serialize_str("plugin.update"),
+            Self::PluginDelete => serializer.serialize_str("plugin.delete"),
             Self::PromptCreate => serializer.serialize_str("prompt.create"),
             Self::PromptDelete => serializer.serialize_str("prompt.delete"),
             Self::PromptUpdate => serializer.serialize_str("prompt.update"),
@@ -596,6 +654,12 @@ impl Serialize for AuditLogEventType {
             Self::IntegrationUpdated => serializer.serialize_str("integration.updated"),
             Self::IntegrationDeleted => serializer.serialize_str("integration.deleted"),
             Self::IntegrationToolCalled => serializer.serialize_str("integration.tool_called"),
+            Self::IntegrationToolActivated => {
+                serializer.serialize_str("integration.tool_activated")
+            }
+            Self::IntegrationToolDeactivated => {
+                serializer.serialize_str("integration.tool_deactivated")
+            }
             Self::IntegrationCredentialsCreatedOrUpdated => {
                 serializer.serialize_str("integration.credentials.created_or_updated")
             }
@@ -633,9 +697,73 @@ impl Serialize for AuditLogEventType {
             Self::CrawlerConfigDelete => serializer.serialize_str("crawler.config.delete"),
             Self::CrawlerRunCreate => serializer.serialize_str("crawler.run.create"),
             Self::CrawlerRunCancel => serializer.serialize_str("crawler.run.cancel"),
+            Self::WebSearchFilterConfigUpdate => {
+                serializer.serialize_str("web_search.filter_config.update")
+            }
+            Self::WebSearchFilterDomainAdd => {
+                serializer.serialize_str("web_search.filter_domain.add")
+            }
+            Self::WebSearchFilterDomainRemove => {
+                serializer.serialize_str("web_search.filter_domain.remove")
+            }
+            Self::WebFiltersConfigUpdate => serializer.serialize_str("web_filters.config.update"),
+            Self::WebFiltersDomainAdd => serializer.serialize_str("web_filters.domain.add"),
+            Self::WebFiltersDomainRemove => serializer.serialize_str("web_filters.domain.remove"),
+            Self::SecretsManagerSecretCreated => {
+                serializer.serialize_str("secrets_manager.secret.created")
+            }
+            Self::SecretsManagerSecretUpdated => {
+                serializer.serialize_str("secrets_manager.secret.updated")
+            }
+            Self::SecretsManagerSecretRevealed => {
+                serializer.serialize_str("secrets_manager.secret.revealed")
+            }
+            Self::SecretsManagerSecretMetadataUpdated => {
+                serializer.serialize_str("secrets_manager.secret.metadata_updated")
+            }
+            Self::SecretsManagerSecretDeleted => {
+                serializer.serialize_str("secrets_manager.secret.deleted")
+            }
+            Self::SecretsManagerSecretVersionDeleted => {
+                serializer.serialize_str("secrets_manager.secret.version.deleted")
+            }
+            Self::SecretsManagerSecretVersionRestored => {
+                serializer.serialize_str("secrets_manager.secret.version.restored")
+            }
             Self::RateLimitRuleCreate => serializer.serialize_str("rate_limit.rule.create"),
             Self::RateLimitRuleUpdate => serializer.serialize_str("rate_limit.rule.update"),
             Self::RateLimitRuleDelete => serializer.serialize_str("rate_limit.rule.delete"),
+            Self::WorkflowExecutionStarted => {
+                serializer.serialize_str("workflow.execution.started")
+            }
+            Self::WorkflowExecutionCanceled => {
+                serializer.serialize_str("workflow.execution.canceled")
+            }
+            Self::WorkflowExecutionTerminated => {
+                serializer.serialize_str("workflow.execution.terminated")
+            }
+            Self::WorkflowExecutionSignal => serializer.serialize_str("workflow.execution.signal"),
+            Self::WorkflowExecutionQuery => serializer.serialize_str("workflow.execution.query"),
+            Self::WorkflowExecutionUpdate => serializer.serialize_str("workflow.execution.update"),
+            Self::WorkflowWorkerRegistered => {
+                serializer.serialize_str("workflow.worker.registered")
+            }
+            Self::WorkflowScheduleCreated => serializer.serialize_str("workflow.schedule.created"),
+            Self::WorkflowScheduleUpdated => serializer.serialize_str("workflow.schedule.updated"),
+            Self::WorkflowSchedulePaused => serializer.serialize_str("workflow.schedule.paused"),
+            Self::WorkflowScheduleResumed => serializer.serialize_str("workflow.schedule.resumed"),
+            Self::WorkflowScheduleDeleted => serializer.serialize_str("workflow.schedule.deleted"),
+            Self::WorkflowScheduleTriggered => {
+                serializer.serialize_str("workflow.schedule.triggered")
+            }
+            Self::WorkflowArchived => serializer.serialize_str("workflow.archived"),
+            Self::WorkflowUnarchived => serializer.serialize_str("workflow.unarchived"),
+            Self::WorkflowDeploymentAuthorizedCredentialGranted => {
+                serializer.serialize_str("workflow.deployment.authorized_credential.granted")
+            }
+            Self::WorkflowDeploymentAuthorizedCredentialRevoked => {
+                serializer.serialize_str("workflow.deployment.authorized_credential.revoked")
+            }
             Self::__Unknown(val) => serializer.serialize_str(val),
         }
     }
@@ -656,6 +784,7 @@ impl<'de> Deserialize<'de> for AuditLogEventType {
             "user.organization.delete" => Ok(Self::UserOrganizationDelete),
             "user.organization.join" => Ok(Self::UserOrganizationJoin),
             "organization.create" => Ok(Self::OrganizationCreate),
+            "organization.delete" => Ok(Self::OrganizationDelete),
             "organization.update" => Ok(Self::OrganizationUpdate),
             "organization.invite.send" => Ok(Self::OrganizationInviteSend),
             "organization.invite.resend" => Ok(Self::OrganizationInviteResend),
@@ -684,6 +813,7 @@ impl<'de> Deserialize<'de> for AuditLogEventType {
                 Ok(Self::OrganizationSamlAuthenticationSsoUserProvisioningUpdate)
             }
             "organization.scim_sync.trigger" => Ok(Self::OrganizationScimSyncTrigger),
+            "organization.scim.secret.rotate" => Ok(Self::OrganizationScimSecretRotate),
             "organization.seat_auto_assign.enable" => Ok(Self::OrganizationSeatAutoAssignEnable),
             "organization.seat_auto_assign.disable" => Ok(Self::OrganizationSeatAutoAssignDisable),
             "organization.kind.update" => Ok(Self::OrganizationKindUpdate),
@@ -726,6 +856,8 @@ impl<'de> Deserialize<'de> for AuditLogEventType {
             }
             "billing.credits.added" => Ok(Self::BillingCreditsAdded),
             "billing.gift_code.used" => Ok(Self::BillingGiftCodeUsed),
+            "billing.credit_coupon.used" => Ok(Self::BillingCreditCouponUsed),
+            "billing.subscription_coupon.used" => Ok(Self::BillingSubscriptionCouponUsed),
             "billing.monthly_limit.updated" => Ok(Self::BillingMonthlyLimitUpdated),
             "billing.workspace_monthly_limit.updated" => {
                 Ok(Self::BillingWorkspaceMonthlyLimitUpdated)
@@ -739,6 +871,12 @@ impl<'de> Deserialize<'de> for AuditLogEventType {
             "billing.priority_service_tier.updated" => Ok(Self::BillingPriorityServiceTierUpdated),
             "billing.priority_service_tier.removed" => Ok(Self::BillingPriorityServiceTierRemoved),
             "le_chat.conversation.created" => Ok(Self::LeChatConversationCreated),
+            "le_chat.temporary_conversation.created" => {
+                Ok(Self::LeChatTemporaryConversationCreated)
+            }
+            "le_chat.temporary_conversation.converted" => {
+                Ok(Self::LeChatTemporaryConversationConverted)
+            }
             "le_chat.conversation.deleted" => Ok(Self::LeChatConversationDeleted),
             "le_chat.conversation_batch.deleted" => Ok(Self::LeChatConversationBatchDeleted),
             "le_chat.conversation.public_sharing.enabled" => {
@@ -791,6 +929,9 @@ impl<'de> Deserialize<'de> for AuditLogEventType {
             "skill.load" => Ok(Self::SkillLoad),
             "skill.force_load" => Ok(Self::SkillForceLoad),
             "skill.version.create" => Ok(Self::SkillVersionCreate),
+            "plugin.create" => Ok(Self::PluginCreate),
+            "plugin.update" => Ok(Self::PluginUpdate),
+            "plugin.delete" => Ok(Self::PluginDelete),
             "prompt.create" => Ok(Self::PromptCreate),
             "prompt.delete" => Ok(Self::PromptDelete),
             "prompt.update" => Ok(Self::PromptUpdate),
@@ -880,6 +1021,8 @@ impl<'de> Deserialize<'de> for AuditLogEventType {
             "integration.updated" => Ok(Self::IntegrationUpdated),
             "integration.deleted" => Ok(Self::IntegrationDeleted),
             "integration.tool_called" => Ok(Self::IntegrationToolCalled),
+            "integration.tool_activated" => Ok(Self::IntegrationToolActivated),
+            "integration.tool_deactivated" => Ok(Self::IntegrationToolDeactivated),
             "integration.credentials.created_or_updated" => {
                 Ok(Self::IntegrationCredentialsCreatedOrUpdated)
             }
@@ -905,9 +1048,49 @@ impl<'de> Deserialize<'de> for AuditLogEventType {
             "crawler.config.delete" => Ok(Self::CrawlerConfigDelete),
             "crawler.run.create" => Ok(Self::CrawlerRunCreate),
             "crawler.run.cancel" => Ok(Self::CrawlerRunCancel),
+            "web_search.filter_config.update" => Ok(Self::WebSearchFilterConfigUpdate),
+            "web_search.filter_domain.add" => Ok(Self::WebSearchFilterDomainAdd),
+            "web_search.filter_domain.remove" => Ok(Self::WebSearchFilterDomainRemove),
+            "web_filters.config.update" => Ok(Self::WebFiltersConfigUpdate),
+            "web_filters.domain.add" => Ok(Self::WebFiltersDomainAdd),
+            "web_filters.domain.remove" => Ok(Self::WebFiltersDomainRemove),
+            "secrets_manager.secret.created" => Ok(Self::SecretsManagerSecretCreated),
+            "secrets_manager.secret.updated" => Ok(Self::SecretsManagerSecretUpdated),
+            "secrets_manager.secret.revealed" => Ok(Self::SecretsManagerSecretRevealed),
+            "secrets_manager.secret.metadata_updated" => {
+                Ok(Self::SecretsManagerSecretMetadataUpdated)
+            }
+            "secrets_manager.secret.deleted" => Ok(Self::SecretsManagerSecretDeleted),
+            "secrets_manager.secret.version.deleted" => {
+                Ok(Self::SecretsManagerSecretVersionDeleted)
+            }
+            "secrets_manager.secret.version.restored" => {
+                Ok(Self::SecretsManagerSecretVersionRestored)
+            }
             "rate_limit.rule.create" => Ok(Self::RateLimitRuleCreate),
             "rate_limit.rule.update" => Ok(Self::RateLimitRuleUpdate),
             "rate_limit.rule.delete" => Ok(Self::RateLimitRuleDelete),
+            "workflow.execution.started" => Ok(Self::WorkflowExecutionStarted),
+            "workflow.execution.canceled" => Ok(Self::WorkflowExecutionCanceled),
+            "workflow.execution.terminated" => Ok(Self::WorkflowExecutionTerminated),
+            "workflow.execution.signal" => Ok(Self::WorkflowExecutionSignal),
+            "workflow.execution.query" => Ok(Self::WorkflowExecutionQuery),
+            "workflow.execution.update" => Ok(Self::WorkflowExecutionUpdate),
+            "workflow.worker.registered" => Ok(Self::WorkflowWorkerRegistered),
+            "workflow.schedule.created" => Ok(Self::WorkflowScheduleCreated),
+            "workflow.schedule.updated" => Ok(Self::WorkflowScheduleUpdated),
+            "workflow.schedule.paused" => Ok(Self::WorkflowSchedulePaused),
+            "workflow.schedule.resumed" => Ok(Self::WorkflowScheduleResumed),
+            "workflow.schedule.deleted" => Ok(Self::WorkflowScheduleDeleted),
+            "workflow.schedule.triggered" => Ok(Self::WorkflowScheduleTriggered),
+            "workflow.archived" => Ok(Self::WorkflowArchived),
+            "workflow.unarchived" => Ok(Self::WorkflowUnarchived),
+            "workflow.deployment.authorized_credential.granted" => {
+                Ok(Self::WorkflowDeploymentAuthorizedCredentialGranted)
+            }
+            "workflow.deployment.authorized_credential.revoked" => {
+                Ok(Self::WorkflowDeploymentAuthorizedCredentialRevoked)
+            }
             _ => Ok(Self::__Unknown(value)),
         }
     }
@@ -927,6 +1110,7 @@ impl fmt::Display for AuditLogEventType {
             Self::UserOrganizationDelete => write!(f, "user.organization.delete"),
             Self::UserOrganizationJoin => write!(f, "user.organization.join"),
             Self::OrganizationCreate => write!(f, "organization.create"),
+            Self::OrganizationDelete => write!(f, "organization.delete"),
             Self::OrganizationUpdate => write!(f, "organization.update"),
             Self::OrganizationInviteSend => write!(f, "organization.invite.send"),
             Self::OrganizationInviteResend => write!(f, "organization.invite.resend"),
@@ -956,6 +1140,7 @@ impl fmt::Display for AuditLogEventType {
                 "organization.saml_authentication.sso_user_provisioning.update"
             ),
             Self::OrganizationScimSyncTrigger => write!(f, "organization.scim_sync.trigger"),
+            Self::OrganizationScimSecretRotate => write!(f, "organization.scim.secret.rotate"),
             Self::OrganizationSeatAutoAssignEnable => {
                 write!(f, "organization.seat_auto_assign.enable")
             }
@@ -1002,6 +1187,8 @@ impl fmt::Display for AuditLogEventType {
             }
             Self::BillingCreditsAdded => write!(f, "billing.credits.added"),
             Self::BillingGiftCodeUsed => write!(f, "billing.gift_code.used"),
+            Self::BillingCreditCouponUsed => write!(f, "billing.credit_coupon.used"),
+            Self::BillingSubscriptionCouponUsed => write!(f, "billing.subscription_coupon.used"),
             Self::BillingMonthlyLimitUpdated => write!(f, "billing.monthly_limit.updated"),
             Self::BillingWorkspaceMonthlyLimitUpdated => {
                 write!(f, "billing.workspace_monthly_limit.updated")
@@ -1019,6 +1206,12 @@ impl fmt::Display for AuditLogEventType {
                 write!(f, "billing.priority_service_tier.removed")
             }
             Self::LeChatConversationCreated => write!(f, "le_chat.conversation.created"),
+            Self::LeChatTemporaryConversationCreated => {
+                write!(f, "le_chat.temporary_conversation.created")
+            }
+            Self::LeChatTemporaryConversationConverted => {
+                write!(f, "le_chat.temporary_conversation.converted")
+            }
             Self::LeChatConversationDeleted => write!(f, "le_chat.conversation.deleted"),
             Self::LeChatConversationBatchDeleted => write!(f, "le_chat.conversation_batch.deleted"),
             Self::LeChatConversationPublicSharingEnabled => {
@@ -1081,6 +1274,9 @@ impl fmt::Display for AuditLogEventType {
             Self::SkillLoad => write!(f, "skill.load"),
             Self::SkillForceLoad => write!(f, "skill.force_load"),
             Self::SkillVersionCreate => write!(f, "skill.version.create"),
+            Self::PluginCreate => write!(f, "plugin.create"),
+            Self::PluginUpdate => write!(f, "plugin.update"),
+            Self::PluginDelete => write!(f, "plugin.delete"),
             Self::PromptCreate => write!(f, "prompt.create"),
             Self::PromptDelete => write!(f, "prompt.delete"),
             Self::PromptUpdate => write!(f, "prompt.update"),
@@ -1184,6 +1380,8 @@ impl fmt::Display for AuditLogEventType {
             Self::IntegrationUpdated => write!(f, "integration.updated"),
             Self::IntegrationDeleted => write!(f, "integration.deleted"),
             Self::IntegrationToolCalled => write!(f, "integration.tool_called"),
+            Self::IntegrationToolActivated => write!(f, "integration.tool_activated"),
+            Self::IntegrationToolDeactivated => write!(f, "integration.tool_deactivated"),
             Self::IntegrationCredentialsCreatedOrUpdated => {
                 write!(f, "integration.credentials.created_or_updated")
             }
@@ -1209,9 +1407,49 @@ impl fmt::Display for AuditLogEventType {
             Self::CrawlerConfigDelete => write!(f, "crawler.config.delete"),
             Self::CrawlerRunCreate => write!(f, "crawler.run.create"),
             Self::CrawlerRunCancel => write!(f, "crawler.run.cancel"),
+            Self::WebSearchFilterConfigUpdate => write!(f, "web_search.filter_config.update"),
+            Self::WebSearchFilterDomainAdd => write!(f, "web_search.filter_domain.add"),
+            Self::WebSearchFilterDomainRemove => write!(f, "web_search.filter_domain.remove"),
+            Self::WebFiltersConfigUpdate => write!(f, "web_filters.config.update"),
+            Self::WebFiltersDomainAdd => write!(f, "web_filters.domain.add"),
+            Self::WebFiltersDomainRemove => write!(f, "web_filters.domain.remove"),
+            Self::SecretsManagerSecretCreated => write!(f, "secrets_manager.secret.created"),
+            Self::SecretsManagerSecretUpdated => write!(f, "secrets_manager.secret.updated"),
+            Self::SecretsManagerSecretRevealed => write!(f, "secrets_manager.secret.revealed"),
+            Self::SecretsManagerSecretMetadataUpdated => {
+                write!(f, "secrets_manager.secret.metadata_updated")
+            }
+            Self::SecretsManagerSecretDeleted => write!(f, "secrets_manager.secret.deleted"),
+            Self::SecretsManagerSecretVersionDeleted => {
+                write!(f, "secrets_manager.secret.version.deleted")
+            }
+            Self::SecretsManagerSecretVersionRestored => {
+                write!(f, "secrets_manager.secret.version.restored")
+            }
             Self::RateLimitRuleCreate => write!(f, "rate_limit.rule.create"),
             Self::RateLimitRuleUpdate => write!(f, "rate_limit.rule.update"),
             Self::RateLimitRuleDelete => write!(f, "rate_limit.rule.delete"),
+            Self::WorkflowExecutionStarted => write!(f, "workflow.execution.started"),
+            Self::WorkflowExecutionCanceled => write!(f, "workflow.execution.canceled"),
+            Self::WorkflowExecutionTerminated => write!(f, "workflow.execution.terminated"),
+            Self::WorkflowExecutionSignal => write!(f, "workflow.execution.signal"),
+            Self::WorkflowExecutionQuery => write!(f, "workflow.execution.query"),
+            Self::WorkflowExecutionUpdate => write!(f, "workflow.execution.update"),
+            Self::WorkflowWorkerRegistered => write!(f, "workflow.worker.registered"),
+            Self::WorkflowScheduleCreated => write!(f, "workflow.schedule.created"),
+            Self::WorkflowScheduleUpdated => write!(f, "workflow.schedule.updated"),
+            Self::WorkflowSchedulePaused => write!(f, "workflow.schedule.paused"),
+            Self::WorkflowScheduleResumed => write!(f, "workflow.schedule.resumed"),
+            Self::WorkflowScheduleDeleted => write!(f, "workflow.schedule.deleted"),
+            Self::WorkflowScheduleTriggered => write!(f, "workflow.schedule.triggered"),
+            Self::WorkflowArchived => write!(f, "workflow.archived"),
+            Self::WorkflowUnarchived => write!(f, "workflow.unarchived"),
+            Self::WorkflowDeploymentAuthorizedCredentialGranted => {
+                write!(f, "workflow.deployment.authorized_credential.granted")
+            }
+            Self::WorkflowDeploymentAuthorizedCredentialRevoked => {
+                write!(f, "workflow.deployment.authorized_credential.revoked")
+            }
             Self::__Unknown(val) => write!(f, "{}", val),
         }
     }

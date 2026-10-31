@@ -9,6 +9,9 @@ pub struct WorkflowTaskFailedResponse {
     /// Event-specific attributes.
     #[serde(default)]
     pub attributes: WorkflowTaskFailedAttributes,
+    /// Identifies one start of an execution. Shared by its continue-as-new, retry and reset runs, and by every sub-workflow below it. Starting the same execution ID again gives a new value.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub chain_run_id: Option<String>,
     /// Run ID of the execution this run continued from. Non-null for continue-as-new runs.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub continued_run_id: Option<String>,
@@ -18,7 +21,7 @@ pub struct WorkflowTaskFailedResponse {
     /// Unix timestamp in nanoseconds when the event was created.
     #[serde(default)]
     pub event_timestamp: i64,
-    /// Run ID of the first execution in this workflow chain. Equals workflow_run_id on fresh starts and resets (chain anchor resets on reset); differs on CAN and Retry runs where it stays anchored to the original first run.
+    /// Run ID of the first execution in this workflow chain. Equals workflow_run_id on a fresh start. Continue-as-new, retry and reset runs keep the original value.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub first_execution_run_id: Option<String>,
     /// Execution ID of the parent workflow that initiated this execution. If this is a root workflow, this field is not set.
@@ -51,6 +54,7 @@ impl WorkflowTaskFailedResponse {
 #[non_exhaustive]
 pub struct WorkflowTaskFailedResponseBuilder {
     attributes: Option<WorkflowTaskFailedAttributes>,
+    chain_run_id: Option<String>,
     continued_run_id: Option<String>,
     event_id: Option<String>,
     event_timestamp: Option<i64>,
@@ -66,6 +70,11 @@ pub struct WorkflowTaskFailedResponseBuilder {
 impl WorkflowTaskFailedResponseBuilder {
     pub fn attributes(mut self, value: WorkflowTaskFailedAttributes) -> Self {
         self.attributes = Some(value);
+        self
+    }
+
+    pub fn chain_run_id(mut self, value: impl Into<String>) -> Self {
+        self.chain_run_id = Some(value.into());
         self
     }
 
@@ -133,6 +142,7 @@ impl WorkflowTaskFailedResponseBuilder {
             attributes: self
                 .attributes
                 .ok_or_else(|| BuildError::missing_field("attributes"))?,
+            chain_run_id: self.chain_run_id,
             continued_run_id: self.continued_run_id,
             event_id: self
                 .event_id

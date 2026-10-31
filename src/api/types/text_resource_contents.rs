@@ -13,9 +13,6 @@ pub struct TextResourceContents {
     pub text: String,
     #[serde(default)]
     pub uri: String,
-    /// Additional properties that are not part of the defined schema.
-    #[serde(flatten)]
-    pub extra: std::collections::HashMap<String, serde_json::Value>,
 }
 
 impl TextResourceContents {
@@ -64,7 +61,6 @@ impl TextResourceContentsBuilder {
             mime_type: self.mime_type,
             text: self.text.ok_or_else(|| BuildError::missing_field("text"))?,
             uri: self.uri.ok_or_else(|| BuildError::missing_field("uri"))?,
-            extra: Default::default(),
         })
     }
 }

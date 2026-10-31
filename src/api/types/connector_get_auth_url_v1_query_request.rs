@@ -7,7 +7,7 @@ pub struct ConnectorGetAuthUrlV1QueryRequest {
     pub app_return_url: Option<String>,
     /// Auth method type to use for the authorization URL. Required when the connector supports multiple interactive auth methods; otherwise the sole method is selected automatically. Use this to pick a specific method (e.g. 'oauth2' vs 'github_app').
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub method_type: Option<OutboundAuthenticationType>,
+    pub method_type: Option<AuthenticationType>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub credentials_name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -27,7 +27,7 @@ impl ConnectorGetAuthUrlV1QueryRequest {
 #[non_exhaustive]
 pub struct ConnectorGetAuthUrlV1QueryRequestBuilder {
     app_return_url: Option<String>,
-    method_type: Option<OutboundAuthenticationType>,
+    method_type: Option<AuthenticationType>,
     credentials_name: Option<String>,
     credentials_title: Option<String>,
     github_installation_link: Option<bool>,
@@ -39,7 +39,7 @@ impl ConnectorGetAuthUrlV1QueryRequestBuilder {
         self
     }
 
-    pub fn method_type(mut self, value: OutboundAuthenticationType) -> Self {
+    pub fn method_type(mut self, value: AuthenticationType) -> Self {
         self.method_type = Some(value);
         self
     }

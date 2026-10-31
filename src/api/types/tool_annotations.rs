@@ -8,7 +8,7 @@ pub use crate::prelude::*;
 ///
 /// Clients should never make tool use decisions based on ToolAnnotations
 /// received from untrusted servers.
-#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
 pub struct ToolAnnotations {
     #[serde(rename = "destructiveHint")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -24,9 +24,6 @@ pub struct ToolAnnotations {
     pub read_only_hint: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub title: Option<String>,
-    /// Additional properties that are not part of the defined schema.
-    #[serde(flatten)]
-    pub extra: std::collections::HashMap<String, serde_json::Value>,
 }
 
 impl ToolAnnotations {
@@ -79,7 +76,6 @@ impl ToolAnnotationsBuilder {
             open_world_hint: self.open_world_hint,
             read_only_hint: self.read_only_hint,
             title: self.title,
-            extra: Default::default(),
         })
     }
 }

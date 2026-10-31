@@ -1,8 +1,6 @@
 pub use crate::prelude::*;
 
-/// Visibility options available to public API callers.
-///
-/// Excludes ``shared_global`` which is reserved for system-owned connectors.
+/// Connector visibility options.
 #[non_exhaustive]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum PublicResourceVisibility {

@@ -120,6 +120,7 @@ impl PromptsClient {
     ///                 notes: None,
     ///                 sharing_scope: None,
     ///                 title: None,
+    ///                 workspace_relation: None,
     ///             },
     ///             None,
     ///         )

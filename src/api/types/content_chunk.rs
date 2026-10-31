@@ -39,6 +39,23 @@ pub enum ContentChunk {
         data: ReferenceChunk,
     },
 
+    #[serde(rename = "resource")]
+    #[non_exhaustive]
+    Resource {
+        content: ResourceChunkContent,
+        #[serde(default)]
+        uri: String,
+    },
+
+    #[serde(rename = "resource_link")]
+    #[non_exhaustive]
+    ResourceLink {
+        #[serde(skip_serializing_if = "Option::is_none")]
+        metadata: Option<HashMap<String, Option<ResourceLinkChunkMetadataValue>>>,
+        #[serde(default)]
+        uri: String,
+    },
+
     #[serde(rename = "text")]
     #[non_exhaustive]
     Text {
@@ -81,12 +98,33 @@ impl ContentChunk {
         Self::Reference { data }
     }
 
+    pub fn resource(content: ResourceChunkContent, uri: String) -> Self {
+        Self::Resource { content, uri }
+    }
+
+    pub fn resource_link(uri: String) -> Self {
+        Self::ResourceLink {
+            metadata: None,
+            uri,
+        }
+    }
+
     pub fn text(data: TextChunk) -> Self {
         Self::Text { data }
     }
 
     pub fn thinking(data: ThinkChunk) -> Self {
         Self::Thinking { data }
+    }
+
+    pub fn resource_link_with_metadata(
+        metadata: HashMap<String, Option<ResourceLinkChunkMetadataValue>>,
+        uri: String,
+    ) -> Self {
+        Self::ResourceLink {
+            metadata: Some(metadata),
+            uri,
+        }
     }
 
     pub fn unknown(value: serde_json::Value) -> Self {

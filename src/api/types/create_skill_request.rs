@@ -17,6 +17,10 @@ pub struct CreateSkillRequest {
     #[serde(rename = "sharingScope")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sharing_scope: Option<RegistrySharingScope>,
+    /// Access every workspace member gets when sharing_scope is `workspace`. Defaults to `writer`, which is what a workspace publish granted before this field existed, so omitting it preserves today's behaviour exactly. Rejected unless sharing_scope is `workspace`.
+    #[serde(rename = "workspaceRelation")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub workspace_relation: Option<ShareRelation>,
 }
 
 impl CreateSkillRequest {
@@ -33,6 +37,7 @@ pub struct CreateSkillRequestBuilder {
     name: Option<String>,
     notes: Option<String>,
     sharing_scope: Option<RegistrySharingScope>,
+    workspace_relation: Option<ShareRelation>,
 }
 
 impl CreateSkillRequestBuilder {
@@ -61,6 +66,11 @@ impl CreateSkillRequestBuilder {
         self
     }
 
+    pub fn workspace_relation(mut self, value: ShareRelation) -> Self {
+        self.workspace_relation = Some(value);
+        self
+    }
+
     /// Consumes the builder and constructs a [`CreateSkillRequest`].
     /// This method will fail if any of the following fields are not set:
     /// - [`definition`](CreateSkillRequestBuilder::definition)
@@ -74,6 +84,7 @@ impl CreateSkillRequestBuilder {
             name: self.name.ok_or_else(|| BuildError::missing_field("name"))?,
             notes: self.notes,
             sharing_scope: self.sharing_scope,
+            workspace_relation: self.workspace_relation,
         })
     }
 }

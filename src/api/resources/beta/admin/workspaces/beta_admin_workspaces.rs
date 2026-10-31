@@ -258,7 +258,7 @@ impl WorkspacesClient {
     ///         .workspaces
     ///         .users_api_admin_workspaces_add_users_workspaces(
     ///             &"workspace_uuid".to_string(),
-    ///             &WorkspaceMemberIn {
+    ///             &AdminWorkspaceMemberIn {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -269,7 +269,7 @@ impl WorkspacesClient {
     pub async fn users_api_admin_workspaces_add_users_workspaces(
         &self,
         workspace_uuid: &str,
-        request: &WorkspaceMemberIn,
+        request: &AdminWorkspaceMemberIn,
         options: Option<RequestOptions>,
     ) -> Result<AddUsersToWorkspaceOut, ApiError> {
         self.http_client
@@ -369,7 +369,7 @@ impl WorkspacesClient {
     ///         .workspaces
     ///         .users_api_admin_workspaces_add_or_update_users_workspaces(
     ///             &"workspace_uuid".to_string(),
-    ///             &WorkspaceMemberIn {
+    ///             &AdminWorkspaceMemberIn {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -380,7 +380,7 @@ impl WorkspacesClient {
     pub async fn users_api_admin_workspaces_add_or_update_users_workspaces(
         &self,
         workspace_uuid: &str,
-        request: &WorkspaceMemberIn,
+        request: &AdminWorkspaceMemberIn,
         options: Option<RequestOptions>,
     ) -> Result<AddOrUpdateUsersToWorkspaceOut, ApiError> {
         self.http_client

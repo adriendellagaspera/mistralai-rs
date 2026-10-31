@@ -8,6 +8,9 @@ pub struct OtelFieldDefinition {
     pub label: String,
     #[serde(default)]
     pub name: String,
+    /// Raw OpenTelemetry attribute key this field is projected from, whether a span attribute (e.g. `gen_ai.request.model` for `request_model`) or a resource attribute (e.g. `service.name` for `service_name`). None when the field is a native OTLP field (like `span_name` or `trace_id`) or a nested attribute map (like `span_attributes`).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source_attribute_key: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub supported_aggregations: Option<Vec<MetricAggregation>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -27,6 +30,7 @@ pub struct OtelFieldDefinitionBuilder {
     group: Option<String>,
     label: Option<String>,
     name: Option<String>,
+    source_attribute_key: Option<String>,
     supported_aggregations: Option<Vec<MetricAggregation>>,
     supported_operators: Option<Vec<OtelFieldDefinitionSupportedOperatorsItem>>,
     r#type: Option<OtelFieldDefinitionType>,
@@ -45,6 +49,11 @@ impl OtelFieldDefinitionBuilder {
 
     pub fn name(mut self, value: impl Into<String>) -> Self {
         self.name = Some(value.into());
+        self
+    }
+
+    pub fn source_attribute_key(mut self, value: impl Into<String>) -> Self {
+        self.source_attribute_key = Some(value.into());
         self
     }
 
@@ -78,6 +87,7 @@ impl OtelFieldDefinitionBuilder {
                 .label
                 .ok_or_else(|| BuildError::missing_field("label"))?,
             name: self.name.ok_or_else(|| BuildError::missing_field("name"))?,
+            source_attribute_key: self.source_attribute_key,
             supported_aggregations: self.supported_aggregations,
             supported_operators: self.supported_operators,
             r#type: self

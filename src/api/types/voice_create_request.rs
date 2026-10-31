@@ -17,8 +17,8 @@ pub struct VoiceCreateRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub retention_notice: Option<i64>,
     /// Base64-encoded audio file
-    #[serde(default)]
-    pub sample_audio: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sample_audio: Option<String>,
     /// Original filename for extension detection
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sample_filename: Option<String>,
@@ -109,7 +109,6 @@ impl VoiceCreateRequestBuilder {
     /// Consumes the builder and constructs a [`VoiceCreateRequest`].
     /// This method will fail if any of the following fields are not set:
     /// - [`name`](VoiceCreateRequestBuilder::name)
-    /// - [`sample_audio`](VoiceCreateRequestBuilder::sample_audio)
     pub fn build(self) -> Result<VoiceCreateRequest, BuildError> {
         Ok(VoiceCreateRequest {
             age: self.age,
@@ -119,9 +118,7 @@ impl VoiceCreateRequestBuilder {
             languages: self.languages,
             name: self.name.ok_or_else(|| BuildError::missing_field("name"))?,
             retention_notice: self.retention_notice,
-            sample_audio: self
-                .sample_audio
-                .ok_or_else(|| BuildError::missing_field("sample_audio"))?,
+            sample_audio: self.sample_audio,
             sample_filename: self.sample_filename,
             slug: self.slug,
             tags: self.tags,

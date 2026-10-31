@@ -23,6 +23,10 @@ pub struct CreatePromptRequest {
     /// Display title.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub title: Option<String>,
+    /// Access every workspace member gets when sharing_scope is `workspace`. Defaults to `writer`, which is what a workspace publish granted before this field existed, so omitting it preserves today's behaviour exactly. Rejected unless sharing_scope is `workspace`.
+    #[serde(rename = "workspaceRelation")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub workspace_relation: Option<ShareRelation>,
 }
 
 impl CreatePromptRequest {
@@ -41,6 +45,7 @@ pub struct CreatePromptRequestBuilder {
     notes: Option<String>,
     sharing_scope: Option<RegistrySharingScope>,
     title: Option<String>,
+    workspace_relation: Option<ShareRelation>,
 }
 
 impl CreatePromptRequestBuilder {
@@ -79,6 +84,11 @@ impl CreatePromptRequestBuilder {
         self
     }
 
+    pub fn workspace_relation(mut self, value: ShareRelation) -> Self {
+        self.workspace_relation = Some(value);
+        self
+    }
+
     /// Consumes the builder and constructs a [`CreatePromptRequest`].
     /// This method will fail if any of the following fields are not set:
     /// - [`definition`](CreatePromptRequestBuilder::definition)
@@ -94,6 +104,7 @@ impl CreatePromptRequestBuilder {
             notes: self.notes,
             sharing_scope: self.sharing_scope,
             title: self.title,
+            workspace_relation: self.workspace_relation,
         })
     }
 }

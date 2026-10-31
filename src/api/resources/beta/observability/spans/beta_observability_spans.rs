@@ -13,6 +13,67 @@ impl SpansClient {
         })
     }
 
+    /// Search pipeline results
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - Additional request options such as headers, timeout, etc.
+    ///
+    /// # Returns
+    ///
+    /// JSON response from the API
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use mistralai_sdk::prelude::*;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let config = ClientConfig {
+    ///         token: Some("<token>".to_string()),
+    ///         ..Default::default()
+    ///     };
+    ///     let client = Mistral::new(config).expect("Failed to build client");
+    ///     client
+    ///         .beta
+    ///         .observability
+    ///         .spans
+    ///         .search_pipeline_results_v1observability_pipeline_results_search_post(
+    ///             &PipelineResultsRequest {
+    ///                 pipeline_config_slugs: vec!["pipeline_config_slugs".to_string()],
+    ///                 from: None,
+    ///                 to: None,
+    ///                 page_size: None,
+    ///                 cursor: None,
+    ///                 search_expression: None,
+    ///             },
+    ///             None,
+    ///         )
+    ///         .await;
+    /// }
+    /// ```
+    pub async fn search_pipeline_results_v1observability_pipeline_results_search_post(
+        &self,
+        request: &PipelineResultsRequest,
+        options: Option<RequestOptions>,
+    ) -> Result<GetPipelineResults, ApiError> {
+        self.http_client
+            .execute_request(
+                Method::POST,
+                "v1/observability/pipeline-results/search",
+                Some(serde_json::to_value(request).map_err(ApiError::Serialization)?),
+                QueryBuilder::new()
+                    .serialize("from", request.from.clone())
+                    .serialize("to", request.to.clone())
+                    .int("page_size", request.page_size.clone())
+                    .serialize("cursor", request.cursor.clone())
+                    .build(),
+                options,
+            )
+            .await
+    }
+
     /// Aggregate spans
     ///
     /// # Arguments
@@ -69,6 +130,72 @@ impl SpansClient {
             .execute_request(
                 Method::POST,
                 "v1/observability/spans/aggregate",
+                Some(serde_json::to_value(&request.body).map_err(ApiError::Serialization)?),
+                QueryBuilder::new()
+                    .serialize("from", request.from.clone())
+                    .serialize("to", request.to.clone())
+                    .build(),
+                options,
+            )
+            .await
+    }
+
+    /// Aggregate span evaluations
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - Additional request options such as headers, timeout, etc.
+    ///
+    /// # Returns
+    ///
+    /// JSON response from the API
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use mistralai_sdk::prelude::*;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let config = ClientConfig {
+    ///         token: Some("<token>".to_string()),
+    ///         ..Default::default()
+    ///     };
+    ///     let client = Mistral::new(config).expect("Failed to build client");
+    ///     client
+    ///         .beta
+    ///         .observability
+    ///         .spans
+    ///         .aggregate_span_evaluations_v1observability_spans_evaluations_aggregate_post(
+    ///             &AggregateSpanEvaluationsV1ObservabilitySpansEvaluationsAggregatePostRequest {
+    ///                 body: AggregationRequest {
+    ///                     dimensions: None,
+    ///                     limit: None,
+    ///                     metric: MetricDefinition {
+    ///                         aggregation: MetricAggregation::Count,
+    ///                         measure: "measure".to_string(),
+    ///                     },
+    ///                     order_by: None,
+    ///                     search_expression: None,
+    ///                     time_dimension: None,
+    ///                 },
+    ///                 from: None,
+    ///                 to: None,
+    ///             },
+    ///             None,
+    ///         )
+    ///         .await;
+    /// }
+    /// ```
+    pub async fn aggregate_span_evaluations_v1observability_spans_evaluations_aggregate_post(
+        &self,
+        request: &AggregateSpanEvaluationsV1ObservabilitySpansEvaluationsAggregatePostRequest,
+        options: Option<RequestOptions>,
+    ) -> Result<Aggregation, ApiError> {
+        self.http_client
+            .execute_request(
+                Method::POST,
+                "v1/observability/spans/evaluations/aggregate",
                 Some(serde_json::to_value(&request.body).map_err(ApiError::Serialization)?),
                 QueryBuilder::new()
                     .serialize("from", request.from.clone())

@@ -7,7 +7,7 @@ pub use deployments::DeploymentsClient;
 pub mod executions;
 pub use executions::ExecutionsClient;
 pub mod runs;
-pub use runs::RunsClient;
+pub use runs::RunsClient2;
 pub mod schedules;
 pub use schedules::SchedulesClient;
 pub mod metrics;
@@ -16,7 +16,7 @@ pub struct WorkflowsClient {
     pub http_client: HttpClient,
     pub deployments: DeploymentsClient,
     pub executions: ExecutionsClient,
-    pub runs: RunsClient,
+    pub runs: RunsClient2,
     pub schedules: SchedulesClient,
     pub metrics: MetricsClient,
 }
@@ -27,7 +27,7 @@ impl WorkflowsClient {
             http_client: HttpClient::new(config.clone())?,
             deployments: DeploymentsClient::new(config.clone())?,
             executions: ExecutionsClient::new(config.clone())?,
-            runs: RunsClient::new(config.clone())?,
+            runs: RunsClient2::new(config.clone())?,
             schedules: SchedulesClient::new(config.clone())?,
             metrics: MetricsClient::new(config.clone())?,
         })
@@ -169,6 +169,7 @@ impl WorkflowsClient {
     /// * `task_queue` - The task queue to filter by
     /// * `active_only` - Whether to only return active workflows versions
     /// * `include_shared` - Whether to include shared workflow versions
+    /// * `workflow_name` - Exact workflow name to filter by
     /// * `workflow_search` - The workflow name to filter by
     /// * `archived` - Filter by archived state. False=exclude archived, True=only archived, None=include all
     /// * `with_workflow` - Whether to include the workflow definition
@@ -219,6 +220,7 @@ impl WorkflowsClient {
                     .serialize("task_queue", request.task_queue.clone())
                     .bool("active_only", request.active_only.clone())
                     .bool("include_shared", request.include_shared.clone())
+                    .serialize("workflow_name", request.workflow_name.clone())
                     .serialize("workflow_search", request.workflow_search.clone())
                     .serialize("archived", request.archived.clone())
                     .bool("with_workflow", request.with_workflow.clone())

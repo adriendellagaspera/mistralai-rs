@@ -67,7 +67,7 @@ impl ConnectorsClient {
             .await
     }
 
-    /// Create a new MCP connector. You can customize its visibility, url and auth type.
+    /// Create a new MCP or HTTP connector. You can customize its visibility, URL, and auth type.
     ///
     /// # Arguments
     ///
@@ -93,20 +93,13 @@ impl ConnectorsClient {
     ///         .beta
     ///         .connectors
     ///         .connector_create_v1(
-    ///             &CreateConnectorRequest {
-    ///                 description: "description".to_string(),
-    ///                 name: "name".to_string(),
-    ///                 server: "server".to_string(),
-    ///                 auth_data: None,
-    ///                 global_headers: None,
-    ///                 headers: None,
-    ///                 icon_url: None,
-    ///                 oauth2server_metadata: None,
-    ///                 oauth2server_metadata_url: None,
-    ///                 protocol: None,
-    ///                 system_prompt: None,
-    ///                 title: None,
-    ///                 visibility: None,
+    ///             &ConnectorCreateV1ConnectorsRequest::HTTP {
+    ///                 data: CreateHTTPConnectorRequest {
+    ///                     description: "description".to_string(),
+    ///                     name: "name".to_string(),
+    ///                     server: "server".to_string(),
+    ///                     ..Default::default()
+    ///                 },
     ///             },
     ///             None,
     ///         )
@@ -115,7 +108,7 @@ impl ConnectorsClient {
     /// ```
     pub async fn connector_create_v1(
         &self,
-        request: &CreateConnectorRequest,
+        request: &ConnectorCreateV1ConnectorsRequest,
         options: Option<RequestOptions>,
     ) -> Result<Connector, ApiError> {
         self.http_client
@@ -134,7 +127,6 @@ impl ConnectorsClient {
     /// # Arguments
     ///
     /// * `fetch_user_data` - Fetch the user-level data associated with the connector (e.g. connection credentials).
-    /// * `fetch_customer_data` - Fetch the customer data associated with the connector (e.g. customer secrets / config).
     /// * `options` - Additional request options such as headers, timeout, etc.
     ///
     /// # Returns
@@ -179,7 +171,6 @@ impl ConnectorsClient {
                 None,
                 QueryBuilder::new()
                     .bool("fetch_user_data", request.fetch_user_data.clone())
-                    .bool("fetch_customer_data", request.fetch_customer_data.clone())
                     .build(),
                 options,
             )
@@ -355,115 +346,6 @@ impl ConnectorsClient {
             .await
     }
 
-    /// Create or update credentials at the organization level for a given connector.
-    ///
-    /// # Arguments
-    ///
-    /// * `options` - Additional request options such as headers, timeout, etc.
-    ///
-    /// # Returns
-    ///
-    /// JSON response from the API
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// use mistralai_sdk::prelude::*;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let config = ClientConfig {
-    ///         token: Some("<token>".to_string()),
-    ///         ..Default::default()
-    ///     };
-    ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client
-    ///         .beta
-    ///         .connectors
-    ///         .connector_create_or_update_organization_credentials_v1(
-    ///             &"connector_id_or_name".to_string(),
-    ///             &CredentialsCreateOrUpdate {
-    ///                 name: "name".to_string(),
-    ///                 ..Default::default()
-    ///             },
-    ///             None,
-    ///         )
-    ///         .await;
-    /// }
-    /// ```
-    pub async fn connector_create_or_update_organization_credentials_v1(
-        &self,
-        connector_id_or_name: &str,
-        request: &CredentialsCreateOrUpdate,
-        options: Option<RequestOptions>,
-    ) -> Result<MessageResponse, ApiError> {
-        self.http_client
-            .execute_request(
-                Method::POST,
-                &format!(
-                    "v1/connectors/{}/organization/credentials",
-                    connector_id_or_name
-                ),
-                Some(serde_json::to_value(request).map_err(ApiError::Serialization)?),
-                None,
-                options,
-            )
-            .await
-    }
-
-    /// Delete credentials at the organization level for a given connector.
-    ///
-    /// # Arguments
-    ///
-    /// * `options` - Additional request options such as headers, timeout, etc.
-    ///
-    /// # Returns
-    ///
-    /// JSON response from the API
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// use mistralai_sdk::prelude::*;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let config = ClientConfig {
-    ///         token: Some("<token>".to_string()),
-    ///         ..Default::default()
-    ///     };
-    ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client
-    ///         .beta
-    ///         .connectors
-    ///         .connector_delete_organization_credentials_v1(
-    ///             &"connector_id_or_name".to_string(),
-    ///             &"credentials_name".to_string(),
-    ///             None,
-    ///         )
-    ///         .await;
-    /// }
-    /// ```
-    pub async fn connector_delete_organization_credentials_v1(
-        &self,
-        connector_id_or_name: &str,
-        credentials_name: &str,
-        options: Option<RequestOptions>,
-    ) -> Result<MessageResponse, ApiError> {
-        self.http_client
-            .execute_request(
-                Method::DELETE,
-                &format!(
-                    "v1/connectors/{}/organization/credentials/{}",
-                    connector_id_or_name, credentials_name
-                ),
-                None,
-                None,
-                options,
-            )
-            .await
-    }
-
     /// List all tools available for an MCP connector.
     ///
     /// # Arguments
@@ -512,7 +394,6 @@ impl ConnectorsClient {
                 &format!("v1/connectors/{}/tools", connector_id_or_name),
                 None,
                 QueryBuilder::new()
-                    .int("page", request.page.clone())
                     .int("page_size", request.page_size.clone())
                     .bool("refresh", request.refresh.clone())
                     .bool("pretty", request.pretty.clone())
@@ -637,59 +518,6 @@ impl ConnectorsClient {
             .await
     }
 
-    /// Create or update credentials at the user level for a given connector.
-    ///
-    /// # Arguments
-    ///
-    /// * `options` - Additional request options such as headers, timeout, etc.
-    ///
-    /// # Returns
-    ///
-    /// JSON response from the API
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// use mistralai_sdk::prelude::*;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let config = ClientConfig {
-    ///         token: Some("<token>".to_string()),
-    ///         ..Default::default()
-    ///     };
-    ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client
-    ///         .beta
-    ///         .connectors
-    ///         .connector_create_or_update_user_credentials_v1(
-    ///             &"connector_id_or_name".to_string(),
-    ///             &CredentialsCreateOrUpdate {
-    ///                 name: "name".to_string(),
-    ///                 ..Default::default()
-    ///             },
-    ///             None,
-    ///         )
-    ///         .await;
-    /// }
-    /// ```
-    pub async fn connector_create_or_update_user_credentials_v1(
-        &self,
-        connector_id_or_name: &str,
-        request: &CredentialsCreateOrUpdate,
-        options: Option<RequestOptions>,
-    ) -> Result<MessageResponse, ApiError> {
-        self.http_client
-            .execute_request(
-                Method::POST,
-                &format!("v1/connectors/{}/user/credentials", connector_id_or_name),
-                Some(serde_json::to_value(request).map_err(ApiError::Serialization)?),
-                None,
-                options,
-            )
-            .await
-    }
-
     /// Delete all credentials configured at the user level for a given connector.
     ///
     /// # Arguments
@@ -728,59 +556,6 @@ impl ConnectorsClient {
             .execute_request(
                 Method::DELETE,
                 &format!("v1/connectors/{}/user/credentials", connector_id_or_name),
-                None,
-                None,
-                options,
-            )
-            .await
-    }
-
-    /// Delete credentials at the user level for a given connector.
-    ///
-    /// # Arguments
-    ///
-    /// * `options` - Additional request options such as headers, timeout, etc.
-    ///
-    /// # Returns
-    ///
-    /// JSON response from the API
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// use mistralai_sdk::prelude::*;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let config = ClientConfig {
-    ///         token: Some("<token>".to_string()),
-    ///         ..Default::default()
-    ///     };
-    ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client
-    ///         .beta
-    ///         .connectors
-    ///         .connector_delete_user_credentials_v1(
-    ///             &"connector_id_or_name".to_string(),
-    ///             &"credentials_name".to_string(),
-    ///             None,
-    ///         )
-    ///         .await;
-    /// }
-    /// ```
-    pub async fn connector_delete_user_credentials_v1(
-        &self,
-        connector_id_or_name: &str,
-        credentials_name: &str,
-        options: Option<RequestOptions>,
-    ) -> Result<MessageResponse, ApiError> {
-        self.http_client
-            .execute_request(
-                Method::DELETE,
-                &format!(
-                    "v1/connectors/{}/user/credentials/{}",
-                    connector_id_or_name, credentials_name
-                ),
                 None,
                 None,
                 options,
@@ -846,7 +621,7 @@ impl ConnectorsClient {
             .await
     }
 
-    /// Create or update credentials at the workspace level for a given connector.
+    /// Create consumer credentials for a given connector and consumer scope (organization, workspace, user)
     ///
     /// # Arguments
     ///
@@ -871,8 +646,9 @@ impl ConnectorsClient {
     ///     client
     ///         .beta
     ///         .connectors
-    ///         .connector_create_or_update_workspace_credentials_v1(
+    ///         .connector_create_credentials_v1(
     ///             &"connector_id_or_name".to_string(),
+    ///             &ConnectorCreateCredentialsV1ConnectorsRequestConsumerScope::User,
     ///             &CredentialsCreateOrUpdate {
     ///                 name: "name".to_string(),
     ///                 ..Default::default()
@@ -882,9 +658,10 @@ impl ConnectorsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn connector_create_or_update_workspace_credentials_v1(
+    pub async fn connector_create_credentials_v1(
         &self,
         connector_id_or_name: &str,
+        consumer_scope: &ConnectorCreateCredentialsV1ConnectorsRequestConsumerScope,
         request: &CredentialsCreateOrUpdate,
         options: Option<RequestOptions>,
     ) -> Result<MessageResponse, ApiError> {
@@ -892,8 +669,8 @@ impl ConnectorsClient {
             .execute_request(
                 Method::POST,
                 &format!(
-                    "v1/connectors/{}/workspace/credentials",
-                    connector_id_or_name
+                    "v1/connectors/{}/{}/credentials",
+                    connector_id_or_name, consumer_scope
                 ),
                 Some(serde_json::to_value(request).map_err(ApiError::Serialization)?),
                 None,
@@ -902,7 +679,7 @@ impl ConnectorsClient {
             .await
     }
 
-    /// Delete credentials at the workspace level for a given connector.
+    /// Create or update consumer credentials for a given connector.
     ///
     /// # Arguments
     ///
@@ -927,17 +704,77 @@ impl ConnectorsClient {
     ///     client
     ///         .beta
     ///         .connectors
-    ///         .connector_delete_workspace_credentials_v1(
+    ///         .connector_update_credentials(
     ///             &"connector_id_or_name".to_string(),
+    ///             &ConnectorUpdateCredentialsConnectorsRequestConsumerScope::User,
+    ///             &CredentialsCreateOrUpdate {
+    ///                 name: "name".to_string(),
+    ///                 ..Default::default()
+    ///             },
+    ///             None,
+    ///         )
+    ///         .await;
+    /// }
+    /// ```
+    pub async fn connector_update_credentials(
+        &self,
+        connector_id_or_name: &str,
+        consumer_scope: &ConnectorUpdateCredentialsConnectorsRequestConsumerScope,
+        request: &CredentialsCreateOrUpdate,
+        options: Option<RequestOptions>,
+    ) -> Result<MessageResponse, ApiError> {
+        self.http_client
+            .execute_request(
+                Method::PATCH,
+                &format!(
+                    "v1/connectors/{}/{}/credentials",
+                    connector_id_or_name, consumer_scope
+                ),
+                Some(serde_json::to_value(request).map_err(ApiError::Serialization)?),
+                None,
+                options,
+            )
+            .await
+    }
+
+    /// Delete connector credentials for a given consumer.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - Additional request options such as headers, timeout, etc.
+    ///
+    /// # Returns
+    ///
+    /// JSON response from the API
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use mistralai_sdk::prelude::*;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let config = ClientConfig {
+    ///         token: Some("<token>".to_string()),
+    ///         ..Default::default()
+    ///     };
+    ///     let client = Mistral::new(config).expect("Failed to build client");
+    ///     client
+    ///         .beta
+    ///         .connectors
+    ///         .connector_delete_credentials(
+    ///             &"connector_id_or_name".to_string(),
+    ///             &ConnectorDeleteCredentialsConnectorsRequestConsumerScope::User,
     ///             &"credentials_name".to_string(),
     ///             None,
     ///         )
     ///         .await;
     /// }
     /// ```
-    pub async fn connector_delete_workspace_credentials_v1(
+    pub async fn connector_delete_credentials(
         &self,
         connector_id_or_name: &str,
+        consumer_scope: &ConnectorDeleteCredentialsConnectorsRequestConsumerScope,
         credentials_name: &str,
         options: Option<RequestOptions>,
     ) -> Result<MessageResponse, ApiError> {
@@ -945,8 +782,8 @@ impl ConnectorsClient {
             .execute_request(
                 Method::DELETE,
                 &format!(
-                    "v1/connectors/{}/workspace/credentials/{}",
-                    connector_id_or_name, credentials_name
+                    "v1/connectors/{}/{}/credentials/{}",
+                    connector_id_or_name, consumer_scope, credentials_name
                 ),
                 None,
                 None,
@@ -1027,8 +864,10 @@ impl ConnectorsClient {
     ///         .connectors
     ///         .connector_update_v1(
     ///             &"connector_id".to_string(),
-    ///             &UpdateConnectorRequest {
-    ///                 ..Default::default()
+    ///             &ConnectorUpdateV1ConnectorsRequestBody::HTTP {
+    ///                 data: UpdateHTTPConnectorRequest {
+    ///                     ..Default::default()
+    ///                 },
     ///             },
     ///             None,
     ///         )
@@ -1038,7 +877,7 @@ impl ConnectorsClient {
     pub async fn connector_update_v1(
         &self,
         connector_id: &str,
-        request: &UpdateConnectorRequest,
+        request: &ConnectorUpdateV1ConnectorsRequestBody,
         options: Option<RequestOptions>,
     ) -> Result<Connector, ApiError> {
         self.http_client
@@ -1046,6 +885,96 @@ impl ConnectorsClient {
                 Method::PATCH,
                 &format!("v1/connectors/{}#id", connector_id),
                 Some(serde_json::to_value(request).map_err(ApiError::Serialization)?),
+                None,
+                options,
+            )
+            .await
+    }
+
+    /// Transfers ownership of a private user-owned connector to the current organization, making it available to all organization members. The creator can later revert this via the unshare endpoint. Any authentication flows that rely on the original owner's identity (e.g. OAuth on-behalf-of) will be affected and must be reconfigured after sharing. Requires the ShareConnectorToOrg organization permission.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - Additional request options such as headers, timeout, etc.
+    ///
+    /// # Returns
+    ///
+    /// JSON response from the API
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use mistralai_sdk::prelude::*;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let config = ClientConfig {
+    ///         token: Some("<token>".to_string()),
+    ///         ..Default::default()
+    ///     };
+    ///     let client = Mistral::new(config).expect("Failed to build client");
+    ///     client
+    ///         .beta
+    ///         .connectors
+    ///         .connector_share_to_organization_v1(&"connector_id".to_string(), None)
+    ///         .await;
+    /// }
+    /// ```
+    pub async fn connector_share_to_organization_v1(
+        &self,
+        connector_id: &str,
+        options: Option<RequestOptions>,
+    ) -> Result<MessageResponse, ApiError> {
+        self.http_client
+            .execute_request(
+                Method::PUT,
+                &format!("v1/connectors/{}/organization/share", connector_id),
+                None,
+                None,
+                options,
+            )
+            .await
+    }
+
+    /// Reverts an organization-shared connector back to a private, creator-owned connector. Organization-scoped connections and other members' connections are removed; the creator's own connection is preserved. Requires the ShareConnectorToOrg organization permission.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - Additional request options such as headers, timeout, etc.
+    ///
+    /// # Returns
+    ///
+    /// JSON response from the API
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use mistralai_sdk::prelude::*;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let config = ClientConfig {
+    ///         token: Some("<token>".to_string()),
+    ///         ..Default::default()
+    ///     };
+    ///     let client = Mistral::new(config).expect("Failed to build client");
+    ///     client
+    ///         .beta
+    ///         .connectors
+    ///         .connector_unshare_from_organization_v1(&"connector_id".to_string(), None)
+    ///         .await;
+    /// }
+    /// ```
+    pub async fn connector_unshare_from_organization_v1(
+        &self,
+        connector_id: &str,
+        options: Option<RequestOptions>,
+    ) -> Result<MessageResponse, ApiError> {
+        self.http_client
+            .execute_request(
+                Method::DELETE,
+                &format!("v1/connectors/{}/organization/share", connector_id),
+                None,
                 None,
                 options,
             )

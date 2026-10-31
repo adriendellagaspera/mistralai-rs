@@ -13,7 +13,7 @@ impl VoicesClient {
         })
     }
 
-    /// List all voices (excluding sample data)
+    /// Offset pagination will not be supported anymore. Use GET /v2/audio/voices instead.
     ///
     /// # Arguments
     ///
@@ -98,13 +98,13 @@ impl VoicesClient {
     ///         .create_voice_v1audio_voices_post(
     ///             &VoiceCreateRequest {
     ///                 name: "name".to_string(),
-    ///                 sample_audio: "sample_audio".to_string(),
     ///                 age: None,
     ///                 color: None,
     ///                 description: None,
     ///                 gender: None,
     ///                 languages: None,
     ///                 retention_notice: None,
+    ///                 sample_audio: None,
     ///                 sample_filename: None,
     ///                 slug: None,
     ///                 tags: None,
@@ -220,7 +220,7 @@ impl VoicesClient {
             .await
     }
 
-    /// Update voice metadata (name, gender, languages, age, tags).
+    /// Update voice metadata (name, gender, languages, age, tags, retention notice).
     ///
     /// # Arguments
     ///
@@ -312,6 +312,69 @@ impl VoicesClient {
                 &format!("v1/audio/voices/{}/sample", voice_id),
                 None,
                 None,
+                options,
+            )
+            .await
+    }
+
+    /// List voices, cursor-paginated
+    ///
+    /// # Arguments
+    ///
+    /// * `page_size` - Maximum number of voices to return
+    /// * `page_token` - Cursor returned as next_page_token by the previous page
+    /// * `type_` - Filter the voices between customs and presets
+    /// * `gender` - Keep voices matching any of these genders
+    /// * `language` - Keep voices supporting any of these languages
+    /// * `query` - Case-insensitive match on voice name
+    /// * `options` - Additional request options such as headers, timeout, etc.
+    ///
+    /// # Returns
+    ///
+    /// JSON response from the API
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use mistralai_sdk::prelude::*;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let config = ClientConfig {
+    ///         token: Some("<token>".to_string()),
+    ///         ..Default::default()
+    ///     };
+    ///     let client = Mistral::new(config).expect("Failed to build client");
+    ///     client
+    ///         .audio
+    ///         .voices
+    ///         .audio_v2voices_list(
+    ///             &AudioV2VoicesListQueryRequest {
+    ///                 ..Default::default()
+    ///             },
+    ///             None,
+    ///         )
+    ///         .await;
+    /// }
+    /// ```
+    pub async fn audio_v2voices_list(
+        &self,
+        request: &AudioV2VoicesListQueryRequest,
+        options: Option<RequestOptions>,
+    ) -> Result<VoiceListPage, ApiError> {
+        self.http_client
+            .execute_request(
+                Method::GET,
+                "v2/audio/voices",
+                None,
+                QueryBuilder::new()
+                    .int("page_size", request.page_size.clone())
+                    .serialize("page_token", request.page_token.clone())
+                    .serialize("type", request.r#type.clone())
+                    .serialize("gender", request.gender.clone())
+                    .serialize("language", request.language.clone())
+                    .structured_query("query", request.query.clone())
+                    .build(),
                 options,
             )
             .await

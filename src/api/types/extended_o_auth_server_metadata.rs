@@ -6,8 +6,12 @@ pub use crate::prelude::*;
 /// Mirrors the shape of .well-known/oauth-authorization-server responses.
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
 pub struct ExtendedOAuthServerMetadata {
-    #[serde(default)]
-    pub authorization_endpoint: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub authorization_endpoint: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub authorization_grant_profiles_supported: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub authorization_response_iss_parameter_supported: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub client_id_metadata_document_supported: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -68,6 +72,8 @@ impl ExtendedOAuthServerMetadata {
 #[non_exhaustive]
 pub struct ExtendedOAuthServerMetadataBuilder {
     authorization_endpoint: Option<String>,
+    authorization_grant_profiles_supported: Option<Vec<String>>,
+    authorization_response_iss_parameter_supported: Option<bool>,
     client_id_metadata_document_supported: Option<bool>,
     code_challenge_methods_supported: Option<Vec<String>>,
     grant_types_supported: Option<Vec<String>>,
@@ -97,6 +103,16 @@ pub struct ExtendedOAuthServerMetadataBuilder {
 impl ExtendedOAuthServerMetadataBuilder {
     pub fn authorization_endpoint(mut self, value: impl Into<String>) -> Self {
         self.authorization_endpoint = Some(value.into());
+        self
+    }
+
+    pub fn authorization_grant_profiles_supported(mut self, value: Vec<String>) -> Self {
+        self.authorization_grant_profiles_supported = Some(value);
+        self
+    }
+
+    pub fn authorization_response_iss_parameter_supported(mut self, value: bool) -> Self {
+        self.authorization_response_iss_parameter_supported = Some(value);
         self
     }
 
@@ -228,14 +244,14 @@ impl ExtendedOAuthServerMetadataBuilder {
 
     /// Consumes the builder and constructs a [`ExtendedOAuthServerMetadata`].
     /// This method will fail if any of the following fields are not set:
-    /// - [`authorization_endpoint`](ExtendedOAuthServerMetadataBuilder::authorization_endpoint)
     /// - [`issuer`](ExtendedOAuthServerMetadataBuilder::issuer)
     /// - [`token_endpoint`](ExtendedOAuthServerMetadataBuilder::token_endpoint)
     pub fn build(self) -> Result<ExtendedOAuthServerMetadata, BuildError> {
         Ok(ExtendedOAuthServerMetadata {
-            authorization_endpoint: self
-                .authorization_endpoint
-                .ok_or_else(|| BuildError::missing_field("authorization_endpoint"))?,
+            authorization_endpoint: self.authorization_endpoint,
+            authorization_grant_profiles_supported: self.authorization_grant_profiles_supported,
+            authorization_response_iss_parameter_supported: self
+                .authorization_response_iss_parameter_supported,
             client_id_metadata_document_supported: self.client_id_metadata_document_supported,
             code_challenge_methods_supported: self.code_challenge_methods_supported,
             grant_types_supported: self.grant_types_supported,

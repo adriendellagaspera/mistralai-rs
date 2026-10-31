@@ -43,6 +43,7 @@ impl SpeechClient {
     ///                 input: "input".to_string(),
     ///                 metadata: None,
     ///                 model: None,
+    ///                 phoneme_hints: None,
     ///                 prompt_cache_key: None,
     ///                 ref_audio: None,
     ///                 response_format: None,

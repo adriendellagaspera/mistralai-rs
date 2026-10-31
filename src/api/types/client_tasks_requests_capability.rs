@@ -1,15 +1,12 @@
 pub use crate::prelude::*;
 
-/// Capability for tasks requests operations.
-#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
+/// Specifies which request types the client can augment with tasks (2025-11-25 only).
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
 pub struct ClientTasksRequestsCapability {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub elicitation: Option<TasksElicitationCapability>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sampling: Option<TasksSamplingCapability>,
-    /// Additional properties that are not part of the defined schema.
-    #[serde(flatten)]
-    pub extra: std::collections::HashMap<String, serde_json::Value>,
 }
 
 impl ClientTasksRequestsCapability {
@@ -41,7 +38,6 @@ impl ClientTasksRequestsCapabilityBuilder {
         Ok(ClientTasksRequestsCapability {
             elicitation: self.elicitation,
             sampling: self.sampling,
-            extra: Default::default(),
         })
     }
 }

@@ -5,7 +5,7 @@ pub use crate::prelude::*;
 /// This is the unified trace format used across all trace providers (Tempo, ClickHouse, etc.).
 /// Regardless of the underlying backend, all trace data is normalized to this Tempo-compatible
 /// OpenTelemetry format to ensure consistency in the API response structure.
-#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
 pub struct TempoGetTraceResponse {
     /// The batches of the trace
     #[serde(skip_serializing_if = "Option::is_none")]

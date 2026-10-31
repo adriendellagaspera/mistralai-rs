@@ -11,10 +11,12 @@
 //! - **fim**
 //! - **models**
 //! - **ocr**
+//! - **responses**
 //! - **workflows**
 //! - **events**
 //! - **Audio**
 //! - **Beta**
+//! - **Realtime**
 
 use crate::{ApiError, ClientConfig};
 
@@ -30,6 +32,8 @@ pub mod files;
 pub mod fim;
 pub mod models;
 pub mod ocr;
+pub mod realtime;
+pub mod responses;
 pub mod workflows;
 pub struct Mistral {
     pub config: ClientConfig,
@@ -42,10 +46,12 @@ pub struct Mistral {
     pub fim: FimClient,
     pub models: ModelsClient,
     pub ocr: OcrClient,
+    pub responses: ResponsesClient,
     pub workflows: WorkflowsClient,
     pub events: EventsClient,
     pub audio: AudioClient,
     pub beta: BetaClient,
+    pub realtime: RealtimeClient,
 }
 
 impl Mistral {
@@ -61,10 +67,12 @@ impl Mistral {
             fim: FimClient::new(config.clone())?,
             models: ModelsClient::new(config.clone())?,
             ocr: OcrClient::new(config.clone())?,
+            responses: ResponsesClient::new(config.clone())?,
             workflows: WorkflowsClient::new(config.clone())?,
             events: EventsClient::new(config.clone())?,
             audio: AudioClient::new(config.clone())?,
             beta: BetaClient::new(config.clone())?,
+            realtime: RealtimeClient::new(config.clone())?,
         })
     }
 }
@@ -81,4 +89,6 @@ pub use files::FilesClient;
 pub use fim::FimClient;
 pub use models::ModelsClient;
 pub use ocr::OcrClient;
+pub use realtime::RealtimeClient;
+pub use responses::ResponsesClient;
 pub use workflows::WorkflowsClient;

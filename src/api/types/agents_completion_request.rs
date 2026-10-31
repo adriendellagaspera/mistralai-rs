@@ -10,6 +10,8 @@ pub struct AgentsCompletionRequest {
     pub frequency_penalty: Option<f64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub guardrails: Option<Vec<GuardrailConfig>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub logprobs: Option<bool>,
     /// The maximum number of tokens to generate in the completion. The token count of your prompt plus `max_tokens` cannot exceed the model's context length.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub max_tokens: Option<i64>,
@@ -18,6 +20,8 @@ pub struct AgentsCompletionRequest {
     pub messages: Vec<AgentsCompletionRequestMessagesItem>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<HashMap<String, serde_json::Value>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub min_tokens: Option<i64>,
     /// Number of completions to return for each request, input tokens are only billed once.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub n: Option<i64>,
@@ -31,6 +35,8 @@ pub struct AgentsCompletionRequest {
     pub presence_penalty: Option<f64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub prompt_cache_key: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub prompt_logprobs: Option<bool>,
     /// Allows toggling between the reasoning mode and no system prompt. When set to `reasoning` the system prompt for reasoning models will be used.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub prompt_mode: Option<MistralPromptMode>,
@@ -39,6 +45,8 @@ pub struct AgentsCompletionRequest {
     pub random_seed: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reasoning_effort: Option<ReasoningEffort>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub repetition_penalty: Option<f64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub response_format: Option<ResponseFormat>,
     /// Determines whether to serve the request using priority or standard capacity.
@@ -54,6 +62,12 @@ pub struct AgentsCompletionRequest {
     pub tool_choice: Option<AgentsCompletionRequestToolChoice>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tools: Option<Vec<AgentsCompletionRequestToolsItem>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub top_k: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub top_logprobs: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub top_prompt_logprobs: Option<i64>,
 }
 
 impl AgentsCompletionRequest {
@@ -68,23 +82,30 @@ pub struct AgentsCompletionRequestBuilder {
     agent_id: Option<String>,
     frequency_penalty: Option<f64>,
     guardrails: Option<Vec<GuardrailConfig>>,
+    logprobs: Option<bool>,
     max_tokens: Option<i64>,
     messages: Option<Vec<AgentsCompletionRequestMessagesItem>>,
     metadata: Option<HashMap<String, serde_json::Value>>,
+    min_tokens: Option<i64>,
     n: Option<i64>,
     parallel_tool_calls: Option<bool>,
     prediction: Option<Prediction>,
     presence_penalty: Option<f64>,
     prompt_cache_key: Option<String>,
+    prompt_logprobs: Option<bool>,
     prompt_mode: Option<MistralPromptMode>,
     random_seed: Option<i64>,
     reasoning_effort: Option<ReasoningEffort>,
+    repetition_penalty: Option<f64>,
     response_format: Option<ResponseFormat>,
     service_tier: Option<RequestedServiceTier>,
     stop: Option<AgentsCompletionRequestStop>,
     stream: Option<bool>,
     tool_choice: Option<AgentsCompletionRequestToolChoice>,
     tools: Option<Vec<AgentsCompletionRequestToolsItem>>,
+    top_k: Option<i64>,
+    top_logprobs: Option<i64>,
+    top_prompt_logprobs: Option<i64>,
 }
 
 impl AgentsCompletionRequestBuilder {
@@ -103,6 +124,11 @@ impl AgentsCompletionRequestBuilder {
         self
     }
 
+    pub fn logprobs(mut self, value: bool) -> Self {
+        self.logprobs = Some(value);
+        self
+    }
+
     pub fn max_tokens(mut self, value: i64) -> Self {
         self.max_tokens = Some(value);
         self
@@ -115,6 +141,11 @@ impl AgentsCompletionRequestBuilder {
 
     pub fn metadata(mut self, value: HashMap<String, serde_json::Value>) -> Self {
         self.metadata = Some(value);
+        self
+    }
+
+    pub fn min_tokens(mut self, value: i64) -> Self {
+        self.min_tokens = Some(value);
         self
     }
 
@@ -143,6 +174,11 @@ impl AgentsCompletionRequestBuilder {
         self
     }
 
+    pub fn prompt_logprobs(mut self, value: bool) -> Self {
+        self.prompt_logprobs = Some(value);
+        self
+    }
+
     pub fn prompt_mode(mut self, value: MistralPromptMode) -> Self {
         self.prompt_mode = Some(value);
         self
@@ -155,6 +191,11 @@ impl AgentsCompletionRequestBuilder {
 
     pub fn reasoning_effort(mut self, value: ReasoningEffort) -> Self {
         self.reasoning_effort = Some(value);
+        self
+    }
+
+    pub fn repetition_penalty(mut self, value: f64) -> Self {
+        self.repetition_penalty = Some(value);
         self
     }
 
@@ -188,6 +229,21 @@ impl AgentsCompletionRequestBuilder {
         self
     }
 
+    pub fn top_k(mut self, value: i64) -> Self {
+        self.top_k = Some(value);
+        self
+    }
+
+    pub fn top_logprobs(mut self, value: i64) -> Self {
+        self.top_logprobs = Some(value);
+        self
+    }
+
+    pub fn top_prompt_logprobs(mut self, value: i64) -> Self {
+        self.top_prompt_logprobs = Some(value);
+        self
+    }
+
     /// Consumes the builder and constructs a [`AgentsCompletionRequest`].
     /// This method will fail if any of the following fields are not set:
     /// - [`agent_id`](AgentsCompletionRequestBuilder::agent_id)
@@ -199,25 +255,32 @@ impl AgentsCompletionRequestBuilder {
                 .ok_or_else(|| BuildError::missing_field("agent_id"))?,
             frequency_penalty: self.frequency_penalty,
             guardrails: self.guardrails,
+            logprobs: self.logprobs,
             max_tokens: self.max_tokens,
             messages: self
                 .messages
                 .ok_or_else(|| BuildError::missing_field("messages"))?,
             metadata: self.metadata,
+            min_tokens: self.min_tokens,
             n: self.n,
             parallel_tool_calls: self.parallel_tool_calls,
             prediction: self.prediction,
             presence_penalty: self.presence_penalty,
             prompt_cache_key: self.prompt_cache_key,
+            prompt_logprobs: self.prompt_logprobs,
             prompt_mode: self.prompt_mode,
             random_seed: self.random_seed,
             reasoning_effort: self.reasoning_effort,
+            repetition_penalty: self.repetition_penalty,
             response_format: self.response_format,
             service_tier: self.service_tier,
             stop: self.stop,
             stream: self.stream,
             tool_choice: self.tool_choice,
             tools: self.tools,
+            top_k: self.top_k,
+            top_logprobs: self.top_logprobs,
+            top_prompt_logprobs: self.top_prompt_logprobs,
         })
     }
 }

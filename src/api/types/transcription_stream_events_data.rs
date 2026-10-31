@@ -29,14 +29,16 @@ pub enum TranscriptionStreamEventsData {
     #[serde(rename = "transcription.segment")]
     #[non_exhaustive]
     TranscriptionSegment {
+        #[serde(skip_serializing_if = "Option::is_none")]
         #[serde(default)]
-        #[serde(with = "crate::core::number_serializers")]
-        end: f64,
+        #[serde(with = "crate::core::number_serializers::option")]
+        end: Option<f64>,
         #[serde(skip_serializing_if = "Option::is_none")]
         speaker_id: Option<String>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         #[serde(default)]
-        #[serde(with = "crate::core::number_serializers")]
-        start: f64,
+        #[serde(with = "crate::core::number_serializers::option")]
+        start: Option<f64>,
         #[serde(default)]
         text: String,
     },
@@ -70,11 +72,11 @@ impl TranscriptionStreamEventsData {
         Self::TranscriptionLanguage { audio_language }
     }
 
-    pub fn transcription_segment(end: f64, start: f64, text: String) -> Self {
+    pub fn transcription_segment(text: String) -> Self {
         Self::TranscriptionSegment {
-            end,
+            end: None,
             speaker_id: None,
-            start,
+            start: None,
             text,
         }
     }
@@ -115,16 +117,44 @@ impl TranscriptionStreamEventsData {
         }
     }
 
-    pub fn transcription_segment_with_speaker_id(
+    pub fn transcription_segment_with_end(
         end: f64,
+        speaker_id: Option<String>,
+        start: Option<f64>,
+        text: String,
+    ) -> Self {
+        Self::TranscriptionSegment {
+            end: Some(end),
+            speaker_id,
+            start,
+            text,
+        }
+    }
+
+    pub fn transcription_segment_with_speaker_id(
+        end: Option<f64>,
         speaker_id: String,
-        start: f64,
+        start: Option<f64>,
         text: String,
     ) -> Self {
         Self::TranscriptionSegment {
             end,
             speaker_id: Some(speaker_id),
             start,
+            text,
+        }
+    }
+
+    pub fn transcription_segment_with_start(
+        end: Option<f64>,
+        speaker_id: Option<String>,
+        start: f64,
+        text: String,
+    ) -> Self {
+        Self::TranscriptionSegment {
+            end,
+            speaker_id,
+            start: Some(start),
             text,
         }
     }

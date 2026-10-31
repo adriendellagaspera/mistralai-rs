@@ -19,6 +19,8 @@ pub struct DatasetImportTask {
     pub message: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub progress: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub result: Option<DatasetImportResult>,
     pub status: BaseTaskStatus,
     #[serde(default)]
     #[serde(with = "crate::core::flexible_datetime::offset")]
@@ -43,6 +45,7 @@ pub struct DatasetImportTaskBuilder {
     id: Option<String>,
     message: Option<String>,
     progress: Option<i64>,
+    result: Option<DatasetImportResult>,
     status: Option<BaseTaskStatus>,
     updated_at: Option<DateTime<FixedOffset>>,
     workspace_id: Option<String>,
@@ -81,6 +84,11 @@ impl DatasetImportTaskBuilder {
 
     pub fn progress(mut self, value: i64) -> Self {
         self.progress = Some(value);
+        self
+    }
+
+    pub fn result(mut self, value: DatasetImportResult) -> Self {
+        self.result = Some(value);
         self
     }
 
@@ -123,6 +131,7 @@ impl DatasetImportTaskBuilder {
             id: self.id.ok_or_else(|| BuildError::missing_field("id"))?,
             message: self.message,
             progress: self.progress,
+            result: self.result,
             status: self
                 .status
                 .ok_or_else(|| BuildError::missing_field("status"))?,

@@ -28,6 +28,9 @@ pub struct WorkflowExecutionTraceEventsResponse {
     /// The unique run identifier (database UUID)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub run_id: Option<String>,
+    /// The execution's search keys (metadata), if requested via include_search_keys.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub search_keys: Option<HashMap<String, Option<String>>>,
     /// The start time of the workflow execution
     #[serde(default)]
     #[serde(with = "crate::core::flexible_datetime::offset")]
@@ -66,6 +69,7 @@ pub struct WorkflowExecutionTraceEventsResponseBuilder {
     result: Option<serde_json::Value>,
     root_execution_id: Option<String>,
     run_id: Option<String>,
+    search_keys: Option<HashMap<String, Option<String>>>,
     start_time: Option<DateTime<FixedOffset>>,
     status: Option<WorkflowExecutionStatus>,
     total_duration_ms: Option<i64>,
@@ -112,6 +116,11 @@ impl WorkflowExecutionTraceEventsResponseBuilder {
 
     pub fn run_id(mut self, value: impl Into<String>) -> Self {
         self.run_id = Some(value.into());
+        self
+    }
+
+    pub fn search_keys(mut self, value: HashMap<String, Option<String>>) -> Self {
+        self.search_keys = Some(value);
         self
     }
 
@@ -165,6 +174,7 @@ impl WorkflowExecutionTraceEventsResponseBuilder {
                 .root_execution_id
                 .ok_or_else(|| BuildError::missing_field("root_execution_id"))?,
             run_id: self.run_id,
+            search_keys: self.search_keys,
             start_time: self
                 .start_time
                 .ok_or_else(|| BuildError::missing_field("start_time"))?,

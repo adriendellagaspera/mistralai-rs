@@ -51,7 +51,7 @@ pub struct ListRunsV1WorkflowsRunsGetQueryRequest {
     /// Token for the next page of results
     #[serde(skip_serializing_if = "Option::is_none")]
     pub next_page_token: Option<String>,
-    /// Filter executions by search key as repeated 'key:value' entries. Each entry matches an exact key and a similar value; multiple entries are AND'd together (max 3).
+    /// Filter executions by search key as repeated entries (max 3, AND'd together). 'key:value' matches a similar value, 'key==:value' matches the exact value, a bare 'key' matches executions that have the key set at all, and 'key==' matches executions whose value for the key is null.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub search_key: Option<Vec<String>>,
 }

@@ -12,6 +12,7 @@ pub enum OrganizationInviteInEmailLanguage {
     Pl,
     Ar,
     Nl,
+    Ko,
     /// This variant is used for forward compatibility.
     /// If the server sends a value not recognized by the current SDK version,
     /// it will be captured here with the raw string value.
@@ -29,6 +30,7 @@ impl Serialize for OrganizationInviteInEmailLanguage {
             Self::Pl => serializer.serialize_str("pl"),
             Self::Ar => serializer.serialize_str("ar"),
             Self::Nl => serializer.serialize_str("nl"),
+            Self::Ko => serializer.serialize_str("ko"),
             Self::__Unknown(val) => serializer.serialize_str(val),
         }
     }
@@ -47,6 +49,7 @@ impl<'de> Deserialize<'de> for OrganizationInviteInEmailLanguage {
             "pl" => Ok(Self::Pl),
             "ar" => Ok(Self::Ar),
             "nl" => Ok(Self::Nl),
+            "ko" => Ok(Self::Ko),
             _ => Ok(Self::__Unknown(value)),
         }
     }
@@ -64,6 +67,7 @@ impl fmt::Display for OrganizationInviteInEmailLanguage {
             Self::Pl => write!(f, "pl"),
             Self::Ar => write!(f, "ar"),
             Self::Nl => write!(f, "nl"),
+            Self::Ko => write!(f, "ko"),
             Self::__Unknown(val) => write!(f, "{}", val),
         }
     }

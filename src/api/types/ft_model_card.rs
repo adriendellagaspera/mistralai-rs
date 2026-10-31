@@ -7,6 +7,8 @@ pub struct FtModelCard {
     pub aliases: Option<Vec<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub archived: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub billing_model_name: Option<String>,
     #[serde(default)]
     pub capabilities: ModelCapabilities,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -48,6 +50,7 @@ impl FtModelCard {
 pub struct FtModelCardBuilder {
     aliases: Option<Vec<String>>,
     archived: Option<bool>,
+    billing_model_name: Option<String>,
     capabilities: Option<ModelCapabilities>,
     created: Option<i64>,
     default_model_temperature: Option<f64>,
@@ -72,6 +75,11 @@ impl FtModelCardBuilder {
 
     pub fn archived(mut self, value: bool) -> Self {
         self.archived = Some(value);
+        self
+    }
+
+    pub fn billing_model_name(mut self, value: impl Into<String>) -> Self {
+        self.billing_model_name = Some(value.into());
         self
     }
 
@@ -155,6 +163,7 @@ impl FtModelCardBuilder {
         Ok(FtModelCard {
             aliases: self.aliases,
             archived: self.archived,
+            billing_model_name: self.billing_model_name,
             capabilities: self
                 .capabilities
                 .ok_or_else(|| BuildError::missing_field("capabilities"))?,

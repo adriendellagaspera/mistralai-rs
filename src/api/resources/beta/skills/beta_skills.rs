@@ -117,6 +117,7 @@ impl SkillsClient {
     ///                 aliases: None,
     ///                 notes: None,
     ///                 sharing_scope: None,
+    ///                 workspace_relation: None,
     ///             },
     ///             None,
     ///         )

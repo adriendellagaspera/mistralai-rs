@@ -13,9 +13,6 @@ pub struct BlobResourceContents {
     pub mime_type: Option<String>,
     #[serde(default)]
     pub uri: String,
-    /// Additional properties that are not part of the defined schema.
-    #[serde(flatten)]
-    pub extra: std::collections::HashMap<String, serde_json::Value>,
 }
 
 impl BlobResourceContents {
@@ -64,7 +61,6 @@ impl BlobResourceContentsBuilder {
             blob: self.blob.ok_or_else(|| BuildError::missing_field("blob"))?,
             mime_type: self.mime_type,
             uri: self.uri.ok_or_else(|| BuildError::missing_field("uri"))?,
-            extra: Default::default(),
         })
     }
 }

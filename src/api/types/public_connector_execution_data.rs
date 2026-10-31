@@ -6,8 +6,6 @@ pub struct PublicConnectorExecutionData {
     pub integrations: Vec<PublicExecutionConnector>,
     #[serde(default)]
     pub tools: Vec<ExecutionTool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub use_connectors_gateway: Option<bool>,
 }
 
 impl PublicConnectorExecutionData {
@@ -21,7 +19,6 @@ impl PublicConnectorExecutionData {
 pub struct PublicConnectorExecutionDataBuilder {
     integrations: Option<Vec<PublicExecutionConnector>>,
     tools: Option<Vec<ExecutionTool>>,
-    use_connectors_gateway: Option<bool>,
 }
 
 impl PublicConnectorExecutionDataBuilder {
@@ -32,11 +29,6 @@ impl PublicConnectorExecutionDataBuilder {
 
     pub fn tools(mut self, value: Vec<ExecutionTool>) -> Self {
         self.tools = Some(value);
-        self
-    }
-
-    pub fn use_connectors_gateway(mut self, value: bool) -> Self {
-        self.use_connectors_gateway = Some(value);
         self
     }
 
@@ -52,7 +44,6 @@ impl PublicConnectorExecutionDataBuilder {
             tools: self
                 .tools
                 .ok_or_else(|| BuildError::missing_field("tools"))?,
-            use_connectors_gateway: self.use_connectors_gateway,
         })
     }
 }

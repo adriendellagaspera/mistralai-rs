@@ -10,10 +10,13 @@ pub enum AdminProvisionGroupToWorkspaceInWorkspaceRoleName {
     DevContributor,
     MistralCodeUser,
     CloudUser,
+    MistralCloudAdmin,
     WorkspaceContributor,
     WorkspaceAdmin,
     ObservabilityViewer,
     WorkflowExecutor,
+    SecretRevealer,
+    Member,
     /// This variant is used for forward compatibility.
     /// If the server sends a value not recognized by the current SDK version,
     /// it will be captured here with the raw string value.
@@ -29,10 +32,13 @@ impl Serialize for AdminProvisionGroupToWorkspaceInWorkspaceRoleName {
             Self::DevContributor => serializer.serialize_str("dev_contributor"),
             Self::MistralCodeUser => serializer.serialize_str("mistral_code_user"),
             Self::CloudUser => serializer.serialize_str("cloud_user"),
+            Self::MistralCloudAdmin => serializer.serialize_str("mistral_cloud_admin"),
             Self::WorkspaceContributor => serializer.serialize_str("workspace_contributor"),
             Self::WorkspaceAdmin => serializer.serialize_str("workspace_admin"),
             Self::ObservabilityViewer => serializer.serialize_str("observability_viewer"),
             Self::WorkflowExecutor => serializer.serialize_str("workflow_executor"),
+            Self::SecretRevealer => serializer.serialize_str("secret_revealer"),
+            Self::Member => serializer.serialize_str("member"),
             Self::__Unknown(val) => serializer.serialize_str(val),
         }
     }
@@ -49,10 +55,13 @@ impl<'de> Deserialize<'de> for AdminProvisionGroupToWorkspaceInWorkspaceRoleName
             "dev_contributor" => Ok(Self::DevContributor),
             "mistral_code_user" => Ok(Self::MistralCodeUser),
             "cloud_user" => Ok(Self::CloudUser),
+            "mistral_cloud_admin" => Ok(Self::MistralCloudAdmin),
             "workspace_contributor" => Ok(Self::WorkspaceContributor),
             "workspace_admin" => Ok(Self::WorkspaceAdmin),
             "observability_viewer" => Ok(Self::ObservabilityViewer),
             "workflow_executor" => Ok(Self::WorkflowExecutor),
+            "secret_revealer" => Ok(Self::SecretRevealer),
+            "member" => Ok(Self::Member),
             _ => Ok(Self::__Unknown(value)),
         }
     }
@@ -68,10 +77,13 @@ impl fmt::Display for AdminProvisionGroupToWorkspaceInWorkspaceRoleName {
             Self::DevContributor => write!(f, "dev_contributor"),
             Self::MistralCodeUser => write!(f, "mistral_code_user"),
             Self::CloudUser => write!(f, "cloud_user"),
+            Self::MistralCloudAdmin => write!(f, "mistral_cloud_admin"),
             Self::WorkspaceContributor => write!(f, "workspace_contributor"),
             Self::WorkspaceAdmin => write!(f, "workspace_admin"),
             Self::ObservabilityViewer => write!(f, "observability_viewer"),
             Self::WorkflowExecutor => write!(f, "workflow_executor"),
+            Self::SecretRevealer => write!(f, "secret_revealer"),
+            Self::Member => write!(f, "member"),
             Self::__Unknown(val) => write!(f, "{}", val),
         }
     }

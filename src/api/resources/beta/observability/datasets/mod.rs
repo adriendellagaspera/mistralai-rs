@@ -124,10 +124,11 @@ impl DatasetsClient {
             .await
     }
 
-    /// Get dataset by id
+    /// Get dataset by ID or slug
     ///
     /// # Arguments
     ///
+    /// * `dataset_id` - Dataset UUID or workspace-scoped slug. UUID-shaped values are always interpreted as dataset IDs.
     /// * `options` - Additional request options such as headers, timeout, etc.
     ///
     /// # Returns
@@ -174,6 +175,7 @@ impl DatasetsClient {
     ///
     /// # Arguments
     ///
+    /// * `dataset_id` - Dataset UUID or workspace-scoped slug. UUID-shaped values are always interpreted as dataset IDs.
     /// * `options` - Additional request options such as headers, timeout, etc.
     ///
     /// # Returns
@@ -220,6 +222,7 @@ impl DatasetsClient {
     ///
     /// # Arguments
     ///
+    /// * `dataset_id` - Dataset UUID or workspace-scoped slug. UUID-shaped values are always interpreted as dataset IDs.
     /// * `options` - Additional request options such as headers, timeout, etc.
     ///
     /// # Returns
@@ -273,6 +276,7 @@ impl DatasetsClient {
     ///
     /// # Arguments
     ///
+    /// * `dataset_id` - Dataset UUID or workspace-scoped slug. UUID-shaped values are always interpreted as dataset IDs.
     /// * `options` - Additional request options such as headers, timeout, etc.
     ///
     /// # Returns
@@ -318,57 +322,11 @@ impl DatasetsClient {
             .await
     }
 
-    /// Populate the dataset with records from a campaign
-    ///
-    /// # Arguments
-    ///
-    /// * `options` - Additional request options such as headers, timeout, etc.
-    ///
-    /// # Returns
-    ///
-    /// JSON response from the API
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// use mistralai_sdk::prelude::*;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let config = ClientConfig {
-    ///         token: Some("<token>".to_string()),
-    ///         ..Default::default()
-    ///     };
-    ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client.beta.observability.datasets.post_dataset_records_from_campaign_v1observability_datasets_dataset_id_imports_from_campaign_post(&"dataset_id".to_string(), &ImportDatasetFromCampaignRequest {
-    ///         campaign_id: "campaign_id".to_string()
-    ///     }, None).await;
-    /// }
-    /// ```
-    pub async fn post_dataset_records_from_campaign_v1observability_datasets_dataset_id_imports_from_campaign_post(
-        &self,
-        dataset_id: &str,
-        request: &ImportDatasetFromCampaignRequest,
-        options: Option<RequestOptions>,
-    ) -> Result<DatasetImportTask, ApiError> {
-        self.http_client
-            .execute_request(
-                Method::POST,
-                &format!(
-                    "v1/observability/datasets/{}/imports/from-campaign",
-                    dataset_id
-                ),
-                Some(serde_json::to_value(request).map_err(ApiError::Serialization)?),
-                None,
-                options,
-            )
-            .await
-    }
-
     /// Populate the dataset with records from another dataset
     ///
     /// # Arguments
     ///
+    /// * `dataset_id` - Dataset UUID or workspace-scoped slug. UUID-shaped values are always interpreted as dataset IDs.
     /// * `options` - Additional request options such as headers, timeout, etc.
     ///
     /// # Returns
@@ -412,57 +370,11 @@ impl DatasetsClient {
             .await
     }
 
-    /// Populate the dataset with records from the explorer
-    ///
-    /// # Arguments
-    ///
-    /// * `options` - Additional request options such as headers, timeout, etc.
-    ///
-    /// # Returns
-    ///
-    /// JSON response from the API
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// use mistralai_sdk::prelude::*;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let config = ClientConfig {
-    ///         token: Some("<token>".to_string()),
-    ///         ..Default::default()
-    ///     };
-    ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client.beta.observability.datasets.post_dataset_records_from_explorer_v1observability_datasets_dataset_id_imports_from_explorer_post(&"dataset_id".to_string(), &ImportDatasetFromExplorerRequest {
-    ///         completion_event_ids: vec!["completion_event_ids".to_string()]
-    ///     }, None).await;
-    /// }
-    /// ```
-    pub async fn post_dataset_records_from_explorer_v1observability_datasets_dataset_id_imports_from_explorer_post(
-        &self,
-        dataset_id: &str,
-        request: &ImportDatasetFromExplorerRequest,
-        options: Option<RequestOptions>,
-    ) -> Result<DatasetImportTask, ApiError> {
-        self.http_client
-            .execute_request(
-                Method::POST,
-                &format!(
-                    "v1/observability/datasets/{}/imports/from-explorer",
-                    dataset_id
-                ),
-                Some(serde_json::to_value(request).map_err(ApiError::Serialization)?),
-                None,
-                options,
-            )
-            .await
-    }
-
     /// Populate the dataset with records from an uploaded file
     ///
     /// # Arguments
     ///
+    /// * `dataset_id` - Dataset UUID or workspace-scoped slug. UUID-shaped values are always interpreted as dataset IDs.
     /// * `options` - Additional request options such as headers, timeout, etc.
     ///
     /// # Returns
@@ -516,6 +428,7 @@ impl DatasetsClient {
     ///
     /// # Arguments
     ///
+    /// * `dataset_id` - Dataset UUID or workspace-scoped slug. UUID-shaped values are always interpreted as dataset IDs.
     /// * `options` - Additional request options such as headers, timeout, etc.
     ///
     /// # Returns
@@ -559,10 +472,74 @@ impl DatasetsClient {
             .await
     }
 
+    /// Starts an asynchronous import of the requested telemetry spans. References not returned by the tenant-scoped telemetry query are skipped without distinguishing absence from access restrictions.
+    ///
+    /// # Arguments
+    ///
+    /// * `dataset_id` - Dataset UUID or workspace-scoped slug. UUID-shaped values are always interpreted as dataset IDs.
+    /// * `options` - Additional request options such as headers, timeout, etc.
+    ///
+    /// # Returns
+    ///
+    /// JSON response from the API
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use mistralai_sdk::prelude::*;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let config = ClientConfig {
+    ///         token: Some("<token>".to_string()),
+    ///         ..Default::default()
+    ///     };
+    ///     let client = Mistral::new(config).expect("Failed to build client");
+    ///     client.beta.observability.datasets.post_dataset_records_from_spans_v1observability_datasets_dataset_id_imports_from_spans_post(&"dataset_id".to_string(), &ImportDatasetFromSpansRequest {
+    ///         mapping_contract: SpanDatasetMappingContract {
+    ///             mappings: vec![SpanDatasetMapping {
+    ///                 source_field: SpanDatasetSourceReference {
+    ///                     key: "key".to_string(),
+    ///                     namespace: SpanDatasetSourceNamespace::SpanAttributes
+    ///                 },
+    ///                 target_field: "target_field".to_string()
+    ///             }],
+    ///             version: 1,
+    ///             ..Default::default()
+    ///         },
+    ///         span_references: vec![TelemetrySpanReference {
+    ///             span_id: "span_id".to_string(),
+    ///             trace_id: "trace_id".to_string(),
+    ///             ..Default::default()
+    ///         }]
+    ///     }, None).await;
+    /// }
+    /// ```
+    pub async fn post_dataset_records_from_spans_v1observability_datasets_dataset_id_imports_from_spans_post(
+        &self,
+        dataset_id: &str,
+        request: &ImportDatasetFromSpansRequest,
+        options: Option<RequestOptions>,
+    ) -> Result<DatasetImportTask, ApiError> {
+        self.http_client
+            .execute_request(
+                Method::POST,
+                &format!(
+                    "v1/observability/datasets/{}/imports/from-spans",
+                    dataset_id
+                ),
+                Some(serde_json::to_value(request).map_err(ApiError::Serialization)?),
+                None,
+                options,
+            )
+            .await
+    }
+
     /// List existing records in the dataset
     ///
     /// # Arguments
     ///
+    /// * `dataset_id` - Dataset UUID or workspace-scoped slug. UUID-shaped values are always interpreted as dataset IDs.
     /// * `options` - Additional request options such as headers, timeout, etc.
     ///
     /// # Returns
@@ -619,6 +596,7 @@ impl DatasetsClient {
     ///
     /// # Arguments
     ///
+    /// * `dataset_id` - Dataset UUID or workspace-scoped slug. UUID-shaped values are always interpreted as dataset IDs.
     /// * `options` - Additional request options such as headers, timeout, etc.
     ///
     /// # Returns
@@ -649,6 +627,7 @@ impl DatasetsClient {
     ///                     serde_json::json!("value"),
     ///                 )])),
     ///                 properties: None,
+    ///                 source: None,
     ///             },
     ///             None,
     ///         )
@@ -676,6 +655,7 @@ impl DatasetsClient {
     ///
     /// # Arguments
     ///
+    /// * `dataset_id` - Dataset UUID or workspace-scoped slug. UUID-shaped values are always interpreted as dataset IDs.
     /// * `options` - Additional request options such as headers, timeout, etc.
     ///
     /// # Returns
@@ -732,6 +712,7 @@ impl DatasetsClient {
     ///
     /// # Arguments
     ///
+    /// * `dataset_id` - Dataset UUID or workspace-scoped slug. UUID-shaped values are always interpreted as dataset IDs.
     /// * `options` - Additional request options such as headers, timeout, etc.
     ///
     /// # Returns

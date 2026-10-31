@@ -2,6 +2,8 @@ pub use crate::prelude::*;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
 pub struct RegisterDeploymentRequestVespaIndex {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub embedding_dimensions: Option<i64>,
     #[serde(default)]
     pub fields: Vec<RegisterDeploymentRequestVespaField>,
     #[serde(default)]
@@ -19,12 +21,18 @@ impl RegisterDeploymentRequestVespaIndex {
 #[derive(Clone, PartialEq, Default, Debug)]
 #[non_exhaustive]
 pub struct RegisterDeploymentRequestVespaIndexBuilder {
+    embedding_dimensions: Option<i64>,
     fields: Option<Vec<RegisterDeploymentRequestVespaField>>,
     name: Option<String>,
     sd: Option<String>,
 }
 
 impl RegisterDeploymentRequestVespaIndexBuilder {
+    pub fn embedding_dimensions(mut self, value: i64) -> Self {
+        self.embedding_dimensions = Some(value);
+        self
+    }
+
     pub fn fields(mut self, value: Vec<RegisterDeploymentRequestVespaField>) -> Self {
         self.fields = Some(value);
         self
@@ -47,6 +55,7 @@ impl RegisterDeploymentRequestVespaIndexBuilder {
     /// - [`sd`](RegisterDeploymentRequestVespaIndexBuilder::sd)
     pub fn build(self) -> Result<RegisterDeploymentRequestVespaIndex, BuildError> {
         Ok(RegisterDeploymentRequestVespaIndex {
+            embedding_dimensions: self.embedding_dimensions,
             fields: self
                 .fields
                 .ok_or_else(|| BuildError::missing_field("fields"))?,

@@ -119,6 +119,7 @@ impl ExecutionsClient {
     ///
     /// # Arguments
     ///
+    /// * `include_search_keys` - Include the execution's search keys (metadata) in the response.
     /// * `options` - Additional request options such as headers, timeout, etc.
     ///
     /// # Returns
@@ -142,6 +143,9 @@ impl ExecutionsClient {
     ///         .executions
     ///         .get_workflow_execution_v1workflows_executions_execution_id_get(
     ///             &"execution_id".to_string(),
+    ///             &GetWorkflowExecutionV1WorkflowsExecutionsExecutionIDGetQueryRequest {
+    ///                 ..Default::default()
+    ///             },
     ///             None,
     ///         )
     ///         .await;
@@ -150,6 +154,7 @@ impl ExecutionsClient {
     pub async fn get_workflow_execution_v1workflows_executions_execution_id_get(
         &self,
         execution_id: &str,
+        request: &GetWorkflowExecutionV1WorkflowsExecutionsExecutionIdGetQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<WorkflowExecutionResponse, ApiError> {
         self.http_client
@@ -157,7 +162,9 @@ impl ExecutionsClient {
                 Method::GET,
                 &format!("v1/workflows/executions/{}", execution_id),
                 None,
-                None,
+                QueryBuilder::new()
+                    .bool("include_search_keys", request.include_search_keys.clone())
+                    .build(),
                 options,
             )
             .await

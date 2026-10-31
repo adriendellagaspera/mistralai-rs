@@ -166,4 +166,40 @@ impl UsersClient {
             )
             .await
     }
+
+    /// Return the authenticated caller's identity.
+    ///
+    /// Principal-agnostic: resolves both users and service accounts.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - Additional request options such as headers, timeout, etc.
+    ///
+    /// # Returns
+    ///
+    /// JSON response from the API
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use mistralai_sdk::prelude::*;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let config = ClientConfig {
+    ///         token: Some("<token>".to_string()),
+    ///         ..Default::default()
+    ///     };
+    ///     let client = Mistral::new(config).expect("Failed to build client");
+    ///     client.beta.users.users_api_whoami(None).await;
+    /// }
+    /// ```
+    pub async fn users_api_whoami(
+        &self,
+        options: Option<RequestOptions>,
+    ) -> Result<WhoamiResponse, ApiError> {
+        self.http_client
+            .execute_request(Method::GET, "v1/whoami", None, None, options)
+            .await
+    }
 }

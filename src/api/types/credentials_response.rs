@@ -3,7 +3,7 @@ pub use crate::prelude::*;
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
 pub struct CredentialsResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub connector_preset_credentials_for_auth: Option<Vec<OutboundAuthenticationType>>,
+    pub connector_preset_credentials_for_auth: Option<Vec<AuthenticationType>>,
     #[serde(default)]
     pub credentials: Vec<AuthenticationConfiguration>,
 }
@@ -17,15 +17,12 @@ impl CredentialsResponse {
 #[derive(Clone, PartialEq, Default, Debug)]
 #[non_exhaustive]
 pub struct CredentialsResponseBuilder {
-    connector_preset_credentials_for_auth: Option<Vec<OutboundAuthenticationType>>,
+    connector_preset_credentials_for_auth: Option<Vec<AuthenticationType>>,
     credentials: Option<Vec<AuthenticationConfiguration>>,
 }
 
 impl CredentialsResponseBuilder {
-    pub fn connector_preset_credentials_for_auth(
-        mut self,
-        value: Vec<OutboundAuthenticationType>,
-    ) -> Self {
+    pub fn connector_preset_credentials_for_auth(mut self, value: Vec<AuthenticationType>) -> Self {
         self.connector_preset_credentials_for_auth = Some(value);
         self
     }

@@ -25,6 +25,9 @@ pub struct WorkflowExecutionRequest {
     /// Maximum time to wait for completion when wait_for_result is true.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub timeout_seconds: Option<f64>,
+    /// W3C trace context to join this execution to the caller's trace. Ignored when force_new_trace is set.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub traceparent: Option<String>,
     /// If true, wait for the workflow to complete and return the result directly.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub wait_for_result: Option<bool>,
@@ -47,6 +50,7 @@ pub struct WorkflowExecutionRequestBuilder {
     input: Option<HashMap<String, serde_json::Value>>,
     task_queue: Option<String>,
     timeout_seconds: Option<f64>,
+    traceparent: Option<String>,
     wait_for_result: Option<bool>,
 }
 
@@ -91,6 +95,11 @@ impl WorkflowExecutionRequestBuilder {
         self
     }
 
+    pub fn traceparent(mut self, value: impl Into<String>) -> Self {
+        self.traceparent = Some(value.into());
+        self
+    }
+
     pub fn wait_for_result(mut self, value: bool) -> Self {
         self.wait_for_result = Some(value);
         self
@@ -107,6 +116,7 @@ impl WorkflowExecutionRequestBuilder {
             input: self.input,
             task_queue: self.task_queue,
             timeout_seconds: self.timeout_seconds,
+            traceparent: self.traceparent,
             wait_for_result: self.wait_for_result,
         })
     }

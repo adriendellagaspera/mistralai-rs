@@ -1,7 +1,7 @@
 pub use crate::prelude::*;
 
-/// An icon for display in user interfaces.
-#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
+/// An optionally-sized icon for display in a user interface (2025-11-25+).
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
 pub struct McpServerIcon {
     #[serde(rename = "mimeType")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -10,9 +10,8 @@ pub struct McpServerIcon {
     pub sizes: Option<Vec<String>>,
     #[serde(default)]
     pub src: String,
-    /// Additional properties that are not part of the defined schema.
-    #[serde(flatten)]
-    pub extra: std::collections::HashMap<String, serde_json::Value>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub theme: Option<McpServerIconTheme>,
 }
 
 impl McpServerIcon {
@@ -27,6 +26,7 @@ pub struct McpServerIconBuilder {
     mime_type: Option<String>,
     sizes: Option<Vec<String>>,
     src: Option<String>,
+    theme: Option<McpServerIconTheme>,
 }
 
 impl McpServerIconBuilder {
@@ -45,6 +45,11 @@ impl McpServerIconBuilder {
         self
     }
 
+    pub fn theme(mut self, value: McpServerIconTheme) -> Self {
+        self.theme = Some(value);
+        self
+    }
+
     /// Consumes the builder and constructs a [`McpServerIcon`].
     /// This method will fail if any of the following fields are not set:
     /// - [`src`](McpServerIconBuilder::src)
@@ -53,7 +58,7 @@ impl McpServerIconBuilder {
             mime_type: self.mime_type,
             sizes: self.sizes,
             src: self.src.ok_or_else(|| BuildError::missing_field("src"))?,
-            extra: Default::default(),
+            theme: self.theme,
         })
     }
 }

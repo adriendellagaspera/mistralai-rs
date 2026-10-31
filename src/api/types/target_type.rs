@@ -13,6 +13,7 @@ pub enum TargetType {
     ServiceAccount,
     Agent,
     Skill,
+    Plugin,
     Prompt,
     KnowledgeBase,
     CustomVoice,
@@ -42,6 +43,8 @@ pub enum TargetType {
     FeaturePermission,
     SecretStoreEntry,
     CrawlerConfig,
+    WebSearchFilter,
+    WebFilters,
     SharedResource,
     RateLimitRule,
     App,
@@ -51,6 +54,8 @@ pub enum TargetType {
     Secret,
     Service,
     TrustedIssuer,
+    Workflow,
+    Schedule,
     /// This variant is used for forward compatibility.
     /// If the server sends a value not recognized by the current SDK version,
     /// it will be captured here with the raw string value.
@@ -69,6 +74,7 @@ impl Serialize for TargetType {
             Self::ServiceAccount => serializer.serialize_str("SERVICE_ACCOUNT"),
             Self::Agent => serializer.serialize_str("AGENT"),
             Self::Skill => serializer.serialize_str("SKILL"),
+            Self::Plugin => serializer.serialize_str("PLUGIN"),
             Self::Prompt => serializer.serialize_str("PROMPT"),
             Self::KnowledgeBase => serializer.serialize_str("KNOWLEDGE_BASE"),
             Self::CustomVoice => serializer.serialize_str("CUSTOM_VOICE"),
@@ -98,6 +104,8 @@ impl Serialize for TargetType {
             Self::FeaturePermission => serializer.serialize_str("FEATURE_PERMISSION"),
             Self::SecretStoreEntry => serializer.serialize_str("SECRET_STORE_ENTRY"),
             Self::CrawlerConfig => serializer.serialize_str("CRAWLER_CONFIG"),
+            Self::WebSearchFilter => serializer.serialize_str("WEB_SEARCH_FILTER"),
+            Self::WebFilters => serializer.serialize_str("WEB_FILTERS"),
             Self::SharedResource => serializer.serialize_str("SHARED_RESOURCE"),
             Self::RateLimitRule => serializer.serialize_str("RATE_LIMIT_RULE"),
             Self::App => serializer.serialize_str("APP"),
@@ -107,6 +115,8 @@ impl Serialize for TargetType {
             Self::Secret => serializer.serialize_str("SECRET"),
             Self::Service => serializer.serialize_str("SERVICE"),
             Self::TrustedIssuer => serializer.serialize_str("TRUSTED_ISSUER"),
+            Self::Workflow => serializer.serialize_str("WORKFLOW"),
+            Self::Schedule => serializer.serialize_str("SCHEDULE"),
             Self::__Unknown(val) => serializer.serialize_str(val),
         }
     }
@@ -126,6 +136,7 @@ impl<'de> Deserialize<'de> for TargetType {
             "SERVICE_ACCOUNT" => Ok(Self::ServiceAccount),
             "AGENT" => Ok(Self::Agent),
             "SKILL" => Ok(Self::Skill),
+            "PLUGIN" => Ok(Self::Plugin),
             "PROMPT" => Ok(Self::Prompt),
             "KNOWLEDGE_BASE" => Ok(Self::KnowledgeBase),
             "CUSTOM_VOICE" => Ok(Self::CustomVoice),
@@ -155,6 +166,8 @@ impl<'de> Deserialize<'de> for TargetType {
             "FEATURE_PERMISSION" => Ok(Self::FeaturePermission),
             "SECRET_STORE_ENTRY" => Ok(Self::SecretStoreEntry),
             "CRAWLER_CONFIG" => Ok(Self::CrawlerConfig),
+            "WEB_SEARCH_FILTER" => Ok(Self::WebSearchFilter),
+            "WEB_FILTERS" => Ok(Self::WebFilters),
             "SHARED_RESOURCE" => Ok(Self::SharedResource),
             "RATE_LIMIT_RULE" => Ok(Self::RateLimitRule),
             "APP" => Ok(Self::App),
@@ -164,6 +177,8 @@ impl<'de> Deserialize<'de> for TargetType {
             "SECRET" => Ok(Self::Secret),
             "SERVICE" => Ok(Self::Service),
             "TRUSTED_ISSUER" => Ok(Self::TrustedIssuer),
+            "WORKFLOW" => Ok(Self::Workflow),
+            "SCHEDULE" => Ok(Self::Schedule),
             _ => Ok(Self::__Unknown(value)),
         }
     }
@@ -182,6 +197,7 @@ impl fmt::Display for TargetType {
             Self::ServiceAccount => write!(f, "SERVICE_ACCOUNT"),
             Self::Agent => write!(f, "AGENT"),
             Self::Skill => write!(f, "SKILL"),
+            Self::Plugin => write!(f, "PLUGIN"),
             Self::Prompt => write!(f, "PROMPT"),
             Self::KnowledgeBase => write!(f, "KNOWLEDGE_BASE"),
             Self::CustomVoice => write!(f, "CUSTOM_VOICE"),
@@ -211,6 +227,8 @@ impl fmt::Display for TargetType {
             Self::FeaturePermission => write!(f, "FEATURE_PERMISSION"),
             Self::SecretStoreEntry => write!(f, "SECRET_STORE_ENTRY"),
             Self::CrawlerConfig => write!(f, "CRAWLER_CONFIG"),
+            Self::WebSearchFilter => write!(f, "WEB_SEARCH_FILTER"),
+            Self::WebFilters => write!(f, "WEB_FILTERS"),
             Self::SharedResource => write!(f, "SHARED_RESOURCE"),
             Self::RateLimitRule => write!(f, "RATE_LIMIT_RULE"),
             Self::App => write!(f, "APP"),
@@ -220,6 +238,8 @@ impl fmt::Display for TargetType {
             Self::Secret => write!(f, "SECRET"),
             Self::Service => write!(f, "SERVICE"),
             Self::TrustedIssuer => write!(f, "TRUSTED_ISSUER"),
+            Self::Workflow => write!(f, "WORKFLOW"),
+            Self::Schedule => write!(f, "SCHEDULE"),
             Self::__Unknown(val) => write!(f, "{}", val),
         }
     }

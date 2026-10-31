@@ -4,6 +4,8 @@ pub use crate::prelude::*;
 pub struct BaseModelCard {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub aliases: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub billing_model_name: Option<String>,
     #[serde(default)]
     pub capabilities: ModelCapabilities,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -40,6 +42,7 @@ impl BaseModelCard {
 #[non_exhaustive]
 pub struct BaseModelCardBuilder {
     aliases: Option<Vec<String>>,
+    billing_model_name: Option<String>,
     capabilities: Option<ModelCapabilities>,
     created: Option<i64>,
     default_model_temperature: Option<f64>,
@@ -57,6 +60,11 @@ pub struct BaseModelCardBuilder {
 impl BaseModelCardBuilder {
     pub fn aliases(mut self, value: Vec<String>) -> Self {
         self.aliases = Some(value);
+        self
+    }
+
+    pub fn billing_model_name(mut self, value: impl Into<String>) -> Self {
+        self.billing_model_name = Some(value.into());
         self
     }
 
@@ -127,6 +135,7 @@ impl BaseModelCardBuilder {
     pub fn build(self) -> Result<BaseModelCard, BuildError> {
         Ok(BaseModelCard {
             aliases: self.aliases,
+            billing_model_name: self.billing_model_name,
             capabilities: self
                 .capabilities
                 .ok_or_else(|| BuildError::missing_field("capabilities"))?,

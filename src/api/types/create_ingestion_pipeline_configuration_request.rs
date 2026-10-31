@@ -6,6 +6,8 @@ pub struct CreateIngestionPipelineConfigurationRequest {
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pipeline_composition: Option<HashMap<String, Option<String>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub target_indexes: Option<Vec<IngestionPipelineTargetIndexRef>>,
 }
 
 impl CreateIngestionPipelineConfigurationRequest {
@@ -19,6 +21,7 @@ impl CreateIngestionPipelineConfigurationRequest {
 pub struct CreateIngestionPipelineConfigurationRequestBuilder {
     name: Option<String>,
     pipeline_composition: Option<HashMap<String, Option<String>>>,
+    target_indexes: Option<Vec<IngestionPipelineTargetIndexRef>>,
 }
 
 impl CreateIngestionPipelineConfigurationRequestBuilder {
@@ -32,6 +35,11 @@ impl CreateIngestionPipelineConfigurationRequestBuilder {
         self
     }
 
+    pub fn target_indexes(mut self, value: Vec<IngestionPipelineTargetIndexRef>) -> Self {
+        self.target_indexes = Some(value);
+        self
+    }
+
     /// Consumes the builder and constructs a [`CreateIngestionPipelineConfigurationRequest`].
     /// This method will fail if any of the following fields are not set:
     /// - [`name`](CreateIngestionPipelineConfigurationRequestBuilder::name)
@@ -39,6 +47,7 @@ impl CreateIngestionPipelineConfigurationRequestBuilder {
         Ok(CreateIngestionPipelineConfigurationRequest {
             name: self.name.ok_or_else(|| BuildError::missing_field("name"))?,
             pipeline_composition: self.pipeline_composition,
+            target_indexes: self.target_indexes,
         })
     }
 }
