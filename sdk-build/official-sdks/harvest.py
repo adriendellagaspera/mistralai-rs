@@ -17,7 +17,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
 LOCK_PATH = ROOT / "sdk-build/provenance.lock.json"
-COVERAGE_PATH = ROOT / "src/generated/coverage.json"
+FERN_INVENTORY_PATH = ROOT / "sdk-build/fern/inventory.json"
 
 
 def run(*args: object, cwd: Path = ROOT, capture: bool = False) -> str:
@@ -462,9 +462,9 @@ def build_inventory(
         "schema_version": 1,
         "provenance": {
             "protocol": {
-                "repository": lock["openapi"]["repository"],
-                "commit": lock["openapi"]["commit"],
-                "artifact": "src/generated/coverage.json",
+                "repository": lock["openapi"].get("url", lock["openapi"].get("repository")),
+                "commit": lock["openapi"]["sha256"] if lock["openapi"].get("source_kind") == "published_catalog" else lock["openapi"]["commit"],
+                "artifact": "sdk-build/fern/inventory.json",
             },
             "typescript": {
                 "repository": lock["official_sdks"]["typescript"]["repository"],
@@ -495,6 +495,27 @@ def build_inventory(
     }
 
 
+def fern_coverage() -> dict[str, Any]:
+    """Adapt Fern's authoritative operation inventory to SDK taxonomy matching."""
+    inventory = load_json(FERN_INVENTORY_PATH)
+    operations = []
+    for operation in inventory["operations"]:
+        operation_id = operation.get("operation_id")
+        method = operation.get("http_method")
+        path = operation.get("http_path")
+        if not operation_id or not method or not path:
+            raise ValueError(f"Incomplete Fern inventory operation: {operation!r}")
+        operations.append({
+            "operation_id": operation_id,
+            "method": method,
+            "path": path,
+            "upstream": operation.get("outcome") == "published",
+        })
+    if not operations:
+        raise ValueError("Fern inventory contains no operations")
+    return {"operations": operations}
+
+
 def generate(lock: dict[str, Any]) -> dict[str, Any]:
     ts_root = checkout(
         lock["official_sdks"]["typescript"]["repository"],
@@ -507,7 +528,7 @@ def generate(lock: dict[str, Any]) -> dict[str, Any]:
     python_records, python_non_http_resources = parse_python(py_root)
     return build_inventory(
         lock,
-        load_json(COVERAGE_PATH),
+        fern_coverage(),
         parse_typescript(ts_root),
         python_records,
         python_non_http_resources,

@@ -1,9 +1,22 @@
 name: Update Mistral SDK Sources
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/update-sdk.yml'
+      - '.github/workflows/monitor-public-openapi.yml'
+      - 'sdk-build/**'
   schedule:
     - cron: '23 3 * * *'
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      badge_scope:
+        description: Which upstream must match for this workflow's badge.
+        type: string
+        required: false
+        default: sdk
 
 permissions: {}
 
@@ -13,12 +26,13 @@ concurrency:
 
 jobs:
   update:
-    name: update
+    name: Check OpenAPI and official SDK alignment
     runs-on: ubuntu-24.04
-    timeout-minutes: 75
+    timeout-minutes: 90
     permissions:
-      contents: write # Commit regenerated source pins and Fern SDK output.
-      pull-requests: write # Open or update the generated source review PR.
+      actions: write # Explicitly dispatch CI for commits created with GITHUB_TOKEN.
+      contents: write # Commit reviewed upstream candidates on the automation branch.
+      pull-requests: write # Create or update the single upstream remediation PR.
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -27,23 +41,13 @@ jobs:
       - run: rustup show
       - run: npm install --global fern-api@5.112.0 # zizmor: ignore[adhoc-packages]
       - run: python3 -m pip install --disable-pip-version-check PyYAML==6.0.3
-      - name: Advance pinned upstream evidence
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          python3 sdk-build/openapi/update.py
-          python3 sdk-build/official-sdks/update.py pin-latest --source python
-          python3 sdk-build/official-sdks/update.py pin-latest --source typescript
-      - name: Detect upstream change
-        id: changed
-        run: |
-          if git diff --quiet -- sdk-build/openapi sdk-build/official-sdks sdk-build/provenance.lock.json; then
-            echo changed=false >> "$GITHUB_OUTPUT"
-          else
-            echo changed=true >> "$GITHUB_OUTPUT"
-          fi
-      - name: Generate and validate candidate
-        if: steps.changed.outputs.changed == 'true'
+      - name: Probe all upstream sources independently
+        id: probe
+        run: python3 sdk-build/monitoring/watch.py prepare
+      - name: Regenerate and validate candidate
+        id: generate
+        if: steps.probe.outputs.changed == 'true'
+        continue-on-error: true
         run: |
           python3 sdk-build/official-sdks/update.py update
           bash sdk-build/fern/generate.sh
@@ -55,22 +59,57 @@ jobs:
           cargo clippy --locked --all-features -- -D clippy::correctness -D clippy::suspicious
           cargo test --locked --all-features --all-targets
           cargo publish --dry-run --locked
-      - name: Open or update review PR
-        if: steps.changed.outputs.changed == 'true'
+      - name: Write deterministic review report
+        if: always() && steps.probe.outputs.changed == 'true'
+        env:
+          GENERATION_OUTCOME: ${{ steps.generate.outcome }}
+        run: python3 sdk-build/monitoring/watch.py finish --generation "$GENERATION_OUTCOME"
+      - name: Create or update one remediation PR
+        if: always() && steps.probe.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           branch=automation/update-mistral-sources
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -A sdk-build/openapi sdk-build/official-sdks sdk-build/provenance.lock.json sdk-build/fern/inventory.json sdk-build/fern/compatibility-report.json sdk-build/fern/resolution.json src Cargo.lock
-          git commit -m 'chore: update Mistral SDK sources'
-          gh auth setup-git
-          git push --force origin "HEAD:refs/heads/$branch"
-          pr="$(gh pr list --base main --head "$branch" --state open --json number --jq '.[0].number // empty')"
-          body='Pinned upstream evidence changed. This candidate was regenerated exclusively with Fern and passed production closure, provenance, collision, determinism, Rust and publication gates.'
-          if [ -n "$pr" ]; then
-            gh pr edit "$pr" --title 'chore: update Mistral SDK sources' --body "$body"
-          else
-            gh pr create --base main --head "$branch" --title 'chore: update Mistral SDK sources' --body "$body"
+          git add -A sdk-build/openapi sdk-build/official-sdks sdk-build/provenance.lock.json sdk-build/fern sdk-build/monitoring/STATUS.md src Cargo.lock
+          if git diff --cached --quiet; then
+            echo "::error::Upstream drift was detected but no candidate or report was staged"
+            exit 1
           fi
+          candidate_tree="$(git write-tree)"
+          remote_tree="$(git rev-parse "refs/remotes/origin/$branch^{tree}" 2>/dev/null || true)"
+          gh auth setup-git
+          if [ "$candidate_tree" != "$remote_tree" ]; then
+            git commit -m 'chore: synchronize Mistral upstream specifications and SDKs'
+            git push --force origin "HEAD:refs/heads/$branch"
+            updated=true
+          else
+            echo "Remediation candidate is unchanged; keeping existing PR commit"
+            updated=false
+          fi
+          pr="$(gh pr list --base main --head "$branch" --state open --json number --jq '.[0].number // empty')"
+          created=false
+          if [ -n "$pr" ]; then
+            gh pr edit "$pr" --title 'chore: synchronize Mistral upstream sources' --body-file sdk-build/monitoring/STATUS.md
+          else
+            gh pr create --base main --head "$branch" --title 'chore: synchronize Mistral upstream sources' --body-file sdk-build/monitoring/STATUS.md
+            created=true
+          fi
+          # GITHUB_TOKEN-created PR/push events do not themselves trigger CI.
+          if [ "$updated" = true ] || [ "$created" = true ]; then
+            gh workflow run ci.yml --ref "$branch"
+          fi
+      - name: Report upstream alignment
+        if: always()
+        env:
+          PROBE_OUTCOME: ${{ steps.probe.outcome }}
+          CHANGED: ${{ steps.probe.outputs.changed }}
+          GENERATION_OUTCOME: ${{ steps.generate.outcome }}
+          BADGE_SCOPE: ${{ inputs.badge_scope || 'sdk' }}
+        run: |
+          if [ "$PROBE_OUTCOME" != success ]; then
+            echo "::error::Upstream probe could not complete"
+            exit 1
+          fi
+          python3 sdk-build/monitoring/watch.py health --scope "$BADGE_SCOPE"

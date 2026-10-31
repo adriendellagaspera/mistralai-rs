@@ -7,11 +7,18 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 inventory = json.loads((HERE / "inventory.json").read_text())
 report = (HERE / "API_COMPATIBILITY.md").read_text()
+catalog = json.loads((HERE.parent / "openapi/public-catalog.lock.json").read_text())
+if catalog.get("reviewed_at") == "PENDING_PR_REVIEW":
+    raise SystemExit(
+        "The new published OpenAPI catalog has not been reviewed. "
+        "A human must verify source provenance and compatibility and replace "
+        "PENDING_PR_REVIEW with the actual review date before merge."
+    )
 
-if inventory["source_operation_count"] != 288:
-    raise SystemExit("source inventory is not 288 operations")
-if inventory["published_operation_count"] != 288:
-    raise SystemExit("published inventory is not 288 operations")
+if inventory["source_operation_count"] <= 0:
+    raise SystemExit("source inventory must contain operations")
+if inventory["published_operation_count"] != inventory["source_operation_count"]:
+    raise SystemExit("not all source operations were published")
 if inventory["excluded_operation_count"] != 0:
     raise SystemExit("unexpected excluded operations")
 if any(inventory["verification"].values()):

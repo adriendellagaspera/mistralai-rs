@@ -94,5 +94,35 @@ class OpenApiPinTests(unittest.TestCase):
         self.assertEqual(self.lock.read_bytes(), initial)
 
 
+    def test_reviewed_published_catalog_does_not_contact_deleted_github_source(self) -> None:
+        lock = json.loads(self.lock.read_text())
+        lock["openapi"] = {
+            "source_kind": "published_catalog",
+            "url": "https://docs.mistral.ai/openapi.yaml",
+            "sha256": hashlib.sha256(OLD).hexdigest(),
+        }
+        self.lock.write_text(json.dumps(lock) + "\n")
+        with patch.object(update, "fetch", return_value=NEW) as fetch:
+            update.main()
+        fetch.assert_called_once_with("https://docs.mistral.ai/openapi.yaml")
+        result = json.loads(self.lock.read_text())["openapi"]
+        self.assertEqual(result["sha256"], hashlib.sha256(NEW).hexdigest())
+        self.assertNotIn("commit", result)
+        self.assertEqual((self.openapi / "published.yaml").read_bytes(), NEW)
+
+    def test_published_catalog_url_requires_review(self) -> None:
+        lock = json.loads(self.lock.read_text())
+        lock["openapi"] = {
+            "source_kind": "published_catalog",
+            "url": "https://attacker.invalid/openapi.yaml",
+            "sha256": hashlib.sha256(OLD).hexdigest(),
+        }
+        self.lock.write_text(json.dumps(lock) + "\n")
+        with patch.object(update, "fetch") as fetch:
+            with self.assertRaisesRegex(ValueError, "Unreviewed published catalog"):
+                update.main()
+        fetch.assert_not_called()
+
+
 if __name__ == "__main__":
     unittest.main()

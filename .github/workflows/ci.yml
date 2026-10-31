@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -103,6 +104,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - run: python3 -m pip install --disable-pip-version-check PyYAML==6.0.3
       - run: python3 -m unittest discover -s sdk-build -p 'test_*.py'
       - run: python3 -m unittest discover -s .github/scripts -p 'test_*.py'
 

@@ -40,6 +40,24 @@ def optional_notice(repository: str, commit: str) -> bytes | None:
 def main() -> None:
     lock = json.loads(LOCK.read_text())
     source = lock["openapi"]
+    if source.get("source_kind") == "published_catalog":
+        url = source["url"]
+        if url != "https://docs.mistral.ai/openapi.yaml":
+            raise ValueError("Unreviewed published catalog URL")
+        spec = fetch(url)
+        digest = hashlib.sha256(spec).hexdigest()
+        if not spec.startswith(b"openapi: 3.1."):
+            raise ValueError("OpenAPI dialect changed; review required")
+        if digest == source["sha256"]:
+            if (HERE / "published.yaml").read_bytes() != spec:
+                raise ValueError("Published catalog checkout differs from locked SHA-256")
+            print("Pinned published OpenAPI unchanged")
+            return
+        (HERE / "published.yaml").write_bytes(spec)
+        source["sha256"] = digest
+        LOCK.write_text(json.dumps(lock, indent=2) + "\n")
+        print(f"Pinned published OpenAPI changed ({digest}); requires review")
+        return
     repository, path = source["repository"], source["path"]
     latest = json.loads(
         fetch(
