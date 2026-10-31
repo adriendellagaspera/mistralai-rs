@@ -42,3 +42,31 @@ The policy compiler/verifier lives in `sdk_surface/`. It consumes OpenAPI and Fe
 - fern-api/fern#17941 — generated crate docs claim the SDK is official; output wording patch.
 
 No `openapi-to-rust`, raw Bindings, raw-to-public conversion, backend-symbol projection, or generated facade participates in production generation.
+
+
+## Official SDK parity evidence
+
+The public Tier-1 OpenAPI contract and the private/official SDK surfaces must
+remain separate. `official-sdks/surface.json` is the *matched naming evidence*
+for published operations; it does **not** measure the remaining official-SDK-only
+HTTP routes.
+
+`official-sdks/parity-audit.json` and `official-sdks/PARITY_AUDIT.md` are
+deterministic snapshots of **pinned** Python and TypeScript SDK source records.
+They report the exact method/path identities absent from the published OpenAPI,
+source aliases that could not be reconciled, cross-SDK path divergences and
+known Python non-HTTP resource candidates. Shared routes are still *observations*
+rather than trusted wire contracts. TypeScript non-HTTP coverage is incomplete.
+
+```sh
+python3 sdk-build/official-sdks/update.py update # refresh both snapshots
+python3 sdk-build/official-sdks/update.py check  # fail on drift
+```
+
+The nightly source-update workflow runs these commands after Fern regeneration,
+so an upstream pin update refreshes the taxonomy and Tier-2/Tier-3 evidence in
+the **same** reviewable PR. The `tooling` CI job independently checks the
+snapshots against the exact pinned SDK revisions.
+
+Tier-2 contract acquisition and scope: [#17](https://github.com/adriendellagaspera/mistralai-rs/issues/17).
+Non-HTTP protocols: [#18](https://github.com/adriendellagaspera/mistralai-rs/issues/18).
