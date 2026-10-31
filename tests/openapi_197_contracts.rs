@@ -1,6 +1,6 @@
 //! Wire regressions for recursive filters and Responses events from OpenAPI #197.
 
-use mistralai_sdk::api::types::{AndMatchesItem, ResponsesStreamFrameData};
+use mistralai_sdk::api::types::{AndMatchesItem, IpaPhoneme, ResponsesStreamFrameData};
 use serde_json::{from_value, json, to_value, Value};
 
 #[test]
@@ -49,4 +49,19 @@ fn responses_unknown_event_remains_inspectable() {
     let parsed: ResponsesStreamFrameData =
         from_value(input.clone()).expect("unknown Responses event preserved");
     assert_eq!(to_value(parsed).unwrap(), input);
+}
+
+#[test]
+fn ipa_phonemes_are_typed_without_changing_unicode_wire_values() {
+    let cases = [
+        (IpaPhoneme::A, "a"),
+        (IpaPhoneme::IpaU0061U026A, "aɪ"),
+        (IpaPhoneme::IpaU0074U0283, "tʃ"),
+        (IpaPhoneme::IpaU03B8, "θ"),
+    ];
+    for (phoneme, wire) in cases {
+        assert_eq!(to_value(&phoneme).unwrap(), json!(wire));
+        let restored: IpaPhoneme = from_value(json!(wire)).unwrap();
+        assert_eq!(restored, phoneme);
+    }
 }
