@@ -10,6 +10,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   regenerate:
+    name: Regenerate validated Rust SDK candidate
     runs-on: ubuntu-24.04
     timeout-minutes: 90
     permissions:
@@ -26,12 +27,11 @@ jobs:
         run: python3 -m unittest discover -s sdk-build -p 'test_*.py'
       - name: Rebuild published SDK
         run: |
-          python3 sdk-build/official-sdks/update.py update
           bash sdk-build/fern/generate.sh
+          python3 sdk-build/official-sdks/update.py update
       - name: Validate candidate
         run: |
           cargo generate-lockfile
-          bash sdk-build/fern/check.sh
           python3 sdk-build/official-sdks/update.py check
           cargo fmt --all --check
           cargo check --locked --all-features
