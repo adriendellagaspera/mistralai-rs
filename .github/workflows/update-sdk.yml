@@ -11,6 +11,12 @@ on:
     - cron: '23 3 * * *'
   workflow_dispatch:
   workflow_call:
+    inputs:
+      badge_scope:
+        description: Which upstream must match for this workflow's badge.
+        type: string
+        required: false
+        default: sdk
 
 permissions: {}
 
@@ -100,13 +106,10 @@ jobs:
           PROBE_OUTCOME: ${{ steps.probe.outcome }}
           CHANGED: ${{ steps.probe.outputs.changed }}
           GENERATION_OUTCOME: ${{ steps.generate.outcome }}
+          BADGE_SCOPE: ${{ inputs.badge_scope || 'sdk' }}
         run: |
           if [ "$PROBE_OUTCOME" != success ]; then
             echo "::error::Upstream probe could not complete"
             exit 1
           fi
-          if [ "$CHANGED" = true ]; then
-            echo "::error::Upstream drift or acquisition failure: remediation PR requires review (generation=$GENERATION_OUTCOME)"
-            exit 1
-          fi
-          echo "Mistral published OpenAPI and both official SDK pins match their reviewed baselines"
+          python3 sdk-build/monitoring/watch.py health --scope "$BADGE_SCOPE"
