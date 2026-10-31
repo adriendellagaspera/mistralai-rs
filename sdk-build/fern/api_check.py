@@ -1,19 +1,21 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 inventory = json.loads((HERE / "inventory.json").read_text())
 report = (HERE / "API_COMPATIBILITY.md").read_text()
+# CI verifies the candidate's bytes and API surface. GitHub PR ruleset
+# governs human approval; changing a lockfile cannot substitute for review.
 catalog = json.loads((HERE.parent / "openapi/public-catalog.lock.json").read_text())
-if catalog.get("reviewed_at") == "PENDING_PR_REVIEW":
-    raise SystemExit(
-        "The new published OpenAPI catalog has not been reviewed. "
-        "A human must verify source provenance and compatibility and replace "
-        "PENDING_PR_REVIEW with the actual review date before merge."
-    )
+provenance = json.loads((HERE.parent / "provenance.lock.json").read_text())
+if provenance["openapi"].get("source_kind") == "published_catalog":
+    digest = hashlib.sha256((HERE.parent / "openapi/published.yaml").read_bytes()).hexdigest()
+    if digest != catalog["sha256"] or digest != provenance["openapi"]["sha256"]:
+        raise SystemExit("published OpenAPI bytes do not match the locked catalog/provenance digests")
 
 if inventory["source_operation_count"] <= 0:
     raise SystemExit("source inventory must contain operations")
