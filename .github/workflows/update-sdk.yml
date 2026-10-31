@@ -49,8 +49,8 @@ jobs:
         if: steps.probe.outputs.changed == 'true'
         continue-on-error: true
         run: |
-          python3 sdk-build/official-sdks/update.py update
           bash sdk-build/fern/generate.sh
+          python3 sdk-build/official-sdks/update.py update
           cargo generate-lockfile
           bash sdk-build/fern/check.sh
           python3 sdk-build/official-sdks/update.py check
