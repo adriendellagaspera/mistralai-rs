@@ -51,7 +51,6 @@ class UpstreamWatchTests(unittest.TestCase):
         self.catalog.write_text(json.dumps({
             "url": watch.PUBLIC_URL,
             "sha256": watch.sha256(BASE),
-            "reviewed_at": "2026-09-01",
         }))
         for name, value in (
             ("LOCK", self.lock), ("CATALOG_LOCK", self.catalog),
@@ -74,7 +73,7 @@ class UpstreamWatchTests(unittest.TestCase):
         self.assertFalse(self.report.exists())
         self.assertIn("changed=false", self.outputs.read_text())
 
-    def test_upstream_drift_prepares_explicit_reviewed_candidate(self) -> None:
+    def test_upstream_drift_creates_unapproved_candidate(self) -> None:
         with patch.object(watch, "download", return_value=CHANGED), patch.object(
             watch, "latest_commit", side_effect=[NEW_PY, NEW_TS]
         ):
@@ -86,10 +85,11 @@ class UpstreamWatchTests(unittest.TestCase):
         self.assertEqual(locked["openapi"]["sha256"], watch.sha256(CHANGED))
         self.assertEqual(locked["official_sdks"]["python"]["commit"], NEW_PY)
         self.assertEqual(locked["official_sdks"]["typescript"]["commit"], NEW_TS)
-        self.assertEqual(json.loads(self.catalog.read_text())["reviewed_at"], "PENDING_PR_REVIEW")
+        self.assertNotIn("reviewed_at", json.loads(self.catalog.read_text()))
         report = self.report.read_text()
         self.assertIn("POST /v1/new", report)
         self.assertIn("FAILURE", report)
+        self.assertIn("GitHub records approvals", report)
         self.assertIn("changed=true", self.outputs.read_text())
 
     def test_source_failure_does_not_suppress_sdk_updates(self) -> None:
