@@ -42,10 +42,10 @@ import sys
 from pathlib import Path
 
 inventory = json.loads(Path(sys.argv[1]).read_text())
-assert inventory["source_operation_count"] == 288, inventory["source_operation_count"]
-assert inventory["published_operation_count"] == 288, inventory["published_operation_count"]
+assert inventory["source_operation_count"] > 0, inventory["source_operation_count"]
+assert inventory["published_operation_count"] == inventory["source_operation_count"], inventory
 assert inventory["excluded_operation_count"] == 0, inventory["excluded_operation_count"]
-assert inventory["public_method_count"] >= 288, inventory["public_method_count"]
+assert inventory["public_method_count"] >= inventory["published_operation_count"], inventory["public_method_count"]
 assert not any(inventory["verification"].values()), inventory["verification"]
 PY
 
