@@ -83,13 +83,15 @@ jobs:
             updated=false
           fi
           pr="$(gh pr list --base main --head "$branch" --state open --json number --jq '.[0].number // empty')"
+          created=false
           if [ -n "$pr" ]; then
             gh pr edit "$pr" --title 'chore: synchronize Mistral upstream sources' --body-file sdk-build/monitoring/STATUS.md
           else
             gh pr create --base main --head "$branch" --title 'chore: synchronize Mistral upstream sources' --body-file sdk-build/monitoring/STATUS.md
+            created=true
           fi
           # GITHUB_TOKEN-created PR/push events do not themselves trigger CI.
-          if [ "$updated" = true ]; then
+          if [ "$updated" = true ] || [ "$created" = true ]; then
             gh workflow run ci.yml --ref "$branch"
           fi
       - name: Report upstream alignment
