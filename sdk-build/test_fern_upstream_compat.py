@@ -158,6 +158,48 @@ class FernCatalogCompatibilityTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Unexpected recursive filter"):
             transform(original)
 
+    def test_correct_upstream_responses_discriminator_needs_no_repair(self) -> None:
+        original = fixture()
+        frame = original["components"]["schemas"]["ResponsesStreamFrame"][
+            "properties"
+        ]["data"]
+        frame["discriminator"]["mapping"]["error"] = (
+            "#/components/schemas/ResponsesErrorEvent"
+        )
+        generated, report = transform(original)
+        self.assertEqual(
+            generated["components"]["schemas"]["ResponsesStreamFrame"][
+                "properties"
+            ]["data"],
+            frame,
+        )
+        self.assertFalse(any(
+            entry["source"] == "#/components/schemas/ResponsesStreamFrame"
+            for entry in report["temporary_workarounds"]
+        ))
+
+    def test_unexpected_responses_alias_is_not_silently_repaired(self) -> None:
+        original = fixture()
+        frame = original["components"]["schemas"]["ResponsesStreamFrame"][
+            "properties"
+        ]["data"]
+        frame["discriminator"]["mapping"]["error"] = (
+            "#/components/schemas/DifferentErrorEvent"
+        )
+        with self.assertRaisesRegex(ValueError, "Unexpected Responses event mapping"):
+            transform(original)
+
+    def test_responses_mapping_tag_set_change_fails_closed(self) -> None:
+        original = fixture()
+        frame = original["components"]["schemas"]["ResponsesStreamFrame"][
+            "properties"
+        ]["data"]
+        frame["discriminator"]["mapping"]["unexpected"] = (
+            "#/components/schemas/ResponsesErrorEvent"
+        )
+        with self.assertRaisesRegex(ValueError, "Responses event tag set changed"):
+            transform(original)
+
     def test_duplicate_responses_tags_fail_closed(self) -> None:
         original = fixture()
         schema = original["components"]["schemas"]["ResponsesCompletedEvent"]

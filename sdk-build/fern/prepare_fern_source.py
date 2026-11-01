@@ -191,11 +191,30 @@ def main() -> int:
             if set(mapping) != set(expected):
                 raise ValueError("Responses event tag set changed")
             if mapping != expected:
+                # Accept only the verified upstream defect: Response* aliases
+                # instead of their matching Responses* oneOf targets. A new or
+                # different mapping error must not be silently normalized.
+                for tag, actual in mapping.items():
+                    wanted = expected[tag]
+                    if actual == wanted:
+                        continue
+                    wanted_name = wanted.rsplit("/", 1)[-1]
+                    if not wanted_name.startswith("Responses"):
+                        raise ValueError(f"Unexpected Responses event name: {wanted}")
+                    legacy = (
+                        "#/components/schemas/Response"
+                        + wanted_name[len("Responses"):]
+                    )
+                    if actual != legacy:
+                        raise ValueError(
+                            f"Unexpected Responses event mapping for {tag}: "
+                            f"{actual}, expected {wanted} or {legacy}"
+                        )
                 discriminator["mapping"] = expected
                 applied.append({
                     "kind": "temporary_fern_workaround",
                     "source": "#/components/schemas/ResponsesStreamFrame",
-                    "upstream": "https://github.com/fern-api/fern",
+                    "upstream": "https://docs.mistral.ai/openapi.yaml",
                     "remove_when": "published Responses discriminator matches its oneOf members",
                 })
             return
