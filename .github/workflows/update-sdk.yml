@@ -77,12 +77,25 @@ jobs:
           # and leave the human candidate unchanged.
           remote_ref="refs/remotes/origin/$branch"
           if git show-ref --verify --quiet "$remote_ref"; then
-            human_authors="$(git log --format='%ae' "origin/main..$remote_ref" | grep -vFx '41898282+github-actions[bot]@users.noreply.github.com' || true)"
+            existing_pr="$(gh pr list --base main --head "$branch" --state open --json number --jq '.[0].number // empty')"
+
+            # Squash-merging a candidate does not make its original commits
+            # ancestors of main. Use the last merged PR head as the baseline,
+            # so already-merged human review commits are not mistaken for
+            # unmerged edits on the persistent automation branch.
+            merged_pr_head="$(gh pr list --base main --head "$branch" --state merged --json headRefOid,mergedAt --jq 'sort_by(.mergedAt) | last | .headRefOid // empty')"
+            if [ -n "$merged_pr_head" ] && git cat-file -e "$merged_pr_head^{commit}" 2>/dev/null && git merge-base --is-ancestor "$merged_pr_head" "$remote_ref"; then
+              protected_range="$merged_pr_head..$remote_ref"
+            else
+              protected_range="origin/main..$remote_ref"
+            fi
+
+            human_authors="$(git log --format='%ae' "$protected_range" | grep -vFx '41898282+github-actions[bot]@users.noreply.github.com' || true)"
             if [ -n "$human_authors" ]; then
-              echo "::warning::Human changes exist on $branch; refusing to overwrite them. Update the candidate manually."
+              echo "::warning::Unmerged human changes exist on $branch; refusing to overwrite them. Update the candidate manually."
               exit 0
             fi
-            existing_pr="$(gh pr list --base main --head "$branch" --state open --json number --jq '.[0].number // empty')"
+
             if [ -n "$existing_pr" ]; then
               approval_count="$(gh pr view "$existing_pr" --json reviews --jq '[.reviews[] | select(.state == "APPROVED")] | length')"
               if [ "$approval_count" -gt 0 ]; then

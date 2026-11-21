@@ -11,7 +11,9 @@ all-features = true
 
 [advisories]
 yanked = "deny"
-ignore = []
+ignore = [
+    { id = "RUSTSEC-2026-0543", reason = "chrono is currently a direct public dependency re-exported by the SDK prelude; RustSec marks all versions unmaintained and no patched release exists. Keep this narrow exception until the SDK can migrate its public date/time API to a maintained alternative in a separately reviewed change." },
+]
 
 [bans]
 multiple-versions = "allow"
