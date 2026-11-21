@@ -68,7 +68,8 @@ POLICY = {
     },
     "types": {
         "#/components/schemas/Judge/properties/output": {
-            "name": "JudgeOutputConfig"
+            "name": "JudgeOutputConfig",
+            "optional": True,
         }
     },
 }
@@ -140,6 +141,45 @@ class SurfaceContractTests(unittest.TestCase):
         ]["name"] = "JudgeOutput"
         with self.assertRaises(ContractError):
             compile_fern_input(SOURCE, policy)
+
+    def test_optional_type_override_is_skipped_when_source_pointer_disappears(
+        self,
+    ) -> None:
+        source = json.loads(json.dumps(SOURCE))
+        del source["components"]["schemas"]["Judge"]
+        output, resolution = compile_fern_input(source, POLICY)
+        self.assertNotIn("Judge", output["components"]["schemas"])
+        self.assertEqual(
+            resolution["type_policy"],
+            [
+                {
+                    "source_schema": "#/components/schemas/Judge/properties/output",
+                    "public_name": "JudgeOutputConfig",
+                    "representation": None,
+                    "optional": True,
+                }
+            ],
+        )
+
+    def test_missing_required_type_override_still_fails(self) -> None:
+        source = json.loads(json.dumps(SOURCE))
+        del source["components"]["schemas"]["Judge"]
+        policy = json.loads(json.dumps(POLICY))
+        policy["types"]["#/components/schemas/Judge/properties/output"].pop(
+            "optional"
+        )
+        with self.assertRaisesRegex(
+            ContractError, "type policy pointer not found in source"
+        ):
+            compile_fern_input(source, policy)
+
+    def test_optional_type_override_does_not_hide_invalid_target(self) -> None:
+        source = json.loads(json.dumps(SOURCE))
+        source["components"]["schemas"]["Judge"]["properties"]["output"] = "not an object"
+        with self.assertRaisesRegex(
+            ContractError, "type policy pointer must target an object schema"
+        ):
+            compile_fern_input(source, POLICY)
 
     def test_compatibility_marks_removed_or_remapped_surface_breaking(
         self,
