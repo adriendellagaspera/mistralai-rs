@@ -8,9 +8,6 @@ pub struct AdminUpdateUserGroupIn {
     /// Updated name of the user group.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
-    /// Full replacement list of parent group UUIDs. Pass an empty list to remove all parents; omit the field to leave the parent groups unchanged.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub parent_group_ids: Option<Vec<String>>,
 }
 
 impl AdminUpdateUserGroupIn {
@@ -24,7 +21,6 @@ impl AdminUpdateUserGroupIn {
 pub struct AdminUpdateUserGroupInBuilder {
     description: Option<String>,
     name: Option<String>,
-    parent_group_ids: Option<Vec<String>>,
 }
 
 impl AdminUpdateUserGroupInBuilder {
@@ -38,17 +34,11 @@ impl AdminUpdateUserGroupInBuilder {
         self
     }
 
-    pub fn parent_group_ids(mut self, value: Vec<String>) -> Self {
-        self.parent_group_ids = Some(value);
-        self
-    }
-
     /// Consumes the builder and constructs a [`AdminUpdateUserGroupIn`].
     pub fn build(self) -> Result<AdminUpdateUserGroupIn, BuildError> {
         Ok(AdminUpdateUserGroupIn {
             description: self.description,
             name: self.name,
-            parent_group_ids: self.parent_group_ids,
         })
     }
 }

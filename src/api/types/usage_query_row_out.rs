@@ -56,6 +56,9 @@ pub struct UsageQueryRowOut {
     /// Usage event type.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub usage_type: Option<String>,
+    /// Harness identified from the request User-Agent header.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub user_agent: Option<String>,
     /// User ID.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub user_id: Option<String>,
@@ -94,6 +97,7 @@ pub struct UsageQueryRowOutBuilder {
     timestamp: Option<DateTime<FixedOffset>>,
     untracked: Option<bool>,
     usage_type: Option<String>,
+    user_agent: Option<String>,
     user_id: Option<String>,
     value: Option<i64>,
     workspace_id: Option<String>,
@@ -190,6 +194,11 @@ impl UsageQueryRowOutBuilder {
         self
     }
 
+    pub fn user_agent(mut self, value: impl Into<String>) -> Self {
+        self.user_agent = Some(value.into());
+        self
+    }
+
     pub fn user_id(mut self, value: impl Into<String>) -> Self {
         self.user_id = Some(value.into());
         self
@@ -226,6 +235,7 @@ impl UsageQueryRowOutBuilder {
             timestamp: self.timestamp,
             untracked: self.untracked,
             usage_type: self.usage_type,
+            user_agent: self.user_agent,
             user_id: self.user_id,
             value: self.value,
             workspace_id: self.workspace_id,

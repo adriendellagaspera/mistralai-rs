@@ -37,6 +37,12 @@ pub struct ListDeploymentsV1WorkflowsDeploymentsGetQueryRequest {
     /// Workspace ID to scope the request to. Defaults to the caller's context.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub workspace_id: Option<String>,
+    /// Filter managed deployments by source repository URL (exact match)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub repository_url: Option<String>,
+    /// Filter managed deployments by Dockerfile path (exact match)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub dockerfile_path: Option<String>,
 }
 
 impl ListDeploymentsV1WorkflowsDeploymentsGetQueryRequest {
@@ -60,6 +66,8 @@ pub struct ListDeploymentsV1WorkflowsDeploymentsGetQueryRequestBuilder {
     limit: Option<i64>,
     cursor: Option<String>,
     workspace_id: Option<String>,
+    repository_url: Option<String>,
+    dockerfile_path: Option<String>,
 }
 
 impl ListDeploymentsV1WorkflowsDeploymentsGetQueryRequestBuilder {
@@ -129,6 +137,16 @@ impl ListDeploymentsV1WorkflowsDeploymentsGetQueryRequestBuilder {
         self
     }
 
+    pub fn repository_url(mut self, value: impl Into<String>) -> Self {
+        self.repository_url = Some(value.into());
+        self
+    }
+
+    pub fn dockerfile_path(mut self, value: impl Into<String>) -> Self {
+        self.dockerfile_path = Some(value.into());
+        self
+    }
+
     /// Consumes the builder and constructs a [`ListDeploymentsV1WorkflowsDeploymentsGetQueryRequest`].
     pub fn build(self) -> Result<ListDeploymentsV1WorkflowsDeploymentsGetQueryRequest, BuildError> {
         Ok(ListDeploymentsV1WorkflowsDeploymentsGetQueryRequest {
@@ -144,6 +162,8 @@ impl ListDeploymentsV1WorkflowsDeploymentsGetQueryRequestBuilder {
             limit: self.limit,
             cursor: self.cursor,
             workspace_id: self.workspace_id,
+            repository_url: self.repository_url,
+            dockerfile_path: self.dockerfile_path,
         })
     }
 }

@@ -10,12 +10,15 @@ pub mod optimizations;
 pub use optimizations::OptimizationsClient;
 pub mod projects;
 pub use projects::ProjectsClient;
+pub mod scorers;
+pub use scorers::ScorersClient;
 pub struct EvaluationsClient {
     pub http_client: HttpClient,
     pub runs: RunsClient,
     pub records: RecordsClient2,
     pub optimizations: OptimizationsClient,
     pub projects: ProjectsClient,
+    pub scorers: ScorersClient,
 }
 
 impl EvaluationsClient {
@@ -26,6 +29,7 @@ impl EvaluationsClient {
             records: RecordsClient2::new(config.clone())?,
             optimizations: OptimizationsClient::new(config.clone())?,
             projects: ProjectsClient::new(config.clone())?,
+            scorers: ScorersClient::new(config.clone())?,
         })
     }
 
@@ -125,6 +129,8 @@ impl EvaluationsClient {
                 None,
                 QueryBuilder::new()
                     .serialize("enabled", request.enabled.clone())
+                    .serialize("from", request.from.clone())
+                    .serialize("to", request.to.clone())
                     .int("page_size", request.page_size.clone())
                     .int("page", request.page.clone())
                     .serialize("q", request.q.clone())

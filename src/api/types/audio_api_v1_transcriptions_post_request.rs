@@ -17,6 +17,8 @@ pub struct AudioApiV1TranscriptionsPostRequest {
     #[serde(default)]
     pub model: String,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub speaker_references: Option<HashMap<String, String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub stream: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub temperature: Option<f64>,
@@ -65,6 +67,12 @@ impl AudioApiV1TranscriptionsPostRequest {
 
         form = form.text("model", self.model.clone());
 
+        if let Some(ref value) = self.speaker_references {
+            if let Ok(json_str) = serde_json::to_string(value) {
+                form = form.text("speaker_references", json_str);
+            }
+        }
+
         if let Some(ref value) = self.stream {
             if let Ok(json_str) = serde_json::to_string(value) {
                 form = form.text("stream", json_str);
@@ -103,6 +111,7 @@ pub struct AudioApiV1TranscriptionsPostRequestBuilder {
     file_url: Option<String>,
     language: Option<String>,
     model: Option<String>,
+    speaker_references: Option<HashMap<String, String>>,
     stream: Option<bool>,
     temperature: Option<f64>,
     timestamp_granularities: Option<Vec<TimestampGranularity>>,
@@ -144,6 +153,11 @@ impl AudioApiV1TranscriptionsPostRequestBuilder {
         self
     }
 
+    pub fn speaker_references(mut self, value: HashMap<String, String>) -> Self {
+        self.speaker_references = Some(value);
+        self
+    }
+
     pub fn stream(mut self, value: bool) -> Self {
         self.stream = Some(value);
         self
@@ -173,6 +187,7 @@ impl AudioApiV1TranscriptionsPostRequestBuilder {
             model: self
                 .model
                 .ok_or_else(|| BuildError::missing_field("model"))?,
+            speaker_references: self.speaker_references,
             stream: self.stream,
             temperature: self.temperature,
             timestamp_granularities: self.timestamp_granularities,

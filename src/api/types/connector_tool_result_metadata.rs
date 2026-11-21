@@ -11,7 +11,7 @@ pub struct ConnectorToolResultMetadata {
     pub is_error: Option<bool>,
     #[serde(rename = "structuredContent")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub structured_content: Option<HashMap<String, serde_json::Value>>,
+    pub structured_content: Option<serde_json::Value>,
     /// Additional properties that are not part of the defined schema.
     #[serde(flatten)]
     pub extra: std::collections::HashMap<String, serde_json::Value>,
@@ -28,7 +28,7 @@ impl ConnectorToolResultMetadata {
 pub struct ConnectorToolResultMetadataBuilder {
     meta: Option<HashMap<String, serde_json::Value>>,
     is_error: Option<bool>,
-    structured_content: Option<HashMap<String, serde_json::Value>>,
+    structured_content: Option<serde_json::Value>,
 }
 
 impl ConnectorToolResultMetadataBuilder {
@@ -42,7 +42,7 @@ impl ConnectorToolResultMetadataBuilder {
         self
     }
 
-    pub fn structured_content(mut self, value: HashMap<String, serde_json::Value>) -> Self {
+    pub fn structured_content(mut self, value: serde_json::Value) -> Self {
         self.structured_content = Some(value);
         self
     }

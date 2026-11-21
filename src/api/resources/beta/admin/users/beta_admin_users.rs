@@ -59,6 +59,7 @@ impl UsersClient2 {
     /// * `page` - Page number to return.
     /// * `page_size` - Maximum number of results per page.
     /// * `email` - Email address to filter users and invitations.
+    /// * `include_inactive` - Also return deactivated and blocked members.
     /// * `options` - Additional request options such as headers, timeout, etc.
     ///
     /// # Returns
@@ -83,6 +84,7 @@ impl UsersClient2 {
     ///         .users
     ///         .users_api_admin_users_get_users(
     ///             &UsersAPIAdminUsersGetUsersQueryRequest {
+    ///                 include_inactive: Some(true),
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -104,6 +106,7 @@ impl UsersClient2 {
                     .int("page", request.page.clone())
                     .int("page_size", request.page_size.clone())
                     .serialize("email", request.email.clone())
+                    .bool("include_inactive", request.include_inactive.clone())
                     .build(),
                 options,
             )
@@ -310,7 +313,7 @@ impl UsersClient2 {
             .await
     }
 
-    /// Get details for an Organization member.
+    /// Get details for an Organization member, including deactivated and blocked members.
     ///
     /// # Arguments
     ///
@@ -357,7 +360,9 @@ impl UsersClient2 {
             .await
     }
 
-    /// Remove a member from the Organization.
+    /// Remove a member from the Organization, whatever their account status.
+    ///
+    /// Members whose email is on one of the Organization's verified domains cannot be removed: deactivate them instead.
     ///
     /// # Arguments
     ///
@@ -458,8 +463,9 @@ impl UsersClient2 {
             .await
     }
 
-    /// Deactivate a user whose email address is on one of the Organization's verified domains: remove them from
-    /// every organization they belong to, which revokes their API keys, and end their sessions.
+    /// Deactivate a user whose email address is on one of the Organization's verified domains: end their sessions,
+    /// delete their API keys and release their seats. Their memberships, groups and roles are kept, so that
+    /// `POST /users/{user_id}/reactivate` can give their access back.
     ///
     /// # Arguments
     ///
@@ -501,6 +507,115 @@ impl UsersClient2 {
                 &format!("v1/admin/users/{}/deactivate", user_id),
                 None,
                 None,
+                options,
+            )
+            .await
+    }
+
+    /// Reactivate a deactivated user whose email address is on one of the Organization's verified domains: give
+    /// them their access back, with their seats when free ones remain.
+    ///
+    /// # Arguments
+    ///
+    /// * `user_id` - User ID.
+    /// * `options` - Additional request options such as headers, timeout, etc.
+    ///
+    /// # Returns
+    ///
+    /// JSON response from the API
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use mistralai_sdk::prelude::*;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let config = ClientConfig {
+    ///         token: Some("<token>".to_string()),
+    ///         ..Default::default()
+    ///     };
+    ///     let client = Mistral::new(config).expect("Failed to build client");
+    ///     client
+    ///         .beta
+    ///         .admin
+    ///         .users
+    ///         .users_api_admin_users_reactivate_user(&"user_id".to_string(), None)
+    ///         .await;
+    /// }
+    /// ```
+    pub async fn users_api_admin_users_reactivate_user(
+        &self,
+        user_id: &str,
+        options: Option<RequestOptions>,
+    ) -> Result<ReactivateUserOut, ApiError> {
+        self.http_client
+            .execute_request(
+                Method::POST,
+                &format!("v1/admin/users/{}/reactivate", user_id),
+                None,
+                None,
+                options,
+            )
+            .await
+    }
+
+    /// List the Workspaces an Organization member belongs to, with their roles.
+    ///
+    /// # Arguments
+    ///
+    /// * `user_id` - User ID.
+    /// * `page` - Page number to return.
+    /// * `page_size` - Maximum number of results per page.
+    /// * `options` - Additional request options such as headers, timeout, etc.
+    ///
+    /// # Returns
+    ///
+    /// JSON response from the API
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use mistralai_sdk::prelude::*;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let config = ClientConfig {
+    ///         token: Some("<token>".to_string()),
+    ///         ..Default::default()
+    ///     };
+    ///     let client = Mistral::new(config).expect("Failed to build client");
+    ///     client
+    ///         .beta
+    ///         .admin
+    ///         .users
+    ///         .users_api_admin_users_get_user_workspaces(
+    ///             &"user_id".to_string(),
+    ///             &UsersAPIAdminUsersGetUserWorkspacesQueryRequest {
+    ///                 page: Some(1),
+    ///                 page_size: Some(25),
+    ///                 ..Default::default()
+    ///             },
+    ///             None,
+    ///         )
+    ///         .await;
+    /// }
+    /// ```
+    pub async fn users_api_admin_users_get_user_workspaces(
+        &self,
+        user_id: &str,
+        request: &UsersApiAdminUsersGetUserWorkspacesQueryRequest,
+        options: Option<RequestOptions>,
+    ) -> Result<AdminUserWorkspacesOut, ApiError> {
+        self.http_client
+            .execute_request(
+                Method::GET,
+                &format!("v1/admin/users/{}/workspaces", user_id),
+                None,
+                QueryBuilder::new()
+                    .int("page", request.page.clone())
+                    .int("page_size", request.page_size.clone())
+                    .build(),
                 options,
             )
             .await

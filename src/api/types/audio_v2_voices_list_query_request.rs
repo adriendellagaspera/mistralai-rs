@@ -21,6 +21,9 @@ pub struct AudioV2VoicesListQueryRequest {
     /// Case-insensitive match on voice name
     #[serde(skip_serializing_if = "Option::is_none")]
     pub query: Option<String>,
+    /// Keep voices cloned with this technology
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub kind: Option<VoiceKind>,
 }
 
 impl AudioV2VoicesListQueryRequest {
@@ -38,6 +41,7 @@ pub struct AudioV2VoicesListQueryRequestBuilder {
     gender: Option<Vec<VoiceGender>>,
     language: Option<Vec<String>>,
     query: Option<String>,
+    kind: Option<VoiceKind>,
 }
 
 impl AudioV2VoicesListQueryRequestBuilder {
@@ -71,6 +75,11 @@ impl AudioV2VoicesListQueryRequestBuilder {
         self
     }
 
+    pub fn kind(mut self, value: VoiceKind) -> Self {
+        self.kind = Some(value);
+        self
+    }
+
     /// Consumes the builder and constructs a [`AudioV2VoicesListQueryRequest`].
     pub fn build(self) -> Result<AudioV2VoicesListQueryRequest, BuildError> {
         Ok(AudioV2VoicesListQueryRequest {
@@ -80,6 +89,7 @@ impl AudioV2VoicesListQueryRequestBuilder {
             gender: self.gender,
             language: self.language,
             query: self.query,
+            kind: self.kind,
         })
     }
 }

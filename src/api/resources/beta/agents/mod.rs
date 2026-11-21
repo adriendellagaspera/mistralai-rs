@@ -1,2 +1,2 @@
 pub mod beta_agents;
-pub use beta_agents::AgentsClient2;
+pub use beta_agents::AgentsClient3;

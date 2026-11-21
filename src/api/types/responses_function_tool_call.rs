@@ -4,6 +4,8 @@ pub use crate::prelude::*;
 pub struct ResponsesFunctionToolCall {
     #[serde(default)]
     pub arguments: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub r#async: Option<bool>,
     #[serde(default)]
     pub call_id: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -32,6 +34,7 @@ impl ResponsesFunctionToolCall {
 #[non_exhaustive]
 pub struct ResponsesFunctionToolCallBuilder {
     arguments: Option<String>,
+    r#async: Option<bool>,
     call_id: Option<String>,
     caller: Option<ResponsesFunctionToolCallCaller>,
     id: Option<String>,
@@ -44,6 +47,11 @@ pub struct ResponsesFunctionToolCallBuilder {
 impl ResponsesFunctionToolCallBuilder {
     pub fn arguments(mut self, value: impl Into<String>) -> Self {
         self.arguments = Some(value.into());
+        self
+    }
+
+    pub fn r#async(mut self, value: bool) -> Self {
+        self.r#async = Some(value);
         self
     }
 
@@ -93,6 +101,7 @@ impl ResponsesFunctionToolCallBuilder {
             arguments: self
                 .arguments
                 .ok_or_else(|| BuildError::missing_field("arguments"))?,
+            r#async: self.r#async,
             call_id: self
                 .call_id
                 .ok_or_else(|| BuildError::missing_field("call_id"))?,

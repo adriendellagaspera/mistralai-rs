@@ -24,6 +24,9 @@ pub struct GetWorkflowsV1WorkflowsGetQueryRequest {
     /// Filter to workflows tagged with all listed tags (AND).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<String>>,
+    /// Exclude workflows tagged with any of the listed tags.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub exclude_tags: Option<Vec<String>>,
     /// Field to sort by
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sort_by: Option<GetWorkflowsV1WorkflowsGetWorkflowsRequestSortBy>,
@@ -60,6 +63,7 @@ pub struct GetWorkflowsV1WorkflowsGetQueryRequestBuilder {
     deployment_status: Option<GetWorkflowsV1WorkflowsGetWorkflowsRequestDeploymentStatus>,
     archived: Option<bool>,
     tags: Option<Vec<String>>,
+    exclude_tags: Option<Vec<String>>,
     sort_by: Option<GetWorkflowsV1WorkflowsGetWorkflowsRequestSortBy>,
     order: Option<GetWorkflowsV1WorkflowsGetWorkflowsRequestOrder>,
     cursor: Option<String>,
@@ -107,6 +111,11 @@ impl GetWorkflowsV1WorkflowsGetQueryRequestBuilder {
         self
     }
 
+    pub fn exclude_tags(mut self, value: Vec<String>) -> Self {
+        self.exclude_tags = Some(value);
+        self
+    }
+
     pub fn sort_by(mut self, value: GetWorkflowsV1WorkflowsGetWorkflowsRequestSortBy) -> Self {
         self.sort_by = Some(value);
         self
@@ -147,6 +156,7 @@ impl GetWorkflowsV1WorkflowsGetQueryRequestBuilder {
             deployment_status: self.deployment_status,
             archived: self.archived,
             tags: self.tags,
+            exclude_tags: self.exclude_tags,
             sort_by: self.sort_by,
             order: self.order,
             cursor: self.cursor,

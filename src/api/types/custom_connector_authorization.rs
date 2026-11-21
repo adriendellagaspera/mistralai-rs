@@ -7,15 +7,15 @@ pub enum CustomConnectorAuthorization {
     #[serde(rename = "api-key")]
     #[non_exhaustive]
     ApiKey {
-        #[serde(default)]
-        value: String,
+        #[serde(flatten)]
+        data: ApiKeyAuth,
     },
 
     #[serde(rename = "oauth2-token")]
     #[non_exhaustive]
     Oauth2Token {
-        #[serde(default)]
-        value: String,
+        #[serde(flatten)]
+        data: OAuth2TokenAuth,
     },
 
     /// Catch-all variant for unrecognized discriminant values.
@@ -26,12 +26,12 @@ pub enum CustomConnectorAuthorization {
 }
 
 impl CustomConnectorAuthorization {
-    pub fn api_key(value: String) -> Self {
-        Self::ApiKey { value }
+    pub fn api_key(data: ApiKeyAuth) -> Self {
+        Self::ApiKey { data }
     }
 
-    pub fn oauth2token(value: String) -> Self {
-        Self::Oauth2Token { value }
+    pub fn oauth2token(data: OAuth2TokenAuth) -> Self {
+        Self::Oauth2Token { data }
     }
 
     pub fn unknown(value: serde_json::Value) -> Self {

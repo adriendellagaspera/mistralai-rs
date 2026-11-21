@@ -5,6 +5,8 @@ pub struct ResponsesFunctionTool {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub allowed_callers: Option<Vec<ResponsesFunctionToolAllowedCallersItem>>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub r#async: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub defer_loading: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
@@ -31,6 +33,7 @@ impl ResponsesFunctionTool {
 #[non_exhaustive]
 pub struct ResponsesFunctionToolBuilder {
     allowed_callers: Option<Vec<ResponsesFunctionToolAllowedCallersItem>>,
+    r#async: Option<bool>,
     defer_loading: Option<bool>,
     description: Option<String>,
     name: Option<String>,
@@ -42,6 +45,11 @@ pub struct ResponsesFunctionToolBuilder {
 impl ResponsesFunctionToolBuilder {
     pub fn allowed_callers(mut self, value: Vec<ResponsesFunctionToolAllowedCallersItem>) -> Self {
         self.allowed_callers = Some(value);
+        self
+    }
+
+    pub fn r#async(mut self, value: bool) -> Self {
+        self.r#async = Some(value);
         self
     }
 
@@ -81,6 +89,7 @@ impl ResponsesFunctionToolBuilder {
     pub fn build(self) -> Result<ResponsesFunctionTool, BuildError> {
         Ok(ResponsesFunctionTool {
             allowed_callers: self.allowed_callers,
+            r#async: self.r#async,
             defer_loading: self.defer_loading,
             description: self.description,
             name: self.name.ok_or_else(|| BuildError::missing_field("name"))?,

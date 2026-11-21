@@ -6,6 +6,8 @@ pub enum AggregationRowMetricValue {
     Double(f64),
 
     Integer(i64),
+
+    DateTime(#[serde(with = "crate::core::flexible_datetime::offset")] DateTime<FixedOffset>),
 }
 
 impl AggregationRowMetricValue {
@@ -15,6 +17,10 @@ impl AggregationRowMetricValue {
 
     pub fn is_integer(&self) -> bool {
         matches!(self, Self::Integer(_))
+    }
+
+    pub fn is_date_time(&self) -> bool {
+        matches!(self, Self::DateTime(_))
     }
 
     pub fn as_double(&self) -> Option<&f64> {
@@ -44,6 +50,20 @@ impl AggregationRowMetricValue {
             _ => None,
         }
     }
+
+    pub fn as_date_time(&self) -> Option<&DateTime<FixedOffset>> {
+        match self {
+            Self::DateTime(value) => Some(value),
+            _ => None,
+        }
+    }
+
+    pub fn into_date_time(self) -> Option<DateTime<FixedOffset>> {
+        match self {
+            Self::DateTime(value) => Some(value),
+            _ => None,
+        }
+    }
 }
 
 impl fmt::Display for AggregationRowMetricValue {
@@ -51,6 +71,7 @@ impl fmt::Display for AggregationRowMetricValue {
         match self {
             Self::Double(value) => write!(f, "{}", value),
             Self::Integer(value) => write!(f, "{}", value),
+            Self::DateTime(value) => write!(f, "{}", value),
         }
     }
 }

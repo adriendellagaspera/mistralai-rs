@@ -191,7 +191,7 @@ impl ServiceAccountsClient {
 
     /// Retrieve a service account.
     ///
-    /// Requires the Workspace admin (`workspace_admin`) role.
+    /// Requires the `see_all_workspace_service_accounts` or `read_workspace_service_account` permission.
     ///
     /// # Arguments
     ///

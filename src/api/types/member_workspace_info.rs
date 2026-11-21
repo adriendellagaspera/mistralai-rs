@@ -9,9 +9,10 @@ pub struct MemberWorkspaceInfo {
     #[serde(default)]
     pub name: String,
     /// Deprecated single workspace role. Use 'raw_roles' instead.
-    pub raw_role: MemberWorkspaceInfoRawRole,
+    pub raw_role: StaticWorkspaceRoles,
     /// Workspace roles assigned to the member.
-    pub raw_roles: MemberWorkspaceInfoRawRoles,
+    #[serde(default)]
+    pub raw_roles: Vec<StaticWorkspaceRoles>,
     /// Workspace ID.
     #[serde(default)]
     pub uuid: String,
@@ -28,8 +29,8 @@ impl MemberWorkspaceInfo {
 pub struct MemberWorkspaceInfoBuilder {
     is_default: Option<bool>,
     name: Option<String>,
-    raw_role: Option<MemberWorkspaceInfoRawRole>,
-    raw_roles: Option<MemberWorkspaceInfoRawRoles>,
+    raw_role: Option<StaticWorkspaceRoles>,
+    raw_roles: Option<Vec<StaticWorkspaceRoles>>,
     uuid: Option<String>,
 }
 
@@ -44,12 +45,12 @@ impl MemberWorkspaceInfoBuilder {
         self
     }
 
-    pub fn raw_role(mut self, value: MemberWorkspaceInfoRawRole) -> Self {
+    pub fn raw_role(mut self, value: StaticWorkspaceRoles) -> Self {
         self.raw_role = Some(value);
         self
     }
 
-    pub fn raw_roles(mut self, value: MemberWorkspaceInfoRawRoles) -> Self {
+    pub fn raw_roles(mut self, value: Vec<StaticWorkspaceRoles>) -> Self {
         self.raw_roles = Some(value);
         self
     }

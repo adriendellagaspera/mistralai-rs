@@ -18,6 +18,7 @@ pub enum UsageQueryInGroupByItem {
     Untracked,
     CallSource,
     CallType,
+    UserAgent,
     CustomerTier,
     /// This variant is used for forward compatibility.
     /// If the server sends a value not recognized by the current SDK version,
@@ -42,6 +43,7 @@ impl Serialize for UsageQueryInGroupByItem {
             Self::Untracked => serializer.serialize_str("untracked"),
             Self::CallSource => serializer.serialize_str("call_source"),
             Self::CallType => serializer.serialize_str("call_type"),
+            Self::UserAgent => serializer.serialize_str("user_agent"),
             Self::CustomerTier => serializer.serialize_str("customer_tier"),
             Self::__Unknown(val) => serializer.serialize_str(val),
         }
@@ -67,6 +69,7 @@ impl<'de> Deserialize<'de> for UsageQueryInGroupByItem {
             "untracked" => Ok(Self::Untracked),
             "call_source" => Ok(Self::CallSource),
             "call_type" => Ok(Self::CallType),
+            "user_agent" => Ok(Self::UserAgent),
             "customer_tier" => Ok(Self::CustomerTier),
             _ => Ok(Self::__Unknown(value)),
         }
@@ -91,6 +94,7 @@ impl fmt::Display for UsageQueryInGroupByItem {
             Self::Untracked => write!(f, "untracked"),
             Self::CallSource => write!(f, "call_source"),
             Self::CallType => write!(f, "call_type"),
+            Self::UserAgent => write!(f, "user_agent"),
             Self::CustomerTier => write!(f, "customer_tier"),
             Self::__Unknown(val) => write!(f, "{}", val),
         }

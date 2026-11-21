@@ -7,8 +7,9 @@ pub struct PublicAuthenticationMethod {
     pub global_headers: Option<HashMap<String, GlobalHeaderValue>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub grant_type: Option<OAuth2GrantType>,
-    #[serde(default)]
-    pub has_default_credentials: bool,
+    /// Deprecated: we removed the concept of connector level default credentials. Always false.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_default_credentials: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub headers: Option<Vec<ConnectorAuthenticationHeader>>,
     pub method_type: AuthenticationType,
@@ -75,15 +76,12 @@ impl PublicAuthenticationMethodBuilder {
 
     /// Consumes the builder and constructs a [`PublicAuthenticationMethod`].
     /// This method will fail if any of the following fields are not set:
-    /// - [`has_default_credentials`](PublicAuthenticationMethodBuilder::has_default_credentials)
     /// - [`method_type`](PublicAuthenticationMethodBuilder::method_type)
     pub fn build(self) -> Result<PublicAuthenticationMethod, BuildError> {
         Ok(PublicAuthenticationMethod {
             global_headers: self.global_headers,
             grant_type: self.grant_type,
-            has_default_credentials: self
-                .has_default_credentials
-                .ok_or_else(|| BuildError::missing_field("has_default_credentials"))?,
+            has_default_credentials: self.has_default_credentials,
             headers: self.headers,
             method_type: self
                 .method_type

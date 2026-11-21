@@ -10,6 +10,8 @@ pub enum ResponsesNamespaceToolToolsItem {
         #[serde(skip_serializing_if = "Option::is_none")]
         allowed_callers: Option<Vec<ResponsesToolFunctionAllowedCallersItem>>,
         #[serde(skip_serializing_if = "Option::is_none")]
+        r#async: Option<bool>,
+        #[serde(skip_serializing_if = "Option::is_none")]
         defer_loading: Option<bool>,
         #[serde(skip_serializing_if = "Option::is_none")]
         description: Option<String>,
@@ -28,6 +30,8 @@ pub enum ResponsesNamespaceToolToolsItem {
     Custom {
         #[serde(skip_serializing_if = "Option::is_none")]
         allowed_callers: Option<Vec<ResponsesCustomToolAllowedCallersItem>>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        r#async: Option<bool>,
         #[serde(skip_serializing_if = "Option::is_none")]
         defer_loading: Option<bool>,
         #[serde(skip_serializing_if = "Option::is_none")]
@@ -49,6 +53,7 @@ impl ResponsesNamespaceToolToolsItem {
     pub fn function(name: String) -> Self {
         Self::Function {
             allowed_callers: None,
+            r#async: None,
             defer_loading: None,
             description: None,
             name,
@@ -61,6 +66,7 @@ impl ResponsesNamespaceToolToolsItem {
     pub fn custom(name: String) -> Self {
         Self::Custom {
             allowed_callers: None,
+            r#async: None,
             defer_loading: None,
             description: None,
             format: None,
@@ -70,6 +76,7 @@ impl ResponsesNamespaceToolToolsItem {
 
     pub fn function_with_allowed_callers(
         allowed_callers: Vec<ResponsesToolFunctionAllowedCallersItem>,
+        r#async: Option<bool>,
         defer_loading: Option<bool>,
         description: Option<String>,
         name: String,
@@ -79,6 +86,29 @@ impl ResponsesNamespaceToolToolsItem {
     ) -> Self {
         Self::Function {
             allowed_callers: Some(allowed_callers),
+            r#async,
+            defer_loading,
+            description,
+            name,
+            output_schema,
+            parameters,
+            strict,
+        }
+    }
+
+    pub fn function_with_async(
+        allowed_callers: Option<Vec<ResponsesToolFunctionAllowedCallersItem>>,
+        r#async: bool,
+        defer_loading: Option<bool>,
+        description: Option<String>,
+        name: String,
+        output_schema: Option<HashMap<String, serde_json::Value>>,
+        parameters: Option<serde_json::Value>,
+        strict: Option<bool>,
+    ) -> Self {
+        Self::Function {
+            allowed_callers,
+            r#async: Some(r#async),
             defer_loading,
             description,
             name,
@@ -90,6 +120,7 @@ impl ResponsesNamespaceToolToolsItem {
 
     pub fn function_with_defer_loading(
         allowed_callers: Option<Vec<ResponsesToolFunctionAllowedCallersItem>>,
+        r#async: Option<bool>,
         defer_loading: bool,
         description: Option<String>,
         name: String,
@@ -99,6 +130,7 @@ impl ResponsesNamespaceToolToolsItem {
     ) -> Self {
         Self::Function {
             allowed_callers,
+            r#async,
             defer_loading: Some(defer_loading),
             description,
             name,
@@ -110,6 +142,7 @@ impl ResponsesNamespaceToolToolsItem {
 
     pub fn function_with_description(
         allowed_callers: Option<Vec<ResponsesToolFunctionAllowedCallersItem>>,
+        r#async: Option<bool>,
         defer_loading: Option<bool>,
         description: String,
         name: String,
@@ -119,6 +152,7 @@ impl ResponsesNamespaceToolToolsItem {
     ) -> Self {
         Self::Function {
             allowed_callers,
+            r#async,
             defer_loading,
             description: Some(description),
             name,
@@ -130,6 +164,7 @@ impl ResponsesNamespaceToolToolsItem {
 
     pub fn function_with_output_schema(
         allowed_callers: Option<Vec<ResponsesToolFunctionAllowedCallersItem>>,
+        r#async: Option<bool>,
         defer_loading: Option<bool>,
         description: Option<String>,
         name: String,
@@ -139,6 +174,7 @@ impl ResponsesNamespaceToolToolsItem {
     ) -> Self {
         Self::Function {
             allowed_callers,
+            r#async,
             defer_loading,
             description,
             name,
@@ -150,6 +186,7 @@ impl ResponsesNamespaceToolToolsItem {
 
     pub fn function_with_parameters(
         allowed_callers: Option<Vec<ResponsesToolFunctionAllowedCallersItem>>,
+        r#async: Option<bool>,
         defer_loading: Option<bool>,
         description: Option<String>,
         name: String,
@@ -159,6 +196,7 @@ impl ResponsesNamespaceToolToolsItem {
     ) -> Self {
         Self::Function {
             allowed_callers,
+            r#async,
             defer_loading,
             description,
             name,
@@ -170,6 +208,7 @@ impl ResponsesNamespaceToolToolsItem {
 
     pub fn function_with_strict(
         allowed_callers: Option<Vec<ResponsesToolFunctionAllowedCallersItem>>,
+        r#async: Option<bool>,
         defer_loading: Option<bool>,
         description: Option<String>,
         name: String,
@@ -179,6 +218,7 @@ impl ResponsesNamespaceToolToolsItem {
     ) -> Self {
         Self::Function {
             allowed_callers,
+            r#async,
             defer_loading,
             description,
             name,
@@ -190,6 +230,7 @@ impl ResponsesNamespaceToolToolsItem {
 
     pub fn custom_with_allowed_callers(
         allowed_callers: Vec<ResponsesCustomToolAllowedCallersItem>,
+        r#async: Option<bool>,
         defer_loading: Option<bool>,
         description: Option<String>,
         format: Option<ResponsesCustomToolFormat>,
@@ -197,6 +238,25 @@ impl ResponsesNamespaceToolToolsItem {
     ) -> Self {
         Self::Custom {
             allowed_callers: Some(allowed_callers),
+            r#async,
+            defer_loading,
+            description,
+            format,
+            name,
+        }
+    }
+
+    pub fn custom_with_async(
+        allowed_callers: Option<Vec<ResponsesCustomToolAllowedCallersItem>>,
+        r#async: bool,
+        defer_loading: Option<bool>,
+        description: Option<String>,
+        format: Option<ResponsesCustomToolFormat>,
+        name: String,
+    ) -> Self {
+        Self::Custom {
+            allowed_callers,
+            r#async: Some(r#async),
             defer_loading,
             description,
             format,
@@ -206,6 +266,7 @@ impl ResponsesNamespaceToolToolsItem {
 
     pub fn custom_with_defer_loading(
         allowed_callers: Option<Vec<ResponsesCustomToolAllowedCallersItem>>,
+        r#async: Option<bool>,
         defer_loading: bool,
         description: Option<String>,
         format: Option<ResponsesCustomToolFormat>,
@@ -213,6 +274,7 @@ impl ResponsesNamespaceToolToolsItem {
     ) -> Self {
         Self::Custom {
             allowed_callers,
+            r#async,
             defer_loading: Some(defer_loading),
             description,
             format,
@@ -222,6 +284,7 @@ impl ResponsesNamespaceToolToolsItem {
 
     pub fn custom_with_description(
         allowed_callers: Option<Vec<ResponsesCustomToolAllowedCallersItem>>,
+        r#async: Option<bool>,
         defer_loading: Option<bool>,
         description: String,
         format: Option<ResponsesCustomToolFormat>,
@@ -229,6 +292,7 @@ impl ResponsesNamespaceToolToolsItem {
     ) -> Self {
         Self::Custom {
             allowed_callers,
+            r#async,
             defer_loading,
             description: Some(description),
             format,
@@ -238,6 +302,7 @@ impl ResponsesNamespaceToolToolsItem {
 
     pub fn custom_with_format(
         allowed_callers: Option<Vec<ResponsesCustomToolAllowedCallersItem>>,
+        r#async: Option<bool>,
         defer_loading: Option<bool>,
         description: Option<String>,
         format: ResponsesCustomToolFormat,
@@ -245,6 +310,7 @@ impl ResponsesNamespaceToolToolsItem {
     ) -> Self {
         Self::Custom {
             allowed_callers,
+            r#async,
             defer_loading,
             description,
             format: Some(format),

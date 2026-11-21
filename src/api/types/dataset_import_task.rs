@@ -7,6 +7,8 @@ pub struct DatasetImportTask {
     pub created_at: DateTime<FixedOffset>,
     #[serde(default)]
     pub creator_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub creator_type: Option<PrincipalType>,
     #[serde(default)]
     pub dataset_id: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -40,6 +42,7 @@ impl DatasetImportTask {
 pub struct DatasetImportTaskBuilder {
     created_at: Option<DateTime<FixedOffset>>,
     creator_id: Option<String>,
+    creator_type: Option<PrincipalType>,
     dataset_id: Option<String>,
     deleted_at: Option<DateTime<FixedOffset>>,
     id: Option<String>,
@@ -59,6 +62,11 @@ impl DatasetImportTaskBuilder {
 
     pub fn creator_id(mut self, value: impl Into<String>) -> Self {
         self.creator_id = Some(value.into());
+        self
+    }
+
+    pub fn creator_type(mut self, value: PrincipalType) -> Self {
+        self.creator_type = Some(value);
         self
     }
 
@@ -124,6 +132,7 @@ impl DatasetImportTaskBuilder {
             creator_id: self
                 .creator_id
                 .ok_or_else(|| BuildError::missing_field("creator_id"))?,
+            creator_type: self.creator_type,
             dataset_id: self
                 .dataset_id
                 .ok_or_else(|| BuildError::missing_field("dataset_id"))?,

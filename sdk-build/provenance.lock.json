@@ -3,7 +3,7 @@
   "rust_toolchain": "1.94.0",
   "cargo_semver_checks_version": "0.50.0",
   "openapi": {
-    "sha256": "08a585fb75bcfa6ff968773134ee00060e0db283fc6b16f421f544e78ba8db92",
+    "sha256": "7652f1307b3bc6cb7a10526c28788a430246f641cb9785a9f1b7b0dd912cdfae",
     "source_kind": "published_catalog",
     "url": "https://docs.mistral.ai/openapi.yaml"
   },
@@ -27,11 +27,11 @@
   "official_sdks": {
     "python": {
       "repository": "mistralai/client-python",
-      "commit": "8fdbff0b1bcb0c9c3e5b803080a20ac820c2905c"
+      "commit": "e3444997d52684aaf612ee8fed98f9b8025b95d6"
     },
     "typescript": {
       "repository": "mistralai/client-ts",
-      "commit": "50b2bc105cce327d3bd2ccee86240c4b0f6f2d6c"
+      "commit": "3e87497eea3ae73f482cd683b043469e72f12389"
     }
   }
 }

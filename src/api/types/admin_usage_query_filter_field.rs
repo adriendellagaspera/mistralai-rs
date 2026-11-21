@@ -15,6 +15,9 @@ pub enum AdminUsageQueryFilterField {
     ApiKeyId,
     ApiZone,
     ServiceTier,
+    CallSource,
+    CallType,
+    UserAgent,
     /// This variant is used for forward compatibility.
     /// If the server sends a value not recognized by the current SDK version,
     /// it will be captured here with the raw string value.
@@ -34,6 +37,9 @@ impl Serialize for AdminUsageQueryFilterField {
             Self::ApiKeyId => serializer.serialize_str("api_key_id"),
             Self::ApiZone => serializer.serialize_str("api_zone"),
             Self::ServiceTier => serializer.serialize_str("service_tier"),
+            Self::CallSource => serializer.serialize_str("call_source"),
+            Self::CallType => serializer.serialize_str("call_type"),
+            Self::UserAgent => serializer.serialize_str("user_agent"),
             Self::__Unknown(val) => serializer.serialize_str(val),
         }
     }
@@ -54,6 +60,9 @@ impl<'de> Deserialize<'de> for AdminUsageQueryFilterField {
             "api_key_id" => Ok(Self::ApiKeyId),
             "api_zone" => Ok(Self::ApiZone),
             "service_tier" => Ok(Self::ServiceTier),
+            "call_source" => Ok(Self::CallSource),
+            "call_type" => Ok(Self::CallType),
+            "user_agent" => Ok(Self::UserAgent),
             _ => Ok(Self::__Unknown(value)),
         }
     }
@@ -73,6 +82,9 @@ impl fmt::Display for AdminUsageQueryFilterField {
             Self::ApiKeyId => write!(f, "api_key_id"),
             Self::ApiZone => write!(f, "api_zone"),
             Self::ServiceTier => write!(f, "service_tier"),
+            Self::CallSource => write!(f, "call_source"),
+            Self::CallType => write!(f, "call_type"),
+            Self::UserAgent => write!(f, "user_agent"),
             Self::__Unknown(val) => write!(f, "{}", val),
         }
     }

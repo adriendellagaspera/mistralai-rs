@@ -1,12 +1,17 @@
 pub use crate::prelude::*;
 
 /// Retrieve document chunks with similar keywords to the given query.
+///
+/// Uses the default settings for the index on the field.
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
 pub struct KeywordRetriever {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub field: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub filter: Option<KeywordRetrieverFilter>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub operator: Option<KeywordRetrieverOperator>,
+    /// The query string from which to match keywords: at most 20 whitespace-separated words.
     #[serde(default)]
     pub query: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -24,6 +29,7 @@ impl KeywordRetriever {
 pub struct KeywordRetrieverBuilder {
     field: Option<String>,
     filter: Option<KeywordRetrieverFilter>,
+    operator: Option<KeywordRetrieverOperator>,
     query: Option<String>,
     top_k: Option<i64>,
 }
@@ -36,6 +42,11 @@ impl KeywordRetrieverBuilder {
 
     pub fn filter(mut self, value: KeywordRetrieverFilter) -> Self {
         self.filter = Some(value);
+        self
+    }
+
+    pub fn operator(mut self, value: KeywordRetrieverOperator) -> Self {
+        self.operator = Some(value);
         self
     }
 
@@ -56,6 +67,7 @@ impl KeywordRetrieverBuilder {
         Ok(KeywordRetriever {
             field: self.field,
             filter: self.filter,
+            operator: self.operator,
             query: self
                 .query
                 .ok_or_else(|| BuildError::missing_field("query"))?,

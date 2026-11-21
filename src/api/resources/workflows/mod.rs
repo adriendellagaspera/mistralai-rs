@@ -44,6 +44,7 @@ impl WorkflowsClient {
     /// * `deployment_status` - Filter by deployment activity. active=only active, inactive=only inactive, None=no filter
     /// * `archived` - Filter by archived state. False=exclude archived, True=only archived, None=include all
     /// * `tags` - Filter to workflows tagged with all listed tags (AND).
+    /// * `exclude_tags` - Exclude workflows tagged with any of the listed tags.
     /// * `sort_by` - Field to sort by
     /// * `order` - Sort direction
     /// * `cursor` - The cursor for pagination
@@ -100,6 +101,7 @@ impl WorkflowsClient {
                     .serialize("deployment_status", request.deployment_status.clone())
                     .serialize("archived", request.archived.clone())
                     .serialize("tags", request.tags.clone())
+                    .serialize("exclude_tags", request.exclude_tags.clone())
                     .serialize("sort_by", request.sort_by.clone())
                     .serialize("order", request.order.clone())
                     .serialize("cursor", request.cursor.clone())
@@ -174,6 +176,7 @@ impl WorkflowsClient {
     /// * `archived` - Filter by archived state. False=exclude archived, True=only archived, None=include all
     /// * `with_workflow` - Whether to include the workflow definition
     /// * `available_in_chat_assistant` - Whether to only return workflows available in chat assistant
+    /// * `exclude_tags` - Exclude registrations of workflows tagged with any of the listed tags.
     /// * `limit` - The maximum number of workflows versions to return
     /// * `cursor` - The cursor for pagination
     /// * `options` - Additional request options such as headers, timeout, etc.
@@ -228,6 +231,7 @@ impl WorkflowsClient {
                         "available_in_chat_assistant",
                         request.available_in_chat_assistant.clone(),
                     )
+                    .serialize("exclude_tags", request.exclude_tags.clone())
                     .int("limit", request.limit.clone())
                     .serialize("cursor", request.cursor.clone())
                     .build(),
@@ -570,6 +574,57 @@ impl WorkflowsClient {
             .execute_request(
                 Method::POST,
                 &format!("v1/workflows/{}/execute", workflow_identifier),
+                Some(serde_json::to_value(request).map_err(ApiError::Serialization)?),
+                None,
+                options,
+            )
+            .await
+    }
+
+    /// Add Workflow Tags
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - Additional request options such as headers, timeout, etc.
+    ///
+    /// # Returns
+    ///
+    /// Empty response
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use mistralai_sdk::prelude::*;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let config = ClientConfig {
+    ///         token: Some("<token>".to_string()),
+    ///         ..Default::default()
+    ///     };
+    ///     let client = Mistral::new(config).expect("Failed to build client");
+    ///     client
+    ///         .workflows
+    ///         .add_workflow_tags_v1workflows_workflow_identifier_tags_post(
+    ///             &"workflow_identifier".to_string(),
+    ///             &WorkflowTagsAddRequest {
+    ///                 tags: vec!["tags".to_string()],
+    ///             },
+    ///             None,
+    ///         )
+    ///         .await;
+    /// }
+    /// ```
+    pub async fn add_workflow_tags_v1workflows_workflow_identifier_tags_post(
+        &self,
+        workflow_identifier: &str,
+        request: &WorkflowTagsAddRequest,
+        options: Option<RequestOptions>,
+    ) -> Result<(), ApiError> {
+        self.http_client
+            .execute_request(
+                Method::POST,
+                &format!("v1/workflows/{}/tags", workflow_identifier),
                 Some(serde_json::to_value(request).map_err(ApiError::Serialization)?),
                 None,
                 options,

@@ -90,8 +90,6 @@ pub enum ResponsesStreamFrameData {
         #[serde(default)]
         item_id: String,
         #[serde(default)]
-        name: String,
-        #[serde(default)]
         output_index: i64,
         #[serde(default)]
         sequence_number: i64,
@@ -284,14 +282,12 @@ impl ResponsesStreamFrameData {
     pub fn response_function_call_arguments_done(
         arguments: String,
         item_id: String,
-        name: String,
         output_index: i64,
         sequence_number: i64,
     ) -> Self {
         Self::ResponseFunctionCallArgumentsDone {
             arguments,
             item_id,
-            name,
             output_index,
             sequence_number,
         }

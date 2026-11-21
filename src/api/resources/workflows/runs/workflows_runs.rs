@@ -30,6 +30,7 @@ impl RunsClient2 {
     /// * `end_time_before` - Include runs with end_time <= value. Running executions (no end_time) are excluded; use the status filter to include them.
     /// * `user_id` - Filter by user id. Use 'current' to filter by the authenticated user
     /// * `workflow_tags` - Filter to runs of workflows tagged with all listed tags (AND).
+    /// * `exclude_workflow_tags` - Exclude runs of workflows tagged with any of the listed tags.
     /// * `include_internal` - Include runs of internal/technical workflows (e.g. parallel-execution)
     /// * `page_size` - Number of items per page
     /// * `next_page_token` - Token for the next page of results
@@ -88,6 +89,10 @@ impl RunsClient2 {
                     .serialize("end_time_before", request.end_time_before.clone())
                     .serialize("user_id", request.user_id.clone())
                     .serialize("workflow_tags", request.workflow_tags.clone())
+                    .serialize(
+                        "exclude_workflow_tags",
+                        request.exclude_workflow_tags.clone(),
+                    )
                     .bool("include_internal", request.include_internal.clone())
                     .int("page_size", request.page_size.clone())
                     .serialize("next_page_token", request.next_page_token.clone())

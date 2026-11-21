@@ -9,7 +9,7 @@ pub use api_keys::ApiKeysClient;
 pub mod audit_logs;
 pub use audit_logs::AuditLogsClient;
 pub mod billing;
-pub use billing::BillingClient;
+pub use billing::BillingClient2;
 pub mod users;
 pub use users::UsersClient2;
 pub mod scim;
@@ -24,7 +24,7 @@ pub struct AdminClient {
     pub vibe_work_analytics: VibeWorkAnalyticsClient,
     pub api_keys: ApiKeysClient,
     pub audit_logs: AuditLogsClient,
-    pub billing: BillingClient,
+    pub billing: BillingClient2,
     pub users: UsersClient2,
     pub scim: ScimClient,
     pub user_groups: UserGroupsClient,
@@ -39,7 +39,7 @@ impl AdminClient {
             vibe_work_analytics: VibeWorkAnalyticsClient::new(config.clone())?,
             api_keys: ApiKeysClient::new(config.clone())?,
             audit_logs: AuditLogsClient::new(config.clone())?,
-            billing: BillingClient::new(config.clone())?,
+            billing: BillingClient2::new(config.clone())?,
             users: UsersClient2::new(config.clone())?,
             scim: ScimClient::new(config.clone())?,
             user_groups: UserGroupsClient::new(config.clone())?,

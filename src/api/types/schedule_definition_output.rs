@@ -57,6 +57,9 @@ pub struct ScheduleDefinitionOutput {
     /// IANA time zone name, for example ``US/Central``.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub time_zone_name: Option<String>,
+    /// ID of the user who created the schedule.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
     /// Name of the workflow this schedule triggers.
     #[serde(default)]
     pub workflow_name: String,
@@ -88,6 +91,7 @@ pub struct ScheduleDefinitionOutputBuilder {
     skip: Option<Vec<ScheduleCalendar>>,
     start_at: Option<DateTime<FixedOffset>>,
     time_zone_name: Option<String>,
+    user_id: Option<String>,
     workflow_name: Option<String>,
 }
 
@@ -177,6 +181,11 @@ impl ScheduleDefinitionOutputBuilder {
         self
     }
 
+    pub fn user_id(mut self, value: impl Into<String>) -> Self {
+        self.user_id = Some(value.into());
+        self
+    }
+
     pub fn workflow_name(mut self, value: impl Into<String>) -> Self {
         self.workflow_name = Some(value.into());
         self
@@ -213,6 +222,7 @@ impl ScheduleDefinitionOutputBuilder {
             skip: self.skip,
             start_at: self.start_at,
             time_zone_name: self.time_zone_name,
+            user_id: self.user_id,
             workflow_name: self
                 .workflow_name
                 .ok_or_else(|| BuildError::missing_field("workflow_name"))?,

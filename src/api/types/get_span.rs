@@ -83,6 +83,8 @@ pub struct GetSpan {
     pub scope_name: String,
     #[serde(default)]
     pub scope_version: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub service_account_id: Option<String>,
     #[serde(default)]
     pub service_name: String,
     #[serde(default)]
@@ -177,6 +179,7 @@ pub struct GetSpanBuilder {
     response_model: Option<String>,
     scope_name: Option<String>,
     scope_version: Option<String>,
+    service_account_id: Option<String>,
     service_name: Option<String>,
     span_attributes: Option<HashMap<String, String>>,
     span_id: Option<String>,
@@ -376,6 +379,11 @@ impl GetSpanBuilder {
 
     pub fn scope_version(mut self, value: impl Into<String>) -> Self {
         self.scope_version = Some(value.into());
+        self
+    }
+
+    pub fn service_account_id(mut self, value: impl Into<String>) -> Self {
+        self.service_account_id = Some(value.into());
         self
     }
 
@@ -652,6 +660,7 @@ impl GetSpanBuilder {
             scope_version: self
                 .scope_version
                 .ok_or_else(|| BuildError::missing_field("scope_version"))?,
+            service_account_id: self.service_account_id,
             service_name: self
                 .service_name
                 .ok_or_else(|| BuildError::missing_field("service_name"))?,

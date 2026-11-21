@@ -8,6 +8,8 @@ pub struct EvaluationRunV2WithRefsResponse {
     #[serde(default)]
     pub creator_id: String,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub creator_type: Option<PrincipalType>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub dataset_id: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
@@ -21,6 +23,9 @@ pub struct EvaluationRunV2WithRefsResponse {
     pub evaluation_id: String,
     #[serde(default)]
     pub evaluators: Vec<EvaluatorV2>,
+    /// Records whose task or at least one score failed, out of `record_count`. Failed tasks and scores are left out of `statistics`, `goal_results` and `passed`. Null for runs created before this counter existed.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub failed_record_count: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub goal_results: Option<HashMap<String, GoalResult>>,
     #[serde(default)]
@@ -38,6 +43,9 @@ pub struct EvaluationRunV2WithRefsResponse {
     pub passed: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub project: Option<RunProjectSummary>,
+    /// Records whose results were uploaded so far, failed or not. Null for runs created before this counter existed.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub record_count: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub run_evaluators: Option<Vec<EvaluatorV2>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -68,12 +76,14 @@ impl EvaluationRunV2WithRefsResponse {
 pub struct EvaluationRunV2WithRefsResponseBuilder {
     created_at: Option<DateTime<FixedOffset>>,
     creator_id: Option<String>,
+    creator_type: Option<PrincipalType>,
     dataset_id: Option<String>,
     deleted_at: Option<DateTime<FixedOffset>>,
     description: Option<String>,
     evaluation: Option<RunEvaluationSummary>,
     evaluation_id: Option<String>,
     evaluators: Option<Vec<EvaluatorV2>>,
+    failed_record_count: Option<i64>,
     goal_results: Option<HashMap<String, GoalResult>>,
     id: Option<String>,
     metadata: Option<HashMap<String, JsonValue>>,
@@ -82,6 +92,7 @@ pub struct EvaluationRunV2WithRefsResponseBuilder {
     optimization: Option<RunOptimizationRef>,
     passed: Option<bool>,
     project: Option<RunProjectSummary>,
+    record_count: Option<i64>,
     run_evaluators: Option<Vec<EvaluatorV2>>,
     run_info: Option<HashMap<String, Option<JsonValue>>>,
     run_scores: Option<HashMap<String, EvaluationRunScoreV2>>,
@@ -100,6 +111,11 @@ impl EvaluationRunV2WithRefsResponseBuilder {
 
     pub fn creator_id(mut self, value: impl Into<String>) -> Self {
         self.creator_id = Some(value.into());
+        self
+    }
+
+    pub fn creator_type(mut self, value: PrincipalType) -> Self {
+        self.creator_type = Some(value);
         self
     }
 
@@ -130,6 +146,11 @@ impl EvaluationRunV2WithRefsResponseBuilder {
 
     pub fn evaluators(mut self, value: Vec<EvaluatorV2>) -> Self {
         self.evaluators = Some(value);
+        self
+    }
+
+    pub fn failed_record_count(mut self, value: i64) -> Self {
+        self.failed_record_count = Some(value);
         self
     }
 
@@ -170,6 +191,11 @@ impl EvaluationRunV2WithRefsResponseBuilder {
 
     pub fn project(mut self, value: RunProjectSummary) -> Self {
         self.project = Some(value);
+        self
+    }
+
+    pub fn record_count(mut self, value: i64) -> Self {
+        self.record_count = Some(value);
         self
     }
 
@@ -233,6 +259,7 @@ impl EvaluationRunV2WithRefsResponseBuilder {
             creator_id: self
                 .creator_id
                 .ok_or_else(|| BuildError::missing_field("creator_id"))?,
+            creator_type: self.creator_type,
             dataset_id: self.dataset_id,
             deleted_at: self.deleted_at,
             description: self.description,
@@ -243,6 +270,7 @@ impl EvaluationRunV2WithRefsResponseBuilder {
             evaluators: self
                 .evaluators
                 .ok_or_else(|| BuildError::missing_field("evaluators"))?,
+            failed_record_count: self.failed_record_count,
             goal_results: self.goal_results,
             id: self.id.ok_or_else(|| BuildError::missing_field("id"))?,
             metadata: self
@@ -255,6 +283,7 @@ impl EvaluationRunV2WithRefsResponseBuilder {
             optimization: self.optimization,
             passed: self.passed,
             project: self.project,
+            record_count: self.record_count,
             run_evaluators: self.run_evaluators,
             run_info: self.run_info,
             run_scores: self.run_scores,

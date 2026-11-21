@@ -74,6 +74,55 @@ impl SpansClient {
             .await
     }
 
+    /// Get pipeline result field definitions
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - Additional request options such as headers, timeout, etc.
+    ///
+    /// # Returns
+    ///
+    /// JSON response from the API
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use mistralai_sdk::prelude::*;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let config = ClientConfig {
+    ///         token: Some("<token>".to_string()),
+    ///         ..Default::default()
+    ///     };
+    ///     let client = Mistral::new(config).expect("Failed to build client");
+    ///     client
+    ///         .beta
+    ///         .observability
+    ///         .spans
+    ///         .get_pipeline_result_fields_v1observability_pipelines_pipeline_id_results_fields_get(
+    ///             &"pipeline_id".to_string(),
+    ///             None,
+    ///         )
+    ///         .await;
+    /// }
+    /// ```
+    pub async fn get_pipeline_result_fields_v1observability_pipelines_pipeline_id_results_fields_get(
+        &self,
+        pipeline_id: &str,
+        options: Option<RequestOptions>,
+    ) -> Result<GetPipelineResultFields, ApiError> {
+        self.http_client
+            .execute_request(
+                Method::GET,
+                &format!("v1/observability/pipelines/{}/results/fields", pipeline_id),
+                None,
+                None,
+                options,
+            )
+            .await
+    }
+
     /// Aggregate spans
     ///
     /// # Arguments

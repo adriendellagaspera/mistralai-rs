@@ -8,6 +8,8 @@ pub struct ConnectionCredentialsInput {
     pub headers: Option<HashMap<String, Option<String>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub oauth: Option<OAuth2ClientCredentialsInput>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub query_params: Option<HashMap<String, Option<String>>>,
 }
 
 impl ConnectionCredentialsInput {
@@ -22,6 +24,7 @@ pub struct ConnectionCredentialsInputBuilder {
     bearer_token: Option<String>,
     headers: Option<HashMap<String, Option<String>>>,
     oauth: Option<OAuth2ClientCredentialsInput>,
+    query_params: Option<HashMap<String, Option<String>>>,
 }
 
 impl ConnectionCredentialsInputBuilder {
@@ -40,12 +43,18 @@ impl ConnectionCredentialsInputBuilder {
         self
     }
 
+    pub fn query_params(mut self, value: HashMap<String, Option<String>>) -> Self {
+        self.query_params = Some(value);
+        self
+    }
+
     /// Consumes the builder and constructs a [`ConnectionCredentialsInput`].
     pub fn build(self) -> Result<ConnectionCredentialsInput, BuildError> {
         Ok(ConnectionCredentialsInput {
             bearer_token: self.bearer_token,
             headers: self.headers,
             oauth: self.oauth,
+            query_params: self.query_params,
         })
     }
 }

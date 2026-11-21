@@ -13,9 +13,10 @@ pub struct OrganizationInviteOut {
     #[serde(default)]
     pub expired: bool,
     /// Deprecated single invite role. Use 'raw_roles' instead.
-    pub raw_role: OrganizationInviteOutRawRole,
+    pub raw_role: StaticOrganizationRoles,
     /// Organization roles assigned by the invite.
-    pub raw_roles: OrganizationInviteOutRawRoles,
+    #[serde(default)]
+    pub raw_roles: Vec<StaticOrganizationRoles>,
     /// Organization invitation ID.
     #[serde(default)]
     pub uuid: String,
@@ -36,8 +37,8 @@ pub struct OrganizationInviteOutBuilder {
     created_at: Option<DateTime<FixedOffset>>,
     email: Option<String>,
     expired: Option<bool>,
-    raw_role: Option<OrganizationInviteOutRawRole>,
-    raw_roles: Option<OrganizationInviteOutRawRoles>,
+    raw_role: Option<StaticOrganizationRoles>,
+    raw_roles: Option<Vec<StaticOrganizationRoles>>,
     uuid: Option<String>,
     workspace_uuids: Option<Vec<String>>,
 }
@@ -58,12 +59,12 @@ impl OrganizationInviteOutBuilder {
         self
     }
 
-    pub fn raw_role(mut self, value: OrganizationInviteOutRawRole) -> Self {
+    pub fn raw_role(mut self, value: StaticOrganizationRoles) -> Self {
         self.raw_role = Some(value);
         self
     }
 
-    pub fn raw_roles(mut self, value: OrganizationInviteOutRawRoles) -> Self {
+    pub fn raw_roles(mut self, value: Vec<StaticOrganizationRoles>) -> Self {
         self.raw_roles = Some(value);
         self
     }

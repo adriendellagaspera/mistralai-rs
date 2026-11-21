@@ -8,9 +8,6 @@ pub struct AdminUserGroupIn {
     /// Name of the user group.
     #[serde(default)]
     pub name: String,
-    /// UUIDs of existing groups to nest this new group inside. Omit or pass an empty list to create a top-level group.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub parent_group_ids: Option<Vec<String>>,
 }
 
 impl AdminUserGroupIn {
@@ -24,7 +21,6 @@ impl AdminUserGroupIn {
 pub struct AdminUserGroupInBuilder {
     description: Option<String>,
     name: Option<String>,
-    parent_group_ids: Option<Vec<String>>,
 }
 
 impl AdminUserGroupInBuilder {
@@ -38,11 +34,6 @@ impl AdminUserGroupInBuilder {
         self
     }
 
-    pub fn parent_group_ids(mut self, value: Vec<String>) -> Self {
-        self.parent_group_ids = Some(value);
-        self
-    }
-
     /// Consumes the builder and constructs a [`AdminUserGroupIn`].
     /// This method will fail if any of the following fields are not set:
     /// - [`name`](AdminUserGroupInBuilder::name)
@@ -50,7 +41,6 @@ impl AdminUserGroupInBuilder {
         Ok(AdminUserGroupIn {
             description: self.description,
             name: self.name.ok_or_else(|| BuildError::missing_field("name"))?,
-            parent_group_ids: self.parent_group_ids,
         })
     }
 }

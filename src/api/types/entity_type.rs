@@ -6,7 +6,6 @@ pub use crate::prelude::*;
 pub enum EntityType {
     User,
     Workspace,
-    Org,
     /// This variant is used for forward compatibility.
     /// If the server sends a value not recognized by the current SDK version,
     /// it will be captured here with the raw string value.
@@ -17,7 +16,6 @@ impl Serialize for EntityType {
         match self {
             Self::User => serializer.serialize_str("User"),
             Self::Workspace => serializer.serialize_str("Workspace"),
-            Self::Org => serializer.serialize_str("Org"),
             Self::__Unknown(val) => serializer.serialize_str(val),
         }
     }
@@ -29,7 +27,6 @@ impl<'de> Deserialize<'de> for EntityType {
         match value.as_str() {
             "User" => Ok(Self::User),
             "Workspace" => Ok(Self::Workspace),
-            "Org" => Ok(Self::Org),
             _ => Ok(Self::__Unknown(value)),
         }
     }
@@ -40,7 +37,6 @@ impl fmt::Display for EntityType {
         match self {
             Self::User => write!(f, "User"),
             Self::Workspace => write!(f, "Workspace"),
-            Self::Org => write!(f, "Org"),
             Self::__Unknown(val) => write!(f, "{}", val),
         }
     }

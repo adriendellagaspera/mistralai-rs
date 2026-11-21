@@ -8,6 +8,9 @@ pub use crate::prelude::*;
 /// shared session context and apply to either principal kind.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct WhoamiResponse {
+    /// The billing customer identifier from the authenticated session. Identifies the billing account, not the organization (organization.id); the IDs are not interchangeable. Null when no customer is selected.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub customer_id: Option<String>,
     /// The organization the caller's session is scoped to, when set.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub organization: Option<WhoamiOrganization>,
@@ -27,12 +30,18 @@ impl WhoamiResponse {
 #[derive(Clone, PartialEq, Default, Debug)]
 #[non_exhaustive]
 pub struct WhoamiResponseBuilder {
+    customer_id: Option<String>,
     organization: Option<WhoamiOrganization>,
     principal: Option<WhoamiResponsePrincipal>,
     workspace: Option<UserIdentityWorkspace>,
 }
 
 impl WhoamiResponseBuilder {
+    pub fn customer_id(mut self, value: impl Into<String>) -> Self {
+        self.customer_id = Some(value.into());
+        self
+    }
+
     pub fn organization(mut self, value: WhoamiOrganization) -> Self {
         self.organization = Some(value);
         self
@@ -53,6 +62,7 @@ impl WhoamiResponseBuilder {
     /// - [`principal`](WhoamiResponseBuilder::principal)
     pub fn build(self) -> Result<WhoamiResponse, BuildError> {
         Ok(WhoamiResponse {
+            customer_id: self.customer_id,
             organization: self.organization,
             principal: self
                 .principal

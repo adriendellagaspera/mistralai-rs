@@ -42,6 +42,9 @@ pub struct ListRunsV1WorkflowsRunsGetQueryRequest {
     /// Filter to runs of workflows tagged with all listed tags (AND).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub workflow_tags: Option<Vec<String>>,
+    /// Exclude runs of workflows tagged with any of the listed tags.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub exclude_workflow_tags: Option<Vec<String>>,
     /// Include runs of internal/technical workflows (e.g. parallel-execution)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub include_internal: Option<bool>,
@@ -78,6 +81,7 @@ pub struct ListRunsV1WorkflowsRunsGetQueryRequestBuilder {
     end_time_before: Option<DateTime<FixedOffset>>,
     user_id: Option<String>,
     workflow_tags: Option<Vec<String>>,
+    exclude_workflow_tags: Option<Vec<String>>,
     include_internal: Option<bool>,
     page_size: Option<i64>,
     next_page_token: Option<String>,
@@ -150,6 +154,11 @@ impl ListRunsV1WorkflowsRunsGetQueryRequestBuilder {
         self
     }
 
+    pub fn exclude_workflow_tags(mut self, value: Vec<String>) -> Self {
+        self.exclude_workflow_tags = Some(value);
+        self
+    }
+
     pub fn include_internal(mut self, value: bool) -> Self {
         self.include_internal = Some(value);
         self
@@ -186,6 +195,7 @@ impl ListRunsV1WorkflowsRunsGetQueryRequestBuilder {
             end_time_before: self.end_time_before,
             user_id: self.user_id,
             workflow_tags: self.workflow_tags,
+            exclude_workflow_tags: self.exclude_workflow_tags,
             include_internal: self.include_internal,
             page_size: self.page_size,
             next_page_token: self.next_page_token,

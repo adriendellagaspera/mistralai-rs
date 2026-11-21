@@ -17,6 +17,8 @@ pub struct DatasetPreview {
     pub name: String,
     #[serde(default)]
     pub owner_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub owner_type: Option<PrincipalType>,
     #[serde(default)]
     pub slug: String,
     #[serde(default)]
@@ -41,6 +43,7 @@ pub struct DatasetPreviewBuilder {
     id: Option<String>,
     name: Option<String>,
     owner_id: Option<String>,
+    owner_type: Option<PrincipalType>,
     slug: Option<String>,
     updated_at: Option<DateTime<FixedOffset>>,
     workspace_id: Option<String>,
@@ -74,6 +77,11 @@ impl DatasetPreviewBuilder {
 
     pub fn owner_id(mut self, value: impl Into<String>) -> Self {
         self.owner_id = Some(value.into());
+        self
+    }
+
+    pub fn owner_type(mut self, value: PrincipalType) -> Self {
+        self.owner_type = Some(value);
         self
     }
 
@@ -116,6 +124,7 @@ impl DatasetPreviewBuilder {
             owner_id: self
                 .owner_id
                 .ok_or_else(|| BuildError::missing_field("owner_id"))?,
+            owner_type: self.owner_type,
             slug: self.slug.ok_or_else(|| BuildError::missing_field("slug"))?,
             updated_at: self
                 .updated_at

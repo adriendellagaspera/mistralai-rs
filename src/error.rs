@@ -20,16 +20,11 @@ pub enum ApiError {
         field: Option<String>,
         details: Option<String>,
     },
-    #[error("NotFoundError: Resource not found - {message}")]
-    NotFoundError {
+    #[error("UnauthorizedError: Authentication failed - {message}")]
+    UnauthorizedError {
         message: String,
-        resource_id: Option<String>,
-        resource_type: Option<String>,
-    },
-    #[error("RequestTimeoutError: {message}")]
-    RequestTimeoutError {
-        message: String,
-        detail: Option<ObservabilityErrorDetail>,
+        code: Option<ConnectorErrorCode>,
+        detail: Option<String>,
     },
     #[error("ForbiddenError: Access forbidden - {message}")]
     ForbiddenError {
@@ -37,10 +32,27 @@ pub enum ApiError {
         resource: Option<String>,
         required_permission: Option<String>,
     },
+    #[error("NotFoundError: Resource not found - {message}")]
+    NotFoundError {
+        message: String,
+        resource_id: Option<String>,
+        resource_type: Option<String>,
+    },
     #[error("InternalServerError: Internal server error - {message}")]
     InternalServerError {
         message: String,
         error_id: Option<String>,
+    },
+    #[error("TooManyRequestsError: Rate limit exceeded - {message}")]
+    TooManyRequestsError {
+        message: String,
+        retry_after_seconds: Option<u64>,
+        limit_type: Option<String>,
+    },
+    #[error("RequestTimeoutError: {message}")]
+    RequestTimeoutError {
+        message: String,
+        detail: Option<ObservabilityErrorDetail>,
     },
     #[error("ServiceUnavailableError: {message}")]
     ServiceUnavailableError { message: String },
@@ -140,49 +152,28 @@ impl ApiError {
                     details: None,
                 };
             }
-            404 => {
-                // Parse error body for NotFoundError;
+            401 => {
+                // Parse error body for UnauthorizedError;
                 if let Some(body_str) = body {
                     if let Ok(parsed) = serde_json::from_str::<serde_json::Value>(body_str) {
-                        return Self::NotFoundError {
+                        return Self::UnauthorizedError {
                             message: parsed
                                 .get("message")
                                 .and_then(|v| v.as_str())
                                 .unwrap_or("Unknown error")
                                 .to_string(),
-                            resource_id: parsed
-                                .get("resourceId")
-                                .and_then(|v| v.as_str().map(|s| s.to_string())),
-                            resource_type: parsed
-                                .get("resourceType")
-                                .and_then(|v| v.as_str().map(|s| s.to_string())),
-                        };
-                    }
-                }
-                return Self::NotFoundError {
-                    message: body.unwrap_or("Unknown error").to_string(),
-                    resource_id: None,
-                    resource_type: None,
-                };
-            }
-            408 => {
-                // Parse error body for RequestTimeoutError;
-                if let Some(body_str) = body {
-                    if let Ok(parsed) = serde_json::from_str::<serde_json::Value>(body_str) {
-                        return Self::RequestTimeoutError {
-                            message: parsed
-                                .get("message")
-                                .and_then(|v| v.as_str())
-                                .unwrap_or("Unknown error")
-                                .to_string(),
-                            detail: parsed.get("detail").and_then(|v| {
-                                serde_json::from_value::<ObservabilityErrorDetail>(v.clone()).ok()
+                            code: parsed.get("code").and_then(|v| {
+                                serde_json::from_value::<ConnectorErrorCode>(v.clone()).ok()
                             }),
+                            detail: parsed
+                                .get("detail")
+                                .and_then(|v| v.as_str().map(|s| s.to_string())),
                         };
                     }
                 }
-                return Self::RequestTimeoutError {
+                return Self::UnauthorizedError {
                     message: body.unwrap_or("Unknown error").to_string(),
+                    code: None,
                     detail: None,
                 };
             }
@@ -211,6 +202,31 @@ impl ApiError {
                     required_permission: None,
                 };
             }
+            404 => {
+                // Parse error body for NotFoundError;
+                if let Some(body_str) = body {
+                    if let Ok(parsed) = serde_json::from_str::<serde_json::Value>(body_str) {
+                        return Self::NotFoundError {
+                            message: parsed
+                                .get("message")
+                                .and_then(|v| v.as_str())
+                                .unwrap_or("Unknown error")
+                                .to_string(),
+                            resource_id: parsed
+                                .get("resourceId")
+                                .and_then(|v| v.as_str().map(|s| s.to_string())),
+                            resource_type: parsed
+                                .get("resourceType")
+                                .and_then(|v| v.as_str().map(|s| s.to_string())),
+                        };
+                    }
+                }
+                return Self::NotFoundError {
+                    message: body.unwrap_or("Unknown error").to_string(),
+                    resource_id: None,
+                    resource_type: None,
+                };
+            }
             500 => {
                 // Parse error body for InternalServerError;
                 if let Some(body_str) = body {
@@ -230,6 +246,52 @@ impl ApiError {
                 return Self::InternalServerError {
                     message: body.unwrap_or("Unknown error").to_string(),
                     error_id: None,
+                };
+            }
+            429 => {
+                // Parse error body for TooManyRequestsError;
+                if let Some(body_str) = body {
+                    if let Ok(parsed) = serde_json::from_str::<serde_json::Value>(body_str) {
+                        return Self::TooManyRequestsError {
+                            message: parsed
+                                .get("message")
+                                .and_then(|v| v.as_str())
+                                .unwrap_or("Unknown error")
+                                .to_string(),
+                            retry_after_seconds: parsed
+                                .get("retryAfterSeconds")
+                                .and_then(|v| v.as_u64()),
+                            limit_type: parsed
+                                .get("limitType")
+                                .and_then(|v| v.as_str().map(|s| s.to_string())),
+                        };
+                    }
+                }
+                return Self::TooManyRequestsError {
+                    message: body.unwrap_or("Unknown error").to_string(),
+                    retry_after_seconds: None,
+                    limit_type: None,
+                };
+            }
+            408 => {
+                // Parse error body for RequestTimeoutError;
+                if let Some(body_str) = body {
+                    if let Ok(parsed) = serde_json::from_str::<serde_json::Value>(body_str) {
+                        return Self::RequestTimeoutError {
+                            message: parsed
+                                .get("message")
+                                .and_then(|v| v.as_str())
+                                .unwrap_or("Unknown error")
+                                .to_string(),
+                            detail: parsed.get("detail").and_then(|v| {
+                                serde_json::from_value::<ObservabilityErrorDetail>(v.clone()).ok()
+                            }),
+                        };
+                    }
+                }
+                return Self::RequestTimeoutError {
+                    message: body.unwrap_or("Unknown error").to_string(),
+                    detail: None,
                 };
             }
             503 => {

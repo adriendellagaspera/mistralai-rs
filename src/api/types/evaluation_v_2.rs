@@ -8,6 +8,8 @@ pub struct EvaluationV2 {
     #[serde(default)]
     pub creator_id: String,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub creator_type: Option<PrincipalType>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]
     #[serde(with = "crate::core::flexible_datetime::offset::option")]
     pub deleted_at: Option<DateTime<FixedOffset>>,
@@ -46,6 +48,7 @@ impl EvaluationV2 {
 pub struct EvaluationV2Builder {
     created_at: Option<DateTime<FixedOffset>>,
     creator_id: Option<String>,
+    creator_type: Option<PrincipalType>,
     deleted_at: Option<DateTime<FixedOffset>>,
     description: Option<String>,
     id: Option<String>,
@@ -67,6 +70,11 @@ impl EvaluationV2Builder {
 
     pub fn creator_id(mut self, value: impl Into<String>) -> Self {
         self.creator_id = Some(value.into());
+        self
+    }
+
+    pub fn creator_type(mut self, value: PrincipalType) -> Self {
+        self.creator_type = Some(value);
         self
     }
 
@@ -145,6 +153,7 @@ impl EvaluationV2Builder {
             creator_id: self
                 .creator_id
                 .ok_or_else(|| BuildError::missing_field("creator_id"))?,
+            creator_type: self.creator_type,
             deleted_at: self.deleted_at,
             description: self.description,
             id: self.id.ok_or_else(|| BuildError::missing_field("id"))?,
