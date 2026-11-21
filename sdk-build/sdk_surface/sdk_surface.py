@@ -347,9 +347,9 @@ def resolution_inventory(
             "source_schema": pointer,
             "public_name": entry.get("name"),
             "representation": entry.get("representation"),
-            "optional": entry.get("optional", False),
         }
         for pointer, entry in sorted(policy.get("types", {}).items())
+        if pointer_exists(spec, pointer)
     ]
     return {
         "schema_version": POLICY_VERSION,
