@@ -83,7 +83,7 @@ jobs:
             # ancestors of main. Use the last merged PR head as the baseline,
             # so already-merged human review commits are not mistaken for
             # unmerged edits on the persistent automation branch.
-            merged_pr_head="$(gh pr list --base main --head "$branch" --state merged --json headRefOid,mergedAt --jq 'sort_by(.mergedAt) | last | .[0].headRefOid // empty')"
+            merged_pr_head="$(gh pr list --base main --head "$branch" --state merged --json headRefOid,mergedAt --jq 'sort_by(.mergedAt) | last | .headRefOid // empty')"
             if [ -n "$merged_pr_head" ] && git cat-file -e "$merged_pr_head^{commit}" 2>/dev/null && git merge-base --is-ancestor "$merged_pr_head" "$remote_ref"; then
               protected_range="$merged_pr_head..$remote_ref"
             else
