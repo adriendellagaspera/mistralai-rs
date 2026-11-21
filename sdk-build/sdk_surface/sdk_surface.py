@@ -170,6 +170,11 @@ def validate_policy(policy: dict[str, Any]) -> None:
             raise ContractError(
                 f"type policy {pointer!r} name must be a non-empty string"
             )
+        optional = entry.get("optional", False)
+        if not isinstance(optional, bool):
+            raise ContractError(
+                f"type policy {pointer!r} optional must be a boolean"
+            )
 
 
 def default_resource(
@@ -279,6 +284,15 @@ def pointer_target(document: dict[str, Any], pointer: str) -> dict[str, Any]:
     return current
 
 
+def pointer_exists(document: dict[str, Any], pointer: str) -> bool:
+    current: Any = document
+    for part in decode_pointer(pointer):
+        if not isinstance(current, dict) or part not in current:
+            return False
+        current = current[part]
+    return True
+
+
 def component_names(spec: dict[str, Any]) -> set[str]:
     schemas = ((spec.get("components") or {}).get("schemas") or {})
     if not isinstance(schemas, dict):
@@ -294,6 +308,10 @@ def validate_type_name_collisions(
         name: f"#/components/schemas/{name}" for name in components
     }
     for pointer, entry in policy.get("types", {}).items():
+        if not pointer_exists(spec, pointer):
+            if entry.get("optional", False):
+                continue
+            pointer_target(spec, pointer)
         pointer_target(spec, pointer)
         public_name = entry.get("name")
         if public_name is None:
@@ -329,6 +347,7 @@ def resolution_inventory(
             "source_schema": pointer,
             "public_name": entry.get("name"),
             "representation": entry.get("representation"),
+            "optional": entry.get("optional", False),
         }
         for pointer, entry in sorted(policy.get("types", {}).items())
     ]
@@ -389,8 +408,13 @@ def compile_fern_input(
                 }
 
     for pointer, entry in policy.get("types", {}).items():
-        if entry.get("name") is not None:
-            pointer_target(output, pointer)["x-fern-type-name"] = entry["name"]
+        if entry.get("name") is None:
+            continue
+        if not pointer_exists(output, pointer):
+            if entry.get("optional", False):
+                continue
+            pointer_target(output, pointer)
+        pointer_target(output, pointer)["x-fern-type-name"] = entry["name"]
 
     return output, resolution_inventory(resolved, policy)
 
@@ -478,6 +502,8 @@ def semantic_inventory(
         )
     for pointer, entry in sorted(policy.get("types", {}).items()):
         if pointer.startswith("#/components/schemas/") and pointer.count("/") == 3:
+            continue
+        if not pointer_exists(spec, pointer) and entry.get("optional", False):
             continue
         public_name = entry.get("name")
         type_provenance.append(
