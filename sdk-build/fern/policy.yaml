@@ -1,54 +1,1069 @@
 schema_version: 1
 defaults:
   resource: first_tag_segments
-  method: operation_id
+  method: null
+
+# Every published operation has an explicit Rust SDK path. Official SDK
+# taxonomy is the naming reference; OpenAPI-only operations are named here.
+# No operationId-derived public method fallback is allowed.
 
 operations:
-  operationId:chat_completion_v1_chat_completions_post:
-    method: complete
+  'operationId:get_organization_stats_v1_admin_analytics_vibe_code_usage_by_organization':
+    resource: ["beta", "admin", "vibe_code_analytics"]
+    method: "organization_stats"
+  'operationId:get_workspace_stats_v1_admin_analytics_vibe_code_usage_by_workspace':
+    resource: ["beta", "admin", "vibe_code_analytics"]
+    method: "workspace_stats"
+  'operationId:get_by_agent_stats_v1_admin_analytics_vibe_work_usage_by_agent_stats':
+    resource: ["beta", "admin", "vibe_work_analytics"]
+    method: "agent_stats"
+  'operationId:get_by_time_stats_v1_admin_analytics_vibe_work_usage_by_time_stats':
+    resource: ["beta", "admin", "vibe_work_analytics"]
+    method: "time_stats"
+  'operationId:get_by_user_stats_v1_admin_analytics_vibe_work_usage_by_user_stats':
+    resource: ["beta", "admin", "vibe_work_analytics"]
+    method: "user_stats"
+  'operationId:users_api_admin_api_keys_get_api_keys':
+    resource: ["beta", "admin", "api_keys"]
+    method: "list"
+  'operationId:users_api_admin_api_keys_create_api_key':
+    resource: ["beta", "admin", "api_keys"]
+    method: "create"
+  'operationId:users_api_admin_api_keys_delete_api_key':
+    resource: ["beta", "admin", "api_keys"]
+    method: "delete"
+  'operationId:users_api_admin_audit_logs_get_audit_logs':
+    resource: ["beta", "admin", "audit_logs"]
+    method: "list"
+  'operationId:users_api_admin_rate_limits_get_rate_limits':
+    resource: ["beta", "admin", "rate_limits"]
+    method: "get"
+  'operationId:users_api_admin_roles_get_roles':
+    resource: ["beta", "admin", "roles"]
+    method: "list"
+  'operationId:users_api_admin_scim_sync_trigger_scim_sync':
+    resource: ["beta", "admin", "scim"]
+    method: "trigger_sync"
+  'operationId:users_api_admin_scim_sync_get_scim_sync_run':
+    resource: ["beta", "admin", "scim"]
+    method: "get_sync_run"
+  'operationId:users_api_admin_spend_limits_get_spend_limits':
+    resource: ["beta", "admin", "spend_limits"]
+    method: "get"
+  'operationId:users_api_admin_spend_limits_update_spend_limits':
+    resource: ["beta", "admin", "spend_limits"]
+    method: "update"
+  'operationId:users_api_admin_usage_get_usage':
+    resource: ["beta", "admin", "usage"]
+    method: "get"
+  'operationId:users_api_admin_usage_query_usage':
+    resource: ["beta", "admin", "usage"]
+    method: "query"
+  'operationId:users_api_admin_user_groups_get_user_groups':
+    resource: ["beta", "admin", "user_groups"]
+    method: "list"
+  'operationId:users_api_admin_user_groups_create_user_group':
+    resource: ["beta", "admin", "user_groups"]
+    method: "create"
+  'operationId:users_api_admin_user_groups_provision_group_to_workspace':
+    resource: ["beta", "admin", "user_groups"]
+    method: "provision_to_workspace"
+  'operationId:users_api_admin_user_groups_delete_user_group':
+    resource: ["beta", "admin", "user_groups"]
+    method: "delete"
+  'operationId:users_api_admin_user_groups_get_user_group':
+    resource: ["beta", "admin", "user_groups"]
+    method: "get"
+  'operationId:users_api_admin_user_groups_update_user_group':
+    resource: ["beta", "admin", "user_groups"]
+    method: "update"
+  'operationId:users_api_admin_user_groups_remove_users_from_group':
+    resource: ["beta", "admin", "user_groups"]
+    method: "remove_users"
+  'operationId:users_api_admin_user_groups_get_user_group_members':
+    resource: ["beta", "admin", "user_groups"]
+    method: "list_members"
+  'operationId:users_api_admin_user_groups_assign_users_to_group':
+    resource: ["beta", "admin", "user_groups"]
+    method: "add_users"
+  'operationId:users_admin_user_groups_update_user_group_organization_role':
+    resource: ["beta", "admin", "user_groups"]
+    method: "update_organization_role"
+  'operationId:users_admin_user_groups_get_group_workspace_assignments':
+    resource: ["beta", "admin", "user_groups"]
+    method: "list_workspace_assignments"
+  'operationId:users_api_admin_user_groups_assign_group_to_workspace':
+    resource: ["beta", "admin", "user_groups"]
+    method: "assign_to_workspace"
+  'operationId:users_admin_user_groups_remove_group_from_workspace':
+    resource: ["beta", "admin", "user_groups"]
+    method: "remove_from_workspace"
+  'operationId:users_admin_user_groups_update_group_workspace_assignment':
+    resource: ["beta", "admin", "user_groups"]
+    method: "update_workspace_assignment"
+  'operationId:users_api_admin_users_get_users':
+    resource: ["beta", "admin", "users"]
+    method: "list"
+  'operationId:users_api_admin_users_create_users':
+    resource: ["beta", "admin", "users"]
+    method: "create"
+  'operationId:users_api_admin_users_get_invite':
+    resource: ["beta", "admin", "users"]
+    method: "get_invite"
+  'operationId:users_api_admin_users_invite_users':
+    resource: ["beta", "admin", "users"]
+    method: "invite"
+  'operationId:users_api_admin_users_delete_invite':
+    resource: ["beta", "admin", "users"]
+    method: "delete_invite"
+  'operationId:users_api_admin_users_delete_user':
+    resource: ["beta", "admin", "users"]
+    method: "delete"
+  'operationId:users_api_admin_users_get_user':
+    resource: ["beta", "admin", "users"]
+    method: "get"
+  'operationId:users_api_admin_users_update_user':
+    resource: ["beta", "admin", "users"]
+    method: "update"
+  'operationId:users_api_admin_users_deactivate_user':
+    resource: ["beta", "admin", "users"]
+    method: "deactivate"
+  'operationId:users_api_admin_users_reactivate_user':
+    resource: ["beta", "admin", "users"]
+    method: "reactivate"
+  'operationId:users_api_admin_users_get_user_workspaces':
+    resource: ["beta", "admin", "users"]
+    method: "list_workspaces"
+  'operationId:users_api_admin_workspaces_get_workspaces':
+    resource: ["beta", "admin", "workspaces"]
+    method: "list"
+  'operationId:users_api_admin_workspaces_create_workspace':
+    resource: ["beta", "admin", "workspaces"]
+    method: "create"
+  'operationId:users_api_admin_workspaces_delete_workspaces':
+    resource: ["beta", "admin", "workspaces"]
+    method: "delete"
+  'operationId:users_api_admin_workspaces_update_workspaces':
+    resource: ["beta", "admin", "workspaces"]
+    method: "update"
+  'operationId:users_api_admin_workspaces_add_users_workspaces':
+    resource: ["beta", "admin", "workspaces"]
+    method: "add_users"
+  'operationId:users_api_admin_workspaces_remove_users_workspaces':
+    resource: ["beta", "admin", "workspaces"]
+    method: "remove_users"
+  'operationId:users_api_admin_workspaces_add_or_update_users_workspaces':
+    resource: ["beta", "admin", "workspaces"]
+    method: "upsert_users"
+  'operationId:agents_api_v1_agents_list':
+    resource: ["beta", "agents"]
+    method: "list"
+  'operationId:agents_api_v1_agents_create':
+    resource: ["beta", "agents"]
+    method: "create"
+  'operationId:agents_completion_v1_agents_completions_post':
+    resource: ["agents"]
+    method: "complete"
+  'operationId:agents_api_v1_agents_list_pages':
+    resource: ["beta", "agents"]
+    method: "list_pages"
+  'operationId:agents_api_v1_agents_delete':
+    resource: ["beta", "agents"]
+    method: "delete"
+  'operationId:agents_api_v1_agents_get':
+    resource: ["beta", "agents"]
+    method: "get"
+  'operationId:agents_api_v1_agents_update':
+    resource: ["beta", "agents"]
+    method: "update"
+  'operationId:agents_api_v1_agents_delete_alias':
+    resource: ["beta", "agents"]
+    method: "delete_version_alias"
+  'operationId:agents_api_v1_agents_list_version_aliases':
+    resource: ["beta", "agents"]
+    method: "list_version_aliases"
+  'operationId:agents_api_v1_agents_create_or_update_alias':
+    resource: ["beta", "agents"]
+    method: "create_version_alias"
+  'operationId:agents_api_v1_agents_update_version':
+    resource: ["beta", "agents"]
+    method: "update_version"
+  'operationId:agents_api_v1_agents_list_versions':
+    resource: ["beta", "agents"]
+    method: "list_versions"
+  'operationId:agents_api_v1_agents_get_version':
+    resource: ["beta", "agents"]
+    method: "get_version"
+  'operationId:list_agents_v1_audio_agents_get':
+    resource: ["audio", "agents"]
+    method: "list"
+  'operationId:create_agent_v1_audio_agents_post':
+    resource: ["audio", "agents"]
+    method: "create"
+  'operationId:delete_agent_v1_audio_agents__agent_id__delete':
+    resource: ["audio", "agents"]
+    method: "delete"
+  'operationId:get_agent_v1_audio_agents__agent_id__get':
+    resource: ["audio", "agents"]
+    method: "get"
+  'operationId:update_agent_v1_audio_agents__agent_id__put':
+    resource: ["audio", "agents"]
+    method: "update"
+  'operationId:list_agent_sessions_v1_audio_agents__agent_id__sessions_get':
+    resource: ["audio", "agents"]
+    method: "list_sessions"
+  'operationId:list_agent_versions_v1_audio_agents__agent_id__versions_get':
+    resource: ["audio", "agents"]
+    method: "list_versions"
+  'operationId:create_session_v1_audio_sessions_post':
+    resource: ["audio", "sessions"]
+    method: "create"
+  'operationId:delete_session_v1_audio_sessions__session_id__delete':
+    resource: ["audio", "sessions"]
+    method: "close"
+  'operationId:get_session_v1_audio_sessions__session_id__get':
+    resource: ["audio", "sessions"]
+    method: "get"
+  'operationId:update_session_v1_audio_sessions__session_id__patch':
+    resource: ["audio", "sessions"]
+    method: "update"
+  'operationId:speech_v1_audio_speech_post':
+    resource: ["audio", "speech"]
+    method: "complete"
+    representation: native-json-audio-data
+  'operationId:audio_api_v1_transcriptions_post':
+    resource: ["audio", "transcriptions"]
+    method: "complete"
+  'operationId:audio_api_v1_transcriptions_post_stream':
+    resource: ["audio", "transcriptions"]
+    method: "stream"
+  'operationId:list_voices_v1_audio_voices_get':
+    resource: ["audio", "voices"]
+    method: "list"
+  'operationId:create_voice_v1_audio_voices_post':
+    resource: ["audio", "voices"]
+    method: "create"
+  'operationId:delete_voice_v1_audio_voices__voice_id__delete':
+    resource: ["audio", "voices"]
+    method: "delete"
+  'operationId:get_voice_v1_audio_voices__voice_id__get':
+    resource: ["audio", "voices"]
+    method: "get"
+  'operationId:update_voice_v1_audio_voices__voice_id__patch':
+    resource: ["audio", "voices"]
+    method: "update"
+  'operationId:get_voice_sample_audio_v1_audio_voices__voice_id__sample_get':
+    resource: ["audio", "voices"]
+    method: "get_sample_audio"
+    representation: native-byte-stream
+  'operationId:jobs_api_routes_batch_get_batch_jobs':
+    resource: ["batch", "jobs"]
+    method: "list"
+  'operationId:jobs_api_routes_batch_create_batch_job':
+    resource: ["batch", "jobs"]
+    method: "create"
+  'operationId:jobs_api_routes_batch_delete_batch_job':
+    resource: ["batch", "jobs"]
+    method: "delete"
+  'operationId:jobs_api_routes_batch_get_batch_job':
+    resource: ["batch", "jobs"]
+    method: "get"
+  'operationId:jobs_api_routes_batch_cancel_batch_job':
+    resource: ["batch", "jobs"]
+    method: "cancel"
+  'operationId:billing_api_public_get_budget':
+    resource: ["beta", "billing"]
+    method: "get_budget"
+  'operationId:billing_api_public_get_subscription':
+    resource: ["beta", "billing"]
+    method: "get_subscription"
+  'operationId:chat_classifications_v1_chat_classifications_post':
+    resource: ["classifiers"]
+    method: "classify_chat"
+  'operationId:chat_completion_v1_chat_completions_post':
+    resource: ["chat"]
+    method: "complete"
     representation: conditional-json-sse
     streaming:
       format: sse
       condition: $request.stream
       response_schema: ChatCompletionResponse
       stream_schema: CompletionChunk
-
-  operationId:fim_completion_v1_fim_completions_post:
-    method: complete
+  'operationId:chat_moderations_v1_chat_moderations_post':
+    resource: ["classifiers"]
+    method: "moderate_chat"
+  'operationId:classifications_v1_classifications_post':
+    resource: ["classifiers"]
+    method: "classify"
+  'operationId:create_client_session_v1_client_sessions_post':
+    resource: ["realtime", "sessions"]
+    method: "create"
+  'operationId:connector_list_v1':
+    resource: ["beta", "connectors"]
+    method: "list"
+  'operationId:connector_create_v1':
+    resource: ["beta", "connectors"]
+    method: "create"
+  'operationId:connector_get_v1':
+    resource: ["beta", "connectors"]
+    method: "get"
+  'operationId:connector_get_auth_url_v1':
+    resource: ["beta", "connectors"]
+    method: "get_auth_url"
+  'operationId:connector_get_authentication_methods_v1':
+    resource: ["beta", "connectors"]
+    method: "get_authentication_methods"
+  'operationId:connector_list_organization_credentials_v1':
+    resource: ["beta", "connectors"]
+    method: "list_organization_credentials"
+  'operationId:connector_list_tools_v1':
+    resource: ["beta", "connectors"]
+    method: "list_tools"
+  'operationId:connector_call_tool_v1':
+    resource: ["beta", "connectors"]
+    method: "call_tool"
+  'operationId:connector_delete_all_user_credentials_v1':
+    resource: ["beta", "connectors"]
+    method: "delete_all_user_credentials"
+  'operationId:connector_list_user_credentials_v1':
+    resource: ["beta", "connectors"]
+    method: "list_user_credentials"
+  'operationId:connector_list_workspace_credentials_v1':
+    resource: ["beta", "connectors"]
+    method: "list_workspace_credentials"
+  'operationId:connector_update_credentials':
+    resource: ["beta", "connectors"]
+    method: "update_credentials"
+  'operationId:connector_create_credentials_v1':
+    resource: ["beta", "connectors"]
+    method: "create_credentials"
+  'operationId:connector_delete_credentials':
+    resource: ["beta", "connectors"]
+    method: "delete_credentials"
+  'operationId:connector_delete_v1':
+    resource: ["beta", "connectors"]
+    method: "delete"
+  'operationId:connector_update_v1':
+    resource: ["beta", "connectors"]
+    method: "update"
+  'operationId:connector_unshare_from_organization_v1':
+    resource: ["beta", "connectors"]
+    method: "unshare_from_organization"
+  'operationId:connector_share_to_organization_v1':
+    resource: ["beta", "connectors"]
+    method: "share_to_organization"
+  'operationId:connector_unshare_v1':
+    resource: ["beta", "connectors"]
+    method: "unshare"
+  'operationId:connector_share_v1':
+    resource: ["beta", "connectors"]
+    method: "share"
+  'operationId:connector_activate_for_consumer_v1':
+    resource: ["beta", "connectors"]
+    method: "activate_for_consumer"
+  'operationId:connector_deactivate_for_consumer_v1':
+    resource: ["beta", "connectors"]
+    method: "deactivate_for_consumer"
+  'operationId:list_indexes_v1_context_search_indexes_get':
+    resource: ["beta", "context", "search_indexes"]
+    method: "list"
+  'operationId:create_index_v1_context_search_indexes_post':
+    resource: ["beta", "context", "search_indexes"]
+    method: "create"
+  'operationId:delete_index_v1_context_search_indexes__index_name__delete':
+    resource: ["beta", "context", "search_indexes"]
+    method: "delete"
+  'operationId:get_index_v1_context_search_indexes__index_name__get':
+    resource: ["beta", "context", "search_indexes"]
+    method: "get"
+  'operationId:update_index_v1_context_search_indexes__index_name__put':
+    resource: ["beta", "context", "search_indexes"]
+    method: "update"
+  'operationId:get_chunk_index_v1_context_search_indexes__index_name__chunks__chunk_id__get':
+    resource: ["beta", "context", "search_indexes"]
+    method: "get_chunk"
+  'operationId:delete_documents_v1_context_search_indexes__index_name__documents_delete':
+    resource: ["beta", "context", "search_indexes"]
+    method: "delete_documents"
+  'operationId:ingest_documents_v1_context_search_indexes__index_name__documents_post':
+    resource: ["beta", "context", "search_indexes"]
+    method: "ingest_documents"
+  'operationId:grep_index_v1_context_search_indexes__index_name__grep_post':
+    resource: ["beta", "context", "search_indexes"]
+    method: "grep"
+  'operationId:navigate_index_v1_context_search_indexes__index_name__navigate_post':
+    resource: ["beta", "context", "search_indexes"]
+    method: "navigate"
+  'operationId:read_index_v1_context_search_indexes__index_name__read_post':
+    resource: ["beta", "context", "search_indexes"]
+    method: "read"
+  'operationId:search_index_v1_context_search_indexes__index_name__search_post':
+    resource: ["beta", "context", "search_indexes"]
+    method: "search"
+  'operationId:get_managed_index_summary_v1_context_search_indexes__index_name__summary_field__language__get':
+    resource: ["beta", "context", "search_indexes"]
+    method: "get_index_summary"
+  'operationId:generate_managed_index_summary_post_v1_context_search_indexes__index_name__summary_field__language__post':
+    resource: ["beta", "context", "search_indexes"]
+    method: "generate_index_summary"
+  'operationId:set_managed_index_summary_v1_context_search_indexes__index_name__summary_field__language__put':
+    resource: ["beta", "context", "search_indexes"]
+    method: "set_index_summary"
+  'operationId:agents_api_v1_conversations_list':
+    resource: ["beta", "conversations"]
+    method: "list"
+  'operationId:agents_api_v1_conversations_start':
+    resource: ["beta", "conversations"]
+    method: "start"
+  'operationId:agents_api_v1_conversations_start_stream':
+    resource: ["beta", "conversations"]
+    method: "start_stream"
+  'operationId:agents_api_v1_conversations_delete':
+    resource: ["beta", "conversations"]
+    method: "delete"
+  'operationId:agents_api_v1_conversations_get':
+    resource: ["beta", "conversations"]
+    method: "get"
+  'operationId:agents_api_v1_conversations_append':
+    resource: ["beta", "conversations"]
+    method: "append"
+  'operationId:agents_api_v1_conversations_append_stream':
+    resource: ["beta", "conversations"]
+    method: "append_stream"
+  'operationId:agents_api_v1_conversations_history':
+    resource: ["beta", "conversations"]
+    method: "get_history"
+  'operationId:agents_api_v1_conversations_messages':
+    resource: ["beta", "conversations"]
+    method: "get_messages"
+  'operationId:agents_api_v1_conversations_restart':
+    resource: ["beta", "conversations"]
+    method: "restart"
+  'operationId:agents_api_v1_conversations_restart_stream':
+    resource: ["beta", "conversations"]
+    method: "restart_stream"
+  'operationId:embeddings_v1_embeddings_post':
+    resource: ["embeddings"]
+    method: "create"
+  'operationId:files_api_routes_list_files':
+    resource: ["files"]
+    method: "list"
+  'operationId:files_api_routes_upload_file':
+    resource: ["files"]
+    method: "upload"
+  'operationId:files_api_routes_delete_file':
+    resource: ["files"]
+    method: "delete"
+  'operationId:files_api_routes_retrieve_file':
+    resource: ["files"]
+    method: "retrieve"
+  'operationId:files_api_routes_download_file':
+    resource: ["files"]
+    method: "download"
+    representation: native-byte-stream
+  'operationId:files_api_routes_get_signed_url':
+    resource: ["files"]
+    method: "get_signed_url"
+  'operationId:fim_completion_v1_fim_completions_post':
+    resource: ["fim"]
+    method: "complete"
     representation: conditional-json-sse
     streaming:
       format: sse
       condition: $request.stream
       response_schema: FIMCompletionResponse
       stream_schema: CompletionChunk
-
-  operationId:embeddings_v1_embeddings_post:
-    method: create
-
-  operationId:files_api_routes_list_files:
-    method: list
-  operationId:files_api_routes_upload_file:
-    method: upload
-  operationId:files_api_routes_retrieve_file:
-    method: retrieve
-  operationId:files_api_routes_delete_file:
-    method: delete
-  operationId:files_api_routes_download_file:
-    method: download
-    representation: native-byte-stream
-  operationId:files_api_routes_get_signed_url:
-    method: get_signed_url
-
-  operationId:ocr_v1_ocr_post:
-    method: process
-
-  operationId:speech_v1_audio_speech_post:
-    method: complete
-    representation: native-json-audio-data
-
-  operationId:get_voice_sample_audio_v1_audio_voices__voice_id__sample_get:
-    method: get_sample_audio
-    representation: native-byte-stream
+  'operationId:jobs_api_routes_fine_tuning_update_fine_tuned_model':
+    resource: ["models"]
+    method: "update"
+  'operationId:jobs_api_routes_fine_tuning_unarchive_fine_tuned_model':
+    resource: ["models"]
+    method: "unarchive"
+  'operationId:jobs_api_routes_fine_tuning_archive_fine_tuned_model':
+    resource: ["models"]
+    method: "archive"
+  'operationId:libraries_list_v1':
+    resource: ["beta", "libraries"]
+    method: "list"
+  'operationId:libraries_create_v1':
+    resource: ["beta", "libraries"]
+    method: "create"
+  'operationId:libraries_delete_v1':
+    resource: ["beta", "libraries"]
+    method: "delete"
+  'operationId:libraries_get_v1':
+    resource: ["beta", "libraries"]
+    method: "get"
+  'operationId:libraries_patch_v1':
+    resource: ["beta", "libraries"]
+    method: "update"
+  'operationId:libraries_update_v1':
+    resource: ["beta", "libraries"]
+    method: "libraries_update_v1"
+  'operationId:libraries_documents_list_v1':
+    resource: ["beta", "libraries", "documents"]
+    method: "list"
+  'operationId:libraries_documents_upload_v1':
+    resource: ["beta", "libraries", "documents"]
+    method: "upload"
+  'operationId:libraries_documents_delete_v1':
+    resource: ["beta", "libraries", "documents"]
+    method: "delete"
+  'operationId:libraries_documents_get_v1':
+    resource: ["beta", "libraries", "documents"]
+    method: "get"
+  'operationId:libraries_documents_patch_v1':
+    resource: ["beta", "libraries", "documents"]
+    method: "update"
+  'operationId:libraries_documents_update_v1':
+    resource: ["beta", "libraries", "documents"]
+    method: "libraries_documents_update_v1"
+  'operationId:libraries_documents_get_extracted_text_signed_url_v1':
+    resource: ["beta", "libraries", "documents"]
+    method: "extracted_text_signed_url"
+  'operationId:libraries_documents_reprocess_v1':
+    resource: ["beta", "libraries", "documents"]
+    method: "reprocess"
+  'operationId:libraries_documents_get_signed_url_v1':
+    resource: ["beta", "libraries", "documents"]
+    method: "get_signed_url"
+  'operationId:libraries_documents_get_status_v1':
+    resource: ["beta", "libraries", "documents"]
+    method: "status"
+  'operationId:libraries_documents_get_text_content_v1':
+    resource: ["beta", "libraries", "documents"]
+    method: "text_content"
+  'operationId:libraries_share_delete_v1':
+    resource: ["beta", "libraries", "accesses"]
+    method: "delete"
+  'operationId:libraries_share_list_v1':
+    resource: ["beta", "libraries", "accesses"]
+    method: "list"
+  'operationId:libraries_share_create_v1':
+    resource: ["beta", "libraries", "accesses"]
+    method: "update_or_create"
+  'operationId:list_models_v1_models_get':
+    resource: ["models"]
+    method: "list"
+  'operationId:delete_model_v1_models__model_id__delete':
+    resource: ["models"]
+    method: "delete"
+  'operationId:retrieve_model_v1_models__model_id__get':
+    resource: ["models"]
+    method: "retrieve"
+  'operationId:moderations_v1_moderations_post':
+    resource: ["classifiers"]
+    method: "moderate"
+  'operationId:delete_dataset_records_v1_observability_dataset_records_bulk_delete_post':
+    resource: ["beta", "observability", "datasets", "records"]
+    method: "bulk_delete"
+  'operationId:delete_dataset_record_v1_observability_dataset_records__dataset_record_id__delete':
+    resource: ["beta", "observability", "datasets", "records"]
+    method: "delete"
+  'operationId:get_dataset_record_v1_observability_dataset_records__dataset_record_id__get':
+    resource: ["beta", "observability", "datasets", "records"]
+    method: "fetch"
+  'operationId:update_dataset_record_payload_v1_observability_dataset_records__dataset_record_id__payload_put':
+    resource: ["beta", "observability", "datasets", "records"]
+    method: "update_payload"
+  'operationId:update_dataset_record_properties_v1_observability_dataset_records__dataset_record_id__properties_put':
+    resource: ["beta", "observability", "datasets", "records"]
+    method: "update_properties"
+  'operationId:get_datasets_v1_observability_datasets_get':
+    resource: ["beta", "observability", "datasets"]
+    method: "list"
+  'operationId:create_dataset_v1_observability_datasets_post':
+    resource: ["beta", "observability", "datasets"]
+    method: "create"
+  'operationId:delete_dataset_v1_observability_datasets__dataset_id__delete':
+    resource: ["beta", "observability", "datasets"]
+    method: "delete"
+  'operationId:get_dataset_by_id_v1_observability_datasets__dataset_id__get':
+    resource: ["beta", "observability", "datasets"]
+    method: "fetch"
+  'operationId:update_dataset_v1_observability_datasets__dataset_id__patch':
+    resource: ["beta", "observability", "datasets"]
+    method: "update"
+  'operationId:export_dataset_to_jsonl_v1_observability_datasets__dataset_id__exports_to_jsonl_get':
+    resource: ["beta", "observability", "datasets"]
+    method: "export_to_jsonl"
+  'operationId:post_dataset_records_from_dataset_v1_observability_datasets__dataset_id__imports_from_dataset_post':
+    resource: ["beta", "observability", "datasets"]
+    method: "import_from_dataset_records"
+  'operationId:post_dataset_records_from_file_v1_observability_datasets__dataset_id__imports_from_file_post':
+    resource: ["beta", "observability", "datasets"]
+    method: "import_from_file"
+  'operationId:post_dataset_records_from_playground_v1_observability_datasets__dataset_id__imports_from_playground_post':
+    resource: ["beta", "observability", "datasets"]
+    method: "import_from_playground"
+  'operationId:post_dataset_records_from_spans_v1_observability_datasets__dataset_id__imports_from_spans_post':
+    resource: ["beta", "observability", "datasets"]
+    method: "import_from_spans"
+  'operationId:get_dataset_records_v1_observability_datasets__dataset_id__records_get':
+    resource: ["beta", "observability", "datasets"]
+    method: "list_records"
+  'operationId:create_dataset_record_v1_observability_datasets__dataset_id__records_post':
+    resource: ["beta", "observability", "datasets"]
+    method: "create_record"
+  'operationId:get_dataset_import_tasks_v1_observability_datasets__dataset_id__tasks_get':
+    resource: ["beta", "observability", "datasets"]
+    method: "list_tasks"
+  'operationId:get_dataset_import_task_v1_observability_datasets__dataset_id__tasks__task_id__get':
+    resource: ["beta", "observability", "datasets"]
+    method: "fetch_task"
+  'operationId:search_all_evaluation_runs_v2_v1_observability_evaluation_runs_v2_search_post':
+    resource: ["beta", "observability", "evaluations", "runs"]
+    method: "search_all"
+  'operationId:get_evaluation_run_v2_v1_observability_evaluation_runs_v2__run_id__get':
+    resource: ["beta", "observability", "evaluations", "runs"]
+    method: "get"
+  'operationId:search_evaluation_run_records_v2_v1_observability_evaluation_runs_v2__run_id__records_search_post':
+    resource: ["beta", "observability", "evaluations", "records"]
+    method: "search"
+  'operationId:get_evaluation_run_record_v2_v1_observability_evaluation_runs_v2__run_id__records__record_id__get':
+    resource: ["beta", "observability", "evaluations", "records"]
+    method: "get"
+  'operationId:get_single_evaluation_run_statistics_v2_v1_observability_evaluation_runs_v2__run_id__statistics_get':
+    resource: ["beta", "observability", "evaluations", "runs"]
+    method: "get_statistics"
+  'operationId:compute_filtered_run_statistics_v2_v1_observability_evaluation_runs_v2__run_id__statistics_compute_post':
+    resource: ["beta", "observability", "evaluations", "runs"]
+    method: "compute_statistics"
+  'operationId:get_evaluation_v2_v1_observability_evaluations_v2__evaluation_slug__get':
+    resource: ["beta", "observability", "evaluations"]
+    method: "get"
+  'operationId:search_evaluation_runs_v2_v1_observability_evaluations_v2__evaluation_slug__runs_search_post':
+    resource: ["beta", "observability", "evaluations", "runs"]
+    method: "search"
+  'operationId:get_log_fields_v1_observability_logs_fields_get':
+    resource: ["beta", "observability", "logs"]
+    method: "list"
+  'operationId:get_log_field_options_v1_observability_logs_fields__field_name__options_get':
+    resource: ["beta", "observability", "logs"]
+    method: "fetch_options"
+  'operationId:search_logs_v1_observability_logs_search_post':
+    resource: ["beta", "observability", "logs"]
+    method: "search"
+  'operationId:list_optimizations_v1_observability_optimizations_get':
+    resource: ["beta", "observability", "evaluations", "optimizations"]
+    method: "list"
+  'operationId:get_optimization_v1_observability_optimizations__optimization_id__get':
+    resource: ["beta", "observability", "evaluations", "optimizations"]
+    method: "get"
+  'operationId:list_optimization_trials_v1_observability_optimizations__optimization_id__trials_get':
+    resource: ["beta", "observability", "evaluations", "optimizations"]
+    method: "list_trials"
+  'operationId:search_pipeline_results_v1_observability_pipeline_results_search_post':
+    resource: ["beta", "observability", "spans"]
+    method: "search_pipeline_results"
+  'operationId:list_pipelines_v1_observability_pipelines_get':
+    resource: ["beta", "observability", "evaluations"]
+    method: "list_pipelines"
+  'operationId:create_pipeline_v1_observability_pipelines_post':
+    resource: ["beta", "observability", "evaluations"]
+    method: "create_pipeline"
+  'operationId:delete_pipeline_v1_observability_pipelines__pipeline_id__delete':
+    resource: ["beta", "observability", "evaluations"]
+    method: "delete_pipeline"
+  'operationId:get_pipeline_v1_observability_pipelines__pipeline_id__get':
+    resource: ["beta", "observability", "evaluations"]
+    method: "get_pipeline"
+  'operationId:update_pipeline_v1_observability_pipelines__pipeline_id__put':
+    resource: ["beta", "observability", "evaluations"]
+    method: "update_pipeline"
+  'operationId:get_pipeline_result_fields_v1_observability_pipelines__pipeline_id__results_fields_get':
+    resource: ["beta", "observability", "spans"]
+    method: "list_pipeline_result_fields"
+  'operationId:get_projects_v1_observability_projects_get':
+    resource: ["beta", "observability", "evaluations", "projects"]
+    method: "list"
+  'operationId:get_project_v1_observability_projects__project_slug__get':
+    resource: ["beta", "observability", "evaluations", "projects"]
+    method: "get"
+  'operationId:get_project_evaluations_v2_v1_observability_projects__project_slug__evaluations_v2_get':
+    resource: ["beta", "observability", "evaluations"]
+    method: "list"
+  'operationId:list_scorers_v1_observability_scorers_get':
+    resource: ["beta", "observability", "evaluations", "scorers"]
+    method: "list"
+  'operationId:create_scorer_v1_observability_scorers_post':
+    resource: ["beta", "observability", "evaluations", "scorers"]
+    method: "create"
+  'operationId:get_scorer_v1_observability_scorers__scorer_slug__get':
+    resource: ["beta", "observability", "evaluations", "scorers"]
+    method: "get"
+  'operationId:edit_scorer_v1_observability_scorers__scorer_slug__patch':
+    resource: ["beta", "observability", "evaluations", "scorers"]
+    method: "update"
+  'operationId:aggregate_spans_v1_observability_spans_aggregate_post':
+    resource: ["beta", "observability", "spans"]
+    method: "aggregate"
+  'operationId:aggregate_span_evaluations_v1_observability_spans_evaluations_aggregate_post':
+    resource: ["beta", "observability", "spans"]
+    method: "aggregate_span_evaluations"
+  'operationId:get_span_evaluation_fields_v1_observability_spans_evaluations_fields_get':
+    resource: ["beta", "observability", "spans"]
+    method: "list_span_eval_fields"
+  'operationId:get_span_evaluation_field_options_v1_observability_spans_evaluations_fields__field_name__options_get':
+    resource: ["beta", "observability", "spans"]
+    method: "fetch_span_eval_field_options"
+  'operationId:search_span_evaluations_v1_observability_spans_evaluations_search_post':
+    resource: ["beta", "observability", "spans"]
+    method: "search_span_evaluations"
+  'operationId:search_latest_span_evaluations_v1_observability_spans_evaluations_search_latest_post':
+    resource: ["beta", "observability", "spans"]
+    method: "search_latest_span_evaluations"
+  'operationId:get_span_fields_v1_observability_spans_fields_get':
+    resource: ["beta", "observability", "spans"]
+    method: "list_span_fields"
+  'operationId:get_span_field_options_v1_observability_spans_fields__field_name__options_get':
+    resource: ["beta", "observability", "spans"]
+    method: "fetch_span_field_options"
+  'operationId:search_spans_v1_observability_spans_search_post':
+    resource: ["beta", "observability", "spans"]
+    method: "search_spans"
+  'operationId:aggregate_traces_v1_observability_traces_aggregate_post':
+    resource: ["beta", "observability", "traces"]
+    method: "aggregate"
+  'operationId:get_trace_fields_v1_observability_traces_fields_get':
+    resource: ["beta", "observability", "traces"]
+    method: "get_trace_fields"
+  'operationId:get_trace_field_options_v1_observability_traces_fields__field_name__options_get':
+    resource: ["beta", "observability", "traces"]
+    method: "fetch_options"
+  'operationId:search_traces_v1_observability_traces_search_post':
+    resource: ["beta", "observability", "traces"]
+    method: "search"
+  'operationId:get_trace_by_id_v1_observability_traces__trace_id__get':
+    resource: ["beta", "observability", "traces"]
+    method: "get_trace_by_id"
+  'operationId:get_trace_spans_v1_observability_traces__trace_id__spans_get':
+    resource: ["beta", "observability", "traces"]
+    method: "get_trace_spans"
+  'operationId:get_span_by_id_v1_observability_traces__trace_id__spans__span_id__get':
+    resource: ["beta", "observability", "traces"]
+    method: "get_span_by_id"
+  'operationId:ocr_v1_ocr_post':
+    resource: ["ocr"]
+    method: "process"
+  'operationId:get_deployment_summaries_v1_rag_deployments_get':
+    resource: ["beta", "rag", "search_indexes"]
+    method: "get_deployment_summaries"
+  'operationId:register_deployment_v1_rag_deployments_put':
+    resource: ["beta", "rag", "search_indexes"]
+    method: "register_deployment"
+  'operationId:unregister_deployment_v1_rag_deployments__deployment_id__delete':
+    resource: ["beta", "rag", "search_indexes"]
+    method: "unregister_deployment"
+  'operationId:update_index_metrics_v1_rag_deployments__deployment_id__metrics_put':
+    resource: ["beta", "rag", "search_indexes"]
+    method: "update_index_metrics"
+  'operationId:get_configs_v1_rag_ingestion_pipeline_configurations_get':
+    resource: ["beta", "rag", "ingestion_pipeline_configurations"]
+    method: "list"
+  'operationId:register_config_v1_rag_ingestion_pipeline_configurations_put':
+    resource: ["beta", "rag", "ingestion_pipeline_configurations"]
+    method: "register"
+  'operationId:update_run_info_v1_rag_ingestion_pipeline_configurations__id__run_info_put':
+    resource: ["beta", "rag", "ingestion_pipeline_configurations"]
+    method: "update_run_info"
+  'operationId:create_response_v1_responses_post':
+    resource: ["responses"]
+    method: "create"
+  'operationId:count_input_tokens_v1_responses_input_tokens_post':
+    resource: ["responses"]
+    method: "count_input_tokens"
+  'operationId:list_service_accounts_v1_service_accounts_get':
+    resource: ["beta", "service_accounts"]
+    method: "list"
+  'operationId:create_service_account_v1_service_accounts_post':
+    resource: ["beta", "service_accounts"]
+    method: "create"
+  'operationId:list_assignable_service_account_roles_v1_service_accounts_assignable_roles_get':
+    resource: ["beta", "service_accounts"]
+    method: "list_assignable_roles"
+  'operationId:delete_service_account_v1_service_accounts__service_account_id__delete':
+    resource: ["beta", "service_accounts"]
+    method: "delete"
+  'operationId:get_service_account_v1_service_accounts__service_account_id__get':
+    resource: ["beta", "service_accounts"]
+    method: "get"
+  'operationId:update_service_account_v1_service_accounts__service_account_id__patch':
+    resource: ["beta", "service_accounts"]
+    method: "update"
+  'operationId:list_service_account_roles_v1_service_accounts__service_account_id__roles_get':
+    resource: ["beta", "service_accounts"]
+    method: "list_roles"
+  'operationId:set_service_account_roles_v1_service_accounts__service_account_id__roles_put':
+    resource: ["beta", "service_accounts"]
+    method: "set_roles"
+  'operationId:list_triggers_v1_triggers_get':
+    resource: ["beta", "triggers"]
+    method: "list"
+  'operationId:create_trigger_v1_triggers_post':
+    resource: ["beta", "triggers"]
+    method: "create"
+  'operationId:delete_trigger_v1_triggers__trigger_id__delete':
+    resource: ["beta", "triggers"]
+    method: "delete"
+  'operationId:get_trigger_v1_triggers__trigger_id__get':
+    resource: ["beta", "triggers"]
+    method: "get"
+  'operationId:list_trigger_events_v1_triggers__trigger_id__events_get':
+    resource: ["beta", "triggers"]
+    method: "list_events"
+  'operationId:users_api_get_identity':
+    resource: ["beta", "users"]
+    method: "get_identity"
+  'operationId:users_api_list_organizations':
+    resource: ["beta", "users"]
+    method: "list_organizations"
+  'operationId:users_api_list_workspaces':
+    resource: ["beta", "users"]
+    method: "list_workspaces"
+  'operationId:list_webhooks_v1_webhooks_get':
+    resource: ["beta", "webhooks"]
+    method: "list"
+  'operationId:create_webhook_v1_webhooks_post':
+    resource: ["beta", "webhooks"]
+    method: "create"
+  'operationId:delete_webhook_v1_webhooks__webhook_id__delete':
+    resource: ["beta", "webhooks"]
+    method: "delete"
+  'operationId:get_webhook_v1_webhooks__webhook_id__get':
+    resource: ["beta", "webhooks"]
+    method: "get"
+  'operationId:get_webhook_signing_secret_v1_webhooks__webhook_id__signing_secret_get':
+    resource: ["beta", "webhooks"]
+    method: "get_signing_secret"
+  'operationId:users_api_whoami':
+    resource: ["beta", "users"]
+    method: "whoami"
+  'operationId:get_workflows_v1_workflows_get':
+    resource: ["workflows"]
+    method: "get_workflows"
+  'operationId:bulk_archive_workflows_v1_workflows_archive_put':
+    resource: ["workflows"]
+    method: "bulk_archive_workflows"
+  'operationId:list_deployments_v1_workflows_deployments_get':
+    resource: ["workflows", "deployments"]
+    method: "list_deployments"
+  'operationId:create_deployment_v1_workflows_deployments_post':
+    resource: ["workflows", "deployments"]
+    method: "create_deployment"
+  'operationId:unharden_deployment_v1_workflows_deployments__deployment_id__unharden_post':
+    resource: ["workflows", "deployments"]
+    method: "unharden_deployment"
+  'operationId:delete_deployment_v1_workflows_deployments__name__delete':
+    resource: ["workflows", "deployments"]
+    method: "delete_deployment"
+  'operationId:get_deployment_v1_workflows_deployments__name__get':
+    resource: ["workflows", "deployments"]
+    method: "get_deployment"
+  'operationId:update_deployment_v1_workflows_deployments__name__patch':
+    resource: ["workflows", "deployments"]
+    method: "update_deployment"
+  'operationId:get_deployment_archive_v1_workflows_deployments__name__archive_get':
+    resource: ["workflows", "deployments"]
+    method: "get_deployment_archive"
+  'operationId:get_deployment_logs':
+    resource: ["workflows", "deployments"]
+    method: "get_deployment_logs"
+  'operationId:stream_deployment_logs':
+    resource: ["workflows", "deployments"]
+    method: "stream_deployment_logs"
+  'operationId:restart_deployment_v1_workflows_deployments__name__restart_post':
+    resource: ["workflows", "deployments"]
+    method: "restart_deployment"
+  'operationId:start_deployment_v1_workflows_deployments__name__start_post':
+    resource: ["workflows", "deployments"]
+    method: "start_deployment"
+  'operationId:stop_deployment_v1_workflows_deployments__name__stop_post':
+    resource: ["workflows", "deployments"]
+    method: "stop_deployment"
+  'operationId:list_deployment_workers_v1_workflows_deployments__name__workers_get':
+    resource: ["workflows", "deployments"]
+    method: "list_deployment_workers"
+  'operationId:get_workflow_events_v1_workflows_events_list_get':
+    resource: ["events"]
+    method: "get_workflow_events"
+  'operationId:get_stream_events_v1_workflows_events_stream_get':
+    resource: ["events"]
+    method: "get_stream_events"
+  'operationId:batch_cancel_workflow_executions_v1_workflows_executions_cancel_post':
+    resource: ["workflows", "executions"]
+    method: "batch_cancel_workflow_executions"
+  'operationId:batch_terminate_workflow_executions_v1_workflows_executions_terminate_post':
+    resource: ["workflows", "executions"]
+    method: "batch_terminate_workflow_executions"
+  'operationId:get_workflow_execution_v1_workflows_executions__execution_id__get':
+    resource: ["workflows", "executions"]
+    method: "get_workflow_execution"
+  'operationId:cancel_workflow_execution_v1_workflows_executions__execution_id__cancel_post':
+    resource: ["workflows", "executions"]
+    method: "cancel_workflow_execution"
+  'operationId:get_workflow_execution_history_v1_workflows_executions__execution_id__history_get':
+    resource: ["workflows", "executions"]
+    method: "get_workflow_execution_history"
+  'operationId:get_workflow_execution_logs':
+    resource: ["workflows", "executions"]
+    method: "get_workflow_execution_logs"
+  'operationId:stream_workflow_execution_logs':
+    resource: ["workflows", "executions"]
+    method: "stream_workflow_execution_logs"
+  'operationId:query_workflow_execution_v1_workflows_executions__execution_id__queries_post':
+    resource: ["workflows", "executions"]
+    method: "query_workflow_execution"
+  'operationId:reset_workflow_v1_workflows_executions__execution_id__reset_post':
+    resource: ["workflows", "executions"]
+    method: "reset_workflow"
+  'operationId:signal_workflow_execution_v1_workflows_executions__execution_id__signals_post':
+    resource: ["workflows", "executions"]
+    method: "signal_workflow_execution"
+  'operationId:stream_v1_workflows_executions__execution_id__stream_get':
+    resource: ["workflows", "executions"]
+    method: "stream"
+  'operationId:terminate_workflow_execution_v1_workflows_executions__execution_id__terminate_post':
+    resource: ["workflows", "executions"]
+    method: "terminate_workflow_execution"
+  'operationId:get_workflow_execution_trace_events':
+    resource: ["workflows", "executions"]
+    method: "get_workflow_execution_trace_events"
+  'operationId:get_workflow_execution_trace_info':
+    resource: ["workflows", "executions"]
+    method: "get_workflow_execution_trace_info"
+  'operationId:get_workflow_execution_trace_otel':
+    resource: ["workflows", "executions"]
+    method: "get_workflow_execution_trace_otel"
+  'operationId:get_workflow_execution_trace_summary':
+    resource: ["workflows", "executions"]
+    method: "get_workflow_execution_trace_summary"
+  'operationId:update_workflow_execution_v1_workflows_executions__execution_id__updates_post':
+    resource: ["workflows", "executions"]
+    method: "update_workflow_execution"
+  'operationId:get_workflow_registrations_v1_workflows_registrations_get':
+    resource: ["workflows"]
+    method: "get_workflow_registrations"
+  'operationId:get_workflow_registration_v1_workflows_registrations__workflow_registration_id__get':
+    resource: ["workflows"]
+    method: "get_workflow_registration"
+  'operationId:execute_workflow_registration_v1_workflows_registrations__workflow_registration_id__execute_post':
+    resource: ["workflows"]
+    method: "execute_workflow_registration"
+  'operationId:list_runs_v1_workflows_runs_get':
+    resource: ["workflows", "runs"]
+    method: "list_runs"
+  'operationId:get_run_v1_workflows_runs__run_id__get':
+    resource: ["workflows", "runs"]
+    method: "get_run"
+  'operationId:get_run_history_v1_workflows_runs__run_id__history_get':
+    resource: ["workflows", "runs"]
+    method: "get_run_history"
+  'operationId:get_schedules_v1_workflows_schedules_get':
+    resource: ["workflows", "schedules"]
+    method: "get_schedules"
+  'operationId:schedule_workflow_v1_workflows_schedules_post':
+    resource: ["workflows", "schedules"]
+    method: "schedule_workflow"
+  'operationId:unschedule_workflow_v1_workflows_schedules__schedule_id__delete':
+    resource: ["workflows", "schedules"]
+    method: "unschedule_workflow"
+  'operationId:get_schedule_v1_workflows_schedules__schedule_id__get':
+    resource: ["workflows", "schedules"]
+    method: "get_schedule"
+  'operationId:update_schedule_v1_workflows_schedules__schedule_id__patch':
+    resource: ["workflows", "schedules"]
+    method: "update_schedule"
+  'operationId:pause_schedule_v1_workflows_schedules__schedule_id__pause_post':
+    resource: ["workflows", "schedules"]
+    method: "pause_schedule"
+  'operationId:resume_schedule_v1_workflows_schedules__schedule_id__resume_post':
+    resource: ["workflows", "schedules"]
+    method: "resume_schedule"
+  'operationId:trigger_schedule_v1_workflows_schedules__schedule_id__trigger_post':
+    resource: ["workflows", "schedules"]
+    method: "trigger_schedule"
+  'operationId:bulk_unarchive_workflows_v1_workflows_unarchive_put':
+    resource: ["workflows"]
+    method: "bulk_unarchive_workflows"
+  'operationId:get_workflow_v1_workflows__workflow_identifier__get':
+    resource: ["workflows"]
+    method: "get_workflow"
+  'operationId:update_workflow_v1_workflows__workflow_identifier__put':
+    resource: ["workflows"]
+    method: "update_workflow"
+  'operationId:archive_workflow_v1_workflows__workflow_identifier__archive_put':
+    resource: ["workflows"]
+    method: "archive_workflow"
+  'operationId:execute_workflow_v1_workflows__workflow_identifier__execute_post':
+    resource: ["workflows"]
+    method: "execute_workflow"
+  'operationId:add_workflow_tags_v1_workflows__workflow_identifier__tags_post':
+    resource: ["workflows"]
+    method: "add_workflow_tags"
+  'operationId:unarchive_workflow_v1_workflows__workflow_identifier__unarchive_put':
+    resource: ["workflows"]
+    method: "unarchive_workflow"
+  'operationId:get_workflow_metrics_v1_workflows__workflow_name__metrics_get':
+    resource: ["workflows", "metrics"]
+    method: "get_workflow_metrics"
+  'operationId:audio_v2_voices_list':
+    resource: ["audio", "voices"]
+    method: "search"
+  'operationId:prompts_list':
+    resource: ["beta", "prompts"]
+    method: "list"
+  'operationId:prompts_create':
+    resource: ["beta", "prompts"]
+    method: "create"
+  'operationId:prompts_delete':
+    resource: ["beta", "prompts"]
+    method: "delete"
+  'operationId:prompts_get':
+    resource: ["beta", "prompts"]
+    method: "get"
+  'operationId:prompts_update':
+    resource: ["beta", "prompts"]
+    method: "update_metadata"
+  'operationId:prompts_list_versions':
+    resource: ["beta", "prompts"]
+    method: "list_versions"
+  'operationId:prompts_create_version':
+    resource: ["beta", "prompts"]
+    method: "create_version"
+  'operationId:prompts_get_version':
+    resource: ["beta", "prompts"]
+    method: "get_version"
+  'operationId:prompts_update_version_metadata':
+    resource: ["beta", "prompts"]
+    method: "update_version_metadata"
+  'operationId:skills_list':
+    resource: ["beta", "skills"]
+    method: "list"
+  'operationId:skills_create':
+    resource: ["beta", "skills"]
+    method: "create"
+  'operationId:skills_delete':
+    resource: ["beta", "skills"]
+    method: "delete"
+  'operationId:skills_get':
+    resource: ["beta", "skills"]
+    method: "get"
+  'operationId:skills_update':
+    resource: ["beta", "skills"]
+    method: "update_metadata"
+  'operationId:skills_list_versions':
+    resource: ["beta", "skills"]
+    method: "list_versions"
+  'operationId:skills_create_version':
+    resource: ["beta", "skills"]
+    method: "create_version"
+  'operationId:skills_get_version':
+    resource: ["beta", "skills"]
+    method: "get_version"
+  'operationId:skills_update_version_metadata':
+    resource: ["beta", "skills"]
+    method: "update_version_metadata"
 
 types:
   '#/components/schemas/Judge/properties/output':
