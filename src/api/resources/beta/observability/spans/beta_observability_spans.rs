@@ -39,7 +39,7 @@ impl SpansClient {
     ///         .beta
     ///         .observability
     ///         .spans
-    ///         .search_pipeline_results_v1observability_pipeline_results_search_post(
+    ///         .search_pipeline_results(
     ///             &PipelineResultsRequest {
     ///                 pipeline_config_slugs: vec!["pipeline_config_slugs".to_string()],
     ///                 from: None,
@@ -53,7 +53,7 @@ impl SpansClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn search_pipeline_results_v1observability_pipeline_results_search_post(
+    pub async fn search_pipeline_results(
         &self,
         request: &PipelineResultsRequest,
         options: Option<RequestOptions>,
@@ -100,14 +100,11 @@ impl SpansClient {
     ///         .beta
     ///         .observability
     ///         .spans
-    ///         .get_pipeline_result_fields_v1observability_pipelines_pipeline_id_results_fields_get(
-    ///             &"pipeline_id".to_string(),
-    ///             None,
-    ///         )
+    ///         .list_pipeline_result_fields(&"pipeline_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn get_pipeline_result_fields_v1observability_pipelines_pipeline_id_results_fields_get(
+    pub async fn list_pipeline_result_fields(
         &self,
         pipeline_id: &str,
         options: Option<RequestOptions>,
@@ -149,8 +146,8 @@ impl SpansClient {
     ///         .beta
     ///         .observability
     ///         .spans
-    ///         .aggregate_spans_v1observability_spans_aggregate_post(
-    ///             &AggregateSpansV1ObservabilitySpansAggregatePostRequest {
+    ///         .aggregate(
+    ///             &AggregateRequest {
     ///                 body: AggregationRequest {
     ///                     dimensions: None,
     ///                     limit: None,
@@ -170,9 +167,9 @@ impl SpansClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn aggregate_spans_v1observability_spans_aggregate_post(
+    pub async fn aggregate(
         &self,
-        request: &AggregateSpansV1ObservabilitySpansAggregatePostRequest,
+        request: &AggregateRequest,
         options: Option<RequestOptions>,
     ) -> Result<Aggregation, ApiError> {
         self.http_client
@@ -215,8 +212,8 @@ impl SpansClient {
     ///         .beta
     ///         .observability
     ///         .spans
-    ///         .aggregate_span_evaluations_v1observability_spans_evaluations_aggregate_post(
-    ///             &AggregateSpanEvaluationsV1ObservabilitySpansEvaluationsAggregatePostRequest {
+    ///         .aggregate_span_evaluations(
+    ///             &AggregateSpanEvaluationsRequest {
     ///                 body: AggregationRequest {
     ///                     dimensions: None,
     ///                     limit: None,
@@ -236,9 +233,9 @@ impl SpansClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn aggregate_span_evaluations_v1observability_spans_evaluations_aggregate_post(
+    pub async fn aggregate_span_evaluations(
         &self,
-        request: &AggregateSpanEvaluationsV1ObservabilitySpansEvaluationsAggregatePostRequest,
+        request: &AggregateSpanEvaluationsRequest,
         options: Option<RequestOptions>,
     ) -> Result<Aggregation, ApiError> {
         self.http_client
@@ -281,11 +278,11 @@ impl SpansClient {
     ///         .beta
     ///         .observability
     ///         .spans
-    ///         .get_span_evaluation_fields_v1observability_spans_evaluations_fields_get(None)
+    ///         .list_span_eval_fields(None)
     ///         .await;
     /// }
     /// ```
-    pub async fn get_span_evaluation_fields_v1observability_spans_evaluations_fields_get(
+    pub async fn list_span_eval_fields(
         &self,
         options: Option<RequestOptions>,
     ) -> Result<GetSpanEvaluationFields, ApiError> {
@@ -322,15 +319,24 @@ impl SpansClient {
     ///         ..Default::default()
     ///     };
     ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client.beta.observability.spans.get_span_evaluation_field_options_v1observability_spans_evaluations_fields_field_name_options_get(&"field_name".to_string(), &GetSpanEvaluationFieldOptionsV1ObservabilitySpansEvaluationsFieldsFieldNameOptionsGetQueryRequest {
-    ///         ..Default::default()
-    ///     }, None).await;
+    ///     client
+    ///         .beta
+    ///         .observability
+    ///         .spans
+    ///         .fetch_span_eval_field_options(
+    ///             &"field_name".to_string(),
+    ///             &FetchSpanEvalFieldOptionsQueryRequest {
+    ///                 ..Default::default()
+    ///             },
+    ///             None,
+    ///         )
+    ///         .await;
     /// }
     /// ```
-    pub async fn get_span_evaluation_field_options_v1observability_spans_evaluations_fields_field_name_options_get(
+    pub async fn fetch_span_eval_field_options(
         &self,
         field_name: &str,
-        request: &GetSpanEvaluationFieldOptionsV1ObservabilitySpansEvaluationsFieldsFieldNameOptionsGetQueryRequest,
+        request: &FetchSpanEvalFieldOptionsQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<GetSpanEvaluationFieldOptions, ApiError> {
         self.http_client
@@ -376,8 +382,8 @@ impl SpansClient {
     ///         .beta
     ///         .observability
     ///         .spans
-    ///         .search_span_evaluations_v1observability_spans_evaluations_search_post(
-    ///             &SearchSpanEvaluationsV1ObservabilitySpansEvaluationsSearchPostRequest {
+    ///         .search_span_evaluations(
+    ///             &SearchSpanEvaluationsRequest {
     ///                 body: SpanEvaluationsRequest {
     ///                     ..Default::default()
     ///                 },
@@ -391,9 +397,9 @@ impl SpansClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn search_span_evaluations_v1observability_spans_evaluations_search_post(
+    pub async fn search_span_evaluations(
         &self,
-        request: &SearchSpanEvaluationsV1ObservabilitySpansEvaluationsSearchPostRequest,
+        request: &SearchSpanEvaluationsRequest,
         options: Option<RequestOptions>,
     ) -> Result<GetSpanEvaluations, ApiError> {
         self.http_client
@@ -438,8 +444,8 @@ impl SpansClient {
     ///         .beta
     ///         .observability
     ///         .spans
-    ///         .search_latest_span_evaluations_v1observability_spans_evaluations_search_latest_post(
-    ///             &SearchLatestSpanEvaluationsV1ObservabilitySpansEvaluationsSearchLatestPostRequest {
+    ///         .search_latest_span_evaluations(
+    ///             &SearchLatestSpanEvaluationsRequest {
     ///                 body: SpanEvaluationsRequest {
     ///                     ..Default::default()
     ///                 },
@@ -453,9 +459,9 @@ impl SpansClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn search_latest_span_evaluations_v1observability_spans_evaluations_search_latest_post(
+    pub async fn search_latest_span_evaluations(
         &self,
-        request: &SearchLatestSpanEvaluationsV1ObservabilitySpansEvaluationsSearchLatestPostRequest,
+        request: &SearchLatestSpanEvaluationsRequest,
         options: Option<RequestOptions>,
     ) -> Result<GetSpanEvaluations, ApiError> {
         self.http_client
@@ -496,15 +502,10 @@ impl SpansClient {
     ///         ..Default::default()
     ///     };
     ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client
-    ///         .beta
-    ///         .observability
-    ///         .spans
-    ///         .get_span_fields_v1observability_spans_fields_get(None)
-    ///         .await;
+    ///     client.beta.observability.spans.list_span_fields(None).await;
     /// }
     /// ```
-    pub async fn get_span_fields_v1observability_spans_fields_get(
+    pub async fn list_span_fields(
         &self,
         options: Option<RequestOptions>,
     ) -> Result<GetSpanFields, ApiError> {
@@ -545,9 +546,9 @@ impl SpansClient {
     ///         .beta
     ///         .observability
     ///         .spans
-    ///         .get_span_field_options_v1observability_spans_fields_field_name_options_get(
+    ///         .fetch_span_field_options(
     ///             &"field_name".to_string(),
-    ///             &GetSpanFieldOptionsV1ObservabilitySpansFieldsFieldNameOptionsGetQueryRequest {
+    ///             &FetchSpanFieldOptionsQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -555,10 +556,10 @@ impl SpansClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn get_span_field_options_v1observability_spans_fields_field_name_options_get(
+    pub async fn fetch_span_field_options(
         &self,
         field_name: &str,
-        request: &GetSpanFieldOptionsV1ObservabilitySpansFieldsFieldNameOptionsGetQueryRequest,
+        request: &FetchSpanFieldOptionsQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<GetSpanFieldOptions, ApiError> {
         self.http_client
@@ -601,7 +602,7 @@ impl SpansClient {
     ///         .beta
     ///         .observability
     ///         .spans
-    ///         .search_spans_v1observability_spans_search_post(
+    ///         .search_spans(
     ///             &SpansRequest {
     ///                 ..Default::default()
     ///             },
@@ -610,7 +611,7 @@ impl SpansClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn search_spans_v1observability_spans_search_post(
+    pub async fn search_spans(
         &self,
         request: &SpansRequest,
         options: Option<RequestOptions>,

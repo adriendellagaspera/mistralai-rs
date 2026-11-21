@@ -39,11 +39,11 @@ impl AccessesClient {
     ///         .beta
     ///         .libraries
     ///         .accesses
-    ///         .libraries_share_list_v1(&"library_id".to_string(), None)
+    ///         .list(&"library_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn libraries_share_list_v1(
+    pub async fn list(
         &self,
         library_id: &str,
         options: Option<RequestOptions>,
@@ -85,7 +85,7 @@ impl AccessesClient {
     ///         .beta
     ///         .libraries
     ///         .accesses
-    ///         .libraries_share_create_v1(
+    ///         .update_or_create(
     ///             &"library_id".to_string(),
     ///             &SharingRequest {
     ///                 level: ShareEnum::Viewer,
@@ -98,7 +98,7 @@ impl AccessesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn libraries_share_create_v1(
+    pub async fn update_or_create(
         &self,
         library_id: &str,
         request: &SharingRequest,
@@ -141,7 +141,7 @@ impl AccessesClient {
     ///         .beta
     ///         .libraries
     ///         .accesses
-    ///         .libraries_share_delete_v1(
+    ///         .delete(
     ///             &"library_id".to_string(),
     ///             &SharingDelete {
     ///                 share_with_type: EntityType::User,
@@ -153,7 +153,7 @@ impl AccessesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn libraries_share_delete_v1(
+    pub async fn delete(
         &self,
         library_id: &str,
         request: &SharingDelete,

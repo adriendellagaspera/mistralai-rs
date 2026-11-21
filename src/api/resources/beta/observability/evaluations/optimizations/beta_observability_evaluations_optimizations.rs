@@ -45,8 +45,8 @@ impl OptimizationsClient {
     ///         .observability
     ///         .evaluations
     ///         .optimizations
-    ///         .list_optimizations_v1observability_optimizations_get(
-    ///             &ListOptimizationsV1ObservabilityOptimizationsGetQueryRequest {
+    ///         .list(
+    ///             &BetaObservabilityEvaluationsOptimizationsListQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -54,9 +54,9 @@ impl OptimizationsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn list_optimizations_v1observability_optimizations_get(
+    pub async fn list(
         &self,
-        request: &ListOptimizationsV1ObservabilityOptimizationsGetQueryRequest,
+        request: &BetaObservabilityEvaluationsOptimizationsListQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<ListOptimizationsResponse, ApiError> {
         self.http_client
@@ -105,14 +105,11 @@ impl OptimizationsClient {
     ///         .observability
     ///         .evaluations
     ///         .optimizations
-    ///         .get_optimization_v1observability_optimizations_optimization_id_get(
-    ///             &"optimization_id".to_string(),
-    ///             None,
-    ///         )
+    ///         .get(&"optimization_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn get_optimization_v1observability_optimizations_optimization_id_get(
+    pub async fn get(
         &self,
         optimization_id: &str,
         options: Option<RequestOptions>,
@@ -150,15 +147,25 @@ impl OptimizationsClient {
     ///         ..Default::default()
     ///     };
     ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client.beta.observability.evaluations.optimizations.list_optimization_trials_v1observability_optimizations_optimization_id_trials_get(&"optimization_id".to_string(), &ListOptimizationTrialsV1ObservabilityOptimizationsOptimizationIDTrialsGetQueryRequest {
-    ///         ..Default::default()
-    ///     }, None).await;
+    ///     client
+    ///         .beta
+    ///         .observability
+    ///         .evaluations
+    ///         .optimizations
+    ///         .list_trials(
+    ///             &"optimization_id".to_string(),
+    ///             &ListTrialsQueryRequest {
+    ///                 ..Default::default()
+    ///             },
+    ///             None,
+    ///         )
+    ///         .await;
     /// }
     /// ```
-    pub async fn list_optimization_trials_v1observability_optimizations_optimization_id_trials_get(
+    pub async fn list_trials(
         &self,
         optimization_id: &str,
-        request: &ListOptimizationTrialsV1ObservabilityOptimizationsOptimizationIdTrialsGetQueryRequest,
+        request: &ListTrialsQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<ListOptimizationTrialsResponse, ApiError> {
         self.http_client

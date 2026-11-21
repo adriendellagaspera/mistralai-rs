@@ -42,8 +42,8 @@ impl ApiKeysClient {
     ///         .beta
     ///         .admin
     ///         .api_keys
-    ///         .users_api_admin_api_keys_get_api_keys(
-    ///             &UsersAPIAdminAPIKeysGetAPIKeysQueryRequest {
+    ///         .list(
+    ///             &BetaAdminAPIKeysListQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -51,9 +51,9 @@ impl ApiKeysClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn users_api_admin_api_keys_get_api_keys(
+    pub async fn list(
         &self,
-        request: &UsersApiAdminApiKeysGetApiKeysQueryRequest,
+        request: &BetaAdminApiKeysListQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<ApiKeysExtendedOut, ApiError> {
         self.http_client
@@ -97,7 +97,7 @@ impl ApiKeysClient {
     ///         .beta
     ///         .admin
     ///         .api_keys
-    ///         .users_api_admin_api_keys_create_api_key(
+    ///         .create(
     ///             &AdminCreateAPIKeyIn {
     ///                 user_id: "user_id".to_string(),
     ///                 workspace_uuid: "workspace_uuid".to_string(),
@@ -109,7 +109,7 @@ impl ApiKeysClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn users_api_admin_api_keys_create_api_key(
+    pub async fn create(
         &self,
         request: &AdminCreateApiKeyIn,
         options: Option<RequestOptions>,
@@ -152,11 +152,11 @@ impl ApiKeysClient {
     ///         .beta
     ///         .admin
     ///         .api_keys
-    ///         .users_api_admin_api_keys_delete_api_key(&"key_id".to_string(), None)
+    ///         .delete(&"key_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn users_api_admin_api_keys_delete_api_key(
+    pub async fn delete(
         &self,
         key_id: &str,
         options: Option<RequestOptions>,

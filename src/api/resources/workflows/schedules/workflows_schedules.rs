@@ -44,8 +44,8 @@ impl SchedulesClient {
     ///     client
     ///         .workflows
     ///         .schedules
-    ///         .get_schedules_v1workflows_schedules_get(
-    ///             &GetSchedulesV1WorkflowsSchedulesGetQueryRequest {
+    ///         .get_schedules(
+    ///             &GetSchedulesQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -53,9 +53,9 @@ impl SchedulesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn get_schedules_v1workflows_schedules_get(
+    pub async fn get_schedules(
         &self,
-        request: &GetSchedulesV1WorkflowsSchedulesGetQueryRequest,
+        request: &GetSchedulesQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<WorkflowScheduleListResponse, ApiError> {
         self.http_client
@@ -101,7 +101,7 @@ impl SchedulesClient {
     ///     client
     ///         .workflows
     ///         .schedules
-    ///         .schedule_workflow_v1workflows_schedules_post(
+    ///         .schedule_workflow(
     ///             &WorkflowScheduleRequest {
     ///                 schedule: ScheduleDefinition {
     ///                     input: serde_json::json!({"key":"value"}),
@@ -119,7 +119,7 @@ impl SchedulesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn schedule_workflow_v1workflows_schedules_post(
+    pub async fn schedule_workflow(
         &self,
         request: &WorkflowScheduleRequest,
         options: Option<RequestOptions>,
@@ -160,11 +160,11 @@ impl SchedulesClient {
     ///     client
     ///         .workflows
     ///         .schedules
-    ///         .get_schedule_v1workflows_schedules_schedule_id_get(&"schedule_id".to_string(), None)
+    ///         .get_schedule(&"schedule_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn get_schedule_v1workflows_schedules_schedule_id_get(
+    pub async fn get_schedule(
         &self,
         schedule_id: &str,
         options: Option<RequestOptions>,
@@ -205,14 +205,11 @@ impl SchedulesClient {
     ///     client
     ///         .workflows
     ///         .schedules
-    ///         .unschedule_workflow_v1workflows_schedules_schedule_id_delete(
-    ///             &"schedule_id".to_string(),
-    ///             None,
-    ///         )
+    ///         .unschedule_workflow(&"schedule_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn unschedule_workflow_v1workflows_schedules_schedule_id_delete(
+    pub async fn unschedule_workflow(
         &self,
         schedule_id: &str,
         options: Option<RequestOptions>,
@@ -253,7 +250,7 @@ impl SchedulesClient {
     ///     client
     ///         .workflows
     ///         .schedules
-    ///         .update_schedule_v1workflows_schedules_schedule_id_patch(
+    ///         .update_schedule(
     ///             &"schedule_id".to_string(),
     ///             &WorkflowScheduleUpdateRequest {
     ///                 schedule: PartialScheduleDefinition {
@@ -265,7 +262,7 @@ impl SchedulesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn update_schedule_v1workflows_schedules_schedule_id_patch(
+    pub async fn update_schedule(
         &self,
         schedule_id: &str,
         request: &WorkflowScheduleUpdateRequest,
@@ -307,7 +304,7 @@ impl SchedulesClient {
     ///     client
     ///         .workflows
     ///         .schedules
-    ///         .pause_schedule_v1workflows_schedules_schedule_id_pause_post(
+    ///         .pause_schedule(
     ///             &"schedule_id".to_string(),
     ///             &Some(WorkflowSchedulePauseRequest {
     ///                 ..Default::default()
@@ -317,7 +314,7 @@ impl SchedulesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn pause_schedule_v1workflows_schedules_schedule_id_pause_post(
+    pub async fn pause_schedule(
         &self,
         schedule_id: &str,
         request: &Option<WorkflowSchedulePauseRequest>,
@@ -359,7 +356,7 @@ impl SchedulesClient {
     ///     client
     ///         .workflows
     ///         .schedules
-    ///         .resume_schedule_v1workflows_schedules_schedule_id_resume_post(
+    ///         .resume_schedule(
     ///             &"schedule_id".to_string(),
     ///             &Some(WorkflowSchedulePauseRequest {
     ///                 ..Default::default()
@@ -369,7 +366,7 @@ impl SchedulesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn resume_schedule_v1workflows_schedules_schedule_id_resume_post(
+    pub async fn resume_schedule(
         &self,
         schedule_id: &str,
         request: &Option<WorkflowSchedulePauseRequest>,
@@ -411,7 +408,7 @@ impl SchedulesClient {
     ///     client
     ///         .workflows
     ///         .schedules
-    ///         .trigger_schedule_v1workflows_schedules_schedule_id_trigger_post(
+    ///         .trigger_schedule(
     ///             &"schedule_id".to_string(),
     ///             &Some(WorkflowScheduleTriggerRequest {
     ///                 ..Default::default()
@@ -421,7 +418,7 @@ impl SchedulesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn trigger_schedule_v1workflows_schedules_schedule_id_trigger_post(
+    pub async fn trigger_schedule(
         &self,
         schedule_id: &str,
         request: &Option<WorkflowScheduleTriggerRequest>,

@@ -50,8 +50,8 @@ impl DeploymentsClient {
     ///     client
     ///         .workflows
     ///         .deployments
-    ///         .list_deployments_v1workflows_deployments_get(
-    ///             &ListDeploymentsV1WorkflowsDeploymentsGetQueryRequest {
+    ///         .list_deployments(
+    ///             &ListDeploymentsQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -59,9 +59,9 @@ impl DeploymentsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn list_deployments_v1workflows_deployments_get(
+    pub async fn list_deployments(
         &self,
-        request: &ListDeploymentsV1WorkflowsDeploymentsGetQueryRequest,
+        request: &ListDeploymentsQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<DeploymentListResponse, ApiError> {
         self.http_client
@@ -115,7 +115,7 @@ impl DeploymentsClient {
     ///     client
     ///         .workflows
     ///         .deployments
-    ///         .create_deployment_v1workflows_deployments_post(
+    ///         .create_deployment(
     ///             &CreateDeploymentRequest {
     ///                 name: "name".to_string(),
     ///                 spec: DeploymentWorkerSpecInput {
@@ -129,7 +129,7 @@ impl DeploymentsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn create_deployment_v1workflows_deployments_post(
+    pub async fn create_deployment(
         &self,
         request: &CreateDeploymentRequest,
         options: Option<RequestOptions>,
@@ -171,9 +171,9 @@ impl DeploymentsClient {
     ///     client
     ///         .workflows
     ///         .deployments
-    ///         .unharden_deployment_v1workflows_deployments_deployment_id_unharden_post(
+    ///         .unharden_deployment(
     ///             &"deployment_id".to_string(),
-    ///             &UnhardenDeploymentV1WorkflowsDeploymentsDeploymentIDUnhardenPostQueryRequest {
+    ///             &UnhardenDeploymentQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -181,10 +181,10 @@ impl DeploymentsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn unharden_deployment_v1workflows_deployments_deployment_id_unharden_post(
+    pub async fn unharden_deployment(
         &self,
         deployment_id: &str,
-        request: &UnhardenDeploymentV1WorkflowsDeploymentsDeploymentIdUnhardenPostQueryRequest,
+        request: &UnhardenDeploymentQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<(), ApiError> {
         self.http_client
@@ -226,9 +226,9 @@ impl DeploymentsClient {
     ///     client
     ///         .workflows
     ///         .deployments
-    ///         .get_deployment_v1workflows_deployments_name_get(
+    ///         .get_deployment(
     ///             &"name".to_string(),
-    ///             &GetDeploymentV1WorkflowsDeploymentsNameGetQueryRequest {
+    ///             &GetDeploymentQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -236,10 +236,10 @@ impl DeploymentsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn get_deployment_v1workflows_deployments_name_get(
+    pub async fn get_deployment(
         &self,
         name: &str,
-        request: &GetDeploymentV1WorkflowsDeploymentsNameGetQueryRequest,
+        request: &GetDeploymentQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<DeploymentDetailResponse, ApiError> {
         self.http_client
@@ -280,11 +280,11 @@ impl DeploymentsClient {
     ///     client
     ///         .workflows
     ///         .deployments
-    ///         .delete_deployment_v1workflows_deployments_name_delete(&"name".to_string(), None)
+    ///         .delete_deployment(&"name".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn delete_deployment_v1workflows_deployments_name_delete(
+    pub async fn delete_deployment(
         &self,
         name: &str,
         options: Option<RequestOptions>,
@@ -325,7 +325,7 @@ impl DeploymentsClient {
     ///     client
     ///         .workflows
     ///         .deployments
-    ///         .update_deployment_v1workflows_deployments_name_patch(
+    ///         .update_deployment(
     ///             &"name".to_string(),
     ///             &UpdateDeploymentRequest {
     ///                 ..Default::default()
@@ -335,7 +335,7 @@ impl DeploymentsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn update_deployment_v1workflows_deployments_name_patch(
+    pub async fn update_deployment(
         &self,
         name: &str,
         request: &UpdateDeploymentRequest,
@@ -380,11 +380,11 @@ impl DeploymentsClient {
     ///     client
     ///         .workflows
     ///         .deployments
-    ///         .get_deployment_archive_v1workflows_deployments_name_archive_get(&"name".to_string(), None)
+    ///         .get_deployment_archive(&"name".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn get_deployment_archive_v1workflows_deployments_name_archive_get(
+    pub async fn get_deployment_archive(
         &self,
         name: &str,
         options: Option<RequestOptions>,
@@ -565,11 +565,11 @@ impl DeploymentsClient {
     ///     client
     ///         .workflows
     ///         .deployments
-    ///         .restart_deployment_v1workflows_deployments_name_restart_post(&"name".to_string(), None)
+    ///         .restart_deployment(&"name".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn restart_deployment_v1workflows_deployments_name_restart_post(
+    pub async fn restart_deployment(
         &self,
         name: &str,
         options: Option<RequestOptions>,
@@ -610,11 +610,11 @@ impl DeploymentsClient {
     ///     client
     ///         .workflows
     ///         .deployments
-    ///         .start_deployment_v1workflows_deployments_name_start_post(&"name".to_string(), None)
+    ///         .start_deployment(&"name".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn start_deployment_v1workflows_deployments_name_start_post(
+    pub async fn start_deployment(
         &self,
         name: &str,
         options: Option<RequestOptions>,
@@ -655,11 +655,11 @@ impl DeploymentsClient {
     ///     client
     ///         .workflows
     ///         .deployments
-    ///         .stop_deployment_v1workflows_deployments_name_stop_post(&"name".to_string(), None)
+    ///         .stop_deployment(&"name".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn stop_deployment_v1workflows_deployments_name_stop_post(
+    pub async fn stop_deployment(
         &self,
         name: &str,
         options: Option<RequestOptions>,
@@ -703,9 +703,9 @@ impl DeploymentsClient {
     ///     client
     ///         .workflows
     ///         .deployments
-    ///         .list_deployment_workers_v1workflows_deployments_name_workers_get(
+    ///         .list_deployment_workers(
     ///             &"name".to_string(),
-    ///             &ListDeploymentWorkersV1WorkflowsDeploymentsNameWorkersGetQueryRequest {
+    ///             &ListDeploymentWorkersQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -713,10 +713,10 @@ impl DeploymentsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn list_deployment_workers_v1workflows_deployments_name_workers_get(
+    pub async fn list_deployment_workers(
         &self,
         name: &str,
-        request: &ListDeploymentWorkersV1WorkflowsDeploymentsNameWorkersGetQueryRequest,
+        request: &ListDeploymentWorkersQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<DeploymentWorkerListResponse, ApiError> {
         self.http_client

@@ -42,8 +42,8 @@ impl PromptsClient {
     ///     client
     ///         .beta
     ///         .prompts
-    ///         .prompts_list(
-    ///             &PromptsListQueryRequest {
+    ///         .list(
+    ///             &BetaPromptsListQueryRequest {
     ///                 page_size: None,
     ///                 page_token: None,
     ///                 alias: None,
@@ -58,9 +58,9 @@ impl PromptsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn prompts_list(
+    pub async fn list(
         &self,
-        request: &PromptsListQueryRequest,
+        request: &BetaPromptsListQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<ListPromptsResponse, ApiError> {
         self.http_client
@@ -108,7 +108,7 @@ impl PromptsClient {
     ///     client
     ///         .beta
     ///         .prompts
-    ///         .prompts_create(
+    ///         .create(
     ///             &CreatePromptRequest {
     ///                 definition: PromptDefinition {
     ///                     content: "content".to_string(),
@@ -127,7 +127,7 @@ impl PromptsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn prompts_create(
+    pub async fn create(
         &self,
         request: &CreatePromptRequest,
         options: Option<RequestOptions>,
@@ -168,9 +168,9 @@ impl PromptsClient {
     ///     client
     ///         .beta
     ///         .prompts
-    ///         .prompts_get(
+    ///         .get(
     ///             &"prompt_id".to_string(),
-    ///             &PromptsGetQueryRequest {
+    ///             &BetaPromptsGetQueryRequest {
     ///                 version: Some(1),
     ///                 alias: None,
     ///                 fields: vec![],
@@ -180,10 +180,10 @@ impl PromptsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn prompts_get(
+    pub async fn get(
         &self,
         prompt_id: &str,
-        request: &PromptsGetQueryRequest,
+        request: &BetaPromptsGetQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<Prompt, ApiError> {
         self.http_client
@@ -226,11 +226,11 @@ impl PromptsClient {
     ///     client
     ///         .beta
     ///         .prompts
-    ///         .prompts_delete(&"prompt_id".to_string(), None)
+    ///         .delete(&"prompt_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn prompts_delete(
+    pub async fn delete(
         &self,
         prompt_id: &str,
         options: Option<RequestOptions>,
@@ -271,9 +271,9 @@ impl PromptsClient {
     ///     client
     ///         .beta
     ///         .prompts
-    ///         .prompts_update(
+    ///         .update_metadata(
     ///             &"prompt_id".to_string(),
-    ///             &PromptsUpdatePromptsRequest {
+    ///             &UpdateMetadataPromptsRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -281,10 +281,10 @@ impl PromptsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn prompts_update(
+    pub async fn update_metadata(
         &self,
         prompt_id: &str,
-        request: &PromptsUpdatePromptsRequest,
+        request: &UpdateMetadataPromptsRequest,
         options: Option<RequestOptions>,
     ) -> Result<Prompt, ApiError> {
         self.http_client
@@ -323,11 +323,11 @@ impl PromptsClient {
     ///     client
     ///         .beta
     ///         .prompts
-    ///         .prompts_list_versions(&"prompt_id".to_string(), None)
+    ///         .list_versions(&"prompt_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn prompts_list_versions(
+    pub async fn list_versions(
         &self,
         prompt_id: &str,
         options: Option<RequestOptions>,
@@ -368,9 +368,9 @@ impl PromptsClient {
     ///     client
     ///         .beta
     ///         .prompts
-    ///         .prompts_create_version(
+    ///         .create_version(
     ///             &"prompt_id".to_string(),
-    ///             &PromptsCreateVersionPromptsRequest {
+    ///             &CreateVersionPromptsRequest {
     ///                 definition: PromptDefinition {
     ///                     content: "content".to_string(),
     ///                     ..Default::default()
@@ -383,10 +383,10 @@ impl PromptsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn prompts_create_version(
+    pub async fn create_version(
         &self,
         prompt_id: &str,
-        request: &PromptsCreateVersionPromptsRequest,
+        request: &CreateVersionPromptsRequest,
         options: Option<RequestOptions>,
     ) -> Result<CreatePromptVersionResponse, ApiError> {
         self.http_client
@@ -425,20 +425,20 @@ impl PromptsClient {
     ///     client
     ///         .beta
     ///         .prompts
-    ///         .prompts_get_version(
+    ///         .get_version(
     ///             &"prompt_id".to_string(),
     ///             1,
-    ///             &PromptsGetVersionQueryRequest { fields: vec![] },
+    ///             &BetaPromptsGetVersionQueryRequest { fields: vec![] },
     ///             None,
     ///         )
     ///         .await;
     /// }
     /// ```
-    pub async fn prompts_get_version(
+    pub async fn get_version(
         &self,
         prompt_id: &str,
         version: i64,
-        request: &PromptsGetVersionQueryRequest,
+        request: &BetaPromptsGetVersionQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<Prompt, ApiError> {
         self.http_client
@@ -479,10 +479,10 @@ impl PromptsClient {
     ///     client
     ///         .beta
     ///         .prompts
-    ///         .prompts_update_version_metadata(
+    ///         .update_version_metadata(
     ///             &"prompt_id".to_string(),
     ///             1,
-    ///             &PromptsUpdateVersionMetadataPromptsRequest {
+    ///             &UpdateVersionMetadataPromptsRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -490,11 +490,11 @@ impl PromptsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn prompts_update_version_metadata(
+    pub async fn update_version_metadata(
         &self,
         prompt_id: &str,
         version: i64,
-        request: &PromptsUpdateVersionMetadataPromptsRequest,
+        request: &UpdateVersionMetadataPromptsRequest,
         options: Option<RequestOptions>,
     ) -> Result<Prompt, ApiError> {
         self.http_client

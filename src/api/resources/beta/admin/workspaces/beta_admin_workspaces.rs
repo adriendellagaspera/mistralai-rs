@@ -43,8 +43,8 @@ impl WorkspacesClient {
     ///         .beta
     ///         .admin
     ///         .workspaces
-    ///         .users_api_admin_workspaces_get_workspaces(
-    ///             &UsersAPIAdminWorkspacesGetWorkspacesQueryRequest {
+    ///         .list(
+    ///             &BetaAdminWorkspacesListQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -52,9 +52,9 @@ impl WorkspacesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn users_api_admin_workspaces_get_workspaces(
+    pub async fn list(
         &self,
-        request: &UsersApiAdminWorkspacesGetWorkspacesQueryRequest,
+        request: &BetaAdminWorkspacesListQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<WorkspacesOut, ApiError> {
         self.http_client
@@ -99,7 +99,7 @@ impl WorkspacesClient {
     ///         .beta
     ///         .admin
     ///         .workspaces
-    ///         .users_api_admin_workspaces_create_workspace(
+    ///         .create(
     ///             &AdminWorkspaceIn {
     ///                 admin_user_id: "admin_user_id".to_string(),
     ///                 name: "Product Team".to_string(),
@@ -112,7 +112,7 @@ impl WorkspacesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn users_api_admin_workspaces_create_workspace(
+    pub async fn create(
         &self,
         request: &AdminWorkspaceIn,
         options: Option<RequestOptions>,
@@ -155,11 +155,11 @@ impl WorkspacesClient {
     ///         .beta
     ///         .admin
     ///         .workspaces
-    ///         .users_api_admin_workspaces_delete_workspaces(&"workspace_uuid".to_string(), None)
+    ///         .delete(&"workspace_uuid".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn users_api_admin_workspaces_delete_workspaces(
+    pub async fn delete(
         &self,
         workspace_uuid: &str,
         options: Option<RequestOptions>,
@@ -202,7 +202,7 @@ impl WorkspacesClient {
     ///         .beta
     ///         .admin
     ///         .workspaces
-    ///         .users_api_admin_workspaces_update_workspaces(
+    ///         .update(
     ///             &"workspace_uuid".to_string(),
     ///             &UpdateWorkspaceIn {
     ///                 ..Default::default()
@@ -212,7 +212,7 @@ impl WorkspacesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn users_api_admin_workspaces_update_workspaces(
+    pub async fn update(
         &self,
         workspace_uuid: &str,
         request: &UpdateWorkspaceIn,
@@ -256,7 +256,7 @@ impl WorkspacesClient {
     ///         .beta
     ///         .admin
     ///         .workspaces
-    ///         .users_api_admin_workspaces_add_users_workspaces(
+    ///         .add_users(
     ///             &"workspace_uuid".to_string(),
     ///             &AdminWorkspaceMemberIn {
     ///                 ..Default::default()
@@ -266,7 +266,7 @@ impl WorkspacesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn users_api_admin_workspaces_add_users_workspaces(
+    pub async fn add_users(
         &self,
         workspace_uuid: &str,
         request: &AdminWorkspaceMemberIn,
@@ -310,7 +310,7 @@ impl WorkspacesClient {
     ///         .beta
     ///         .admin
     ///         .workspaces
-    ///         .users_api_admin_workspaces_remove_users_workspaces(
+    ///         .remove_users(
     ///             &"workspace_uuid".to_string(),
     ///             &RemoveWorkspaceMembersIn {
     ///                 members: vec![BaseWorkspaceMemberIn {
@@ -323,7 +323,7 @@ impl WorkspacesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn users_api_admin_workspaces_remove_users_workspaces(
+    pub async fn remove_users(
         &self,
         workspace_uuid: &str,
         request: &RemoveWorkspaceMembersIn,
@@ -367,7 +367,7 @@ impl WorkspacesClient {
     ///         .beta
     ///         .admin
     ///         .workspaces
-    ///         .users_api_admin_workspaces_add_or_update_users_workspaces(
+    ///         .upsert_users(
     ///             &"workspace_uuid".to_string(),
     ///             &AdminWorkspaceMemberIn {
     ///                 ..Default::default()
@@ -377,7 +377,7 @@ impl WorkspacesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn users_api_admin_workspaces_add_or_update_users_workspaces(
+    pub async fn upsert_users(
         &self,
         workspace_uuid: &str,
         request: &AdminWorkspaceMemberIn,

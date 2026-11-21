@@ -39,11 +39,11 @@ impl IngestionPipelineConfigurationsClient {
     ///         .beta
     ///         .rag
     ///         .ingestion_pipeline_configurations
-    ///         .get_configs_v1rag_ingestion_pipeline_configurations_get(None)
+    ///         .list(None)
     ///         .await;
     /// }
     /// ```
-    pub async fn get_configs_v1rag_ingestion_pipeline_configurations_get(
+    pub async fn list(
         &self,
         options: Option<RequestOptions>,
     ) -> Result<Vec<IngestionPipelineConfiguration>, ApiError> {
@@ -84,7 +84,7 @@ impl IngestionPipelineConfigurationsClient {
     ///         .beta
     ///         .rag
     ///         .ingestion_pipeline_configurations
-    ///         .register_config_v1rag_ingestion_pipeline_configurations_put(
+    ///         .register(
     ///             &CreateIngestionPipelineConfigurationRequest {
     ///                 name: "name".to_string(),
     ///                 pipeline_composition: None,
@@ -95,7 +95,7 @@ impl IngestionPipelineConfigurationsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn register_config_v1rag_ingestion_pipeline_configurations_put(
+    pub async fn register(
         &self,
         request: &CreateIngestionPipelineConfigurationRequest,
         options: Option<RequestOptions>,
@@ -137,7 +137,7 @@ impl IngestionPipelineConfigurationsClient {
     ///         .beta
     ///         .rag
     ///         .ingestion_pipeline_configurations
-    ///         .update_run_info_v1rag_ingestion_pipeline_configurations_id_run_info_put(
+    ///         .update_run_info(
     ///             &"id".to_string(),
     ///             &UpdateRunInfo {
     ///                 chunks_count: 1,
@@ -148,7 +148,7 @@ impl IngestionPipelineConfigurationsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn update_run_info_v1rag_ingestion_pipeline_configurations_id_run_info_put(
+    pub async fn update_run_info(
         &self,
         id: &str,
         request: &UpdateRunInfo,

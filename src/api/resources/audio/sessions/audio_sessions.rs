@@ -38,7 +38,7 @@ impl SessionsClient {
     ///     client
     ///         .audio
     ///         .sessions
-    ///         .create_session_v1audio_sessions_post(
+    ///         .create(
     ///             &AudioSessionCreateRequest {
     ///                 ..Default::default()
     ///             },
@@ -47,7 +47,7 @@ impl SessionsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn create_session_v1audio_sessions_post(
+    pub async fn create(
         &self,
         request: &AudioSessionCreateRequest,
         options: Option<RequestOptions>,
@@ -88,11 +88,11 @@ impl SessionsClient {
     ///     client
     ///         .audio
     ///         .sessions
-    ///         .get_session_v1audio_sessions_session_id_get(&"session_id".to_string(), None)
+    ///         .get(&"session_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn get_session_v1audio_sessions_session_id_get(
+    pub async fn get(
         &self,
         session_id: &str,
         options: Option<RequestOptions>,
@@ -133,11 +133,11 @@ impl SessionsClient {
     ///     client
     ///         .audio
     ///         .sessions
-    ///         .delete_session_v1audio_sessions_session_id_delete(&"session_id".to_string(), None)
+    ///         .close(&"session_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn delete_session_v1audio_sessions_session_id_delete(
+    pub async fn close(
         &self,
         session_id: &str,
         options: Option<RequestOptions>,
@@ -183,7 +183,7 @@ impl SessionsClient {
     ///     client
     ///         .audio
     ///         .sessions
-    ///         .update_session_v1audio_sessions_session_id_patch(
+    ///         .update(
     ///             &"session_id".to_string(),
     ///             &AudioSessionUpdateRequest {
     ///                 ..Default::default()
@@ -193,7 +193,7 @@ impl SessionsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn update_session_v1audio_sessions_session_id_patch(
+    pub async fn update(
         &self,
         session_id: &str,
         request: &AudioSessionUpdateRequest,

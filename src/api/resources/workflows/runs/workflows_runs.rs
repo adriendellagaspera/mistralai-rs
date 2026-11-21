@@ -56,8 +56,8 @@ impl RunsClient2 {
     ///     client
     ///         .workflows
     ///         .runs
-    ///         .list_runs_v1workflows_runs_get(
-    ///             &ListRunsV1WorkflowsRunsGetQueryRequest {
+    ///         .list_runs(
+    ///             &ListRunsQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -65,9 +65,9 @@ impl RunsClient2 {
     ///         .await;
     /// }
     /// ```
-    pub async fn list_runs_v1workflows_runs_get(
+    pub async fn list_runs(
         &self,
-        request: &ListRunsV1WorkflowsRunsGetQueryRequest,
+        request: &ListRunsQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<WorkflowExecutionListResponse, ApiError> {
         self.http_client
@@ -128,11 +128,11 @@ impl RunsClient2 {
     ///     client
     ///         .workflows
     ///         .runs
-    ///         .get_run_v1workflows_runs_run_id_get(&"run_id".to_string(), None)
+    ///         .get_run(&"run_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn get_run_v1workflows_runs_run_id_get(
+    pub async fn get_run(
         &self,
         run_id: &str,
         options: Option<RequestOptions>,
@@ -173,9 +173,9 @@ impl RunsClient2 {
     ///     client
     ///         .workflows
     ///         .runs
-    ///         .get_run_history_v1workflows_runs_run_id_history_get(
+    ///         .get_run_history(
     ///             &"run_id".to_string(),
-    ///             &GetRunHistoryV1WorkflowsRunsRunIDHistoryGetQueryRequest {
+    ///             &GetRunHistoryQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -183,10 +183,10 @@ impl RunsClient2 {
     ///         .await;
     /// }
     /// ```
-    pub async fn get_run_history_v1workflows_runs_run_id_history_get(
+    pub async fn get_run_history(
         &self,
         run_id: &str,
-        request: &GetRunHistoryV1WorkflowsRunsRunIdHistoryGetQueryRequest,
+        request: &GetRunHistoryQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<serde_json::Value, ApiError> {
         self.http_client

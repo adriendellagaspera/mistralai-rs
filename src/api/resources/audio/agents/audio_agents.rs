@@ -41,8 +41,8 @@ impl AgentsClient2 {
     ///     client
     ///         .audio
     ///         .agents
-    ///         .list_agents_v1audio_agents_get(
-    ///             &ListAgentsV1AudioAgentsGetQueryRequest {
+    ///         .list(
+    ///             &AudioAgentsListQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -50,9 +50,9 @@ impl AgentsClient2 {
     ///         .await;
     /// }
     /// ```
-    pub async fn list_agents_v1audio_agents_get(
+    pub async fn list(
         &self,
-        request: &ListAgentsV1AudioAgentsGetQueryRequest,
+        request: &AudioAgentsListQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<AudioAgentListPage, ApiError> {
         self.http_client
@@ -95,7 +95,7 @@ impl AgentsClient2 {
     ///     client
     ///         .audio
     ///         .agents
-    ///         .create_agent_v1audio_agents_post(
+    ///         .create(
     ///             &AudioAgentCreateRequest {
     ///                 configuration: AudioAgentConfigurationRequest {
     ///                     ..Default::default()
@@ -108,7 +108,7 @@ impl AgentsClient2 {
     ///         .await;
     /// }
     /// ```
-    pub async fn create_agent_v1audio_agents_post(
+    pub async fn create(
         &self,
         request: &AudioAgentCreateRequest,
         options: Option<RequestOptions>,
@@ -150,9 +150,9 @@ impl AgentsClient2 {
     ///     client
     ///         .audio
     ///         .agents
-    ///         .get_agent_v1audio_agents_agent_id_get(
+    ///         .get(
     ///             &"agent_id".to_string(),
-    ///             &GetAgentV1AudioAgentsAgentIDGetQueryRequest {
+    ///             &AudioAgentsGetQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -160,10 +160,10 @@ impl AgentsClient2 {
     ///         .await;
     /// }
     /// ```
-    pub async fn get_agent_v1audio_agents_agent_id_get(
+    pub async fn get(
         &self,
         agent_id: &str,
-        request: &GetAgentV1AudioAgentsAgentIdGetQueryRequest,
+        request: &AudioAgentsGetQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<AudioAgentResponse, ApiError> {
         self.http_client
@@ -204,7 +204,7 @@ impl AgentsClient2 {
     ///     client
     ///         .audio
     ///         .agents
-    ///         .update_agent_v1audio_agents_agent_id_put(
+    ///         .update(
     ///             &"agent_id".to_string(),
     ///             &AudioAgentUpdateRequest {
     ///                 configuration: AudioAgentConfigurationRequest {
@@ -218,7 +218,7 @@ impl AgentsClient2 {
     ///         .await;
     /// }
     /// ```
-    pub async fn update_agent_v1audio_agents_agent_id_put(
+    pub async fn update(
         &self,
         agent_id: &str,
         request: &AudioAgentUpdateRequest,
@@ -260,11 +260,11 @@ impl AgentsClient2 {
     ///     client
     ///         .audio
     ///         .agents
-    ///         .delete_agent_v1audio_agents_agent_id_delete(&"agent_id".to_string(), None)
+    ///         .delete(&"agent_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn delete_agent_v1audio_agents_agent_id_delete(
+    pub async fn delete(
         &self,
         agent_id: &str,
         options: Option<RequestOptions>,
@@ -307,9 +307,9 @@ impl AgentsClient2 {
     ///     client
     ///         .audio
     ///         .agents
-    ///         .list_agent_sessions_v1audio_agents_agent_id_sessions_get(
+    ///         .list_sessions(
     ///             &"agent_id".to_string(),
-    ///             &ListAgentSessionsV1AudioAgentsAgentIDSessionsGetQueryRequest {
+    ///             &ListSessionsQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -317,10 +317,10 @@ impl AgentsClient2 {
     ///         .await;
     /// }
     /// ```
-    pub async fn list_agent_sessions_v1audio_agents_agent_id_sessions_get(
+    pub async fn list_sessions(
         &self,
         agent_id: &str,
-        request: &ListAgentSessionsV1AudioAgentsAgentIdSessionsGetQueryRequest,
+        request: &ListSessionsQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<AudioAgentSessionListPage, ApiError> {
         self.http_client
@@ -364,9 +364,9 @@ impl AgentsClient2 {
     ///     client
     ///         .audio
     ///         .agents
-    ///         .list_agent_versions_v1audio_agents_agent_id_versions_get(
+    ///         .list_versions(
     ///             &"agent_id".to_string(),
-    ///             &ListAgentVersionsV1AudioAgentsAgentIDVersionsGetQueryRequest {
+    ///             &AudioAgentsListVersionsQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -374,10 +374,10 @@ impl AgentsClient2 {
     ///         .await;
     /// }
     /// ```
-    pub async fn list_agent_versions_v1audio_agents_agent_id_versions_get(
+    pub async fn list_versions(
         &self,
         agent_id: &str,
-        request: &ListAgentVersionsV1AudioAgentsAgentIdVersionsGetQueryRequest,
+        request: &AudioAgentsListVersionsQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<AudioAgentListPage, ApiError> {
         self.http_client

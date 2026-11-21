@@ -39,8 +39,8 @@ impl TracesClient {
     ///         .beta
     ///         .observability
     ///         .traces
-    ///         .aggregate_traces_v1observability_traces_aggregate_post(
-    ///             &AggregateTracesV1ObservabilityTracesAggregatePostRequest {
+    ///         .aggregate(
+    ///             &AggregateRequest {
     ///                 body: AggregationRequest {
     ///                     dimensions: None,
     ///                     limit: None,
@@ -60,9 +60,9 @@ impl TracesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn aggregate_traces_v1observability_traces_aggregate_post(
+    pub async fn aggregate(
         &self,
-        request: &AggregateTracesV1ObservabilityTracesAggregatePostRequest,
+        request: &AggregateRequest2,
         options: Option<RequestOptions>,
     ) -> Result<Aggregation, ApiError> {
         self.http_client
@@ -105,11 +105,11 @@ impl TracesClient {
     ///         .beta
     ///         .observability
     ///         .traces
-    ///         .get_trace_fields_v1observability_traces_fields_get(None)
+    ///         .get_trace_fields(None)
     ///         .await;
     /// }
     /// ```
-    pub async fn get_trace_fields_v1observability_traces_fields_get(
+    pub async fn get_trace_fields(
         &self,
         options: Option<RequestOptions>,
     ) -> Result<GetTraceFields, ApiError> {
@@ -150,9 +150,9 @@ impl TracesClient {
     ///         .beta
     ///         .observability
     ///         .traces
-    ///         .get_trace_field_options_v1observability_traces_fields_field_name_options_get(
+    ///         .fetch_options(
     ///             &"field_name".to_string(),
-    ///             &GetTraceFieldOptionsV1ObservabilityTracesFieldsFieldNameOptionsGetQueryRequest {
+    ///             &BetaObservabilityTracesFetchOptionsQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -160,10 +160,10 @@ impl TracesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn get_trace_field_options_v1observability_traces_fields_field_name_options_get(
+    pub async fn fetch_options(
         &self,
         field_name: &str,
-        request: &GetTraceFieldOptionsV1ObservabilityTracesFieldsFieldNameOptionsGetQueryRequest,
+        request: &BetaObservabilityTracesFetchOptionsQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<GetTraceFieldOptions, ApiError> {
         self.http_client
@@ -206,7 +206,7 @@ impl TracesClient {
     ///         .beta
     ///         .observability
     ///         .traces
-    ///         .search_traces_v1observability_traces_search_post(
+    ///         .search(
     ///             &TracesRequest {
     ///                 ..Default::default()
     ///             },
@@ -215,7 +215,7 @@ impl TracesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn search_traces_v1observability_traces_search_post(
+    pub async fn search(
         &self,
         request: &TracesRequest,
         options: Option<RequestOptions>,
@@ -262,11 +262,11 @@ impl TracesClient {
     ///         .beta
     ///         .observability
     ///         .traces
-    ///         .get_trace_by_id_v1observability_traces_trace_id_get(&"trace_id".to_string(), None)
+    ///         .get_trace_by_id(&"trace_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn get_trace_by_id_v1observability_traces_trace_id_get(
+    pub async fn get_trace_by_id(
         &self,
         trace_id: &str,
         options: Option<RequestOptions>,
@@ -308,9 +308,9 @@ impl TracesClient {
     ///         .beta
     ///         .observability
     ///         .traces
-    ///         .get_trace_spans_v1observability_traces_trace_id_spans_get(
+    ///         .get_trace_spans(
     ///             &"trace_id".to_string(),
-    ///             &GetTraceSpansV1ObservabilityTracesTraceIDSpansGetQueryRequest {
+    ///             &GetTraceSpansQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -318,10 +318,10 @@ impl TracesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn get_trace_spans_v1observability_traces_trace_id_spans_get(
+    pub async fn get_trace_spans(
         &self,
         trace_id: &str,
-        request: &GetTraceSpansV1ObservabilityTracesTraceIdSpansGetQueryRequest,
+        request: &GetTraceSpansQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<GetSpans, ApiError> {
         self.http_client
@@ -366,10 +366,10 @@ impl TracesClient {
     ///         .beta
     ///         .observability
     ///         .traces
-    ///         .get_span_by_id_v1observability_traces_trace_id_spans_span_id_get(
+    ///         .get_span_by_id(
     ///             &"trace_id".to_string(),
     ///             &"span_id".to_string(),
-    ///             &GetSpanByIDV1ObservabilityTracesTraceIDSpansSpanIDGetQueryRequest {
+    ///             &GetSpanByIDQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -377,11 +377,11 @@ impl TracesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn get_span_by_id_v1observability_traces_trace_id_spans_span_id_get(
+    pub async fn get_span_by_id(
         &self,
         trace_id: &str,
         span_id: &str,
-        request: &GetSpanByIdV1ObservabilityTracesTraceIdSpansSpanIdGetQueryRequest,
+        request: &GetSpanByIdQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<GetSpan, ApiError> {
         self.http_client

@@ -47,8 +47,8 @@ impl AuditLogsClient {
     ///         .beta
     ///         .admin
     ///         .audit_logs
-    ///         .users_api_admin_audit_logs_get_audit_logs(
-    ///             &UsersAPIAdminAuditLogsGetAuditLogsQueryRequest {
+    ///         .list(
+    ///             &BetaAdminAuditLogsListQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -56,9 +56,9 @@ impl AuditLogsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn users_api_admin_audit_logs_get_audit_logs(
+    pub async fn list(
         &self,
-        request: &UsersApiAdminAuditLogsGetAuditLogsQueryRequest,
+        request: &BetaAdminAuditLogsListQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<Vec<AuditLogOut>, ApiError> {
         self.http_client

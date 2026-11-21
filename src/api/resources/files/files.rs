@@ -38,7 +38,7 @@ impl FilesClient {
     ///     client
     ///         .files
     ///         .list(
-    ///             &ListQueryRequest {
+    ///             &FilesListQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -48,7 +48,7 @@ impl FilesClient {
     /// ```
     pub async fn list(
         &self,
-        request: &ListQueryRequest,
+        request: &FilesListQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<ListFilesResponse, ApiError> {
         self.http_client

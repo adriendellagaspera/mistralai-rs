@@ -40,8 +40,8 @@ impl RunsClient {
     ///         .observability
     ///         .evaluations
     ///         .runs
-    ///         .search_all_evaluation_runs_v2v1observability_evaluation_runs_v2search_post(
-    ///             &SearchAllEvaluationRunsV2V1ObservabilityEvaluationRunsV2SearchPostRequest {
+    ///         .search_all(
+    ///             &SearchAllRequest {
     ///                 body: Some(EvaluationRunFilterInput {
     ///                     ..Default::default()
     ///                 }),
@@ -52,9 +52,9 @@ impl RunsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn search_all_evaluation_runs_v2v1observability_evaluation_runs_v2search_post(
+    pub async fn search_all(
         &self,
-        request: &SearchAllEvaluationRunsV2V1ObservabilityEvaluationRunsV2SearchPostRequest,
+        request: &SearchAllRequest,
         options: Option<RequestOptions>,
     ) -> Result<SearchAllEvaluationRunsResponse, ApiError> {
         self.http_client
@@ -98,14 +98,11 @@ impl RunsClient {
     ///         .observability
     ///         .evaluations
     ///         .runs
-    ///         .get_evaluation_run_v2v1observability_evaluation_runs_v2run_id_get(
-    ///             &"run_id".to_string(),
-    ///             None,
-    ///         )
+    ///         .get(&"run_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn get_evaluation_run_v2v1observability_evaluation_runs_v2run_id_get(
+    pub async fn get(
         &self,
         run_id: &str,
         options: Option<RequestOptions>,
@@ -143,10 +140,16 @@ impl RunsClient {
     ///         ..Default::default()
     ///     };
     ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client.beta.observability.evaluations.runs.get_single_evaluation_run_statistics_v2v1observability_evaluation_runs_v2run_id_statistics_get(&"run_id".to_string(), None).await;
+    ///     client
+    ///         .beta
+    ///         .observability
+    ///         .evaluations
+    ///         .runs
+    ///         .get_statistics(&"run_id".to_string(), None)
+    ///         .await;
     /// }
     /// ```
-    pub async fn get_single_evaluation_run_statistics_v2v1observability_evaluation_runs_v2run_id_statistics_get(
+    pub async fn get_statistics(
         &self,
         run_id: &str,
         options: Option<RequestOptions>,
@@ -184,12 +187,22 @@ impl RunsClient {
     ///         ..Default::default()
     ///     };
     ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client.beta.observability.evaluations.runs.compute_filtered_run_statistics_v2v1observability_evaluation_runs_v2run_id_statistics_compute_post(&"run_id".to_string(), &Some(EvaluationRunRecordFilterInput {
-    ///         ..Default::default()
-    ///     }), None).await;
+    ///     client
+    ///         .beta
+    ///         .observability
+    ///         .evaluations
+    ///         .runs
+    ///         .compute_statistics(
+    ///             &"run_id".to_string(),
+    ///             &Some(EvaluationRunRecordFilterInput {
+    ///                 ..Default::default()
+    ///             }),
+    ///             None,
+    ///         )
+    ///         .await;
     /// }
     /// ```
-    pub async fn compute_filtered_run_statistics_v2v1observability_evaluation_runs_v2run_id_statistics_compute_post(
+    pub async fn compute_statistics(
         &self,
         run_id: &str,
         request: &Option<EvaluationRunRecordFilterInput>,
@@ -231,18 +244,28 @@ impl RunsClient {
     ///         ..Default::default()
     ///     };
     ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client.beta.observability.evaluations.runs.search_evaluation_runs_v2v1observability_evaluations_v2evaluation_slug_runs_search_post(&"evaluation_slug".to_string(), &SearchEvaluationRunsV2V1ObservabilityEvaluationsV2EvaluationSlugRunsSearchPostRequest {
-    ///         body: Some(EvaluationRunFilterInput {
-    ///             ..Default::default()
-    ///         }),
-    ///         ..Default::default()
-    ///     }, None).await;
+    ///     client
+    ///         .beta
+    ///         .observability
+    ///         .evaluations
+    ///         .runs
+    ///         .search(
+    ///             &"evaluation_slug".to_string(),
+    ///             &SearchRequest {
+    ///                 body: Some(EvaluationRunFilterInput {
+    ///                     ..Default::default()
+    ///                 }),
+    ///                 ..Default::default()
+    ///             },
+    ///             None,
+    ///         )
+    ///         .await;
     /// }
     /// ```
-    pub async fn search_evaluation_runs_v2v1observability_evaluations_v2evaluation_slug_runs_search_post(
+    pub async fn search(
         &self,
         evaluation_slug: &str,
-        request: &SearchEvaluationRunsV2V1ObservabilityEvaluationsV2EvaluationSlugRunsSearchPostRequest,
+        request: &SearchRequest2,
         options: Option<RequestOptions>,
     ) -> Result<ListEvaluationRunsResponse, ApiError> {
         self.http_client

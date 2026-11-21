@@ -38,8 +38,8 @@ impl ConversationsClient {
     ///     client
     ///         .beta
     ///         .conversations
-    ///         .agents_api_v1conversations_list(
-    ///             &AgentsAPIV1ConversationsListQueryRequest {
+    ///         .list(
+    ///             &BetaConversationsListQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -47,11 +47,11 @@ impl ConversationsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn agents_api_v1conversations_list(
+    pub async fn list(
         &self,
-        request: &AgentsApiV1ConversationsListQueryRequest,
+        request: &BetaConversationsListQueryRequest,
         options: Option<RequestOptions>,
-    ) -> Result<Vec<AgentsApiV1ConversationsListConversationsResponseItem>, ApiError> {
+    ) -> Result<Vec<ListConversationsResponseItem>, ApiError> {
         self.http_client
             .execute_request(
                 Method::GET,
@@ -92,7 +92,7 @@ impl ConversationsClient {
     ///     client
     ///         .beta
     ///         .conversations
-    ///         .agents_api_v1conversations_start(
+    ///         .start(
     ///             &ConversationRequest {
     ///                 inputs: ConversationInputs::String("inputs".to_string()),
     ///                 agent_id: None,
@@ -114,7 +114,7 @@ impl ConversationsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn agents_api_v1conversations_start(
+    pub async fn start(
         &self,
         request: &ConversationRequest,
         options: Option<RequestOptions>,
@@ -155,7 +155,7 @@ impl ConversationsClient {
     ///     client
     ///         .beta
     ///         .conversations
-    ///         .agents_api_v1conversations_start_stream(
+    ///         .start_stream(
     ///             &ConversationStreamRequest {
     ///                 inputs: ConversationInputs::String("inputs".to_string()),
     ///                 agent_id: None,
@@ -177,7 +177,7 @@ impl ConversationsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn agents_api_v1conversations_start_stream(
+    pub async fn start_stream(
         &self,
         request: &ConversationStreamRequest,
         options: Option<RequestOptions>,
@@ -220,15 +220,15 @@ impl ConversationsClient {
     ///     client
     ///         .beta
     ///         .conversations
-    ///         .agents_api_v1conversations_get(&"conversation_id".to_string(), None)
+    ///         .get(&"conversation_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn agents_api_v1conversations_get(
+    pub async fn get(
         &self,
         conversation_id: &str,
         options: Option<RequestOptions>,
-    ) -> Result<AgentsApiV1ConversationsGetConversationsResponse, ApiError> {
+    ) -> Result<GetConversationsResponse, ApiError> {
         self.http_client
             .execute_request(
                 Method::GET,
@@ -266,7 +266,7 @@ impl ConversationsClient {
     ///     client
     ///         .beta
     ///         .conversations
-    ///         .agents_api_v1conversations_append(
+    ///         .append(
     ///             &"conversation_id".to_string(),
     ///             &ConversationAppendRequest {
     ///                 ..Default::default()
@@ -276,7 +276,7 @@ impl ConversationsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn agents_api_v1conversations_append(
+    pub async fn append(
         &self,
         conversation_id: &str,
         request: &ConversationAppendRequest,
@@ -319,11 +319,11 @@ impl ConversationsClient {
     ///     client
     ///         .beta
     ///         .conversations
-    ///         .agents_api_v1conversations_delete(&"conversation_id".to_string(), None)
+    ///         .delete(&"conversation_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn agents_api_v1conversations_delete(
+    pub async fn delete(
         &self,
         conversation_id: &str,
         options: Option<RequestOptions>,
@@ -365,7 +365,7 @@ impl ConversationsClient {
     ///     client
     ///         .beta
     ///         .conversations
-    ///         .agents_api_v1conversations_append_stream(
+    ///         .append_stream(
     ///             &"conversation_id".to_string(),
     ///             &ConversationAppendStreamRequest {
     ///                 ..Default::default()
@@ -375,7 +375,7 @@ impl ConversationsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn agents_api_v1conversations_append_stream(
+    pub async fn append_stream(
         &self,
         conversation_id: &str,
         request: &ConversationAppendStreamRequest,
@@ -419,11 +419,11 @@ impl ConversationsClient {
     ///     client
     ///         .beta
     ///         .conversations
-    ///         .agents_api_v1conversations_history(&"conversation_id".to_string(), None)
+    ///         .get_history(&"conversation_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn agents_api_v1conversations_history(
+    pub async fn get_history(
         &self,
         conversation_id: &str,
         options: Option<RequestOptions>,
@@ -465,11 +465,11 @@ impl ConversationsClient {
     ///     client
     ///         .beta
     ///         .conversations
-    ///         .agents_api_v1conversations_messages(&"conversation_id".to_string(), None)
+    ///         .get_messages(&"conversation_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn agents_api_v1conversations_messages(
+    pub async fn get_messages(
         &self,
         conversation_id: &str,
         options: Option<RequestOptions>,
@@ -511,7 +511,7 @@ impl ConversationsClient {
     ///     client
     ///         .beta
     ///         .conversations
-    ///         .agents_api_v1conversations_restart(
+    ///         .restart(
     ///             &"conversation_id".to_string(),
     ///             &ConversationRestartRequest {
     ///                 from_entry_id: "from_entry_id".to_string(),
@@ -529,7 +529,7 @@ impl ConversationsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn agents_api_v1conversations_restart(
+    pub async fn restart(
         &self,
         conversation_id: &str,
         request: &ConversationRestartRequest,
@@ -572,7 +572,7 @@ impl ConversationsClient {
     ///     client
     ///         .beta
     ///         .conversations
-    ///         .agents_api_v1conversations_restart_stream(
+    ///         .restart_stream(
     ///             &"conversation_id".to_string(),
     ///             &ConversationRestartStreamRequest {
     ///                 from_entry_id: "from_entry_id".to_string(),
@@ -590,7 +590,7 @@ impl ConversationsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn agents_api_v1conversations_restart_stream(
+    pub async fn restart_stream(
         &self,
         conversation_id: &str,
         request: &ConversationRestartStreamRequest,

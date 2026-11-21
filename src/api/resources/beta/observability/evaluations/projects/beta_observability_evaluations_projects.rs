@@ -41,8 +41,8 @@ impl ProjectsClient {
     ///         .observability
     ///         .evaluations
     ///         .projects
-    ///         .get_projects_v1observability_projects_get(
-    ///             &GetProjectsV1ObservabilityProjectsGetQueryRequest {
+    ///         .list(
+    ///             &BetaObservabilityEvaluationsProjectsListQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -50,9 +50,9 @@ impl ProjectsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn get_projects_v1observability_projects_get(
+    pub async fn list(
         &self,
-        request: &GetProjectsV1ObservabilityProjectsGetQueryRequest,
+        request: &BetaObservabilityEvaluationsProjectsListQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<Projects, ApiError> {
         self.http_client
@@ -97,11 +97,11 @@ impl ProjectsClient {
     ///         .observability
     ///         .evaluations
     ///         .projects
-    ///         .get_project_v1observability_projects_project_slug_get(&"project_slug".to_string(), None)
+    ///         .get(&"project_slug".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn get_project_v1observability_projects_project_slug_get(
+    pub async fn get(
         &self,
         project_slug: &str,
         options: Option<RequestOptions>,

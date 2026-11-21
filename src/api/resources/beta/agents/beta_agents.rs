@@ -42,8 +42,8 @@ impl AgentsClient3 {
     ///     client
     ///         .beta
     ///         .agents
-    ///         .agents_api_v1agents_list(
-    ///             &AgentsAPIV1AgentsListQueryRequest {
+    ///         .list(
+    ///             &BetaAgentsListQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -51,9 +51,9 @@ impl AgentsClient3 {
     ///         .await;
     /// }
     /// ```
-    pub async fn agents_api_v1agents_list(
+    pub async fn list(
         &self,
-        request: &AgentsApiV1AgentsListQueryRequest,
+        request: &BetaAgentsListQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<Vec<Agent>, ApiError> {
         self.http_client
@@ -101,7 +101,7 @@ impl AgentsClient3 {
     ///     client
     ///         .beta
     ///         .agents
-    ///         .agents_api_v1agents_create(
+    ///         .create(
     ///             &CreateAgentRequest {
     ///                 model: "model".to_string(),
     ///                 name: "name".to_string(),
@@ -119,7 +119,7 @@ impl AgentsClient3 {
     ///         .await;
     /// }
     /// ```
-    pub async fn agents_api_v1agents_create(
+    pub async fn create(
         &self,
         request: &CreateAgentRequest,
         options: Option<RequestOptions>,
@@ -164,8 +164,8 @@ impl AgentsClient3 {
     ///     client
     ///         .beta
     ///         .agents
-    ///         .agents_api_v1agents_list_pages(
-    ///             &AgentsAPIV1AgentsListPagesQueryRequest {
+    ///         .list_pages(
+    ///             &ListPagesQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -173,9 +173,9 @@ impl AgentsClient3 {
     ///         .await;
     /// }
     /// ```
-    pub async fn agents_api_v1agents_list_pages(
+    pub async fn list_pages(
         &self,
-        request: &AgentsApiV1AgentsListPagesQueryRequest,
+        request: &ListPagesQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<AgentListPage, ApiError> {
         self.http_client
@@ -223,9 +223,9 @@ impl AgentsClient3 {
     ///     client
     ///         .beta
     ///         .agents
-    ///         .agents_api_v1agents_get(
+    ///         .get(
     ///             &"agent_id".to_string(),
-    ///             &AgentsAPIV1AgentsGetQueryRequest {
+    ///             &BetaAgentsGetQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -233,10 +233,10 @@ impl AgentsClient3 {
     ///         .await;
     /// }
     /// ```
-    pub async fn agents_api_v1agents_get(
+    pub async fn get(
         &self,
         agent_id: &str,
-        request: &AgentsApiV1AgentsGetQueryRequest,
+        request: &BetaAgentsGetQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<Agent, ApiError> {
         self.http_client
@@ -277,11 +277,11 @@ impl AgentsClient3 {
     ///     client
     ///         .beta
     ///         .agents
-    ///         .agents_api_v1agents_delete(&"agent_id".to_string(), None)
+    ///         .delete(&"agent_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn agents_api_v1agents_delete(
+    pub async fn delete(
         &self,
         agent_id: &str,
         options: Option<RequestOptions>,
@@ -322,7 +322,7 @@ impl AgentsClient3 {
     ///     client
     ///         .beta
     ///         .agents
-    ///         .agents_api_v1agents_update(
+    ///         .update(
     ///             &"agent_id".to_string(),
     ///             &UpdateAgentRequest {
     ///                 ..Default::default()
@@ -332,7 +332,7 @@ impl AgentsClient3 {
     ///         .await;
     /// }
     /// ```
-    pub async fn agents_api_v1agents_update(
+    pub async fn update(
         &self,
         agent_id: &str,
         request: &UpdateAgentRequest,
@@ -374,11 +374,11 @@ impl AgentsClient3 {
     ///     client
     ///         .beta
     ///         .agents
-    ///         .agents_api_v1agents_list_version_aliases(&"agent_id".to_string(), None)
+    ///         .list_version_aliases(&"agent_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn agents_api_v1agents_list_version_aliases(
+    pub async fn list_version_aliases(
         &self,
         agent_id: &str,
         options: Option<RequestOptions>,
@@ -419,9 +419,9 @@ impl AgentsClient3 {
     ///     client
     ///         .beta
     ///         .agents
-    ///         .agents_api_v1agents_create_or_update_alias(
+    ///         .create_version_alias(
     ///             &"agent_id".to_string(),
-    ///             &AgentsAPIV1AgentsCreateOrUpdateAliasQueryRequest {
+    ///             &CreateVersionAliasQueryRequest {
     ///                 alias: "alias".to_string(),
     ///                 version: 1,
     ///             },
@@ -430,10 +430,10 @@ impl AgentsClient3 {
     ///         .await;
     /// }
     /// ```
-    pub async fn agents_api_v1agents_create_or_update_alias(
+    pub async fn create_version_alias(
         &self,
         agent_id: &str,
-        request: &AgentsApiV1AgentsCreateOrUpdateAliasQueryRequest,
+        request: &CreateVersionAliasQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<AgentAliasResponse, ApiError> {
         self.http_client
@@ -475,9 +475,9 @@ impl AgentsClient3 {
     ///     client
     ///         .beta
     ///         .agents
-    ///         .agents_api_v1agents_delete_alias(
+    ///         .delete_version_alias(
     ///             &"agent_id".to_string(),
-    ///             &AgentsAPIV1AgentsDeleteAliasQueryRequest {
+    ///             &DeleteVersionAliasQueryRequest {
     ///                 alias: "alias".to_string(),
     ///             },
     ///             None,
@@ -485,10 +485,10 @@ impl AgentsClient3 {
     ///         .await;
     /// }
     /// ```
-    pub async fn agents_api_v1agents_delete_alias(
+    pub async fn delete_version_alias(
         &self,
         agent_id: &str,
-        request: &AgentsApiV1AgentsDeleteAliasQueryRequest,
+        request: &DeleteVersionAliasQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<(), ApiError> {
         self.http_client
@@ -529,18 +529,18 @@ impl AgentsClient3 {
     ///     client
     ///         .beta
     ///         .agents
-    ///         .agents_api_v1agents_update_version(
+    ///         .update_version(
     ///             &"agent_id".to_string(),
-    ///             &AgentsAPIV1AgentsUpdateVersionQueryRequest { version: 1 },
+    ///             &UpdateVersionQueryRequest { version: 1 },
     ///             None,
     ///         )
     ///         .await;
     /// }
     /// ```
-    pub async fn agents_api_v1agents_update_version(
+    pub async fn update_version(
         &self,
         agent_id: &str,
-        request: &AgentsApiV1AgentsUpdateVersionQueryRequest,
+        request: &UpdateVersionQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<Agent, ApiError> {
         self.http_client
@@ -583,9 +583,9 @@ impl AgentsClient3 {
     ///     client
     ///         .beta
     ///         .agents
-    ///         .agents_api_v1agents_list_versions(
+    ///         .list_versions(
     ///             &"agent_id".to_string(),
-    ///             &AgentsAPIV1AgentsListVersionsQueryRequest {
+    ///             &BetaAgentsListVersionsQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -593,10 +593,10 @@ impl AgentsClient3 {
     ///         .await;
     /// }
     /// ```
-    pub async fn agents_api_v1agents_list_versions(
+    pub async fn list_versions(
         &self,
         agent_id: &str,
-        request: &AgentsApiV1AgentsListVersionsQueryRequest,
+        request: &BetaAgentsListVersionsQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<Vec<Agent>, ApiError> {
         self.http_client
@@ -638,11 +638,11 @@ impl AgentsClient3 {
     ///     client
     ///         .beta
     ///         .agents
-    ///         .agents_api_v1agents_get_version(&"agent_id".to_string(), &"version".to_string(), None)
+    ///         .get_version(&"agent_id".to_string(), &"version".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn agents_api_v1agents_get_version(
+    pub async fn get_version(
         &self,
         agent_id: &str,
         version: &str,

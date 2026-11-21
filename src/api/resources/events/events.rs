@@ -42,8 +42,8 @@ impl EventsClient {
     ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .events
-    ///         .get_workflow_events_v1workflows_events_list_get(
-    ///             &GetWorkflowEventsV1WorkflowsEventsListGetQueryRequest {
+    ///         .get_workflow_events(
+    ///             &GetWorkflowEventsQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -51,9 +51,9 @@ impl EventsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn get_workflow_events_v1workflows_events_list_get(
+    pub async fn get_workflow_events(
         &self,
-        request: &GetWorkflowEventsV1WorkflowsEventsListGetQueryRequest,
+        request: &GetWorkflowEventsQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<ListWorkflowEventResponse, ApiError> {
         self.http_client
@@ -102,8 +102,8 @@ impl EventsClient {
     ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .events
-    ///         .get_stream_events_v1workflows_events_stream_get(
-    ///             &GetStreamEventsV1WorkflowsEventsStreamGetQueryRequest {
+    ///         .get_stream_events(
+    ///             &GetStreamEventsQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             Some(RequestOptions::new()),
@@ -111,11 +111,11 @@ impl EventsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn get_stream_events_v1workflows_events_stream_get(
+    pub async fn get_stream_events(
         &self,
-        request: &GetStreamEventsV1WorkflowsEventsStreamGetQueryRequest,
+        request: &GetStreamEventsQueryRequest,
         options: Option<RequestOptions>,
-    ) -> Result<SseStream<GetStreamEventsV1WorkflowsEventsStreamGetEventsResponse>, ApiError> {
+    ) -> Result<SseStream<GetStreamEventsEventsResponse>, ApiError> {
         self.http_client
             .execute_sse_request(
                 Method::GET,

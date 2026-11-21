@@ -37,7 +37,7 @@ impl ClassifiersClient {
     ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .classifiers
-    ///         .chat_classifications_v1chat_classifications_post(
+    ///         .classify_chat(
     ///             &ChatClassificationRequest {
     ///                 input: ChatClassificationRequestInputs::InstructRequest(InstructRequest {
     ///                     messages: vec![InstructRequestMessagesItem::Assistant {
@@ -54,7 +54,7 @@ impl ClassifiersClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn chat_classifications_v1chat_classifications_post(
+    pub async fn classify_chat(
         &self,
         request: &ChatClassificationRequest,
         options: Option<RequestOptions>,
@@ -94,7 +94,7 @@ impl ClassifiersClient {
     ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .classifiers
-    ///         .chat_moderations_v1chat_moderations_post(
+    ///         .moderate_chat(
     ///             &ChatModerationRequest {
     ///                 input: ChatModerationRequestInput::ChatModerationRequestInputZeroItemList(vec![
     ///                     ChatModerationRequestInputZeroItem::Assistant {
@@ -110,7 +110,7 @@ impl ClassifiersClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn chat_moderations_v1chat_moderations_post(
+    pub async fn moderate_chat(
         &self,
         request: &ChatModerationRequest,
         options: Option<RequestOptions>,
@@ -150,7 +150,7 @@ impl ClassifiersClient {
     ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .classifiers
-    ///         .classifications_v1classifications_post(
+    ///         .classify(
     ///             &ClassificationRequest {
     ///                 input: ClassificationRequestInput::String("input".to_string()),
     ///                 metadata: None,
@@ -161,7 +161,7 @@ impl ClassifiersClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn classifications_v1classifications_post(
+    pub async fn classify(
         &self,
         request: &ClassificationRequest,
         options: Option<RequestOptions>,
@@ -201,7 +201,7 @@ impl ClassifiersClient {
     ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .classifiers
-    ///         .moderations_v1moderations_post(
+    ///         .moderate(
     ///             &ClassificationRequest {
     ///                 input: ClassificationRequestInput::String("input".to_string()),
     ///                 metadata: None,
@@ -212,7 +212,7 @@ impl ClassifiersClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn moderations_v1moderations_post(
+    pub async fn moderate(
         &self,
         request: &ClassificationRequest,
         options: Option<RequestOptions>,

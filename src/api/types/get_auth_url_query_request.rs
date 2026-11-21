@@ -1,0 +1,72 @@
+pub use crate::prelude::*;
+
+/// Query parameters for get_auth_url
+#[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
+pub struct GetAuthUrlQueryRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub app_return_url: Option<String>,
+    /// Auth method type to use for the authorization URL. Required when the connector supports multiple interactive auth methods; otherwise the sole method is selected automatically. Use this to pick a specific method (e.g. 'oauth2' vs 'github_app').
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub method_type: Option<AuthenticationType>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub credentials_name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub credentials_title: Option<String>,
+    /// Only valid with method_type=oauth2. When true, returns a GitHub App installation URL (https://github.com/apps/<slug>/installations/new) if the connector has the proper configuration The Github application needs to have 'Request user authorization (OAuth) during installation' enabled to perform the proper auth loop.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub github_installation_link: Option<bool>,
+}
+
+impl GetAuthUrlQueryRequest {
+    pub fn builder() -> GetAuthUrlQueryRequestBuilder {
+        <GetAuthUrlQueryRequestBuilder as Default>::default()
+    }
+}
+
+#[derive(Clone, PartialEq, Default, Debug)]
+#[non_exhaustive]
+pub struct GetAuthUrlQueryRequestBuilder {
+    app_return_url: Option<String>,
+    method_type: Option<AuthenticationType>,
+    credentials_name: Option<String>,
+    credentials_title: Option<String>,
+    github_installation_link: Option<bool>,
+}
+
+impl GetAuthUrlQueryRequestBuilder {
+    pub fn app_return_url(mut self, value: impl Into<String>) -> Self {
+        self.app_return_url = Some(value.into());
+        self
+    }
+
+    pub fn method_type(mut self, value: AuthenticationType) -> Self {
+        self.method_type = Some(value);
+        self
+    }
+
+    pub fn credentials_name(mut self, value: impl Into<String>) -> Self {
+        self.credentials_name = Some(value.into());
+        self
+    }
+
+    pub fn credentials_title(mut self, value: impl Into<String>) -> Self {
+        self.credentials_title = Some(value.into());
+        self
+    }
+
+    pub fn github_installation_link(mut self, value: bool) -> Self {
+        self.github_installation_link = Some(value);
+        self
+    }
+
+    /// Consumes the builder and constructs a [`GetAuthUrlQueryRequest`].
+    pub fn build(self) -> Result<GetAuthUrlQueryRequest, BuildError> {
+        Ok(GetAuthUrlQueryRequest {
+            app_return_url: self.app_return_url,
+            method_type: self.method_type,
+            credentials_name: self.credentials_name,
+            credentials_title: self.credentials_title,
+            github_installation_link: self.github_installation_link,
+        })
+    }
+}

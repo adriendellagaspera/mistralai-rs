@@ -13,45 +13,6 @@ impl UsersClient2 {
         })
     }
 
-    /// List Organization and Workspace roles.
-    ///
-    /// # Arguments
-    ///
-    /// * `options` - Additional request options such as headers, timeout, etc.
-    ///
-    /// # Returns
-    ///
-    /// JSON response from the API
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// use mistralai_sdk::prelude::*;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let config = ClientConfig {
-    ///         token: Some("<token>".to_string()),
-    ///         ..Default::default()
-    ///     };
-    ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client
-    ///         .beta
-    ///         .admin
-    ///         .users
-    ///         .users_api_admin_roles_get_roles(None)
-    ///         .await;
-    /// }
-    /// ```
-    pub async fn users_api_admin_roles_get_roles(
-        &self,
-        options: Option<RequestOptions>,
-    ) -> Result<RolesOut, ApiError> {
-        self.http_client
-            .execute_request(Method::GET, "v1/admin/roles", None, None, options)
-            .await
-    }
-
     /// List Organization members and pending invitations.
     ///
     /// # Arguments
@@ -82,8 +43,8 @@ impl UsersClient2 {
     ///         .beta
     ///         .admin
     ///         .users
-    ///         .users_api_admin_users_get_users(
-    ///             &UsersAPIAdminUsersGetUsersQueryRequest {
+    ///         .list(
+    ///             &BetaAdminUsersListQueryRequest {
     ///                 include_inactive: Some(true),
     ///                 ..Default::default()
     ///             },
@@ -92,9 +53,9 @@ impl UsersClient2 {
     ///         .await;
     /// }
     /// ```
-    pub async fn users_api_admin_users_get_users(
+    pub async fn list(
         &self,
-        request: &UsersApiAdminUsersGetUsersQueryRequest,
+        request: &BetaAdminUsersListQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<OrganizationAdminUsersOut, ApiError> {
         self.http_client
@@ -139,7 +100,7 @@ impl UsersClient2 {
     ///         .beta
     ///         .admin
     ///         .users
-    ///         .users_api_admin_users_create_users(
+    ///         .create(
     ///             &vec![OrganizationMemberCreate {
     ///                 email: "alice.martin@example.com".to_string(),
     ///                 first_name: "Alice".to_string(),
@@ -151,7 +112,7 @@ impl UsersClient2 {
     ///         .await;
     /// }
     /// ```
-    pub async fn users_api_admin_users_create_users(
+    pub async fn create(
         &self,
         request: &Vec<OrganizationMemberCreate>,
         options: Option<RequestOptions>,
@@ -189,15 +150,10 @@ impl UsersClient2 {
     ///         ..Default::default()
     ///     };
     ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client
-    ///         .beta
-    ///         .admin
-    ///         .users
-    ///         .users_api_admin_users_get_invite(None)
-    ///         .await;
+    ///     client.beta.admin.users.get_invite(None).await;
     /// }
     /// ```
-    pub async fn users_api_admin_users_get_invite(
+    pub async fn get_invite(
         &self,
         options: Option<RequestOptions>,
     ) -> Result<Vec<OrganizationUserInviteOut>, ApiError> {
@@ -232,7 +188,7 @@ impl UsersClient2 {
     ///         .beta
     ///         .admin
     ///         .users
-    ///         .users_api_admin_users_invite_users(
+    ///         .invite(
     ///             &OrganizationInviteIn {
     ///                 email: "alice.martin@example.com, bob.smith@example.com".to_string(),
     ///                 email_language: None,
@@ -250,7 +206,7 @@ impl UsersClient2 {
     ///         .await;
     /// }
     /// ```
-    pub async fn users_api_admin_users_invite_users(
+    pub async fn invite(
         &self,
         request: &OrganizationInviteIn,
         options: Option<RequestOptions>,
@@ -293,11 +249,11 @@ impl UsersClient2 {
     ///         .beta
     ///         .admin
     ///         .users
-    ///         .users_api_admin_users_delete_invite(&"invite_uuid".to_string(), None)
+    ///         .delete_invite(&"invite_uuid".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn users_api_admin_users_delete_invite(
+    pub async fn delete_invite(
         &self,
         invite_uuid: &str,
         options: Option<RequestOptions>,
@@ -340,11 +296,11 @@ impl UsersClient2 {
     ///         .beta
     ///         .admin
     ///         .users
-    ///         .users_api_admin_users_get_user(&"user_id".to_string(), None)
+    ///         .get(&"user_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn users_api_admin_users_get_user(
+    pub async fn get(
         &self,
         user_id: &str,
         options: Option<RequestOptions>,
@@ -389,11 +345,11 @@ impl UsersClient2 {
     ///         .beta
     ///         .admin
     ///         .users
-    ///         .users_api_admin_users_delete_user(&"user_id".to_string(), None)
+    ///         .delete(&"user_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn users_api_admin_users_delete_user(
+    pub async fn delete(
         &self,
         user_id: &str,
         options: Option<RequestOptions>,
@@ -436,7 +392,7 @@ impl UsersClient2 {
     ///         .beta
     ///         .admin
     ///         .users
-    ///         .users_api_admin_users_update_user(
+    ///         .update(
     ///             &"user_id".to_string(),
     ///             &AdminOrganizationMemberUpdate {
     ///                 ..Default::default()
@@ -446,7 +402,7 @@ impl UsersClient2 {
     ///         .await;
     /// }
     /// ```
-    pub async fn users_api_admin_users_update_user(
+    pub async fn update(
         &self,
         user_id: &str,
         request: &AdminOrganizationMemberUpdate,
@@ -492,11 +448,11 @@ impl UsersClient2 {
     ///         .beta
     ///         .admin
     ///         .users
-    ///         .users_api_admin_users_deactivate_user(&"user_id".to_string(), None)
+    ///         .deactivate(&"user_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn users_api_admin_users_deactivate_user(
+    pub async fn deactivate(
         &self,
         user_id: &str,
         options: Option<RequestOptions>,
@@ -540,11 +496,11 @@ impl UsersClient2 {
     ///         .beta
     ///         .admin
     ///         .users
-    ///         .users_api_admin_users_reactivate_user(&"user_id".to_string(), None)
+    ///         .reactivate(&"user_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn users_api_admin_users_reactivate_user(
+    pub async fn reactivate(
         &self,
         user_id: &str,
         options: Option<RequestOptions>,
@@ -589,9 +545,9 @@ impl UsersClient2 {
     ///         .beta
     ///         .admin
     ///         .users
-    ///         .users_api_admin_users_get_user_workspaces(
+    ///         .list_workspaces(
     ///             &"user_id".to_string(),
-    ///             &UsersAPIAdminUsersGetUserWorkspacesQueryRequest {
+    ///             &BetaAdminUsersListWorkspacesQueryRequest {
     ///                 page: Some(1),
     ///                 page_size: Some(25),
     ///                 ..Default::default()
@@ -601,10 +557,10 @@ impl UsersClient2 {
     ///         .await;
     /// }
     /// ```
-    pub async fn users_api_admin_users_get_user_workspaces(
+    pub async fn list_workspaces(
         &self,
         user_id: &str,
-        request: &UsersApiAdminUsersGetUserWorkspacesQueryRequest,
+        request: &BetaAdminUsersListWorkspacesQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<AdminUserWorkspacesOut, ApiError> {
         self.http_client

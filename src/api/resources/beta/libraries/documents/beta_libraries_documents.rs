@@ -40,9 +40,9 @@ impl DocumentsClient {
     ///         .beta
     ///         .libraries
     ///         .documents
-    ///         .libraries_documents_list_v1(
+    ///         .list(
     ///             &"library_id".to_string(),
-    ///             &LibrariesDocumentsListV1QueryRequest {
+    ///             &BetaLibrariesDocumentsListQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -50,10 +50,10 @@ impl DocumentsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn libraries_documents_list_v1(
+    pub async fn list(
         &self,
         library_id: &str,
-        request: &LibrariesDocumentsListV1QueryRequest,
+        request: &BetaLibrariesDocumentsListQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<ListDocumentsResponse, ApiError> {
         self.http_client
@@ -100,9 +100,9 @@ impl DocumentsClient {
     ///         .beta
     ///         .libraries
     ///         .documents
-    ///         .libraries_documents_upload_v1(
+    ///         .upload(
     ///             &"library_id".to_string(),
-    ///             &LibrariesDocumentsUploadV1Request {
+    ///             &UploadRequest {
     ///                 file: File("file".to_string()),
     ///             },
     ///             None,
@@ -110,10 +110,10 @@ impl DocumentsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn libraries_documents_upload_v1(
+    pub async fn upload(
         &self,
         library_id: &str,
-        request: &LibrariesDocumentsUploadV1Request,
+        request: &UploadRequest,
         options: Option<RequestOptions>,
     ) -> Result<Document, ApiError> {
         self.http_client
@@ -153,11 +153,11 @@ impl DocumentsClient {
     ///         .beta
     ///         .libraries
     ///         .documents
-    ///         .libraries_documents_get_v1(&"library_id".to_string(), &"document_id".to_string(), None)
+    ///         .get(&"library_id".to_string(), &"document_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn libraries_documents_get_v1(
+    pub async fn get(
         &self,
         library_id: &str,
         document_id: &str,
@@ -255,11 +255,11 @@ impl DocumentsClient {
     ///         .beta
     ///         .libraries
     ///         .documents
-    ///         .libraries_documents_delete_v1(&"library_id".to_string(), &"document_id".to_string(), None)
+    ///         .delete(&"library_id".to_string(), &"document_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn libraries_documents_delete_v1(
+    pub async fn delete(
         &self,
         library_id: &str,
         document_id: &str,
@@ -302,7 +302,7 @@ impl DocumentsClient {
     ///         .beta
     ///         .libraries
     ///         .documents
-    ///         .libraries_documents_patch_v1(
+    ///         .update(
     ///             &"library_id".to_string(),
     ///             &"document_id".to_string(),
     ///             &UpdateDocumentRequest {
@@ -313,7 +313,7 @@ impl DocumentsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn libraries_documents_patch_v1(
+    pub async fn update(
         &self,
         library_id: &str,
         document_id: &str,
@@ -357,15 +357,11 @@ impl DocumentsClient {
     ///         .beta
     ///         .libraries
     ///         .documents
-    ///         .libraries_documents_get_extracted_text_signed_url_v1(
-    ///             &"library_id".to_string(),
-    ///             &"document_id".to_string(),
-    ///             None,
-    ///         )
+    ///         .extracted_text_signed_url(&"library_id".to_string(), &"document_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn libraries_documents_get_extracted_text_signed_url_v1(
+    pub async fn extracted_text_signed_url(
         &self,
         library_id: &str,
         document_id: &str,
@@ -411,15 +407,11 @@ impl DocumentsClient {
     ///         .beta
     ///         .libraries
     ///         .documents
-    ///         .libraries_documents_reprocess_v1(
-    ///             &"library_id".to_string(),
-    ///             &"document_id".to_string(),
-    ///             None,
-    ///         )
+    ///         .reprocess(&"library_id".to_string(), &"document_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn libraries_documents_reprocess_v1(
+    pub async fn reprocess(
         &self,
         library_id: &str,
         document_id: &str,
@@ -465,15 +457,11 @@ impl DocumentsClient {
     ///         .beta
     ///         .libraries
     ///         .documents
-    ///         .libraries_documents_get_signed_url_v1(
-    ///             &"library_id".to_string(),
-    ///             &"document_id".to_string(),
-    ///             None,
-    ///         )
+    ///         .get_signed_url(&"library_id".to_string(), &"document_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn libraries_documents_get_signed_url_v1(
+    pub async fn get_signed_url(
         &self,
         library_id: &str,
         document_id: &str,
@@ -519,15 +507,11 @@ impl DocumentsClient {
     ///         .beta
     ///         .libraries
     ///         .documents
-    ///         .libraries_documents_get_status_v1(
-    ///             &"library_id".to_string(),
-    ///             &"document_id".to_string(),
-    ///             None,
-    ///         )
+    ///         .status(&"library_id".to_string(), &"document_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn libraries_documents_get_status_v1(
+    pub async fn status(
         &self,
         library_id: &str,
         document_id: &str,
@@ -573,10 +557,10 @@ impl DocumentsClient {
     ///         .beta
     ///         .libraries
     ///         .documents
-    ///         .libraries_documents_get_text_content_v1(
+    ///         .text_content(
     ///             &"library_id".to_string(),
     ///             &"document_id".to_string(),
-    ///             &LibrariesDocumentsGetTextContentV1QueryRequest {
+    ///             &TextContentQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -584,11 +568,11 @@ impl DocumentsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn libraries_documents_get_text_content_v1(
+    pub async fn text_content(
         &self,
         library_id: &str,
         document_id: &str,
-        request: &LibrariesDocumentsGetTextContentV1QueryRequest,
+        request: &TextContentQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<DocumentTextContent, ApiError> {
         self.http_client

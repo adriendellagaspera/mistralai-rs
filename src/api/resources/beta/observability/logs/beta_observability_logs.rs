@@ -35,18 +35,10 @@ impl LogsClient {
     ///         ..Default::default()
     ///     };
     ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client
-    ///         .beta
-    ///         .observability
-    ///         .logs
-    ///         .get_log_fields_v1observability_logs_fields_get(None)
-    ///         .await;
+    ///     client.beta.observability.logs.list(None).await;
     /// }
     /// ```
-    pub async fn get_log_fields_v1observability_logs_fields_get(
-        &self,
-        options: Option<RequestOptions>,
-    ) -> Result<GetLogFields, ApiError> {
+    pub async fn list(&self, options: Option<RequestOptions>) -> Result<GetLogFields, ApiError> {
         self.http_client
             .execute_request(
                 Method::GET,
@@ -84,9 +76,9 @@ impl LogsClient {
     ///         .beta
     ///         .observability
     ///         .logs
-    ///         .get_log_field_options_v1observability_logs_fields_field_name_options_get(
+    ///         .fetch_options(
     ///             &"field_name".to_string(),
-    ///             &GetLogFieldOptionsV1ObservabilityLogsFieldsFieldNameOptionsGetQueryRequest {
+    ///             &BetaObservabilityLogsFetchOptionsQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -94,10 +86,10 @@ impl LogsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn get_log_field_options_v1observability_logs_fields_field_name_options_get(
+    pub async fn fetch_options(
         &self,
         field_name: &str,
-        request: &GetLogFieldOptionsV1ObservabilityLogsFieldsFieldNameOptionsGetQueryRequest,
+        request: &BetaObservabilityLogsFetchOptionsQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<GetLogFieldOptions, ApiError> {
         self.http_client
@@ -140,7 +132,7 @@ impl LogsClient {
     ///         .beta
     ///         .observability
     ///         .logs
-    ///         .search_logs_v1observability_logs_search_post(
+    ///         .search(
     ///             &LogsRequest {
     ///                 ..Default::default()
     ///             },
@@ -149,7 +141,7 @@ impl LogsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn search_logs_v1observability_logs_search_post(
+    pub async fn search(
         &self,
         request: &LogsRequest,
         options: Option<RequestOptions>,

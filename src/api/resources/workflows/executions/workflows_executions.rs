@@ -38,7 +38,7 @@ impl ExecutionsClient {
     ///     client
     ///         .workflows
     ///         .executions
-    ///         .batch_cancel_workflow_executions_v1workflows_executions_cancel_post(
+    ///         .batch_cancel_workflow_executions(
     ///             &BatchExecutionBody {
     ///                 execution_ids: vec!["execution_ids".to_string()],
     ///                 ..Default::default()
@@ -48,7 +48,7 @@ impl ExecutionsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn batch_cancel_workflow_executions_v1workflows_executions_cancel_post(
+    pub async fn batch_cancel_workflow_executions(
         &self,
         request: &BatchExecutionBody,
         options: Option<RequestOptions>,
@@ -89,7 +89,7 @@ impl ExecutionsClient {
     ///     client
     ///         .workflows
     ///         .executions
-    ///         .batch_terminate_workflow_executions_v1workflows_executions_terminate_post(
+    ///         .batch_terminate_workflow_executions(
     ///             &BatchExecutionBody {
     ///                 execution_ids: vec!["execution_ids".to_string()],
     ///                 ..Default::default()
@@ -99,7 +99,7 @@ impl ExecutionsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn batch_terminate_workflow_executions_v1workflows_executions_terminate_post(
+    pub async fn batch_terminate_workflow_executions(
         &self,
         request: &BatchExecutionBody,
         options: Option<RequestOptions>,
@@ -141,9 +141,9 @@ impl ExecutionsClient {
     ///     client
     ///         .workflows
     ///         .executions
-    ///         .get_workflow_execution_v1workflows_executions_execution_id_get(
+    ///         .get_workflow_execution(
     ///             &"execution_id".to_string(),
-    ///             &GetWorkflowExecutionV1WorkflowsExecutionsExecutionIDGetQueryRequest {
+    ///             &GetWorkflowExecutionQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -151,10 +151,10 @@ impl ExecutionsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn get_workflow_execution_v1workflows_executions_execution_id_get(
+    pub async fn get_workflow_execution(
         &self,
         execution_id: &str,
-        request: &GetWorkflowExecutionV1WorkflowsExecutionsExecutionIdGetQueryRequest,
+        request: &GetWorkflowExecutionQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<WorkflowExecutionResponse, ApiError> {
         self.http_client
@@ -195,14 +195,11 @@ impl ExecutionsClient {
     ///     client
     ///         .workflows
     ///         .executions
-    ///         .cancel_workflow_execution_v1workflows_executions_execution_id_cancel_post(
-    ///             &"execution_id".to_string(),
-    ///             None,
-    ///         )
+    ///         .cancel_workflow_execution(&"execution_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn cancel_workflow_execution_v1workflows_executions_execution_id_cancel_post(
+    pub async fn cancel_workflow_execution(
         &self,
         execution_id: &str,
         options: Option<RequestOptions>,
@@ -243,9 +240,9 @@ impl ExecutionsClient {
     ///     client
     ///         .workflows
     ///         .executions
-    ///         .get_workflow_execution_history_v1workflows_executions_execution_id_history_get(
+    ///         .get_workflow_execution_history(
     ///             &"execution_id".to_string(),
-    ///             &GetWorkflowExecutionHistoryV1WorkflowsExecutionsExecutionIDHistoryGetQueryRequest {
+    ///             &GetWorkflowExecutionHistoryQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -253,10 +250,10 @@ impl ExecutionsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn get_workflow_execution_history_v1workflows_executions_execution_id_history_get(
+    pub async fn get_workflow_execution_history(
         &self,
         execution_id: &str,
-        request: &GetWorkflowExecutionHistoryV1WorkflowsExecutionsExecutionIdHistoryGetQueryRequest,
+        request: &GetWorkflowExecutionHistoryQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<serde_json::Value, ApiError> {
         self.http_client
@@ -432,7 +429,7 @@ impl ExecutionsClient {
     ///     client
     ///         .workflows
     ///         .executions
-    ///         .query_workflow_execution_v1workflows_executions_execution_id_queries_post(
+    ///         .query_workflow_execution(
     ///             &"execution_id".to_string(),
     ///             &QueryInvocationBody {
     ///                 name: "name".to_string(),
@@ -443,7 +440,7 @@ impl ExecutionsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn query_workflow_execution_v1workflows_executions_execution_id_queries_post(
+    pub async fn query_workflow_execution(
         &self,
         execution_id: &str,
         request: &QueryInvocationBody,
@@ -485,7 +482,7 @@ impl ExecutionsClient {
     ///     client
     ///         .workflows
     ///         .executions
-    ///         .reset_workflow_v1workflows_executions_execution_id_reset_post(
+    ///         .reset_workflow(
     ///             &"execution_id".to_string(),
     ///             &ResetInvocationBody {
     ///                 event_id: 1,
@@ -498,7 +495,7 @@ impl ExecutionsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn reset_workflow_v1workflows_executions_execution_id_reset_post(
+    pub async fn reset_workflow(
         &self,
         execution_id: &str,
         request: &ResetInvocationBody,
@@ -540,7 +537,7 @@ impl ExecutionsClient {
     ///     client
     ///         .workflows
     ///         .executions
-    ///         .signal_workflow_execution_v1workflows_executions_execution_id_signals_post(
+    ///         .signal_workflow_execution(
     ///             &"execution_id".to_string(),
     ///             &SignalInvocationBody {
     ///                 name: "name".to_string(),
@@ -551,7 +548,7 @@ impl ExecutionsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn signal_workflow_execution_v1workflows_executions_execution_id_signals_post(
+    pub async fn signal_workflow_execution(
         &self,
         execution_id: &str,
         request: &SignalInvocationBody,
@@ -593,9 +590,9 @@ impl ExecutionsClient {
     ///     client
     ///         .workflows
     ///         .executions
-    ///         .stream_v1workflows_executions_execution_id_stream_get(
+    ///         .stream(
     ///             &"execution_id".to_string(),
-    ///             &StreamV1WorkflowsExecutionsExecutionIDStreamGetQueryRequest {
+    ///             &StreamQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -603,15 +600,12 @@ impl ExecutionsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn stream_v1workflows_executions_execution_id_stream_get(
+    pub async fn stream(
         &self,
         execution_id: &str,
-        request: &StreamV1WorkflowsExecutionsExecutionIdStreamGetQueryRequest,
+        request: &StreamQueryRequest,
         options: Option<RequestOptions>,
-    ) -> Result<
-        SseStream<StreamV1WorkflowsExecutionsExecutionIdStreamGetExecutionsResponse>,
-        ApiError,
-    > {
+    ) -> Result<SseStream<StreamExecutionsResponse>, ApiError> {
         self.http_client
             .execute_sse_request(
                 Method::GET,
@@ -652,14 +646,11 @@ impl ExecutionsClient {
     ///     client
     ///         .workflows
     ///         .executions
-    ///         .terminate_workflow_execution_v1workflows_executions_execution_id_terminate_post(
-    ///             &"execution_id".to_string(),
-    ///             None,
-    ///         )
+    ///         .terminate_workflow_execution(&"execution_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn terminate_workflow_execution_v1workflows_executions_execution_id_terminate_post(
+    pub async fn terminate_workflow_execution(
         &self,
         execution_id: &str,
         options: Option<RequestOptions>,
@@ -893,7 +884,7 @@ impl ExecutionsClient {
     ///     client
     ///         .workflows
     ///         .executions
-    ///         .update_workflow_execution_v1workflows_executions_execution_id_updates_post(
+    ///         .update_workflow_execution(
     ///             &"execution_id".to_string(),
     ///             &UpdateInvocationBody {
     ///                 name: "name".to_string(),
@@ -904,7 +895,7 @@ impl ExecutionsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn update_workflow_execution_v1workflows_executions_execution_id_updates_post(
+    pub async fn update_workflow_execution(
         &self,
         execution_id: &str,
         request: &UpdateInvocationBody,

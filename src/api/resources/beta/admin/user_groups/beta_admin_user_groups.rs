@@ -44,8 +44,8 @@ impl UserGroupsClient {
     ///         .beta
     ///         .admin
     ///         .user_groups
-    ///         .users_api_admin_user_groups_get_user_groups(
-    ///             &UsersAPIAdminUserGroupsGetUserGroupsQueryRequest {
+    ///         .list(
+    ///             &BetaAdminUserGroupsListQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -53,9 +53,9 @@ impl UserGroupsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn users_api_admin_user_groups_get_user_groups(
+    pub async fn list(
         &self,
-        request: &UsersApiAdminUserGroupsGetUserGroupsQueryRequest,
+        request: &BetaAdminUserGroupsListQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<AdminUserGroupsOut, ApiError> {
         self.http_client
@@ -101,7 +101,7 @@ impl UserGroupsClient {
     ///         .beta
     ///         .admin
     ///         .user_groups
-    ///         .users_api_admin_user_groups_create_user_group(
+    ///         .create(
     ///             &AdminUserGroupIn {
     ///                 name: "Engineering Team".to_string(),
     ///                 description: None,
@@ -111,7 +111,7 @@ impl UserGroupsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn users_api_admin_user_groups_create_user_group(
+    pub async fn create(
         &self,
         request: &AdminUserGroupIn,
         options: Option<RequestOptions>,
@@ -156,7 +156,7 @@ impl UserGroupsClient {
     ///         .beta
     ///         .admin
     ///         .user_groups
-    ///         .users_api_admin_user_groups_provision_group_to_workspace(
+    ///         .provision_to_workspace(
     ///             &AdminProvisionGroupToWorkspaceIn {
     ///                 user_group_uuid: "user_group_uuid".to_string(),
     ///                 workspace_uuid: "workspace_uuid".to_string(),
@@ -168,7 +168,7 @@ impl UserGroupsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn users_api_admin_user_groups_provision_group_to_workspace(
+    pub async fn provision_to_workspace(
         &self,
         request: &AdminProvisionGroupToWorkspaceIn,
         options: Option<RequestOptions>,
@@ -211,11 +211,11 @@ impl UserGroupsClient {
     ///         .beta
     ///         .admin
     ///         .user_groups
-    ///         .users_api_admin_user_groups_get_user_group(&"group_uuid".to_string(), None)
+    ///         .get(&"group_uuid".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn users_api_admin_user_groups_get_user_group(
+    pub async fn get(
         &self,
         group_uuid: &str,
         options: Option<RequestOptions>,
@@ -258,11 +258,11 @@ impl UserGroupsClient {
     ///         .beta
     ///         .admin
     ///         .user_groups
-    ///         .users_api_admin_user_groups_delete_user_group(&"group_uuid".to_string(), None)
+    ///         .delete(&"group_uuid".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn users_api_admin_user_groups_delete_user_group(
+    pub async fn delete(
         &self,
         group_uuid: &str,
         options: Option<RequestOptions>,
@@ -304,7 +304,7 @@ impl UserGroupsClient {
     ///         .beta
     ///         .admin
     ///         .user_groups
-    ///         .users_api_admin_user_groups_update_user_group(
+    ///         .update(
     ///             &"group_uuid".to_string(),
     ///             &AdminUpdateUserGroupIn {
     ///                 ..Default::default()
@@ -314,7 +314,7 @@ impl UserGroupsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn users_api_admin_user_groups_update_user_group(
+    pub async fn update(
         &self,
         group_uuid: &str,
         request: &AdminUpdateUserGroupIn,
@@ -360,9 +360,9 @@ impl UserGroupsClient {
     ///         .beta
     ///         .admin
     ///         .user_groups
-    ///         .users_api_admin_user_groups_get_user_group_members(
+    ///         .list_members(
     ///             &"group_uuid".to_string(),
-    ///             &UsersAPIAdminUserGroupsGetUserGroupMembersQueryRequest {
+    ///             &ListMembersQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -370,10 +370,10 @@ impl UserGroupsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn users_api_admin_user_groups_get_user_group_members(
+    pub async fn list_members(
         &self,
         group_uuid: &str,
-        request: &UsersApiAdminUserGroupsGetUserGroupMembersQueryRequest,
+        request: &ListMembersQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<AdminUserGroupMembersOut, ApiError> {
         self.http_client
@@ -416,7 +416,7 @@ impl UserGroupsClient {
     ///         .beta
     ///         .admin
     ///         .user_groups
-    ///         .users_api_admin_user_groups_assign_users_to_group(
+    ///         .add_users(
     ///             &"group_uuid".to_string(),
     ///             &AdminAssignUsersToGroupIn {
     ///                 user_uuids: vec!["user_uuids".to_string()],
@@ -427,7 +427,7 @@ impl UserGroupsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn users_api_admin_user_groups_assign_users_to_group(
+    pub async fn add_users(
         &self,
         group_uuid: &str,
         request: &AdminAssignUsersToGroupIn,
@@ -470,7 +470,7 @@ impl UserGroupsClient {
     ///         .beta
     ///         .admin
     ///         .user_groups
-    ///         .users_api_admin_user_groups_remove_users_from_group(
+    ///         .remove_users(
     ///             &"group_uuid".to_string(),
     ///             &AdminAssignUsersToGroupIn {
     ///                 user_uuids: vec!["user_uuids".to_string()],
@@ -481,7 +481,7 @@ impl UserGroupsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn users_api_admin_user_groups_remove_users_from_group(
+    pub async fn remove_users(
         &self,
         group_uuid: &str,
         request: &AdminAssignUsersToGroupIn,
@@ -521,12 +521,12 @@ impl UserGroupsClient {
     ///         ..Default::default()
     ///     };
     ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client.beta.admin.user_groups.users_admin_user_groups_update_user_group_organization_role(&"group_uuid".to_string(), &AdminUpdateUserGroupOrganizationRoleIn {
+    ///     client.beta.admin.user_groups.update_organization_role(&"group_uuid".to_string(), &AdminUpdateUserGroupOrganizationRoleIn {
     ///         organization_role: AdminUpdateUserGroupOrganizationRoleInOrganizationRole::AdminUpdateUserGroupOrganizationRoleInOrganizationRoleZero(AdminUpdateUserGroupOrganizationRoleInOrganizationRoleZero::Member)
     ///     }, None).await;
     /// }
     /// ```
-    pub async fn users_admin_user_groups_update_user_group_organization_role(
+    pub async fn update_organization_role(
         &self,
         group_uuid: &str,
         request: &AdminUpdateUserGroupOrganizationRoleIn,
@@ -572,9 +572,9 @@ impl UserGroupsClient {
     ///         .beta
     ///         .admin
     ///         .user_groups
-    ///         .users_admin_user_groups_get_group_workspace_assignments(
+    ///         .list_workspace_assignments(
     ///             &"group_uuid".to_string(),
-    ///             &UsersAdminUserGroupsGetGroupWorkspaceAssignmentsQueryRequest {
+    ///             &ListWorkspaceAssignmentsQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -582,10 +582,10 @@ impl UserGroupsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn users_admin_user_groups_get_group_workspace_assignments(
+    pub async fn list_workspace_assignments(
         &self,
         group_uuid: &str,
-        request: &UsersAdminUserGroupsGetGroupWorkspaceAssignmentsQueryRequest,
+        request: &ListWorkspaceAssignmentsQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<GroupWorkspaceAssignmentsOut, ApiError> {
         self.http_client
@@ -629,7 +629,7 @@ impl UserGroupsClient {
     ///         .beta
     ///         .admin
     ///         .user_groups
-    ///         .users_api_admin_user_groups_assign_group_to_workspace(
+    ///         .assign_to_workspace(
     ///             &"group_uuid".to_string(),
     ///             &AdminAssignGroupToWorkspaceIn {
     ///                 workspace_uuid: "workspace_uuid".to_string(),
@@ -642,7 +642,7 @@ impl UserGroupsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn users_api_admin_user_groups_assign_group_to_workspace(
+    pub async fn assign_to_workspace(
         &self,
         group_uuid: &str,
         request: &AdminAssignGroupToWorkspaceIn,
@@ -687,7 +687,7 @@ impl UserGroupsClient {
     ///         .beta
     ///         .admin
     ///         .user_groups
-    ///         .users_admin_user_groups_remove_group_from_workspace(
+    ///         .remove_from_workspace(
     ///             &"group_uuid".to_string(),
     ///             &"workspace_uuid".to_string(),
     ///             None,
@@ -695,7 +695,7 @@ impl UserGroupsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn users_admin_user_groups_remove_group_from_workspace(
+    pub async fn remove_from_workspace(
         &self,
         group_uuid: &str,
         workspace_uuid: &str,
@@ -743,7 +743,7 @@ impl UserGroupsClient {
     ///         .beta
     ///         .admin
     ///         .user_groups
-    ///         .users_admin_user_groups_update_group_workspace_assignment(
+    ///         .update_workspace_assignment(
     ///             &"group_uuid".to_string(),
     ///             &"workspace_uuid".to_string(),
     ///             &AdminUpdateGroupWorkspaceAssignmentIn {
@@ -754,7 +754,7 @@ impl UserGroupsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn users_admin_user_groups_update_group_workspace_assignment(
+    pub async fn update_workspace_assignment(
         &self,
         group_uuid: &str,
         workspace_uuid: &str,

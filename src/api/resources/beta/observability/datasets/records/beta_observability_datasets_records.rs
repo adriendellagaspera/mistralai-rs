@@ -40,7 +40,7 @@ impl RecordsClient {
     ///         .observability
     ///         .datasets
     ///         .records
-    ///         .delete_dataset_records_v1observability_dataset_records_bulk_delete_post(
+    ///         .bulk_delete(
     ///             &DeleteDatasetRecordsRequest {
     ///                 dataset_record_ids: vec!["dataset_record_ids".to_string()],
     ///             },
@@ -49,7 +49,7 @@ impl RecordsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn delete_dataset_records_v1observability_dataset_records_bulk_delete_post(
+    pub async fn bulk_delete(
         &self,
         request: &DeleteDatasetRecordsRequest,
         options: Option<RequestOptions>,
@@ -92,14 +92,11 @@ impl RecordsClient {
     ///         .observability
     ///         .datasets
     ///         .records
-    ///         .get_dataset_record_v1observability_dataset_records_dataset_record_id_get(
-    ///             &"dataset_record_id".to_string(),
-    ///             None,
-    ///         )
+    ///         .fetch(&"dataset_record_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn get_dataset_record_v1observability_dataset_records_dataset_record_id_get(
+    pub async fn fetch(
         &self,
         dataset_record_id: &str,
         options: Option<RequestOptions>,
@@ -142,14 +139,11 @@ impl RecordsClient {
     ///         .observability
     ///         .datasets
     ///         .records
-    ///         .delete_dataset_record_v1observability_dataset_records_dataset_record_id_delete(
-    ///             &"dataset_record_id".to_string(),
-    ///             None,
-    ///         )
+    ///         .delete(&"dataset_record_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn delete_dataset_record_v1observability_dataset_records_dataset_record_id_delete(
+    pub async fn delete(
         &self,
         dataset_record_id: &str,
         options: Option<RequestOptions>,
@@ -187,12 +181,25 @@ impl RecordsClient {
     ///         ..Default::default()
     ///     };
     ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client.beta.observability.datasets.records.update_dataset_record_payload_v1observability_dataset_records_dataset_record_id_payload_put(&"dataset_record_id".to_string(), &UpdateDatasetRecordPayloadRequest {
-    ///         payload: DatasetRecordPayload(HashMap::from([("key".to_string(), serde_json::json!("value"))]))
-    ///     }, None).await;
+    ///     client
+    ///         .beta
+    ///         .observability
+    ///         .datasets
+    ///         .records
+    ///         .update_payload(
+    ///             &"dataset_record_id".to_string(),
+    ///             &UpdateDatasetRecordPayloadRequest {
+    ///                 payload: DatasetRecordPayload(HashMap::from([(
+    ///                     "key".to_string(),
+    ///                     serde_json::json!("value"),
+    ///                 )])),
+    ///             },
+    ///             None,
+    ///         )
+    ///         .await;
     /// }
     /// ```
-    pub async fn update_dataset_record_payload_v1observability_dataset_records_dataset_record_id_payload_put(
+    pub async fn update_payload(
         &self,
         dataset_record_id: &str,
         request: &UpdateDatasetRecordPayloadRequest,
@@ -234,12 +241,22 @@ impl RecordsClient {
     ///         ..Default::default()
     ///     };
     ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client.beta.observability.datasets.records.update_dataset_record_properties_v1observability_dataset_records_dataset_record_id_properties_put(&"dataset_record_id".to_string(), &UpdateDatasetRecordPropertiesRequest {
-    ///         properties: HashMap::from([("key".to_string(), serde_json::json!("value"))])
-    ///     }, None).await;
+    ///     client
+    ///         .beta
+    ///         .observability
+    ///         .datasets
+    ///         .records
+    ///         .update_properties(
+    ///             &"dataset_record_id".to_string(),
+    ///             &UpdateDatasetRecordPropertiesRequest {
+    ///                 properties: HashMap::from([("key".to_string(), serde_json::json!("value"))]),
+    ///             },
+    ///             None,
+    ///         )
+    ///         .await;
     /// }
     /// ```
-    pub async fn update_dataset_record_properties_v1observability_dataset_records_dataset_record_id_properties_put(
+    pub async fn update_properties(
         &self,
         dataset_record_id: &str,
         request: &UpdateDatasetRecordPropertiesRequest,
