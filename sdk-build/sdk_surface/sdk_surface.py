@@ -326,7 +326,9 @@ def validate_type_name_collisions(
 
 
 def resolution_inventory(
-    resolved: Iterable[ResolvedOperation], policy: dict[str, Any]
+    resolved: Iterable[ResolvedOperation],
+    policy: dict[str, Any],
+    spec: dict[str, Any],
 ) -> dict[str, Any]:
     operations = []
     for item in resolved:
@@ -416,7 +418,7 @@ def compile_fern_input(
             pointer_target(output, pointer)
         pointer_target(output, pointer)["x-fern-type-name"] = entry["name"]
 
-    return output, resolution_inventory(resolved, policy)
+    return output, resolution_inventory(resolved, policy, spec)
 
 
 def fern_resource_path(service: dict[str, Any]) -> tuple[str, ...]:
@@ -478,7 +480,7 @@ def semantic_inventory(
     spec: dict[str, Any], policy: dict[str, Any], ir: dict[str, Any]
 ) -> dict[str, Any]:
     resolved = resolve_policy(spec, policy)
-    resolution = resolution_inventory(resolved, policy)
+    resolution = resolution_inventory(resolved, policy, spec)
     expected = {path for item in resolved for path in item.public_paths}
     actual = fern_public_method_paths(ir)
     missing = sorted(".".join(path) for path in expected - actual)
