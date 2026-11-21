@@ -49,7 +49,3 @@ operations:
   operationId:get_voice_sample_audio_v1_audio_voices__voice_id__sample_get:
     method: get_sample_audio
     representation: native-byte-stream
-
-types:
-  '#/components/schemas/Judge/properties/output':
-    name: JudgeOutputConfig
