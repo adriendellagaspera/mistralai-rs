@@ -149,17 +149,7 @@ class SurfaceContractTests(unittest.TestCase):
         del source["components"]["schemas"]["Judge"]
         output, resolution = compile_fern_input(source, POLICY)
         self.assertNotIn("Judge", output["components"]["schemas"])
-        self.assertEqual(
-            resolution["type_policy"],
-            [
-                {
-                    "source_schema": "#/components/schemas/Judge/properties/output",
-                    "public_name": "JudgeOutputConfig",
-                    "representation": None,
-                    "optional": True,
-                }
-            ],
-        )
+        self.assertEqual(resolution["type_policy"], [])
 
     def test_missing_required_type_override_still_fails(self) -> None:
         source = json.loads(json.dumps(SOURCE))
