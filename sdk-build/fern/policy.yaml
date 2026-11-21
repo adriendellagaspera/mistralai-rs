@@ -53,3 +53,4 @@ operations:
 types:
   '#/components/schemas/Judge/properties/output':
     name: JudgeOutputConfig
+    optional: true
