@@ -37,6 +37,12 @@ pub struct ApiKeyExtendedOut {
     /// Product the API key belongs to.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub product: Option<ApiKeyProduct>,
+    /// ID of the service account that owns the API key. Null for keys not owned by a service account.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub service_account_id: Option<String>,
+    /// ID of the user who owns the API key. Null for keys not owned by a user.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub user_id: Option<String>,
     /// Workspace ID for the API key.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub workspace_id: Option<String>,
@@ -65,6 +71,8 @@ pub struct ApiKeyExtendedOutBuilder {
     last_used: Option<NaiveDate>,
     name: Option<String>,
     product: Option<ApiKeyProduct>,
+    service_account_id: Option<String>,
+    user_id: Option<String>,
     workspace_id: Option<String>,
     workspace_name: Option<String>,
 }
@@ -125,6 +133,16 @@ impl ApiKeyExtendedOutBuilder {
         self
     }
 
+    pub fn service_account_id(mut self, value: impl Into<String>) -> Self {
+        self.service_account_id = Some(value.into());
+        self
+    }
+
+    pub fn user_id(mut self, value: impl Into<String>) -> Self {
+        self.user_id = Some(value.into());
+        self
+    }
+
     pub fn workspace_id(mut self, value: impl Into<String>) -> Self {
         self.workspace_id = Some(value.into());
         self
@@ -159,6 +177,8 @@ impl ApiKeyExtendedOutBuilder {
             last_used: self.last_used,
             name: self.name,
             product: self.product,
+            service_account_id: self.service_account_id,
+            user_id: self.user_id,
             workspace_id: self.workspace_id,
             workspace_name: self.workspace_name,
         })

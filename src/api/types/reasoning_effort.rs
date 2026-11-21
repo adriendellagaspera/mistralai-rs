@@ -9,6 +9,7 @@ pub enum ReasoningEffort {
     Medium,
     High,
     Xhigh,
+    Max,
     /// This variant is used for forward compatibility.
     /// If the server sends a value not recognized by the current SDK version,
     /// it will be captured here with the raw string value.
@@ -23,6 +24,7 @@ impl Serialize for ReasoningEffort {
             Self::Medium => serializer.serialize_str("medium"),
             Self::High => serializer.serialize_str("high"),
             Self::Xhigh => serializer.serialize_str("xhigh"),
+            Self::Max => serializer.serialize_str("max"),
             Self::__Unknown(val) => serializer.serialize_str(val),
         }
     }
@@ -38,6 +40,7 @@ impl<'de> Deserialize<'de> for ReasoningEffort {
             "medium" => Ok(Self::Medium),
             "high" => Ok(Self::High),
             "xhigh" => Ok(Self::Xhigh),
+            "max" => Ok(Self::Max),
             _ => Ok(Self::__Unknown(value)),
         }
     }
@@ -52,6 +55,7 @@ impl fmt::Display for ReasoningEffort {
             Self::Medium => write!(f, "medium"),
             Self::High => write!(f, "high"),
             Self::Xhigh => write!(f, "xhigh"),
+            Self::Max => write!(f, "max"),
             Self::__Unknown(val) => write!(f, "{}", val),
         }
     }

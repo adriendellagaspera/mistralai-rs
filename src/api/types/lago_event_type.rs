@@ -11,6 +11,9 @@ pub enum LagoEventType {
     ApiLibrariesTokens,
     ApiLibrariesPages,
     ApiLibrariesAudio,
+    ApiManagedIndexStorageBytes,
+    ApiManagedIndexWrittenBytes,
+    ApiManagedIndexSearches,
     DeploymentTokens,
     GpuHour,
     ReservedInstance,
@@ -35,6 +38,13 @@ impl Serialize for LagoEventType {
             Self::ApiLibrariesTokens => serializer.serialize_str("api_libraries_tokens"),
             Self::ApiLibrariesPages => serializer.serialize_str("api_libraries_pages"),
             Self::ApiLibrariesAudio => serializer.serialize_str("api_libraries_audio"),
+            Self::ApiManagedIndexStorageBytes => {
+                serializer.serialize_str("api_managed_index_storage_bytes")
+            }
+            Self::ApiManagedIndexWrittenBytes => {
+                serializer.serialize_str("api_managed_index_written_bytes")
+            }
+            Self::ApiManagedIndexSearches => serializer.serialize_str("api_managed_index_searches"),
             Self::DeploymentTokens => serializer.serialize_str("deployment_tokens"),
             Self::GpuHour => serializer.serialize_str("gpu_hour"),
             Self::ReservedInstance => serializer.serialize_str("reserved_instance"),
@@ -60,6 +70,9 @@ impl<'de> Deserialize<'de> for LagoEventType {
             "api_libraries_tokens" => Ok(Self::ApiLibrariesTokens),
             "api_libraries_pages" => Ok(Self::ApiLibrariesPages),
             "api_libraries_audio" => Ok(Self::ApiLibrariesAudio),
+            "api_managed_index_storage_bytes" => Ok(Self::ApiManagedIndexStorageBytes),
+            "api_managed_index_written_bytes" => Ok(Self::ApiManagedIndexWrittenBytes),
+            "api_managed_index_searches" => Ok(Self::ApiManagedIndexSearches),
             "deployment_tokens" => Ok(Self::DeploymentTokens),
             "gpu_hour" => Ok(Self::GpuHour),
             "reserved_instance" => Ok(Self::ReservedInstance),
@@ -84,6 +97,9 @@ impl fmt::Display for LagoEventType {
             Self::ApiLibrariesTokens => write!(f, "api_libraries_tokens"),
             Self::ApiLibrariesPages => write!(f, "api_libraries_pages"),
             Self::ApiLibrariesAudio => write!(f, "api_libraries_audio"),
+            Self::ApiManagedIndexStorageBytes => write!(f, "api_managed_index_storage_bytes"),
+            Self::ApiManagedIndexWrittenBytes => write!(f, "api_managed_index_written_bytes"),
+            Self::ApiManagedIndexSearches => write!(f, "api_managed_index_searches"),
             Self::DeploymentTokens => write!(f, "deployment_tokens"),
             Self::GpuHour => write!(f, "gpu_hour"),
             Self::ReservedInstance => write!(f, "reserved_instance"),

@@ -9,6 +9,8 @@ pub enum AuditLogEventType {
     UserInfoUpdate,
     UserPasswordUpdate,
     UserPhoneNumberVerify,
+    UserDeactivate,
+    UserReactivate,
     UserOrganizationLeave,
     UserOrganizationRoleUpdate,
     UserOrganizationDelete,
@@ -16,6 +18,7 @@ pub enum AuditLogEventType {
     OrganizationCreate,
     OrganizationDelete,
     OrganizationUpdate,
+    OrganizationMembersExport,
     OrganizationInviteSend,
     OrganizationInviteResend,
     OrganizationInviteAccepted,
@@ -67,6 +70,9 @@ pub enum AuditLogEventType {
     BillingMonthlyLimitUpdated,
     BillingWorkspaceMonthlyLimitUpdated,
     BillingSharedBudgetOverrideUpdated,
+    BillingSpendingLimitCreated,
+    BillingSpendingLimitUpdated,
+    BillingSpendingLimitDeleted,
     BillingAutoRechargeUpdated,
     BillingSeatGrant,
     BillingSeatRevoke,
@@ -131,10 +137,22 @@ pub enum AuditLogEventType {
     KnowledgeBaseCreate,
     KnowledgeBaseDelete,
     KnowledgeBaseUpdate,
+    KnowledgeBaseLoad,
     KnowledgeBaseVersionCreate,
     CustomVoiceCreate,
     CustomVoiceUpdate,
     CustomVoiceDelete,
+    CapabilityRegistryCreate,
+    CapabilityRegistryDefaultWorkspaceAccessEnable,
+    CapabilityRegistryDefaultWorkspaceAccessDisable,
+    CapabilityRegistryWorkspaceAccessEnable,
+    CapabilityRegistryWorkspaceAccessDisable,
+    CapabilityRegistryWorkspaceAccessRemove,
+    CapabilityVersionCreate,
+    CapabilityVersionDisable,
+    CapabilityVersionEnable,
+    CapabilityDisable,
+    CapabilityEnable,
     FeaturePermissionOverrideCreated,
     FeaturePermissionOverrideDeleted,
     ResourceShare,
@@ -241,6 +259,8 @@ pub enum AuditLogEventType {
     WorkflowExecutionStarted,
     WorkflowExecutionCanceled,
     WorkflowExecutionTerminated,
+    WorkflowExecutionCompleted,
+    WorkflowExecutionFailed,
     WorkflowExecutionSignal,
     WorkflowExecutionQuery,
     WorkflowExecutionUpdate,
@@ -255,6 +275,15 @@ pub enum AuditLogEventType {
     WorkflowUnarchived,
     WorkflowDeploymentAuthorizedCredentialGranted,
     WorkflowDeploymentAuthorizedCredentialRevoked,
+    WorkflowManagedDeploymentCreated,
+    WorkflowManagedDeploymentUpdated,
+    WorkflowManagedDeploymentStopped,
+    WorkflowManagedDeploymentStarted,
+    WorkflowManagedDeploymentRestarted,
+    WorkflowManagedDeploymentDeleted,
+    WorkflowManagedDeploymentCredentialProvisioned,
+    WorkflowManagedDeploymentCredentialRevoked,
+    WorkflowManagedDeploymentStatusChanged,
     /// This variant is used for forward compatibility.
     /// If the server sends a value not recognized by the current SDK version,
     /// it will be captured here with the raw string value.
@@ -269,6 +298,8 @@ impl Serialize for AuditLogEventType {
             Self::UserInfoUpdate => serializer.serialize_str("user.info.update"),
             Self::UserPasswordUpdate => serializer.serialize_str("user.password.update"),
             Self::UserPhoneNumberVerify => serializer.serialize_str("user.phone_number.verify"),
+            Self::UserDeactivate => serializer.serialize_str("user.deactivate"),
+            Self::UserReactivate => serializer.serialize_str("user.reactivate"),
             Self::UserOrganizationLeave => serializer.serialize_str("user.organization.leave"),
             Self::UserOrganizationRoleUpdate => {
                 serializer.serialize_str("user.organization.role.update")
@@ -278,6 +309,9 @@ impl Serialize for AuditLogEventType {
             Self::OrganizationCreate => serializer.serialize_str("organization.create"),
             Self::OrganizationDelete => serializer.serialize_str("organization.delete"),
             Self::OrganizationUpdate => serializer.serialize_str("organization.update"),
+            Self::OrganizationMembersExport => {
+                serializer.serialize_str("organization.members.export")
+            }
             Self::OrganizationInviteSend => serializer.serialize_str("organization.invite.send"),
             Self::OrganizationInviteResend => {
                 serializer.serialize_str("organization.invite.resend")
@@ -398,6 +432,15 @@ impl Serialize for AuditLogEventType {
             Self::BillingSharedBudgetOverrideUpdated => {
                 serializer.serialize_str("billing.shared_budget_override.updated")
             }
+            Self::BillingSpendingLimitCreated => {
+                serializer.serialize_str("billing.spending_limit.created")
+            }
+            Self::BillingSpendingLimitUpdated => {
+                serializer.serialize_str("billing.spending_limit.updated")
+            }
+            Self::BillingSpendingLimitDeleted => {
+                serializer.serialize_str("billing.spending_limit.deleted")
+            }
             Self::BillingAutoRechargeUpdated => {
                 serializer.serialize_str("billing.auto_recharge.updated")
             }
@@ -504,12 +547,38 @@ impl Serialize for AuditLogEventType {
             Self::KnowledgeBaseCreate => serializer.serialize_str("knowledge_base.create"),
             Self::KnowledgeBaseDelete => serializer.serialize_str("knowledge_base.delete"),
             Self::KnowledgeBaseUpdate => serializer.serialize_str("knowledge_base.update"),
+            Self::KnowledgeBaseLoad => serializer.serialize_str("knowledge_base.load"),
             Self::KnowledgeBaseVersionCreate => {
                 serializer.serialize_str("knowledge_base.version.create")
             }
             Self::CustomVoiceCreate => serializer.serialize_str("custom_voice.create"),
             Self::CustomVoiceUpdate => serializer.serialize_str("custom_voice.update"),
             Self::CustomVoiceDelete => serializer.serialize_str("custom_voice.delete"),
+            Self::CapabilityRegistryCreate => {
+                serializer.serialize_str("capability_registry.create")
+            }
+            Self::CapabilityRegistryDefaultWorkspaceAccessEnable => {
+                serializer.serialize_str("capability_registry.default_workspace_access.enable")
+            }
+            Self::CapabilityRegistryDefaultWorkspaceAccessDisable => {
+                serializer.serialize_str("capability_registry.default_workspace_access.disable")
+            }
+            Self::CapabilityRegistryWorkspaceAccessEnable => {
+                serializer.serialize_str("capability_registry.workspace_access.enable")
+            }
+            Self::CapabilityRegistryWorkspaceAccessDisable => {
+                serializer.serialize_str("capability_registry.workspace_access.disable")
+            }
+            Self::CapabilityRegistryWorkspaceAccessRemove => {
+                serializer.serialize_str("capability_registry.workspace_access.remove")
+            }
+            Self::CapabilityVersionCreate => serializer.serialize_str("capability.version.create"),
+            Self::CapabilityVersionDisable => {
+                serializer.serialize_str("capability.version.disable")
+            }
+            Self::CapabilityVersionEnable => serializer.serialize_str("capability.version.enable"),
+            Self::CapabilityDisable => serializer.serialize_str("capability.disable"),
+            Self::CapabilityEnable => serializer.serialize_str("capability.enable"),
             Self::FeaturePermissionOverrideCreated => {
                 serializer.serialize_str("feature_permission.override.created")
             }
@@ -742,6 +811,10 @@ impl Serialize for AuditLogEventType {
             Self::WorkflowExecutionTerminated => {
                 serializer.serialize_str("workflow.execution.terminated")
             }
+            Self::WorkflowExecutionCompleted => {
+                serializer.serialize_str("workflow.execution.completed")
+            }
+            Self::WorkflowExecutionFailed => serializer.serialize_str("workflow.execution.failed"),
             Self::WorkflowExecutionSignal => serializer.serialize_str("workflow.execution.signal"),
             Self::WorkflowExecutionQuery => serializer.serialize_str("workflow.execution.query"),
             Self::WorkflowExecutionUpdate => serializer.serialize_str("workflow.execution.update"),
@@ -764,6 +837,33 @@ impl Serialize for AuditLogEventType {
             Self::WorkflowDeploymentAuthorizedCredentialRevoked => {
                 serializer.serialize_str("workflow.deployment.authorized_credential.revoked")
             }
+            Self::WorkflowManagedDeploymentCreated => {
+                serializer.serialize_str("workflow.managed_deployment.created")
+            }
+            Self::WorkflowManagedDeploymentUpdated => {
+                serializer.serialize_str("workflow.managed_deployment.updated")
+            }
+            Self::WorkflowManagedDeploymentStopped => {
+                serializer.serialize_str("workflow.managed_deployment.stopped")
+            }
+            Self::WorkflowManagedDeploymentStarted => {
+                serializer.serialize_str("workflow.managed_deployment.started")
+            }
+            Self::WorkflowManagedDeploymentRestarted => {
+                serializer.serialize_str("workflow.managed_deployment.restarted")
+            }
+            Self::WorkflowManagedDeploymentDeleted => {
+                serializer.serialize_str("workflow.managed_deployment.deleted")
+            }
+            Self::WorkflowManagedDeploymentCredentialProvisioned => {
+                serializer.serialize_str("workflow.managed_deployment.credential.provisioned")
+            }
+            Self::WorkflowManagedDeploymentCredentialRevoked => {
+                serializer.serialize_str("workflow.managed_deployment.credential.revoked")
+            }
+            Self::WorkflowManagedDeploymentStatusChanged => {
+                serializer.serialize_str("workflow.managed_deployment.status.changed")
+            }
             Self::__Unknown(val) => serializer.serialize_str(val),
         }
     }
@@ -779,6 +879,8 @@ impl<'de> Deserialize<'de> for AuditLogEventType {
             "user.info.update" => Ok(Self::UserInfoUpdate),
             "user.password.update" => Ok(Self::UserPasswordUpdate),
             "user.phone_number.verify" => Ok(Self::UserPhoneNumberVerify),
+            "user.deactivate" => Ok(Self::UserDeactivate),
+            "user.reactivate" => Ok(Self::UserReactivate),
             "user.organization.leave" => Ok(Self::UserOrganizationLeave),
             "user.organization.role.update" => Ok(Self::UserOrganizationRoleUpdate),
             "user.organization.delete" => Ok(Self::UserOrganizationDelete),
@@ -786,6 +888,7 @@ impl<'de> Deserialize<'de> for AuditLogEventType {
             "organization.create" => Ok(Self::OrganizationCreate),
             "organization.delete" => Ok(Self::OrganizationDelete),
             "organization.update" => Ok(Self::OrganizationUpdate),
+            "organization.members.export" => Ok(Self::OrganizationMembersExport),
             "organization.invite.send" => Ok(Self::OrganizationInviteSend),
             "organization.invite.resend" => Ok(Self::OrganizationInviteResend),
             "organization.invite.accepted" => Ok(Self::OrganizationInviteAccepted),
@@ -865,6 +968,9 @@ impl<'de> Deserialize<'de> for AuditLogEventType {
             "billing.shared_budget_override.updated" => {
                 Ok(Self::BillingSharedBudgetOverrideUpdated)
             }
+            "billing.spending_limit.created" => Ok(Self::BillingSpendingLimitCreated),
+            "billing.spending_limit.updated" => Ok(Self::BillingSpendingLimitUpdated),
+            "billing.spending_limit.deleted" => Ok(Self::BillingSpendingLimitDeleted),
             "billing.auto_recharge.updated" => Ok(Self::BillingAutoRechargeUpdated),
             "billing.seat.grant" => Ok(Self::BillingSeatGrant),
             "billing.seat.revoke" => Ok(Self::BillingSeatRevoke),
@@ -939,10 +1045,32 @@ impl<'de> Deserialize<'de> for AuditLogEventType {
             "knowledge_base.create" => Ok(Self::KnowledgeBaseCreate),
             "knowledge_base.delete" => Ok(Self::KnowledgeBaseDelete),
             "knowledge_base.update" => Ok(Self::KnowledgeBaseUpdate),
+            "knowledge_base.load" => Ok(Self::KnowledgeBaseLoad),
             "knowledge_base.version.create" => Ok(Self::KnowledgeBaseVersionCreate),
             "custom_voice.create" => Ok(Self::CustomVoiceCreate),
             "custom_voice.update" => Ok(Self::CustomVoiceUpdate),
             "custom_voice.delete" => Ok(Self::CustomVoiceDelete),
+            "capability_registry.create" => Ok(Self::CapabilityRegistryCreate),
+            "capability_registry.default_workspace_access.enable" => {
+                Ok(Self::CapabilityRegistryDefaultWorkspaceAccessEnable)
+            }
+            "capability_registry.default_workspace_access.disable" => {
+                Ok(Self::CapabilityRegistryDefaultWorkspaceAccessDisable)
+            }
+            "capability_registry.workspace_access.enable" => {
+                Ok(Self::CapabilityRegistryWorkspaceAccessEnable)
+            }
+            "capability_registry.workspace_access.disable" => {
+                Ok(Self::CapabilityRegistryWorkspaceAccessDisable)
+            }
+            "capability_registry.workspace_access.remove" => {
+                Ok(Self::CapabilityRegistryWorkspaceAccessRemove)
+            }
+            "capability.version.create" => Ok(Self::CapabilityVersionCreate),
+            "capability.version.disable" => Ok(Self::CapabilityVersionDisable),
+            "capability.version.enable" => Ok(Self::CapabilityVersionEnable),
+            "capability.disable" => Ok(Self::CapabilityDisable),
+            "capability.enable" => Ok(Self::CapabilityEnable),
             "feature_permission.override.created" => Ok(Self::FeaturePermissionOverrideCreated),
             "feature_permission.override.deleted" => Ok(Self::FeaturePermissionOverrideDeleted),
             "resource.share" => Ok(Self::ResourceShare),
@@ -1073,6 +1201,8 @@ impl<'de> Deserialize<'de> for AuditLogEventType {
             "workflow.execution.started" => Ok(Self::WorkflowExecutionStarted),
             "workflow.execution.canceled" => Ok(Self::WorkflowExecutionCanceled),
             "workflow.execution.terminated" => Ok(Self::WorkflowExecutionTerminated),
+            "workflow.execution.completed" => Ok(Self::WorkflowExecutionCompleted),
+            "workflow.execution.failed" => Ok(Self::WorkflowExecutionFailed),
             "workflow.execution.signal" => Ok(Self::WorkflowExecutionSignal),
             "workflow.execution.query" => Ok(Self::WorkflowExecutionQuery),
             "workflow.execution.update" => Ok(Self::WorkflowExecutionUpdate),
@@ -1091,6 +1221,21 @@ impl<'de> Deserialize<'de> for AuditLogEventType {
             "workflow.deployment.authorized_credential.revoked" => {
                 Ok(Self::WorkflowDeploymentAuthorizedCredentialRevoked)
             }
+            "workflow.managed_deployment.created" => Ok(Self::WorkflowManagedDeploymentCreated),
+            "workflow.managed_deployment.updated" => Ok(Self::WorkflowManagedDeploymentUpdated),
+            "workflow.managed_deployment.stopped" => Ok(Self::WorkflowManagedDeploymentStopped),
+            "workflow.managed_deployment.started" => Ok(Self::WorkflowManagedDeploymentStarted),
+            "workflow.managed_deployment.restarted" => Ok(Self::WorkflowManagedDeploymentRestarted),
+            "workflow.managed_deployment.deleted" => Ok(Self::WorkflowManagedDeploymentDeleted),
+            "workflow.managed_deployment.credential.provisioned" => {
+                Ok(Self::WorkflowManagedDeploymentCredentialProvisioned)
+            }
+            "workflow.managed_deployment.credential.revoked" => {
+                Ok(Self::WorkflowManagedDeploymentCredentialRevoked)
+            }
+            "workflow.managed_deployment.status.changed" => {
+                Ok(Self::WorkflowManagedDeploymentStatusChanged)
+            }
             _ => Ok(Self::__Unknown(value)),
         }
     }
@@ -1105,6 +1250,8 @@ impl fmt::Display for AuditLogEventType {
             Self::UserInfoUpdate => write!(f, "user.info.update"),
             Self::UserPasswordUpdate => write!(f, "user.password.update"),
             Self::UserPhoneNumberVerify => write!(f, "user.phone_number.verify"),
+            Self::UserDeactivate => write!(f, "user.deactivate"),
+            Self::UserReactivate => write!(f, "user.reactivate"),
             Self::UserOrganizationLeave => write!(f, "user.organization.leave"),
             Self::UserOrganizationRoleUpdate => write!(f, "user.organization.role.update"),
             Self::UserOrganizationDelete => write!(f, "user.organization.delete"),
@@ -1112,6 +1259,7 @@ impl fmt::Display for AuditLogEventType {
             Self::OrganizationCreate => write!(f, "organization.create"),
             Self::OrganizationDelete => write!(f, "organization.delete"),
             Self::OrganizationUpdate => write!(f, "organization.update"),
+            Self::OrganizationMembersExport => write!(f, "organization.members.export"),
             Self::OrganizationInviteSend => write!(f, "organization.invite.send"),
             Self::OrganizationInviteResend => write!(f, "organization.invite.resend"),
             Self::OrganizationInviteAccepted => write!(f, "organization.invite.accepted"),
@@ -1196,6 +1344,9 @@ impl fmt::Display for AuditLogEventType {
             Self::BillingSharedBudgetOverrideUpdated => {
                 write!(f, "billing.shared_budget_override.updated")
             }
+            Self::BillingSpendingLimitCreated => write!(f, "billing.spending_limit.created"),
+            Self::BillingSpendingLimitUpdated => write!(f, "billing.spending_limit.updated"),
+            Self::BillingSpendingLimitDeleted => write!(f, "billing.spending_limit.deleted"),
             Self::BillingAutoRechargeUpdated => write!(f, "billing.auto_recharge.updated"),
             Self::BillingSeatGrant => write!(f, "billing.seat.grant"),
             Self::BillingSeatRevoke => write!(f, "billing.seat.revoke"),
@@ -1284,10 +1435,32 @@ impl fmt::Display for AuditLogEventType {
             Self::KnowledgeBaseCreate => write!(f, "knowledge_base.create"),
             Self::KnowledgeBaseDelete => write!(f, "knowledge_base.delete"),
             Self::KnowledgeBaseUpdate => write!(f, "knowledge_base.update"),
+            Self::KnowledgeBaseLoad => write!(f, "knowledge_base.load"),
             Self::KnowledgeBaseVersionCreate => write!(f, "knowledge_base.version.create"),
             Self::CustomVoiceCreate => write!(f, "custom_voice.create"),
             Self::CustomVoiceUpdate => write!(f, "custom_voice.update"),
             Self::CustomVoiceDelete => write!(f, "custom_voice.delete"),
+            Self::CapabilityRegistryCreate => write!(f, "capability_registry.create"),
+            Self::CapabilityRegistryDefaultWorkspaceAccessEnable => {
+                write!(f, "capability_registry.default_workspace_access.enable")
+            }
+            Self::CapabilityRegistryDefaultWorkspaceAccessDisable => {
+                write!(f, "capability_registry.default_workspace_access.disable")
+            }
+            Self::CapabilityRegistryWorkspaceAccessEnable => {
+                write!(f, "capability_registry.workspace_access.enable")
+            }
+            Self::CapabilityRegistryWorkspaceAccessDisable => {
+                write!(f, "capability_registry.workspace_access.disable")
+            }
+            Self::CapabilityRegistryWorkspaceAccessRemove => {
+                write!(f, "capability_registry.workspace_access.remove")
+            }
+            Self::CapabilityVersionCreate => write!(f, "capability.version.create"),
+            Self::CapabilityVersionDisable => write!(f, "capability.version.disable"),
+            Self::CapabilityVersionEnable => write!(f, "capability.version.enable"),
+            Self::CapabilityDisable => write!(f, "capability.disable"),
+            Self::CapabilityEnable => write!(f, "capability.enable"),
             Self::FeaturePermissionOverrideCreated => {
                 write!(f, "feature_permission.override.created")
             }
@@ -1432,6 +1605,8 @@ impl fmt::Display for AuditLogEventType {
             Self::WorkflowExecutionStarted => write!(f, "workflow.execution.started"),
             Self::WorkflowExecutionCanceled => write!(f, "workflow.execution.canceled"),
             Self::WorkflowExecutionTerminated => write!(f, "workflow.execution.terminated"),
+            Self::WorkflowExecutionCompleted => write!(f, "workflow.execution.completed"),
+            Self::WorkflowExecutionFailed => write!(f, "workflow.execution.failed"),
             Self::WorkflowExecutionSignal => write!(f, "workflow.execution.signal"),
             Self::WorkflowExecutionQuery => write!(f, "workflow.execution.query"),
             Self::WorkflowExecutionUpdate => write!(f, "workflow.execution.update"),
@@ -1449,6 +1624,33 @@ impl fmt::Display for AuditLogEventType {
             }
             Self::WorkflowDeploymentAuthorizedCredentialRevoked => {
                 write!(f, "workflow.deployment.authorized_credential.revoked")
+            }
+            Self::WorkflowManagedDeploymentCreated => {
+                write!(f, "workflow.managed_deployment.created")
+            }
+            Self::WorkflowManagedDeploymentUpdated => {
+                write!(f, "workflow.managed_deployment.updated")
+            }
+            Self::WorkflowManagedDeploymentStopped => {
+                write!(f, "workflow.managed_deployment.stopped")
+            }
+            Self::WorkflowManagedDeploymentStarted => {
+                write!(f, "workflow.managed_deployment.started")
+            }
+            Self::WorkflowManagedDeploymentRestarted => {
+                write!(f, "workflow.managed_deployment.restarted")
+            }
+            Self::WorkflowManagedDeploymentDeleted => {
+                write!(f, "workflow.managed_deployment.deleted")
+            }
+            Self::WorkflowManagedDeploymentCredentialProvisioned => {
+                write!(f, "workflow.managed_deployment.credential.provisioned")
+            }
+            Self::WorkflowManagedDeploymentCredentialRevoked => {
+                write!(f, "workflow.managed_deployment.credential.revoked")
+            }
+            Self::WorkflowManagedDeploymentStatusChanged => {
+                write!(f, "workflow.managed_deployment.status.changed")
             }
             Self::__Unknown(val) => write!(f, "{}", val),
         }

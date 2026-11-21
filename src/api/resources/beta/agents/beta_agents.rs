@@ -2,11 +2,11 @@ use crate::api::*;
 use crate::{ApiError, ClientConfig, HttpClient, QueryBuilder, RequestOptions};
 use reqwest::Method;
 
-pub struct AgentsClient2 {
+pub struct AgentsClient3 {
     pub http_client: HttpClient,
 }
 
-impl AgentsClient2 {
+impl AgentsClient3 {
     pub fn new(config: ClientConfig) -> Result<Self, ApiError> {
         Ok(Self {
             http_client: HttpClient::new(config.clone())?,

@@ -8,6 +8,10 @@ pub struct ResponsesFunctionCallOutput {
     pub caller: Option<ResponsesFunctionCallOutputCaller>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub namespace: Option<String>,
     pub output: ResponsesFunctionCallOutputOutput,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<ResponsesFunctionCallOutputStatus>,
@@ -29,6 +33,8 @@ pub struct ResponsesFunctionCallOutputBuilder {
     call_id: Option<String>,
     caller: Option<ResponsesFunctionCallOutputCaller>,
     id: Option<String>,
+    name: Option<String>,
+    namespace: Option<String>,
     output: Option<ResponsesFunctionCallOutputOutput>,
     status: Option<ResponsesFunctionCallOutputStatus>,
     r#type: Option<ResponsesFunctionCallOutputType>,
@@ -47,6 +53,16 @@ impl ResponsesFunctionCallOutputBuilder {
 
     pub fn id(mut self, value: impl Into<String>) -> Self {
         self.id = Some(value.into());
+        self
+    }
+
+    pub fn name(mut self, value: impl Into<String>) -> Self {
+        self.name = Some(value.into());
+        self
+    }
+
+    pub fn namespace(mut self, value: impl Into<String>) -> Self {
+        self.namespace = Some(value.into());
         self
     }
 
@@ -77,6 +93,8 @@ impl ResponsesFunctionCallOutputBuilder {
                 .ok_or_else(|| BuildError::missing_field("call_id"))?,
             caller: self.caller,
             id: self.id,
+            name: self.name,
+            namespace: self.namespace,
             output: self
                 .output
                 .ok_or_else(|| BuildError::missing_field("output"))?,

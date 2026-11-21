@@ -8,6 +8,8 @@ pub enum CreateResponseResponseServiceTier {
     Flex,
     Scale,
     Priority,
+    Fast,
+    Ultrafast,
     /// This variant is used for forward compatibility.
     /// If the server sends a value not recognized by the current SDK version,
     /// it will be captured here with the raw string value.
@@ -21,6 +23,8 @@ impl Serialize for CreateResponseResponseServiceTier {
             Self::Flex => serializer.serialize_str("flex"),
             Self::Scale => serializer.serialize_str("scale"),
             Self::Priority => serializer.serialize_str("priority"),
+            Self::Fast => serializer.serialize_str("fast"),
+            Self::Ultrafast => serializer.serialize_str("ultrafast"),
             Self::__Unknown(val) => serializer.serialize_str(val),
         }
     }
@@ -35,6 +39,8 @@ impl<'de> Deserialize<'de> for CreateResponseResponseServiceTier {
             "flex" => Ok(Self::Flex),
             "scale" => Ok(Self::Scale),
             "priority" => Ok(Self::Priority),
+            "fast" => Ok(Self::Fast),
+            "ultrafast" => Ok(Self::Ultrafast),
             _ => Ok(Self::__Unknown(value)),
         }
     }
@@ -48,6 +54,8 @@ impl fmt::Display for CreateResponseResponseServiceTier {
             Self::Flex => write!(f, "flex"),
             Self::Scale => write!(f, "scale"),
             Self::Priority => write!(f, "priority"),
+            Self::Fast => write!(f, "fast"),
+            Self::Ultrafast => write!(f, "ultrafast"),
             Self::__Unknown(val) => write!(f, "{}", val),
         }
     }

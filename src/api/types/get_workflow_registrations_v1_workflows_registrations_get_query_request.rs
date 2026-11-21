@@ -30,6 +30,9 @@ pub struct GetWorkflowRegistrationsV1WorkflowsRegistrationsGetQueryRequest {
     /// Whether to only return workflows available in chat assistant
     #[serde(skip_serializing_if = "Option::is_none")]
     pub available_in_chat_assistant: Option<bool>,
+    /// Exclude registrations of workflows tagged with any of the listed tags.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub exclude_tags: Option<Vec<String>>,
     /// The maximum number of workflows versions to return
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
@@ -57,6 +60,7 @@ pub struct GetWorkflowRegistrationsV1WorkflowsRegistrationsGetQueryRequestBuilde
     archived: Option<bool>,
     with_workflow: Option<bool>,
     available_in_chat_assistant: Option<bool>,
+    exclude_tags: Option<Vec<String>>,
     limit: Option<i64>,
     cursor: Option<String>,
 }
@@ -107,6 +111,11 @@ impl GetWorkflowRegistrationsV1WorkflowsRegistrationsGetQueryRequestBuilder {
         self
     }
 
+    pub fn exclude_tags(mut self, value: Vec<String>) -> Self {
+        self.exclude_tags = Some(value);
+        self
+    }
+
     pub fn limit(mut self, value: i64) -> Self {
         self.limit = Some(value);
         self
@@ -132,6 +141,7 @@ impl GetWorkflowRegistrationsV1WorkflowsRegistrationsGetQueryRequestBuilder {
                 archived: self.archived,
                 with_workflow: self.with_workflow,
                 available_in_chat_assistant: self.available_in_chat_assistant,
+                exclude_tags: self.exclude_tags,
                 limit: self.limit,
                 cursor: self.cursor,
             },

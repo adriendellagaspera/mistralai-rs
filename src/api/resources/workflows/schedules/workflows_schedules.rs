@@ -20,7 +20,7 @@ impl SchedulesClient {
     /// * `workflow_name` - Filter by exact workflow name
     /// * `user_id` - Filter by user ID. Pass 'current' to resolve to the authenticated user's ID.
     /// * `status` - Filter by schedule status: 'active' or 'paused'
-    /// * `search` - Prefix search query for workflow name
+    /// * `search` - Fuzzy search query for workflow name, display name, description, or ID
     /// * `page_size` - Number of items per page. Omitting this parameter fetches all results at once (deprecated — pass page_size to use pagination).
     /// * `next_page_token` - Token for the next page of results
     /// * `options` - Additional request options such as headers, timeout, etc.

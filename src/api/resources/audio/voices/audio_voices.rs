@@ -106,7 +106,6 @@ impl VoicesClient {
     ///                 retention_notice: None,
     ///                 sample_audio: None,
     ///                 sample_filename: None,
-    ///                 slug: None,
     ///                 tags: None,
     ///             },
     ///             None,
@@ -327,6 +326,7 @@ impl VoicesClient {
     /// * `gender` - Keep voices matching any of these genders
     /// * `language` - Keep voices supporting any of these languages
     /// * `query` - Case-insensitive match on voice name
+    /// * `kind` - Keep voices cloned with this technology
     /// * `options` - Additional request options such as headers, timeout, etc.
     ///
     /// # Returns
@@ -374,6 +374,7 @@ impl VoicesClient {
                     .serialize("gender", request.gender.clone())
                     .serialize("language", request.language.clone())
                     .structured_query("query", request.query.clone())
+                    .serialize("kind", request.kind.clone())
                     .build(),
                 options,
             )

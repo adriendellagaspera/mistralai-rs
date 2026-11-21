@@ -2,6 +2,7 @@ pub use crate::prelude::*;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
 pub struct CustomConnector {
+    /// Deprecated: per-request connector credentials will be removed. Authenticate the connector through the Connectors API instead.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub authorization: Option<CustomConnectorAuthorization>,
     #[serde(default)]

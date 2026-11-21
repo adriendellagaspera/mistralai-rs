@@ -24,6 +24,7 @@ pub enum ObservabilityErrorCode {
     JudgeNameAlreadyExists,
     JudgeNotFound,
     JudgeDidNotChange,
+    JudgeWritesFrozen,
     DatasetNotFound,
     DatasetTaskNotFound,
     DatasetRecordNotFound,
@@ -38,6 +39,7 @@ pub enum ObservabilityErrorCode {
     EvaluationRunTransitionIsRunningAlready,
     EvaluationRunTransitionError,
     EvaluationRunOutputRecordConflict,
+    EvaluationRunInputRecordConflict,
     TemplateError,
     TemplateSyntaxError,
     ProjectNotFound,
@@ -52,6 +54,7 @@ pub enum ObservabilityErrorCode {
     EvaluationNameAlreadyExists,
     OptimizationNotFound,
     OptimizationTrialKeyAlreadyExists,
+    OptimizationTrialObservationAlreadyExists,
     TracesFilterQueryParseError,
     TraceNotFound,
     SpanNotFound,
@@ -94,6 +97,7 @@ impl Serialize for ObservabilityErrorCode {
             Self::JudgeNameAlreadyExists => serializer.serialize_str("JUDGE_NAME_ALREADY_EXISTS"),
             Self::JudgeNotFound => serializer.serialize_str("JUDGE_NOT_FOUND"),
             Self::JudgeDidNotChange => serializer.serialize_str("JUDGE_DID_NOT_CHANGE"),
+            Self::JudgeWritesFrozen => serializer.serialize_str("JUDGE_WRITES_FROZEN"),
             Self::DatasetNotFound => serializer.serialize_str("DATASET_NOT_FOUND"),
             Self::DatasetTaskNotFound => serializer.serialize_str("DATASET_TASK_NOT_FOUND"),
             Self::DatasetRecordNotFound => serializer.serialize_str("DATASET_RECORD_NOT_FOUND"),
@@ -122,6 +126,9 @@ impl Serialize for ObservabilityErrorCode {
             Self::EvaluationRunOutputRecordConflict => {
                 serializer.serialize_str("EVALUATION_RUN_OUTPUT_RECORD_CONFLICT")
             }
+            Self::EvaluationRunInputRecordConflict => {
+                serializer.serialize_str("EVALUATION_RUN_INPUT_RECORD_CONFLICT")
+            }
             Self::TemplateError => serializer.serialize_str("TEMPLATE_ERROR"),
             Self::TemplateSyntaxError => serializer.serialize_str("TEMPLATE_SYNTAX_ERROR"),
             Self::ProjectNotFound => serializer.serialize_str("PROJECT_NOT_FOUND"),
@@ -145,6 +152,9 @@ impl Serialize for ObservabilityErrorCode {
             Self::OptimizationNotFound => serializer.serialize_str("OPTIMIZATION_NOT_FOUND"),
             Self::OptimizationTrialKeyAlreadyExists => {
                 serializer.serialize_str("OPTIMIZATION_TRIAL_KEY_ALREADY_EXISTS")
+            }
+            Self::OptimizationTrialObservationAlreadyExists => {
+                serializer.serialize_str("OPTIMIZATION_TRIAL_OBSERVATION_ALREADY_EXISTS")
             }
             Self::TracesFilterQueryParseError => {
                 serializer.serialize_str("TRACES_FILTER_QUERY_PARSE_ERROR")
@@ -181,6 +191,7 @@ impl<'de> Deserialize<'de> for ObservabilityErrorCode {
             "JUDGE_NAME_ALREADY_EXISTS" => Ok(Self::JudgeNameAlreadyExists),
             "JUDGE_NOT_FOUND" => Ok(Self::JudgeNotFound),
             "JUDGE_DID_NOT_CHANGE" => Ok(Self::JudgeDidNotChange),
+            "JUDGE_WRITES_FROZEN" => Ok(Self::JudgeWritesFrozen),
             "DATASET_NOT_FOUND" => Ok(Self::DatasetNotFound),
             "DATASET_TASK_NOT_FOUND" => Ok(Self::DatasetTaskNotFound),
             "DATASET_RECORD_NOT_FOUND" => Ok(Self::DatasetRecordNotFound),
@@ -197,6 +208,7 @@ impl<'de> Deserialize<'de> for ObservabilityErrorCode {
             }
             "EVALUATION_RUN_TRANSITION_ERROR" => Ok(Self::EvaluationRunTransitionError),
             "EVALUATION_RUN_OUTPUT_RECORD_CONFLICT" => Ok(Self::EvaluationRunOutputRecordConflict),
+            "EVALUATION_RUN_INPUT_RECORD_CONFLICT" => Ok(Self::EvaluationRunInputRecordConflict),
             "TEMPLATE_ERROR" => Ok(Self::TemplateError),
             "TEMPLATE_SYNTAX_ERROR" => Ok(Self::TemplateSyntaxError),
             "PROJECT_NOT_FOUND" => Ok(Self::ProjectNotFound),
@@ -211,6 +223,9 @@ impl<'de> Deserialize<'de> for ObservabilityErrorCode {
             "EVALUATION_NAME_ALREADY_EXISTS" => Ok(Self::EvaluationNameAlreadyExists),
             "OPTIMIZATION_NOT_FOUND" => Ok(Self::OptimizationNotFound),
             "OPTIMIZATION_TRIAL_KEY_ALREADY_EXISTS" => Ok(Self::OptimizationTrialKeyAlreadyExists),
+            "OPTIMIZATION_TRIAL_OBSERVATION_ALREADY_EXISTS" => {
+                Ok(Self::OptimizationTrialObservationAlreadyExists)
+            }
             "TRACES_FILTER_QUERY_PARSE_ERROR" => Ok(Self::TracesFilterQueryParseError),
             "TRACE_NOT_FOUND" => Ok(Self::TraceNotFound),
             "SPAN_NOT_FOUND" => Ok(Self::SpanNotFound),
@@ -245,6 +260,7 @@ impl fmt::Display for ObservabilityErrorCode {
             Self::JudgeNameAlreadyExists => write!(f, "JUDGE_NAME_ALREADY_EXISTS"),
             Self::JudgeNotFound => write!(f, "JUDGE_NOT_FOUND"),
             Self::JudgeDidNotChange => write!(f, "JUDGE_DID_NOT_CHANGE"),
+            Self::JudgeWritesFrozen => write!(f, "JUDGE_WRITES_FROZEN"),
             Self::DatasetNotFound => write!(f, "DATASET_NOT_FOUND"),
             Self::DatasetTaskNotFound => write!(f, "DATASET_TASK_NOT_FOUND"),
             Self::DatasetRecordNotFound => write!(f, "DATASET_RECORD_NOT_FOUND"),
@@ -265,6 +281,9 @@ impl fmt::Display for ObservabilityErrorCode {
             Self::EvaluationRunOutputRecordConflict => {
                 write!(f, "EVALUATION_RUN_OUTPUT_RECORD_CONFLICT")
             }
+            Self::EvaluationRunInputRecordConflict => {
+                write!(f, "EVALUATION_RUN_INPUT_RECORD_CONFLICT")
+            }
             Self::TemplateError => write!(f, "TEMPLATE_ERROR"),
             Self::TemplateSyntaxError => write!(f, "TEMPLATE_SYNTAX_ERROR"),
             Self::ProjectNotFound => write!(f, "PROJECT_NOT_FOUND"),
@@ -280,6 +299,9 @@ impl fmt::Display for ObservabilityErrorCode {
             Self::OptimizationNotFound => write!(f, "OPTIMIZATION_NOT_FOUND"),
             Self::OptimizationTrialKeyAlreadyExists => {
                 write!(f, "OPTIMIZATION_TRIAL_KEY_ALREADY_EXISTS")
+            }
+            Self::OptimizationTrialObservationAlreadyExists => {
+                write!(f, "OPTIMIZATION_TRIAL_OBSERVATION_ALREADY_EXISTS")
             }
             Self::TracesFilterQueryParseError => write!(f, "TRACES_FILTER_QUERY_PARSE_ERROR"),
             Self::TraceNotFound => write!(f, "TRACE_NOT_FOUND"),

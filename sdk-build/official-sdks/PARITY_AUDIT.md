@@ -6,22 +6,22 @@
 
 | Source | Revision |
 | --- | --- |
-| OpenAPI | `08a585fb75bcfa6ff968773134ee00060e0db283fc6b16f421f544e78ba8db92` |
-| Python | `8fdbff0b1bcb0c9c3e5b803080a20ac820c2905c` |
-| TypeScript | `50b2bc105cce327d3bd2ccee86240c4b0f6f2d6c` |
+| OpenAPI | `7652f1307b3bc6cb7a10526c28788a430246f641cb9785a9f1b7b0dd912cdfae` |
+| Python | `e3444997d52684aaf612ee8fed98f9b8025b95d6` |
+| TypeScript | `3e87497eea3ae73f482cd683b043469e72f12389` |
 
 ## HTTP summary
 
 | Measure | Count |
 | --- | ---: |
-| Published OpenAPI operations | 321 |
-| OpenAPI operations with official SDK taxonomy | 260 |
-| Extracted Python SDK methods | 290 |
-| Extracted TypeScript SDK methods | 292 |
-| Unresolved Python methods | 25 |
-| Unresolved TypeScript methods | 25 |
-| New HTTP routes observed in both SDKs | 25 |
-| New HTTP routes observed in only one SDK | 0 |
+| Published OpenAPI operations | 347 |
+| OpenAPI operations with official SDK taxonomy | 298 |
+| Extracted Python SDK methods | 303 |
+| Extracted TypeScript SDK methods | 304 |
+| Unresolved Python methods | 0 |
+| Unresolved TypeScript methods | 7 |
+| New HTTP routes observed in both SDKs | 0 |
+| New HTTP routes observed in only one SDK | 7 |
 | Existing OpenAPI routes with unresolved SDK identity | 0 |
 | Public method taxonomy divergences | 1 |
 
@@ -32,31 +32,13 @@ Matching uses exact normalized method/path, not inferred request shapes.
 
 | HTTP route | Official SDKs | Classification |
 | --- | --- | --- |
-| `DELETE /v1/audio/agents/{agent_id}` | python, typescript | sdk_observed_both |
-| `DELETE /v1/audio/sessions/{session_id}` | python, typescript | sdk_observed_both |
-| `DELETE /v1/context/search-indexes/{index_name}` | python, typescript | sdk_observed_both |
-| `DELETE /v1/context/search-indexes/{index_name}/documents` | python, typescript | sdk_observed_both |
-| `GET /v1/audio/agents` | python, typescript | sdk_observed_both |
-| `GET /v1/audio/agents/{agent_id}` | python, typescript | sdk_observed_both |
-| `GET /v1/audio/agents/{agent_id}/sessions` | python, typescript | sdk_observed_both |
-| `GET /v1/audio/agents/{agent_id}/versions` | python, typescript | sdk_observed_both |
-| `GET /v1/audio/sessions/{session_id}` | python, typescript | sdk_observed_both |
-| `GET /v1/context/search-indexes` | python, typescript | sdk_observed_both |
-| `GET /v1/context/search-indexes/{index_name}` | python, typescript | sdk_observed_both |
-| `GET /v1/context/search-indexes/{index_name}/chunks/{chunk_id}` | python, typescript | sdk_observed_both |
-| `GET /v1/context/search-indexes/{index_name}/summary_field/{language}` | python, typescript | sdk_observed_both |
-| `POST /v1/audio/agents` | python, typescript | sdk_observed_both |
-| `POST /v1/audio/sessions` | python, typescript | sdk_observed_both |
-| `POST /v1/context/search-indexes` | python, typescript | sdk_observed_both |
-| `POST /v1/context/search-indexes/{index_name}/documents` | python, typescript | sdk_observed_both |
-| `POST /v1/context/search-indexes/{index_name}/grep` | python, typescript | sdk_observed_both |
-| `POST /v1/context/search-indexes/{index_name}/navigate` | python, typescript | sdk_observed_both |
-| `POST /v1/context/search-indexes/{index_name}/read` | python, typescript | sdk_observed_both |
-| `POST /v1/context/search-indexes/{index_name}/search` | python, typescript | sdk_observed_both |
-| `POST /v1/context/search-indexes/{index_name}/summary_field/{language}` | python, typescript | sdk_observed_both |
-| `PUT /v1/audio/agents/{agent_id}` | python, typescript | sdk_observed_both |
-| `PUT /v1/context/search-indexes/{index_name}` | python, typescript | sdk_observed_both |
-| `PUT /v1/context/search-indexes/{index_name}/summary_field/{language}` | python, typescript | sdk_observed_both |
+| `DELETE /v1/observability/judges/{judge_id}` | typescript | sdk_observed_one |
+| `GET /v1/observability/judges` | typescript | sdk_observed_one |
+| `GET /v1/observability/judges/{judge_id}` | typescript | sdk_observed_one |
+| `POST /v1/observability/dataset-records/{dataset_record_id}/live-judging` | typescript | sdk_observed_one |
+| `POST /v1/observability/judges` | typescript | sdk_observed_one |
+| `POST /v1/observability/judges/{judge_id}/live-judging` | typescript | sdk_observed_one |
+| `PUT /v1/observability/judges/{judge_id}` | typescript | sdk_observed_one |
 
 Machine-readable evidence contains original operation IDs, public
 paths, transport variants, and matching failures.

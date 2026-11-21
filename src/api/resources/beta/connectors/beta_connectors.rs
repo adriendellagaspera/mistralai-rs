@@ -621,7 +621,7 @@ impl ConnectorsClient {
             .await
     }
 
-    /// Create consumer credentials for a given connector and consumer scope (organization, workspace, user)
+    /// Create consumer credentials for a given connector and consumer scope (workspace, user)
     ///
     /// # Arguments
     ///

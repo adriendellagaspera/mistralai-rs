@@ -7,7 +7,7 @@ pub struct VoiceUpdateRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub gender: Option<String>,
+    pub gender: Option<VoiceGender>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub languages: Option<Vec<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -29,7 +29,7 @@ impl VoiceUpdateRequest {
 pub struct VoiceUpdateRequestBuilder {
     age: Option<i64>,
     description: Option<String>,
-    gender: Option<String>,
+    gender: Option<VoiceGender>,
     languages: Option<Vec<String>>,
     name: Option<String>,
     retention_notice: Option<i64>,
@@ -47,8 +47,8 @@ impl VoiceUpdateRequestBuilder {
         self
     }
 
-    pub fn gender(mut self, value: impl Into<String>) -> Self {
-        self.gender = Some(value.into());
+    pub fn gender(mut self, value: VoiceGender) -> Self {
+        self.gender = Some(value);
         self
     }
 

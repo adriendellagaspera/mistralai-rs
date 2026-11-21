@@ -14,9 +14,13 @@ pub struct PipelineResult {
     #[serde(default)]
     pub judge_scores: HashMap<String, f64>,
     #[serde(default)]
+    pub operation_name: String,
+    #[serde(default)]
     pub span_id: String,
     #[serde(default)]
     pub span_name: String,
+    #[serde(default)]
+    pub tool_name: String,
     #[serde(default)]
     pub trace_id: String,
 }
@@ -35,8 +39,10 @@ pub struct PipelineResultBuilder {
     judge_explanations: Option<HashMap<String, String>>,
     judge_labels: Option<HashMap<String, String>>,
     judge_scores: Option<HashMap<String, f64>>,
+    operation_name: Option<String>,
     span_id: Option<String>,
     span_name: Option<String>,
+    tool_name: Option<String>,
     trace_id: Option<String>,
 }
 
@@ -66,6 +72,11 @@ impl PipelineResultBuilder {
         self
     }
 
+    pub fn operation_name(mut self, value: impl Into<String>) -> Self {
+        self.operation_name = Some(value.into());
+        self
+    }
+
     pub fn span_id(mut self, value: impl Into<String>) -> Self {
         self.span_id = Some(value.into());
         self
@@ -73,6 +84,11 @@ impl PipelineResultBuilder {
 
     pub fn span_name(mut self, value: impl Into<String>) -> Self {
         self.span_name = Some(value.into());
+        self
+    }
+
+    pub fn tool_name(mut self, value: impl Into<String>) -> Self {
+        self.tool_name = Some(value.into());
         self
     }
 
@@ -88,8 +104,10 @@ impl PipelineResultBuilder {
     /// - [`judge_explanations`](PipelineResultBuilder::judge_explanations)
     /// - [`judge_labels`](PipelineResultBuilder::judge_labels)
     /// - [`judge_scores`](PipelineResultBuilder::judge_scores)
+    /// - [`operation_name`](PipelineResultBuilder::operation_name)
     /// - [`span_id`](PipelineResultBuilder::span_id)
     /// - [`span_name`](PipelineResultBuilder::span_name)
+    /// - [`tool_name`](PipelineResultBuilder::tool_name)
     /// - [`trace_id`](PipelineResultBuilder::trace_id)
     pub fn build(self) -> Result<PipelineResult, BuildError> {
         Ok(PipelineResult {
@@ -108,12 +126,18 @@ impl PipelineResultBuilder {
             judge_scores: self
                 .judge_scores
                 .ok_or_else(|| BuildError::missing_field("judge_scores"))?,
+            operation_name: self
+                .operation_name
+                .ok_or_else(|| BuildError::missing_field("operation_name"))?,
             span_id: self
                 .span_id
                 .ok_or_else(|| BuildError::missing_field("span_id"))?,
             span_name: self
                 .span_name
                 .ok_or_else(|| BuildError::missing_field("span_name"))?,
+            tool_name: self
+                .tool_name
+                .ok_or_else(|| BuildError::missing_field("tool_name"))?,
             trace_id: self
                 .trace_id
                 .ok_or_else(|| BuildError::missing_field("trace_id"))?,

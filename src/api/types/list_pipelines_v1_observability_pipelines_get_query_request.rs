@@ -6,6 +6,10 @@ pub struct ListPipelinesV1ObservabilityPipelinesGetQueryRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub enabled: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub from: Option<DateTime<FixedOffset>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub to: Option<DateTime<FixedOffset>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub page_size: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub page: Option<i64>,
@@ -23,6 +27,8 @@ impl ListPipelinesV1ObservabilityPipelinesGetQueryRequest {
 #[non_exhaustive]
 pub struct ListPipelinesV1ObservabilityPipelinesGetQueryRequestBuilder {
     enabled: Option<bool>,
+    from: Option<DateTime<FixedOffset>>,
+    to: Option<DateTime<FixedOffset>>,
     page_size: Option<i64>,
     page: Option<i64>,
     q: Option<String>,
@@ -31,6 +37,16 @@ pub struct ListPipelinesV1ObservabilityPipelinesGetQueryRequestBuilder {
 impl ListPipelinesV1ObservabilityPipelinesGetQueryRequestBuilder {
     pub fn enabled(mut self, value: bool) -> Self {
         self.enabled = Some(value);
+        self
+    }
+
+    pub fn from(mut self, value: DateTime<FixedOffset>) -> Self {
+        self.from = Some(value);
+        self
+    }
+
+    pub fn to(mut self, value: DateTime<FixedOffset>) -> Self {
+        self.to = Some(value);
         self
     }
 
@@ -53,6 +69,8 @@ impl ListPipelinesV1ObservabilityPipelinesGetQueryRequestBuilder {
     pub fn build(self) -> Result<ListPipelinesV1ObservabilityPipelinesGetQueryRequest, BuildError> {
         Ok(ListPipelinesV1ObservabilityPipelinesGetQueryRequest {
             enabled: self.enabled,
+            from: self.from,
+            to: self.to,
             page_size: self.page_size,
             page: self.page,
             q: self.q,

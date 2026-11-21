@@ -4,8 +4,6 @@ pub use crate::prelude::*;
 pub struct Tool {
     #[serde(default)]
     pub function: Function,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub r#type: Option<ToolTypes>,
 }
 
 impl Tool {
@@ -18,17 +16,11 @@ impl Tool {
 #[non_exhaustive]
 pub struct ToolBuilder {
     function: Option<Function>,
-    r#type: Option<ToolTypes>,
 }
 
 impl ToolBuilder {
     pub fn function(mut self, value: Function) -> Self {
         self.function = Some(value);
-        self
-    }
-
-    pub fn r#type(mut self, value: ToolTypes) -> Self {
-        self.r#type = Some(value);
         self
     }
 
@@ -40,7 +32,6 @@ impl ToolBuilder {
             function: self
                 .function
                 .ok_or_else(|| BuildError::missing_field("function"))?,
-            r#type: self.r#type,
         })
     }
 }

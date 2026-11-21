@@ -7,6 +7,8 @@ pub enum CreateClientSessionV1ClientSessionsPostSessionsRequest {
     #[serde(rename = "realtime")]
     #[non_exhaustive]
     Realtime {
+        #[serde(skip_serializing_if = "Option::is_none")]
+        metadata: Option<MetadataDict>,
         #[serde(default)]
         model: String,
         #[serde(skip_serializing_if = "Option::is_none")]
@@ -23,13 +25,31 @@ pub enum CreateClientSessionV1ClientSessionsPostSessionsRequest {
 impl CreateClientSessionV1ClientSessionsPostSessionsRequest {
     pub fn realtime(model: String) -> Self {
         Self::Realtime {
+            metadata: None,
             model,
             ttl_seconds: None,
         }
     }
 
-    pub fn realtime_with_ttl_seconds(model: String, ttl_seconds: i64) -> Self {
+    pub fn realtime_with_metadata(
+        metadata: MetadataDict,
+        model: String,
+        ttl_seconds: Option<i64>,
+    ) -> Self {
         Self::Realtime {
+            metadata: Some(metadata),
+            model,
+            ttl_seconds,
+        }
+    }
+
+    pub fn realtime_with_ttl_seconds(
+        metadata: Option<MetadataDict>,
+        model: String,
+        ttl_seconds: i64,
+    ) -> Self {
+        Self::Realtime {
+            metadata,
             model,
             ttl_seconds: Some(ttl_seconds),
         }

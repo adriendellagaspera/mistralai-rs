@@ -51,6 +51,8 @@ pub struct GetTrace {
     pub root_span_id: String,
     #[serde(default)]
     pub root_span_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub service_account_id: Option<String>,
     #[serde(default)]
     pub service_name: String,
     #[serde(default)]
@@ -106,6 +108,7 @@ pub struct GetTraceBuilder {
     retrieval_count: Option<i64>,
     root_span_id: Option<String>,
     root_span_name: Option<String>,
+    service_account_id: Option<String>,
     service_name: Option<String>,
     span_count: Option<i64>,
     start_time: Option<DateTime<FixedOffset>>,
@@ -236,6 +239,11 @@ impl GetTraceBuilder {
 
     pub fn root_span_name(mut self, value: impl Into<String>) -> Self {
         self.root_span_name = Some(value.into());
+        self
+    }
+
+    pub fn service_account_id(mut self, value: impl Into<String>) -> Self {
+        self.service_account_id = Some(value.into());
         self
     }
 
@@ -399,6 +407,7 @@ impl GetTraceBuilder {
             root_span_name: self
                 .root_span_name
                 .ok_or_else(|| BuildError::missing_field("root_span_name"))?,
+            service_account_id: self.service_account_id,
             service_name: self
                 .service_name
                 .ok_or_else(|| BuildError::missing_field("service_name"))?,

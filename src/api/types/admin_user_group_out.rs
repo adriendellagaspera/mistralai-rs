@@ -14,9 +14,6 @@ pub struct AdminUserGroupOut {
     /// Organization role assigned to the group.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub organization_role: Option<String>,
-    /// UUIDs of the groups this group is directly nested inside.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub parent_group_ids: Option<Vec<String>>,
     /// User group ID.
     #[serde(default)]
     pub uuid: String,
@@ -35,7 +32,6 @@ pub struct AdminUserGroupOutBuilder {
     externally_managed: Option<bool>,
     name: Option<String>,
     organization_role: Option<String>,
-    parent_group_ids: Option<Vec<String>>,
     uuid: Option<String>,
 }
 
@@ -60,11 +56,6 @@ impl AdminUserGroupOutBuilder {
         self
     }
 
-    pub fn parent_group_ids(mut self, value: Vec<String>) -> Self {
-        self.parent_group_ids = Some(value);
-        self
-    }
-
     pub fn uuid(mut self, value: impl Into<String>) -> Self {
         self.uuid = Some(value.into());
         self
@@ -80,7 +71,6 @@ impl AdminUserGroupOutBuilder {
             externally_managed: self.externally_managed,
             name: self.name.ok_or_else(|| BuildError::missing_field("name"))?,
             organization_role: self.organization_role,
-            parent_group_ids: self.parent_group_ids,
             uuid: self.uuid.ok_or_else(|| BuildError::missing_field("uuid"))?,
         })
     }

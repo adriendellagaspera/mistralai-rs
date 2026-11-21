@@ -21,6 +21,8 @@ pub struct GetSpanEvaluation {
     #[serde(default)]
     #[serde(with = "crate::core::number_serializers")]
     pub score_value: f64,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub service_account_id: Option<String>,
     #[serde(default)]
     pub span_id: String,
     #[serde(default)]
@@ -52,6 +54,7 @@ pub struct GetSpanEvaluationBuilder {
     response_id: Option<String>,
     score_label: Option<String>,
     score_value: Option<f64>,
+    service_account_id: Option<String>,
     span_id: Option<String>,
     timestamp: Option<DateTime<FixedOffset>>,
     trace_id: Option<String>,
@@ -102,6 +105,11 @@ impl GetSpanEvaluationBuilder {
 
     pub fn score_value(mut self, value: f64) -> Self {
         self.score_value = Some(value);
+        self
+    }
+
+    pub fn service_account_id(mut self, value: impl Into<String>) -> Self {
+        self.service_account_id = Some(value.into());
         self
     }
 
@@ -175,6 +183,7 @@ impl GetSpanEvaluationBuilder {
             score_value: self
                 .score_value
                 .ok_or_else(|| BuildError::missing_field("score_value"))?,
+            service_account_id: self.service_account_id,
             span_id: self
                 .span_id
                 .ok_or_else(|| BuildError::missing_field("span_id"))?,

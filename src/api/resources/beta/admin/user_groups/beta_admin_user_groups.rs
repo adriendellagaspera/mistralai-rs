@@ -20,6 +20,8 @@ impl UserGroupsClient {
     /// * `page` - Page number to return.
     /// * `page_size` - Maximum number of results per page.
     /// * `search` - Search term used to filter user groups by name.
+    /// * `workspace_uuid` - Filter groups to those assigned to this Workspace. Assignments to archived Workspaces never match.
+    /// * `role` - Filter groups to those holding this role on a Workspace. When combined with workspace_uuid, the role must be held on that Workspace. Assignments to archived Workspaces never match.
     /// * `options` - Additional request options such as headers, timeout, etc.
     ///
     /// # Returns
@@ -65,6 +67,8 @@ impl UserGroupsClient {
                     .int("page", request.page.clone())
                     .int("page_size", request.page_size.clone())
                     .serialize("search", request.search.clone())
+                    .serialize("workspace_uuid", request.workspace_uuid.clone())
+                    .serialize("role", request.role.clone())
                     .build(),
                 options,
             )
@@ -101,7 +105,6 @@ impl UserGroupsClient {
     ///             &AdminUserGroupIn {
     ///                 name: "Engineering Team".to_string(),
     ///                 description: None,
-    ///                 parent_group_ids: None,
     ///             },
     ///             None,
     ///         )
@@ -488,107 +491,6 @@ impl UserGroupsClient {
             .execute_request(
                 Method::DELETE,
                 &format!("v1/admin/user-groups/{}/members", group_uuid),
-                Some(serde_json::to_value(request).map_err(ApiError::Serialization)?),
-                None,
-                options,
-            )
-            .await
-    }
-
-    /// List the groups directly nested inside this group.
-    ///
-    /// # Arguments
-    ///
-    /// * `group_uuid` - User group ID.
-    /// * `options` - Additional request options such as headers, timeout, etc.
-    ///
-    /// # Returns
-    ///
-    /// JSON response from the API
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// use mistralai_sdk::prelude::*;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let config = ClientConfig {
-    ///         token: Some("<token>".to_string()),
-    ///         ..Default::default()
-    ///     };
-    ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client
-    ///         .beta
-    ///         .admin
-    ///         .user_groups
-    ///         .users_api_admin_user_groups_get_nested_groups(&"group_uuid".to_string(), None)
-    ///         .await;
-    /// }
-    /// ```
-    pub async fn users_api_admin_user_groups_get_nested_groups(
-        &self,
-        group_uuid: &str,
-        options: Option<RequestOptions>,
-    ) -> Result<NestedGroupsOut, ApiError> {
-        self.http_client
-            .execute_request(
-                Method::GET,
-                &format!("v1/admin/user-groups/{}/nested", group_uuid),
-                None,
-                None,
-                options,
-            )
-            .await
-    }
-
-    /// Replace the set of groups directly nested inside this group.
-    ///
-    /// # Arguments
-    ///
-    /// * `group_uuid` - User group ID.
-    /// * `options` - Additional request options such as headers, timeout, etc.
-    ///
-    /// # Returns
-    ///
-    /// Empty response
-    ///
-    /// # Examples
-    ///
-    /// ```no_run
-    /// use mistralai_sdk::prelude::*;
-    ///
-    /// #[tokio::main]
-    /// async fn main() {
-    ///     let config = ClientConfig {
-    ///         token: Some("<token>".to_string()),
-    ///         ..Default::default()
-    ///     };
-    ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client
-    ///         .beta
-    ///         .admin
-    ///         .user_groups
-    ///         .users_api_admin_user_groups_set_nested_groups(
-    ///             &"group_uuid".to_string(),
-    ///             &SetNestedGroupsIn {
-    ///                 child_group_uuids: vec!["a1b2c3d4-e5f6-7890-abcd-ef1234567890".to_string()],
-    ///             },
-    ///             None,
-    ///         )
-    ///         .await;
-    /// }
-    /// ```
-    pub async fn users_api_admin_user_groups_set_nested_groups(
-        &self,
-        group_uuid: &str,
-        request: &SetNestedGroupsIn,
-        options: Option<RequestOptions>,
-    ) -> Result<(), ApiError> {
-        self.http_client
-            .execute_request(
-                Method::PATCH,
-                &format!("v1/admin/user-groups/{}/nested", group_uuid),
                 Some(serde_json::to_value(request).map_err(ApiError::Serialization)?),
                 None,
                 options,

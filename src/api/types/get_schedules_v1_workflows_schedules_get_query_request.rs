@@ -12,7 +12,7 @@ pub struct GetSchedulesV1WorkflowsSchedulesGetQueryRequest {
     /// Filter by schedule status: 'active' or 'paused'
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<GetSchedulesV1WorkflowsSchedulesGetSchedulesRequestStatus>,
-    /// Prefix search query for workflow name
+    /// Fuzzy search query for workflow name, display name, description, or ID
     #[serde(skip_serializing_if = "Option::is_none")]
     pub search: Option<String>,
     /// Number of items per page. Omitting this parameter fetches all results at once (deprecated — pass page_size to use pagination).

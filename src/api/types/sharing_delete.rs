@@ -5,7 +5,7 @@ pub struct SharingDelete {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub org_id: Option<String>,
     pub share_with_type: EntityType,
-    /// The id of the entity (user, workspace or organization) to share with
+    /// The id of the entity to stop sharing with, as returned by the list endpoint
     #[serde(default)]
     pub share_with_uuid: String,
 }

@@ -27,6 +27,8 @@ impl DeploymentsClient {
     /// * `limit` - Maximum number of deployments to return
     /// * `cursor` - Cursor from a previous response for pagination
     /// * `workspace_id` - Workspace ID to scope the request to. Defaults to the caller's context.
+    /// * `repository_url` - Filter managed deployments by source repository URL (exact match)
+    /// * `dockerfile_path` - Filter managed deployments by Dockerfile path (exact match)
     /// * `options` - Additional request options such as headers, timeout, etc.
     ///
     /// # Returns
@@ -77,9 +79,11 @@ impl DeploymentsClient {
                     .serialize("search", request.search.clone())
                     .serialize("order_by", request.order_by.clone())
                     .serialize("order", request.order.clone())
-                    .serialize("limit", request.limit.clone())
+                    .int("limit", request.limit.clone())
                     .serialize("cursor", request.cursor.clone())
                     .serialize("workspace_id", request.workspace_id.clone())
+                    .serialize("repository_url", request.repository_url.clone())
+                    .serialize("dockerfile_path", request.dockerfile_path.clone())
                     .build(),
                 options,
             )
@@ -115,7 +119,6 @@ impl DeploymentsClient {
     ///             &CreateDeploymentRequest {
     ///                 name: "name".to_string(),
     ///                 spec: DeploymentWorkerSpecInput {
-    ///                     github_url: "github_url".to_string(),
     ///                     ..Default::default()
     ///                 },
     ///                 hardened: None,
@@ -343,6 +346,54 @@ impl DeploymentsClient {
                 Method::PATCH,
                 &format!("v1/workflows/deployments/{}", name),
                 Some(serde_json::to_value(request).map_err(ApiError::Serialization)?),
+                None,
+                options,
+            )
+            .await
+    }
+
+    /// Get the archive a managed deployment builds from, with a signed URL to download it.
+    ///
+    /// `download_url` expires within 24 hours, and is null once Mistral Cloud has deleted the archive.
+    /// A deployment that builds from a repository answers 404.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - Additional request options such as headers, timeout, etc.
+    ///
+    /// # Returns
+    ///
+    /// JSON response from the API
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use mistralai_sdk::prelude::*;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let config = ClientConfig {
+    ///         token: Some("<token>".to_string()),
+    ///         ..Default::default()
+    ///     };
+    ///     let client = Mistral::new(config).expect("Failed to build client");
+    ///     client
+    ///         .workflows
+    ///         .deployments
+    ///         .get_deployment_archive_v1workflows_deployments_name_archive_get(&"name".to_string(), None)
+    ///         .await;
+    /// }
+    /// ```
+    pub async fn get_deployment_archive_v1workflows_deployments_name_archive_get(
+        &self,
+        name: &str,
+        options: Option<RequestOptions>,
+    ) -> Result<DeploymentArchiveResponse, ApiError> {
+        self.http_client
+            .execute_request(
+                Method::GET,
+                &format!("v1/workflows/deployments/{}/archive", name),
+                None,
                 None,
                 options,
             )

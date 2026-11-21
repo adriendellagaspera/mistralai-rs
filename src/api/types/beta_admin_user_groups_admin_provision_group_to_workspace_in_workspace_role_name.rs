@@ -9,6 +9,7 @@ pub enum AdminProvisionGroupToWorkspaceInWorkspaceRoleName {
     Dev,
     DevContributor,
     MistralCodeUser,
+    VibeCodeCliUser,
     CloudUser,
     MistralCloudAdmin,
     WorkspaceContributor,
@@ -16,6 +17,7 @@ pub enum AdminProvisionGroupToWorkspaceInWorkspaceRoleName {
     ObservabilityViewer,
     WorkflowExecutor,
     SecretRevealer,
+    OfflineEvaluationsManager,
     Member,
     /// This variant is used for forward compatibility.
     /// If the server sends a value not recognized by the current SDK version,
@@ -31,6 +33,7 @@ impl Serialize for AdminProvisionGroupToWorkspaceInWorkspaceRoleName {
             Self::Dev => serializer.serialize_str("dev"),
             Self::DevContributor => serializer.serialize_str("dev_contributor"),
             Self::MistralCodeUser => serializer.serialize_str("mistral_code_user"),
+            Self::VibeCodeCliUser => serializer.serialize_str("vibe_code_cli_user"),
             Self::CloudUser => serializer.serialize_str("cloud_user"),
             Self::MistralCloudAdmin => serializer.serialize_str("mistral_cloud_admin"),
             Self::WorkspaceContributor => serializer.serialize_str("workspace_contributor"),
@@ -38,6 +41,9 @@ impl Serialize for AdminProvisionGroupToWorkspaceInWorkspaceRoleName {
             Self::ObservabilityViewer => serializer.serialize_str("observability_viewer"),
             Self::WorkflowExecutor => serializer.serialize_str("workflow_executor"),
             Self::SecretRevealer => serializer.serialize_str("secret_revealer"),
+            Self::OfflineEvaluationsManager => {
+                serializer.serialize_str("offline_evaluations_manager")
+            }
             Self::Member => serializer.serialize_str("member"),
             Self::__Unknown(val) => serializer.serialize_str(val),
         }
@@ -54,6 +60,7 @@ impl<'de> Deserialize<'de> for AdminProvisionGroupToWorkspaceInWorkspaceRoleName
             "dev" => Ok(Self::Dev),
             "dev_contributor" => Ok(Self::DevContributor),
             "mistral_code_user" => Ok(Self::MistralCodeUser),
+            "vibe_code_cli_user" => Ok(Self::VibeCodeCliUser),
             "cloud_user" => Ok(Self::CloudUser),
             "mistral_cloud_admin" => Ok(Self::MistralCloudAdmin),
             "workspace_contributor" => Ok(Self::WorkspaceContributor),
@@ -61,6 +68,7 @@ impl<'de> Deserialize<'de> for AdminProvisionGroupToWorkspaceInWorkspaceRoleName
             "observability_viewer" => Ok(Self::ObservabilityViewer),
             "workflow_executor" => Ok(Self::WorkflowExecutor),
             "secret_revealer" => Ok(Self::SecretRevealer),
+            "offline_evaluations_manager" => Ok(Self::OfflineEvaluationsManager),
             "member" => Ok(Self::Member),
             _ => Ok(Self::__Unknown(value)),
         }
@@ -76,6 +84,7 @@ impl fmt::Display for AdminProvisionGroupToWorkspaceInWorkspaceRoleName {
             Self::Dev => write!(f, "dev"),
             Self::DevContributor => write!(f, "dev_contributor"),
             Self::MistralCodeUser => write!(f, "mistral_code_user"),
+            Self::VibeCodeCliUser => write!(f, "vibe_code_cli_user"),
             Self::CloudUser => write!(f, "cloud_user"),
             Self::MistralCloudAdmin => write!(f, "mistral_cloud_admin"),
             Self::WorkspaceContributor => write!(f, "workspace_contributor"),
@@ -83,6 +92,7 @@ impl fmt::Display for AdminProvisionGroupToWorkspaceInWorkspaceRoleName {
             Self::ObservabilityViewer => write!(f, "observability_viewer"),
             Self::WorkflowExecutor => write!(f, "workflow_executor"),
             Self::SecretRevealer => write!(f, "secret_revealer"),
+            Self::OfflineEvaluationsManager => write!(f, "offline_evaluations_manager"),
             Self::Member => write!(f, "member"),
             Self::__Unknown(val) => write!(f, "{}", val),
         }

@@ -24,6 +24,8 @@ pub struct GetLog {
     pub scope_schema_url: String,
     #[serde(default)]
     pub scope_version: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub service_account_id: Option<String>,
     #[serde(default)]
     pub service_name: String,
     #[serde(default)]
@@ -65,6 +67,7 @@ pub struct GetLogBuilder {
     scope_name: Option<String>,
     scope_schema_url: Option<String>,
     scope_version: Option<String>,
+    service_account_id: Option<String>,
     service_name: Option<String>,
     severity_number: Option<i64>,
     severity_text: Option<String>,
@@ -129,6 +132,11 @@ impl GetLogBuilder {
 
     pub fn scope_version(mut self, value: impl Into<String>) -> Self {
         self.scope_version = Some(value.into());
+        self
+    }
+
+    pub fn service_account_id(mut self, value: impl Into<String>) -> Self {
+        self.service_account_id = Some(value.into());
         self
     }
 
@@ -232,6 +240,7 @@ impl GetLogBuilder {
             scope_version: self
                 .scope_version
                 .ok_or_else(|| BuildError::missing_field("scope_version"))?,
+            service_account_id: self.service_account_id,
             service_name: self
                 .service_name
                 .ok_or_else(|| BuildError::missing_field("service_name"))?,

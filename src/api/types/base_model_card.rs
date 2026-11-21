@@ -5,6 +5,10 @@ pub struct BaseModelCard {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub aliases: Option<Vec<String>>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub audio_speech_capabilities: Option<AudioSpeechCapabilities>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub audio_transcription_capabilities: Option<AudioTranscriptionCapabilities>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub billing_model_name: Option<String>,
     #[serde(default)]
     pub capabilities: ModelCapabilities,
@@ -42,6 +46,8 @@ impl BaseModelCard {
 #[non_exhaustive]
 pub struct BaseModelCardBuilder {
     aliases: Option<Vec<String>>,
+    audio_speech_capabilities: Option<AudioSpeechCapabilities>,
+    audio_transcription_capabilities: Option<AudioTranscriptionCapabilities>,
     billing_model_name: Option<String>,
     capabilities: Option<ModelCapabilities>,
     created: Option<i64>,
@@ -60,6 +66,19 @@ pub struct BaseModelCardBuilder {
 impl BaseModelCardBuilder {
     pub fn aliases(mut self, value: Vec<String>) -> Self {
         self.aliases = Some(value);
+        self
+    }
+
+    pub fn audio_speech_capabilities(mut self, value: AudioSpeechCapabilities) -> Self {
+        self.audio_speech_capabilities = Some(value);
+        self
+    }
+
+    pub fn audio_transcription_capabilities(
+        mut self,
+        value: AudioTranscriptionCapabilities,
+    ) -> Self {
+        self.audio_transcription_capabilities = Some(value);
         self
     }
 
@@ -135,6 +154,8 @@ impl BaseModelCardBuilder {
     pub fn build(self) -> Result<BaseModelCard, BuildError> {
         Ok(BaseModelCard {
             aliases: self.aliases,
+            audio_speech_capabilities: self.audio_speech_capabilities,
+            audio_transcription_capabilities: self.audio_transcription_capabilities,
             billing_model_name: self.billing_model_name,
             capabilities: self
                 .capabilities

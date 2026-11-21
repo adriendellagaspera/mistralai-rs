@@ -41,6 +41,8 @@ impl SpeechClient {
     ///         .complete(
     ///             &SpeechRequest {
     ///                 input: "input".to_string(),
+    ///                 conversation_history: None,
+    ///                 expressiveness: None,
     ///                 metadata: None,
     ///                 model: None,
     ///                 phoneme_hints: None,

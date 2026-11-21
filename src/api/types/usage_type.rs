@@ -23,6 +23,10 @@ pub enum UsageType {
     AudioAgents,
     Connectors,
     WorkflowExecutions,
+    SkillActivations,
+    ManagedIndexStorageBytes,
+    ManagedIndexWrittenBytes,
+    ManagedIndexSearches,
     Vibe,
     VibeConnectors,
     VibeOcr,
@@ -51,6 +55,14 @@ impl Serialize for UsageType {
             Self::AudioAgents => serializer.serialize_str("audio_agents"),
             Self::Connectors => serializer.serialize_str("connectors"),
             Self::WorkflowExecutions => serializer.serialize_str("workflow_executions"),
+            Self::SkillActivations => serializer.serialize_str("skill_activations"),
+            Self::ManagedIndexStorageBytes => {
+                serializer.serialize_str("managed_index_storage_bytes")
+            }
+            Self::ManagedIndexWrittenBytes => {
+                serializer.serialize_str("managed_index_written_bytes")
+            }
+            Self::ManagedIndexSearches => serializer.serialize_str("managed_index_searches"),
             Self::Vibe => serializer.serialize_str("vibe"),
             Self::VibeConnectors => serializer.serialize_str("vibe_connectors"),
             Self::VibeOcr => serializer.serialize_str("vibe_ocr"),
@@ -80,6 +92,10 @@ impl<'de> Deserialize<'de> for UsageType {
             "audio_agents" => Ok(Self::AudioAgents),
             "connectors" => Ok(Self::Connectors),
             "workflow_executions" => Ok(Self::WorkflowExecutions),
+            "skill_activations" => Ok(Self::SkillActivations),
+            "managed_index_storage_bytes" => Ok(Self::ManagedIndexStorageBytes),
+            "managed_index_written_bytes" => Ok(Self::ManagedIndexWrittenBytes),
+            "managed_index_searches" => Ok(Self::ManagedIndexSearches),
             "vibe" => Ok(Self::Vibe),
             "vibe_connectors" => Ok(Self::VibeConnectors),
             "vibe_ocr" => Ok(Self::VibeOcr),
@@ -108,6 +124,10 @@ impl fmt::Display for UsageType {
             Self::AudioAgents => write!(f, "audio_agents"),
             Self::Connectors => write!(f, "connectors"),
             Self::WorkflowExecutions => write!(f, "workflow_executions"),
+            Self::SkillActivations => write!(f, "skill_activations"),
+            Self::ManagedIndexStorageBytes => write!(f, "managed_index_storage_bytes"),
+            Self::ManagedIndexWrittenBytes => write!(f, "managed_index_written_bytes"),
+            Self::ManagedIndexSearches => write!(f, "managed_index_searches"),
             Self::Vibe => write!(f, "vibe"),
             Self::VibeConnectors => write!(f, "vibe_connectors"),
             Self::VibeOcr => write!(f, "vibe_ocr"),

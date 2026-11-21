@@ -2,6 +2,12 @@ pub use crate::prelude::*;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
 pub struct SpeechRequest {
+    /// Prior turns, oldest first, alternating and ending on a user turn: `input` is the assistant reply to it. Conditions delivery, not speaker: set `voice_id` to choose the speaker. Requires `voice_id` to be a preset voice whose `kind` is `pvc`. Cannot be combined with `ref_audio`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub conversation_history: Option<Vec<SpeechRequestConversationHistoryItem>>,
+    /// Speaker flow-matching classifier-free guidance scale. Must be finite and at least 1.0.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub expressiveness: Option<f64>,
     /// Text to generate a speech from
     #[serde(default)]
     pub input: String,
@@ -36,6 +42,8 @@ impl SpeechRequest {
 #[derive(Clone, PartialEq, Default, Debug)]
 #[non_exhaustive]
 pub struct SpeechRequestBuilder {
+    conversation_history: Option<Vec<SpeechRequestConversationHistoryItem>>,
+    expressiveness: Option<f64>,
     input: Option<String>,
     metadata: Option<MetadataDict>,
     model: Option<String>,
@@ -48,6 +56,19 @@ pub struct SpeechRequestBuilder {
 }
 
 impl SpeechRequestBuilder {
+    pub fn conversation_history(
+        mut self,
+        value: Vec<SpeechRequestConversationHistoryItem>,
+    ) -> Self {
+        self.conversation_history = Some(value);
+        self
+    }
+
+    pub fn expressiveness(mut self, value: f64) -> Self {
+        self.expressiveness = Some(value);
+        self
+    }
+
     pub fn input(mut self, value: impl Into<String>) -> Self {
         self.input = Some(value.into());
         self
@@ -98,6 +119,8 @@ impl SpeechRequestBuilder {
     /// - [`input`](SpeechRequestBuilder::input)
     pub fn build(self) -> Result<SpeechRequest, BuildError> {
         Ok(SpeechRequest {
+            conversation_history: self.conversation_history,
+            expressiveness: self.expressiveness,
             input: self
                 .input
                 .ok_or_else(|| BuildError::missing_field("input"))?,

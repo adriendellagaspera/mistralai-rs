@@ -1,2 +1,2 @@
 pub mod realtime_sessions;
-pub use realtime_sessions::SessionsClient;
+pub use realtime_sessions::SessionsClient2;

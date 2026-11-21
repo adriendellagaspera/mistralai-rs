@@ -9,6 +9,7 @@ pub enum StaticWorkspaceRoles {
     UndefinedF143194C88994838A5184483B6,
     D79B30274Eb245218722825Acfee7D8B,
     TwoHundredFiftyTwoA082540B94B98Be807658956F13E9,
+    UndefinedCa63Db141Bc8C10F0Ae6F460Fba,
     SeventeenAa61C51C61477Ea40Ae52C8Ccd74B9,
     ThreeHundredFortyEightFc8DaF6Da4464Ad3EAf7Bc137E221,
     B23Cd6E091Cd4A8A9869B30366Bf3966,
@@ -16,6 +17,7 @@ pub enum StaticWorkspaceRoles {
     Ff86D4327F2747F8B02Fb5C102Ef6A55,
     ZeroF9Acbf693B542C7A227Fc7652755F65,
     NinetyFourEf59Cf56Bf43839Dd61Fee77D370Af,
+    TwentyFourB51Cb872Fe411C8652C719C7270Ca2,
     SevenE69E493Caf64671Af6084951754D9Fc,
     /// This variant is used for forward compatibility.
     /// If the server sends a value not recognized by the current SDK version,
@@ -43,6 +45,9 @@ impl Serialize for StaticWorkspaceRoles {
             Self::TwoHundredFiftyTwoA082540B94B98Be807658956F13E9 => {
                 serializer.serialize_str("252a0825-40b9-4b98-be80-7658956f13e9")
             }
+            Self::UndefinedCa63Db141Bc8C10F0Ae6F460Fba => {
+                serializer.serialize_str("50023ca6-3db1-41bc-8c10-f0ae6f460fba")
+            }
             Self::SeventeenAa61C51C61477Ea40Ae52C8Ccd74B9 => {
                 serializer.serialize_str("17aa61c5-1c61-477e-a40a-e52c8ccd74b9")
             }
@@ -63,6 +68,9 @@ impl Serialize for StaticWorkspaceRoles {
             }
             Self::NinetyFourEf59Cf56Bf43839Dd61Fee77D370Af => {
                 serializer.serialize_str("94ef59cf-56bf-4383-9dd6-1fee77d370af")
+            }
+            Self::TwentyFourB51Cb872Fe411C8652C719C7270Ca2 => {
+                serializer.serialize_str("24b51cb8-72fe-411c-8652-c719c7270ca2")
             }
             Self::SevenE69E493Caf64671Af6084951754D9Fc => {
                 serializer.serialize_str("7e69e493-caf6-4671-af60-84951754d9fc")
@@ -86,6 +94,9 @@ impl<'de> Deserialize<'de> for StaticWorkspaceRoles {
             "252a0825-40b9-4b98-be80-7658956f13e9" => {
                 Ok(Self::TwoHundredFiftyTwoA082540B94B98Be807658956F13E9)
             }
+            "50023ca6-3db1-41bc-8c10-f0ae6f460fba" => {
+                Ok(Self::UndefinedCa63Db141Bc8C10F0Ae6F460Fba)
+            }
             "17aa61c5-1c61-477e-a40a-e52c8ccd74b9" => {
                 Ok(Self::SeventeenAa61C51C61477Ea40Ae52C8Ccd74B9)
             }
@@ -100,6 +111,9 @@ impl<'de> Deserialize<'de> for StaticWorkspaceRoles {
             "0f9acbf6-93b5-42c7-a227-fc7652755f65" => Ok(Self::ZeroF9Acbf693B542C7A227Fc7652755F65),
             "94ef59cf-56bf-4383-9dd6-1fee77d370af" => {
                 Ok(Self::NinetyFourEf59Cf56Bf43839Dd61Fee77D370Af)
+            }
+            "24b51cb8-72fe-411c-8652-c719c7270ca2" => {
+                Ok(Self::TwentyFourB51Cb872Fe411C8652C719C7270Ca2)
             }
             "7e69e493-caf6-4671-af60-84951754d9fc" => {
                 Ok(Self::SevenE69E493Caf64671Af6084951754D9Fc)
@@ -130,6 +144,9 @@ impl fmt::Display for StaticWorkspaceRoles {
             Self::TwoHundredFiftyTwoA082540B94B98Be807658956F13E9 => {
                 write!(f, "252a0825-40b9-4b98-be80-7658956f13e9")
             }
+            Self::UndefinedCa63Db141Bc8C10F0Ae6F460Fba => {
+                write!(f, "50023ca6-3db1-41bc-8c10-f0ae6f460fba")
+            }
             Self::SeventeenAa61C51C61477Ea40Ae52C8Ccd74B9 => {
                 write!(f, "17aa61c5-1c61-477e-a40a-e52c8ccd74b9")
             }
@@ -150,6 +167,9 @@ impl fmt::Display for StaticWorkspaceRoles {
             }
             Self::NinetyFourEf59Cf56Bf43839Dd61Fee77D370Af => {
                 write!(f, "94ef59cf-56bf-4383-9dd6-1fee77d370af")
+            }
+            Self::TwentyFourB51Cb872Fe411C8652C719C7270Ca2 => {
+                write!(f, "24b51cb8-72fe-411c-8652-c719c7270ca2")
             }
             Self::SevenE69E493Caf64671Af6084951754D9Fc => {
                 write!(f, "7e69e493-caf6-4671-af60-84951754d9fc")

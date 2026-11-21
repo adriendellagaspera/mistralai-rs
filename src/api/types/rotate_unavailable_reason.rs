@@ -7,12 +7,10 @@ pub use crate::prelude::*;
 /// consumers (e.g. the dashboard rotate button) can show an appropriate message without hardcoding
 /// the rules. Consumers should treat unknown values as "rotation unavailable".
 ///
-/// Reasons fall into three kinds. Scope-based reasons are immutable (a function of the key's scope
-/// alone) and are owned by services that hold the key, e.g. Albe. Key-state reasons depend on the
-/// key's own state (e.g. expiry) and are likewise determined where the key lives. Permission-based
-/// reasons are request-scoped (they depend on who is asking) and can only be determined where the
-/// acting user is known, e.g. the dashboard. When several reasons apply, precedence runs immutable
-/// scope-based, then key-state, then request-scoped permission.
+/// Key-state reasons depend on the key's own state (e.g. expiry) and are determined where the key
+/// lives, e.g. Albe. Permission-based reasons are request-scoped (they depend on who is asking) and can
+/// only be determined where the acting user is known, e.g. the dashboard. When both apply, the
+/// key-state reason wins.
 #[non_exhaustive]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum RotateUnavailableReason {

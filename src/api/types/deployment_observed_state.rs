@@ -13,6 +13,8 @@ pub struct DeploymentObservedState {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub generation: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_phase_changed_at: Option<DateTime<FixedOffset>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub last_seen: Option<DateTime<FixedOffset>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<String>,
@@ -36,6 +38,7 @@ pub struct DeploymentObservedStateBuilder {
     deployed_revision: Option<String>,
     endpoint: Option<String>,
     generation: Option<i64>,
+    last_phase_changed_at: Option<DateTime<FixedOffset>>,
     last_seen: Option<DateTime<FixedOffset>>,
     message: Option<String>,
     phase: Option<String>,
@@ -68,6 +71,11 @@ impl DeploymentObservedStateBuilder {
         self
     }
 
+    pub fn last_phase_changed_at(mut self, value: DateTime<FixedOffset>) -> Self {
+        self.last_phase_changed_at = Some(value);
+        self
+    }
+
     pub fn last_seen(mut self, value: DateTime<FixedOffset>) -> Self {
         self.last_seen = Some(value);
         self
@@ -96,6 +104,7 @@ impl DeploymentObservedStateBuilder {
             deployed_revision: self.deployed_revision,
             endpoint: self.endpoint,
             generation: self.generation,
+            last_phase_changed_at: self.last_phase_changed_at,
             last_seen: self.last_seen,
             message: self.message,
             phase: self.phase,

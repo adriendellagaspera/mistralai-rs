@@ -315,30 +315,6 @@
     },
     {
       "exclusion_reason": null,
-      "http_method": "GET",
-      "http_path": "/v1/admin/user-groups/{group_uuid}/nested",
-      "operation_id": "users_api_admin_user_groups_get_nested_groups",
-      "outcome": "published",
-      "public_paths": [
-        "beta.admin.user-groups.users_api_admin_user_groups_get_nested_groups"
-      ],
-      "representation": null,
-      "source_identity": "operationId:users_api_admin_user_groups_get_nested_groups"
-    },
-    {
-      "exclusion_reason": null,
-      "http_method": "PATCH",
-      "http_path": "/v1/admin/user-groups/{group_uuid}/nested",
-      "operation_id": "users_api_admin_user_groups_set_nested_groups",
-      "outcome": "published",
-      "public_paths": [
-        "beta.admin.user-groups.users_api_admin_user_groups_set_nested_groups"
-      ],
-      "representation": null,
-      "source_identity": "operationId:users_api_admin_user_groups_set_nested_groups"
-    },
-    {
-      "exclusion_reason": null,
       "http_method": "PATCH",
       "http_path": "/v1/admin/user-groups/{group_uuid}/organization-role",
       "operation_id": "users_admin_user_groups_update_user_group_organization_role",
@@ -504,6 +480,30 @@
       ],
       "representation": null,
       "source_identity": "operationId:users_api_admin_users_deactivate_user"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/admin/users/{user_id}/reactivate",
+      "operation_id": "users_api_admin_users_reactivate_user",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.users.users_api_admin_users_reactivate_user"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_users_reactivate_user"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/admin/users/{user_id}/workspaces",
+      "operation_id": "users_api_admin_users_get_user_workspaces",
+      "outcome": "published",
+      "public_paths": [
+        "beta.admin.users.users_api_admin_users_get_user_workspaces"
+      ],
+      "representation": null,
+      "source_identity": "operationId:users_api_admin_users_get_user_workspaces"
     },
     {
       "exclusion_reason": null,
@@ -747,6 +747,138 @@
     },
     {
       "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/audio/agents",
+      "operation_id": "list_agents_v1_audio_agents_get",
+      "outcome": "published",
+      "public_paths": [
+        "audio.agents.list_agents_v1_audio_agents_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:list_agents_v1_audio_agents_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/audio/agents",
+      "operation_id": "create_agent_v1_audio_agents_post",
+      "outcome": "published",
+      "public_paths": [
+        "audio.agents.create_agent_v1_audio_agents_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:create_agent_v1_audio_agents_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/audio/agents/{agent_id}",
+      "operation_id": "delete_agent_v1_audio_agents__agent_id__delete",
+      "outcome": "published",
+      "public_paths": [
+        "audio.agents.delete_agent_v1_audio_agents__agent_id__delete"
+      ],
+      "representation": null,
+      "source_identity": "operationId:delete_agent_v1_audio_agents__agent_id__delete"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/audio/agents/{agent_id}",
+      "operation_id": "get_agent_v1_audio_agents__agent_id__get",
+      "outcome": "published",
+      "public_paths": [
+        "audio.agents.get_agent_v1_audio_agents__agent_id__get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_agent_v1_audio_agents__agent_id__get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PUT",
+      "http_path": "/v1/audio/agents/{agent_id}",
+      "operation_id": "update_agent_v1_audio_agents__agent_id__put",
+      "outcome": "published",
+      "public_paths": [
+        "audio.agents.update_agent_v1_audio_agents__agent_id__put"
+      ],
+      "representation": null,
+      "source_identity": "operationId:update_agent_v1_audio_agents__agent_id__put"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/audio/agents/{agent_id}/sessions",
+      "operation_id": "list_agent_sessions_v1_audio_agents__agent_id__sessions_get",
+      "outcome": "published",
+      "public_paths": [
+        "audio.agents.list_agent_sessions_v1_audio_agents__agent_id__sessions_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:list_agent_sessions_v1_audio_agents__agent_id__sessions_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/audio/agents/{agent_id}/versions",
+      "operation_id": "list_agent_versions_v1_audio_agents__agent_id__versions_get",
+      "outcome": "published",
+      "public_paths": [
+        "audio.agents.list_agent_versions_v1_audio_agents__agent_id__versions_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:list_agent_versions_v1_audio_agents__agent_id__versions_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/audio/sessions",
+      "operation_id": "create_session_v1_audio_sessions_post",
+      "outcome": "published",
+      "public_paths": [
+        "audio.sessions.create_session_v1_audio_sessions_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:create_session_v1_audio_sessions_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/audio/sessions/{session_id}",
+      "operation_id": "delete_session_v1_audio_sessions__session_id__delete",
+      "outcome": "published",
+      "public_paths": [
+        "audio.sessions.delete_session_v1_audio_sessions__session_id__delete"
+      ],
+      "representation": null,
+      "source_identity": "operationId:delete_session_v1_audio_sessions__session_id__delete"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/audio/sessions/{session_id}",
+      "operation_id": "get_session_v1_audio_sessions__session_id__get",
+      "outcome": "published",
+      "public_paths": [
+        "audio.sessions.get_session_v1_audio_sessions__session_id__get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_session_v1_audio_sessions__session_id__get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PATCH",
+      "http_path": "/v1/audio/sessions/{session_id}",
+      "operation_id": "update_session_v1_audio_sessions__session_id__patch",
+      "outcome": "published",
+      "public_paths": [
+        "audio.sessions.update_session_v1_audio_sessions__session_id__patch"
+      ],
+      "representation": null,
+      "source_identity": "operationId:update_session_v1_audio_sessions__session_id__patch"
+    },
+    {
+      "exclusion_reason": null,
       "http_method": "POST",
       "http_path": "/v1/audio/speech",
       "operation_id": "speech_v1_audio_speech_post",
@@ -912,6 +1044,30 @@
       ],
       "representation": null,
       "source_identity": "operationId:jobs_api_routes_batch_cancel_batch_job"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/billing/budget",
+      "operation_id": "billing_api_public_get_budget",
+      "outcome": "published",
+      "public_paths": [
+        "beta.billing.billing_api_public_get_budget"
+      ],
+      "representation": null,
+      "source_identity": "operationId:billing_api_public_get_budget"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/billing/subscription",
+      "operation_id": "billing_api_public_get_subscription",
+      "outcome": "published",
+      "public_paths": [
+        "beta.billing.billing_api_public_get_subscription"
+      ],
+      "representation": null,
+      "source_identity": "operationId:billing_api_public_get_subscription"
     },
     {
       "exclusion_reason": null,
@@ -1237,6 +1393,186 @@
       ],
       "representation": null,
       "source_identity": "operationId:connector_deactivate_for_consumer_v1"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/context/search-indexes",
+      "operation_id": "list_indexes_v1_context_search_indexes_get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.context.search_indexes.list_indexes_v1_context_search_indexes_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:list_indexes_v1_context_search_indexes_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/context/search-indexes",
+      "operation_id": "create_index_v1_context_search_indexes_post",
+      "outcome": "published",
+      "public_paths": [
+        "beta.context.search_indexes.create_index_v1_context_search_indexes_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:create_index_v1_context_search_indexes_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/context/search-indexes/{index_name}",
+      "operation_id": "delete_index_v1_context_search_indexes__index_name__delete",
+      "outcome": "published",
+      "public_paths": [
+        "beta.context.search_indexes.delete_index_v1_context_search_indexes__index_name__delete"
+      ],
+      "representation": null,
+      "source_identity": "operationId:delete_index_v1_context_search_indexes__index_name__delete"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/context/search-indexes/{index_name}",
+      "operation_id": "get_index_v1_context_search_indexes__index_name__get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.context.search_indexes.get_index_v1_context_search_indexes__index_name__get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_index_v1_context_search_indexes__index_name__get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PUT",
+      "http_path": "/v1/context/search-indexes/{index_name}",
+      "operation_id": "update_index_v1_context_search_indexes__index_name__put",
+      "outcome": "published",
+      "public_paths": [
+        "beta.context.search_indexes.update_index_v1_context_search_indexes__index_name__put"
+      ],
+      "representation": null,
+      "source_identity": "operationId:update_index_v1_context_search_indexes__index_name__put"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/context/search-indexes/{index_name}/chunks/{chunk_id}",
+      "operation_id": "get_chunk_index_v1_context_search_indexes__index_name__chunks__chunk_id__get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.context.search_indexes.get_chunk_index_v1_context_search_indexes__index_name__chunks__chunk_id__get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_chunk_index_v1_context_search_indexes__index_name__chunks__chunk_id__get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/context/search-indexes/{index_name}/documents",
+      "operation_id": "delete_documents_v1_context_search_indexes__index_name__documents_delete",
+      "outcome": "published",
+      "public_paths": [
+        "beta.context.search_indexes.delete_documents_v1_context_search_indexes__index_name__documents_delete"
+      ],
+      "representation": null,
+      "source_identity": "operationId:delete_documents_v1_context_search_indexes__index_name__documents_delete"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/context/search-indexes/{index_name}/documents",
+      "operation_id": "ingest_documents_v1_context_search_indexes__index_name__documents_post",
+      "outcome": "published",
+      "public_paths": [
+        "beta.context.search_indexes.ingest_documents_v1_context_search_indexes__index_name__documents_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:ingest_documents_v1_context_search_indexes__index_name__documents_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/context/search-indexes/{index_name}/grep",
+      "operation_id": "grep_index_v1_context_search_indexes__index_name__grep_post",
+      "outcome": "published",
+      "public_paths": [
+        "beta.context.search_indexes.grep_index_v1_context_search_indexes__index_name__grep_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:grep_index_v1_context_search_indexes__index_name__grep_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/context/search-indexes/{index_name}/navigate",
+      "operation_id": "navigate_index_v1_context_search_indexes__index_name__navigate_post",
+      "outcome": "published",
+      "public_paths": [
+        "beta.context.search_indexes.navigate_index_v1_context_search_indexes__index_name__navigate_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:navigate_index_v1_context_search_indexes__index_name__navigate_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/context/search-indexes/{index_name}/read",
+      "operation_id": "read_index_v1_context_search_indexes__index_name__read_post",
+      "outcome": "published",
+      "public_paths": [
+        "beta.context.search_indexes.read_index_v1_context_search_indexes__index_name__read_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:read_index_v1_context_search_indexes__index_name__read_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/context/search-indexes/{index_name}/search",
+      "operation_id": "search_index_v1_context_search_indexes__index_name__search_post",
+      "outcome": "published",
+      "public_paths": [
+        "beta.context.search_indexes.search_index_v1_context_search_indexes__index_name__search_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:search_index_v1_context_search_indexes__index_name__search_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/context/search-indexes/{index_name}/summary_field/{language}",
+      "operation_id": "get_managed_index_summary_v1_context_search_indexes__index_name__summary_field__language__get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.context.search_indexes.get_managed_index_summary_v1_context_search_indexes__index_name__summary_field__language__get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_managed_index_summary_v1_context_search_indexes__index_name__summary_field__language__get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/context/search-indexes/{index_name}/summary_field/{language}",
+      "operation_id": "generate_managed_index_summary_post_v1_context_search_indexes__index_name__summary_field__language__post",
+      "outcome": "published",
+      "public_paths": [
+        "beta.context.search_indexes.generate_managed_index_summary_post_v1_context_search_indexes__index_name__summary_field__language__post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:generate_managed_index_summary_post_v1_context_search_indexes__index_name__summary_field__language__post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PUT",
+      "http_path": "/v1/context/search-indexes/{index_name}/summary_field/{language}",
+      "operation_id": "set_managed_index_summary_v1_context_search_indexes__index_name__summary_field__language__put",
+      "outcome": "published",
+      "public_paths": [
+        "beta.context.search_indexes.set_managed_index_summary_v1_context_search_indexes__index_name__summary_field__language__put"
+      ],
+      "representation": null,
+      "source_identity": "operationId:set_managed_index_summary_v1_context_search_indexes__index_name__summary_field__language__put"
     },
     {
       "exclusion_reason": null,
@@ -1829,18 +2165,6 @@
     },
     {
       "exclusion_reason": null,
-      "http_method": "POST",
-      "http_path": "/v1/observability/dataset-records/{dataset_record_id}/live-judging",
-      "operation_id": "judge_dataset_record_v1_observability_dataset_records__dataset_record_id__live_judging_post",
-      "outcome": "published",
-      "public_paths": [
-        "beta.observability.datasets.records.judge_dataset_record_v1_observability_dataset_records__dataset_record_id__live_judging_post"
-      ],
-      "representation": null,
-      "source_identity": "operationId:judge_dataset_record_v1_observability_dataset_records__dataset_record_id__live_judging_post"
-    },
-    {
-      "exclusion_reason": null,
       "http_method": "PUT",
       "http_path": "/v1/observability/dataset-records/{dataset_record_id}/payload",
       "operation_id": "update_dataset_record_payload_v1_observability_dataset_records__dataset_record_id__payload_put",
@@ -2130,78 +2454,6 @@
     {
       "exclusion_reason": null,
       "http_method": "GET",
-      "http_path": "/v1/observability/judges",
-      "operation_id": "get_judges_v1_observability_judges_get",
-      "outcome": "published",
-      "public_paths": [
-        "beta.observability.judges.get_judges_v1_observability_judges_get"
-      ],
-      "representation": null,
-      "source_identity": "operationId:get_judges_v1_observability_judges_get"
-    },
-    {
-      "exclusion_reason": null,
-      "http_method": "POST",
-      "http_path": "/v1/observability/judges",
-      "operation_id": "create_judge_v1_observability_judges_post",
-      "outcome": "published",
-      "public_paths": [
-        "beta.observability.judges.create_judge_v1_observability_judges_post"
-      ],
-      "representation": null,
-      "source_identity": "operationId:create_judge_v1_observability_judges_post"
-    },
-    {
-      "exclusion_reason": null,
-      "http_method": "DELETE",
-      "http_path": "/v1/observability/judges/{judge_id}",
-      "operation_id": "delete_judge_v1_observability_judges__judge_id__delete",
-      "outcome": "published",
-      "public_paths": [
-        "beta.observability.judges.delete_judge_v1_observability_judges__judge_id__delete"
-      ],
-      "representation": null,
-      "source_identity": "operationId:delete_judge_v1_observability_judges__judge_id__delete"
-    },
-    {
-      "exclusion_reason": null,
-      "http_method": "GET",
-      "http_path": "/v1/observability/judges/{judge_id}",
-      "operation_id": "get_judge_by_id_v1_observability_judges__judge_id__get",
-      "outcome": "published",
-      "public_paths": [
-        "beta.observability.judges.get_judge_by_id_v1_observability_judges__judge_id__get"
-      ],
-      "representation": null,
-      "source_identity": "operationId:get_judge_by_id_v1_observability_judges__judge_id__get"
-    },
-    {
-      "exclusion_reason": null,
-      "http_method": "PUT",
-      "http_path": "/v1/observability/judges/{judge_id}",
-      "operation_id": "update_judge_v1_observability_judges__judge_id__put",
-      "outcome": "published",
-      "public_paths": [
-        "beta.observability.judges.update_judge_v1_observability_judges__judge_id__put"
-      ],
-      "representation": null,
-      "source_identity": "operationId:update_judge_v1_observability_judges__judge_id__put"
-    },
-    {
-      "exclusion_reason": null,
-      "http_method": "POST",
-      "http_path": "/v1/observability/judges/{judge_id}/live-judging",
-      "operation_id": "judge_conversation_v1_observability_judges__judge_id__live_judging_post",
-      "outcome": "published",
-      "public_paths": [
-        "beta.observability.judges.judge_conversation_v1_observability_judges__judge_id__live_judging_post"
-      ],
-      "representation": null,
-      "source_identity": "operationId:judge_conversation_v1_observability_judges__judge_id__live_judging_post"
-    },
-    {
-      "exclusion_reason": null,
-      "http_method": "GET",
       "http_path": "/v1/observability/logs/fields",
       "operation_id": "get_log_fields_v1_observability_logs_fields_get",
       "outcome": "published",
@@ -2346,6 +2598,18 @@
     {
       "exclusion_reason": null,
       "http_method": "GET",
+      "http_path": "/v1/observability/pipelines/{pipeline_id}/results/fields",
+      "operation_id": "get_pipeline_result_fields_v1_observability_pipelines__pipeline_id__results_fields_get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.spans.get_pipeline_result_fields_v1_observability_pipelines__pipeline_id__results_fields_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_pipeline_result_fields_v1_observability_pipelines__pipeline_id__results_fields_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
       "http_path": "/v1/observability/projects",
       "operation_id": "get_projects_v1_observability_projects_get",
       "outcome": "published",
@@ -2378,6 +2642,54 @@
       ],
       "representation": null,
       "source_identity": "operationId:get_project_evaluations_v2_v1_observability_projects__project_slug__evaluations_v2_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/observability/scorers",
+      "operation_id": "list_scorers_v1_observability_scorers_get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.evaluations.scorers.list_scorers_v1_observability_scorers_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:list_scorers_v1_observability_scorers_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/observability/scorers",
+      "operation_id": "create_scorer_v1_observability_scorers_post",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.evaluations.scorers.create_scorer_v1_observability_scorers_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:create_scorer_v1_observability_scorers_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/observability/scorers/{scorer_slug}",
+      "operation_id": "get_scorer_v1_observability_scorers__scorer_slug__get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.evaluations.scorers.get_scorer_v1_observability_scorers__scorer_slug__get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_scorer_v1_observability_scorers__scorer_slug__get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "PATCH",
+      "http_path": "/v1/observability/scorers/{scorer_slug}",
+      "operation_id": "edit_scorer_v1_observability_scorers__scorer_slug__patch",
+      "outcome": "published",
+      "public_paths": [
+        "beta.observability.evaluations.scorers.edit_scorer_v1_observability_scorers__scorer_slug__patch"
+      ],
+      "representation": null,
+      "source_identity": "operationId:edit_scorer_v1_observability_scorers__scorer_slug__patch"
     },
     {
       "exclusion_reason": null,
@@ -2669,150 +2981,6 @@
     },
     {
       "exclusion_reason": null,
-      "http_method": "GET",
-      "http_path": "/v1/rag/managed_indexes",
-      "operation_id": "list_indexes_v1_rag_managed_indexes_get",
-      "outcome": "published",
-      "public_paths": [
-        "beta.rag.managed_indexes.list_indexes_v1_rag_managed_indexes_get"
-      ],
-      "representation": null,
-      "source_identity": "operationId:list_indexes_v1_rag_managed_indexes_get"
-    },
-    {
-      "exclusion_reason": null,
-      "http_method": "POST",
-      "http_path": "/v1/rag/managed_indexes",
-      "operation_id": "create_index_v1_rag_managed_indexes_post",
-      "outcome": "published",
-      "public_paths": [
-        "beta.rag.managed_indexes.create_index_v1_rag_managed_indexes_post"
-      ],
-      "representation": null,
-      "source_identity": "operationId:create_index_v1_rag_managed_indexes_post"
-    },
-    {
-      "exclusion_reason": null,
-      "http_method": "DELETE",
-      "http_path": "/v1/rag/managed_indexes/{index_name}",
-      "operation_id": "delete_index_v1_rag_managed_indexes__index_name__delete",
-      "outcome": "published",
-      "public_paths": [
-        "beta.rag.managed_indexes.delete_index_v1_rag_managed_indexes__index_name__delete"
-      ],
-      "representation": null,
-      "source_identity": "operationId:delete_index_v1_rag_managed_indexes__index_name__delete"
-    },
-    {
-      "exclusion_reason": null,
-      "http_method": "GET",
-      "http_path": "/v1/rag/managed_indexes/{index_name}",
-      "operation_id": "get_index_v1_rag_managed_indexes__index_name__get",
-      "outcome": "published",
-      "public_paths": [
-        "beta.rag.managed_indexes.get_index_v1_rag_managed_indexes__index_name__get"
-      ],
-      "representation": null,
-      "source_identity": "operationId:get_index_v1_rag_managed_indexes__index_name__get"
-    },
-    {
-      "exclusion_reason": null,
-      "http_method": "PUT",
-      "http_path": "/v1/rag/managed_indexes/{index_name}",
-      "operation_id": "update_index_v1_rag_managed_indexes__index_name__put",
-      "outcome": "published",
-      "public_paths": [
-        "beta.rag.managed_indexes.update_index_v1_rag_managed_indexes__index_name__put"
-      ],
-      "representation": null,
-      "source_identity": "operationId:update_index_v1_rag_managed_indexes__index_name__put"
-    },
-    {
-      "exclusion_reason": null,
-      "http_method": "GET",
-      "http_path": "/v1/rag/managed_indexes/{index_name}/chunks/{chunk_id}",
-      "operation_id": "get_chunk_index_v1_rag_managed_indexes__index_name__chunks__chunk_id__get",
-      "outcome": "published",
-      "public_paths": [
-        "beta.rag.managed_indexes.get_chunk_index_v1_rag_managed_indexes__index_name__chunks__chunk_id__get"
-      ],
-      "representation": null,
-      "source_identity": "operationId:get_chunk_index_v1_rag_managed_indexes__index_name__chunks__chunk_id__get"
-    },
-    {
-      "exclusion_reason": null,
-      "http_method": "DELETE",
-      "http_path": "/v1/rag/managed_indexes/{index_name}/documents",
-      "operation_id": "delete_documents_v1_rag_managed_indexes__index_name__documents_delete",
-      "outcome": "published",
-      "public_paths": [
-        "beta.rag.managed_indexes.delete_documents_v1_rag_managed_indexes__index_name__documents_delete"
-      ],
-      "representation": null,
-      "source_identity": "operationId:delete_documents_v1_rag_managed_indexes__index_name__documents_delete"
-    },
-    {
-      "exclusion_reason": null,
-      "http_method": "POST",
-      "http_path": "/v1/rag/managed_indexes/{index_name}/documents",
-      "operation_id": "ingest_documents_v1_rag_managed_indexes__index_name__documents_post",
-      "outcome": "published",
-      "public_paths": [
-        "beta.rag.managed_indexes.ingest_documents_v1_rag_managed_indexes__index_name__documents_post"
-      ],
-      "representation": null,
-      "source_identity": "operationId:ingest_documents_v1_rag_managed_indexes__index_name__documents_post"
-    },
-    {
-      "exclusion_reason": null,
-      "http_method": "POST",
-      "http_path": "/v1/rag/managed_indexes/{index_name}/grep",
-      "operation_id": "grep_index_v1_rag_managed_indexes__index_name__grep_post",
-      "outcome": "published",
-      "public_paths": [
-        "beta.rag.managed_indexes.grep_index_v1_rag_managed_indexes__index_name__grep_post"
-      ],
-      "representation": null,
-      "source_identity": "operationId:grep_index_v1_rag_managed_indexes__index_name__grep_post"
-    },
-    {
-      "exclusion_reason": null,
-      "http_method": "POST",
-      "http_path": "/v1/rag/managed_indexes/{index_name}/navigate",
-      "operation_id": "navigate_index_v1_rag_managed_indexes__index_name__navigate_post",
-      "outcome": "published",
-      "public_paths": [
-        "beta.rag.managed_indexes.navigate_index_v1_rag_managed_indexes__index_name__navigate_post"
-      ],
-      "representation": null,
-      "source_identity": "operationId:navigate_index_v1_rag_managed_indexes__index_name__navigate_post"
-    },
-    {
-      "exclusion_reason": null,
-      "http_method": "POST",
-      "http_path": "/v1/rag/managed_indexes/{index_name}/read",
-      "operation_id": "read_index_v1_rag_managed_indexes__index_name__read_post",
-      "outcome": "published",
-      "public_paths": [
-        "beta.rag.managed_indexes.read_index_v1_rag_managed_indexes__index_name__read_post"
-      ],
-      "representation": null,
-      "source_identity": "operationId:read_index_v1_rag_managed_indexes__index_name__read_post"
-    },
-    {
-      "exclusion_reason": null,
-      "http_method": "POST",
-      "http_path": "/v1/rag/managed_indexes/{index_name}/search",
-      "operation_id": "search_index_v1_rag_managed_indexes__index_name__search_post",
-      "outcome": "published",
-      "public_paths": [
-        "beta.rag.managed_indexes.search_index_v1_rag_managed_indexes__index_name__search_post"
-      ],
-      "representation": null,
-      "source_identity": "operationId:search_index_v1_rag_managed_indexes__index_name__search_post"
-    },
-    {
-      "exclusion_reason": null,
       "http_method": "POST",
       "http_path": "/v1/responses",
       "operation_id": "create_response_v1_responses_post",
@@ -2934,6 +3102,66 @@
     {
       "exclusion_reason": null,
       "http_method": "GET",
+      "http_path": "/v1/triggers",
+      "operation_id": "list_triggers_v1_triggers_get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.triggers.list_triggers_v1_triggers_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:list_triggers_v1_triggers_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/triggers",
+      "operation_id": "create_trigger_v1_triggers_post",
+      "outcome": "published",
+      "public_paths": [
+        "beta.triggers.create_trigger_v1_triggers_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:create_trigger_v1_triggers_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/triggers/{trigger_id}",
+      "operation_id": "delete_trigger_v1_triggers__trigger_id__delete",
+      "outcome": "published",
+      "public_paths": [
+        "beta.triggers.delete_trigger_v1_triggers__trigger_id__delete"
+      ],
+      "representation": null,
+      "source_identity": "operationId:delete_trigger_v1_triggers__trigger_id__delete"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/triggers/{trigger_id}",
+      "operation_id": "get_trigger_v1_triggers__trigger_id__get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.triggers.get_trigger_v1_triggers__trigger_id__get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_trigger_v1_triggers__trigger_id__get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/triggers/{trigger_id}/events",
+      "operation_id": "list_trigger_events_v1_triggers__trigger_id__events_get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.triggers.list_trigger_events_v1_triggers__trigger_id__events_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:list_trigger_events_v1_triggers__trigger_id__events_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
       "http_path": "/v1/users/me",
       "operation_id": "users_api_get_identity",
       "outcome": "published",
@@ -2966,6 +3194,66 @@
       ],
       "representation": null,
       "source_identity": "operationId:users_api_list_workspaces"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/webhooks",
+      "operation_id": "list_webhooks_v1_webhooks_get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.webhooks.list_webhooks_v1_webhooks_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:list_webhooks_v1_webhooks_get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/webhooks",
+      "operation_id": "create_webhook_v1_webhooks_post",
+      "outcome": "published",
+      "public_paths": [
+        "beta.webhooks.create_webhook_v1_webhooks_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:create_webhook_v1_webhooks_post"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "DELETE",
+      "http_path": "/v1/webhooks/{webhook_id}",
+      "operation_id": "delete_webhook_v1_webhooks__webhook_id__delete",
+      "outcome": "published",
+      "public_paths": [
+        "beta.webhooks.delete_webhook_v1_webhooks__webhook_id__delete"
+      ],
+      "representation": null,
+      "source_identity": "operationId:delete_webhook_v1_webhooks__webhook_id__delete"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/webhooks/{webhook_id}",
+      "operation_id": "get_webhook_v1_webhooks__webhook_id__get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.webhooks.get_webhook_v1_webhooks__webhook_id__get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_webhook_v1_webhooks__webhook_id__get"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/webhooks/{webhook_id}/signing-secret",
+      "operation_id": "get_webhook_signing_secret_v1_webhooks__webhook_id__signing_secret_get",
+      "outcome": "published",
+      "public_paths": [
+        "beta.webhooks.get_webhook_signing_secret_v1_webhooks__webhook_id__signing_secret_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_webhook_signing_secret_v1_webhooks__webhook_id__signing_secret_get"
     },
     {
       "exclusion_reason": null,
@@ -3074,6 +3362,18 @@
       ],
       "representation": null,
       "source_identity": "operationId:update_deployment_v1_workflows_deployments__name__patch"
+    },
+    {
+      "exclusion_reason": null,
+      "http_method": "GET",
+      "http_path": "/v1/workflows/deployments/{name}/archive",
+      "operation_id": "get_deployment_archive_v1_workflows_deployments__name__archive_get",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.deployments.get_deployment_archive_v1_workflows_deployments__name__archive_get"
+      ],
+      "representation": null,
+      "source_identity": "operationId:get_deployment_archive_v1_workflows_deployments__name__archive_get"
     },
     {
       "exclusion_reason": null,
@@ -3605,6 +3905,18 @@
     },
     {
       "exclusion_reason": null,
+      "http_method": "POST",
+      "http_path": "/v1/workflows/{workflow_identifier}/tags",
+      "operation_id": "add_workflow_tags_v1_workflows__workflow_identifier__tags_post",
+      "outcome": "published",
+      "public_paths": [
+        "workflows.add_workflow_tags_v1_workflows__workflow_identifier__tags_post"
+      ],
+      "representation": null,
+      "source_identity": "operationId:add_workflow_tags_v1_workflows__workflow_identifier__tags_post"
+    },
+    {
+      "exclusion_reason": null,
       "http_method": "PUT",
       "http_path": "/v1/workflows/{workflow_identifier}/unarchive",
       "operation_id": "unarchive_workflow_v1_workflows__workflow_identifier__unarchive_put",
@@ -4016,18 +4328,6 @@
       },
       {
         "public_paths": [
-          "beta.admin.user-groups.users_api_admin_user_groups_get_nested_groups"
-        ],
-        "source_identity": "operationId:users_api_admin_user_groups_get_nested_groups"
-      },
-      {
-        "public_paths": [
-          "beta.admin.user-groups.users_api_admin_user_groups_set_nested_groups"
-        ],
-        "source_identity": "operationId:users_api_admin_user_groups_set_nested_groups"
-      },
-      {
-        "public_paths": [
           "beta.admin.user-groups.users_admin_user_groups_update_user_group_organization_role"
         ],
         "source_identity": "operationId:users_admin_user_groups_update_user_group_organization_role"
@@ -4109,6 +4409,18 @@
           "beta.admin.users.users_api_admin_users_deactivate_user"
         ],
         "source_identity": "operationId:users_api_admin_users_deactivate_user"
+      },
+      {
+        "public_paths": [
+          "beta.admin.users.users_api_admin_users_reactivate_user"
+        ],
+        "source_identity": "operationId:users_api_admin_users_reactivate_user"
+      },
+      {
+        "public_paths": [
+          "beta.admin.users.users_api_admin_users_get_user_workspaces"
+        ],
+        "source_identity": "operationId:users_api_admin_users_get_user_workspaces"
       },
       {
         "public_paths": [
@@ -4232,6 +4544,72 @@
       },
       {
         "public_paths": [
+          "audio.agents.list_agents_v1_audio_agents_get"
+        ],
+        "source_identity": "operationId:list_agents_v1_audio_agents_get"
+      },
+      {
+        "public_paths": [
+          "audio.agents.create_agent_v1_audio_agents_post"
+        ],
+        "source_identity": "operationId:create_agent_v1_audio_agents_post"
+      },
+      {
+        "public_paths": [
+          "audio.agents.delete_agent_v1_audio_agents__agent_id__delete"
+        ],
+        "source_identity": "operationId:delete_agent_v1_audio_agents__agent_id__delete"
+      },
+      {
+        "public_paths": [
+          "audio.agents.get_agent_v1_audio_agents__agent_id__get"
+        ],
+        "source_identity": "operationId:get_agent_v1_audio_agents__agent_id__get"
+      },
+      {
+        "public_paths": [
+          "audio.agents.update_agent_v1_audio_agents__agent_id__put"
+        ],
+        "source_identity": "operationId:update_agent_v1_audio_agents__agent_id__put"
+      },
+      {
+        "public_paths": [
+          "audio.agents.list_agent_sessions_v1_audio_agents__agent_id__sessions_get"
+        ],
+        "source_identity": "operationId:list_agent_sessions_v1_audio_agents__agent_id__sessions_get"
+      },
+      {
+        "public_paths": [
+          "audio.agents.list_agent_versions_v1_audio_agents__agent_id__versions_get"
+        ],
+        "source_identity": "operationId:list_agent_versions_v1_audio_agents__agent_id__versions_get"
+      },
+      {
+        "public_paths": [
+          "audio.sessions.create_session_v1_audio_sessions_post"
+        ],
+        "source_identity": "operationId:create_session_v1_audio_sessions_post"
+      },
+      {
+        "public_paths": [
+          "audio.sessions.delete_session_v1_audio_sessions__session_id__delete"
+        ],
+        "source_identity": "operationId:delete_session_v1_audio_sessions__session_id__delete"
+      },
+      {
+        "public_paths": [
+          "audio.sessions.get_session_v1_audio_sessions__session_id__get"
+        ],
+        "source_identity": "operationId:get_session_v1_audio_sessions__session_id__get"
+      },
+      {
+        "public_paths": [
+          "audio.sessions.update_session_v1_audio_sessions__session_id__patch"
+        ],
+        "source_identity": "operationId:update_session_v1_audio_sessions__session_id__patch"
+      },
+      {
+        "public_paths": [
           "audio.speech.complete"
         ],
         "source_identity": "operationId:speech_v1_audio_speech_post"
@@ -4313,6 +4691,18 @@
           "batch.jobs_api_routes_batch_cancel_batch_job"
         ],
         "source_identity": "operationId:jobs_api_routes_batch_cancel_batch_job"
+      },
+      {
+        "public_paths": [
+          "beta.billing.billing_api_public_get_budget"
+        ],
+        "source_identity": "operationId:billing_api_public_get_budget"
+      },
+      {
+        "public_paths": [
+          "beta.billing.billing_api_public_get_subscription"
+        ],
+        "source_identity": "operationId:billing_api_public_get_subscription"
       },
       {
         "public_paths": [
@@ -4476,6 +4866,96 @@
           "beta.connectors.connector_deactivate_for_consumer_v1"
         ],
         "source_identity": "operationId:connector_deactivate_for_consumer_v1"
+      },
+      {
+        "public_paths": [
+          "beta.context.search_indexes.list_indexes_v1_context_search_indexes_get"
+        ],
+        "source_identity": "operationId:list_indexes_v1_context_search_indexes_get"
+      },
+      {
+        "public_paths": [
+          "beta.context.search_indexes.create_index_v1_context_search_indexes_post"
+        ],
+        "source_identity": "operationId:create_index_v1_context_search_indexes_post"
+      },
+      {
+        "public_paths": [
+          "beta.context.search_indexes.delete_index_v1_context_search_indexes__index_name__delete"
+        ],
+        "source_identity": "operationId:delete_index_v1_context_search_indexes__index_name__delete"
+      },
+      {
+        "public_paths": [
+          "beta.context.search_indexes.get_index_v1_context_search_indexes__index_name__get"
+        ],
+        "source_identity": "operationId:get_index_v1_context_search_indexes__index_name__get"
+      },
+      {
+        "public_paths": [
+          "beta.context.search_indexes.update_index_v1_context_search_indexes__index_name__put"
+        ],
+        "source_identity": "operationId:update_index_v1_context_search_indexes__index_name__put"
+      },
+      {
+        "public_paths": [
+          "beta.context.search_indexes.get_chunk_index_v1_context_search_indexes__index_name__chunks__chunk_id__get"
+        ],
+        "source_identity": "operationId:get_chunk_index_v1_context_search_indexes__index_name__chunks__chunk_id__get"
+      },
+      {
+        "public_paths": [
+          "beta.context.search_indexes.delete_documents_v1_context_search_indexes__index_name__documents_delete"
+        ],
+        "source_identity": "operationId:delete_documents_v1_context_search_indexes__index_name__documents_delete"
+      },
+      {
+        "public_paths": [
+          "beta.context.search_indexes.ingest_documents_v1_context_search_indexes__index_name__documents_post"
+        ],
+        "source_identity": "operationId:ingest_documents_v1_context_search_indexes__index_name__documents_post"
+      },
+      {
+        "public_paths": [
+          "beta.context.search_indexes.grep_index_v1_context_search_indexes__index_name__grep_post"
+        ],
+        "source_identity": "operationId:grep_index_v1_context_search_indexes__index_name__grep_post"
+      },
+      {
+        "public_paths": [
+          "beta.context.search_indexes.navigate_index_v1_context_search_indexes__index_name__navigate_post"
+        ],
+        "source_identity": "operationId:navigate_index_v1_context_search_indexes__index_name__navigate_post"
+      },
+      {
+        "public_paths": [
+          "beta.context.search_indexes.read_index_v1_context_search_indexes__index_name__read_post"
+        ],
+        "source_identity": "operationId:read_index_v1_context_search_indexes__index_name__read_post"
+      },
+      {
+        "public_paths": [
+          "beta.context.search_indexes.search_index_v1_context_search_indexes__index_name__search_post"
+        ],
+        "source_identity": "operationId:search_index_v1_context_search_indexes__index_name__search_post"
+      },
+      {
+        "public_paths": [
+          "beta.context.search_indexes.get_managed_index_summary_v1_context_search_indexes__index_name__summary_field__language__get"
+        ],
+        "source_identity": "operationId:get_managed_index_summary_v1_context_search_indexes__index_name__summary_field__language__get"
+      },
+      {
+        "public_paths": [
+          "beta.context.search_indexes.generate_managed_index_summary_post_v1_context_search_indexes__index_name__summary_field__language__post"
+        ],
+        "source_identity": "operationId:generate_managed_index_summary_post_v1_context_search_indexes__index_name__summary_field__language__post"
+      },
+      {
+        "public_paths": [
+          "beta.context.search_indexes.set_managed_index_summary_v1_context_search_indexes__index_name__summary_field__language__put"
+        ],
+        "source_identity": "operationId:set_managed_index_summary_v1_context_search_indexes__index_name__summary_field__language__put"
       },
       {
         "public_paths": [
@@ -4774,12 +5254,6 @@
       },
       {
         "public_paths": [
-          "beta.observability.datasets.records.judge_dataset_record_v1_observability_dataset_records__dataset_record_id__live_judging_post"
-        ],
-        "source_identity": "operationId:judge_dataset_record_v1_observability_dataset_records__dataset_record_id__live_judging_post"
-      },
-      {
-        "public_paths": [
           "beta.observability.datasets.records.update_dataset_record_payload_v1_observability_dataset_records__dataset_record_id__payload_put"
         ],
         "source_identity": "operationId:update_dataset_record_payload_v1_observability_dataset_records__dataset_record_id__payload_put"
@@ -4924,42 +5398,6 @@
       },
       {
         "public_paths": [
-          "beta.observability.judges.get_judges_v1_observability_judges_get"
-        ],
-        "source_identity": "operationId:get_judges_v1_observability_judges_get"
-      },
-      {
-        "public_paths": [
-          "beta.observability.judges.create_judge_v1_observability_judges_post"
-        ],
-        "source_identity": "operationId:create_judge_v1_observability_judges_post"
-      },
-      {
-        "public_paths": [
-          "beta.observability.judges.delete_judge_v1_observability_judges__judge_id__delete"
-        ],
-        "source_identity": "operationId:delete_judge_v1_observability_judges__judge_id__delete"
-      },
-      {
-        "public_paths": [
-          "beta.observability.judges.get_judge_by_id_v1_observability_judges__judge_id__get"
-        ],
-        "source_identity": "operationId:get_judge_by_id_v1_observability_judges__judge_id__get"
-      },
-      {
-        "public_paths": [
-          "beta.observability.judges.update_judge_v1_observability_judges__judge_id__put"
-        ],
-        "source_identity": "operationId:update_judge_v1_observability_judges__judge_id__put"
-      },
-      {
-        "public_paths": [
-          "beta.observability.judges.judge_conversation_v1_observability_judges__judge_id__live_judging_post"
-        ],
-        "source_identity": "operationId:judge_conversation_v1_observability_judges__judge_id__live_judging_post"
-      },
-      {
-        "public_paths": [
           "beta.observability.logs.get_log_fields_v1_observability_logs_fields_get"
         ],
         "source_identity": "operationId:get_log_fields_v1_observability_logs_fields_get"
@@ -5032,6 +5470,12 @@
       },
       {
         "public_paths": [
+          "beta.observability.spans.get_pipeline_result_fields_v1_observability_pipelines__pipeline_id__results_fields_get"
+        ],
+        "source_identity": "operationId:get_pipeline_result_fields_v1_observability_pipelines__pipeline_id__results_fields_get"
+      },
+      {
+        "public_paths": [
           "beta.observability.evaluations.projects.get_projects_v1_observability_projects_get"
         ],
         "source_identity": "operationId:get_projects_v1_observability_projects_get"
@@ -5047,6 +5491,30 @@
           "beta.observability.evaluations.get_project_evaluations_v2_v1_observability_projects__project_slug__evaluations_v2_get"
         ],
         "source_identity": "operationId:get_project_evaluations_v2_v1_observability_projects__project_slug__evaluations_v2_get"
+      },
+      {
+        "public_paths": [
+          "beta.observability.evaluations.scorers.list_scorers_v1_observability_scorers_get"
+        ],
+        "source_identity": "operationId:list_scorers_v1_observability_scorers_get"
+      },
+      {
+        "public_paths": [
+          "beta.observability.evaluations.scorers.create_scorer_v1_observability_scorers_post"
+        ],
+        "source_identity": "operationId:create_scorer_v1_observability_scorers_post"
+      },
+      {
+        "public_paths": [
+          "beta.observability.evaluations.scorers.get_scorer_v1_observability_scorers__scorer_slug__get"
+        ],
+        "source_identity": "operationId:get_scorer_v1_observability_scorers__scorer_slug__get"
+      },
+      {
+        "public_paths": [
+          "beta.observability.evaluations.scorers.edit_scorer_v1_observability_scorers__scorer_slug__patch"
+        ],
+        "source_identity": "operationId:edit_scorer_v1_observability_scorers__scorer_slug__patch"
       },
       {
         "public_paths": [
@@ -5194,78 +5662,6 @@
       },
       {
         "public_paths": [
-          "beta.rag.managed_indexes.list_indexes_v1_rag_managed_indexes_get"
-        ],
-        "source_identity": "operationId:list_indexes_v1_rag_managed_indexes_get"
-      },
-      {
-        "public_paths": [
-          "beta.rag.managed_indexes.create_index_v1_rag_managed_indexes_post"
-        ],
-        "source_identity": "operationId:create_index_v1_rag_managed_indexes_post"
-      },
-      {
-        "public_paths": [
-          "beta.rag.managed_indexes.delete_index_v1_rag_managed_indexes__index_name__delete"
-        ],
-        "source_identity": "operationId:delete_index_v1_rag_managed_indexes__index_name__delete"
-      },
-      {
-        "public_paths": [
-          "beta.rag.managed_indexes.get_index_v1_rag_managed_indexes__index_name__get"
-        ],
-        "source_identity": "operationId:get_index_v1_rag_managed_indexes__index_name__get"
-      },
-      {
-        "public_paths": [
-          "beta.rag.managed_indexes.update_index_v1_rag_managed_indexes__index_name__put"
-        ],
-        "source_identity": "operationId:update_index_v1_rag_managed_indexes__index_name__put"
-      },
-      {
-        "public_paths": [
-          "beta.rag.managed_indexes.get_chunk_index_v1_rag_managed_indexes__index_name__chunks__chunk_id__get"
-        ],
-        "source_identity": "operationId:get_chunk_index_v1_rag_managed_indexes__index_name__chunks__chunk_id__get"
-      },
-      {
-        "public_paths": [
-          "beta.rag.managed_indexes.delete_documents_v1_rag_managed_indexes__index_name__documents_delete"
-        ],
-        "source_identity": "operationId:delete_documents_v1_rag_managed_indexes__index_name__documents_delete"
-      },
-      {
-        "public_paths": [
-          "beta.rag.managed_indexes.ingest_documents_v1_rag_managed_indexes__index_name__documents_post"
-        ],
-        "source_identity": "operationId:ingest_documents_v1_rag_managed_indexes__index_name__documents_post"
-      },
-      {
-        "public_paths": [
-          "beta.rag.managed_indexes.grep_index_v1_rag_managed_indexes__index_name__grep_post"
-        ],
-        "source_identity": "operationId:grep_index_v1_rag_managed_indexes__index_name__grep_post"
-      },
-      {
-        "public_paths": [
-          "beta.rag.managed_indexes.navigate_index_v1_rag_managed_indexes__index_name__navigate_post"
-        ],
-        "source_identity": "operationId:navigate_index_v1_rag_managed_indexes__index_name__navigate_post"
-      },
-      {
-        "public_paths": [
-          "beta.rag.managed_indexes.read_index_v1_rag_managed_indexes__index_name__read_post"
-        ],
-        "source_identity": "operationId:read_index_v1_rag_managed_indexes__index_name__read_post"
-      },
-      {
-        "public_paths": [
-          "beta.rag.managed_indexes.search_index_v1_rag_managed_indexes__index_name__search_post"
-        ],
-        "source_identity": "operationId:search_index_v1_rag_managed_indexes__index_name__search_post"
-      },
-      {
-        "public_paths": [
           "responses.create_response_v1_responses_post"
         ],
         "source_identity": "operationId:create_response_v1_responses_post"
@@ -5326,6 +5722,36 @@
       },
       {
         "public_paths": [
+          "beta.triggers.list_triggers_v1_triggers_get"
+        ],
+        "source_identity": "operationId:list_triggers_v1_triggers_get"
+      },
+      {
+        "public_paths": [
+          "beta.triggers.create_trigger_v1_triggers_post"
+        ],
+        "source_identity": "operationId:create_trigger_v1_triggers_post"
+      },
+      {
+        "public_paths": [
+          "beta.triggers.delete_trigger_v1_triggers__trigger_id__delete"
+        ],
+        "source_identity": "operationId:delete_trigger_v1_triggers__trigger_id__delete"
+      },
+      {
+        "public_paths": [
+          "beta.triggers.get_trigger_v1_triggers__trigger_id__get"
+        ],
+        "source_identity": "operationId:get_trigger_v1_triggers__trigger_id__get"
+      },
+      {
+        "public_paths": [
+          "beta.triggers.list_trigger_events_v1_triggers__trigger_id__events_get"
+        ],
+        "source_identity": "operationId:list_trigger_events_v1_triggers__trigger_id__events_get"
+      },
+      {
+        "public_paths": [
           "beta.users.users_api_get_identity"
         ],
         "source_identity": "operationId:users_api_get_identity"
@@ -5341,6 +5767,36 @@
           "beta.users.users_api_list_workspaces"
         ],
         "source_identity": "operationId:users_api_list_workspaces"
+      },
+      {
+        "public_paths": [
+          "beta.webhooks.list_webhooks_v1_webhooks_get"
+        ],
+        "source_identity": "operationId:list_webhooks_v1_webhooks_get"
+      },
+      {
+        "public_paths": [
+          "beta.webhooks.create_webhook_v1_webhooks_post"
+        ],
+        "source_identity": "operationId:create_webhook_v1_webhooks_post"
+      },
+      {
+        "public_paths": [
+          "beta.webhooks.delete_webhook_v1_webhooks__webhook_id__delete"
+        ],
+        "source_identity": "operationId:delete_webhook_v1_webhooks__webhook_id__delete"
+      },
+      {
+        "public_paths": [
+          "beta.webhooks.get_webhook_v1_webhooks__webhook_id__get"
+        ],
+        "source_identity": "operationId:get_webhook_v1_webhooks__webhook_id__get"
+      },
+      {
+        "public_paths": [
+          "beta.webhooks.get_webhook_signing_secret_v1_webhooks__webhook_id__signing_secret_get"
+        ],
+        "source_identity": "operationId:get_webhook_signing_secret_v1_webhooks__webhook_id__signing_secret_get"
       },
       {
         "public_paths": [
@@ -5395,6 +5851,12 @@
           "workflows.deployments.update_deployment_v1_workflows_deployments__name__patch"
         ],
         "source_identity": "operationId:update_deployment_v1_workflows_deployments__name__patch"
+      },
+      {
+        "public_paths": [
+          "workflows.deployments.get_deployment_archive_v1_workflows_deployments__name__archive_get"
+        ],
+        "source_identity": "operationId:get_deployment_archive_v1_workflows_deployments__name__archive_get"
       },
       {
         "public_paths": [
@@ -5659,6 +6121,12 @@
           "workflows.execute_workflow_v1_workflows__workflow_identifier__execute_post"
         ],
         "source_identity": "operationId:execute_workflow_v1_workflows__workflow_identifier__execute_post"
+      },
+      {
+        "public_paths": [
+          "workflows.add_workflow_tags_v1_workflows__workflow_identifier__tags_post"
+        ],
+        "source_identity": "operationId:add_workflow_tags_v1_workflows__workflow_identifier__tags_post"
       },
       {
         "public_paths": [
@@ -5961,6 +6429,10 @@
         "source_schema": "#/components/schemas/AdminUserOUT"
       },
       {
+        "public_name": "AdminUserWorkspacesOUT",
+        "source_schema": "#/components/schemas/AdminUserWorkspacesOUT"
+      },
+      {
         "public_name": "AdminWorkspaceIn",
         "source_schema": "#/components/schemas/AdminWorkspaceIn"
       },
@@ -6025,6 +6497,10 @@
         "source_schema": "#/components/schemas/AliasList"
       },
       {
+        "public_name": "AmazonConnectContact",
+        "source_schema": "#/components/schemas/AmazonConnectContact"
+      },
+      {
         "public_name": "And",
         "source_schema": "#/components/schemas/And"
       },
@@ -6065,6 +6541,42 @@
         "source_schema": "#/components/schemas/AttributeHashSampling"
       },
       {
+        "public_name": "AudioAgentConfigurationRequest",
+        "source_schema": "#/components/schemas/AudioAgentConfigurationRequest"
+      },
+      {
+        "public_name": "AudioAgentConfigurationResponseConfig",
+        "source_schema": "#/components/schemas/AudioAgentConfigurationResponseConfig"
+      },
+      {
+        "public_name": "AudioAgentCreateRequest",
+        "source_schema": "#/components/schemas/AudioAgentCreateRequest"
+      },
+      {
+        "public_name": "AudioAgentListPage",
+        "source_schema": "#/components/schemas/AudioAgentListPage"
+      },
+      {
+        "public_name": "AudioAgentResponse",
+        "source_schema": "#/components/schemas/AudioAgentResponse"
+      },
+      {
+        "public_name": "AudioAgentSessionListPage",
+        "source_schema": "#/components/schemas/AudioAgentSessionListPage"
+      },
+      {
+        "public_name": "AudioAgentSessionSummary",
+        "source_schema": "#/components/schemas/AudioAgentSessionSummary"
+      },
+      {
+        "public_name": "AudioAgentUpdateRequest",
+        "source_schema": "#/components/schemas/AudioAgentUpdateRequest"
+      },
+      {
+        "public_name": "AudioAssistantTranscriptTurn",
+        "source_schema": "#/components/schemas/AudioAssistantTranscriptTurn"
+      },
+      {
         "public_name": "AudioChunk",
         "source_schema": "#/components/schemas/AudioChunk"
       },
@@ -6073,12 +6585,100 @@
         "source_schema": "#/components/schemas/AudioContent"
       },
       {
+        "public_name": "AudioInactivityConfig",
+        "source_schema": "#/components/schemas/AudioInactivityConfig"
+      },
+      {
+        "public_name": "AudioLLMConfig",
+        "source_schema": "#/components/schemas/AudioLLMConfig"
+      },
+      {
+        "public_name": "AudioLatencyBreakdownAssistant",
+        "source_schema": "#/components/schemas/AudioLatencyBreakdownAssistant"
+      },
+      {
+        "public_name": "AudioLatencyBreakdownUser",
+        "source_schema": "#/components/schemas/AudioLatencyBreakdownUser"
+      },
+      {
+        "public_name": "AudioSTTConfig",
+        "source_schema": "#/components/schemas/AudioSTTConfig"
+      },
+      {
+        "public_name": "AudioSessionCreateRequest",
+        "source_schema": "#/components/schemas/AudioSessionCreateRequest"
+      },
+      {
+        "public_name": "AudioSessionCreateResponse",
+        "source_schema": "#/components/schemas/AudioSessionCreateResponse"
+      },
+      {
+        "public_name": "AudioSessionPhoneCall",
+        "source_schema": "#/components/schemas/AudioSessionPhoneCall"
+      },
+      {
+        "public_name": "AudioSessionPhoneNumber",
+        "source_schema": "#/components/schemas/AudioSessionPhoneNumber"
+      },
+      {
+        "public_name": "AudioSessionResponse",
+        "source_schema": "#/components/schemas/AudioSessionResponse"
+      },
+      {
+        "public_name": "AudioSessionTurnUpdate",
+        "source_schema": "#/components/schemas/AudioSessionTurnUpdate"
+      },
+      {
+        "public_name": "AudioSessionUpdateRequest",
+        "source_schema": "#/components/schemas/AudioSessionUpdateRequest"
+      },
+      {
+        "public_name": "AudioSessionUpdateResponse",
+        "source_schema": "#/components/schemas/AudioSessionUpdateResponse"
+      },
+      {
+        "public_name": "AudioSpeechCapabilities",
+        "source_schema": "#/components/schemas/AudioSpeechCapabilities"
+      },
+      {
+        "public_name": "AudioTTSConfig",
+        "source_schema": "#/components/schemas/AudioTTSConfig"
+      },
+      {
+        "public_name": "AudioToolCall",
+        "source_schema": "#/components/schemas/AudioToolCall"
+      },
+      {
+        "public_name": "AudioToolTranscriptTurn",
+        "source_schema": "#/components/schemas/AudioToolTranscriptTurn"
+      },
+      {
+        "public_name": "AudioToolTranscriptTurnStatus",
+        "source_schema": "#/components/schemas/AudioToolTranscriptTurnStatus"
+      },
+      {
+        "public_name": "AudioTranscriptionCapabilities",
+        "source_schema": "#/components/schemas/AudioTranscriptionCapabilities"
+      },
+      {
         "public_name": "AudioTranscriptionRequest",
         "source_schema": "#/components/schemas/AudioTranscriptionRequest"
       },
       {
         "public_name": "AudioTranscriptionRequestStream",
         "source_schema": "#/components/schemas/AudioTranscriptionRequestStream"
+      },
+      {
+        "public_name": "AudioTurnConfig",
+        "source_schema": "#/components/schemas/AudioTurnConfig"
+      },
+      {
+        "public_name": "AudioTurnDetectionConfig",
+        "source_schema": "#/components/schemas/AudioTurnDetectionConfig"
+      },
+      {
+        "public_name": "AudioUserTranscriptTurn",
+        "source_schema": "#/components/schemas/AudioUserTranscriptTurn"
       },
       {
         "public_name": "AuditLogEventType",
@@ -6171,6 +6771,10 @@
       {
         "public_name": "BoolFieldDefinition",
         "source_schema": "#/components/schemas/BoolFieldDefinition"
+      },
+      {
+        "public_name": "BudgetDetail",
+        "source_schema": "#/components/schemas/BudgetDetail"
       },
       {
         "public_name": "BuiltInConnectors",
@@ -6309,10 +6913,6 @@
         "source_schema": "#/components/schemas/ConfusionMatrix"
       },
       {
-        "public_name": "ConnectionConfigType",
-        "source_schema": "#/components/schemas/ConnectionConfigType"
-      },
-      {
         "public_name": "ConnectionCredentialsInput",
         "source_schema": "#/components/schemas/ConnectionCredentialsInput"
       },
@@ -6333,12 +6933,24 @@
         "source_schema": "#/components/schemas/ConnectorCallToolRequest"
       },
       {
+        "public_name": "ConnectorErrorCode",
+        "source_schema": "#/components/schemas/ConnectorErrorCode"
+      },
+      {
+        "public_name": "ConnectorErrorResponse",
+        "source_schema": "#/components/schemas/ConnectorErrorResponse"
+      },
+      {
         "public_name": "ConnectorLocale",
         "source_schema": "#/components/schemas/ConnectorLocale"
       },
       {
         "public_name": "ConnectorMCPPublicUpdate",
         "source_schema": "#/components/schemas/ConnectorMCPPublicUpdate"
+      },
+      {
+        "public_name": "ConnectorOpenApiSpec",
+        "source_schema": "#/components/schemas/ConnectorOpenApiSpec"
       },
       {
         "public_name": "ConnectorSupportedLanguage",
@@ -6485,10 +7097,6 @@
         "source_schema": "#/components/schemas/CreateIngestionPipelineConfigurationRequest"
       },
       {
-        "public_name": "CreateJudgeRequest",
-        "source_schema": "#/components/schemas/CreateJudgeRequest"
-      },
-      {
         "public_name": "CreateLibraryRequest",
         "source_schema": "#/components/schemas/CreateLibraryRequest"
       },
@@ -6525,6 +7133,10 @@
         "source_schema": "#/components/schemas/CreateResponseResponse"
       },
       {
+        "public_name": "CreateScorerRequest",
+        "source_schema": "#/components/schemas/CreateScorerRequest"
+      },
+      {
         "public_name": "CreateServiceAccountRequest",
         "source_schema": "#/components/schemas/CreateServiceAccountRequest"
       },
@@ -6535,6 +7147,18 @@
       {
         "public_name": "CreateSkillVersionResponse",
         "source_schema": "#/components/schemas/CreateSkillVersionResponse"
+      },
+      {
+        "public_name": "CreateTrigger",
+        "source_schema": "#/components/schemas/CreateTrigger"
+      },
+      {
+        "public_name": "CreateTriggerAction",
+        "source_schema": "#/components/schemas/CreateTriggerAction"
+      },
+      {
+        "public_name": "CreateWebhook",
+        "source_schema": "#/components/schemas/CreateWebhook"
       },
       {
         "public_name": "CredentialsCreateOrUpdate",
@@ -6697,6 +7321,10 @@
         "source_schema": "#/components/schemas/DenseVectorFieldDefinition"
       },
       {
+        "public_name": "DeploymentArchiveResponse",
+        "source_schema": "#/components/schemas/DeploymentArchiveResponse"
+      },
+      {
         "public_name": "DeploymentBuildState",
         "source_schema": "#/components/schemas/DeploymentBuildState"
       },
@@ -6801,6 +7429,10 @@
         "source_schema": "#/components/schemas/DocumentURLChunk"
       },
       {
+        "public_name": "EditScorerRequest",
+        "source_schema": "#/components/schemas/EditScorerRequest"
+      },
+      {
         "public_name": "ElicitationCapability",
         "source_schema": "#/components/schemas/ElicitationCapability"
       },
@@ -6843,6 +7475,10 @@
       {
         "public_name": "EntityType",
         "source_schema": "#/components/schemas/EntityType"
+      },
+      {
+        "public_name": "EnumConstraints",
+        "source_schema": "#/components/schemas/EnumConstraints"
       },
       {
         "public_name": "Equal",
@@ -6935,10 +7571,6 @@
       {
         "public_name": "ExecutionLogSearchResponse",
         "source_schema": "#/components/schemas/ExecutionLogSearchResponse"
-      },
-      {
-        "public_name": "ExecutionTool",
-        "source_schema": "#/components/schemas/ExecutionTool"
       },
       {
         "public_name": "ExecutionTraceInfoResponse",
@@ -7037,6 +7669,10 @@
         "source_schema": "#/components/schemas/FloatArrayFieldDefinition"
       },
       {
+        "public_name": "FloatConstraints",
+        "source_schema": "#/components/schemas/FloatConstraints"
+      },
+      {
         "public_name": "FloatFieldDefinition",
         "source_schema": "#/components/schemas/FloatFieldDefinition"
       },
@@ -7069,12 +7705,24 @@
         "source_schema": "#/components/schemas/FunctionName"
       },
       {
+        "public_name": "FunctionRequest",
+        "source_schema": "#/components/schemas/FunctionRequest"
+      },
+      {
         "public_name": "FunctionResultEntry",
         "source_schema": "#/components/schemas/FunctionResultEntry"
       },
       {
         "public_name": "FunctionTool",
         "source_schema": "#/components/schemas/FunctionTool"
+      },
+      {
+        "public_name": "GeneratedToolFiller",
+        "source_schema": "#/components/schemas/GeneratedToolFiller"
+      },
+      {
+        "public_name": "GetBudgetResponse",
+        "source_schema": "#/components/schemas/GetBudgetResponse"
       },
       {
         "public_name": "GetDeploymentSummariesResponse",
@@ -7111,6 +7759,10 @@
       {
         "public_name": "GetLogs",
         "source_schema": "#/components/schemas/GetLogs"
+      },
+      {
+        "public_name": "GetPipelineResultFields",
+        "source_schema": "#/components/schemas/GetPipelineResultFields"
       },
       {
         "public_name": "GetPipelineResults",
@@ -7151,6 +7803,14 @@
       {
         "public_name": "GetSpans",
         "source_schema": "#/components/schemas/GetSpans"
+      },
+      {
+        "public_name": "GetSubscriptionResponse",
+        "source_schema": "#/components/schemas/GetSubscriptionResponse"
+      },
+      {
+        "public_name": "GetSummaryResponseSummary",
+        "source_schema": "#/components/schemas/GetSummaryResponseSummary"
       },
       {
         "public_name": "GetTrace",
@@ -7239,6 +7899,10 @@
       {
         "public_name": "HTTPValidationError",
         "source_schema": "#/components/schemas/HTTPValidationError"
+      },
+      {
+        "public_name": "HangUpTool",
+        "source_schema": "#/components/schemas/HangUpTool"
       },
       {
         "public_name": "IPAPhoneme",
@@ -7365,40 +8029,8 @@
         "source_schema": "#/components/schemas/JsonValue"
       },
       {
-        "public_name": "Judge",
-        "source_schema": "#/components/schemas/Judge"
-      },
-      {
-        "public_name": "JudgeClassificationOutput",
-        "source_schema": "#/components/schemas/JudgeClassificationOutput"
-      },
-      {
-        "public_name": "JudgeClassificationOutputOption",
-        "source_schema": "#/components/schemas/JudgeClassificationOutputOption"
-      },
-      {
-        "public_name": "JudgeConversationRequest",
-        "source_schema": "#/components/schemas/JudgeConversationRequest"
-      },
-      {
-        "public_name": "JudgeDatasetRecordRequest",
-        "source_schema": "#/components/schemas/JudgeDatasetRecordRequest"
-      },
-      {
         "public_name": "JudgeDefinitionV1",
         "source_schema": "#/components/schemas/JudgeDefinitionV1"
-      },
-      {
-        "public_name": "JudgeOutput",
-        "source_schema": "#/components/schemas/JudgeOutput"
-      },
-      {
-        "public_name": "JudgeOutputType",
-        "source_schema": "#/components/schemas/JudgeOutputType"
-      },
-      {
-        "public_name": "JudgeRegressionOutput",
-        "source_schema": "#/components/schemas/JudgeRegressionOutput"
       },
       {
         "public_name": "KeywordArrayFieldDefinition",
@@ -7469,10 +8101,6 @@
         "source_schema": "#/components/schemas/ListFilesResponse"
       },
       {
-        "public_name": "ListJudgesResponse",
-        "source_schema": "#/components/schemas/ListJudgesResponse"
-      },
-      {
         "public_name": "ListLibrariesResponse",
         "source_schema": "#/components/schemas/ListLibrariesResponse"
       },
@@ -7499,6 +8127,10 @@
       {
         "public_name": "ListPromptsResponse",
         "source_schema": "#/components/schemas/ListPromptsResponse"
+      },
+      {
+        "public_name": "ListScorersResponse",
+        "source_schema": "#/components/schemas/ListScorersResponse"
       },
       {
         "public_name": "ListServiceAccountRolesResponse",
@@ -7535,6 +8167,14 @@
       {
         "public_name": "ListWorkspacesResponse",
         "source_schema": "#/components/schemas/ListWorkspacesResponse"
+      },
+      {
+        "public_name": "LlmJudgeConfig",
+        "source_schema": "#/components/schemas/LlmJudgeConfig"
+      },
+      {
+        "public_name": "LlmJudgeParams",
+        "source_schema": "#/components/schemas/LlmJudgeParams"
       },
       {
         "public_name": "LlmJudgeReference",
@@ -7647,6 +8287,10 @@
       {
         "public_name": "MaxCandidatesTooSmallResponse",
         "source_schema": "#/components/schemas/MaxCandidatesTooSmallResponse"
+      },
+      {
+        "public_name": "MemberStatus",
+        "source_schema": "#/components/schemas/MemberStatus"
       },
       {
         "public_name": "MemberSubscriptionOUT",
@@ -7783,14 +8427,6 @@
       {
         "public_name": "NearestNeighbourRetriever",
         "source_schema": "#/components/schemas/NearestNeighbourRetriever"
-      },
-      {
-        "public_name": "NestedGroupRef",
-        "source_schema": "#/components/schemas/NestedGroupRef"
-      },
-      {
-        "public_name": "NestedGroupsOut",
-        "source_schema": "#/components/schemas/NestedGroupsOut"
       },
       {
         "public_name": "NetworkEncodedInput",
@@ -7961,6 +8597,18 @@
         "source_schema": "#/components/schemas/ObservabilityErrorDetail"
       },
       {
+        "public_name": "OpenApiFileSource",
+        "source_schema": "#/components/schemas/OpenApiFileSource"
+      },
+      {
+        "public_name": "OpenApiSpecSource",
+        "source_schema": "#/components/schemas/OpenApiSpecSource"
+      },
+      {
+        "public_name": "OpenApiUrlSource",
+        "source_schema": "#/components/schemas/OpenApiUrlSource"
+      },
+      {
         "public_name": "Optimization",
         "source_schema": "#/components/schemas/Optimization"
       },
@@ -8017,8 +8665,16 @@
         "source_schema": "#/components/schemas/OrganizationUsersCreateOUT"
       },
       {
+        "public_name": "OtelEnumFieldDefinition",
+        "source_schema": "#/components/schemas/OtelEnumFieldDefinition"
+      },
+      {
         "public_name": "OtelFieldDefinition",
         "source_schema": "#/components/schemas/OtelFieldDefinition"
+      },
+      {
+        "public_name": "OtelFloatFieldDefinition",
+        "source_schema": "#/components/schemas/OtelFloatFieldDefinition"
       },
       {
         "public_name": "OutputContentChunks",
@@ -8057,10 +8713,6 @@
         "source_schema": "#/components/schemas/PaginatedResultEvaluationV2"
       },
       {
-        "public_name": "PaginatedResultJudgePreview",
-        "source_schema": "#/components/schemas/PaginatedResultJudgePreview"
-      },
-      {
         "public_name": "PaginatedResultOptimization",
         "source_schema": "#/components/schemas/PaginatedResultOptimization"
       },
@@ -8077,6 +8729,10 @@
         "source_schema": "#/components/schemas/PaginatedResultProject"
       },
       {
+        "public_name": "PaginatedResultScorerSummary",
+        "source_schema": "#/components/schemas/PaginatedResultScorerSummary"
+      },
+      {
         "public_name": "PaginationInfo",
         "source_schema": "#/components/schemas/PaginationInfo"
       },
@@ -8091,6 +8747,10 @@
       {
         "public_name": "PercentileStatisticSpec",
         "source_schema": "#/components/schemas/PercentileStatisticSpec"
+      },
+      {
+        "public_name": "PhoneDestination",
+        "source_schema": "#/components/schemas/PhoneDestination"
       },
       {
         "public_name": "Pipeline",
@@ -8205,26 +8865,6 @@
         "source_schema": "#/components/schemas/PublicAuthenticationMethod"
       },
       {
-        "public_name": "PublicConnectionConfig",
-        "source_schema": "#/components/schemas/PublicConnectionConfig"
-      },
-      {
-        "public_name": "PublicConnectorExecutionData",
-        "source_schema": "#/components/schemas/PublicConnectorExecutionData"
-      },
-      {
-        "public_name": "PublicExecutionConnectionConfig",
-        "source_schema": "#/components/schemas/PublicExecutionConnectionConfig"
-      },
-      {
-        "public_name": "PublicExecutionConnector",
-        "source_schema": "#/components/schemas/PublicExecutionConnector"
-      },
-      {
-        "public_name": "PublicExecutionEnv",
-        "source_schema": "#/components/schemas/PublicExecutionEnv"
-      },
-      {
         "public_name": "PublicResourceVisibility",
         "source_schema": "#/components/schemas/PublicResourceVisibility"
       },
@@ -8251,6 +8891,14 @@
       {
         "public_name": "RateLimitsOUT",
         "source_schema": "#/components/schemas/RateLimitsOUT"
+      },
+      {
+        "public_name": "RawAudio",
+        "source_schema": "#/components/schemas/RawAudio"
+      },
+      {
+        "public_name": "ReactivateUserOUT",
+        "source_schema": "#/components/schemas/ReactivateUserOUT"
       },
       {
         "public_name": "ReadRequest",
@@ -8511,6 +9159,14 @@
       {
         "public_name": "ResponsesMessage",
         "source_schema": "#/components/schemas/ResponsesMessage"
+      },
+      {
+        "public_name": "ResponsesMisalignment",
+        "source_schema": "#/components/schemas/ResponsesMisalignment"
+      },
+      {
+        "public_name": "ResponsesMisalignmentSteer",
+        "source_schema": "#/components/schemas/ResponsesMisalignmentSteer"
       },
       {
         "public_name": "ResponsesNamespaceTool",
@@ -8801,6 +9457,22 @@
         "source_schema": "#/components/schemas/ScoreSortInput"
       },
       {
+        "public_name": "Scorer",
+        "source_schema": "#/components/schemas/Scorer"
+      },
+      {
+        "public_name": "ScorerKind",
+        "source_schema": "#/components/schemas/ScorerKind"
+      },
+      {
+        "public_name": "ScorerSummary",
+        "source_schema": "#/components/schemas/ScorerSummary"
+      },
+      {
+        "public_name": "ScorerVersion",
+        "source_schema": "#/components/schemas/ScorerVersion"
+      },
+      {
         "public_name": "SearchAllEvaluationRunsResponse",
         "source_schema": "#/components/schemas/SearchAllEvaluationRunsResponse"
       },
@@ -8849,10 +9521,6 @@
         "source_schema": "#/components/schemas/ServiceTier"
       },
       {
-        "public_name": "SetNestedGroupsIn",
-        "source_schema": "#/components/schemas/SetNestedGroupsIn"
-      },
-      {
         "public_name": "SetServiceAccountRolesRequest",
         "source_schema": "#/components/schemas/SetServiceAccountRolesRequest"
       },
@@ -8891,6 +9559,10 @@
       {
         "public_name": "SimpleNumericStatisticSpec",
         "source_schema": "#/components/schemas/SimpleNumericStatisticSpec"
+      },
+      {
+        "public_name": "SipDestination",
+        "source_schema": "#/components/schemas/SipDestination"
       },
       {
         "public_name": "Skill",
@@ -8949,6 +9621,10 @@
         "source_schema": "#/components/schemas/SpansRequest"
       },
       {
+        "public_name": "SpeechAssistantTurn",
+        "source_schema": "#/components/schemas/SpeechAssistantTurn"
+      },
+      {
         "public_name": "SpeechOutputFormat",
         "source_schema": "#/components/schemas/SpeechOutputFormat"
       },
@@ -8957,8 +9633,24 @@
         "source_schema": "#/components/schemas/SpeechRequest"
       },
       {
+        "public_name": "SpeechStreamAudioDelta",
+        "source_schema": "#/components/schemas/SpeechStreamAudioDelta"
+      },
+      {
+        "public_name": "SpeechStreamDone",
+        "source_schema": "#/components/schemas/SpeechStreamDone"
+      },
+      {
+        "public_name": "SpeechUserTurn",
+        "source_schema": "#/components/schemas/SpeechUserTurn"
+      },
+      {
         "public_name": "StaticOrganizationRoles",
         "source_schema": "#/components/schemas/StaticOrganizationRoles"
+      },
+      {
+        "public_name": "StaticToolFiller",
+        "source_schema": "#/components/schemas/StaticToolFiller"
       },
       {
         "public_name": "StaticWorkspaceRoles",
@@ -8981,8 +9673,16 @@
         "source_schema": "#/components/schemas/StreamEventWorkflowContext"
       },
       {
+        "public_name": "StreamingDelayRange",
+        "source_schema": "#/components/schemas/StreamingDelayRange"
+      },
+      {
         "public_name": "SubscriptionStatus",
         "source_schema": "#/components/schemas/SubscriptionStatus"
+      },
+      {
+        "public_name": "SummaryStatus",
+        "source_schema": "#/components/schemas/SummaryStatus"
       },
       {
         "public_name": "SystemFilter",
@@ -9305,6 +10005,46 @@
         "source_schema": "#/components/schemas/TranscriptionStreamTextDelta"
       },
       {
+        "public_name": "TransferCallTool",
+        "source_schema": "#/components/schemas/TransferCallTool"
+      },
+      {
+        "public_name": "TransferTarget",
+        "source_schema": "#/components/schemas/TransferTarget"
+      },
+      {
+        "public_name": "Trigger",
+        "source_schema": "#/components/schemas/Trigger"
+      },
+      {
+        "public_name": "TriggerAction",
+        "source_schema": "#/components/schemas/TriggerAction"
+      },
+      {
+        "public_name": "TriggerActionType",
+        "source_schema": "#/components/schemas/TriggerActionType"
+      },
+      {
+        "public_name": "TriggerEvent",
+        "source_schema": "#/components/schemas/TriggerEvent"
+      },
+      {
+        "public_name": "TriggerEventList",
+        "source_schema": "#/components/schemas/TriggerEventList"
+      },
+      {
+        "public_name": "TriggerHandler",
+        "source_schema": "#/components/schemas/TriggerHandler"
+      },
+      {
+        "public_name": "TriggerStatusValue",
+        "source_schema": "#/components/schemas/TriggerStatusValue"
+      },
+      {
+        "public_name": "TriggersOwnerType",
+        "source_schema": "#/components/schemas/TriggersOwnerType"
+      },
+      {
         "public_name": "TurbineMeta",
         "source_schema": "#/components/schemas/TurbineMeta"
       },
@@ -9361,10 +10101,6 @@
         "source_schema": "#/components/schemas/UpdateInvocationBody"
       },
       {
-        "public_name": "UpdateJudgeRequest",
-        "source_schema": "#/components/schemas/UpdateJudgeRequest"
-      },
-      {
         "public_name": "UpdateLibraryRequest",
         "source_schema": "#/components/schemas/UpdateLibraryRequest"
       },
@@ -9399,6 +10135,10 @@
       {
         "public_name": "UpdateServiceAccountRequest",
         "source_schema": "#/components/schemas/UpdateServiceAccountRequest"
+      },
+      {
+        "public_name": "UpdateSummaryRequestSummary",
+        "source_schema": "#/components/schemas/UpdateSummaryRequestSummary"
       },
       {
         "public_name": "UpdateWorkflowResponse",
@@ -9569,6 +10309,50 @@
         "source_schema": "#/components/schemas/VibeWorkspaceStatsOUT"
       },
       {
+        "public_name": "VoiceAgentCustomConnector",
+        "source_schema": "#/components/schemas/VoiceAgentCustomConnector"
+      },
+      {
+        "public_name": "VoiceAgentDocumentLibraryTool",
+        "source_schema": "#/components/schemas/VoiceAgentDocumentLibraryTool"
+      },
+      {
+        "public_name": "VoiceAgentErrorEvent",
+        "source_schema": "#/components/schemas/VoiceAgentErrorEvent"
+      },
+      {
+        "public_name": "VoiceAgentEvent",
+        "source_schema": "#/components/schemas/VoiceAgentEvent"
+      },
+      {
+        "public_name": "VoiceAgentFunctionTool",
+        "source_schema": "#/components/schemas/VoiceAgentFunctionTool"
+      },
+      {
+        "public_name": "VoiceAgentFunctionToolRequest",
+        "source_schema": "#/components/schemas/VoiceAgentFunctionToolRequest"
+      },
+      {
+        "public_name": "VoiceAgentStateChangedEvent",
+        "source_schema": "#/components/schemas/VoiceAgentStateChangedEvent"
+      },
+      {
+        "public_name": "VoiceAgentToolCallEndedEvent",
+        "source_schema": "#/components/schemas/VoiceAgentToolCallEndedEvent"
+      },
+      {
+        "public_name": "VoiceAgentToolCallStartedEvent",
+        "source_schema": "#/components/schemas/VoiceAgentToolCallStartedEvent"
+      },
+      {
+        "public_name": "VoiceAgentTranscriptEvent",
+        "source_schema": "#/components/schemas/VoiceAgentTranscriptEvent"
+      },
+      {
+        "public_name": "VoiceAgentWebSearchTool",
+        "source_schema": "#/components/schemas/VoiceAgentWebSearchTool"
+      },
+      {
         "public_name": "VoiceCreateRequest",
         "source_schema": "#/components/schemas/VoiceCreateRequest"
       },
@@ -9603,6 +10387,26 @@
       {
         "public_name": "WebSearchTool",
         "source_schema": "#/components/schemas/WebSearchTool"
+      },
+      {
+        "public_name": "Webhook",
+        "source_schema": "#/components/schemas/Webhook"
+      },
+      {
+        "public_name": "WebhookProvider",
+        "source_schema": "#/components/schemas/WebhookProvider"
+      },
+      {
+        "public_name": "WebhookSignatureEncoding",
+        "source_schema": "#/components/schemas/WebhookSignatureEncoding"
+      },
+      {
+        "public_name": "WebhookSignatureHashAlgorithm",
+        "source_schema": "#/components/schemas/WebhookSignatureHashAlgorithm"
+      },
+      {
+        "public_name": "WebhookSigningSecret",
+        "source_schema": "#/components/schemas/WebhookSigningSecret"
       },
       {
         "public_name": "WhoamiOrganization",
@@ -9809,6 +10613,10 @@
         "source_schema": "#/components/schemas/WorkflowScheduleUpdateRequest"
       },
       {
+        "public_name": "WorkflowTagsAddRequest",
+        "source_schema": "#/components/schemas/WorkflowTagsAddRequest"
+      },
+      {
         "public_name": "WorkflowTaskFailedAttributes",
         "source_schema": "#/components/schemas/WorkflowTaskFailedAttributes"
       },
@@ -9871,16 +10679,23 @@
       {
         "public_name": "WorkspacesOut",
         "source_schema": "#/components/schemas/WorkspacesOut"
-      },
-      {
-        "public_name": "JudgeOutputConfig",
-        "source_schema": "#/components/schemas/Judge/properties/output"
       }
     ]
   },
-  "public_method_count": 323,
+  "public_method_count": 349,
   "public_methods": [
     "agents.agents_completion_v1_agents_completions_post",
+    "audio.agents.create_agent_v1_audio_agents_post",
+    "audio.agents.delete_agent_v1_audio_agents__agent_id__delete",
+    "audio.agents.get_agent_v1_audio_agents__agent_id__get",
+    "audio.agents.list_agent_sessions_v1_audio_agents__agent_id__sessions_get",
+    "audio.agents.list_agent_versions_v1_audio_agents__agent_id__versions_get",
+    "audio.agents.list_agents_v1_audio_agents_get",
+    "audio.agents.update_agent_v1_audio_agents__agent_id__put",
+    "audio.sessions.create_session_v1_audio_sessions_post",
+    "audio.sessions.delete_session_v1_audio_sessions__session_id__delete",
+    "audio.sessions.get_session_v1_audio_sessions__session_id__get",
+    "audio.sessions.update_session_v1_audio_sessions__session_id__patch",
     "audio.speech.complete",
     "audio.transcriptions.audio_api_v1_transcriptions_post",
     "audio.transcriptions.audio_api_v1_transcriptions_post_stream",
@@ -9915,13 +10730,11 @@
     "beta.admin.user-groups.users_api_admin_user_groups_assign_users_to_group",
     "beta.admin.user-groups.users_api_admin_user_groups_create_user_group",
     "beta.admin.user-groups.users_api_admin_user_groups_delete_user_group",
-    "beta.admin.user-groups.users_api_admin_user_groups_get_nested_groups",
     "beta.admin.user-groups.users_api_admin_user_groups_get_user_group",
     "beta.admin.user-groups.users_api_admin_user_groups_get_user_group_members",
     "beta.admin.user-groups.users_api_admin_user_groups_get_user_groups",
     "beta.admin.user-groups.users_api_admin_user_groups_provision_group_to_workspace",
     "beta.admin.user-groups.users_api_admin_user_groups_remove_users_from_group",
-    "beta.admin.user-groups.users_api_admin_user_groups_set_nested_groups",
     "beta.admin.user-groups.users_api_admin_user_groups_update_user_group",
     "beta.admin.users.users_api_admin_roles_get_roles",
     "beta.admin.users.users_api_admin_users_create_users",
@@ -9930,8 +10743,10 @@
     "beta.admin.users.users_api_admin_users_delete_user",
     "beta.admin.users.users_api_admin_users_get_invite",
     "beta.admin.users.users_api_admin_users_get_user",
+    "beta.admin.users.users_api_admin_users_get_user_workspaces",
     "beta.admin.users.users_api_admin_users_get_users",
     "beta.admin.users.users_api_admin_users_invite_users",
+    "beta.admin.users.users_api_admin_users_reactivate_user",
     "beta.admin.users.users_api_admin_users_update_user",
     "beta.admin.vibe-code-analytics.get_organization_stats_v1_admin_analytics_vibe_code_usage_by_organization",
     "beta.admin.vibe-code-analytics.get_workspace_stats_v1_admin_analytics_vibe_code_usage_by_workspace",
@@ -9957,6 +10772,8 @@
     "beta.agents.agents_api_v1_agents_list_versions",
     "beta.agents.agents_api_v1_agents_update",
     "beta.agents.agents_api_v1_agents_update_version",
+    "beta.billing.billing_api_public_get_budget",
+    "beta.billing.billing_api_public_get_subscription",
     "beta.connectors.connector_activate_for_consumer_v1",
     "beta.connectors.connector_call_tool_v1",
     "beta.connectors.connector_create_credentials_v1",
@@ -9979,6 +10796,21 @@
     "beta.connectors.connector_unshare_v1",
     "beta.connectors.connector_update_credentials",
     "beta.connectors.connector_update_v1",
+    "beta.context.search_indexes.create_index_v1_context_search_indexes_post",
+    "beta.context.search_indexes.delete_documents_v1_context_search_indexes__index_name__documents_delete",
+    "beta.context.search_indexes.delete_index_v1_context_search_indexes__index_name__delete",
+    "beta.context.search_indexes.generate_managed_index_summary_post_v1_context_search_indexes__index_name__summary_field__language__post",
+    "beta.context.search_indexes.get_chunk_index_v1_context_search_indexes__index_name__chunks__chunk_id__get",
+    "beta.context.search_indexes.get_index_v1_context_search_indexes__index_name__get",
+    "beta.context.search_indexes.get_managed_index_summary_v1_context_search_indexes__index_name__summary_field__language__get",
+    "beta.context.search_indexes.grep_index_v1_context_search_indexes__index_name__grep_post",
+    "beta.context.search_indexes.ingest_documents_v1_context_search_indexes__index_name__documents_post",
+    "beta.context.search_indexes.list_indexes_v1_context_search_indexes_get",
+    "beta.context.search_indexes.navigate_index_v1_context_search_indexes__index_name__navigate_post",
+    "beta.context.search_indexes.read_index_v1_context_search_indexes__index_name__read_post",
+    "beta.context.search_indexes.search_index_v1_context_search_indexes__index_name__search_post",
+    "beta.context.search_indexes.set_managed_index_summary_v1_context_search_indexes__index_name__summary_field__language__put",
+    "beta.context.search_indexes.update_index_v1_context_search_indexes__index_name__put",
     "beta.conversations.agents_api_v1_conversations_append",
     "beta.conversations.agents_api_v1_conversations_append_stream",
     "beta.conversations.agents_api_v1_conversations_delete",
@@ -10026,7 +10858,6 @@
     "beta.observability.datasets.records.delete_dataset_record_v1_observability_dataset_records__dataset_record_id__delete",
     "beta.observability.datasets.records.delete_dataset_records_v1_observability_dataset_records_bulk_delete_post",
     "beta.observability.datasets.records.get_dataset_record_v1_observability_dataset_records__dataset_record_id__get",
-    "beta.observability.datasets.records.judge_dataset_record_v1_observability_dataset_records__dataset_record_id__live_judging_post",
     "beta.observability.datasets.records.update_dataset_record_payload_v1_observability_dataset_records__dataset_record_id__payload_put",
     "beta.observability.datasets.records.update_dataset_record_properties_v1_observability_dataset_records__dataset_record_id__properties_put",
     "beta.observability.datasets.update_dataset_v1_observability_datasets__dataset_id__patch",
@@ -10048,18 +10879,17 @@
     "beta.observability.evaluations.runs.get_single_evaluation_run_statistics_v2_v1_observability_evaluation_runs_v2__run_id__statistics_get",
     "beta.observability.evaluations.runs.search_all_evaluation_runs_v2_v1_observability_evaluation_runs_v2_search_post",
     "beta.observability.evaluations.runs.search_evaluation_runs_v2_v1_observability_evaluations_v2__evaluation_slug__runs_search_post",
+    "beta.observability.evaluations.scorers.create_scorer_v1_observability_scorers_post",
+    "beta.observability.evaluations.scorers.edit_scorer_v1_observability_scorers__scorer_slug__patch",
+    "beta.observability.evaluations.scorers.get_scorer_v1_observability_scorers__scorer_slug__get",
+    "beta.observability.evaluations.scorers.list_scorers_v1_observability_scorers_get",
     "beta.observability.evaluations.update_pipeline_v1_observability_pipelines__pipeline_id__put",
-    "beta.observability.judges.create_judge_v1_observability_judges_post",
-    "beta.observability.judges.delete_judge_v1_observability_judges__judge_id__delete",
-    "beta.observability.judges.get_judge_by_id_v1_observability_judges__judge_id__get",
-    "beta.observability.judges.get_judges_v1_observability_judges_get",
-    "beta.observability.judges.judge_conversation_v1_observability_judges__judge_id__live_judging_post",
-    "beta.observability.judges.update_judge_v1_observability_judges__judge_id__put",
     "beta.observability.logs.get_log_field_options_v1_observability_logs_fields__field_name__options_get",
     "beta.observability.logs.get_log_fields_v1_observability_logs_fields_get",
     "beta.observability.logs.search_logs_v1_observability_logs_search_post",
     "beta.observability.spans.aggregate_span_evaluations_v1_observability_spans_evaluations_aggregate_post",
     "beta.observability.spans.aggregate_spans_v1_observability_spans_aggregate_post",
+    "beta.observability.spans.get_pipeline_result_fields_v1_observability_pipelines__pipeline_id__results_fields_get",
     "beta.observability.spans.get_span_evaluation_field_options_v1_observability_spans_evaluations_fields__field_name__options_get",
     "beta.observability.spans.get_span_evaluation_fields_v1_observability_spans_evaluations_fields_get",
     "beta.observability.spans.get_span_field_options_v1_observability_spans_fields__field_name__options_get",
@@ -10087,18 +10917,6 @@
     "beta.rag.ingestion_pipeline_configurations.get_configs_v1_rag_ingestion_pipeline_configurations_get",
     "beta.rag.ingestion_pipeline_configurations.register_config_v1_rag_ingestion_pipeline_configurations_put",
     "beta.rag.ingestion_pipeline_configurations.update_run_info_v1_rag_ingestion_pipeline_configurations__id__run_info_put",
-    "beta.rag.managed_indexes.create_index_v1_rag_managed_indexes_post",
-    "beta.rag.managed_indexes.delete_documents_v1_rag_managed_indexes__index_name__documents_delete",
-    "beta.rag.managed_indexes.delete_index_v1_rag_managed_indexes__index_name__delete",
-    "beta.rag.managed_indexes.get_chunk_index_v1_rag_managed_indexes__index_name__chunks__chunk_id__get",
-    "beta.rag.managed_indexes.get_index_v1_rag_managed_indexes__index_name__get",
-    "beta.rag.managed_indexes.grep_index_v1_rag_managed_indexes__index_name__grep_post",
-    "beta.rag.managed_indexes.ingest_documents_v1_rag_managed_indexes__index_name__documents_post",
-    "beta.rag.managed_indexes.list_indexes_v1_rag_managed_indexes_get",
-    "beta.rag.managed_indexes.navigate_index_v1_rag_managed_indexes__index_name__navigate_post",
-    "beta.rag.managed_indexes.read_index_v1_rag_managed_indexes__index_name__read_post",
-    "beta.rag.managed_indexes.search_index_v1_rag_managed_indexes__index_name__search_post",
-    "beta.rag.managed_indexes.update_index_v1_rag_managed_indexes__index_name__put",
     "beta.rag.search_indexes.get_deployment_summaries_v1_rag_deployments_get",
     "beta.rag.search_indexes.register_deployment_v1_rag_deployments_put",
     "beta.rag.search_indexes.unregister_deployment_v1_rag_deployments__deployment_id__delete",
@@ -10120,10 +10938,20 @@
     "beta.skills.skills_list_versions",
     "beta.skills.skills_update",
     "beta.skills.skills_update_version_metadata",
+    "beta.triggers.create_trigger_v1_triggers_post",
+    "beta.triggers.delete_trigger_v1_triggers__trigger_id__delete",
+    "beta.triggers.get_trigger_v1_triggers__trigger_id__get",
+    "beta.triggers.list_trigger_events_v1_triggers__trigger_id__events_get",
+    "beta.triggers.list_triggers_v1_triggers_get",
     "beta.users.users_api_get_identity",
     "beta.users.users_api_list_organizations",
     "beta.users.users_api_list_workspaces",
     "beta.users.users_api_whoami",
+    "beta.webhooks.create_webhook_v1_webhooks_post",
+    "beta.webhooks.delete_webhook_v1_webhooks__webhook_id__delete",
+    "beta.webhooks.get_webhook_signing_secret_v1_webhooks__webhook_id__signing_secret_get",
+    "beta.webhooks.get_webhook_v1_webhooks__webhook_id__get",
+    "beta.webhooks.list_webhooks_v1_webhooks_get",
     "chat.complete",
     "chat.complete_stream",
     "classifiers.chat_classifications_v1_chat_classifications_post",
@@ -10151,11 +10979,13 @@
     "realtime.sessions.create_client_session_v1_client_sessions_post",
     "responses.count_input_tokens_v1_responses_input_tokens_post",
     "responses.create_response_v1_responses_post",
+    "workflows.add_workflow_tags_v1_workflows__workflow_identifier__tags_post",
     "workflows.archive_workflow_v1_workflows__workflow_identifier__archive_put",
     "workflows.bulk_archive_workflows_v1_workflows_archive_put",
     "workflows.bulk_unarchive_workflows_v1_workflows_unarchive_put",
     "workflows.deployments.create_deployment_v1_workflows_deployments_post",
     "workflows.deployments.delete_deployment_v1_workflows_deployments__name__delete",
+    "workflows.deployments.get_deployment_archive_v1_workflows_deployments__name__archive_get",
     "workflows.deployments.get_deployment_logs",
     "workflows.deployments.get_deployment_v1_workflows_deployments__name__get",
     "workflows.deployments.list_deployment_workers_v1_workflows_deployments__name__workers_get",
@@ -10204,7 +11034,7 @@
     "workflows.unarchive_workflow_v1_workflows__workflow_identifier__unarchive_put",
     "workflows.update_workflow_v1_workflows__workflow_identifier__put"
   ],
-  "public_type_count": 1599,
+  "public_type_count": 1770,
   "public_types": [
     "APIKeyActions",
     "APIKeyAuth",
@@ -10235,10 +11065,6 @@
     "AdminAssignUsersToGroupIn",
     "AdminCreateAPIKeyIN",
     "AdminOrganizationMemberOUT",
-    "AdminOrganizationMemberOutRawRole",
-    "AdminOrganizationMemberOutRawRoles",
-    "AdminOrganizationMemberOutRawRoles0",
-    "AdminOrganizationMemberOutRawRoles1",
     "AdminOrganizationMemberOutSubscriptionTypesItems",
     "AdminOrganizationMemberUpdate",
     "AdminOrganizationMemberUpdateRole",
@@ -10273,11 +11099,8 @@
     "AdminUserGroupOut",
     "AdminUserGroupsOut",
     "AdminUserOUT",
-    "AdminUserOutRawRole",
-    "AdminUserOutRawRoles",
-    "AdminUserOutRawRoles0",
-    "AdminUserOutRawRoles1",
     "AdminUserOutSubscriptionTypesItems",
+    "AdminUserWorkspacesOUT",
     "AdminWorkspaceIn",
     "AdminWorkspaceMemberIN",
     "AdminWorkspaceMemberSingleIN",
@@ -10317,6 +11140,7 @@
     "AggregationRow",
     "AggregationRowMetricValue",
     "AliasList",
+    "AmazonConnectContact",
     "And",
     "AndMatchesItems",
     "Annotations",
@@ -10335,11 +11159,101 @@
     "AssistantMessageContent",
     "AssistantMessageContent1",
     "AttributeHashSampling",
+    "AudioAgentConfigurationRequest",
+    "AudioAgentConfigurationRequestToolsItems",
+    "AudioAgentConfigurationRequestToolsItemsDiscriminatorMappingConnectorAuthorization",
+    "AudioAgentConfigurationRequestToolsItemsDiscriminatorMappingConnectorFiller",
+    "AudioAgentConfigurationRequestToolsItemsDiscriminatorMappingConnectorFillerDiscriminatorMappingGeneratedFallback",
+    "AudioAgentConfigurationRequestToolsItemsDiscriminatorMappingDocumentLibraryFiller",
+    "AudioAgentConfigurationRequestToolsItemsDiscriminatorMappingDocumentLibraryFillerDiscriminatorMappingGeneratedFallback",
+    "AudioAgentConfigurationRequestToolsItemsDiscriminatorMappingFunctionFiller",
+    "AudioAgentConfigurationRequestToolsItemsDiscriminatorMappingFunctionFillerDiscriminatorMappingGeneratedFallback",
+    "AudioAgentConfigurationRequestToolsItemsDiscriminatorMappingHangUpFiller",
+    "AudioAgentConfigurationRequestToolsItemsDiscriminatorMappingHangUpFillerDiscriminatorMappingGeneratedFallback",
+    "AudioAgentConfigurationRequestToolsItemsDiscriminatorMappingTransferCallFiller",
+    "AudioAgentConfigurationRequestToolsItemsDiscriminatorMappingTransferCallFillerDiscriminatorMappingGeneratedFallback",
+    "AudioAgentConfigurationRequestToolsItemsDiscriminatorMappingWebSearchFiller",
+    "AudioAgentConfigurationRequestToolsItemsDiscriminatorMappingWebSearchFillerDiscriminatorMappingGeneratedFallback",
+    "AudioAgentConfigurationResponseConfig",
+    "AudioAgentConfigurationResponseConfigToolsItems",
+    "AudioAgentConfigurationResponseConfigToolsItemsDiscriminatorMappingConnectorAuthorization",
+    "AudioAgentConfigurationResponseConfigToolsItemsDiscriminatorMappingConnectorFiller",
+    "AudioAgentConfigurationResponseConfigToolsItemsDiscriminatorMappingConnectorFillerDiscriminatorMappingGeneratedFallback",
+    "AudioAgentConfigurationResponseConfigToolsItemsDiscriminatorMappingDocumentLibraryFiller",
+    "AudioAgentConfigurationResponseConfigToolsItemsDiscriminatorMappingDocumentLibraryFillerDiscriminatorMappingGeneratedFallback",
+    "AudioAgentConfigurationResponseConfigToolsItemsDiscriminatorMappingFunctionFiller",
+    "AudioAgentConfigurationResponseConfigToolsItemsDiscriminatorMappingFunctionFillerDiscriminatorMappingGeneratedFallback",
+    "AudioAgentConfigurationResponseConfigToolsItemsDiscriminatorMappingHangUpFiller",
+    "AudioAgentConfigurationResponseConfigToolsItemsDiscriminatorMappingHangUpFillerDiscriminatorMappingGeneratedFallback",
+    "AudioAgentConfigurationResponseConfigToolsItemsDiscriminatorMappingTransferCallFiller",
+    "AudioAgentConfigurationResponseConfigToolsItemsDiscriminatorMappingTransferCallFillerDiscriminatorMappingGeneratedFallback",
+    "AudioAgentConfigurationResponseConfigToolsItemsDiscriminatorMappingWebSearchFiller",
+    "AudioAgentConfigurationResponseConfigToolsItemsDiscriminatorMappingWebSearchFillerDiscriminatorMappingGeneratedFallback",
+    "AudioAgentCreateRequest",
+    "AudioAgentListPage",
+    "AudioAgentResponse",
+    "AudioAgentSessionListPage",
+    "AudioAgentSessionSummary",
+    "AudioAgentUpdateRequest",
+    "AudioAssistantTranscriptTurn",
     "AudioChunk",
     "AudioChunkInputAudio",
     "AudioContent",
+    "AudioInactivityConfig",
+    "AudioLLMConfig",
+    "AudioLatencyBreakdownAssistant",
+    "AudioLatencyBreakdownUser",
+    "AudioSTTConfig",
+    "AudioSessionCreateRequest",
+    "AudioSessionCreateRequestToolsItems",
+    "AudioSessionCreateRequestToolsItemsDiscriminatorMappingConnectorAuthorization",
+    "AudioSessionCreateRequestToolsItemsDiscriminatorMappingConnectorFiller",
+    "AudioSessionCreateRequestToolsItemsDiscriminatorMappingConnectorFillerDiscriminatorMappingGeneratedFallback",
+    "AudioSessionCreateRequestToolsItemsDiscriminatorMappingDocumentLibraryFiller",
+    "AudioSessionCreateRequestToolsItemsDiscriminatorMappingDocumentLibraryFillerDiscriminatorMappingGeneratedFallback",
+    "AudioSessionCreateRequestToolsItemsDiscriminatorMappingFunctionFiller",
+    "AudioSessionCreateRequestToolsItemsDiscriminatorMappingFunctionFillerDiscriminatorMappingGeneratedFallback",
+    "AudioSessionCreateRequestToolsItemsDiscriminatorMappingHangUpFiller",
+    "AudioSessionCreateRequestToolsItemsDiscriminatorMappingHangUpFillerDiscriminatorMappingGeneratedFallback",
+    "AudioSessionCreateRequestToolsItemsDiscriminatorMappingTransferCallFiller",
+    "AudioSessionCreateRequestToolsItemsDiscriminatorMappingTransferCallFillerDiscriminatorMappingGeneratedFallback",
+    "AudioSessionCreateRequestToolsItemsDiscriminatorMappingWebSearchFiller",
+    "AudioSessionCreateRequestToolsItemsDiscriminatorMappingWebSearchFillerDiscriminatorMappingGeneratedFallback",
+    "AudioSessionCreateResponse",
+    "AudioSessionPhoneCall",
+    "AudioSessionPhoneNumber",
+    "AudioSessionResponse",
+    "AudioSessionResponseStatus",
+    "AudioSessionResponseTranscriptsItems",
+    "AudioSessionTurnUpdate",
+    "AudioSessionUpdateRequest",
+    "AudioSessionUpdateRequestToolsItems",
+    "AudioSessionUpdateRequestToolsItemsDiscriminatorMappingConnectorAuthorization",
+    "AudioSessionUpdateRequestToolsItemsDiscriminatorMappingConnectorFiller",
+    "AudioSessionUpdateRequestToolsItemsDiscriminatorMappingConnectorFillerDiscriminatorMappingGeneratedFallback",
+    "AudioSessionUpdateRequestToolsItemsDiscriminatorMappingDocumentLibraryFiller",
+    "AudioSessionUpdateRequestToolsItemsDiscriminatorMappingDocumentLibraryFillerDiscriminatorMappingGeneratedFallback",
+    "AudioSessionUpdateRequestToolsItemsDiscriminatorMappingFunctionFiller",
+    "AudioSessionUpdateRequestToolsItemsDiscriminatorMappingFunctionFillerDiscriminatorMappingGeneratedFallback",
+    "AudioSessionUpdateRequestToolsItemsDiscriminatorMappingHangUpFiller",
+    "AudioSessionUpdateRequestToolsItemsDiscriminatorMappingHangUpFillerDiscriminatorMappingGeneratedFallback",
+    "AudioSessionUpdateRequestToolsItemsDiscriminatorMappingTransferCallFiller",
+    "AudioSessionUpdateRequestToolsItemsDiscriminatorMappingTransferCallFillerDiscriminatorMappingGeneratedFallback",
+    "AudioSessionUpdateRequestToolsItemsDiscriminatorMappingWebSearchFiller",
+    "AudioSessionUpdateRequestToolsItemsDiscriminatorMappingWebSearchFillerDiscriminatorMappingGeneratedFallback",
+    "AudioSessionUpdateResponse",
+    "AudioSessionUpdateResponseStatus",
+    "AudioSpeechCapabilities",
+    "AudioTTSConfig",
+    "AudioToolCall",
+    "AudioToolTranscriptTurn",
+    "AudioToolTranscriptTurnStatus",
+    "AudioTranscriptionCapabilities",
     "AudioTranscriptionRequest",
     "AudioTranscriptionRequestStream",
+    "AudioTurnConfig",
+    "AudioTurnDetectionConfig",
+    "AudioUserTranscriptTurn",
     "AuditLogEventType",
     "AuditLogOut",
     "AuthData",
@@ -10364,6 +11278,7 @@
     "BlobResourceContents",
     "BoolArrayFieldDefinition",
     "BoolFieldDefinition",
+    "BudgetDetail",
     "BuiltInConnectors",
     "CategoricalStatistics",
     "ChatClassificationRequest",
@@ -10440,16 +11355,18 @@
     "CompletionResponseStreamChoiceFinishReason",
     "CompletionsCapability",
     "ConfusionMatrix",
-    "ConnectionConfigType",
     "ConnectionCredentialsInput",
     "ConnectionPreference",
     "Connector",
     "ConnectorAuthenticationHeader",
     "ConnectorCallToolRequest",
+    "ConnectorErrorCode",
+    "ConnectorErrorResponse",
     "ConnectorLocale",
     "ConnectorMCPPublicUpdate",
     "ConnectorMcpPublicUpdateAuthMethodsItems",
     "ConnectorMcpPublicUpdateAuthMethodsItems0",
+    "ConnectorOpenApiSpec",
     "ConnectorSupportedLanguage",
     "ConnectorTool",
     "ConnectorToolCallMetadata",
@@ -10532,8 +11449,6 @@
     "CreateHTTPConnectorRequest",
     "CreateHttpConnectorRequestAuthMethodsItems",
     "CreateIngestionPipelineConfigurationRequest",
-    "CreateJudgeRequest",
-    "CreateJudgeRequestOutput",
     "CreateLibraryRequest",
     "CreateLibraryRequestOwnerType",
     "CreateManagedIndexRequest",
@@ -10558,9 +11473,13 @@
     "CreateResponseResponseToolChoice0",
     "CreateResponseResponseToolsItems",
     "CreateResponseResponseTruncation",
+    "CreateScorerRequest",
     "CreateServiceAccountRequest",
     "CreateSkillRequest",
     "CreateSkillVersionResponse",
+    "CreateTrigger",
+    "CreateTriggerAction",
+    "CreateWebhook",
     "CredentialsCreateOrUpdate",
     "CredentialsResponse",
     "CredentialsStatus",
@@ -10606,6 +11525,7 @@
     "DeltaMessageContent",
     "DeltaMessageContent1",
     "DenseVectorFieldDefinition",
+    "DeploymentArchiveResponse",
     "DeploymentBuildState",
     "DeploymentDetailResponse",
     "DeploymentK8sBackendSpec",
@@ -10636,6 +11556,7 @@
     "DocumentLibraryToolType",
     "DocumentTextContent",
     "DocumentURLChunk",
+    "EditScorerRequest",
     "ElicitationCapability",
     "EmbeddedResource",
     "EmbeddedResourceResource",
@@ -10649,6 +11570,7 @@
     "EncodingFormat",
     "EncryptedPatchValue",
     "EntityType",
+    "EnumConstraints",
     "Equal",
     "EqualValue",
     "EvaluationBooleanResultSpec",
@@ -10680,7 +11602,6 @@
     "ExecutionConfig",
     "ExecutionLogRecord",
     "ExecutionLogSearchResponse",
-    "ExecutionTool",
     "ExecutionTraceInfoResponse",
     "ExportDatasetResponse",
     "ExportDefinitionV1",
@@ -10706,6 +11627,7 @@
     "FineTunedModelCapabilities",
     "FineTuningDataJSON",
     "FloatArrayFieldDefinition",
+    "FloatConstraints",
     "FloatFieldDefinition",
     "FormElicitationCapability",
     "Function",
@@ -10717,9 +11639,13 @@
     "FunctionCallEvent",
     "FunctionCallEventConfirmationStatus",
     "FunctionName",
+    "FunctionRequest",
     "FunctionResultEntry",
     "FunctionTool",
     "FunctionToolType",
+    "GeneratedToolFiller",
+    "GeneratedToolFillerFallback",
+    "GetBudgetResponse",
     "GetDeploymentSummariesResponse",
     "GetDeploymentSummariesResponseDeployment",
     "GetDeploymentSummariesResponseDeploymentDeployment",
@@ -10731,6 +11657,10 @@
     "GetLogFieldOptions",
     "GetLogFields",
     "GetLogs",
+    "GetPipelineResultFields",
+    "GetPipelineResultFieldsFieldDefinitionsItems",
+    "GetPipelineResultFieldsFieldDefinitionsItemsDiscriminatorMappingEnumSupportedOperatorsItems",
+    "GetPipelineResultFieldsFieldDefinitionsItemsDiscriminatorMappingFloatSupportedOperatorsItems",
     "GetPipelineResults",
     "GetSignedUrlResponse",
     "GetSpan",
@@ -10742,6 +11672,8 @@
     "GetSpanFields",
     "GetSpanStatusCode",
     "GetSpans",
+    "GetSubscriptionResponse",
+    "GetSummaryResponseSummary",
     "GetTrace",
     "GetTraceFieldOptions",
     "GetTraceFields",
@@ -10766,6 +11698,9 @@
     "HTTPConnector",
     "HTTPStatus",
     "HTTPValidationError",
+    "HangUpTool",
+    "HangUpToolFiller",
+    "HangUpToolFillerDiscriminatorMappingGeneratedFallback",
     "IPAPhoneme",
     "ImageContent",
     "ImageDetail",
@@ -10814,17 +11749,7 @@
     "JsonPatchPayloadValueResponse0",
     "JsonSchema",
     "JsonValue",
-    "Judge",
-    "JudgeClassificationOutput",
-    "JudgeClassificationOutputOption",
-    "JudgeConversationRequest",
-    "JudgeDatasetRecordRequest",
     "JudgeDefinitionV1",
-    "JudgeOutput",
-    "JudgeOutputAnswer",
-    "JudgeOutputConfig",
-    "JudgeOutputType",
-    "JudgeRegressionOutput",
     "KeywordArrayFieldDefinition",
     "KeywordFieldDefinition",
     "KeywordRetriever",
@@ -10838,6 +11763,7 @@
     "KeywordRetrieverFilterDiscriminatorMappingRangeGte",
     "KeywordRetrieverFilterDiscriminatorMappingRangeLt",
     "KeywordRetrieverFilterDiscriminatorMappingRangeLte",
+    "KeywordRetrieverOperator",
     "LagoEventType",
     "LibrariesAPIUsageDataJSON",
     "Library",
@@ -10852,7 +11778,6 @@
     "ListEvaluationRunRecordsResponse",
     "ListEvaluationRunsResponse",
     "ListFilesResponse",
-    "ListJudgesResponse",
     "ListLibrariesResponse",
     "ListManagedIndexesResponse",
     "ListOptimizationTrialsResponse",
@@ -10860,6 +11785,7 @@
     "ListOrganizationsResponse",
     "ListPromptVersionsResponse",
     "ListPromptsResponse",
+    "ListScorersResponse",
     "ListServiceAccountRolesResponse",
     "ListServiceAccountsResponse",
     "ListSharingResponse",
@@ -10870,6 +11796,8 @@
     "ListWorkflowEventResponse",
     "ListWorkflowEventResponseEventsItems",
     "ListWorkspacesResponse",
+    "LlmJudgeConfig",
+    "LlmJudgeParams",
     "LlmJudgeReference",
     "LocationType",
     "LoggingCapability",
@@ -10913,13 +11841,10 @@
     "McpServerIconTheme",
     "McpServerRemoteType",
     "McpuiToolMetaVisibilityItems",
+    "MemberStatus",
     "MemberSubscriptionOUT",
     "MemberSubscriptionOutPlan",
     "MemberWorkspaceInfo",
-    "MemberWorkspaceInfoRawRole",
-    "MemberWorkspaceInfoRawRoles",
-    "MemberWorkspaceInfoRawRoles0",
-    "MemberWorkspaceInfoRawRoles1",
     "MessageEntries",
     "MessageEntriesItems",
     "MessageInputContentChunks",
@@ -10973,8 +11898,6 @@
     "NearestNeighbourRetrieverFilterDiscriminatorMappingRangeGte",
     "NearestNeighbourRetrieverFilterDiscriminatorMappingRangeLt",
     "NearestNeighbourRetrieverFilterDiscriminatorMappingRangeLte",
-    "NestedGroupRef",
-    "NestedGroupsOut",
     "NetworkEncodedInput",
     "NewUsageLimitIN",
     "NoneAuthMethod",
@@ -11025,6 +11948,9 @@
     "OcrRequestPages",
     "OcrRequestTableFormat",
     "OcrTableObjectFormat",
+    "OpenApiFileSource",
+    "OpenApiSpecSource",
+    "OpenApiUrlSource",
     "Optimization",
     "OptimizationDetail",
     "OptimizationReference",
@@ -11044,10 +11970,6 @@
     "OrganizationInviteInRoles0",
     "OrganizationInviteInRoles1",
     "OrganizationInviteOUT",
-    "OrganizationInviteOutRawRole",
-    "OrganizationInviteOutRawRoles",
-    "OrganizationInviteOutRawRoles0",
-    "OrganizationInviteOutRawRoles1",
     "OrganizationInvitesCreateOUT",
     "OrganizationMemberCreate",
     "OrganizationMemberCreateRole",
@@ -11057,14 +11979,14 @@
     "OrganizationMemberCreateRoles0",
     "OrganizationMemberCreateRoles1",
     "OrganizationUserInviteOUT",
-    "OrganizationUserInviteOutRole",
-    "OrganizationUserInviteOutRoles",
-    "OrganizationUserInviteOutRoles0",
-    "OrganizationUserInviteOutRoles1",
     "OrganizationUsersCreateOUT",
+    "OtelEnumFieldDefinition",
+    "OtelEnumFieldDefinitionSupportedOperatorsItems",
     "OtelFieldDefinition",
     "OtelFieldDefinitionSupportedOperatorsItems",
     "OtelFieldDefinitionType",
+    "OtelFloatFieldDefinition",
+    "OtelFloatFieldDefinitionSupportedOperatorsItems",
     "OutputContentChunks",
     "PaginatedConnectors",
     "PaginatedResultDatasetImportTask",
@@ -11074,16 +11996,17 @@
     "PaginatedResultEvaluationRunV2Response",
     "PaginatedResultEvaluationRunV2WithRefsResponse",
     "PaginatedResultEvaluationV2",
-    "PaginatedResultJudgePreview",
     "PaginatedResultOptimization",
     "PaginatedResultOptimizationTrialWithObservations",
     "PaginatedResultPipeline",
     "PaginatedResultProject",
+    "PaginatedResultScorerSummary",
     "PaginationInfo",
     "PaginationResponse",
     "PartialScheduleDefinition",
     "PercentileStatisticSpec",
     "PercentileStatisticSpecPercentile",
+    "PhoneDestination",
     "Pipeline",
     "PipelineConfig",
     "PipelineConfigDefinition",
@@ -11113,11 +12036,6 @@
     "PromptVersion",
     "PromptsCapability",
     "PublicAuthenticationMethod",
-    "PublicConnectionConfig",
-    "PublicConnectorExecutionData",
-    "PublicExecutionConnectionConfig",
-    "PublicExecutionConnector",
-    "PublicExecutionEnv",
     "PublicResourceVisibility",
     "QueryDefinition",
     "QueryInvocationBody",
@@ -11130,6 +12048,9 @@
     "RangeLt",
     "RangeLte",
     "RateLimitsOUT",
+    "RawAudio",
+    "RawAudioData",
+    "ReactivateUserOUT",
     "ReadRequest",
     "ReasoningEffort",
     "RecordSortField",
@@ -11188,6 +12109,7 @@
     "ResponsesError",
     "ResponsesErrorCode",
     "ResponsesErrorEvent",
+    "ResponsesErrorReason",
     "ResponsesFailedEvent",
     "ResponsesFormatJSONObject",
     "ResponsesFormatText",
@@ -11228,6 +12150,8 @@
     "ResponsesMessageContentItems",
     "ResponsesMessageRole",
     "ResponsesMessageStatus",
+    "ResponsesMisalignment",
+    "ResponsesMisalignmentSteer",
     "ResponsesNamespaceTool",
     "ResponsesNamespaceToolToolsItems",
     "ResponsesOutputItemAddedEvent",
@@ -11246,6 +12170,7 @@
     "ResponsesOutputTokensDetails",
     "ResponsesPartReasoningText",
     "ResponsesPromptCacheBreakpoint",
+    "ResponsesPromptCacheBreakpointTtl",
     "ResponsesReasoningItem",
     "ResponsesReasoningItemStatus",
     "ResponsesReasoningTextDeltaEvent",
@@ -11301,6 +12226,7 @@
     "RrfRetrieverRetrieversItemsDiscriminatorMappingKeywordFilterDiscriminatorMappingRangeGte",
     "RrfRetrieverRetrieversItemsDiscriminatorMappingKeywordFilterDiscriminatorMappingRangeLt",
     "RrfRetrieverRetrieversItemsDiscriminatorMappingKeywordFilterDiscriminatorMappingRangeLte",
+    "RrfRetrieverRetrieversItemsDiscriminatorMappingKeywordOperator",
     "RrfRetrieverRetrieversItemsDiscriminatorMappingNearestNeighbourFilter",
     "RrfRetrieverRetrieversItemsDiscriminatorMappingNearestNeighbourFilterDiscriminatorMappingAndMatchesItems",
     "RrfRetrieverRetrieversItemsDiscriminatorMappingNearestNeighbourFilterDiscriminatorMappingEqualValue",
@@ -11352,6 +12278,10 @@
     "ScoreFilterValue",
     "ScoreOperator",
     "ScoreSortInput",
+    "Scorer",
+    "ScorerKind",
+    "ScorerSummary",
+    "ScorerVersion",
     "SearchAllEvaluationRunsResponse",
     "SearchChunkResponse",
     "SearchHitResponse",
@@ -11367,6 +12297,7 @@
     "SearchRequestRetrieverDiscriminatorMappingKeywordFilterDiscriminatorMappingRangeGte",
     "SearchRequestRetrieverDiscriminatorMappingKeywordFilterDiscriminatorMappingRangeLt",
     "SearchRequestRetrieverDiscriminatorMappingKeywordFilterDiscriminatorMappingRangeLte",
+    "SearchRequestRetrieverDiscriminatorMappingKeywordOperator",
     "SearchRequestRetrieverDiscriminatorMappingNearestNeighbourFilter",
     "SearchRequestRetrieverDiscriminatorMappingNearestNeighbourFilterDiscriminatorMappingAndMatchesItems",
     "SearchRequestRetrieverDiscriminatorMappingNearestNeighbourFilterDiscriminatorMappingEqualValue",
@@ -11398,6 +12329,7 @@
     "SearchRequestRetrieverDiscriminatorMappingRrfRetrieversItemsDiscriminatorMappingKeywordFilterDiscriminatorMappingRangeGte",
     "SearchRequestRetrieverDiscriminatorMappingRrfRetrieversItemsDiscriminatorMappingKeywordFilterDiscriminatorMappingRangeLt",
     "SearchRequestRetrieverDiscriminatorMappingRrfRetrieversItemsDiscriminatorMappingKeywordFilterDiscriminatorMappingRangeLte",
+    "SearchRequestRetrieverDiscriminatorMappingRrfRetrieversItemsDiscriminatorMappingKeywordOperator",
     "SearchRequestRetrieverDiscriminatorMappingRrfRetrieversItemsDiscriminatorMappingNearestNeighbourFilter",
     "SearchRequestRetrieverDiscriminatorMappingRrfRetrieversItemsDiscriminatorMappingNearestNeighbourFilterDiscriminatorMappingAndMatchesItems",
     "SearchRequestRetrieverDiscriminatorMappingRrfRetrieversItemsDiscriminatorMappingNearestNeighbourFilterDiscriminatorMappingEqualValue",
@@ -11416,7 +12348,6 @@
     "ServiceAccount",
     "ServiceAccountRole",
     "ServiceTier",
-    "SetNestedGroupsIn",
     "SetServiceAccountRolesRequest",
     "ShareEnum",
     "ShareRelation",
@@ -11429,6 +12360,7 @@
     "SignalWorkflowResponse",
     "SimpleNumericStatisticSpec",
     "SimpleNumericStatisticSpecKind",
+    "SipDestination",
     "Skill",
     "SkillAssetContent",
     "SkillAssetContent0",
@@ -11445,17 +12377,25 @@
     "SpanDatasetSourceReference",
     "SpanEvaluationsRequest",
     "SpansRequest",
+    "SpeechAssistantTurn",
     "SpeechOutputFormat",
     "SpeechRequest",
+    "SpeechRequestConversationHistoryItems",
     "SpeechRequestRefAudio",
+    "SpeechStreamAudioDelta",
+    "SpeechStreamDone",
+    "SpeechUserTurn",
     "StaticOrganizationRoles",
+    "StaticToolFiller",
     "StaticWorkspaceRoles",
     "StreamError",
     "StreamEventSseErrorData",
     "StreamEventSsePayload",
     "StreamEventSsePayloadData",
     "StreamEventWorkflowContext",
+    "StreamingDelayRange",
     "SubscriptionStatus",
+    "SummaryStatus",
     "SystemFilter",
     "SystemMessage",
     "SystemMessageContent",
@@ -11556,6 +12496,19 @@
     "TranscriptionStreamLanguage",
     "TranscriptionStreamSegmentDelta",
     "TranscriptionStreamTextDelta",
+    "TransferCallTool",
+    "TransferCallToolFiller",
+    "TransferCallToolFillerDiscriminatorMappingGeneratedFallback",
+    "TransferTarget",
+    "TransferTargetDestination",
+    "Trigger",
+    "TriggerAction",
+    "TriggerActionType",
+    "TriggerEvent",
+    "TriggerEventList",
+    "TriggerHandler",
+    "TriggerStatusValue",
+    "TriggersOwnerType",
     "TurbineMeta",
     "TurbineToolLocale",
     "TurbineToolMeta",
@@ -11576,8 +12529,6 @@
     "UpdateHttpConnectorRequestAuthMethodsItems0",
     "UpdateInvocationBody",
     "UpdateInvocationBodyInput",
-    "UpdateJudgeRequest",
-    "UpdateJudgeRequestOutput",
     "UpdateLibraryRequest",
     "UpdateManagedIndexRequest",
     "UpdateMetricsRequestDeploymentMetricsOffline",
@@ -11587,6 +12538,8 @@
     "UpdatePipelineRequest",
     "UpdateRunInfo",
     "UpdateServiceAccountRequest",
+    "UpdateSummaryRequestSummary",
+    "UpdateSummaryRequestSummaryStatus",
     "UpdateWorkflowResponse",
     "UpdateWorkspaceIN",
     "UrlElicitationCapability",
@@ -11616,6 +12569,7 @@
     "UserWorkspace",
     "V1AdminAnalyticsVibeWorkUsageByTimeStatsGetParametersGranularitySchema",
     "V1AdminAuditLogsGetParametersSort",
+    "V1AdminUserGroupsGetParametersRoleSchema",
     "V1AgentsAgentIdGetParametersAgentVersionSchema",
     "V1AudioVoicesGetParametersType",
     "V1BatchJobsGetParametersOrderBy",
@@ -11655,10 +12609,13 @@
     "V1ConnectorsConnectorIdOrNameWorkspaceCredentialsGetParametersConnectorIdOrName",
     "V1ConnectorsPostRequestBodyContentApplicationJsonSchemaDiscriminatorMappingHttpAuthMethodsItems",
     "V1ConnectorsPostRequestBodyContentApplicationJsonSchemaDiscriminatorMappingMcpAuthMethodsItems",
+    "V1ContextSearchIndexesIndexNameSearchPostResponsesContentApplicationJsonSchemaItems",
+    "V1ContextSearchIndexesIndexNameSummaryFieldLanguageGetParametersLanguage",
+    "V1ContextSearchIndexesIndexNameSummaryFieldLanguagePostParametersLanguage",
+    "V1ContextSearchIndexesIndexNameSummaryFieldLanguagePutParametersLanguage",
     "V1ConversationsGetResponsesContentApplicationJsonSchemaItems",
     "V1FilesPostRequestBodyContentMultipartFormDataSchemaVisibility",
     "V1FimCompletionsPostRequestBodyContentApplicationJsonSchemaStop",
-    "V1RagManagedIndexesIndexNameSearchPostResponsesContentApplicationJsonSchemaItems",
     "V1WorkflowsDeploymentsGetParametersOrder",
     "V1WorkflowsDeploymentsGetParametersOrderBySchema",
     "V1WorkflowsDeploymentsNameLogsGetParametersOrder",
@@ -11704,6 +12661,43 @@
     "VibeWorkByUserStat",
     "VibeWorkByUserStatsOUT",
     "VibeWorkspaceStatsOUT",
+    "VoiceAgentCustomConnector",
+    "VoiceAgentCustomConnectorAuthorization",
+    "VoiceAgentCustomConnectorFiller",
+    "VoiceAgentCustomConnectorFillerDiscriminatorMappingGeneratedFallback",
+    "VoiceAgentCustomConnectorType",
+    "VoiceAgentDocumentLibraryTool",
+    "VoiceAgentDocumentLibraryToolFiller",
+    "VoiceAgentDocumentLibraryToolFillerDiscriminatorMappingGeneratedFallback",
+    "VoiceAgentDocumentLibraryToolType",
+    "VoiceAgentErrorEvent",
+    "VoiceAgentErrorEventSource",
+    "VoiceAgentEvent",
+    "VoiceAgentEventDiscriminatorMappingAgentStateChangedOldState",
+    "VoiceAgentEventDiscriminatorMappingAgentStateChangedState",
+    "VoiceAgentEventDiscriminatorMappingErrorSource",
+    "VoiceAgentEventDiscriminatorMappingToolCallEndedStatus",
+    "VoiceAgentEventDiscriminatorMappingTranscriptionSegmentRole",
+    "VoiceAgentFunctionTool",
+    "VoiceAgentFunctionToolFiller",
+    "VoiceAgentFunctionToolFillerDiscriminatorMappingGeneratedFallback",
+    "VoiceAgentFunctionToolRequest",
+    "VoiceAgentFunctionToolRequestFiller",
+    "VoiceAgentFunctionToolRequestFillerDiscriminatorMappingGeneratedFallback",
+    "VoiceAgentFunctionToolRequestType",
+    "VoiceAgentFunctionToolType",
+    "VoiceAgentStateChangedEvent",
+    "VoiceAgentStateChangedEventOldState",
+    "VoiceAgentStateChangedEventState",
+    "VoiceAgentToolCallEndedEvent",
+    "VoiceAgentToolCallEndedEventStatus",
+    "VoiceAgentToolCallStartedEvent",
+    "VoiceAgentTranscriptEvent",
+    "VoiceAgentTranscriptEventRole",
+    "VoiceAgentWebSearchTool",
+    "VoiceAgentWebSearchToolFiller",
+    "VoiceAgentWebSearchToolFillerDiscriminatorMappingGeneratedFallback",
+    "VoiceAgentWebSearchToolType",
     "VoiceCreateRequest",
     "VoiceGender",
     "VoiceKind",
@@ -11716,6 +12710,11 @@
     "WebSearchPremiumToolType",
     "WebSearchTool",
     "WebSearchToolType",
+    "Webhook",
+    "WebhookProvider",
+    "WebhookSignatureEncoding",
+    "WebhookSignatureHashAlgorithm",
+    "WebhookSigningSecret",
     "WhoamiOrganization",
     "WhoamiResponse",
     "WhoamiResponsePrincipal",
@@ -11771,6 +12770,7 @@
     "WorkflowScheduleResponse",
     "WorkflowScheduleTriggerRequest",
     "WorkflowScheduleUpdateRequest",
+    "WorkflowTagsAddRequest",
     "WorkflowTaskFailedAttributes",
     "WorkflowTaskFailedResponse",
     "WorkflowTaskTimedOutAttributes",
@@ -11794,6 +12794,7 @@
     "beta_connectors_connector_create_v1_Request",
     "beta_connectors_connector_list_tools_v1_Response_200",
     "beta_connectors_connector_update_v1_Request",
+    "beta_context_search_indexes_generate_managed_index_summary_post_v1_context_search_indexes__index_name__summary_field__language__post_Response_200",
     "beta_conversations_agents_api_v1_conversations_get_Response_200",
     "beta_rag_search_indexes_update_index_metrics_v1_rag_deployments__deployment_id__metrics_put_Request",
     "events_get_stream_events_v1_workflows_events_stream_get_Response_200",
@@ -11806,16 +12807,10 @@
     "workflows_executions_stream_v1_workflows_executions__execution_id__stream_get_Response_200",
     "workflows_executions_stream_workflow_execution_logs_Response_200"
   ],
-  "published_operation_count": 321,
+  "published_operation_count": 347,
   "schema_version": 1,
-  "source_operation_count": 321,
-  "type_policy": [
-    {
-      "public_name": "JudgeOutputConfig",
-      "representation": null,
-      "source_schema": "#/components/schemas/Judge/properties/output"
-    }
-  ],
+  "source_operation_count": 347,
+  "type_policy": [],
   "verification": {
     "closure_missing_type_ids": [],
     "missing_public_methods": [],

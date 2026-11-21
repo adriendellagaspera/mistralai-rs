@@ -9,9 +9,10 @@ pub struct OrganizationUserInviteOut {
     #[serde(default)]
     pub invite_uuid: String,
     /// Deprecated single invite role. Use 'roles' instead.
-    pub role: OrganizationUserInviteOutRole,
+    pub role: StaticOrganizationRoles,
     /// Organization roles assigned by the invite.
-    pub roles: OrganizationUserInviteOutRoles,
+    #[serde(default)]
+    pub roles: Vec<StaticOrganizationRoles>,
 }
 
 impl OrganizationUserInviteOut {
@@ -25,8 +26,8 @@ impl OrganizationUserInviteOut {
 pub struct OrganizationUserInviteOutBuilder {
     email: Option<String>,
     invite_uuid: Option<String>,
-    role: Option<OrganizationUserInviteOutRole>,
-    roles: Option<OrganizationUserInviteOutRoles>,
+    role: Option<StaticOrganizationRoles>,
+    roles: Option<Vec<StaticOrganizationRoles>>,
 }
 
 impl OrganizationUserInviteOutBuilder {
@@ -40,12 +41,12 @@ impl OrganizationUserInviteOutBuilder {
         self
     }
 
-    pub fn role(mut self, value: OrganizationUserInviteOutRole) -> Self {
+    pub fn role(mut self, value: StaticOrganizationRoles) -> Self {
         self.role = Some(value);
         self
     }
 
-    pub fn roles(mut self, value: OrganizationUserInviteOutRoles) -> Self {
+    pub fn roles(mut self, value: Vec<StaticOrganizationRoles>) -> Self {
         self.roles = Some(value);
         self
     }

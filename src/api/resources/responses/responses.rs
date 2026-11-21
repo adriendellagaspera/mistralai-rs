@@ -15,7 +15,7 @@ impl ResponsesClient {
 
     /// Create a response.
     ///
-    /// Generate a model response from text or image inputs. The response can
+    /// Generate a model response from text, image, or file inputs. The response can
     /// include text, reasoning, and function calls. Set stream to true to
     /// receive Server-Sent Events.
     ///

@@ -11,6 +11,7 @@ pub struct SkillsListQueryRequest {
     pub page_token: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alias: Option<String>,
+    /// Projection over each listed Skill. definition.description is the only definition path a list accepts; body and assets are read one skill at a time with GetSkill.
     #[serde(default)]
     pub fields: Vec<Option<String>>,
     /// Defaults to created_at when omitted.

@@ -2,6 +2,9 @@
   "schema_version": 1,
   "client": "Mistral",
   "operations": {
+    "add_workflow_tags_v1_workflows__workflow_identifier__tags_post": [
+      "workflows.add_workflow_tags"
+    ],
     "agents_api_v1_agents_create": [
       "beta.agents.create"
     ],
@@ -102,6 +105,12 @@
     "batch_terminate_workflow_executions_v1_workflows_executions_terminate_post": [
       "workflows.executions.batch_terminate_workflow_executions"
     ],
+    "billing_api_public_get_budget": [
+      "beta.billing.get_budget"
+    ],
+    "billing_api_public_get_subscription": [
+      "beta.billing.get_subscription"
+    ],
     "bulk_archive_workflows_v1_workflows_archive_put": [
       "workflows.bulk_archive_workflows"
     ],
@@ -198,6 +207,9 @@
     "count_input_tokens_v1_responses_input_tokens_post": [
       "responses.count_input_tokens"
     ],
+    "create_agent_v1_audio_agents_post": [
+      "audio.agents.create"
+    ],
     "create_client_session_v1_client_sessions_post": [
       "realtime.sessions.create"
     ],
@@ -210,8 +222,8 @@
     "create_deployment_v1_workflows_deployments_post": [
       "workflows.deployments.create_deployment"
     ],
-    "create_judge_v1_observability_judges_post": [
-      "beta.observability.judges.create"
+    "create_index_v1_context_search_indexes_post": [
+      "beta.context.search_indexes.create"
     ],
     "create_pipeline_v1_observability_pipelines_post": [
       "beta.observability.evaluations.create_pipeline"
@@ -219,11 +231,26 @@
     "create_response_v1_responses_post": [
       "responses.create"
     ],
+    "create_scorer_v1_observability_scorers_post": [
+      "beta.observability.evaluations.scorers.create"
+    ],
     "create_service_account_v1_service_accounts_post": [
       "beta.service_accounts.create"
     ],
+    "create_session_v1_audio_sessions_post": [
+      "audio.sessions.create"
+    ],
+    "create_trigger_v1_triggers_post": [
+      "beta.triggers.create"
+    ],
     "create_voice_v1_audio_voices_post": [
       "audio.voices.create"
+    ],
+    "create_webhook_v1_webhooks_post": [
+      "beta.webhooks.create"
+    ],
+    "delete_agent_v1_audio_agents__agent_id__delete": [
+      "audio.agents.delete"
     ],
     "delete_dataset_record_v1_observability_dataset_records__dataset_record_id__delete": [
       "beta.observability.datasets.records.delete"
@@ -237,8 +264,11 @@
     "delete_deployment_v1_workflows_deployments__name__delete": [
       "workflows.deployments.delete_deployment"
     ],
-    "delete_judge_v1_observability_judges__judge_id__delete": [
-      "beta.observability.judges.delete"
+    "delete_documents_v1_context_search_indexes__index_name__documents_delete": [
+      "beta.context.search_indexes.delete_documents"
+    ],
+    "delete_index_v1_context_search_indexes__index_name__delete": [
+      "beta.context.search_indexes.delete"
     ],
     "delete_model_v1_models__model_id__delete": [
       "models.delete"
@@ -249,8 +279,20 @@
     "delete_service_account_v1_service_accounts__service_account_id__delete": [
       "beta.service_accounts.delete"
     ],
+    "delete_session_v1_audio_sessions__session_id__delete": [
+      "audio.sessions.close"
+    ],
+    "delete_trigger_v1_triggers__trigger_id__delete": [
+      "beta.triggers.delete"
+    ],
     "delete_voice_v1_audio_voices__voice_id__delete": [
       "audio.voices.delete"
+    ],
+    "delete_webhook_v1_webhooks__webhook_id__delete": [
+      "beta.webhooks.delete"
+    ],
+    "edit_scorer_v1_observability_scorers__scorer_slug__patch": [
+      "beta.observability.evaluations.scorers.update"
     ],
     "embeddings_v1_embeddings_post": [
       "embeddings.create"
@@ -286,6 +328,15 @@
       "fim.complete",
       "fim.stream"
     ],
+    "generate_managed_index_summary_post_v1_context_search_indexes__index_name__summary_field__language__post": [
+      "beta.context.search_indexes.generate_index_summary"
+    ],
+    "get_agent_v1_audio_agents__agent_id__get": [
+      "audio.agents.get"
+    ],
+    "get_chunk_index_v1_context_search_indexes__index_name__chunks__chunk_id__get": [
+      "beta.context.search_indexes.get_chunk"
+    ],
     "get_configs_v1_rag_ingestion_pipeline_configurations_get": [
       "beta.rag.ingestion_pipeline_configurations.list"
     ],
@@ -307,6 +358,9 @@
     "get_datasets_v1_observability_datasets_get": [
       "beta.observability.datasets.list"
     ],
+    "get_deployment_archive_v1_workflows_deployments__name__archive_get": [
+      "workflows.deployments.get_deployment_archive"
+    ],
     "get_deployment_logs": [
       "workflows.deployments.get_deployment_logs"
     ],
@@ -325,11 +379,8 @@
     "get_evaluation_v2_v1_observability_evaluations_v2__evaluation_slug__get": [
       "beta.observability.evaluations.get"
     ],
-    "get_judge_by_id_v1_observability_judges__judge_id__get": [
-      "beta.observability.judges.fetch"
-    ],
-    "get_judges_v1_observability_judges_get": [
-      "beta.observability.judges.list"
+    "get_index_v1_context_search_indexes__index_name__get": [
+      "beta.context.search_indexes.get"
     ],
     "get_log_field_options_v1_observability_logs_fields__field_name__options_get": [
       "beta.observability.logs.fetch_options"
@@ -337,8 +388,14 @@
     "get_log_fields_v1_observability_logs_fields_get": [
       "beta.observability.logs.list"
     ],
+    "get_managed_index_summary_v1_context_search_indexes__index_name__summary_field__language__get": [
+      "beta.context.search_indexes.get_index_summary"
+    ],
     "get_optimization_v1_observability_optimizations__optimization_id__get": [
       "beta.observability.evaluations.optimizations.get"
+    ],
+    "get_pipeline_result_fields_v1_observability_pipelines__pipeline_id__results_fields_get": [
+      "beta.observability.spans.list_pipeline_result_fields"
     ],
     "get_pipeline_v1_observability_pipelines__pipeline_id__get": [
       "beta.observability.evaluations.get_pipeline"
@@ -364,8 +421,14 @@
     "get_schedules_v1_workflows_schedules_get": [
       "workflows.schedules.get_schedules"
     ],
+    "get_scorer_v1_observability_scorers__scorer_slug__get": [
+      "beta.observability.evaluations.scorers.get"
+    ],
     "get_service_account_v1_service_accounts__service_account_id__get": [
       "beta.service_accounts.get"
+    ],
+    "get_session_v1_audio_sessions__session_id__get": [
+      "audio.sessions.get"
     ],
     "get_single_evaluation_run_statistics_v2_v1_observability_evaluation_runs_v2__run_id__statistics_get": [
       "beta.observability.evaluations.runs.get_statistics"
@@ -401,11 +464,20 @@
     "get_trace_spans_v1_observability_traces__trace_id__spans_get": [
       "beta.observability.traces.get_trace_spans"
     ],
+    "get_trigger_v1_triggers__trigger_id__get": [
+      "beta.triggers.get"
+    ],
     "get_voice_sample_audio_v1_audio_voices__voice_id__sample_get": [
       "audio.voices.get_sample_audio"
     ],
     "get_voice_v1_audio_voices__voice_id__get": [
       "audio.voices.get"
+    ],
+    "get_webhook_signing_secret_v1_webhooks__webhook_id__signing_secret_get": [
+      "beta.webhooks.get_signing_secret"
+    ],
+    "get_webhook_v1_webhooks__webhook_id__get": [
+      "beta.webhooks.get"
     ],
     "get_workflow_events_v1_workflows_events_list_get": [
       "events.get_workflow_events",
@@ -447,6 +519,12 @@
     "get_workflows_v1_workflows_get": [
       "workflows.get_workflows"
     ],
+    "grep_index_v1_context_search_indexes__index_name__grep_post": [
+      "beta.context.search_indexes.grep"
+    ],
+    "ingest_documents_v1_context_search_indexes__index_name__documents_post": [
+      "beta.context.search_indexes.ingest_documents"
+    ],
     "jobs_api_routes_batch_cancel_batch_job": [
       "batch.jobs.cancel"
     ],
@@ -470,12 +548,6 @@
     ],
     "jobs_api_routes_fine_tuning_update_fine_tuned_model": [
       "models.update"
-    ],
-    "judge_conversation_v1_observability_judges__judge_id__live_judging_post": [
-      "beta.observability.judges.judge_conversation"
-    ],
-    "judge_dataset_record_v1_observability_dataset_records__dataset_record_id__live_judging_post": [
-      "beta.observability.datasets.records.judge"
     ],
     "libraries_create_v1": [
       "beta.libraries.create"
@@ -537,6 +609,15 @@
     "libraries_update_v1": [
       "beta.libraries.libraries_update_v1"
     ],
+    "list_agent_sessions_v1_audio_agents__agent_id__sessions_get": [
+      "audio.agents.list_sessions"
+    ],
+    "list_agent_versions_v1_audio_agents__agent_id__versions_get": [
+      "audio.agents.list_versions"
+    ],
+    "list_agents_v1_audio_agents_get": [
+      "audio.agents.list"
+    ],
     "list_assignable_service_account_roles_v1_service_accounts_assignable_roles_get": [
       "beta.service_accounts.list_assignable_roles"
     ],
@@ -545,6 +626,9 @@
     ],
     "list_deployments_v1_workflows_deployments_get": [
       "workflows.deployments.list_deployments"
+    ],
+    "list_indexes_v1_context_search_indexes_get": [
+      "beta.context.search_indexes.list"
     ],
     "list_models_v1_models_get": [
       "models.list"
@@ -561,17 +645,32 @@
     "list_runs_v1_workflows_runs_get": [
       "workflows.runs.list_runs"
     ],
+    "list_scorers_v1_observability_scorers_get": [
+      "beta.observability.evaluations.scorers.list"
+    ],
     "list_service_account_roles_v1_service_accounts__service_account_id__roles_get": [
       "beta.service_accounts.list_roles"
     ],
     "list_service_accounts_v1_service_accounts_get": [
       "beta.service_accounts.list"
     ],
+    "list_trigger_events_v1_triggers__trigger_id__events_get": [
+      "beta.triggers.list_events"
+    ],
+    "list_triggers_v1_triggers_get": [
+      "beta.triggers.list"
+    ],
     "list_voices_v1_audio_voices_get": [
       "audio.voices.list"
     ],
+    "list_webhooks_v1_webhooks_get": [
+      "beta.webhooks.list"
+    ],
     "moderations_v1_moderations_post": [
       "classifiers.moderate"
+    ],
+    "navigate_index_v1_context_search_indexes__index_name__navigate_post": [
+      "beta.context.search_indexes.navigate"
     ],
     "ocr_v1_ocr_post": [
       "ocr.process"
@@ -621,6 +720,9 @@
     "query_workflow_execution_v1_workflows_executions__execution_id__queries_post": [
       "workflows.executions.query_workflow_execution"
     ],
+    "read_index_v1_context_search_indexes__index_name__read_post": [
+      "beta.context.search_indexes.read"
+    ],
     "register_config_v1_rag_ingestion_pipeline_configurations_put": [
       "beta.rag.ingestion_pipeline_configurations.register"
     ],
@@ -651,6 +753,9 @@
     "search_evaluation_runs_v2_v1_observability_evaluations_v2__evaluation_slug__runs_search_post": [
       "beta.observability.evaluations.runs.search"
     ],
+    "search_index_v1_context_search_indexes__index_name__search_post": [
+      "beta.context.search_indexes.search"
+    ],
     "search_latest_span_evaluations_v1_observability_spans_evaluations_search_latest_post": [
       "beta.observability.spans.search_latest_span_evaluations"
     ],
@@ -668,6 +773,9 @@
     ],
     "search_traces_v1_observability_traces_search_post": [
       "beta.observability.traces.search"
+    ],
+    "set_managed_index_summary_v1_context_search_indexes__index_name__summary_field__language__put": [
+      "beta.context.search_indexes.set_index_summary"
     ],
     "set_service_account_roles_v1_service_accounts__service_account_id__roles_put": [
       "beta.service_accounts.set_roles"
@@ -738,6 +846,9 @@
     "unschedule_workflow_v1_workflows_schedules__schedule_id__delete": [
       "workflows.schedules.unschedule_workflow"
     ],
+    "update_agent_v1_audio_agents__agent_id__put": [
+      "audio.agents.update"
+    ],
     "update_dataset_record_payload_v1_observability_dataset_records__dataset_record_id__payload_put": [
       "beta.observability.datasets.records.update_payload"
     ],
@@ -753,8 +864,8 @@
     "update_index_metrics_v1_rag_deployments__deployment_id__metrics_put": [
       "beta.rag.search_indexes.update_index_metrics"
     ],
-    "update_judge_v1_observability_judges__judge_id__put": [
-      "beta.observability.judges.update"
+    "update_index_v1_context_search_indexes__index_name__put": [
+      "beta.context.search_indexes.update"
     ],
     "update_pipeline_v1_observability_pipelines__pipeline_id__put": [
       "beta.observability.evaluations.update_pipeline"
@@ -767,6 +878,9 @@
     ],
     "update_service_account_v1_service_accounts__service_account_id__patch": [
       "beta.service_accounts.update"
+    ],
+    "update_session_v1_audio_sessions__session_id__patch": [
+      "audio.sessions.update"
     ],
     "update_voice_v1_audio_voices__voice_id__patch": [
       "audio.voices.update"

@@ -11,10 +11,14 @@ pub struct SystemV2 {
     pub deleted_at: Option<DateTime<FixedOffset>>,
     #[serde(default)]
     pub id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub kind: Option<String>,
     #[serde(default)]
     pub name: String,
     #[serde(default)]
     pub params: HashMap<String, SystemV2ParamsValue>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub spec: Option<HashMap<String, Option<JsonValue>>>,
     #[serde(default)]
     #[serde(with = "crate::core::flexible_datetime::offset")]
     pub updated_at: DateTime<FixedOffset>,
@@ -32,8 +36,10 @@ pub struct SystemV2Builder {
     created_at: Option<DateTime<FixedOffset>>,
     deleted_at: Option<DateTime<FixedOffset>>,
     id: Option<String>,
+    kind: Option<String>,
     name: Option<String>,
     params: Option<HashMap<String, SystemV2ParamsValue>>,
+    spec: Option<HashMap<String, Option<JsonValue>>>,
     updated_at: Option<DateTime<FixedOffset>>,
 }
 
@@ -53,6 +59,11 @@ impl SystemV2Builder {
         self
     }
 
+    pub fn kind(mut self, value: impl Into<String>) -> Self {
+        self.kind = Some(value.into());
+        self
+    }
+
     pub fn name(mut self, value: impl Into<String>) -> Self {
         self.name = Some(value.into());
         self
@@ -60,6 +71,11 @@ impl SystemV2Builder {
 
     pub fn params(mut self, value: HashMap<String, SystemV2ParamsValue>) -> Self {
         self.params = Some(value);
+        self
+    }
+
+    pub fn spec(mut self, value: HashMap<String, Option<JsonValue>>) -> Self {
+        self.spec = Some(value);
         self
     }
 
@@ -82,10 +98,12 @@ impl SystemV2Builder {
                 .ok_or_else(|| BuildError::missing_field("created_at"))?,
             deleted_at: self.deleted_at,
             id: self.id.ok_or_else(|| BuildError::missing_field("id"))?,
+            kind: self.kind,
             name: self.name.ok_or_else(|| BuildError::missing_field("name"))?,
             params: self
                 .params
                 .ok_or_else(|| BuildError::missing_field("params"))?,
+            spec: self.spec,
             updated_at: self
                 .updated_at
                 .ok_or_else(|| BuildError::missing_field("updated_at"))?,

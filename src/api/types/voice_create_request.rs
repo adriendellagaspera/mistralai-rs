@@ -9,7 +9,7 @@ pub struct VoiceCreateRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub gender: Option<String>,
+    pub gender: Option<VoiceGender>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub languages: Option<Vec<String>>,
     #[serde(default)]
@@ -22,8 +22,6 @@ pub struct VoiceCreateRequest {
     /// Original filename for extension detection
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sample_filename: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub slug: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<String>>,
 }
@@ -40,13 +38,12 @@ pub struct VoiceCreateRequestBuilder {
     age: Option<i64>,
     color: Option<String>,
     description: Option<String>,
-    gender: Option<String>,
+    gender: Option<VoiceGender>,
     languages: Option<Vec<String>>,
     name: Option<String>,
     retention_notice: Option<i64>,
     sample_audio: Option<String>,
     sample_filename: Option<String>,
-    slug: Option<String>,
     tags: Option<Vec<String>>,
 }
 
@@ -66,8 +63,8 @@ impl VoiceCreateRequestBuilder {
         self
     }
 
-    pub fn gender(mut self, value: impl Into<String>) -> Self {
-        self.gender = Some(value.into());
+    pub fn gender(mut self, value: VoiceGender) -> Self {
+        self.gender = Some(value);
         self
     }
 
@@ -96,11 +93,6 @@ impl VoiceCreateRequestBuilder {
         self
     }
 
-    pub fn slug(mut self, value: impl Into<String>) -> Self {
-        self.slug = Some(value.into());
-        self
-    }
-
     pub fn tags(mut self, value: Vec<String>) -> Self {
         self.tags = Some(value);
         self
@@ -120,7 +112,6 @@ impl VoiceCreateRequestBuilder {
             retention_notice: self.retention_notice,
             sample_audio: self.sample_audio,
             sample_filename: self.sample_filename,
-            slug: self.slug,
             tags: self.tags,
         })
     }
