@@ -47,7 +47,7 @@ from pathlib import Path
 
 root = Path(sys.argv[1])
 signatures = set()
-pattern = re.compile(r"(?m)^\s*pub(?:\([^)]*\))?\s+(?:async\s+)?fn\s+[A-Za-z0-9_]+")
+pattern = re.compile(r"(?m)^\s*pub\s+(?:async\s+)?fn\s+[A-Za-z0-9_]+")
 for path in root.rglob("*.rs"):
     source = path.read_text(errors="replace")
     for match in pattern.finditer(source):
