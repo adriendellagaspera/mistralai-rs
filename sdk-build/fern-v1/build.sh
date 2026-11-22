@@ -50,8 +50,8 @@ root = Path(sys.argv[1])
 names = set()
 for path in root.rglob("*.rs"):
     source = path.read_text(errors="replace")
-    names.update(re.findall(r"pub\\s+(?:struct|enum|type)\\s+([A-Za-z0-9_]*QueryRequest)\\b", source))
-Path(sys.argv[2]).write_text("\\n".join(sorted(names)) + ("\\n" if names else ""))
+    names.update(re.findall(r"pub\s+(?:struct|enum|type)\s+([A-Za-z0-9_]*QueryRequest)\b", source))
+Path(sys.argv[2]).write_text("\n".join(sorted(names)) + ("\n" if names else ""))
 print(f"{Path(sys.argv[2]).name}: {len(names)} public QueryRequest types")
 for name in sorted(names):
     print(name)
