@@ -168,7 +168,7 @@ jobs:
         env:
           POLICY: ${{ needs.policy.result }}
           GENERATION: ${{ needs.generation.result }}
-          GENERATION_V1: ${{ needs.generation-v1.result }}
+          GENERATION_V1: ${{ needs['generation-v1'].result }}
           FORMAT: ${{ needs.format.result }}
           LINT: ${{ needs.lint.result }}
           DEPENDENCIES: ${{ needs.dependencies.result }}
