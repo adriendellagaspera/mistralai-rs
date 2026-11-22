@@ -79,6 +79,8 @@ jobs:
           path: |
             sdk-build/fern-v1/query-types-*.txt
             sdk-build/fern-v1/query-types.diff
+            sdk-build/fern-v1/public-functions-*.txt
+            sdk-build/fern-v1/public-functions.diff
             sdk-build/fern-v1/fern-generate-*.log
             sdk-build/fern-v1/cargo-check-*.log
             sdk-build/fern-v1/resolution.json
