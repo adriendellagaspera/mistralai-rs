@@ -200,7 +200,7 @@ impl DocumentsClient {
     ///         .beta
     ///         .libraries
     ///         .documents
-    ///         .libraries_documents_update_v1(
+    ///         .rename(
     ///             &"library_id".to_string(),
     ///             &"document_id".to_string(),
     ///             &UpdateDocumentRequest {
@@ -211,7 +211,7 @@ impl DocumentsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn libraries_documents_update_v1(
+    pub async fn rename(
         &self,
         library_id: &str,
         document_id: &str,
