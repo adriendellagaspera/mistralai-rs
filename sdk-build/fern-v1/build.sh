@@ -36,7 +36,7 @@ PY
   rm -rf "$FERN_DIR/generated"
   (
     cd "$WORKSPACE"
-    fern generate --target rust --local --no-prompt --force --log-level info
+    fern generate --target rust --local --force --log-level info
   )
   test -f "$FERN_DIR/generated/Cargo.toml"
   cargo check --manifest-path "$FERN_DIR/generated/Cargo.toml" --all-features
