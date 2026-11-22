@@ -1,0 +1,25 @@
+schemaVersion: sdk-config/v1
+sdkName: Mistral AI
+sdkVersion: "0.5.0"
+source:
+  specs:
+    - id: mistral
+      type: openapi
+      path: openapi.json
+client:
+  requestParameterStyle: wrapped
+package:
+  description: "Unofficial asynchronous Rust SDK for Mistral AI"
+  repository: "https://github.com/adriendellagaspera/mistralai-rs"
+targets:
+  - language: rust
+    generatorVersion: "1.0.0"
+    package:
+      packageName: mistralai_sdk
+    generation:
+      naming:
+        clientName: Mistral
+        exportedClientName: Mistral
+    output:
+      delivery: files
+      path: generated
