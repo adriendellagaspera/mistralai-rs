@@ -1978,7 +1978,7 @@
       "operation_id": "libraries_documents_update_v1",
       "outcome": "published",
       "public_paths": [
-        "beta.libraries.documents.libraries_documents_update_v1"
+        "beta.libraries.documents.rename"
       ],
       "representation": null,
       "source_identity": "operationId:libraries_documents_update_v1"
@@ -5158,7 +5158,7 @@
       },
       {
         "public_paths": [
-          "beta.libraries.documents.libraries_documents_update_v1"
+          "beta.libraries.documents.rename"
         ],
         "source_identity": "operationId:libraries_documents_update_v1"
       },
@@ -10831,7 +10831,7 @@
     "beta.libraries.documents.extracted_text_signed_url",
     "beta.libraries.documents.get",
     "beta.libraries.documents.get_signed_url",
-    "beta.libraries.documents.libraries_documents_update_v1",
+    "beta.libraries.documents.rename",
     "beta.libraries.documents.list",
     "beta.libraries.documents.reprocess",
     "beta.libraries.documents.status",
