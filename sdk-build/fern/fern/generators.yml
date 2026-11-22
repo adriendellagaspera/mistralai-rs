@@ -1,6 +1,8 @@
 api:
   specs:
     - openapi: ./openapi.json
+      settings:
+        idiomatic-request-names: true
 
 default-group: rust-sdk
 
