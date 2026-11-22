@@ -67,7 +67,24 @@ jobs:
       - run: rustup show
       - run: npm install --global fern-api@5.226.1 # zizmor: ignore[adhoc-packages]
       - run: python3 -m pip install --disable-pip-version-check PyYAML==6.0.3
-      - run: bash sdk-build/fern-v1/build.sh
+      - name: Generate and compile both Fern v1 parameter styles
+        run: bash sdk-build/fern-v1/build.sh
+      - name: Preserve generated SDKs and audit outputs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: fern-v1-sdk-audit
+          if-no-files-found: warn
+          retention-days: 7
+          path: |
+            sdk-build/fern-v1/fern/generated-wrapped/
+            sdk-build/fern-v1/fern/generated-inline/
+            sdk-build/fern-v1/query-types-*.txt
+            sdk-build/fern-v1/query-types.diff
+            sdk-build/fern-v1/fern-generate-*.log
+            sdk-build/fern-v1/cargo-check-*.log
+            sdk-build/fern-v1/resolution.json
+            sdk-build/fern-v1/fern/openapi.json
 
   format:
     name: format
