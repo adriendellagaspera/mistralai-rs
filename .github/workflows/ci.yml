@@ -56,6 +56,19 @@ jobs:
       - run: python3 -m pip install --disable-pip-version-check PyYAML==6.0.3
       - run: bash sdk-build/fern/check.sh
 
+  generation-v1:
+    name: generation-v1
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: rustup show
+      - run: npm install --global fern-api@5.112.0 # zizmor: ignore[adhoc-packages]
+      - run: python3 -m pip install --disable-pip-version-check PyYAML==6.0.3
+      - run: bash sdk-build/fern-v1/build.sh
+
   format:
     name: format
     runs-on: ubuntu-24.04
@@ -147,7 +160,7 @@ jobs:
   gate:
     name: gate
     if: always()
-    needs: [policy, generation, format, lint, dependencies, tooling, test, docs, api]
+    needs: [policy, generation, generation-v1, format, lint, dependencies, tooling, test, docs, api]
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
@@ -155,6 +168,7 @@ jobs:
         env:
           POLICY: ${{ needs.policy.result }}
           GENERATION: ${{ needs.generation.result }}
+          GENERATION_V1: ${{ needs.generation-v1.result }}
           FORMAT: ${{ needs.format.result }}
           LINT: ${{ needs.lint.result }}
           DEPENDENCIES: ${{ needs.dependencies.result }}
@@ -163,6 +177,6 @@ jobs:
           DOCS: ${{ needs.docs.result }}
           API: ${{ needs.api.result }}
         run: |
-          for result in "$POLICY" "$GENERATION" "$FORMAT" "$LINT" "$DEPENDENCIES" "$TOOLING" "$TEST" "$DOCS" "$API"; do
+          for result in "$POLICY" "$GENERATION" "$GENERATION_V1" "$FORMAT" "$LINT" "$DEPENDENCIES" "$TOOLING" "$TEST" "$DOCS" "$API"; do
             test "$result" = success
           done
