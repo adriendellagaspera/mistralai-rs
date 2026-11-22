@@ -35,10 +35,10 @@ impl UsersClient {
     ///         ..Default::default()
     ///     };
     ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client.beta.users.users_api_get_identity(None).await;
+    ///     client.beta.users.get_identity(None).await;
     /// }
     /// ```
-    pub async fn users_api_get_identity(
+    pub async fn get_identity(
         &self,
         options: Option<RequestOptions>,
     ) -> Result<UserIdentity, ApiError> {
@@ -77,8 +77,8 @@ impl UsersClient {
     ///     client
     ///         .beta
     ///         .users
-    ///         .users_api_list_organizations(
-    ///             &UsersAPIListOrganizationsQueryRequest {
+    ///         .list_organizations(
+    ///             &ListOrganizationsQueryRequest {
     ///                 offset: Some(0),
     ///                 limit: Some(100),
     ///                 ..Default::default()
@@ -88,9 +88,9 @@ impl UsersClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn users_api_list_organizations(
+    pub async fn list_organizations(
         &self,
-        request: &UsersApiListOrganizationsQueryRequest,
+        request: &ListOrganizationsQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<ListOrganizationsResponse, ApiError> {
         self.http_client
@@ -136,8 +136,8 @@ impl UsersClient {
     ///     client
     ///         .beta
     ///         .users
-    ///         .users_api_list_workspaces(
-    ///             &UsersAPIListWorkspacesQueryRequest {
+    ///         .list_workspaces(
+    ///             &BetaUsersListWorkspacesQueryRequest {
     ///                 offset: Some(0),
     ///                 limit: Some(100),
     ///                 ..Default::default()
@@ -147,9 +147,9 @@ impl UsersClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn users_api_list_workspaces(
+    pub async fn list_workspaces(
         &self,
-        request: &UsersApiListWorkspacesQueryRequest,
+        request: &BetaUsersListWorkspacesQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<ListWorkspacesResponse, ApiError> {
         self.http_client
@@ -191,10 +191,10 @@ impl UsersClient {
     ///         ..Default::default()
     ///     };
     ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client.beta.users.users_api_whoami(None).await;
+    ///     client.beta.users.whoami(None).await;
     /// }
     /// ```
-    pub async fn users_api_whoami(
+    pub async fn whoami(
         &self,
         options: Option<RequestOptions>,
     ) -> Result<WhoamiResponse, ApiError> {

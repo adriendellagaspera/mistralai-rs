@@ -50,8 +50,8 @@ impl LibrariesClient {
     ///     client
     ///         .beta
     ///         .libraries
-    ///         .libraries_list_v1(
-    ///             &LibrariesListV1QueryRequest {
+    ///         .list(
+    ///             &BetaLibrariesListQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -59,9 +59,9 @@ impl LibrariesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn libraries_list_v1(
+    pub async fn list(
         &self,
-        request: &LibrariesListV1QueryRequest,
+        request: &BetaLibrariesListQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<ListLibrariesResponse, ApiError> {
         self.http_client
@@ -106,7 +106,7 @@ impl LibrariesClient {
     ///     client
     ///         .beta
     ///         .libraries
-    ///         .libraries_create_v1(
+    ///         .create(
     ///             &CreateLibraryRequest {
     ///                 name: "name".to_string(),
     ///                 chunk_size: None,
@@ -118,7 +118,7 @@ impl LibrariesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn libraries_create_v1(
+    pub async fn create(
         &self,
         request: &CreateLibraryRequest,
         options: Option<RequestOptions>,
@@ -159,11 +159,11 @@ impl LibrariesClient {
     ///     client
     ///         .beta
     ///         .libraries
-    ///         .libraries_get_v1(&"library_id".to_string(), None)
+    ///         .get(&"library_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn libraries_get_v1(
+    pub async fn get(
         &self,
         library_id: &str,
         options: Option<RequestOptions>,
@@ -256,11 +256,11 @@ impl LibrariesClient {
     ///     client
     ///         .beta
     ///         .libraries
-    ///         .libraries_delete_v1(&"library_id".to_string(), None)
+    ///         .delete(&"library_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn libraries_delete_v1(
+    pub async fn delete(
         &self,
         library_id: &str,
         options: Option<RequestOptions>,
@@ -301,7 +301,7 @@ impl LibrariesClient {
     ///     client
     ///         .beta
     ///         .libraries
-    ///         .libraries_patch_v1(
+    ///         .update(
     ///             &"library_id".to_string(),
     ///             &UpdateLibraryRequest {
     ///                 ..Default::default()
@@ -311,7 +311,7 @@ impl LibrariesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn libraries_patch_v1(
+    pub async fn update(
         &self,
         library_id: &str,
         request: &UpdateLibraryRequest,

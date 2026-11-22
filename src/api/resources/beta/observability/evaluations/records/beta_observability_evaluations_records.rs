@@ -35,18 +35,28 @@ impl RecordsClient2 {
     ///         ..Default::default()
     ///     };
     ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client.beta.observability.evaluations.records.search_evaluation_run_records_v2v1observability_evaluation_runs_v2run_id_records_search_post(&"run_id".to_string(), &SearchEvaluationRunRecordsV2V1ObservabilityEvaluationRunsV2RunIDRecordsSearchPostRequest {
-    ///         body: Some(EvaluationRunRecordFilterInput {
-    ///             ..Default::default()
-    ///         }),
-    ///         ..Default::default()
-    ///     }, None).await;
+    ///     client
+    ///         .beta
+    ///         .observability
+    ///         .evaluations
+    ///         .records
+    ///         .search(
+    ///             &"run_id".to_string(),
+    ///             &SearchRequest {
+    ///                 body: Some(EvaluationRunRecordFilterInput {
+    ///                     ..Default::default()
+    ///                 }),
+    ///                 ..Default::default()
+    ///             },
+    ///             None,
+    ///         )
+    ///         .await;
     /// }
     /// ```
-    pub async fn search_evaluation_run_records_v2v1observability_evaluation_runs_v2run_id_records_search_post(
+    pub async fn search(
         &self,
         run_id: &str,
-        request: &SearchEvaluationRunRecordsV2V1ObservabilityEvaluationRunsV2RunIdRecordsSearchPostRequest,
+        request: &SearchRequest3,
         options: Option<RequestOptions>,
     ) -> Result<ListEvaluationRunRecordsResponse, ApiError> {
         self.http_client
@@ -93,15 +103,11 @@ impl RecordsClient2 {
     ///         .observability
     ///         .evaluations
     ///         .records
-    ///         .get_evaluation_run_record_v2v1observability_evaluation_runs_v2run_id_records_record_id_get(
-    ///             &"run_id".to_string(),
-    ///             &"record_id".to_string(),
-    ///             None,
-    ///         )
+    ///         .get(&"run_id".to_string(), &"record_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn get_evaluation_run_record_v2v1observability_evaluation_runs_v2run_id_records_record_id_get(
+    pub async fn get(
         &self,
         run_id: &str,
         record_id: &str,

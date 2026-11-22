@@ -44,7 +44,7 @@ impl ScimClient {
     ///         .beta
     ///         .admin
     ///         .scim
-    ///         .users_api_admin_scim_sync_trigger_scim_sync(
+    ///         .trigger_sync(
     ///             &AdminSCIMSyncTriggerIn {
     ///                 ..Default::default()
     ///             },
@@ -53,7 +53,7 @@ impl ScimClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn users_api_admin_scim_sync_trigger_scim_sync(
+    pub async fn trigger_sync(
         &self,
         request: &AdminScimSyncTriggerIn,
         options: Option<RequestOptions>,
@@ -99,14 +99,11 @@ impl ScimClient {
     ///         .beta
     ///         .admin
     ///         .scim
-    ///         .users_api_admin_scim_sync_get_scim_sync_run(
-    ///             &"6f9619ff-8b86-d011-b42d-00cf4fc964ff".to_string(),
-    ///             None,
-    ///         )
+    ///         .get_sync_run(&"6f9619ff-8b86-d011-b42d-00cf4fc964ff".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn users_api_admin_scim_sync_get_scim_sync_run(
+    pub async fn get_sync_run(
         &self,
         run_id: &str,
         options: Option<RequestOptions>,

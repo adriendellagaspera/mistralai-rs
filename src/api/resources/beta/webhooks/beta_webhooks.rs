@@ -35,17 +35,10 @@ impl WebhooksClient {
     ///         ..Default::default()
     ///     };
     ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client
-    ///         .beta
-    ///         .webhooks
-    ///         .list_webhooks_v1webhooks_get(None)
-    ///         .await;
+    ///     client.beta.webhooks.list(None).await;
     /// }
     /// ```
-    pub async fn list_webhooks_v1webhooks_get(
-        &self,
-        options: Option<RequestOptions>,
-    ) -> Result<Vec<Webhook>, ApiError> {
+    pub async fn list(&self, options: Option<RequestOptions>) -> Result<Vec<Webhook>, ApiError> {
         self.http_client
             .execute_request(Method::GET, "v1/webhooks", None, None, options)
             .await
@@ -76,7 +69,7 @@ impl WebhooksClient {
     ///     client
     ///         .beta
     ///         .webhooks
-    ///         .create_webhook_v1webhooks_post(
+    ///         .create(
     ///             &CreateWebhook {
     ///                 name: "name".to_string(),
     ///                 provider: WebhookProvider::Slack,
@@ -101,7 +94,7 @@ impl WebhooksClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn create_webhook_v1webhooks_post(
+    pub async fn create(
         &self,
         request: &CreateWebhook,
         options: Option<RequestOptions>,
@@ -142,11 +135,11 @@ impl WebhooksClient {
     ///     client
     ///         .beta
     ///         .webhooks
-    ///         .get_webhook_v1webhooks_webhook_id_get(&"webhook_id".to_string(), None)
+    ///         .get(&"webhook_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn get_webhook_v1webhooks_webhook_id_get(
+    pub async fn get(
         &self,
         webhook_id: &str,
         options: Option<RequestOptions>,
@@ -187,11 +180,11 @@ impl WebhooksClient {
     ///     client
     ///         .beta
     ///         .webhooks
-    ///         .delete_webhook_v1webhooks_webhook_id_delete(&"webhook_id".to_string(), None)
+    ///         .delete(&"webhook_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn delete_webhook_v1webhooks_webhook_id_delete(
+    pub async fn delete(
         &self,
         webhook_id: &str,
         options: Option<RequestOptions>,
@@ -232,14 +225,11 @@ impl WebhooksClient {
     ///     client
     ///         .beta
     ///         .webhooks
-    ///         .get_webhook_signing_secret_v1webhooks_webhook_id_signing_secret_get(
-    ///             &"webhook_id".to_string(),
-    ///             None,
-    ///         )
+    ///         .get_signing_secret(&"webhook_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn get_webhook_signing_secret_v1webhooks_webhook_id_signing_secret_get(
+    pub async fn get_signing_secret(
         &self,
         webhook_id: &str,
         options: Option<RequestOptions>,

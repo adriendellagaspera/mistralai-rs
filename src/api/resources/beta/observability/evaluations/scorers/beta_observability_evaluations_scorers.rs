@@ -43,8 +43,8 @@ impl ScorersClient {
     ///         .observability
     ///         .evaluations
     ///         .scorers
-    ///         .list_scorers_v1observability_scorers_get(
-    ///             &ListScorersV1ObservabilityScorersGetQueryRequest {
+    ///         .list(
+    ///             &BetaObservabilityEvaluationsScorersListQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -52,9 +52,9 @@ impl ScorersClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn list_scorers_v1observability_scorers_get(
+    pub async fn list(
         &self,
-        request: &ListScorersV1ObservabilityScorersGetQueryRequest,
+        request: &BetaObservabilityEvaluationsScorersListQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<ListScorersResponse, ApiError> {
         self.http_client
@@ -101,7 +101,7 @@ impl ScorersClient {
     ///         .observability
     ///         .evaluations
     ///         .scorers
-    ///         .create_scorer_v1observability_scorers_post(
+    ///         .create(
     ///             &CreateScorerRequest {
     ///                 config: LlmJudgeConfig {
     ///                     model: "model".to_string(),
@@ -118,7 +118,7 @@ impl ScorersClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn create_scorer_v1observability_scorers_post(
+    pub async fn create(
         &self,
         request: &CreateScorerRequest,
         options: Option<RequestOptions>,
@@ -161,11 +161,11 @@ impl ScorersClient {
     ///         .observability
     ///         .evaluations
     ///         .scorers
-    ///         .get_scorer_v1observability_scorers_scorer_slug_get(&"scorer_slug".to_string(), None)
+    ///         .get(&"scorer_slug".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn get_scorer_v1observability_scorers_scorer_slug_get(
+    pub async fn get(
         &self,
         scorer_slug: &str,
         options: Option<RequestOptions>,
@@ -208,7 +208,7 @@ impl ScorersClient {
     ///         .observability
     ///         .evaluations
     ///         .scorers
-    ///         .edit_scorer_v1observability_scorers_scorer_slug_patch(
+    ///         .update(
     ///             &"scorer_slug".to_string(),
     ///             &EditScorerRequest {
     ///                 ..Default::default()
@@ -218,7 +218,7 @@ impl ScorersClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn edit_scorer_v1observability_scorers_scorer_slug_patch(
+    pub async fn update(
         &self,
         scorer_slug: &str,
         request: &EditScorerRequest,

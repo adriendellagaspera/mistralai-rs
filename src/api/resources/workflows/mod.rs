@@ -71,8 +71,8 @@ impl WorkflowsClient {
     ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .workflows
-    ///         .get_workflows_v1workflows_get(
-    ///             &GetWorkflowsV1WorkflowsGetQueryRequest {
+    ///         .get_workflows(
+    ///             &GetWorkflowsQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -80,9 +80,9 @@ impl WorkflowsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn get_workflows_v1workflows_get(
+    pub async fn get_workflows(
         &self,
-        request: &GetWorkflowsV1WorkflowsGetQueryRequest,
+        request: &GetWorkflowsQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<WorkflowListResponse, ApiError> {
         self.http_client
@@ -138,7 +138,7 @@ impl WorkflowsClient {
     ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .workflows
-    ///         .bulk_archive_workflows_v1workflows_archive_put(
+    ///         .bulk_archive_workflows(
     ///             &WorkflowBulkArchiveRequest {
     ///                 workflow_ids: vec!["workflow_ids".to_string()],
     ///             },
@@ -147,7 +147,7 @@ impl WorkflowsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn bulk_archive_workflows_v1workflows_archive_put(
+    pub async fn bulk_archive_workflows(
         &self,
         request: &WorkflowBulkArchiveRequest,
         options: Option<RequestOptions>,
@@ -199,8 +199,8 @@ impl WorkflowsClient {
     ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .workflows
-    ///         .get_workflow_registrations_v1workflows_registrations_get(
-    ///             &GetWorkflowRegistrationsV1WorkflowsRegistrationsGetQueryRequest {
+    ///         .get_workflow_registrations(
+    ///             &GetWorkflowRegistrationsQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -208,9 +208,9 @@ impl WorkflowsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn get_workflow_registrations_v1workflows_registrations_get(
+    pub async fn get_workflow_registrations(
         &self,
-        request: &GetWorkflowRegistrationsV1WorkflowsRegistrationsGetQueryRequest,
+        request: &GetWorkflowRegistrationsQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<WorkflowRegistrationListResponse, ApiError> {
         self.http_client
@@ -266,9 +266,9 @@ impl WorkflowsClient {
     ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .workflows
-    ///         .get_workflow_registration_v1workflows_registrations_workflow_registration_id_get(
+    ///         .get_workflow_registration(
     ///             &"workflow_registration_id".to_string(),
-    ///             &GetWorkflowRegistrationV1WorkflowsRegistrationsWorkflowRegistrationIDGetQueryRequest {
+    ///             &GetWorkflowRegistrationQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -276,10 +276,10 @@ impl WorkflowsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn get_workflow_registration_v1workflows_registrations_workflow_registration_id_get(
+    pub async fn get_workflow_registration(
         &self,
         workflow_registration_id: &str,
-        request: &GetWorkflowRegistrationV1WorkflowsRegistrationsWorkflowRegistrationIdGetQueryRequest,
+        request: &GetWorkflowRegistrationQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<WorkflowRegistrationGetResponse, ApiError> {
         self.http_client
@@ -318,12 +318,24 @@ impl WorkflowsClient {
     ///         ..Default::default()
     ///     };
     ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client.workflows.execute_workflow_registration_v1workflows_registrations_workflow_registration_id_execute_post(&"workflow_registration_id".to_string(), &WorkflowExecutionRequest {
-    ///         ..Default::default()
-    ///     }, None).await;
+    ///     client
+    ///         .workflows
+    ///         .execute_workflow_registration(
+    ///             &"workflow_registration_id".to_string(),
+    ///             &WorkflowExecutionRequest {
+    ///                 ..Default::default()
+    ///             },
+    ///             None,
+    ///         )
+    ///         .await;
     /// }
     /// ```
-    pub async fn execute_workflow_registration_v1workflows_registrations_workflow_registration_id_execute_post(&self, workflow_registration_id: &str, request: &WorkflowExecutionRequest, options: Option<RequestOptions>) -> Result<ExecuteWorkflowRegistrationV1WorkflowsRegistrationsWorkflowRegistrationIdExecutePostWorkflowsResponse, ApiError>{
+    pub async fn execute_workflow_registration(
+        &self,
+        workflow_registration_id: &str,
+        request: &WorkflowExecutionRequest,
+        options: Option<RequestOptions>,
+    ) -> Result<ExecuteWorkflowRegistrationWorkflowsResponse, ApiError> {
         self.http_client
             .execute_request(
                 Method::POST,
@@ -362,7 +374,7 @@ impl WorkflowsClient {
     ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .workflows
-    ///         .bulk_unarchive_workflows_v1workflows_unarchive_put(
+    ///         .bulk_unarchive_workflows(
     ///             &WorkflowBulkUnarchiveRequest {
     ///                 workflow_ids: vec!["workflow_ids".to_string()],
     ///             },
@@ -371,7 +383,7 @@ impl WorkflowsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn bulk_unarchive_workflows_v1workflows_unarchive_put(
+    pub async fn bulk_unarchive_workflows(
         &self,
         request: &WorkflowBulkUnarchiveRequest,
         options: Option<RequestOptions>,
@@ -411,11 +423,11 @@ impl WorkflowsClient {
     ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .workflows
-    ///         .get_workflow_v1workflows_workflow_identifier_get(&"workflow_identifier".to_string(), None)
+    ///         .get_workflow(&"workflow_identifier".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn get_workflow_v1workflows_workflow_identifier_get(
+    pub async fn get_workflow(
         &self,
         workflow_identifier: &str,
         options: Option<RequestOptions>,
@@ -455,7 +467,7 @@ impl WorkflowsClient {
     ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .workflows
-    ///         .update_workflow_v1workflows_workflow_identifier_put(
+    ///         .update_workflow(
     ///             &"workflow_identifier".to_string(),
     ///             &WorkflowUpdateRequest {
     ///                 ..Default::default()
@@ -465,7 +477,7 @@ impl WorkflowsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn update_workflow_v1workflows_workflow_identifier_put(
+    pub async fn update_workflow(
         &self,
         workflow_identifier: &str,
         request: &WorkflowUpdateRequest,
@@ -506,14 +518,11 @@ impl WorkflowsClient {
     ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .workflows
-    ///         .archive_workflow_v1workflows_workflow_identifier_archive_put(
-    ///             &"workflow_identifier".to_string(),
-    ///             None,
-    ///         )
+    ///         .archive_workflow(&"workflow_identifier".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn archive_workflow_v1workflows_workflow_identifier_archive_put(
+    pub async fn archive_workflow(
         &self,
         workflow_identifier: &str,
         options: Option<RequestOptions>,
@@ -553,7 +562,7 @@ impl WorkflowsClient {
     ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .workflows
-    ///         .execute_workflow_v1workflows_workflow_identifier_execute_post(
+    ///         .execute_workflow(
     ///             &"workflow_identifier".to_string(),
     ///             &WorkflowExecutionRequest {
     ///                 ..Default::default()
@@ -563,13 +572,12 @@ impl WorkflowsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn execute_workflow_v1workflows_workflow_identifier_execute_post(
+    pub async fn execute_workflow(
         &self,
         workflow_identifier: &str,
         request: &WorkflowExecutionRequest,
         options: Option<RequestOptions>,
-    ) -> Result<ExecuteWorkflowV1WorkflowsWorkflowIdentifierExecutePostWorkflowsResponse, ApiError>
-    {
+    ) -> Result<ExecuteWorkflowWorkflowsResponse, ApiError> {
         self.http_client
             .execute_request(
                 Method::POST,
@@ -605,7 +613,7 @@ impl WorkflowsClient {
     ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .workflows
-    ///         .add_workflow_tags_v1workflows_workflow_identifier_tags_post(
+    ///         .add_workflow_tags(
     ///             &"workflow_identifier".to_string(),
     ///             &WorkflowTagsAddRequest {
     ///                 tags: vec!["tags".to_string()],
@@ -615,7 +623,7 @@ impl WorkflowsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn add_workflow_tags_v1workflows_workflow_identifier_tags_post(
+    pub async fn add_workflow_tags(
         &self,
         workflow_identifier: &str,
         request: &WorkflowTagsAddRequest,
@@ -656,14 +664,11 @@ impl WorkflowsClient {
     ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .workflows
-    ///         .unarchive_workflow_v1workflows_workflow_identifier_unarchive_put(
-    ///             &"workflow_identifier".to_string(),
-    ///             None,
-    ///         )
+    ///         .unarchive_workflow(&"workflow_identifier".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn unarchive_workflow_v1workflows_workflow_identifier_unarchive_put(
+    pub async fn unarchive_workflow(
         &self,
         workflow_identifier: &str,
         options: Option<RequestOptions>,

@@ -41,8 +41,8 @@ impl VibeCodeAnalyticsClient {
     ///         .beta
     ///         .admin
     ///         .vibe_code_analytics
-    ///         .get_organization_stats_v1admin_analytics_vibe_code_usage_by_organization(
-    ///             &GetOrganizationStatsV1AdminAnalyticsVibeCodeUsageByOrganizationQueryRequest {
+    ///         .organization_stats(
+    ///             &OrganizationStatsQueryRequest {
     ///                 start_time: 1764547200,
     ///                 end_time: 1767225600,
     ///             },
@@ -51,9 +51,9 @@ impl VibeCodeAnalyticsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn get_organization_stats_v1admin_analytics_vibe_code_usage_by_organization(
+    pub async fn organization_stats(
         &self,
-        request: &GetOrganizationStatsV1AdminAnalyticsVibeCodeUsageByOrganizationQueryRequest,
+        request: &OrganizationStatsQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<VibeOrganizationStatsOut, ApiError> {
         self.http_client
@@ -99,8 +99,8 @@ impl VibeCodeAnalyticsClient {
     ///         .beta
     ///         .admin
     ///         .vibe_code_analytics
-    ///         .get_workspace_stats_v1admin_analytics_vibe_code_usage_by_workspace(
-    ///             &GetWorkspaceStatsV1AdminAnalyticsVibeCodeUsageByWorkspaceQueryRequest {
+    ///         .workspace_stats(
+    ///             &WorkspaceStatsQueryRequest {
     ///                 start_time: 1764547200,
     ///                 end_time: 1767225600,
     ///                 workspace_id: None,
@@ -110,9 +110,9 @@ impl VibeCodeAnalyticsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn get_workspace_stats_v1admin_analytics_vibe_code_usage_by_workspace(
+    pub async fn workspace_stats(
         &self,
-        request: &GetWorkspaceStatsV1AdminAnalyticsVibeCodeUsageByWorkspaceQueryRequest,
+        request: &WorkspaceStatsQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<VibeWorkspaceStatsOut, ApiError> {
         self.http_client

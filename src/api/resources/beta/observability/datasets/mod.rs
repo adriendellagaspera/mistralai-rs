@@ -43,8 +43,8 @@ impl DatasetsClient {
     ///         .beta
     ///         .observability
     ///         .datasets
-    ///         .get_datasets_v1observability_datasets_get(
-    ///             &GetDatasetsV1ObservabilityDatasetsGetQueryRequest {
+    ///         .list(
+    ///             &BetaObservabilityDatasetsListQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -52,9 +52,9 @@ impl DatasetsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn get_datasets_v1observability_datasets_get(
+    pub async fn list(
         &self,
-        request: &GetDatasetsV1ObservabilityDatasetsGetQueryRequest,
+        request: &BetaObservabilityDatasetsListQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<ListDatasetsResponse, ApiError> {
         self.http_client
@@ -98,7 +98,7 @@ impl DatasetsClient {
     ///         .beta
     ///         .observability
     ///         .datasets
-    ///         .create_dataset_v1observability_datasets_post(
+    ///         .create(
     ///             &CreateDatasetRequest {
     ///                 description: "description".to_string(),
     ///                 name: "name".to_string(),
@@ -108,7 +108,7 @@ impl DatasetsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn create_dataset_v1observability_datasets_post(
+    pub async fn create(
         &self,
         request: &CreateDatasetRequest,
         options: Option<RequestOptions>,
@@ -151,11 +151,11 @@ impl DatasetsClient {
     ///         .beta
     ///         .observability
     ///         .datasets
-    ///         .get_dataset_by_id_v1observability_datasets_dataset_id_get(&"dataset_id".to_string(), None)
+    ///         .fetch(&"dataset_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn get_dataset_by_id_v1observability_datasets_dataset_id_get(
+    pub async fn fetch(
         &self,
         dataset_id: &str,
         options: Option<RequestOptions>,
@@ -198,11 +198,11 @@ impl DatasetsClient {
     ///         .beta
     ///         .observability
     ///         .datasets
-    ///         .delete_dataset_v1observability_datasets_dataset_id_delete(&"dataset_id".to_string(), None)
+    ///         .delete(&"dataset_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn delete_dataset_v1observability_datasets_dataset_id_delete(
+    pub async fn delete(
         &self,
         dataset_id: &str,
         options: Option<RequestOptions>,
@@ -245,7 +245,7 @@ impl DatasetsClient {
     ///         .beta
     ///         .observability
     ///         .datasets
-    ///         .update_dataset_v1observability_datasets_dataset_id_patch(
+    ///         .update(
     ///             &"dataset_id".to_string(),
     ///             &UpdateDatasetRequest {
     ///                 ..Default::default()
@@ -255,7 +255,7 @@ impl DatasetsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn update_dataset_v1observability_datasets_dataset_id_patch(
+    pub async fn update(
         &self,
         dataset_id: &str,
         request: &UpdateDatasetRequest,
@@ -299,14 +299,11 @@ impl DatasetsClient {
     ///         .beta
     ///         .observability
     ///         .datasets
-    ///         .export_dataset_to_jsonl_v1observability_datasets_dataset_id_exports_to_jsonl_get(
-    ///             &"dataset_id".to_string(),
-    ///             None,
-    ///         )
+    ///         .export_to_jsonl(&"dataset_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn export_dataset_to_jsonl_v1observability_datasets_dataset_id_exports_to_jsonl_get(
+    pub async fn export_to_jsonl(
         &self,
         dataset_id: &str,
         options: Option<RequestOptions>,
@@ -345,12 +342,21 @@ impl DatasetsClient {
     ///         ..Default::default()
     ///     };
     ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client.beta.observability.datasets.post_dataset_records_from_dataset_v1observability_datasets_dataset_id_imports_from_dataset_post(&"dataset_id".to_string(), &ImportDatasetFromDatasetRequest {
-    ///         dataset_record_ids: vec!["dataset_record_ids".to_string()]
-    ///     }, None).await;
+    ///     client
+    ///         .beta
+    ///         .observability
+    ///         .datasets
+    ///         .import_from_dataset_records(
+    ///             &"dataset_id".to_string(),
+    ///             &ImportDatasetFromDatasetRequest {
+    ///                 dataset_record_ids: vec!["dataset_record_ids".to_string()],
+    ///             },
+    ///             None,
+    ///         )
+    ///         .await;
     /// }
     /// ```
-    pub async fn post_dataset_records_from_dataset_v1observability_datasets_dataset_id_imports_from_dataset_post(
+    pub async fn import_from_dataset_records(
         &self,
         dataset_id: &str,
         request: &ImportDatasetFromDatasetRequest,
@@ -397,7 +403,7 @@ impl DatasetsClient {
     ///         .beta
     ///         .observability
     ///         .datasets
-    ///         .post_dataset_records_from_file_v1observability_datasets_dataset_id_imports_from_file_post(
+    ///         .import_from_file(
     ///             &"dataset_id".to_string(),
     ///             &ImportDatasetFromFileRequest {
     ///                 file_id: "file_id".to_string(),
@@ -407,7 +413,7 @@ impl DatasetsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn post_dataset_records_from_file_v1observability_datasets_dataset_id_imports_from_file_post(
+    pub async fn import_from_file(
         &self,
         dataset_id: &str,
         request: &ImportDatasetFromFileRequest,
@@ -447,12 +453,21 @@ impl DatasetsClient {
     ///         ..Default::default()
     ///     };
     ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client.beta.observability.datasets.post_dataset_records_from_playground_v1observability_datasets_dataset_id_imports_from_playground_post(&"dataset_id".to_string(), &ImportDatasetFromPlaygroundRequest {
-    ///         conversation_ids: vec!["conversation_ids".to_string()]
-    ///     }, None).await;
+    ///     client
+    ///         .beta
+    ///         .observability
+    ///         .datasets
+    ///         .import_from_playground(
+    ///             &"dataset_id".to_string(),
+    ///             &ImportDatasetFromPlaygroundRequest {
+    ///                 conversation_ids: vec!["conversation_ids".to_string()],
+    ///             },
+    ///             None,
+    ///         )
+    ///         .await;
     /// }
     /// ```
-    pub async fn post_dataset_records_from_playground_v1observability_datasets_dataset_id_imports_from_playground_post(
+    pub async fn import_from_playground(
         &self,
         dataset_id: &str,
         request: &ImportDatasetFromPlaygroundRequest,
@@ -495,27 +510,36 @@ impl DatasetsClient {
     ///         ..Default::default()
     ///     };
     ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client.beta.observability.datasets.post_dataset_records_from_spans_v1observability_datasets_dataset_id_imports_from_spans_post(&"dataset_id".to_string(), &ImportDatasetFromSpansRequest {
-    ///         mapping_contract: SpanDatasetMappingContract {
-    ///             mappings: vec![SpanDatasetMapping {
-    ///                 source_field: SpanDatasetSourceReference {
-    ///                     key: "key".to_string(),
-    ///                     namespace: SpanDatasetSourceNamespace::SpanAttributes
+    ///     client
+    ///         .beta
+    ///         .observability
+    ///         .datasets
+    ///         .import_from_spans(
+    ///             &"dataset_id".to_string(),
+    ///             &ImportDatasetFromSpansRequest {
+    ///                 mapping_contract: SpanDatasetMappingContract {
+    ///                     mappings: vec![SpanDatasetMapping {
+    ///                         source_field: SpanDatasetSourceReference {
+    ///                             key: "key".to_string(),
+    ///                             namespace: SpanDatasetSourceNamespace::SpanAttributes,
+    ///                         },
+    ///                         target_field: "target_field".to_string(),
+    ///                     }],
+    ///                     version: 1,
+    ///                     ..Default::default()
     ///                 },
-    ///                 target_field: "target_field".to_string()
-    ///             }],
-    ///             version: 1,
-    ///             ..Default::default()
-    ///         },
-    ///         span_references: vec![TelemetrySpanReference {
-    ///             span_id: "span_id".to_string(),
-    ///             trace_id: "trace_id".to_string(),
-    ///             ..Default::default()
-    ///         }]
-    ///     }, None).await;
+    ///                 span_references: vec![TelemetrySpanReference {
+    ///                     span_id: "span_id".to_string(),
+    ///                     trace_id: "trace_id".to_string(),
+    ///                     ..Default::default()
+    ///                 }],
+    ///             },
+    ///             None,
+    ///         )
+    ///         .await;
     /// }
     /// ```
-    pub async fn post_dataset_records_from_spans_v1observability_datasets_dataset_id_imports_from_spans_post(
+    pub async fn import_from_spans(
         &self,
         dataset_id: &str,
         request: &ImportDatasetFromSpansRequest,
@@ -562,9 +586,9 @@ impl DatasetsClient {
     ///         .beta
     ///         .observability
     ///         .datasets
-    ///         .get_dataset_records_v1observability_datasets_dataset_id_records_get(
+    ///         .list_records(
     ///             &"dataset_id".to_string(),
-    ///             &GetDatasetRecordsV1ObservabilityDatasetsDatasetIDRecordsGetQueryRequest {
+    ///             &ListRecordsQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -572,10 +596,10 @@ impl DatasetsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn get_dataset_records_v1observability_datasets_dataset_id_records_get(
+    pub async fn list_records(
         &self,
         dataset_id: &str,
-        request: &GetDatasetRecordsV1ObservabilityDatasetsDatasetIdRecordsGetQueryRequest,
+        request: &ListRecordsQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<ListDatasetRecordsResponse, ApiError> {
         self.http_client
@@ -619,7 +643,7 @@ impl DatasetsClient {
     ///         .beta
     ///         .observability
     ///         .datasets
-    ///         .create_dataset_record_v1observability_datasets_dataset_id_records_post(
+    ///         .create_record(
     ///             &"dataset_id".to_string(),
     ///             &CreateDatasetRecordRequest {
     ///                 payload: DatasetRecordPayload(HashMap::from([(
@@ -634,7 +658,7 @@ impl DatasetsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn create_dataset_record_v1observability_datasets_dataset_id_records_post(
+    pub async fn create_record(
         &self,
         dataset_id: &str,
         request: &CreateDatasetRecordRequest,
@@ -678,9 +702,9 @@ impl DatasetsClient {
     ///         .beta
     ///         .observability
     ///         .datasets
-    ///         .get_dataset_import_tasks_v1observability_datasets_dataset_id_tasks_get(
+    ///         .list_tasks(
     ///             &"dataset_id".to_string(),
-    ///             &GetDatasetImportTasksV1ObservabilityDatasetsDatasetIDTasksGetQueryRequest {
+    ///             &ListTasksQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -688,10 +712,10 @@ impl DatasetsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn get_dataset_import_tasks_v1observability_datasets_dataset_id_tasks_get(
+    pub async fn list_tasks(
         &self,
         dataset_id: &str,
-        request: &GetDatasetImportTasksV1ObservabilityDatasetsDatasetIdTasksGetQueryRequest,
+        request: &ListTasksQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<ListDatasetImportTasksResponse, ApiError> {
         self.http_client
@@ -735,15 +759,11 @@ impl DatasetsClient {
     ///         .beta
     ///         .observability
     ///         .datasets
-    ///         .get_dataset_import_task_v1observability_datasets_dataset_id_tasks_task_id_get(
-    ///             &"dataset_id".to_string(),
-    ///             &"task_id".to_string(),
-    ///             None,
-    ///         )
+    ///         .fetch_task(&"dataset_id".to_string(), &"task_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn get_dataset_import_task_v1observability_datasets_dataset_id_tasks_task_id_get(
+    pub async fn fetch_task(
         &self,
         dataset_id: &str,
         task_id: &str,

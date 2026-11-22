@@ -44,8 +44,8 @@ impl SearchIndexesClient {
     ///         .beta
     ///         .context
     ///         .search_indexes
-    ///         .list_indexes_v1context_search_indexes_get(
-    ///             &ListIndexesV1ContextSearchIndexesGetQueryRequest {
+    ///         .list(
+    ///             &BetaContextSearchIndexesListQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -53,9 +53,9 @@ impl SearchIndexesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn list_indexes_v1context_search_indexes_get(
+    pub async fn list(
         &self,
-        request: &ListIndexesV1ContextSearchIndexesGetQueryRequest,
+        request: &BetaContextSearchIndexesListQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<ListManagedIndexesResponse, ApiError> {
         self.http_client
@@ -101,7 +101,7 @@ impl SearchIndexesClient {
     ///         .beta
     ///         .context
     ///         .search_indexes
-    ///         .create_index_v1context_search_indexes_post(
+    ///         .create(
     ///             &CreateManagedIndexRequest {
     ///                 config: ManagedIndexConfig {
     ///                     embedding: ManagedIndexConfigEmbedding::Custom {
@@ -120,7 +120,7 @@ impl SearchIndexesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn create_index_v1context_search_indexes_post(
+    pub async fn create(
         &self,
         request: &CreateManagedIndexRequest,
         options: Option<RequestOptions>,
@@ -162,11 +162,11 @@ impl SearchIndexesClient {
     ///         .beta
     ///         .context
     ///         .search_indexes
-    ///         .get_index_v1context_search_indexes_index_name_get(&"index_name".to_string(), None)
+    ///         .get(&"index_name".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn get_index_v1context_search_indexes_index_name_get(
+    pub async fn get(
         &self,
         index_name: &str,
         options: Option<RequestOptions>,
@@ -208,7 +208,7 @@ impl SearchIndexesClient {
     ///         .beta
     ///         .context
     ///         .search_indexes
-    ///         .update_index_v1context_search_indexes_index_name_put(
+    ///         .update(
     ///             &"index_name".to_string(),
     ///             &UpdateManagedIndexRequest {
     ///                 schema: ManagedIndexFields {
@@ -220,7 +220,7 @@ impl SearchIndexesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn update_index_v1context_search_indexes_index_name_put(
+    pub async fn update(
         &self,
         index_name: &str,
         request: &UpdateManagedIndexRequest,
@@ -263,11 +263,11 @@ impl SearchIndexesClient {
     ///         .beta
     ///         .context
     ///         .search_indexes
-    ///         .delete_index_v1context_search_indexes_index_name_delete(&"index_name".to_string(), None)
+    ///         .delete(&"index_name".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn delete_index_v1context_search_indexes_index_name_delete(
+    pub async fn delete(
         &self,
         index_name: &str,
         options: Option<RequestOptions>,
@@ -309,15 +309,11 @@ impl SearchIndexesClient {
     ///         .beta
     ///         .context
     ///         .search_indexes
-    ///         .get_chunk_index_v1context_search_indexes_index_name_chunks_chunk_id_get(
-    ///             &"index_name".to_string(),
-    ///             &"chunk_id".to_string(),
-    ///             None,
-    ///         )
+    ///         .get_chunk(&"index_name".to_string(), &"chunk_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn get_chunk_index_v1context_search_indexes_index_name_chunks_chunk_id_get(
+    pub async fn get_chunk(
         &self,
         index_name: &str,
         chunk_id: &str,
@@ -363,7 +359,7 @@ impl SearchIndexesClient {
     ///         .beta
     ///         .context
     ///         .search_indexes
-    ///         .ingest_documents_v1context_search_indexes_index_name_documents_post(
+    ///         .ingest_documents(
     ///             &"index_name".to_string(),
     ///             &IngestDocumentsRequest {
     ///                 documents: vec![HashMap::from([(
@@ -376,7 +372,7 @@ impl SearchIndexesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn ingest_documents_v1context_search_indexes_index_name_documents_post(
+    pub async fn ingest_documents(
         &self,
         index_name: &str,
         request: &IngestDocumentsRequest,
@@ -419,7 +415,7 @@ impl SearchIndexesClient {
     ///         .beta
     ///         .context
     ///         .search_indexes
-    ///         .delete_documents_v1context_search_indexes_index_name_documents_delete(
+    ///         .delete_documents(
     ///             &"index_name".to_string(),
     ///             &DeleteDocumentsRequest {
     ///                 document_ids: vec!["document_ids".to_string()],
@@ -429,7 +425,7 @@ impl SearchIndexesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn delete_documents_v1context_search_indexes_index_name_documents_delete(
+    pub async fn delete_documents(
         &self,
         index_name: &str,
         request: &DeleteDocumentsRequest,
@@ -472,7 +468,7 @@ impl SearchIndexesClient {
     ///         .beta
     ///         .context
     ///         .search_indexes
-    ///         .grep_index_v1context_search_indexes_index_name_grep_post(
+    ///         .grep(
     ///             &"index_name".to_string(),
     ///             &GrepRequest {
     ///                 pattern: "pattern".to_string(),
@@ -486,7 +482,7 @@ impl SearchIndexesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn grep_index_v1context_search_indexes_index_name_grep_post(
+    pub async fn grep(
         &self,
         index_name: &str,
         request: &GrepRequest,
@@ -529,7 +525,7 @@ impl SearchIndexesClient {
     ///         .beta
     ///         .context
     ///         .search_indexes
-    ///         .navigate_index_v1context_search_indexes_index_name_navigate_post(
+    ///         .navigate(
     ///             &"index_name".to_string(),
     ///             &NavigateRequest {
     ///                 direction: NavigationDirection::Next,
@@ -544,7 +540,7 @@ impl SearchIndexesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn navigate_index_v1context_search_indexes_index_name_navigate_post(
+    pub async fn navigate(
         &self,
         index_name: &str,
         request: &NavigateRequest,
@@ -587,7 +583,7 @@ impl SearchIndexesClient {
     ///         .beta
     ///         .context
     ///         .search_indexes
-    ///         .read_index_v1context_search_indexes_index_name_read_post(
+    ///         .read(
     ///             &"index_name".to_string(),
     ///             &ReadRequest {
     ///                 source_id: "source_id".to_string(),
@@ -601,7 +597,7 @@ impl SearchIndexesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn read_index_v1context_search_indexes_index_name_read_post(
+    pub async fn read(
         &self,
         index_name: &str,
         request: &ReadRequest,
@@ -644,7 +640,7 @@ impl SearchIndexesClient {
     ///         .beta
     ///         .context
     ///         .search_indexes
-    ///         .search_index_v1context_search_indexes_index_name_search_post(
+    ///         .search(
     ///             &"index_name".to_string(),
     ///             &SearchRequest {
     ///                 retriever: SearchRequestRetriever::Keyword {
@@ -659,7 +655,7 @@ impl SearchIndexesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn search_index_v1context_search_indexes_index_name_search_post(
+    pub async fn search(
         &self,
         index_name: &str,
         request: &SearchRequest,
@@ -698,13 +694,22 @@ impl SearchIndexesClient {
     ///         ..Default::default()
     ///     };
     ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client.beta.context.search_indexes.get_managed_index_summary_v1context_search_indexes_index_name_summary_field_language_get(&"index_name".to_string(), &GetManagedIndexSummaryV1ContextSearchIndexesIndexNameSummaryFieldLanguageGetSearchIndexesRequestLanguage::En, None).await;
+    ///     client
+    ///         .beta
+    ///         .context
+    ///         .search_indexes
+    ///         .get_index_summary(
+    ///             &"index_name".to_string(),
+    ///             &GetIndexSummarySearchIndexesRequestLanguage::En,
+    ///             None,
+    ///         )
+    ///         .await;
     /// }
     /// ```
-    pub async fn get_managed_index_summary_v1context_search_indexes_index_name_summary_field_language_get(
+    pub async fn get_index_summary(
         &self,
         index_name: &str,
-        language: &GetManagedIndexSummaryV1ContextSearchIndexesIndexNameSummaryFieldLanguageGetSearchIndexesRequestLanguage,
+        language: &GetIndexSummarySearchIndexesRequestLanguage,
         options: Option<RequestOptions>,
     ) -> Result<GetSummaryResponseSummary, ApiError> {
         self.http_client
@@ -750,16 +755,26 @@ impl SearchIndexesClient {
     ///         ..Default::default()
     ///     };
     ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client.beta.context.search_indexes.generate_managed_index_summary_post_v1context_search_indexes_index_name_summary_field_language_post(&"index_name".to_string(), &GenerateManagedIndexSummaryPostV1ContextSearchIndexesIndexNameSummaryFieldLanguagePostSearchIndexesRequestLanguage::En, &GenerateManagedIndexSummaryPostV1ContextSearchIndexesIndexNameSummaryFieldLanguagePostQueryRequest {
-    ///         ..Default::default()
-    ///     }, None).await;
+    ///     client
+    ///         .beta
+    ///         .context
+    ///         .search_indexes
+    ///         .generate_index_summary(
+    ///             &"index_name".to_string(),
+    ///             &GenerateIndexSummarySearchIndexesRequestLanguage::En,
+    ///             &GenerateIndexSummaryQueryRequest {
+    ///                 ..Default::default()
+    ///             },
+    ///             None,
+    ///         )
+    ///         .await;
     /// }
     /// ```
-    pub async fn generate_managed_index_summary_post_v1context_search_indexes_index_name_summary_field_language_post(
+    pub async fn generate_index_summary(
         &self,
         index_name: &str,
-        language: &GenerateManagedIndexSummaryPostV1ContextSearchIndexesIndexNameSummaryFieldLanguagePostSearchIndexesRequestLanguage,
-        request: &GenerateManagedIndexSummaryPostV1ContextSearchIndexesIndexNameSummaryFieldLanguagePostQueryRequest,
+        language: &GenerateIndexSummarySearchIndexesRequestLanguage,
+        request: &GenerateIndexSummaryQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<serde_json::Value, ApiError> {
         self.http_client
@@ -800,17 +815,27 @@ impl SearchIndexesClient {
     ///         ..Default::default()
     ///     };
     ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client.beta.context.search_indexes.set_managed_index_summary_v1context_search_indexes_index_name_summary_field_language_put(&"index_name".to_string(), &SetManagedIndexSummaryV1ContextSearchIndexesIndexNameSummaryFieldLanguagePutSearchIndexesRequestLanguage::En, &UpdateSummaryRequestSummary {
-    ///         content: "content".to_string(),
-    ///         status: UpdateSummaryRequestSummaryStatus::Handwritten,
-    ///         translated: true
-    ///     }, None).await;
+    ///     client
+    ///         .beta
+    ///         .context
+    ///         .search_indexes
+    ///         .set_index_summary(
+    ///             &"index_name".to_string(),
+    ///             &SetIndexSummarySearchIndexesRequestLanguage::En,
+    ///             &UpdateSummaryRequestSummary {
+    ///                 content: "content".to_string(),
+    ///                 status: UpdateSummaryRequestSummaryStatus::Handwritten,
+    ///                 translated: true,
+    ///             },
+    ///             None,
+    ///         )
+    ///         .await;
     /// }
     /// ```
-    pub async fn set_managed_index_summary_v1context_search_indexes_index_name_summary_field_language_put(
+    pub async fn set_index_summary(
         &self,
         index_name: &str,
-        language: &SetManagedIndexSummaryV1ContextSearchIndexesIndexNameSummaryFieldLanguagePutSearchIndexesRequestLanguage,
+        language: &SetIndexSummarySearchIndexesRequestLanguage,
         request: &UpdateSummaryRequestSummary,
         options: Option<RequestOptions>,
     ) -> Result<serde_json::Value, ApiError> {

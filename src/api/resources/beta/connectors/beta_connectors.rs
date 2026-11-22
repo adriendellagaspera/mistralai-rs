@@ -38,8 +38,8 @@ impl ConnectorsClient {
     ///     client
     ///         .beta
     ///         .connectors
-    ///         .connector_list_v1(
-    ///             &ConnectorListV1QueryRequest {
+    ///         .list(
+    ///             &BetaConnectorsListQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -47,9 +47,9 @@ impl ConnectorsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn connector_list_v1(
+    pub async fn list(
         &self,
-        request: &ConnectorListV1QueryRequest,
+        request: &BetaConnectorsListQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<PaginatedConnectors, ApiError> {
         self.http_client
@@ -92,8 +92,8 @@ impl ConnectorsClient {
     ///     client
     ///         .beta
     ///         .connectors
-    ///         .connector_create_v1(
-    ///             &ConnectorCreateV1ConnectorsRequest::HTTP {
+    ///         .create(
+    ///             &CreateConnectorsRequest::HTTP {
     ///                 data: CreateHTTPConnectorRequest {
     ///                     description: "description".to_string(),
     ///                     name: "name".to_string(),
@@ -106,9 +106,9 @@ impl ConnectorsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn connector_create_v1(
+    pub async fn create(
         &self,
-        request: &ConnectorCreateV1ConnectorsRequest,
+        request: &CreateConnectorsRequest,
         options: Option<RequestOptions>,
     ) -> Result<Connector, ApiError> {
         self.http_client
@@ -148,9 +148,9 @@ impl ConnectorsClient {
     ///     client
     ///         .beta
     ///         .connectors
-    ///         .connector_get_v1(
+    ///         .get(
     ///             &"connector_id_or_name".to_string(),
-    ///             &ConnectorGetV1QueryRequest {
+    ///             &BetaConnectorsGetQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -158,10 +158,10 @@ impl ConnectorsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn connector_get_v1(
+    pub async fn get(
         &self,
         connector_id_or_name: &str,
-        request: &ConnectorGetV1QueryRequest,
+        request: &BetaConnectorsGetQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<Connector, ApiError> {
         self.http_client
@@ -204,9 +204,9 @@ impl ConnectorsClient {
     ///     client
     ///         .beta
     ///         .connectors
-    ///         .connector_get_auth_url_v1(
+    ///         .get_auth_url(
     ///             &"connector_id_or_name".to_string(),
-    ///             &ConnectorGetAuthURLV1QueryRequest {
+    ///             &GetAuthURLQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -214,10 +214,10 @@ impl ConnectorsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn connector_get_auth_url_v1(
+    pub async fn get_auth_url(
         &self,
         connector_id_or_name: &str,
-        request: &ConnectorGetAuthUrlV1QueryRequest,
+        request: &GetAuthUrlQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<AuthUrlResponse, ApiError> {
         self.http_client
@@ -265,11 +265,11 @@ impl ConnectorsClient {
     ///     client
     ///         .beta
     ///         .connectors
-    ///         .connector_get_authentication_methods_v1(&"connector_id_or_name".to_string(), None)
+    ///         .get_authentication_methods(&"connector_id_or_name".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn connector_get_authentication_methods_v1(
+    pub async fn get_authentication_methods(
         &self,
         connector_id_or_name: &str,
         options: Option<RequestOptions>,
@@ -313,9 +313,9 @@ impl ConnectorsClient {
     ///     client
     ///         .beta
     ///         .connectors
-    ///         .connector_list_organization_credentials_v1(
+    ///         .list_organization_credentials(
     ///             &"connector_id_or_name".to_string(),
-    ///             &ConnectorListOrganizationCredentialsV1QueryRequest {
+    ///             &ListOrganizationCredentialsQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -323,10 +323,10 @@ impl ConnectorsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn connector_list_organization_credentials_v1(
+    pub async fn list_organization_credentials(
         &self,
         connector_id_or_name: &str,
-        request: &ConnectorListOrganizationCredentialsV1QueryRequest,
+        request: &ListOrganizationCredentialsQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<CredentialsResponse, ApiError> {
         self.http_client
@@ -372,9 +372,9 @@ impl ConnectorsClient {
     ///     client
     ///         .beta
     ///         .connectors
-    ///         .connector_list_tools_v1(
+    ///         .list_tools(
     ///             &"connector_id_or_name".to_string(),
-    ///             &ConnectorListToolsV1QueryRequest {
+    ///             &ListToolsQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -382,12 +382,12 @@ impl ConnectorsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn connector_list_tools_v1(
+    pub async fn list_tools(
         &self,
         connector_id_or_name: &str,
-        request: &ConnectorListToolsV1QueryRequest,
+        request: &ListToolsQueryRequest,
         options: Option<RequestOptions>,
-    ) -> Result<ConnectorListToolsV1ConnectorsResponse, ApiError> {
+    ) -> Result<ListToolsConnectorsResponse, ApiError> {
         self.http_client
             .execute_request(
                 Method::GET,
@@ -429,7 +429,7 @@ impl ConnectorsClient {
     ///     client
     ///         .beta
     ///         .connectors
-    ///         .connector_call_tool_v1(
+    ///         .call_tool(
     ///             &"connector_id_or_name".to_string(),
     ///             &"tool_name".to_string(),
     ///             &ConnectorCallToolRequest {
@@ -440,7 +440,7 @@ impl ConnectorsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn connector_call_tool_v1(
+    pub async fn call_tool(
         &self,
         connector_id_or_name: &str,
         tool_name: &str,
@@ -488,9 +488,9 @@ impl ConnectorsClient {
     ///     client
     ///         .beta
     ///         .connectors
-    ///         .connector_list_user_credentials_v1(
+    ///         .list_user_credentials(
     ///             &"connector_id_or_name".to_string(),
-    ///             &ConnectorListUserCredentialsV1QueryRequest {
+    ///             &ListUserCredentialsQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -498,10 +498,10 @@ impl ConnectorsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn connector_list_user_credentials_v1(
+    pub async fn list_user_credentials(
         &self,
         connector_id_or_name: &str,
-        request: &ConnectorListUserCredentialsV1QueryRequest,
+        request: &ListUserCredentialsQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<CredentialsResponse, ApiError> {
         self.http_client
@@ -543,11 +543,11 @@ impl ConnectorsClient {
     ///     client
     ///         .beta
     ///         .connectors
-    ///         .connector_delete_all_user_credentials_v1(&"connector_id_or_name".to_string(), None)
+    ///         .delete_all_user_credentials(&"connector_id_or_name".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn connector_delete_all_user_credentials_v1(
+    pub async fn delete_all_user_credentials(
         &self,
         connector_id_or_name: &str,
         options: Option<RequestOptions>,
@@ -588,9 +588,9 @@ impl ConnectorsClient {
     ///     client
     ///         .beta
     ///         .connectors
-    ///         .connector_list_workspace_credentials_v1(
+    ///         .list_workspace_credentials(
     ///             &"connector_id_or_name".to_string(),
-    ///             &ConnectorListWorkspaceCredentialsV1QueryRequest {
+    ///             &ListWorkspaceCredentialsQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -598,10 +598,10 @@ impl ConnectorsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn connector_list_workspace_credentials_v1(
+    pub async fn list_workspace_credentials(
         &self,
         connector_id_or_name: &str,
-        request: &ConnectorListWorkspaceCredentialsV1QueryRequest,
+        request: &ListWorkspaceCredentialsQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<CredentialsResponse, ApiError> {
         self.http_client
@@ -646,9 +646,9 @@ impl ConnectorsClient {
     ///     client
     ///         .beta
     ///         .connectors
-    ///         .connector_create_credentials_v1(
+    ///         .create_credentials(
     ///             &"connector_id_or_name".to_string(),
-    ///             &ConnectorCreateCredentialsV1ConnectorsRequestConsumerScope::User,
+    ///             &CreateCredentialsConnectorsRequestConsumerScope::User,
     ///             &CredentialsCreateOrUpdate {
     ///                 name: "name".to_string(),
     ///                 ..Default::default()
@@ -658,10 +658,10 @@ impl ConnectorsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn connector_create_credentials_v1(
+    pub async fn create_credentials(
         &self,
         connector_id_or_name: &str,
-        consumer_scope: &ConnectorCreateCredentialsV1ConnectorsRequestConsumerScope,
+        consumer_scope: &CreateCredentialsConnectorsRequestConsumerScope,
         request: &CredentialsCreateOrUpdate,
         options: Option<RequestOptions>,
     ) -> Result<MessageResponse, ApiError> {
@@ -704,9 +704,9 @@ impl ConnectorsClient {
     ///     client
     ///         .beta
     ///         .connectors
-    ///         .connector_update_credentials(
+    ///         .update_credentials(
     ///             &"connector_id_or_name".to_string(),
-    ///             &ConnectorUpdateCredentialsConnectorsRequestConsumerScope::User,
+    ///             &UpdateCredentialsConnectorsRequestConsumerScope::User,
     ///             &CredentialsCreateOrUpdate {
     ///                 name: "name".to_string(),
     ///                 ..Default::default()
@@ -716,10 +716,10 @@ impl ConnectorsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn connector_update_credentials(
+    pub async fn update_credentials(
         &self,
         connector_id_or_name: &str,
-        consumer_scope: &ConnectorUpdateCredentialsConnectorsRequestConsumerScope,
+        consumer_scope: &UpdateCredentialsConnectorsRequestConsumerScope,
         request: &CredentialsCreateOrUpdate,
         options: Option<RequestOptions>,
     ) -> Result<MessageResponse, ApiError> {
@@ -762,19 +762,19 @@ impl ConnectorsClient {
     ///     client
     ///         .beta
     ///         .connectors
-    ///         .connector_delete_credentials(
+    ///         .delete_credentials(
     ///             &"connector_id_or_name".to_string(),
-    ///             &ConnectorDeleteCredentialsConnectorsRequestConsumerScope::User,
+    ///             &DeleteCredentialsConnectorsRequestConsumerScope::User,
     ///             &"credentials_name".to_string(),
     ///             None,
     ///         )
     ///         .await;
     /// }
     /// ```
-    pub async fn connector_delete_credentials(
+    pub async fn delete_credentials(
         &self,
         connector_id_or_name: &str,
-        consumer_scope: &ConnectorDeleteCredentialsConnectorsRequestConsumerScope,
+        consumer_scope: &DeleteCredentialsConnectorsRequestConsumerScope,
         credentials_name: &str,
         options: Option<RequestOptions>,
     ) -> Result<MessageResponse, ApiError> {
@@ -817,11 +817,11 @@ impl ConnectorsClient {
     ///     client
     ///         .beta
     ///         .connectors
-    ///         .connector_delete_v1(&"connector_id".to_string(), None)
+    ///         .delete(&"connector_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn connector_delete_v1(
+    pub async fn delete(
         &self,
         connector_id: &str,
         options: Option<RequestOptions>,
@@ -862,9 +862,9 @@ impl ConnectorsClient {
     ///     client
     ///         .beta
     ///         .connectors
-    ///         .connector_update_v1(
+    ///         .update(
     ///             &"connector_id".to_string(),
-    ///             &ConnectorUpdateV1ConnectorsRequestBody::HTTP {
+    ///             &UpdateConnectorsRequestBody::HTTP {
     ///                 data: UpdateHTTPConnectorRequest {
     ///                     ..Default::default()
     ///                 },
@@ -874,10 +874,10 @@ impl ConnectorsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn connector_update_v1(
+    pub async fn update(
         &self,
         connector_id: &str,
-        request: &ConnectorUpdateV1ConnectorsRequestBody,
+        request: &UpdateConnectorsRequestBody,
         options: Option<RequestOptions>,
     ) -> Result<Connector, ApiError> {
         self.http_client
@@ -916,11 +916,11 @@ impl ConnectorsClient {
     ///     client
     ///         .beta
     ///         .connectors
-    ///         .connector_share_to_organization_v1(&"connector_id".to_string(), None)
+    ///         .share_to_organization(&"connector_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn connector_share_to_organization_v1(
+    pub async fn share_to_organization(
         &self,
         connector_id: &str,
         options: Option<RequestOptions>,
@@ -961,11 +961,11 @@ impl ConnectorsClient {
     ///     client
     ///         .beta
     ///         .connectors
-    ///         .connector_unshare_from_organization_v1(&"connector_id".to_string(), None)
+    ///         .unshare_from_organization(&"connector_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn connector_unshare_from_organization_v1(
+    pub async fn unshare_from_organization(
         &self,
         connector_id: &str,
         options: Option<RequestOptions>,
@@ -1006,11 +1006,11 @@ impl ConnectorsClient {
     ///     client
     ///         .beta
     ///         .connectors
-    ///         .connector_share_v1(&"connector_id".to_string(), None)
+    ///         .share(&"connector_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn connector_share_v1(
+    pub async fn share(
         &self,
         connector_id: &str,
         options: Option<RequestOptions>,
@@ -1051,11 +1051,11 @@ impl ConnectorsClient {
     ///     client
     ///         .beta
     ///         .connectors
-    ///         .connector_unshare_v1(&"connector_id".to_string(), None)
+    ///         .unshare(&"connector_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn connector_unshare_v1(
+    pub async fn unshare(
         &self,
         connector_id: &str,
         options: Option<RequestOptions>,
@@ -1096,18 +1096,18 @@ impl ConnectorsClient {
     ///     client
     ///         .beta
     ///         .connectors
-    ///         .connector_activate_for_consumer_v1(
+    ///         .activate_for_consumer(
     ///             &"connector_id".to_string(),
-    ///             &ConnectorActivateForConsumerV1ConnectorsRequestConsumerScope::User,
+    ///             &ActivateForConsumerConnectorsRequestConsumerScope::User,
     ///             None,
     ///         )
     ///         .await;
     /// }
     /// ```
-    pub async fn connector_activate_for_consumer_v1(
+    pub async fn activate_for_consumer(
         &self,
         connector_id: &str,
-        consumer_scope: &ConnectorActivateForConsumerV1ConnectorsRequestConsumerScope,
+        consumer_scope: &ActivateForConsumerConnectorsRequestConsumerScope,
         options: Option<RequestOptions>,
     ) -> Result<MessageResponse, ApiError> {
         self.http_client
@@ -1146,18 +1146,18 @@ impl ConnectorsClient {
     ///     client
     ///         .beta
     ///         .connectors
-    ///         .connector_deactivate_for_consumer_v1(
+    ///         .deactivate_for_consumer(
     ///             &"connector_id".to_string(),
-    ///             &ConnectorDeactivateForConsumerV1ConnectorsRequestConsumerScope::User,
+    ///             &DeactivateForConsumerConnectorsRequestConsumerScope::User,
     ///             None,
     ///         )
     ///         .await;
     /// }
     /// ```
-    pub async fn connector_deactivate_for_consumer_v1(
+    pub async fn deactivate_for_consumer(
         &self,
         connector_id: &str,
-        consumer_scope: &ConnectorDeactivateForConsumerV1ConnectorsRequestConsumerScope,
+        consumer_scope: &DeactivateForConsumerConnectorsRequestConsumerScope,
         options: Option<RequestOptions>,
     ) -> Result<MessageResponse, ApiError> {
         self.http_client

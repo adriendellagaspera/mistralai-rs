@@ -59,9 +59,9 @@ impl MetricsClient {
     ///     client
     ///         .workflows
     ///         .metrics
-    ///         .get_workflow_metrics_v1workflows_workflow_name_metrics_get(
+    ///         .get_workflow_metrics(
     ///             &"workflow_name".to_string(),
-    ///             &GetWorkflowMetricsV1WorkflowsWorkflowNameMetricsGetQueryRequest {
+    ///             &GetWorkflowMetricsQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -69,10 +69,10 @@ impl MetricsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn get_workflow_metrics_v1workflows_workflow_name_metrics_get(
+    pub async fn get_workflow_metrics(
         &self,
         workflow_name: &str,
-        request: &GetWorkflowMetricsV1WorkflowsWorkflowNameMetricsGetQueryRequest,
+        request: &GetWorkflowMetricsQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<WorkflowMetrics, ApiError> {
         self.http_client

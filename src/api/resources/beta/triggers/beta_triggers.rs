@@ -41,8 +41,8 @@ impl TriggersClient {
     ///     client
     ///         .beta
     ///         .triggers
-    ///         .list_triggers_v1triggers_get(
-    ///             &ListTriggersV1TriggersGetQueryRequest {
+    ///         .list(
+    ///             &BetaTriggersListQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -50,9 +50,9 @@ impl TriggersClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn list_triggers_v1triggers_get(
+    pub async fn list(
         &self,
-        request: &ListTriggersV1TriggersGetQueryRequest,
+        request: &BetaTriggersListQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<Vec<Trigger>, ApiError> {
         self.http_client
@@ -95,7 +95,7 @@ impl TriggersClient {
     ///     client
     ///         .beta
     ///         .triggers
-    ///         .create_trigger_v1triggers_post(
+    ///         .create(
     ///             &CreateTrigger {
     ///                 action: CreateTriggerAction {
     ///                     primitive_id: "primitive_id".to_string(),
@@ -112,7 +112,7 @@ impl TriggersClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn create_trigger_v1triggers_post(
+    pub async fn create(
         &self,
         request: &CreateTrigger,
         options: Option<RequestOptions>,
@@ -153,11 +153,11 @@ impl TriggersClient {
     ///     client
     ///         .beta
     ///         .triggers
-    ///         .get_trigger_v1triggers_trigger_id_get(&"trigger_id".to_string(), None)
+    ///         .get(&"trigger_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn get_trigger_v1triggers_trigger_id_get(
+    pub async fn get(
         &self,
         trigger_id: &str,
         options: Option<RequestOptions>,
@@ -198,11 +198,11 @@ impl TriggersClient {
     ///     client
     ///         .beta
     ///         .triggers
-    ///         .delete_trigger_v1triggers_trigger_id_delete(&"trigger_id".to_string(), None)
+    ///         .delete(&"trigger_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn delete_trigger_v1triggers_trigger_id_delete(
+    pub async fn delete(
         &self,
         trigger_id: &str,
         options: Option<RequestOptions>,
@@ -244,9 +244,9 @@ impl TriggersClient {
     ///     client
     ///         .beta
     ///         .triggers
-    ///         .list_trigger_events_v1triggers_trigger_id_events_get(
+    ///         .list_events(
     ///             &"trigger_id".to_string(),
-    ///             &ListTriggerEventsV1TriggersTriggerIDEventsGetQueryRequest {
+    ///             &ListEventsQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -254,10 +254,10 @@ impl TriggersClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn list_trigger_events_v1triggers_trigger_id_events_get(
+    pub async fn list_events(
         &self,
         trigger_id: &str,
-        request: &ListTriggerEventsV1TriggersTriggerIdEventsGetQueryRequest,
+        request: &ListEventsQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<TriggerEventList, ApiError> {
         self.http_client

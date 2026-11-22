@@ -38,8 +38,8 @@ impl TranscriptionsClient {
     ///     client
     ///         .audio
     ///         .transcriptions
-    ///         .audio_api_v1transcriptions_post(
-    ///             &AudioAPIV1TranscriptionsPostRequest {
+    ///         .complete(
+    ///             &CompleteRequest {
     ///                 context_bias: None,
     ///                 diarize: None,
     ///                 file: None,
@@ -57,9 +57,9 @@ impl TranscriptionsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn audio_api_v1transcriptions_post(
+    pub async fn complete(
         &self,
-        request: &AudioApiV1TranscriptionsPostRequest,
+        request: &CompleteRequest,
         options: Option<RequestOptions>,
     ) -> Result<TranscriptionResponse, ApiError> {
         self.http_client
@@ -98,8 +98,8 @@ impl TranscriptionsClient {
     ///     client
     ///         .audio
     ///         .transcriptions
-    ///         .audio_api_v1transcriptions_post_stream(
-    ///             &AudioAPIV1TranscriptionsPostStreamRequest {
+    ///         .stream(
+    ///             &StreamRequest {
     ///                 context_bias: None,
     ///                 diarize: None,
     ///                 file: None,
@@ -117,9 +117,9 @@ impl TranscriptionsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn audio_api_v1transcriptions_post_stream(
+    pub async fn stream(
         &self,
-        request: &AudioApiV1TranscriptionsPostStreamRequest,
+        request: &StreamRequest,
         options: Option<RequestOptions>,
     ) -> Result<SseStream<TranscriptionStreamEvents>, ApiError> {
         self.http_client

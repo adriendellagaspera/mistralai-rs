@@ -37,14 +37,10 @@ impl BillingClient {
     ///         ..Default::default()
     ///     };
     ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client
-    ///         .beta
-    ///         .billing
-    ///         .billing_api_public_get_budget(None)
-    ///         .await;
+    ///     client.beta.billing.get_budget(None).await;
     /// }
     /// ```
-    pub async fn billing_api_public_get_budget(
+    pub async fn get_budget(
         &self,
         options: Option<RequestOptions>,
     ) -> Result<GetBudgetResponse, ApiError> {
@@ -75,14 +71,10 @@ impl BillingClient {
     ///         ..Default::default()
     ///     };
     ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client
-    ///         .beta
-    ///         .billing
-    ///         .billing_api_public_get_subscription(None)
-    ///         .await;
+    ///     client.beta.billing.get_subscription(None).await;
     /// }
     /// ```
-    pub async fn billing_api_public_get_subscription(
+    pub async fn get_subscription(
         &self,
         options: Option<RequestOptions>,
     ) -> Result<GetSubscriptionResponse, ApiError> {

@@ -38,7 +38,7 @@ impl ModelsClient {
     ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .models
-    ///         .jobs_api_routes_fine_tuning_update_fine_tuned_model(
+    ///         .update(
     ///             &"ft:open-mistral-7b:587a6b29:20240514:7e773925".to_string(),
     ///             &UpdateModelRequest {
     ///                 ..Default::default()
@@ -48,12 +48,12 @@ impl ModelsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn jobs_api_routes_fine_tuning_update_fine_tuned_model(
+    pub async fn update(
         &self,
         model_id: &str,
         request: &UpdateModelRequest,
         options: Option<RequestOptions>,
-    ) -> Result<JobsApiRoutesFineTuningUpdateFineTunedModelModelsResponse, ApiError> {
+    ) -> Result<UpdateModelsResponse, ApiError> {
         self.http_client
             .execute_request(
                 Method::PATCH,
@@ -90,14 +90,14 @@ impl ModelsClient {
     ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .models
-    ///         .jobs_api_routes_fine_tuning_archive_fine_tuned_model(
+    ///         .archive(
     ///             &"ft:open-mistral-7b:587a6b29:20240514:7e773925".to_string(),
     ///             None,
     ///         )
     ///         .await;
     /// }
     /// ```
-    pub async fn jobs_api_routes_fine_tuning_archive_fine_tuned_model(
+    pub async fn archive(
         &self,
         model_id: &str,
         options: Option<RequestOptions>,
@@ -138,14 +138,14 @@ impl ModelsClient {
     ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .models
-    ///         .jobs_api_routes_fine_tuning_unarchive_fine_tuned_model(
+    ///         .unarchive(
     ///             &"ft:open-mistral-7b:587a6b29:20240514:7e773925".to_string(),
     ///             None,
     ///         )
     ///         .await;
     /// }
     /// ```
-    pub async fn jobs_api_routes_fine_tuning_unarchive_fine_tuned_model(
+    pub async fn unarchive(
         &self,
         model_id: &str,
         options: Option<RequestOptions>,
@@ -185,8 +185,8 @@ impl ModelsClient {
     ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .models
-    ///         .list_models_v1models_get(
-    ///             &ListModelsV1ModelsGetQueryRequest {
+    ///         .list(
+    ///             &ModelsListQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -194,9 +194,9 @@ impl ModelsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn list_models_v1models_get(
+    pub async fn list(
         &self,
-        request: &ListModelsV1ModelsGetQueryRequest,
+        request: &ModelsListQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<ModelList, ApiError> {
         self.http_client
@@ -238,18 +238,18 @@ impl ModelsClient {
     ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .models
-    ///         .retrieve_model_v1models_model_id_get(
+    ///         .retrieve(
     ///             &"ft:open-mistral-7b:587a6b29:20240514:7e773925".to_string(),
     ///             None,
     ///         )
     ///         .await;
     /// }
     /// ```
-    pub async fn retrieve_model_v1models_model_id_get(
+    pub async fn retrieve(
         &self,
         model_id: &str,
         options: Option<RequestOptions>,
-    ) -> Result<RetrieveModelV1ModelsModelIdGetModelsResponse, ApiError> {
+    ) -> Result<RetrieveModelsResponse, ApiError> {
         self.http_client
             .execute_request(
                 Method::GET,
@@ -286,14 +286,14 @@ impl ModelsClient {
     ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .models
-    ///         .delete_model_v1models_model_id_delete(
+    ///         .delete(
     ///             &"ft:open-mistral-7b:587a6b29:20240514:7e773925".to_string(),
     ///             None,
     ///         )
     ///         .await;
     /// }
     /// ```
-    pub async fn delete_model_v1models_model_id_delete(
+    pub async fn delete(
         &self,
         model_id: &str,
         options: Option<RequestOptions>,

@@ -39,11 +39,11 @@ impl SearchIndexesClient2 {
     ///         .beta
     ///         .rag
     ///         .search_indexes
-    ///         .get_deployment_summaries_v1rag_deployments_get(None)
+    ///         .get_deployment_summaries(None)
     ///         .await;
     /// }
     /// ```
-    pub async fn get_deployment_summaries_v1rag_deployments_get(
+    pub async fn get_deployment_summaries(
         &self,
         options: Option<RequestOptions>,
     ) -> Result<GetDeploymentSummariesResponse, ApiError> {
@@ -78,7 +78,7 @@ impl SearchIndexesClient2 {
     ///         .beta
     ///         .rag
     ///         .search_indexes
-    ///         .register_deployment_v1rag_deployments_put(
+    ///         .register_deployment(
     ///             &RegisterDeploymentRequestDeployment {
     ///                 deployment: RegisterDeploymentRequestDeploymentDeployment::Vespa {
     ///                     data: RegisterDeploymentRequestVespaDeployment {
@@ -108,7 +108,7 @@ impl SearchIndexesClient2 {
     ///         .await;
     /// }
     /// ```
-    pub async fn register_deployment_v1rag_deployments_put(
+    pub async fn register_deployment(
         &self,
         request: &RegisterDeploymentRequestDeployment,
         options: Option<RequestOptions>,
@@ -150,14 +150,11 @@ impl SearchIndexesClient2 {
     ///         .beta
     ///         .rag
     ///         .search_indexes
-    ///         .unregister_deployment_v1rag_deployments_deployment_id_delete(
-    ///             &"deployment_id".to_string(),
-    ///             None,
-    ///         )
+    ///         .unregister_deployment(&"deployment_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn unregister_deployment_v1rag_deployments_deployment_id_delete(
+    pub async fn unregister_deployment(
         &self,
         deployment_id: &str,
         options: Option<RequestOptions>,
@@ -195,23 +192,32 @@ impl SearchIndexesClient2 {
     ///         ..Default::default()
     ///     };
     ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client.beta.rag.search_indexes.update_index_metrics_v1rag_deployments_deployment_id_metrics_put(&"deployment_id".to_string(), &UpdateIndexMetricsV1RagDeploymentsDeploymentIDMetricsPutSearchIndexesRequestBody::Online {
-    ///         data: UpdateMetricsRequestDeploymentMetricsOnline {
-    ///             document_count: 1,
-    ///             index_metrics: vec![UpdateMetricsRequestIndexMetrics {
-    ///                 document_count: 1,
-    ///                 name: "name".to_string(),
-    ///                 ..Default::default()
-    ///             }],
-    ///             ..Default::default()
-    ///         }
-    ///     }, None).await;
+    ///     client
+    ///         .beta
+    ///         .rag
+    ///         .search_indexes
+    ///         .update_index_metrics(
+    ///             &"deployment_id".to_string(),
+    ///             &UpdateIndexMetricsSearchIndexesRequestBody::Online {
+    ///                 data: UpdateMetricsRequestDeploymentMetricsOnline {
+    ///                     document_count: 1,
+    ///                     index_metrics: vec![UpdateMetricsRequestIndexMetrics {
+    ///                         document_count: 1,
+    ///                         name: "name".to_string(),
+    ///                         ..Default::default()
+    ///                     }],
+    ///                     ..Default::default()
+    ///                 },
+    ///             },
+    ///             None,
+    ///         )
+    ///         .await;
     /// }
     /// ```
-    pub async fn update_index_metrics_v1rag_deployments_deployment_id_metrics_put(
+    pub async fn update_index_metrics(
         &self,
         deployment_id: &str,
-        request: &UpdateIndexMetricsV1RagDeploymentsDeploymentIdMetricsPutSearchIndexesRequestBody,
+        request: &UpdateIndexMetricsSearchIndexesRequestBody,
         options: Option<RequestOptions>,
     ) -> Result<serde_json::Value, ApiError> {
         self.http_client

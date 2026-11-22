@@ -8,14 +8,20 @@ pub mod api_keys;
 pub use api_keys::ApiKeysClient;
 pub mod audit_logs;
 pub use audit_logs::AuditLogsClient;
-pub mod billing;
-pub use billing::BillingClient2;
-pub mod users;
-pub use users::UsersClient2;
+pub mod rate_limits;
+pub use rate_limits::RateLimitsClient;
+pub mod roles;
+pub use roles::RolesClient;
 pub mod scim;
 pub use scim::ScimClient;
+pub mod spend_limits;
+pub use spend_limits::SpendLimitsClient;
+pub mod usage;
+pub use usage::UsageClient;
 pub mod user_groups;
 pub use user_groups::UserGroupsClient;
+pub mod users;
+pub use users::UsersClient2;
 pub mod workspaces;
 pub use workspaces::WorkspacesClient;
 pub struct AdminClient {
@@ -24,10 +30,13 @@ pub struct AdminClient {
     pub vibe_work_analytics: VibeWorkAnalyticsClient,
     pub api_keys: ApiKeysClient,
     pub audit_logs: AuditLogsClient,
-    pub billing: BillingClient2,
-    pub users: UsersClient2,
+    pub rate_limits: RateLimitsClient,
+    pub roles: RolesClient,
     pub scim: ScimClient,
+    pub spend_limits: SpendLimitsClient,
+    pub usage: UsageClient,
     pub user_groups: UserGroupsClient,
+    pub users: UsersClient2,
     pub workspaces: WorkspacesClient,
 }
 
@@ -39,10 +48,13 @@ impl AdminClient {
             vibe_work_analytics: VibeWorkAnalyticsClient::new(config.clone())?,
             api_keys: ApiKeysClient::new(config.clone())?,
             audit_logs: AuditLogsClient::new(config.clone())?,
-            billing: BillingClient2::new(config.clone())?,
-            users: UsersClient2::new(config.clone())?,
+            rate_limits: RateLimitsClient::new(config.clone())?,
+            roles: RolesClient::new(config.clone())?,
             scim: ScimClient::new(config.clone())?,
+            spend_limits: SpendLimitsClient::new(config.clone())?,
+            usage: UsageClient::new(config.clone())?,
             user_groups: UserGroupsClient::new(config.clone())?,
+            users: UsersClient2::new(config.clone())?,
             workspaces: WorkspacesClient::new(config.clone())?,
         })
     }

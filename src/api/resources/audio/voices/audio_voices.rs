@@ -41,8 +41,8 @@ impl VoicesClient {
     ///     client
     ///         .audio
     ///         .voices
-    ///         .list_voices_v1audio_voices_get(
-    ///             &ListVoicesV1AudioVoicesGetQueryRequest {
+    ///         .list(
+    ///             &AudioVoicesListQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -50,9 +50,9 @@ impl VoicesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn list_voices_v1audio_voices_get(
+    pub async fn list(
         &self,
-        request: &ListVoicesV1AudioVoicesGetQueryRequest,
+        request: &AudioVoicesListQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<VoiceListResponse, ApiError> {
         self.http_client
@@ -95,7 +95,7 @@ impl VoicesClient {
     ///     client
     ///         .audio
     ///         .voices
-    ///         .create_voice_v1audio_voices_post(
+    ///         .create(
     ///             &VoiceCreateRequest {
     ///                 name: "name".to_string(),
     ///                 age: None,
@@ -113,7 +113,7 @@ impl VoicesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn create_voice_v1audio_voices_post(
+    pub async fn create(
         &self,
         request: &VoiceCreateRequest,
         options: Option<RequestOptions>,
@@ -151,14 +151,10 @@ impl VoicesClient {
     ///         ..Default::default()
     ///     };
     ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client
-    ///         .audio
-    ///         .voices
-    ///         .get_voice_v1audio_voices_voice_id_get(&"voice_id".to_string(), None)
-    ///         .await;
+    ///     client.audio.voices.get(&"voice_id".to_string(), None).await;
     /// }
     /// ```
-    pub async fn get_voice_v1audio_voices_voice_id_get(
+    pub async fn get(
         &self,
         voice_id: &str,
         options: Option<RequestOptions>,
@@ -199,11 +195,11 @@ impl VoicesClient {
     ///     client
     ///         .audio
     ///         .voices
-    ///         .delete_voice_v1audio_voices_voice_id_delete(&"voice_id".to_string(), None)
+    ///         .delete(&"voice_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn delete_voice_v1audio_voices_voice_id_delete(
+    pub async fn delete(
         &self,
         voice_id: &str,
         options: Option<RequestOptions>,
@@ -244,7 +240,7 @@ impl VoicesClient {
     ///     client
     ///         .audio
     ///         .voices
-    ///         .update_voice_v1audio_voices_voice_id_patch(
+    ///         .update(
     ///             &"voice_id".to_string(),
     ///             &VoiceUpdateRequest {
     ///                 ..Default::default()
@@ -254,7 +250,7 @@ impl VoicesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn update_voice_v1audio_voices_voice_id_patch(
+    pub async fn update(
         &self,
         voice_id: &str,
         request: &VoiceUpdateRequest,
@@ -348,8 +344,8 @@ impl VoicesClient {
     ///     client
     ///         .audio
     ///         .voices
-    ///         .audio_v2voices_list(
-    ///             &AudioV2VoicesListQueryRequest {
+    ///         .search(
+    ///             &SearchQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -357,9 +353,9 @@ impl VoicesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn audio_v2voices_list(
+    pub async fn search(
         &self,
-        request: &AudioV2VoicesListQueryRequest,
+        request: &SearchQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<VoiceListPage, ApiError> {
         self.http_client

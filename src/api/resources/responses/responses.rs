@@ -45,7 +45,7 @@ impl ResponsesClient {
     ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .responses
-    ///         .create_response_v1responses_post(
+    ///         .create(
     ///             &CreateResponseRequest {
     ///                 input: CreateResponseRequestInput::String("input".to_string()),
     ///                 model: "model".to_string(),
@@ -76,7 +76,7 @@ impl ResponsesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn create_response_v1responses_post(
+    pub async fn create(
         &self,
         request: &CreateResponseRequest,
         options: Option<RequestOptions>,
@@ -124,7 +124,7 @@ impl ResponsesClient {
     ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .responses
-    ///         .count_input_tokens_v1responses_input_tokens_post(
+    ///         .count_input_tokens(
     ///             &CountResponseInputTokensRequest {
     ///                 input: CountResponseInputTokensRequestInput::String("input".to_string()),
     ///                 model: "model".to_string(),
@@ -144,7 +144,7 @@ impl ResponsesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn count_input_tokens_v1responses_input_tokens_post(
+    pub async fn count_input_tokens(
         &self,
         request: &CountResponseInputTokensRequest,
         options: Option<RequestOptions>,

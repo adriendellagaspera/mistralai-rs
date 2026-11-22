@@ -41,8 +41,8 @@ impl VibeWorkAnalyticsClient {
     ///         .beta
     ///         .admin
     ///         .vibe_work_analytics
-    ///         .get_by_agent_stats_v1admin_analytics_vibe_work_usage_by_agent_stats(
-    ///             &GetByAgentStatsV1AdminAnalyticsVibeWorkUsageByAgentStatsQueryRequest {
+    ///         .agent_stats(
+    ///             &AgentStatsQueryRequest {
     ///                 start_time: 1764547200,
     ///                 end_time: 1767225600,
     ///             },
@@ -51,9 +51,9 @@ impl VibeWorkAnalyticsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn get_by_agent_stats_v1admin_analytics_vibe_work_usage_by_agent_stats(
+    pub async fn agent_stats(
         &self,
-        request: &GetByAgentStatsV1AdminAnalyticsVibeWorkUsageByAgentStatsQueryRequest,
+        request: &AgentStatsQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<VibeWorkByAgentStatsOut, ApiError> {
         self.http_client
@@ -99,8 +99,8 @@ impl VibeWorkAnalyticsClient {
     ///         .beta
     ///         .admin
     ///         .vibe_work_analytics
-    ///         .get_by_time_stats_v1admin_analytics_vibe_work_usage_by_time_stats(
-    ///             &GetByTimeStatsV1AdminAnalyticsVibeWorkUsageByTimeStatsQueryRequest {
+    ///         .time_stats(
+    ///             &TimeStatsQueryRequest {
     ///                 start_time: 1764547200,
     ///                 end_time: 1767225600,
     ///                 granularity: None,
@@ -110,9 +110,9 @@ impl VibeWorkAnalyticsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn get_by_time_stats_v1admin_analytics_vibe_work_usage_by_time_stats(
+    pub async fn time_stats(
         &self,
-        request: &GetByTimeStatsV1AdminAnalyticsVibeWorkUsageByTimeStatsQueryRequest,
+        request: &TimeStatsQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<VibeWorkByTimeStatsOut, ApiError> {
         self.http_client
@@ -158,8 +158,8 @@ impl VibeWorkAnalyticsClient {
     ///         .beta
     ///         .admin
     ///         .vibe_work_analytics
-    ///         .get_by_user_stats_v1admin_analytics_vibe_work_usage_by_user_stats(
-    ///             &GetByUserStatsV1AdminAnalyticsVibeWorkUsageByUserStatsQueryRequest {
+    ///         .user_stats(
+    ///             &UserStatsQueryRequest {
     ///                 start_time: 1764547200,
     ///                 end_time: 1767225600,
     ///             },
@@ -168,9 +168,9 @@ impl VibeWorkAnalyticsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn get_by_user_stats_v1admin_analytics_vibe_work_usage_by_user_stats(
+    pub async fn user_stats(
         &self,
-        request: &GetByUserStatsV1AdminAnalyticsVibeWorkUsageByUserStatsQueryRequest,
+        request: &UserStatsQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<VibeWorkByUserStatsOut, ApiError> {
         self.http_client

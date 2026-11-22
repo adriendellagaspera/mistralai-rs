@@ -16,7 +16,7 @@
 //!     let client = Mistral::new(config).expect("Failed to build client");
 //!     client
 //!         .agents
-//!         .agents_completion_v1agents_completions_post(
+//!         .complete(
 //!             &AgentsCompletionRequest {
 //!                 agent_id: "agent_id".to_string(),
 //!                 messages: vec![AgentsCompletionRequestMessagesItem::User {

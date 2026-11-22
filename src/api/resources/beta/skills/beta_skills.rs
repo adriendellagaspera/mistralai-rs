@@ -43,8 +43,8 @@ impl SkillsClient {
     ///     client
     ///         .beta
     ///         .skills
-    ///         .skills_list(
-    ///             &SkillsListQueryRequest {
+    ///         .list(
+    ///             &BetaSkillsListQueryRequest {
     ///                 page_size: None,
     ///                 page_token: None,
     ///                 alias: None,
@@ -59,9 +59,9 @@ impl SkillsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn skills_list(
+    pub async fn list(
         &self,
-        request: &SkillsListQueryRequest,
+        request: &BetaSkillsListQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<ListSkillsResponse, ApiError> {
         self.http_client
@@ -109,7 +109,7 @@ impl SkillsClient {
     ///     client
     ///         .beta
     ///         .skills
-    ///         .skills_create(
+    ///         .create(
     ///             &CreateSkillRequest {
     ///                 definition: SkillDefinition {
     ///                     ..Default::default()
@@ -125,7 +125,7 @@ impl SkillsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn skills_create(
+    pub async fn create(
         &self,
         request: &CreateSkillRequest,
         options: Option<RequestOptions>,
@@ -166,9 +166,9 @@ impl SkillsClient {
     ///     client
     ///         .beta
     ///         .skills
-    ///         .skills_get(
+    ///         .get(
     ///             &"skill_id".to_string(),
-    ///             &SkillsGetQueryRequest {
+    ///             &BetaSkillsGetQueryRequest {
     ///                 version: Some(1),
     ///                 alias: None,
     ///                 fields: vec![],
@@ -178,10 +178,10 @@ impl SkillsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn skills_get(
+    pub async fn get(
         &self,
         skill_id: &str,
-        request: &SkillsGetQueryRequest,
+        request: &BetaSkillsGetQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<Skill, ApiError> {
         self.http_client
@@ -224,11 +224,11 @@ impl SkillsClient {
     ///     client
     ///         .beta
     ///         .skills
-    ///         .skills_delete(&"skill_id".to_string(), None)
+    ///         .delete(&"skill_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn skills_delete(
+    pub async fn delete(
         &self,
         skill_id: &str,
         options: Option<RequestOptions>,
@@ -269,9 +269,9 @@ impl SkillsClient {
     ///     client
     ///         .beta
     ///         .skills
-    ///         .skills_update(
+    ///         .update_metadata(
     ///             &"skill_id".to_string(),
-    ///             &SkillsUpdateSkillsRequest {
+    ///             &UpdateMetadataSkillsRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -279,10 +279,10 @@ impl SkillsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn skills_update(
+    pub async fn update_metadata(
         &self,
         skill_id: &str,
-        request: &SkillsUpdateSkillsRequest,
+        request: &UpdateMetadataSkillsRequest,
         options: Option<RequestOptions>,
     ) -> Result<Skill, ApiError> {
         self.http_client
@@ -321,11 +321,11 @@ impl SkillsClient {
     ///     client
     ///         .beta
     ///         .skills
-    ///         .skills_list_versions(&"skill_id".to_string(), None)
+    ///         .list_versions(&"skill_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn skills_list_versions(
+    pub async fn list_versions(
         &self,
         skill_id: &str,
         options: Option<RequestOptions>,
@@ -366,9 +366,9 @@ impl SkillsClient {
     ///     client
     ///         .beta
     ///         .skills
-    ///         .skills_create_version(
+    ///         .create_version(
     ///             &"skill_id".to_string(),
-    ///             &SkillsCreateVersionSkillsRequest {
+    ///             &CreateVersionSkillsRequest {
     ///                 definition: SkillDefinition {
     ///                     ..Default::default()
     ///                 },
@@ -380,10 +380,10 @@ impl SkillsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn skills_create_version(
+    pub async fn create_version(
         &self,
         skill_id: &str,
-        request: &SkillsCreateVersionSkillsRequest,
+        request: &CreateVersionSkillsRequest,
         options: Option<RequestOptions>,
     ) -> Result<CreateSkillVersionResponse, ApiError> {
         self.http_client
@@ -422,20 +422,20 @@ impl SkillsClient {
     ///     client
     ///         .beta
     ///         .skills
-    ///         .skills_get_version(
+    ///         .get_version(
     ///             &"skill_id".to_string(),
     ///             1,
-    ///             &SkillsGetVersionQueryRequest { fields: vec![] },
+    ///             &BetaSkillsGetVersionQueryRequest { fields: vec![] },
     ///             None,
     ///         )
     ///         .await;
     /// }
     /// ```
-    pub async fn skills_get_version(
+    pub async fn get_version(
         &self,
         skill_id: &str,
         version: i64,
-        request: &SkillsGetVersionQueryRequest,
+        request: &BetaSkillsGetVersionQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<Skill, ApiError> {
         self.http_client
@@ -476,10 +476,10 @@ impl SkillsClient {
     ///     client
     ///         .beta
     ///         .skills
-    ///         .skills_update_version_metadata(
+    ///         .update_version_metadata(
     ///             &"skill_id".to_string(),
     ///             1,
-    ///             &SkillsUpdateVersionMetadataSkillsRequest {
+    ///             &UpdateVersionMetadataSkillsRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -487,11 +487,11 @@ impl SkillsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn skills_update_version_metadata(
+    pub async fn update_version_metadata(
         &self,
         skill_id: &str,
         version: i64,
-        request: &SkillsUpdateVersionMetadataSkillsRequest,
+        request: &UpdateVersionMetadataSkillsRequest,
         options: Option<RequestOptions>,
     ) -> Result<Skill, ApiError> {
         self.http_client

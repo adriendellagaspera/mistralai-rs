@@ -59,14 +59,11 @@ impl EvaluationsClient {
     ///         .beta
     ///         .observability
     ///         .evaluations
-    ///         .get_evaluation_v2v1observability_evaluations_v2evaluation_slug_get(
-    ///             &"evaluation_slug".to_string(),
-    ///             None,
-    ///         )
+    ///         .get(&"evaluation_slug".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn get_evaluation_v2v1observability_evaluations_v2evaluation_slug_get(
+    pub async fn get(
         &self,
         evaluation_slug: &str,
         options: Option<RequestOptions>,
@@ -108,8 +105,8 @@ impl EvaluationsClient {
     ///         .beta
     ///         .observability
     ///         .evaluations
-    ///         .list_pipelines_v1observability_pipelines_get(
-    ///             &ListPipelinesV1ObservabilityPipelinesGetQueryRequest {
+    ///         .list_pipelines(
+    ///             &ListPipelinesQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -117,9 +114,9 @@ impl EvaluationsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn list_pipelines_v1observability_pipelines_get(
+    pub async fn list_pipelines(
         &self,
-        request: &ListPipelinesV1ObservabilityPipelinesGetQueryRequest,
+        request: &ListPipelinesQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<PipelinesResponse, ApiError> {
         self.http_client
@@ -166,7 +163,7 @@ impl EvaluationsClient {
     ///         .beta
     ///         .observability
     ///         .evaluations
-    ///         .create_pipeline_v1observability_pipelines_post(
+    ///         .create_pipeline(
     ///             &CreatePipelineRequest {
     ///                 definitions: vec![LlmJudgeReference {
     ///                     slug: "slug".to_string(),
@@ -185,7 +182,7 @@ impl EvaluationsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn create_pipeline_v1observability_pipelines_post(
+    pub async fn create_pipeline(
         &self,
         request: &CreatePipelineRequest,
         options: Option<RequestOptions>,
@@ -227,11 +224,11 @@ impl EvaluationsClient {
     ///         .beta
     ///         .observability
     ///         .evaluations
-    ///         .get_pipeline_v1observability_pipelines_pipeline_id_get(&"pipeline_id".to_string(), None)
+    ///         .get_pipeline(&"pipeline_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn get_pipeline_v1observability_pipelines_pipeline_id_get(
+    pub async fn get_pipeline(
         &self,
         pipeline_id: &str,
         options: Option<RequestOptions>,
@@ -273,7 +270,7 @@ impl EvaluationsClient {
     ///         .beta
     ///         .observability
     ///         .evaluations
-    ///         .update_pipeline_v1observability_pipelines_pipeline_id_put(
+    ///         .update_pipeline(
     ///             &"pipeline_id".to_string(),
     ///             &UpdatePipelineRequest {
     ///                 ..Default::default()
@@ -283,7 +280,7 @@ impl EvaluationsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn update_pipeline_v1observability_pipelines_pipeline_id_put(
+    pub async fn update_pipeline(
         &self,
         pipeline_id: &str,
         request: &UpdatePipelineRequest,
@@ -326,14 +323,11 @@ impl EvaluationsClient {
     ///         .beta
     ///         .observability
     ///         .evaluations
-    ///         .delete_pipeline_v1observability_pipelines_pipeline_id_delete(
-    ///             &"pipeline_id".to_string(),
-    ///             None,
-    ///         )
+    ///         .delete_pipeline(&"pipeline_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn delete_pipeline_v1observability_pipelines_pipeline_id_delete(
+    pub async fn delete_pipeline(
         &self,
         pipeline_id: &str,
         options: Option<RequestOptions>,
@@ -371,15 +365,24 @@ impl EvaluationsClient {
     ///         ..Default::default()
     ///     };
     ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client.beta.observability.evaluations.get_project_evaluations_v2v1observability_projects_project_slug_evaluations_v2get(&"project_slug".to_string(), &GetProjectEvaluationsV2V1ObservabilityProjectsProjectSlugEvaluationsV2GetQueryRequest {
-    ///         ..Default::default()
-    ///     }, None).await;
+    ///     client
+    ///         .beta
+    ///         .observability
+    ///         .evaluations
+    ///         .list(
+    ///             &"project_slug".to_string(),
+    ///             &BetaObservabilityEvaluationsListQueryRequest {
+    ///                 ..Default::default()
+    ///             },
+    ///             None,
+    ///         )
+    ///         .await;
     /// }
     /// ```
-    pub async fn get_project_evaluations_v2v1observability_projects_project_slug_evaluations_v2get(
+    pub async fn list(
         &self,
         project_slug: &str,
-        request: &GetProjectEvaluationsV2V1ObservabilityProjectsProjectSlugEvaluationsV2GetQueryRequest,
+        request: &BetaObservabilityEvaluationsListQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<EvaluationsV2, ApiError> {
         self.http_client

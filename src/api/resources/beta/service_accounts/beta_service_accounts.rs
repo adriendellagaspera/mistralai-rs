@@ -45,8 +45,8 @@ impl ServiceAccountsClient {
     ///     client
     ///         .beta
     ///         .service_accounts
-    ///         .list_service_accounts_v1service_accounts_get(
-    ///             &ListServiceAccountsV1ServiceAccountsGetQueryRequest {
+    ///         .list(
+    ///             &BetaServiceAccountsListQueryRequest {
     ///                 offset: 1,
     ///                 limit: 1,
     ///                 workspace_id: None,
@@ -59,9 +59,9 @@ impl ServiceAccountsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn list_service_accounts_v1service_accounts_get(
+    pub async fn list(
         &self,
-        request: &ListServiceAccountsV1ServiceAccountsGetQueryRequest,
+        request: &BetaServiceAccountsListQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<ListServiceAccountsResponse, ApiError> {
         self.http_client
@@ -107,7 +107,7 @@ impl ServiceAccountsClient {
     ///     client
     ///         .beta
     ///         .service_accounts
-    ///         .create_service_account_v1service_accounts_post(
+    ///         .create(
     ///             &CreateServiceAccountRequest {
     ///                 name: "name".to_string(),
     ///                 workspace_id: "workspace_id".to_string(),
@@ -119,7 +119,7 @@ impl ServiceAccountsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn create_service_account_v1service_accounts_post(
+    pub async fn create(
         &self,
         request: &CreateServiceAccountRequest,
         options: Option<RequestOptions>,
@@ -162,8 +162,8 @@ impl ServiceAccountsClient {
     ///     client
     ///         .beta
     ///         .service_accounts
-    ///         .list_assignable_service_account_roles_v1service_accounts_assignable_roles_get(
-    ///             &ListAssignableServiceAccountRolesV1ServiceAccountsAssignableRolesGetQueryRequest {
+    ///         .list_assignable_roles(
+    ///             &ListAssignableRolesQueryRequest {
     ///                 workspace_id: "workspace_id".to_string(),
     ///             },
     ///             None,
@@ -171,9 +171,9 @@ impl ServiceAccountsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn list_assignable_service_account_roles_v1service_accounts_assignable_roles_get(
+    pub async fn list_assignable_roles(
         &self,
-        request: &ListAssignableServiceAccountRolesV1ServiceAccountsAssignableRolesGetQueryRequest,
+        request: &ListAssignableRolesQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<ListAssignableServiceAccountRolesResponse, ApiError> {
         self.http_client
@@ -216,14 +216,11 @@ impl ServiceAccountsClient {
     ///     client
     ///         .beta
     ///         .service_accounts
-    ///         .get_service_account_v1service_accounts_service_account_id_get(
-    ///             &"service_account_id".to_string(),
-    ///             None,
-    ///         )
+    ///         .get(&"service_account_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn get_service_account_v1service_accounts_service_account_id_get(
+    pub async fn get(
         &self,
         service_account_id: &str,
         options: Option<RequestOptions>,
@@ -266,14 +263,11 @@ impl ServiceAccountsClient {
     ///     client
     ///         .beta
     ///         .service_accounts
-    ///         .delete_service_account_v1service_accounts_service_account_id_delete(
-    ///             &"service_account_id".to_string(),
-    ///             None,
-    ///         )
+    ///         .delete(&"service_account_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn delete_service_account_v1service_accounts_service_account_id_delete(
+    pub async fn delete(
         &self,
         service_account_id: &str,
         options: Option<RequestOptions>,
@@ -316,7 +310,7 @@ impl ServiceAccountsClient {
     ///     client
     ///         .beta
     ///         .service_accounts
-    ///         .update_service_account_v1service_accounts_service_account_id_patch(
+    ///         .update(
     ///             &"service_account_id".to_string(),
     ///             &UpdateServiceAccountRequest {
     ///                 ..Default::default()
@@ -326,7 +320,7 @@ impl ServiceAccountsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn update_service_account_v1service_accounts_service_account_id_patch(
+    pub async fn update(
         &self,
         service_account_id: &str,
         request: &UpdateServiceAccountRequest,
@@ -370,14 +364,11 @@ impl ServiceAccountsClient {
     ///     client
     ///         .beta
     ///         .service_accounts
-    ///         .list_service_account_roles_v1service_accounts_service_account_id_roles_get(
-    ///             &"service_account_id".to_string(),
-    ///             None,
-    ///         )
+    ///         .list_roles(&"service_account_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn list_service_account_roles_v1service_accounts_service_account_id_roles_get(
+    pub async fn list_roles(
         &self,
         service_account_id: &str,
         options: Option<RequestOptions>,
@@ -420,7 +411,7 @@ impl ServiceAccountsClient {
     ///     client
     ///         .beta
     ///         .service_accounts
-    ///         .set_service_account_roles_v1service_accounts_service_account_id_roles_put(
+    ///         .set_roles(
     ///             &"service_account_id".to_string(),
     ///             &SetServiceAccountRolesRequest {
     ///                 role_ids: vec!["7e69e493-caf6-4671-af60-84951754d9fc".to_string()],
@@ -430,7 +421,7 @@ impl ServiceAccountsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn set_service_account_roles_v1service_accounts_service_account_id_roles_put(
+    pub async fn set_roles(
         &self,
         service_account_id: &str,
         request: &SetServiceAccountRolesRequest,
