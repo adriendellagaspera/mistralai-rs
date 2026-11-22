@@ -1,0 +1,8 @@
+overlay: 1.0.0
+info:
+  title: Fern SDK method-name experiment
+  version: 1.0.0
+actions:
+  - target: $.paths['/v1/audio/agents'].get
+    update:
+      x-fern-sdk-method-name: enumerate_voice_agents
