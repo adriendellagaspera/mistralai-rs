@@ -65,7 +65,7 @@ jobs:
         with:
           persist-credentials: false
       - run: rustup show
-      - run: npm install --global fern-api@5.112.0 # zizmor: ignore[adhoc-packages]
+      - run: npm install --global fern-api@5.226.1 # zizmor: ignore[adhoc-packages]
       - run: python3 -m pip install --disable-pip-version-check PyYAML==6.0.3
       - run: bash sdk-build/fern-v1/build.sh
 
