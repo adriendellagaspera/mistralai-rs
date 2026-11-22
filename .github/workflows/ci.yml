@@ -77,8 +77,6 @@ jobs:
           if-no-files-found: warn
           retention-days: 7
           path: |
-            sdk-build/fern-v1/fern/generated-wrapped/
-            sdk-build/fern-v1/fern/generated-inline/
             sdk-build/fern-v1/query-types-*.txt
             sdk-build/fern-v1/query-types.diff
             sdk-build/fern-v1/fern-generate-*.log
