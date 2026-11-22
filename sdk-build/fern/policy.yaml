@@ -517,7 +517,7 @@ operations:
     method: "update"
   'operationId:libraries_documents_update_v1':
     resource: ["beta", "libraries", "documents"]
-    method: "libraries_documents_update_v1"
+    method: "rename"
   'operationId:libraries_documents_get_extracted_text_signed_url_v1':
     resource: ["beta", "libraries", "documents"]
     method: "extracted_text_signed_url"
