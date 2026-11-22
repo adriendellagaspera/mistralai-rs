@@ -4,7 +4,8 @@ This isolated workspace tests the Rust SDK Config generator without changing the
 production legacy `generators.yml` pipeline or committed SDK sources.
 
 The build regenerates the exact compatibility-filtered OpenAPI source used by
-production, then generates two Rust SDKs with Fern Rust generator 1.0.0:
+production, then generates two Rust SDKs with Fern Rust generator 1.0.0 in Fern
+guest mode (remote execution, no account token):
 
 - `client.requestParameterStyle: wrapped`
 - `client.requestParameterStyle: inline`
