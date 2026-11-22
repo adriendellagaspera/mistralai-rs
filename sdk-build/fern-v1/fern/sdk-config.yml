@@ -6,6 +6,8 @@ source:
     - id: mistral
       type: openapi
       path: openapi.json
+      overlays:
+        - sdk-method-naming.overlay.yml
 client:
   requestParameterStyle: wrapped
 package:
