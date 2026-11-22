@@ -30,8 +30,8 @@ root = Path(sys.argv[1])
 names = set()
 for path in root.rglob("*.rs"):
     source = path.read_text(errors="replace")
-    names.update(re.findall(r"pub\\s+(?:struct|enum|type)\\s+([A-Za-z0-9_]*QueryRequest)\\b", source))
-Path(sys.argv[2]).write_text("\\n".join(sorted(names)) + ("\\n" if names else ""))
+    names.update(re.findall(r"pub\s+(?:struct|enum|type)\s+([A-Za-z0-9_]*QueryRequest)\b", source))
+Path(sys.argv[2]).write_text("\n".join(sorted(names)) + ("\n" if names else ""))
 print(f"{Path(sys.argv[2]).name}: {len(names)} public QueryRequest types")
 for name in sorted(names):
     print(name)
@@ -47,7 +47,7 @@ from pathlib import Path
 
 root = Path(sys.argv[1])
 signatures = set()
-pattern = re.compile(r"(?m)^\\s*pub(?:\\([^)]*\\))?\\s+(?:async\\s+)?fn\\s+[A-Za-z0-9_]+")
+pattern = re.compile(r"(?m)^\s*pub(?:\([^)]*\))?\s+(?:async\s+)?fn\s+[A-Za-z0-9_]+")
 for path in root.rglob("*.rs"):
     source = path.read_text(errors="replace")
     for match in pattern.finditer(source):
@@ -60,7 +60,7 @@ for path in root.rglob("*.rs"):
         relative_path = path.relative_to(root).as_posix()
         signatures.add(f"{relative_path}: {signature}")
 output = Path(sys.argv[2])
-output.write_text("\\n".join(sorted(signatures)) + ("\\n" if signatures else ""))
+output.write_text("\n".join(sorted(signatures)) + ("\n" if signatures else ""))
 print(f"{output.name}: {len(signatures)} public function signatures")
 PY
 }
