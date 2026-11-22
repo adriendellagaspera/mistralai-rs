@@ -15,7 +15,7 @@ Both generated crates are compiled. The script records the public
 Run from the repository root:
 
 ```sh
-npm install --global fern-api@5.112.0
+npm install --global fern-api@5.226.1
 python3 -m pip install PyYAML==6.0.3
 bash sdk-build/fern-v1/build.sh
 ```
