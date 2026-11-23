@@ -36,3 +36,8 @@ limitation is tracked at https://github.com/fern-api/fern/issues/17932.
 twice, proves deterministic output, verifies all source operations, builds
 the generated crate, and requires byte-equivalent committed Rust sources plus
 the reviewed semantic inventory.
+
+
+## Generator upgrade diagnostics
+
+The `chore/fern-rust-generator-0.53.3` branch evaluates Fern Rust generator 0.53.3 against this production pipeline. It is diagnostic only: the production pin remains unchanged until generated-source drift and public API inventory have been reviewed. On a failed generation audit, CI preserves the generated tree, candidate inventory, Fern IR, and generation digests as the `fern-generation-diagnostic` artifact for seven days.
