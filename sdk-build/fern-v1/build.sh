@@ -94,6 +94,26 @@ print(f"{output.name}: {len(signatures)} public function signatures")
 PY
 }
 
+inventory_endpoint_methods() {
+  local style="$1"
+  local source_root="$2"
+  python3 - "$source_root" "$WORKSPACE/endpoint-methods-$style.txt" <<'PY'
+import re
+import sys
+from collections import Counter
+from pathlib import Path
+
+root = Path(sys.argv[1])
+counts = Counter()
+for path in (root / "api" / "resources").rglob("*.rs"):
+    source = path.read_text(errors="replace")
+    counts.update(re.findall(r"(?m)^\\s*pub\\s+async\\s+fn\\s+([A-Za-z0-9_]+)", source))
+output = Path(sys.argv[2])
+output.write_text("\\n".join(name for name in sorted(counts) for _ in range(counts[name])) + ("\\n" if counts else ""))
+print(f"{output.name}: {sum(counts.values())} public async resource methods")
+PY
+}
+
 run_generation() {
   local style="$1"
   python3 - "$FERN_DIR/sdk-config.yml" "$style" <<'PY'
@@ -120,6 +140,7 @@ PY
   # request type names or public method signatures being compared.
   inventory_query_types "$style"
   inventory_public_functions "$style"
+  inventory_endpoint_methods "$style" "$FERN_DIR/generated/src"
   mv "$FERN_DIR/generated" "$FERN_DIR/generated-$style"
 
 # Capture a deterministic tree digest for each generated parameter style.
@@ -180,6 +201,7 @@ diff -u "$WORKSPACE/public-functions-wrapped.txt" "$WORKSPACE/public-functions-i
 # Compare the candidate's public type/function declarations with the checked-in
 # production Fern 0.48 output. These diffs are evidence, not automatic failures:
 # v1 intentionally has a different resource layout and request API shape.
+inventory_endpoint_methods production "$ROOT/src"
 python3 - "$ROOT/src" "$WORKSPACE/query-types-production.txt" "$WORKSPACE/public-functions-production.txt" <<'PY'
 import re
 import sys
@@ -209,6 +231,10 @@ diff -u "$WORKSPACE/public-functions-production.txt" "$WORKSPACE/public-function
   | tee "$WORKSPACE/public-functions-v1-vs-production-wrapped.diff" || true
 diff -u "$WORKSPACE/public-functions-production.txt" "$WORKSPACE/public-functions-inline.txt" \
   | tee "$WORKSPACE/public-functions-v1-vs-production-inline.diff" || true
+diff -u "$WORKSPACE/endpoint-methods-production.txt" "$WORKSPACE/endpoint-methods-wrapped.txt" \
+  | tee "$WORKSPACE/endpoint-methods-v1-vs-production-wrapped.diff" || true
+diff -u "$WORKSPACE/endpoint-methods-production.txt" "$WORKSPACE/endpoint-methods-inline.txt" \
+  | tee "$WORKSPACE/endpoint-methods-v1-vs-production-inline.diff" || true
 
 echo "Fern Rust generator 1.0.0 audit completed (compile status: $COMPILE_STATUS; see per-command Cargo logs)."
 # This job validates generation and the naming/signature inventories. Cargo
