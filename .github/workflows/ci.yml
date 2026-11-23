@@ -61,6 +61,34 @@ jobs:
       - run: npm install --global fern-api@5.112.0 # zizmor: ignore[adhoc-packages]
       - run: python3 -m pip install --disable-pip-version-check PyYAML==6.0.3
       - run: bash sdk-build/fern/check.sh
+      - name: Prepare compact generated diff for failed audit
+        if: failure()
+        run: |
+          set -euo pipefail
+          mkdir -p sdk-build/fern/diagnostic
+          : > sdk-build/fern/diagnostic/generated.diff
+          : > sdk-build/fern/diagnostic/differing-files.txt
+          while IFS= read -r generated_file; do
+            relative_path="${generated_file#sdk-build/fern/generated/src/}"
+            committed_file="src/${relative_path}"
+            if [ ! -f "$committed_file" ] || ! cmp -s "$generated_file" "$committed_file"; then
+              printf '%s\\n' "$relative_path" >> sdk-build/fern/diagnostic/differing-files.txt
+              if [ -f "$committed_file" ]; then
+                diff -u --label "committed/$relative_path" --label "generated/$relative_path" "$committed_file" "$generated_file" >> sdk-build/fern/diagnostic/generated.diff || true
+              fi
+            fi
+          done < <(find sdk-build/fern/generated/src -type f -name '*.rs' | sort)
+          cp sdk-build/fern/inventory.candidate.json sdk-build/fern/diagnostic/
+          cp sdk-build/fern/digest.first.json sdk-build/fern/diagnostic/
+          cp sdk-build/fern/digest.second.json sdk-build/fern/diagnostic/
+      - name: Preserve compact diagnostics for failed generation audits
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: fern-generation-diagnostic
+          if-no-files-found: warn
+          retention-days: 7
+          path: sdk-build/fern/diagnostic/
 
   generation-v1:
     name: generation-v1

@@ -8,7 +8,7 @@ groups:
   rust-sdk:
     generators:
       - name: fernapi/fern-rust-sdk
-        version: 0.48.0
+        version: 0.53.3
         config:
           clientClassName: Mistral
           crateName: mistralai_sdk
