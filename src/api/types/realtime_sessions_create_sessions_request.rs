@@ -3,7 +3,7 @@ pub use crate::prelude::*;
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(tag = "purpose")]
 #[non_exhaustive]
-pub enum CreateRealtimeSessionSessionsRequest {
+pub enum CreateSessionsRequest {
     #[serde(rename = "realtime")]
     #[non_exhaustive]
     Realtime {
@@ -22,7 +22,7 @@ pub enum CreateRealtimeSessionSessionsRequest {
     __Unknown(serde_json::Value),
 }
 
-impl CreateRealtimeSessionSessionsRequest {
+impl CreateSessionsRequest {
     pub fn realtime(model: String) -> Self {
         Self::Realtime {
             metadata: None,

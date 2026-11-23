@@ -38,8 +38,8 @@ impl SessionsClient2 {
     ///     client
     ///         .realtime
     ///         .sessions
-    ///         .create_realtime_session(
-    ///             &CreateRealtimeSessionSessionsRequest::Realtime {
+    ///         .create(
+    ///             &CreateSessionsRequest::Realtime {
     ///                 data: CreateRealtimeSessionRequest {
     ///                     model: "model".to_string(),
     ///                     ..Default::default()
@@ -50,9 +50,9 @@ impl SessionsClient2 {
     ///         .await;
     /// }
     /// ```
-    pub async fn create_realtime_session(
+    pub async fn create(
         &self,
-        request: &CreateRealtimeSessionSessionsRequest,
+        request: &CreateSessionsRequest,
         options: Option<RequestOptions>,
     ) -> Result<CreateRealtimeSessionResponse, ApiError> {
         self.http_client

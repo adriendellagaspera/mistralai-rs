@@ -1,8 +1,8 @@
 pub use crate::prelude::*;
 
-/// Query parameters for list_current_user_workspaces
+/// Query parameters for list_workspaces
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
-pub struct ListCurrentUserWorkspacesQueryRequest {
+pub struct BetaUsersListWorkspacesQueryRequest {
     /// Return only workspaces belonging to this organization.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub organization_id: Option<String>,
@@ -14,21 +14,21 @@ pub struct ListCurrentUserWorkspacesQueryRequest {
     pub limit: Option<i64>,
 }
 
-impl ListCurrentUserWorkspacesQueryRequest {
-    pub fn builder() -> ListCurrentUserWorkspacesQueryRequestBuilder {
-        <ListCurrentUserWorkspacesQueryRequestBuilder as Default>::default()
+impl BetaUsersListWorkspacesQueryRequest {
+    pub fn builder() -> BetaUsersListWorkspacesQueryRequestBuilder {
+        <BetaUsersListWorkspacesQueryRequestBuilder as Default>::default()
     }
 }
 
 #[derive(Clone, PartialEq, Default, Debug)]
 #[non_exhaustive]
-pub struct ListCurrentUserWorkspacesQueryRequestBuilder {
+pub struct BetaUsersListWorkspacesQueryRequestBuilder {
     organization_id: Option<String>,
     offset: Option<i64>,
     limit: Option<i64>,
 }
 
-impl ListCurrentUserWorkspacesQueryRequestBuilder {
+impl BetaUsersListWorkspacesQueryRequestBuilder {
     pub fn organization_id(mut self, value: impl Into<String>) -> Self {
         self.organization_id = Some(value.into());
         self
@@ -44,9 +44,9 @@ impl ListCurrentUserWorkspacesQueryRequestBuilder {
         self
     }
 
-    /// Consumes the builder and constructs a [`ListCurrentUserWorkspacesQueryRequest`].
-    pub fn build(self) -> Result<ListCurrentUserWorkspacesQueryRequest, BuildError> {
-        Ok(ListCurrentUserWorkspacesQueryRequest {
+    /// Consumes the builder and constructs a [`BetaUsersListWorkspacesQueryRequest`].
+    pub fn build(self) -> Result<BetaUsersListWorkspacesQueryRequest, BuildError> {
+        Ok(BetaUsersListWorkspacesQueryRequest {
             organization_id: self.organization_id,
             offset: self.offset,
             limit: self.limit,

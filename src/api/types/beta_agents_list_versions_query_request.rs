@@ -2,7 +2,7 @@ pub use crate::prelude::*;
 
 /// Query parameters for list_versions
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
-pub struct ListVersionsQueryRequest {
+pub struct BetaAgentsListVersionsQueryRequest {
     /// Page number (0-indexed)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub page: Option<i64>,
@@ -11,20 +11,20 @@ pub struct ListVersionsQueryRequest {
     pub page_size: Option<i64>,
 }
 
-impl ListVersionsQueryRequest {
-    pub fn builder() -> ListVersionsQueryRequestBuilder {
-        <ListVersionsQueryRequestBuilder as Default>::default()
+impl BetaAgentsListVersionsQueryRequest {
+    pub fn builder() -> BetaAgentsListVersionsQueryRequestBuilder {
+        <BetaAgentsListVersionsQueryRequestBuilder as Default>::default()
     }
 }
 
 #[derive(Clone, PartialEq, Default, Debug)]
 #[non_exhaustive]
-pub struct ListVersionsQueryRequestBuilder {
+pub struct BetaAgentsListVersionsQueryRequestBuilder {
     page: Option<i64>,
     page_size: Option<i64>,
 }
 
-impl ListVersionsQueryRequestBuilder {
+impl BetaAgentsListVersionsQueryRequestBuilder {
     pub fn page(mut self, value: i64) -> Self {
         self.page = Some(value);
         self
@@ -35,9 +35,9 @@ impl ListVersionsQueryRequestBuilder {
         self
     }
 
-    /// Consumes the builder and constructs a [`ListVersionsQueryRequest`].
-    pub fn build(self) -> Result<ListVersionsQueryRequest, BuildError> {
-        Ok(ListVersionsQueryRequest {
+    /// Consumes the builder and constructs a [`BetaAgentsListVersionsQueryRequest`].
+    pub fn build(self) -> Result<BetaAgentsListVersionsQueryRequest, BuildError> {
+        Ok(BetaAgentsListVersionsQueryRequest {
             page: self.page,
             page_size: self.page_size,
         })

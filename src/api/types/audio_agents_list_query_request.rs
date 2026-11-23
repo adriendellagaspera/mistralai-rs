@@ -1,8 +1,8 @@
 pub use crate::prelude::*;
 
-/// Query parameters for list_audio_agents
+/// Query parameters for list
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
-pub struct ListAudioAgentsQueryRequest {
+pub struct AudioAgentsListQueryRequest {
     /// Maximum number of agents to return
     #[serde(skip_serializing_if = "Option::is_none")]
     pub page_size: Option<i64>,
@@ -14,21 +14,21 @@ pub struct ListAudioAgentsQueryRequest {
     pub search: Option<String>,
 }
 
-impl ListAudioAgentsQueryRequest {
-    pub fn builder() -> ListAudioAgentsQueryRequestBuilder {
-        <ListAudioAgentsQueryRequestBuilder as Default>::default()
+impl AudioAgentsListQueryRequest {
+    pub fn builder() -> AudioAgentsListQueryRequestBuilder {
+        <AudioAgentsListQueryRequestBuilder as Default>::default()
     }
 }
 
 #[derive(Clone, PartialEq, Default, Debug)]
 #[non_exhaustive]
-pub struct ListAudioAgentsQueryRequestBuilder {
+pub struct AudioAgentsListQueryRequestBuilder {
     page_size: Option<i64>,
     page_token: Option<String>,
     search: Option<String>,
 }
 
-impl ListAudioAgentsQueryRequestBuilder {
+impl AudioAgentsListQueryRequestBuilder {
     pub fn page_size(mut self, value: i64) -> Self {
         self.page_size = Some(value);
         self
@@ -44,9 +44,9 @@ impl ListAudioAgentsQueryRequestBuilder {
         self
     }
 
-    /// Consumes the builder and constructs a [`ListAudioAgentsQueryRequest`].
-    pub fn build(self) -> Result<ListAudioAgentsQueryRequest, BuildError> {
-        Ok(ListAudioAgentsQueryRequest {
+    /// Consumes the builder and constructs a [`AudioAgentsListQueryRequest`].
+    pub fn build(self) -> Result<AudioAgentsListQueryRequest, BuildError> {
+        Ok(AudioAgentsListQueryRequest {
             page_size: self.page_size,
             page_token: self.page_token,
             search: self.search,

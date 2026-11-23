@@ -1,34 +1,34 @@
 pub use crate::prelude::*;
 
-/// Query parameters for get_audio_agent
+/// Query parameters for get
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
-pub struct GetAudioAgentQueryRequest {
+pub struct AudioAgentsGetQueryRequest {
     /// Version to return. Defaults to the latest version.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub version: Option<i64>,
 }
 
-impl GetAudioAgentQueryRequest {
-    pub fn builder() -> GetAudioAgentQueryRequestBuilder {
-        <GetAudioAgentQueryRequestBuilder as Default>::default()
+impl AudioAgentsGetQueryRequest {
+    pub fn builder() -> AudioAgentsGetQueryRequestBuilder {
+        <AudioAgentsGetQueryRequestBuilder as Default>::default()
     }
 }
 
 #[derive(Clone, PartialEq, Default, Debug)]
 #[non_exhaustive]
-pub struct GetAudioAgentQueryRequestBuilder {
+pub struct AudioAgentsGetQueryRequestBuilder {
     version: Option<i64>,
 }
 
-impl GetAudioAgentQueryRequestBuilder {
+impl AudioAgentsGetQueryRequestBuilder {
     pub fn version(mut self, value: i64) -> Self {
         self.version = Some(value);
         self
     }
 
-    /// Consumes the builder and constructs a [`GetAudioAgentQueryRequest`].
-    pub fn build(self) -> Result<GetAudioAgentQueryRequest, BuildError> {
-        Ok(GetAudioAgentQueryRequest {
+    /// Consumes the builder and constructs a [`AudioAgentsGetQueryRequest`].
+    pub fn build(self) -> Result<AudioAgentsGetQueryRequest, BuildError> {
+        Ok(AudioAgentsGetQueryRequest {
             version: self.version,
         })
     }

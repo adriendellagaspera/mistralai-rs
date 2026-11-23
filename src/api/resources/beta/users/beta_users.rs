@@ -136,8 +136,8 @@ impl UsersClient {
     ///     client
     ///         .beta
     ///         .users
-    ///         .list_current_user_workspaces(
-    ///             &ListCurrentUserWorkspacesQueryRequest {
+    ///         .list_workspaces(
+    ///             &BetaUsersListWorkspacesQueryRequest {
     ///                 offset: Some(0),
     ///                 limit: Some(100),
     ///                 ..Default::default()
@@ -147,9 +147,9 @@ impl UsersClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn list_current_user_workspaces(
+    pub async fn list_workspaces(
         &self,
-        request: &ListCurrentUserWorkspacesQueryRequest,
+        request: &BetaUsersListWorkspacesQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<ListWorkspacesResponse, ApiError> {
         self.http_client

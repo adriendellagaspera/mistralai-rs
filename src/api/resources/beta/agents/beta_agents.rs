@@ -585,7 +585,7 @@ impl AgentsClient3 {
     ///         .agents
     ///         .list_versions(
     ///             &"agent_id".to_string(),
-    ///             &ListVersionsQueryRequest {
+    ///             &BetaAgentsListVersionsQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -596,7 +596,7 @@ impl AgentsClient3 {
     pub async fn list_versions(
         &self,
         agent_id: &str,
-        request: &ListVersionsQueryRequest,
+        request: &BetaAgentsListVersionsQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<Vec<Agent>, ApiError> {
         self.http_client

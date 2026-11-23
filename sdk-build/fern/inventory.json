@@ -4544,31 +4544,31 @@
       },
       {
         "public_paths": [
-          "audio.agents.list_audio_agents"
+          "audio.agents.list"
         ],
         "source_identity": "operationId:list_agents_v1_audio_agents_get"
       },
       {
         "public_paths": [
-          "audio.agents.create_audio_agent"
+          "audio.agents.create"
         ],
         "source_identity": "operationId:create_agent_v1_audio_agents_post"
       },
       {
         "public_paths": [
-          "audio.agents.delete_audio_agent"
+          "audio.agents.delete"
         ],
         "source_identity": "operationId:delete_agent_v1_audio_agents__agent_id__delete"
       },
       {
         "public_paths": [
-          "audio.agents.get_audio_agent"
+          "audio.agents.get"
         ],
         "source_identity": "operationId:get_agent_v1_audio_agents__agent_id__get"
       },
       {
         "public_paths": [
-          "audio.agents.update_audio_agent"
+          "audio.agents.update"
         ],
         "source_identity": "operationId:update_agent_v1_audio_agents__agent_id__put"
       },
@@ -4580,7 +4580,7 @@
       },
       {
         "public_paths": [
-          "audio.agents.list_audio_agent_versions"
+          "audio.agents.list_versions"
         ],
         "source_identity": "operationId:list_agent_versions_v1_audio_agents__agent_id__versions_get"
       },
@@ -4731,7 +4731,7 @@
       },
       {
         "public_paths": [
-          "realtime.sessions.create_realtime_session"
+          "realtime.sessions.create"
         ],
         "source_identity": "operationId:create_client_session_v1_client_sessions_post"
       },
@@ -5764,7 +5764,7 @@
       },
       {
         "public_paths": [
-          "beta.users.list_current_user_workspaces"
+          "beta.users.list_workspaces"
         ],
         "source_identity": "operationId:users_api_list_workspaces"
       },
@@ -10685,13 +10685,13 @@
   "public_method_count": 349,
   "public_methods": [
     "agents.complete",
-    "audio.agents.create_audio_agent",
-    "audio.agents.delete_audio_agent",
-    "audio.agents.get_audio_agent",
-    "audio.agents.list_audio_agent_versions",
-    "audio.agents.list_audio_agents",
+    "audio.agents.create",
+    "audio.agents.delete",
+    "audio.agents.get",
+    "audio.agents.list",
     "audio.agents.list_sessions",
-    "audio.agents.update_audio_agent",
+    "audio.agents.list_versions",
+    "audio.agents.update",
     "audio.sessions.close",
     "audio.sessions.create",
     "audio.sessions.get",
@@ -10944,8 +10944,8 @@
     "beta.triggers.list",
     "beta.triggers.list_events",
     "beta.users.get_identity",
-    "beta.users.list_current_user_workspaces",
     "beta.users.list_organizations",
+    "beta.users.list_workspaces",
     "beta.users.whoami",
     "beta.webhooks.create",
     "beta.webhooks.delete",
@@ -10976,7 +10976,7 @@
     "models.unarchive",
     "models.update",
     "ocr.process",
-    "realtime.sessions.create_realtime_session",
+    "realtime.sessions.create",
     "responses.count_input_tokens",
     "responses.create",
     "workflows.add_workflow_tags",
@@ -12800,7 +12800,7 @@
     "events_stream_Response_200",
     "models_retrieve_Response_200",
     "models_update_Response_200",
-    "realtime_sessions_create_realtime_session_Request",
+    "realtime_sessions_create_Request",
     "workflows_deployments_stream_logs_Response_200",
     "workflows_execute_workflow_Response_200",
     "workflows_execute_workflow_registration_Response_200",
