@@ -12,28 +12,30 @@ guest mode (remote execution, no account token):
 - `client.requestParameterStyle: inline`
 
 For each mode, the script inventories public `*QueryRequest` declarations and
-public Rust function signatures **before** running `cargo check`. It then
-compares both inventories. This distinguishes type-name stability from changes
-to generated client method signatures. A compilation failure therefore does
-not prevent the second mode from being generated or the inventories from being
-compared.
+public Rust function signatures before running `cargo fmt`, `cargo check`,
+Clippy, and the generated crate's full test targets. It compares wrapped and
+inline outputs, and also emits diffs against the checked-in Fern 0.48 public
+type/function inventories. Those diffs are diagnostic because v1 changes
+resource grouping and request APIs. A compilation failure does not prevent the
+other checks or the second parameter style from being evaluated.
 
 The `fern-v1-sdk-audit` CI artifact (7-day retention) contains the inventories,
-their diffs, Fern generation logs, Cargo diagnostics, schema resolution, and
-the exact OpenAPI input. Generated crate trees are not uploaded.
+their diffs, per-style generated-tree digests, Fern generation logs, Cargo
+format/check/Clippy/test diagnostics, schema resolution, and the exact OpenAPI
+input. Generated crate trees are not uploaded.
 
 Run from the repository root:
 
 ```sh
-npm install --global fern-api@5.226.1
+npm install --global fern-api@5.228.1
 python3 -m pip install PyYAML==6.0.3
 bash sdk-build/fern-v1/build.sh
 ```
 
 
-The v1 CI job is opt-in because Fern guest mode has a daily session quota. To run
-it, dispatch the **CI** workflow with the `run_fern_v1` input enabled. Ordinary
-pull-request CI validates the production generator and does not consume guest
+The v1 CI job remains opt-in because Fern guest mode has a daily session quota.
+It can be dispatched manually with `run_fern_v1`; the dedicated evaluation PR
+also enables it explicitly. Ordinary pull-request CI does not consume guest
 sessions.
 
 The v1 Rust generator currently flattens some nested resource groups, which can
