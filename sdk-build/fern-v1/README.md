@@ -13,16 +13,16 @@ guest mode (remote execution, no account token):
 
 For each mode, the script inventories public `*QueryRequest` declarations and
 public Rust function signatures before running `cargo fmt`, `cargo check`,
-Clippy, and the generated crate's full test targets. It compares wrapped and
-inline outputs, and also emits diffs against the checked-in Fern 0.48 public
-type/function inventories. Those diffs are diagnostic because v1 changes
+Clippy, and the generated crate's full test targets. It repeats each style to prove deterministic tree output, compares wrapped and
+inline inventories, and emits diffs against the checked-in Fern 0.48 public
+query types, endpoint method names, and function signatures. Those diffs are diagnostic because v1 changes
 resource grouping and request APIs. A compilation failure does not prevent the
 other checks or the second parameter style from being evaluated.
 
 The `fern-v1-sdk-audit` CI artifact (7-day retention) contains the inventories,
-their diffs, per-style generated-tree digests, Fern generation logs, Cargo
-format/check/Clippy/test diagnostics, schema resolution, and the exact OpenAPI
-input. Generated crate trees are not uploaded.
+their diffs, per-style and repeat generated-tree digests, Fern generation logs, Cargo
+format/check/Clippy/test diagnostics, production-vs-v1 inventory diffs, schema
+resolution, and the exact OpenAPI input. Generated crate trees are not uploaded.
 
 Run from the repository root:
 
