@@ -42,8 +42,8 @@ impl EventsClient {
     ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .events
-    ///         .get_workflow_events(
-    ///             &GetWorkflowEventsQueryRequest {
+    ///         .list(
+    ///             &EventsListQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -51,9 +51,9 @@ impl EventsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn get_workflow_events(
+    pub async fn list(
         &self,
-        request: &GetWorkflowEventsQueryRequest,
+        request: &EventsListQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<ListWorkflowEventResponse, ApiError> {
         self.http_client
@@ -102,8 +102,8 @@ impl EventsClient {
     ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .events
-    ///         .get_stream_events(
-    ///             &GetStreamEventsQueryRequest {
+    ///         .stream(
+    ///             &EventsStreamQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             Some(RequestOptions::new()),
@@ -111,11 +111,11 @@ impl EventsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn get_stream_events(
+    pub async fn stream(
         &self,
-        request: &GetStreamEventsQueryRequest,
+        request: &EventsStreamQueryRequest,
         options: Option<RequestOptions>,
-    ) -> Result<SseStream<GetStreamEventsEventsResponse>, ApiError> {
+    ) -> Result<SseStream<StreamEventsResponse>, ApiError> {
         self.http_client
             .execute_sse_request(
                 Method::GET,

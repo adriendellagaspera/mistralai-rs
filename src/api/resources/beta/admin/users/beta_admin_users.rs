@@ -547,7 +547,7 @@ impl UsersClient2 {
     ///         .users
     ///         .list_workspaces(
     ///             &"user_id".to_string(),
-    ///             &BetaAdminUsersListWorkspacesQueryRequest {
+    ///             &ListWorkspacesQueryRequest {
     ///                 page: Some(1),
     ///                 page_size: Some(25),
     ///                 ..Default::default()
@@ -560,7 +560,7 @@ impl UsersClient2 {
     pub async fn list_workspaces(
         &self,
         user_id: &str,
-        request: &BetaAdminUsersListWorkspacesQueryRequest,
+        request: &ListWorkspacesQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<AdminUserWorkspacesOut, ApiError> {
         self.http_client

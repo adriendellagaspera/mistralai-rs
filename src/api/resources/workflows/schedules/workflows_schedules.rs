@@ -44,8 +44,8 @@ impl SchedulesClient {
     ///     client
     ///         .workflows
     ///         .schedules
-    ///         .get_schedules(
-    ///             &GetSchedulesQueryRequest {
+    ///         .list(
+    ///             &WorkflowsSchedulesListQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -53,9 +53,9 @@ impl SchedulesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn get_schedules(
+    pub async fn list(
         &self,
-        request: &GetSchedulesQueryRequest,
+        request: &WorkflowsSchedulesListQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<WorkflowScheduleListResponse, ApiError> {
         self.http_client

@@ -204,7 +204,7 @@ impl LibrariesClient {
     ///     client
     ///         .beta
     ///         .libraries
-    ///         .libraries_update_v1(
+    ///         .update_legacy(
     ///             &"library_id".to_string(),
     ///             &UpdateLibraryRequest {
     ///                 ..Default::default()
@@ -214,7 +214,7 @@ impl LibrariesClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn libraries_update_v1(
+    pub async fn update_legacy(
         &self,
         library_id: &str,
         request: &UpdateLibraryRequest,

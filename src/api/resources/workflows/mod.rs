@@ -71,8 +71,8 @@ impl WorkflowsClient {
     ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .workflows
-    ///         .get_workflows(
-    ///             &GetWorkflowsQueryRequest {
+    ///         .list(
+    ///             &WorkflowsListQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -80,9 +80,9 @@ impl WorkflowsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn get_workflows(
+    pub async fn list(
         &self,
-        request: &GetWorkflowsQueryRequest,
+        request: &WorkflowsListQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<WorkflowListResponse, ApiError> {
         self.http_client
@@ -199,8 +199,8 @@ impl WorkflowsClient {
     ///     let client = Mistral::new(config).expect("Failed to build client");
     ///     client
     ///         .workflows
-    ///         .get_workflow_registrations(
-    ///             &GetWorkflowRegistrationsQueryRequest {
+    ///         .list_registrations(
+    ///             &ListRegistrationsQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -208,9 +208,9 @@ impl WorkflowsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn get_workflow_registrations(
+    pub async fn list_registrations(
         &self,
-        request: &GetWorkflowRegistrationsQueryRequest,
+        request: &ListRegistrationsQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<WorkflowRegistrationListResponse, ApiError> {
         self.http_client

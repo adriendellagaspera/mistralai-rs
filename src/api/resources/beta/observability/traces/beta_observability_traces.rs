@@ -101,15 +101,10 @@ impl TracesClient {
     ///         ..Default::default()
     ///     };
     ///     let client = Mistral::new(config).expect("Failed to build client");
-    ///     client
-    ///         .beta
-    ///         .observability
-    ///         .traces
-    ///         .get_trace_fields(None)
-    ///         .await;
+    ///     client.beta.observability.traces.list_fields(None).await;
     /// }
     /// ```
-    pub async fn get_trace_fields(
+    pub async fn list_fields(
         &self,
         options: Option<RequestOptions>,
     ) -> Result<GetTraceFields, ApiError> {

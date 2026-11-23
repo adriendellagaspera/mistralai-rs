@@ -41,8 +41,8 @@ impl AgentsClient2 {
     ///     client
     ///         .audio
     ///         .agents
-    ///         .list(
-    ///             &AudioAgentsListQueryRequest {
+    ///         .list_audio_agents(
+    ///             &ListAudioAgentsQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -50,9 +50,9 @@ impl AgentsClient2 {
     ///         .await;
     /// }
     /// ```
-    pub async fn list(
+    pub async fn list_audio_agents(
         &self,
-        request: &AudioAgentsListQueryRequest,
+        request: &ListAudioAgentsQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<AudioAgentListPage, ApiError> {
         self.http_client
@@ -95,7 +95,7 @@ impl AgentsClient2 {
     ///     client
     ///         .audio
     ///         .agents
-    ///         .create(
+    ///         .create_audio_agent(
     ///             &AudioAgentCreateRequest {
     ///                 configuration: AudioAgentConfigurationRequest {
     ///                     ..Default::default()
@@ -108,7 +108,7 @@ impl AgentsClient2 {
     ///         .await;
     /// }
     /// ```
-    pub async fn create(
+    pub async fn create_audio_agent(
         &self,
         request: &AudioAgentCreateRequest,
         options: Option<RequestOptions>,
@@ -150,9 +150,9 @@ impl AgentsClient2 {
     ///     client
     ///         .audio
     ///         .agents
-    ///         .get(
+    ///         .get_audio_agent(
     ///             &"agent_id".to_string(),
-    ///             &AudioAgentsGetQueryRequest {
+    ///             &GetAudioAgentQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -160,10 +160,10 @@ impl AgentsClient2 {
     ///         .await;
     /// }
     /// ```
-    pub async fn get(
+    pub async fn get_audio_agent(
         &self,
         agent_id: &str,
-        request: &AudioAgentsGetQueryRequest,
+        request: &GetAudioAgentQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<AudioAgentResponse, ApiError> {
         self.http_client
@@ -204,7 +204,7 @@ impl AgentsClient2 {
     ///     client
     ///         .audio
     ///         .agents
-    ///         .update(
+    ///         .update_audio_agent(
     ///             &"agent_id".to_string(),
     ///             &AudioAgentUpdateRequest {
     ///                 configuration: AudioAgentConfigurationRequest {
@@ -218,7 +218,7 @@ impl AgentsClient2 {
     ///         .await;
     /// }
     /// ```
-    pub async fn update(
+    pub async fn update_audio_agent(
         &self,
         agent_id: &str,
         request: &AudioAgentUpdateRequest,
@@ -260,11 +260,11 @@ impl AgentsClient2 {
     ///     client
     ///         .audio
     ///         .agents
-    ///         .delete(&"agent_id".to_string(), None)
+    ///         .delete_audio_agent(&"agent_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn delete(
+    pub async fn delete_audio_agent(
         &self,
         agent_id: &str,
         options: Option<RequestOptions>,
@@ -364,9 +364,9 @@ impl AgentsClient2 {
     ///     client
     ///         .audio
     ///         .agents
-    ///         .list_versions(
+    ///         .list_audio_agent_versions(
     ///             &"agent_id".to_string(),
-    ///             &AudioAgentsListVersionsQueryRequest {
+    ///             &ListAudioAgentVersionsQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -374,10 +374,10 @@ impl AgentsClient2 {
     ///         .await;
     /// }
     /// ```
-    pub async fn list_versions(
+    pub async fn list_audio_agent_versions(
         &self,
         agent_id: &str,
-        request: &AudioAgentsListVersionsQueryRequest,
+        request: &ListAudioAgentVersionsQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<AudioAgentListPage, ApiError> {
         self.http_client
