@@ -55,6 +55,16 @@ jobs:
       - run: npm install --global fern-api@5.112.0 # zizmor: ignore[adhoc-packages]
       - run: python3 -m pip install --disable-pip-version-check PyYAML==6.0.3
       - run: bash sdk-build/fern/check.sh
+      - name: Preserve regenerated production SDK for review
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: fern-production-sdk-candidate
+          if-no-files-found: warn
+          retention-days: 7
+          path: |
+            sdk-build/fern/generated/src/
+            sdk-build/fern/inventory.candidate.json
 
   generation-v1:
     name: generation-v1
