@@ -122,14 +122,52 @@ PY
   inventory_public_functions "$style"
   mv "$FERN_DIR/generated" "$FERN_DIR/generated-$style"
 
-  if cargo check --manifest-path "$FERN_DIR/generated-$style/Cargo.toml" --all-features \
-    2>&1 | tee "$WORKSPACE/cargo-check-$style.log"; then
-    echo "cargo check ($style): success"
-  else
-    local status=$?
-    echo "cargo check ($style): failed with exit code $status" >&2
-    COMPILE_STATUS=1
-  fi
+# Capture a deterministic tree digest for each generated parameter style.
+python3 - "$FERN_DIR/generated-$style" "$WORKSPACE/digest-$style.json" <<'PY'
+import hashlib
+import json
+import sys
+from pathlib import Path
+
+root = Path(sys.argv[1])
+entries = []
+for path in sorted(p for p in root.rglob("*") if p.is_file()):
+    entries.append({
+        "path": path.relative_to(root).as_posix(),
+        "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+    })
+payload = {"file_count": len(entries), "files": entries}
+Path(sys.argv[2]).write_text(json.dumps(payload, indent=2) + "\\n")
+print(f"{sys.argv[2]}: {len(entries)} files")
+PY
+
+  # The generated crate is retained per parameter style so every diagnostic
+  # operates on the exact same candidate tree.
+  for diagnostic in fmt check clippy test; do
+    local log="$WORKSPACE/cargo-$diagnostic-$style.log"
+    local status=0
+    case "$diagnostic" in
+      fmt)
+        cargo fmt --manifest-path "$FERN_DIR/generated-$style/Cargo.toml" -- --check
+        ;;
+      check)
+        cargo check --manifest-path "$FERN_DIR/generated-$style/Cargo.toml" --all-features
+        ;;
+      clippy)
+        cargo clippy --manifest-path "$FERN_DIR/generated-$style/Cargo.toml" --all-features -- \
+          -D clippy::correctness -D clippy::suspicious
+        ;;
+      test)
+        cargo test --manifest-path "$FERN_DIR/generated-$style/Cargo.toml" --all-features --all-targets
+        ;;
+    esac > >(tee "$log") 2>&1 || status=$?
+    if [ "$status" -eq 0 ]; then
+      echo "cargo $diagnostic ($style): success"
+    else
+      echo "cargo $diagnostic ($style): failed with exit code $status" >&2
+      COMPILE_STATUS=1
+    fi
+  done
 }
 
 run_generation wrapped
@@ -139,6 +177,38 @@ diff -u "$WORKSPACE/query-types-wrapped.txt" "$WORKSPACE/query-types-inline.txt"
   | tee "$WORKSPACE/query-types.diff" || true
 diff -u "$WORKSPACE/public-functions-wrapped.txt" "$WORKSPACE/public-functions-inline.txt" \
   | tee "$WORKSPACE/public-functions.diff" || true
+# Compare the candidate's public type/function declarations with the checked-in
+# production Fern 0.48 output. These diffs are evidence, not automatic failures:
+# v1 intentionally has a different resource layout and request API shape.
+python3 - "$ROOT/src" "$WORKSPACE/query-types-production.txt" "$WORKSPACE/public-functions-production.txt" <<'PY'
+import re
+import sys
+from pathlib import Path
+
+root = Path(sys.argv[1])
+query_types = set()
+functions = set()
+for path in root.rglob("*.rs"):
+    source = path.read_text(errors="replace")
+    query_types.update(re.findall(r"pub\\s+(?:struct|enum|type)\\s+([A-Za-z0-9_]*QueryRequest[0-9]*)\\b", source))
+    pattern = re.compile(r"(?m)^\\s*pub\\s+(?:async\\s+)?fn\\s+[A-Za-z0-9_]+")
+    for match in pattern.finditer(source):
+        body_start = source.find("{", match.end())
+        if body_start >= 0:
+            signature = " ".join(source[match.start():body_start].split())
+            functions.add(f"{path.relative_to(root).as_posix()}: {signature}")
+Path(sys.argv[2]).write_text("\\n".join(sorted(query_types)) + ("\\n" if query_types else ""))
+Path(sys.argv[3]).write_text("\\n".join(sorted(functions)) + ("\\n" if functions else ""))
+print(f"production baseline: {len(query_types)} QueryRequest types, {len(functions)} public functions")
+PY
+diff -u "$WORKSPACE/query-types-production.txt" "$WORKSPACE/query-types-wrapped.txt" \
+  | tee "$WORKSPACE/query-types-v1-vs-production-wrapped.diff" || true
+diff -u "$WORKSPACE/query-types-production.txt" "$WORKSPACE/query-types-inline.txt" \
+  | tee "$WORKSPACE/query-types-v1-vs-production-inline.diff" || true
+diff -u "$WORKSPACE/public-functions-production.txt" "$WORKSPACE/public-functions-wrapped.txt" \
+  | tee "$WORKSPACE/public-functions-v1-vs-production-wrapped.diff" || true
+diff -u "$WORKSPACE/public-functions-production.txt" "$WORKSPACE/public-functions-inline.txt" \
+  | tee "$WORKSPACE/public-functions-v1-vs-production-inline.diff" || true
 
 echo "Fern Rust generator 1.0.0 audit completed (compile status: $COMPILE_STATUS; see cargo-check logs)."
 # This job validates generation and the naming/signature inventories. Cargo
