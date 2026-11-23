@@ -402,9 +402,11 @@ The naming review checked the public resource grouping and semantic role of each
 
 ## Generation validation
 
-The Fern v1 build now emits:
-- the full 349-entry public method-path inventory derived from the resolved 347 published OpenAPI operations;
-- the generated public Rust function-signature inventories for both `wrapped` and `inline` parameter styles;
-- the complete public synthetic `*QueryRequest` type inventories, including numeric collision suffixes such as `QueryRequest2`.
+Run 45142402366 (commit `5011520`) completed successfully, including the `generation-v1` job and final gate. The artifact was checked against the previous no-overlay baseline:
+- Fern resolves 347 published operations into 349 public method paths; the generated Rust SDK contains 347 public async endpoint methods. The two additional paths are the streaming/non-streaming variants of chat and FIM completions.
+- All 16 approved method overrides appear in the generated resource modules, with no duplicate method-name collisions.
+- Ten query-bearing operations have their synthetic wrapper names updated consistently (for example, `GetWorkflowEventsQueryRequest` → `EventsListQueryRequest`, `GetWorkflowExecutionTraceEventsQueryRequest` → `ListTraceEventsQueryRequest`). The remaining six overrides do not have synthetic query wrappers.
+- The corrected type inventory contains 93 public `*QueryRequest` types. Compared with the baseline, ten old wrapper names are replaced by their new names; two additional entries (`AgentsGetQueryRequest2` and `AgentsListQueryRequest2`) are previously omitted numeric-suffix collision types now captured by the corrected inventory regex.
+- The generated public function inventories contain 9,796 declarations in each parameter style. Exactly 165 signature lines change from the baseline and 165 are added, corresponding to the 16 endpoint renames and Fern's derived request/response naming changes. Wrapped-vs-inline function and query-type diffs are both empty.
 
-The generation run will determine whether all 16 overrides are reflected in the generated methods and synthetic request types. Compilation remains diagnostic because the v1 generator currently has unrelated crate-level failures; the audit gate validates generation and inventories.
+Both Fern generation modes succeed. Cargo checks remain diagnostic and currently report 51 pre-existing/unrelated crate errors in each mode, so this run does not establish that the v1 generated crate compiles. The generation gate validates Fern generation, the inventories, and parity between parameter styles.
