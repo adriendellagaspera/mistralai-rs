@@ -47,6 +47,9 @@ jobs:
     name: generation
     runs-on: ubuntu-24.04
     timeout-minutes: 45
+    permissions:
+      actions: write
+      contents: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -54,17 +57,28 @@ jobs:
       - run: rustup show
       - run: npm install --global fern-api@5.112.0 # zizmor: ignore[adhoc-packages]
       - run: python3 -m pip install --disable-pip-version-check PyYAML==6.0.3
-      - run: bash sdk-build/fern/check.sh
-      - name: Preserve regenerated production SDK for review
-        if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        with:
-          name: fern-production-sdk-candidate
-          if-no-files-found: warn
-          retention-days: 7
-          path: |
-            sdk-build/fern/generated/src/
-            sdk-build/fern/inventory.candidate.json
+      - name: Materialize the reviewed SDK for same-repository pull requests
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        run: bash sdk-build/fern/generate.sh
+      - name: Verify production generation
+        run: bash sdk-build/fern/check.sh
+      - name: Commit generated SDK and trigger verification on the new head
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src sdk-build/fern/inventory.json
+          if git diff --cached --quiet; then
+            echo "Generated SDK already matches the reviewed policy"
+            exit 0
+          fi
+          git commit -m 'chore(sdk): regenerate Rust SDK from naming policy'
+          gh auth setup-git
+          git push origin "HEAD:refs/heads/$HEAD_REF"
+          gh workflow run ci.yml --ref "$HEAD_REF"
 
   generation-v1:
     name: generation-v1
