@@ -113,6 +113,7 @@ jobs:
           retention-days: 7
           path: |
             sdk-build/fern-v1/public-method-paths.tsv
+            sdk-build/fern-v1/endpoint-methods-*.txt
             sdk-build/fern-v1/query-types-*.txt
             sdk-build/fern-v1/query-types*.diff
             sdk-build/fern-v1/public-functions-*.txt
