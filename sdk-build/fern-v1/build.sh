@@ -19,6 +19,35 @@ python3 "$SURFACE_TOOL" compile \
   --output "$FERN_DIR/openapi.json" \
   --resolution "$WORKSPACE/resolution.json"
 
+python3 - "$WORKSPACE/resolution.json" "$WORKSPACE/public-method-paths.tsv" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+resolution = json.loads(Path(sys.argv[1]).read_text())
+rows = []
+for operation in resolution["operations"]:
+    if operation["outcome"] != "published":
+        continue
+    for public_path in operation["public_paths"]:
+        rows.append(
+            "\\t".join(
+                [
+                    operation["http_method"],
+                    operation["http_path"],
+                    operation.get("operation_id") or "",
+                    public_path,
+                ]
+            )
+        )
+output = Path(sys.argv[2])
+output.write_text("\\n".join(sorted(rows)) + "\\n")
+print(
+    f"public method paths: {len(rows)} across "
+    f"{resolution['published_operation_count']} published operations"
+)
+PY
+
 inventory_query_types() {
   local style="$1"
   python3 - "$FERN_DIR/generated/src" "$WORKSPACE/query-types-$style.txt" <<'PY'
