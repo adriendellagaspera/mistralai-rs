@@ -5,7 +5,7 @@ info:
 actions:
   - target: "$.paths['/v1/libraries/{library_id}'].put"
     update:
-      x-fern-sdk-method-name: update
+      x-fern-sdk-method-name: update_legacy
   - target: "$.paths['/v1/workflows'].get"
     update:
       x-fern-sdk-method-name: list
