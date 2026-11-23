@@ -5,6 +5,12 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+    inputs:
+      run_fern_v1:
+        description: "Run the quota-limited Fern v1 guest-generation diagnostic"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -45,45 +51,20 @@ jobs:
 
   generation:
     name: generation
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-24.04
     timeout-minutes: 45
-    permissions:
-      actions: write # Dispatch CI after committing generator-produced SDK sources.
-      contents: write # Commit Fern-generated sources on same-repository pull requests.
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           persist-credentials: false
       - run: rustup show
       - run: npm install --global fern-api@5.112.0 # zizmor: ignore[adhoc-packages]
       - run: python3 -m pip install --disable-pip-version-check PyYAML==6.0.3
-      - name: Materialize the reviewed SDK for same-repository pull requests
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
-        run: bash sdk-build/fern/generate.sh
-      - name: Verify production generation
-        run: bash sdk-build/fern/check.sh
-      - name: Commit generated SDK and trigger verification on the new head
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
-        env:
-          GH_TOKEN: ${{ github.token }}
-          HEAD_REF: ${{ github.event.pull_request.head.ref }}
-        run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add src sdk-build/fern/inventory.json
-          if git diff --cached --quiet; then
-            echo "Generated SDK already matches the reviewed policy"
-            exit 0
-          fi
-          git commit -m 'chore(sdk): regenerate Rust SDK from naming policy'
-          gh auth setup-git
-          git push origin "HEAD:refs/heads/$HEAD_REF"
-          gh workflow run ci.yml --ref "$HEAD_REF"
+      - run: bash sdk-build/fern/check.sh
 
   generation-v1:
     name: generation-v1
+    if: github.event_name == 'workflow_dispatch' && inputs.run_fern_v1 == true
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
@@ -220,14 +201,11 @@ jobs:
           TEST: ${{ needs.test.result }}
           DOCS: ${{ needs.docs.result }}
           API: ${{ needs.api.result }}
-          EVENT_NAME: ${{ github.event_name }}
-          HEAD_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name || '' }}
-          REPOSITORY: ${{ github.repository }}
+          RUN_FERN_V1: ${{ github.event.inputs.run_fern_v1 || 'false' }}
         run: |
-          # Fork pull requests skip the write-enabled generation job; all other jobs remain required.
-          if [ "$EVENT_NAME" = "pull_request" ] && [ "$HEAD_REPOSITORY" != "$REPOSITORY" ]; then
-            test "$GENERATION" = skipped
-            GENERATION=success
+          # Fern v1 is an opt-in diagnostic; skipped runs do not block production SDK checks.
+          if [ "$GENERATION_V1" = skipped ] && [ "$RUN_FERN_V1" != "true" ]; then
+            GENERATION_V1=success
           fi
           for result in "$POLICY" "$GENERATION" "$GENERATION_V1" "$FORMAT" "$LINT" "$DEPENDENCIES" "$TOOLING" "$TEST" "$DOCS" "$API"; do
             test "$result" = success
