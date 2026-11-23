@@ -752,7 +752,7 @@
       "operation_id": "list_agents_v1_audio_agents_get",
       "outcome": "published",
       "public_paths": [
-        "audio.agents.list"
+        "audio.agents.list_audio_agents"
       ],
       "representation": null,
       "source_identity": "operationId:list_agents_v1_audio_agents_get"
@@ -764,7 +764,7 @@
       "operation_id": "create_agent_v1_audio_agents_post",
       "outcome": "published",
       "public_paths": [
-        "audio.agents.create"
+        "audio.agents.create_audio_agent"
       ],
       "representation": null,
       "source_identity": "operationId:create_agent_v1_audio_agents_post"
@@ -776,7 +776,7 @@
       "operation_id": "delete_agent_v1_audio_agents__agent_id__delete",
       "outcome": "published",
       "public_paths": [
-        "audio.agents.delete"
+        "audio.agents.delete_audio_agent"
       ],
       "representation": null,
       "source_identity": "operationId:delete_agent_v1_audio_agents__agent_id__delete"
@@ -788,7 +788,7 @@
       "operation_id": "get_agent_v1_audio_agents__agent_id__get",
       "outcome": "published",
       "public_paths": [
-        "audio.agents.get"
+        "audio.agents.get_audio_agent"
       ],
       "representation": null,
       "source_identity": "operationId:get_agent_v1_audio_agents__agent_id__get"
@@ -800,7 +800,7 @@
       "operation_id": "update_agent_v1_audio_agents__agent_id__put",
       "outcome": "published",
       "public_paths": [
-        "audio.agents.update"
+        "audio.agents.update_audio_agent"
       ],
       "representation": null,
       "source_identity": "operationId:update_agent_v1_audio_agents__agent_id__put"
@@ -824,7 +824,7 @@
       "operation_id": "list_agent_versions_v1_audio_agents__agent_id__versions_get",
       "outcome": "published",
       "public_paths": [
-        "audio.agents.list_versions"
+        "audio.agents.list_audio_agent_versions"
       ],
       "representation": null,
       "source_identity": "operationId:list_agent_versions_v1_audio_agents__agent_id__versions_get"
@@ -1125,7 +1125,7 @@
       "operation_id": "create_client_session_v1_client_sessions_post",
       "outcome": "published",
       "public_paths": [
-        "realtime.sessions.create"
+        "realtime.sessions.create_realtime_session"
       ],
       "representation": null,
       "source_identity": "operationId:create_client_session_v1_client_sessions_post"
@@ -3190,7 +3190,7 @@
       "operation_id": "users_api_list_workspaces",
       "outcome": "published",
       "public_paths": [
-        "beta.users.list_workspaces"
+        "beta.users.list_current_user_workspaces"
       ],
       "representation": null,
       "source_identity": "operationId:users_api_list_workspaces"
