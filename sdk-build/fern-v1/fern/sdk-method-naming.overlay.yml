@@ -51,3 +51,27 @@ actions:
   - target: "$.paths['/v1/workflows/executions/{execution_id}/trace/summary'].get"
     update:
       x-fern-sdk-method-name: get_trace_summary
+  - target: "$.paths['/v1/audio/agents'].post"
+    update:
+      x-fern-sdk-method-name: create_audio_agent
+  - target: "$.paths['/v1/audio/agents/{agent_id}'].delete"
+    update:
+      x-fern-sdk-method-name: delete_audio_agent
+  - target: "$.paths['/v1/audio/agents/{agent_id}'].get"
+    update:
+      x-fern-sdk-method-name: get_audio_agent
+  - target: "$.paths['/v1/audio/agents'].get"
+    update:
+      x-fern-sdk-method-name: list_audio_agents
+  - target: "$.paths['/v1/audio/agents/{agent_id}/versions'].get"
+    update:
+      x-fern-sdk-method-name: list_audio_agent_versions
+  - target: "$.paths['/v1/audio/agents/{agent_id}'].put"
+    update:
+      x-fern-sdk-method-name: update_audio_agent
+  - target: "$.paths['/v1/client/sessions'].post"
+    update:
+      x-fern-sdk-method-name: create_realtime_session
+  - target: "$.paths['/v1/users/me/workspaces'].get"
+    update:
+      x-fern-sdk-method-name: list_current_user_workspaces
