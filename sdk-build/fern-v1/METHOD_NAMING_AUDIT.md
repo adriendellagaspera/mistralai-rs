@@ -40,7 +40,7 @@ This is an audit of the reviewed SDK surface policy, not a dump of generated Rus
 | GET `/v1/workflows/executions/{execution_id}/trace/otel` | `get_workflow_execution_trace_otel` | `get_trace_otel` | Remove repeated resource hierarchy. |
 | GET `/v1/workflows/executions/{execution_id}/trace/summary` | `get_workflow_execution_trace_summary` | `get_trace_summary` | Remove repeated resource hierarchy. |
 
-These are recommendations, not applied changes. In particular, confirm whether the collection operations return complete lists or paginated result pages before finalizing `list` names. `get_budget`, `get_subscription`, `get_identity`, and `get_invite` remain `get` because they address singular resources.
+These 16 changes are approved for the Fern v1 experiment. The collection operations retain `list` naming even when the response is paginated: the verb describes collection semantics, not whether the SDK transparently fetches every page. `get_budget`, `get_subscription`, `get_identity`, and `get_invite` remain `get` because they address singular resources or scalar state. Trace event retrieval is named `list_trace_events` to distinguish the collection from the singular trace metadata operations.
 
 ## Complete operation inventory
 
@@ -394,10 +394,17 @@ These are recommendations, not applied changes. In particular, confirm whether t
 | PUT | `/v1/workflows/{workflow_identifier}/unarchive` | `unarchive_workflow_v1_workflows__workflow_identifier__unarchive_put` | `workflows.unarchive_workflow` |
 | PUT | `/v1/workflows/{workflow_identifier}` | `update_workflow_v1_workflows__workflow_identifier__put` | `workflows.update_workflow` |
 
-## Follow-up validation
+## Approved naming decisions
 
-1. Review the 16 proposed changes against endpoint semantics and the official Mistral API terminology.
-2. Check collisions after shortening names, especially methods sharing the same resource module.
-3. Apply the approved method names with `x-fern-sdk-method-name` in the OpenAPI Overlay. This should also rename synthetic query wrapper types, as demonstrated by the `/v1/audio/agents` experiment.
-4. Run Fern generation and compare public method/type inventories; verify that no `_2`/numeric collision suffixes remain and that the generated crate compiles.
-5. Keep wire-level operationIds and endpoint behavior unchanged; this is an SDK naming-only overlay.
+The 16 changes above are now encoded in `fern/sdk-method-naming.overlay.yml` using native OpenAPI Overlay actions and `x-fern-sdk-method-name`. No operationId, path, HTTP verb, request schema, or response schema is changed.
+
+The naming review checked the public resource grouping and semantic role of each operation. Shortened names are scoped by the generated resource module; therefore `get_logs` and `stream_logs` can coexist in the separate deployment and execution modules. `list_trace_events` is intentionally distinct from `get_trace_info`, `get_trace_otel`, and `get_trace_summary`.
+
+## Generation validation
+
+The Fern v1 build now emits:
+- the full 349-entry public method-path inventory derived from the resolved 347 published OpenAPI operations;
+- the generated public Rust function-signature inventories for both `wrapped` and `inline` parameter styles;
+- the complete public synthetic `*QueryRequest` type inventories, including numeric collision suffixes such as `QueryRequest2`.
+
+The generation run will determine whether all 16 overrides are reflected in the generated methods and synthetic request types. Compilation remains diagnostic because the v1 generator currently has unrelated crate-level failures; the audit gate validates generation and inventories.
