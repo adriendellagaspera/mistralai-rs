@@ -40,4 +40,4 @@ the reviewed semantic inventory.
 
 ## Generator upgrade diagnostics
 
-The `chore/fern-rust-generator-0.53.3` branch evaluates Fern Rust generator 0.53.3 against this production pipeline. It is diagnostic only: the production pin remains unchanged until generated-source drift and public API inventory have been reviewed. On a failed generation audit, CI preserves the generated tree, candidate inventory, Fern IR, and generation digests as the `fern-generation-diagnostic` artifact for seven days.
+The `chore/fern-rust-generator-0.53.3` branch evaluates Fern Rust generator 0.53.3 against this production pipeline. It is diagnostic only: the production pin remains unchanged until generated-source drift and public API inventory have been reviewed. On a failed generation audit, CI preserves a compact `fern-generation-diagnostic` artifact containing the generated-source diff, differing-file list, candidate inventory, and generation digests (seven-day retention). The semantic inventory comparison runs before the byte-for-byte source comparison so API parity is still checked when generator templates drift.
