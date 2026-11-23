@@ -23,7 +23,7 @@ This is an audit of the reviewed SDK surface policy, not a dump of generated Rus
 
 | Endpoint | Current method | Proposed method | Rationale |
 |---|---|---|---|
-| PUT `/v1/libraries/{library_id}` | `libraries_update_v1` | `update` | Leaks operationId/version into the public API; module is already `beta.libraries`. |
+| PUT `/v1/libraries/{library_id}` | `libraries_update_v1` | `update_legacy` | Deprecated PUT endpoint; PATCH already owns the canonical `update` method. |
 | GET `/v1/workflows` | `get_workflows` | `list` | Collection endpoint; module is already `workflows`. |
 | GET `/v1/workflows/registrations` | `get_workflow_registrations` | `list_registrations` | Collection endpoint; avoid repeating `workflow`. |
 | GET `/v1/workflows/schedules` | `get_schedules` | `list` | Collection endpoint; module is already `workflows.schedules`. |
@@ -40,7 +40,7 @@ This is an audit of the reviewed SDK surface policy, not a dump of generated Rus
 | GET `/v1/workflows/executions/{execution_id}/trace/otel` | `get_workflow_execution_trace_otel` | `get_trace_otel` | Remove repeated resource hierarchy. |
 | GET `/v1/workflows/executions/{execution_id}/trace/summary` | `get_workflow_execution_trace_summary` | `get_trace_summary` | Remove repeated resource hierarchy. |
 
-These 16 changes are approved for the Fern v1 experiment. The collection operations retain `list` naming even when the response is paginated: the verb describes collection semantics, not whether the SDK transparently fetches every page. `get_budget`, `get_subscription`, `get_identity`, and `get_invite` remain `get` because they address singular resources or scalar state. Trace event retrieval is named `list_trace_events` to distinguish the collection from the singular trace metadata operations.
+These 16 changes are approved for the Fern v1 experiment. The legacy library PUT operation is named `update_legacy` because the current PATCH endpoint already owns `update`; Mistral documents PUT as deprecated and recommends PATCH. The collection operations retain `list` naming even when the response is paginated: the verb describes collection semantics, not whether the SDK transparently fetches every page. `get_budget`, `get_subscription`, `get_identity`, and `get_invite` remain `get` because they address singular resources or scalar state. Trace event retrieval is named `list_trace_events` to distinguish the collection from the singular trace metadata operations.
 
 ## Complete operation inventory
 
