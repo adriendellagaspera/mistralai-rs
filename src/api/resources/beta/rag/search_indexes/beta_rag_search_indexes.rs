@@ -39,11 +39,11 @@ impl SearchIndexesClient2 {
     ///         .beta
     ///         .rag
     ///         .search_indexes
-    ///         .get_deployment_summaries(None)
+    ///         .list_deployment_summaries(None)
     ///         .await;
     /// }
     /// ```
-    pub async fn get_deployment_summaries(
+    pub async fn list_deployment_summaries(
         &self,
         options: Option<RequestOptions>,
     ) -> Result<GetDeploymentSummariesResponse, ApiError> {

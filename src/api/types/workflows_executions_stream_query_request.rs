@@ -2,27 +2,27 @@ pub use crate::prelude::*;
 
 /// Query parameters for stream
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
-pub struct StreamQueryRequest {
+pub struct WorkflowsExecutionsStreamQueryRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub event_source: Option<EventSource>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_event_id: Option<String>,
 }
 
-impl StreamQueryRequest {
-    pub fn builder() -> StreamQueryRequestBuilder {
-        <StreamQueryRequestBuilder as Default>::default()
+impl WorkflowsExecutionsStreamQueryRequest {
+    pub fn builder() -> WorkflowsExecutionsStreamQueryRequestBuilder {
+        <WorkflowsExecutionsStreamQueryRequestBuilder as Default>::default()
     }
 }
 
 #[derive(Clone, PartialEq, Default, Debug)]
 #[non_exhaustive]
-pub struct StreamQueryRequestBuilder {
+pub struct WorkflowsExecutionsStreamQueryRequestBuilder {
     event_source: Option<EventSource>,
     last_event_id: Option<String>,
 }
 
-impl StreamQueryRequestBuilder {
+impl WorkflowsExecutionsStreamQueryRequestBuilder {
     pub fn event_source(mut self, value: EventSource) -> Self {
         self.event_source = Some(value);
         self
@@ -33,9 +33,9 @@ impl StreamQueryRequestBuilder {
         self
     }
 
-    /// Consumes the builder and constructs a [`StreamQueryRequest`].
-    pub fn build(self) -> Result<StreamQueryRequest, BuildError> {
-        Ok(StreamQueryRequest {
+    /// Consumes the builder and constructs a [`WorkflowsExecutionsStreamQueryRequest`].
+    pub fn build(self) -> Result<WorkflowsExecutionsStreamQueryRequest, BuildError> {
+        Ok(WorkflowsExecutionsStreamQueryRequest {
             event_source: self.event_source,
             last_event_id: self.last_event_id,
         })

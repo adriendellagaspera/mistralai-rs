@@ -499,7 +499,7 @@ operations:
     method: "update"
   'operationId:libraries_update_v1':
     resource: ["beta", "libraries"]
-    method: "libraries_update_v1"
+    method: "update_legacy"
   'operationId:libraries_documents_list_v1':
     resource: ["beta", "libraries", "documents"]
     method: "list"
@@ -727,7 +727,7 @@ operations:
     method: "aggregate"
   'operationId:get_trace_fields_v1_observability_traces_fields_get':
     resource: ["beta", "observability", "traces"]
-    method: "get_trace_fields"
+    method: "list_fields"
   'operationId:get_trace_field_options_v1_observability_traces_fields__field_name__options_get':
     resource: ["beta", "observability", "traces"]
     method: "fetch_options"
@@ -748,7 +748,7 @@ operations:
     method: "process"
   'operationId:get_deployment_summaries_v1_rag_deployments_get':
     resource: ["beta", "rag", "search_indexes"]
-    method: "get_deployment_summaries"
+    method: "list_deployment_summaries"
   'operationId:register_deployment_v1_rag_deployments_put':
     resource: ["beta", "rag", "search_indexes"]
     method: "register_deployment"
@@ -841,7 +841,7 @@ operations:
     method: "whoami"
   'operationId:get_workflows_v1_workflows_get':
     resource: ["workflows"]
-    method: "get_workflows"
+    method: "list"
   'operationId:bulk_archive_workflows_v1_workflows_archive_put':
     resource: ["workflows"]
     method: "bulk_archive_workflows"
@@ -868,10 +868,10 @@ operations:
     method: "get_deployment_archive"
   'operationId:get_deployment_logs':
     resource: ["workflows", "deployments"]
-    method: "get_deployment_logs"
+    method: "get_logs"
   'operationId:stream_deployment_logs':
     resource: ["workflows", "deployments"]
-    method: "stream_deployment_logs"
+    method: "stream_logs"
   'operationId:restart_deployment_v1_workflows_deployments__name__restart_post':
     resource: ["workflows", "deployments"]
     method: "restart_deployment"
@@ -886,10 +886,10 @@ operations:
     method: "list_deployment_workers"
   'operationId:get_workflow_events_v1_workflows_events_list_get':
     resource: ["events"]
-    method: "get_workflow_events"
+    method: "list"
   'operationId:get_stream_events_v1_workflows_events_stream_get':
     resource: ["events"]
-    method: "get_stream_events"
+    method: "stream"
   'operationId:batch_cancel_workflow_executions_v1_workflows_executions_cancel_post':
     resource: ["workflows", "executions"]
     method: "batch_cancel_workflow_executions"
@@ -907,10 +907,10 @@ operations:
     method: "get_workflow_execution_history"
   'operationId:get_workflow_execution_logs':
     resource: ["workflows", "executions"]
-    method: "get_workflow_execution_logs"
+    method: "get_logs"
   'operationId:stream_workflow_execution_logs':
     resource: ["workflows", "executions"]
-    method: "stream_workflow_execution_logs"
+    method: "stream_logs"
   'operationId:query_workflow_execution_v1_workflows_executions__execution_id__queries_post':
     resource: ["workflows", "executions"]
     method: "query_workflow_execution"
@@ -928,22 +928,22 @@ operations:
     method: "terminate_workflow_execution"
   'operationId:get_workflow_execution_trace_events':
     resource: ["workflows", "executions"]
-    method: "get_workflow_execution_trace_events"
+    method: "list_trace_events"
   'operationId:get_workflow_execution_trace_info':
     resource: ["workflows", "executions"]
-    method: "get_workflow_execution_trace_info"
+    method: "get_trace_info"
   'operationId:get_workflow_execution_trace_otel':
     resource: ["workflows", "executions"]
-    method: "get_workflow_execution_trace_otel"
+    method: "get_trace_otel"
   'operationId:get_workflow_execution_trace_summary':
     resource: ["workflows", "executions"]
-    method: "get_workflow_execution_trace_summary"
+    method: "get_trace_summary"
   'operationId:update_workflow_execution_v1_workflows_executions__execution_id__updates_post':
     resource: ["workflows", "executions"]
     method: "update_workflow_execution"
   'operationId:get_workflow_registrations_v1_workflows_registrations_get':
     resource: ["workflows"]
-    method: "get_workflow_registrations"
+    method: "list_registrations"
   'operationId:get_workflow_registration_v1_workflows_registrations__workflow_registration_id__get':
     resource: ["workflows"]
     method: "get_workflow_registration"
@@ -961,7 +961,7 @@ operations:
     method: "get_run_history"
   'operationId:get_schedules_v1_workflows_schedules_get':
     resource: ["workflows", "schedules"]
-    method: "get_schedules"
+    method: "list"
   'operationId:schedule_workflow_v1_workflows_schedules_post':
     resource: ["workflows", "schedules"]
     method: "schedule_workflow"

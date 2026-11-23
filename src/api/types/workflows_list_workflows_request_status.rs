@@ -2,13 +2,13 @@ pub use crate::prelude::*;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 #[serde(untagged)]
-pub enum GetWorkflowsWorkflowsRequestStatus {
+pub enum ListWorkflowsRequestStatus {
     WorkflowExecutionStatus(WorkflowExecutionStatus),
 
     WorkflowExecutionStatusList(Vec<WorkflowExecutionStatus>),
 }
 
-impl GetWorkflowsWorkflowsRequestStatus {
+impl ListWorkflowsRequestStatus {
     pub fn is_workflow_execution_status(&self) -> bool {
         matches!(self, Self::WorkflowExecutionStatus(_))
     }

@@ -1,41 +1,42 @@
 pub use crate::prelude::*;
 
+/// First-page sort order: 'asc' (oldest first) or 'desc'. Ignored when `cursor` is set.
 #[non_exhaustive]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum GetWorkflowsWorkflowsRequestDeploymentStatus {
-    Active,
-    Inactive,
+pub enum GetLogsExecutionsRequestOrder {
+    Asc,
+    Desc,
     /// This variant is used for forward compatibility.
     /// If the server sends a value not recognized by the current SDK version,
     /// it will be captured here with the raw string value.
     __Unknown(String),
 }
-impl Serialize for GetWorkflowsWorkflowsRequestDeploymentStatus {
+impl Serialize for GetLogsExecutionsRequestOrder {
     fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         match self {
-            Self::Active => serializer.serialize_str("active"),
-            Self::Inactive => serializer.serialize_str("inactive"),
+            Self::Asc => serializer.serialize_str("asc"),
+            Self::Desc => serializer.serialize_str("desc"),
             Self::__Unknown(val) => serializer.serialize_str(val),
         }
     }
 }
 
-impl<'de> Deserialize<'de> for GetWorkflowsWorkflowsRequestDeploymentStatus {
+impl<'de> Deserialize<'de> for GetLogsExecutionsRequestOrder {
     fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
         let value = String::deserialize(deserializer)?;
         match value.as_str() {
-            "active" => Ok(Self::Active),
-            "inactive" => Ok(Self::Inactive),
+            "asc" => Ok(Self::Asc),
+            "desc" => Ok(Self::Desc),
             _ => Ok(Self::__Unknown(value)),
         }
     }
 }
 
-impl fmt::Display for GetWorkflowsWorkflowsRequestDeploymentStatus {
+impl fmt::Display for GetLogsExecutionsRequestOrder {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::Active => write!(f, "active"),
-            Self::Inactive => write!(f, "inactive"),
+            Self::Asc => write!(f, "asc"),
+            Self::Desc => write!(f, "desc"),
             Self::__Unknown(val) => write!(f, "{}", val),
         }
     }

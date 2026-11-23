@@ -439,9 +439,9 @@ impl DeploymentsClient {
     ///     client
     ///         .workflows
     ///         .deployments
-    ///         .get_deployment_logs(
+    ///         .get_logs(
     ///             &"name".to_string(),
-    ///             &GetDeploymentLogsQueryRequest {
+    ///             &WorkflowsDeploymentsGetLogsQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -449,10 +449,10 @@ impl DeploymentsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn get_deployment_logs(
+    pub async fn get_logs(
         &self,
         name: &str,
-        request: &GetDeploymentLogsQueryRequest,
+        request: &WorkflowsDeploymentsGetLogsQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<DeploymentLogSearchResponse, ApiError> {
         self.http_client
@@ -507,9 +507,9 @@ impl DeploymentsClient {
     ///     client
     ///         .workflows
     ///         .deployments
-    ///         .stream_deployment_logs(
+    ///         .stream_logs(
     ///             &"name".to_string(),
-    ///             &StreamDeploymentLogsQueryRequest {
+    ///             &WorkflowsDeploymentsStreamLogsQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             Some(RequestOptions::new()),
@@ -517,12 +517,12 @@ impl DeploymentsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn stream_deployment_logs(
+    pub async fn stream_logs(
         &self,
         name: &str,
-        request: &StreamDeploymentLogsQueryRequest,
+        request: &WorkflowsDeploymentsStreamLogsQueryRequest,
         options: Option<RequestOptions>,
-    ) -> Result<SseStream<StreamDeploymentLogsDeploymentsResponse>, ApiError> {
+    ) -> Result<SseStream<StreamLogsDeploymentsResponse>, ApiError> {
         self.http_client
             .execute_sse_request(
                 Method::GET,

@@ -1,8 +1,8 @@
 pub use crate::prelude::*;
 
-/// Query parameters for stream_workflow_execution_logs
+/// Query parameters for stream_logs
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
-pub struct StreamWorkflowExecutionLogsQueryRequest {
+pub struct WorkflowsExecutionsStreamLogsQueryRequest {
     /// Filter logs by workflow run ID
     #[serde(skip_serializing_if = "Option::is_none")]
     pub run_id: Option<String>,
@@ -17,22 +17,22 @@ pub struct StreamWorkflowExecutionLogsQueryRequest {
     pub last_event_id: Option<String>,
 }
 
-impl StreamWorkflowExecutionLogsQueryRequest {
-    pub fn builder() -> StreamWorkflowExecutionLogsQueryRequestBuilder {
-        <StreamWorkflowExecutionLogsQueryRequestBuilder as Default>::default()
+impl WorkflowsExecutionsStreamLogsQueryRequest {
+    pub fn builder() -> WorkflowsExecutionsStreamLogsQueryRequestBuilder {
+        <WorkflowsExecutionsStreamLogsQueryRequestBuilder as Default>::default()
     }
 }
 
 #[derive(Clone, PartialEq, Default, Debug)]
 #[non_exhaustive]
-pub struct StreamWorkflowExecutionLogsQueryRequestBuilder {
+pub struct WorkflowsExecutionsStreamLogsQueryRequestBuilder {
     run_id: Option<String>,
     activity_id: Option<String>,
     after: Option<DateTime<FixedOffset>>,
     last_event_id: Option<String>,
 }
 
-impl StreamWorkflowExecutionLogsQueryRequestBuilder {
+impl WorkflowsExecutionsStreamLogsQueryRequestBuilder {
     pub fn run_id(mut self, value: impl Into<String>) -> Self {
         self.run_id = Some(value.into());
         self
@@ -53,9 +53,9 @@ impl StreamWorkflowExecutionLogsQueryRequestBuilder {
         self
     }
 
-    /// Consumes the builder and constructs a [`StreamWorkflowExecutionLogsQueryRequest`].
-    pub fn build(self) -> Result<StreamWorkflowExecutionLogsQueryRequest, BuildError> {
-        Ok(StreamWorkflowExecutionLogsQueryRequest {
+    /// Consumes the builder and constructs a [`WorkflowsExecutionsStreamLogsQueryRequest`].
+    pub fn build(self) -> Result<WorkflowsExecutionsStreamLogsQueryRequest, BuildError> {
+        Ok(WorkflowsExecutionsStreamLogsQueryRequest {
             run_id: self.run_id,
             activity_id: self.activity_id,
             after: self.after,

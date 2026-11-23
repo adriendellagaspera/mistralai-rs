@@ -1906,7 +1906,7 @@
       "operation_id": "libraries_update_v1",
       "outcome": "published",
       "public_paths": [
-        "beta.libraries.libraries_update_v1"
+        "beta.libraries.update_legacy"
       ],
       "representation": null,
       "source_identity": "operationId:libraries_update_v1"
@@ -2818,7 +2818,7 @@
       "operation_id": "get_trace_fields_v1_observability_traces_fields_get",
       "outcome": "published",
       "public_paths": [
-        "beta.observability.traces.get_trace_fields"
+        "beta.observability.traces.list_fields"
       ],
       "representation": null,
       "source_identity": "operationId:get_trace_fields_v1_observability_traces_fields_get"
@@ -2902,7 +2902,7 @@
       "operation_id": "get_deployment_summaries_v1_rag_deployments_get",
       "outcome": "published",
       "public_paths": [
-        "beta.rag.search_indexes.get_deployment_summaries"
+        "beta.rag.search_indexes.list_deployment_summaries"
       ],
       "representation": null,
       "source_identity": "operationId:get_deployment_summaries_v1_rag_deployments_get"
@@ -3274,7 +3274,7 @@
       "operation_id": "get_workflows_v1_workflows_get",
       "outcome": "published",
       "public_paths": [
-        "workflows.get_workflows"
+        "workflows.list"
       ],
       "representation": null,
       "source_identity": "operationId:get_workflows_v1_workflows_get"
@@ -3382,7 +3382,7 @@
       "operation_id": "get_deployment_logs",
       "outcome": "published",
       "public_paths": [
-        "workflows.deployments.get_deployment_logs"
+        "workflows.deployments.get_logs"
       ],
       "representation": null,
       "source_identity": "operationId:get_deployment_logs"
@@ -3394,7 +3394,7 @@
       "operation_id": "stream_deployment_logs",
       "outcome": "published",
       "public_paths": [
-        "workflows.deployments.stream_deployment_logs"
+        "workflows.deployments.stream_logs"
       ],
       "representation": null,
       "source_identity": "operationId:stream_deployment_logs"
@@ -3454,7 +3454,7 @@
       "operation_id": "get_workflow_events_v1_workflows_events_list_get",
       "outcome": "published",
       "public_paths": [
-        "events.get_workflow_events"
+        "events.list"
       ],
       "representation": null,
       "source_identity": "operationId:get_workflow_events_v1_workflows_events_list_get"
@@ -3466,7 +3466,7 @@
       "operation_id": "get_stream_events_v1_workflows_events_stream_get",
       "outcome": "published",
       "public_paths": [
-        "events.get_stream_events"
+        "events.stream"
       ],
       "representation": null,
       "source_identity": "operationId:get_stream_events_v1_workflows_events_stream_get"
@@ -3538,7 +3538,7 @@
       "operation_id": "get_workflow_execution_logs",
       "outcome": "published",
       "public_paths": [
-        "workflows.executions.get_workflow_execution_logs"
+        "workflows.executions.get_logs"
       ],
       "representation": null,
       "source_identity": "operationId:get_workflow_execution_logs"
@@ -3550,7 +3550,7 @@
       "operation_id": "stream_workflow_execution_logs",
       "outcome": "published",
       "public_paths": [
-        "workflows.executions.stream_workflow_execution_logs"
+        "workflows.executions.stream_logs"
       ],
       "representation": null,
       "source_identity": "operationId:stream_workflow_execution_logs"
@@ -3622,7 +3622,7 @@
       "operation_id": "get_workflow_execution_trace_events",
       "outcome": "published",
       "public_paths": [
-        "workflows.executions.get_workflow_execution_trace_events"
+        "workflows.executions.list_trace_events"
       ],
       "representation": null,
       "source_identity": "operationId:get_workflow_execution_trace_events"
@@ -3634,7 +3634,7 @@
       "operation_id": "get_workflow_execution_trace_info",
       "outcome": "published",
       "public_paths": [
-        "workflows.executions.get_workflow_execution_trace_info"
+        "workflows.executions.get_trace_info"
       ],
       "representation": null,
       "source_identity": "operationId:get_workflow_execution_trace_info"
@@ -3646,7 +3646,7 @@
       "operation_id": "get_workflow_execution_trace_otel",
       "outcome": "published",
       "public_paths": [
-        "workflows.executions.get_workflow_execution_trace_otel"
+        "workflows.executions.get_trace_otel"
       ],
       "representation": null,
       "source_identity": "operationId:get_workflow_execution_trace_otel"
@@ -3658,7 +3658,7 @@
       "operation_id": "get_workflow_execution_trace_summary",
       "outcome": "published",
       "public_paths": [
-        "workflows.executions.get_workflow_execution_trace_summary"
+        "workflows.executions.get_trace_summary"
       ],
       "representation": null,
       "source_identity": "operationId:get_workflow_execution_trace_summary"
@@ -3682,7 +3682,7 @@
       "operation_id": "get_workflow_registrations_v1_workflows_registrations_get",
       "outcome": "published",
       "public_paths": [
-        "workflows.get_workflow_registrations"
+        "workflows.list_registrations"
       ],
       "representation": null,
       "source_identity": "operationId:get_workflow_registrations_v1_workflows_registrations_get"
@@ -3754,7 +3754,7 @@
       "operation_id": "get_schedules_v1_workflows_schedules_get",
       "outcome": "published",
       "public_paths": [
-        "workflows.schedules.get_schedules"
+        "workflows.schedules.list"
       ],
       "representation": null,
       "source_identity": "operationId:get_schedules_v1_workflows_schedules_get"
@@ -5122,7 +5122,7 @@
       },
       {
         "public_paths": [
-          "beta.libraries.libraries_update_v1"
+          "beta.libraries.update_legacy"
         ],
         "source_identity": "operationId:libraries_update_v1"
       },
@@ -5578,7 +5578,7 @@
       },
       {
         "public_paths": [
-          "beta.observability.traces.get_trace_fields"
+          "beta.observability.traces.list_fields"
         ],
         "source_identity": "operationId:get_trace_fields_v1_observability_traces_fields_get"
       },
@@ -5620,7 +5620,7 @@
       },
       {
         "public_paths": [
-          "beta.rag.search_indexes.get_deployment_summaries"
+          "beta.rag.search_indexes.list_deployment_summaries"
         ],
         "source_identity": "operationId:get_deployment_summaries_v1_rag_deployments_get"
       },
@@ -5806,7 +5806,7 @@
       },
       {
         "public_paths": [
-          "workflows.get_workflows"
+          "workflows.list"
         ],
         "source_identity": "operationId:get_workflows_v1_workflows_get"
       },
@@ -5860,13 +5860,13 @@
       },
       {
         "public_paths": [
-          "workflows.deployments.get_deployment_logs"
+          "workflows.deployments.get_logs"
         ],
         "source_identity": "operationId:get_deployment_logs"
       },
       {
         "public_paths": [
-          "workflows.deployments.stream_deployment_logs"
+          "workflows.deployments.stream_logs"
         ],
         "source_identity": "operationId:stream_deployment_logs"
       },
@@ -5896,13 +5896,13 @@
       },
       {
         "public_paths": [
-          "events.get_workflow_events"
+          "events.list"
         ],
         "source_identity": "operationId:get_workflow_events_v1_workflows_events_list_get"
       },
       {
         "public_paths": [
-          "events.get_stream_events"
+          "events.stream"
         ],
         "source_identity": "operationId:get_stream_events_v1_workflows_events_stream_get"
       },
@@ -5938,13 +5938,13 @@
       },
       {
         "public_paths": [
-          "workflows.executions.get_workflow_execution_logs"
+          "workflows.executions.get_logs"
         ],
         "source_identity": "operationId:get_workflow_execution_logs"
       },
       {
         "public_paths": [
-          "workflows.executions.stream_workflow_execution_logs"
+          "workflows.executions.stream_logs"
         ],
         "source_identity": "operationId:stream_workflow_execution_logs"
       },
@@ -5980,25 +5980,25 @@
       },
       {
         "public_paths": [
-          "workflows.executions.get_workflow_execution_trace_events"
+          "workflows.executions.list_trace_events"
         ],
         "source_identity": "operationId:get_workflow_execution_trace_events"
       },
       {
         "public_paths": [
-          "workflows.executions.get_workflow_execution_trace_info"
+          "workflows.executions.get_trace_info"
         ],
         "source_identity": "operationId:get_workflow_execution_trace_info"
       },
       {
         "public_paths": [
-          "workflows.executions.get_workflow_execution_trace_otel"
+          "workflows.executions.get_trace_otel"
         ],
         "source_identity": "operationId:get_workflow_execution_trace_otel"
       },
       {
         "public_paths": [
-          "workflows.executions.get_workflow_execution_trace_summary"
+          "workflows.executions.get_trace_summary"
         ],
         "source_identity": "operationId:get_workflow_execution_trace_summary"
       },
@@ -6010,7 +6010,7 @@
       },
       {
         "public_paths": [
-          "workflows.get_workflow_registrations"
+          "workflows.list_registrations"
         ],
         "source_identity": "operationId:get_workflow_registrations_v1_workflows_registrations_get"
       },
@@ -6046,7 +6046,7 @@
       },
       {
         "public_paths": [
-          "workflows.schedules.get_schedules"
+          "workflows.schedules.list"
         ],
         "source_identity": "operationId:get_schedules_v1_workflows_schedules_get"
       },
@@ -10839,9 +10839,9 @@
     "beta.libraries.documents.update",
     "beta.libraries.documents.upload",
     "beta.libraries.get",
-    "beta.libraries.libraries_update_v1",
     "beta.libraries.list",
     "beta.libraries.update",
+    "beta.libraries.update_legacy",
     "beta.observability.datasets.create",
     "beta.observability.datasets.create_record",
     "beta.observability.datasets.delete",
@@ -10902,8 +10902,8 @@
     "beta.observability.traces.fetch_options",
     "beta.observability.traces.get_span_by_id",
     "beta.observability.traces.get_trace_by_id",
-    "beta.observability.traces.get_trace_fields",
     "beta.observability.traces.get_trace_spans",
+    "beta.observability.traces.list_fields",
     "beta.observability.traces.search",
     "beta.prompts.create",
     "beta.prompts.create_version",
@@ -10917,7 +10917,7 @@
     "beta.rag.ingestion_pipeline_configurations.list",
     "beta.rag.ingestion_pipeline_configurations.register",
     "beta.rag.ingestion_pipeline_configurations.update_run_info",
-    "beta.rag.search_indexes.get_deployment_summaries",
+    "beta.rag.search_indexes.list_deployment_summaries",
     "beta.rag.search_indexes.register_deployment",
     "beta.rag.search_indexes.unregister_deployment",
     "beta.rag.search_indexes.update_index_metrics",
@@ -10959,8 +10959,8 @@
     "classifiers.moderate",
     "classifiers.moderate_chat",
     "embeddings.create",
-    "events.get_stream_events",
-    "events.get_workflow_events",
+    "events.list",
+    "events.stream",
     "files.delete",
     "files.download",
     "files.get_signed_url",
@@ -10987,13 +10987,13 @@
     "workflows.deployments.delete_deployment",
     "workflows.deployments.get_deployment",
     "workflows.deployments.get_deployment_archive",
-    "workflows.deployments.get_deployment_logs",
+    "workflows.deployments.get_logs",
     "workflows.deployments.list_deployment_workers",
     "workflows.deployments.list_deployments",
     "workflows.deployments.restart_deployment",
     "workflows.deployments.start_deployment",
     "workflows.deployments.stop_deployment",
-    "workflows.deployments.stream_deployment_logs",
+    "workflows.deployments.stream_logs",
     "workflows.deployments.unharden_deployment",
     "workflows.deployments.update_deployment",
     "workflows.execute_workflow",
@@ -11001,30 +11001,30 @@
     "workflows.executions.batch_cancel_workflow_executions",
     "workflows.executions.batch_terminate_workflow_executions",
     "workflows.executions.cancel_workflow_execution",
+    "workflows.executions.get_logs",
+    "workflows.executions.get_trace_info",
+    "workflows.executions.get_trace_otel",
+    "workflows.executions.get_trace_summary",
     "workflows.executions.get_workflow_execution",
     "workflows.executions.get_workflow_execution_history",
-    "workflows.executions.get_workflow_execution_logs",
-    "workflows.executions.get_workflow_execution_trace_events",
-    "workflows.executions.get_workflow_execution_trace_info",
-    "workflows.executions.get_workflow_execution_trace_otel",
-    "workflows.executions.get_workflow_execution_trace_summary",
+    "workflows.executions.list_trace_events",
     "workflows.executions.query_workflow_execution",
     "workflows.executions.reset_workflow",
     "workflows.executions.signal_workflow_execution",
     "workflows.executions.stream",
-    "workflows.executions.stream_workflow_execution_logs",
+    "workflows.executions.stream_logs",
     "workflows.executions.terminate_workflow_execution",
     "workflows.executions.update_workflow_execution",
     "workflows.get_workflow",
     "workflows.get_workflow_registration",
-    "workflows.get_workflow_registrations",
-    "workflows.get_workflows",
+    "workflows.list",
+    "workflows.list_registrations",
     "workflows.metrics.get_workflow_metrics",
     "workflows.runs.get_run",
     "workflows.runs.get_run_history",
     "workflows.runs.list_runs",
     "workflows.schedules.get_schedule",
-    "workflows.schedules.get_schedules",
+    "workflows.schedules.list",
     "workflows.schedules.pause_schedule",
     "workflows.schedules.resume_schedule",
     "workflows.schedules.schedule_workflow",
@@ -12797,15 +12797,15 @@
     "beta_context_search_indexes_generate_index_summary_Response_200",
     "beta_conversations_get_Response_200",
     "beta_rag_search_indexes_update_index_metrics_Request",
-    "events_get_stream_events_Response_200",
+    "events_stream_Response_200",
     "models_retrieve_Response_200",
     "models_update_Response_200",
     "realtime_sessions_create_Request",
-    "workflows_deployments_stream_deployment_logs_Response_200",
+    "workflows_deployments_stream_logs_Response_200",
     "workflows_execute_workflow_Response_200",
     "workflows_execute_workflow_registration_Response_200",
     "workflows_executions_stream_Response_200",
-    "workflows_executions_stream_workflow_execution_logs_Response_200"
+    "workflows_executions_stream_logs_Response_200"
   ],
   "published_operation_count": 347,
   "schema_version": 1,

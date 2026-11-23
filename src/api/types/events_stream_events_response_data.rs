@@ -2,13 +2,13 @@ pub use crate::prelude::*;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(untagged)]
-pub enum GetStreamEventsEventsResponseData {
+pub enum StreamEventsResponseData {
     StreamEventSsePayload(StreamEventSsePayload),
 
     StreamEventSseErrorData(StreamEventSseErrorData),
 }
 
-impl GetStreamEventsEventsResponseData {
+impl StreamEventsResponseData {
     pub fn is_stream_event_sse_payload(&self) -> bool {
         matches!(self, Self::StreamEventSsePayload(_))
     }
@@ -46,7 +46,7 @@ impl GetStreamEventsEventsResponseData {
     }
 }
 
-impl fmt::Display for GetStreamEventsEventsResponseData {
+impl fmt::Display for StreamEventsResponseData {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::StreamEventSsePayload(value) => write!(

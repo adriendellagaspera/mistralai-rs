@@ -1,9 +1,9 @@
 pub use crate::prelude::*;
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
-pub struct GetStreamEventsEventsResponse {
+pub struct StreamEventsResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub data: Option<GetStreamEventsEventsResponseData>,
+    pub data: Option<StreamEventsResponseData>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub event: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -12,23 +12,23 @@ pub struct GetStreamEventsEventsResponse {
     pub retry: Option<i64>,
 }
 
-impl GetStreamEventsEventsResponse {
-    pub fn builder() -> GetStreamEventsEventsResponseBuilder {
-        <GetStreamEventsEventsResponseBuilder as Default>::default()
+impl StreamEventsResponse {
+    pub fn builder() -> StreamEventsResponseBuilder {
+        <StreamEventsResponseBuilder as Default>::default()
     }
 }
 
 #[derive(Clone, PartialEq, Default, Debug)]
 #[non_exhaustive]
-pub struct GetStreamEventsEventsResponseBuilder {
-    data: Option<GetStreamEventsEventsResponseData>,
+pub struct StreamEventsResponseBuilder {
+    data: Option<StreamEventsResponseData>,
     event: Option<String>,
     id: Option<String>,
     retry: Option<i64>,
 }
 
-impl GetStreamEventsEventsResponseBuilder {
-    pub fn data(mut self, value: GetStreamEventsEventsResponseData) -> Self {
+impl StreamEventsResponseBuilder {
+    pub fn data(mut self, value: StreamEventsResponseData) -> Self {
         self.data = Some(value);
         self
     }
@@ -48,9 +48,9 @@ impl GetStreamEventsEventsResponseBuilder {
         self
     }
 
-    /// Consumes the builder and constructs a [`GetStreamEventsEventsResponse`].
-    pub fn build(self) -> Result<GetStreamEventsEventsResponse, BuildError> {
-        Ok(GetStreamEventsEventsResponse {
+    /// Consumes the builder and constructs a [`StreamEventsResponse`].
+    pub fn build(self) -> Result<StreamEventsResponse, BuildError> {
+        Ok(StreamEventsResponse {
             data: self.data,
             event: self.event,
             id: self.id,

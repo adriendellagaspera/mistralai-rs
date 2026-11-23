@@ -1,8 +1,8 @@
 pub use crate::prelude::*;
 
-/// Query parameters for get_schedules
+/// Query parameters for list
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
-pub struct GetSchedulesQueryRequest {
+pub struct WorkflowsSchedulesListQueryRequest {
     /// Filter by exact workflow name
     #[serde(skip_serializing_if = "Option::is_none")]
     pub workflow_name: Option<String>,
@@ -11,7 +11,7 @@ pub struct GetSchedulesQueryRequest {
     pub user_id: Option<String>,
     /// Filter by schedule status: 'active' or 'paused'
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub status: Option<GetSchedulesSchedulesRequestStatus>,
+    pub status: Option<ListSchedulesRequestStatus>,
     /// Fuzzy search query for workflow name, display name, description, or ID
     #[serde(skip_serializing_if = "Option::is_none")]
     pub search: Option<String>,
@@ -23,24 +23,24 @@ pub struct GetSchedulesQueryRequest {
     pub next_page_token: Option<String>,
 }
 
-impl GetSchedulesQueryRequest {
-    pub fn builder() -> GetSchedulesQueryRequestBuilder {
-        <GetSchedulesQueryRequestBuilder as Default>::default()
+impl WorkflowsSchedulesListQueryRequest {
+    pub fn builder() -> WorkflowsSchedulesListQueryRequestBuilder {
+        <WorkflowsSchedulesListQueryRequestBuilder as Default>::default()
     }
 }
 
 #[derive(Clone, PartialEq, Default, Debug)]
 #[non_exhaustive]
-pub struct GetSchedulesQueryRequestBuilder {
+pub struct WorkflowsSchedulesListQueryRequestBuilder {
     workflow_name: Option<String>,
     user_id: Option<String>,
-    status: Option<GetSchedulesSchedulesRequestStatus>,
+    status: Option<ListSchedulesRequestStatus>,
     search: Option<String>,
     page_size: Option<i64>,
     next_page_token: Option<String>,
 }
 
-impl GetSchedulesQueryRequestBuilder {
+impl WorkflowsSchedulesListQueryRequestBuilder {
     pub fn workflow_name(mut self, value: impl Into<String>) -> Self {
         self.workflow_name = Some(value.into());
         self
@@ -51,7 +51,7 @@ impl GetSchedulesQueryRequestBuilder {
         self
     }
 
-    pub fn status(mut self, value: GetSchedulesSchedulesRequestStatus) -> Self {
+    pub fn status(mut self, value: ListSchedulesRequestStatus) -> Self {
         self.status = Some(value);
         self
     }
@@ -71,9 +71,9 @@ impl GetSchedulesQueryRequestBuilder {
         self
     }
 
-    /// Consumes the builder and constructs a [`GetSchedulesQueryRequest`].
-    pub fn build(self) -> Result<GetSchedulesQueryRequest, BuildError> {
-        Ok(GetSchedulesQueryRequest {
+    /// Consumes the builder and constructs a [`WorkflowsSchedulesListQueryRequest`].
+    pub fn build(self) -> Result<WorkflowsSchedulesListQueryRequest, BuildError> {
+        Ok(WorkflowsSchedulesListQueryRequest {
             workflow_name: self.workflow_name,
             user_id: self.user_id,
             status: self.status,

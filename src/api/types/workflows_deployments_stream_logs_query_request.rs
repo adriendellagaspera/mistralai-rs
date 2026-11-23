@@ -1,8 +1,8 @@
 pub use crate::prelude::*;
 
-/// Query parameters for stream_deployment_logs
+/// Query parameters for stream_logs
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
-pub struct StreamDeploymentLogsQueryRequest {
+pub struct WorkflowsDeploymentsStreamLogsQueryRequest {
     /// Filter logs by worker name
     #[serde(skip_serializing_if = "Option::is_none")]
     pub worker_name: Option<String>,
@@ -17,22 +17,22 @@ pub struct StreamDeploymentLogsQueryRequest {
     pub last_event_id: Option<String>,
 }
 
-impl StreamDeploymentLogsQueryRequest {
-    pub fn builder() -> StreamDeploymentLogsQueryRequestBuilder {
-        <StreamDeploymentLogsQueryRequestBuilder as Default>::default()
+impl WorkflowsDeploymentsStreamLogsQueryRequest {
+    pub fn builder() -> WorkflowsDeploymentsStreamLogsQueryRequestBuilder {
+        <WorkflowsDeploymentsStreamLogsQueryRequestBuilder as Default>::default()
     }
 }
 
 #[derive(Clone, PartialEq, Default, Debug)]
 #[non_exhaustive]
-pub struct StreamDeploymentLogsQueryRequestBuilder {
+pub struct WorkflowsDeploymentsStreamLogsQueryRequestBuilder {
     worker_name: Option<String>,
     workflow_name: Option<String>,
     after: Option<DateTime<FixedOffset>>,
     last_event_id: Option<String>,
 }
 
-impl StreamDeploymentLogsQueryRequestBuilder {
+impl WorkflowsDeploymentsStreamLogsQueryRequestBuilder {
     pub fn worker_name(mut self, value: impl Into<String>) -> Self {
         self.worker_name = Some(value.into());
         self
@@ -53,9 +53,9 @@ impl StreamDeploymentLogsQueryRequestBuilder {
         self
     }
 
-    /// Consumes the builder and constructs a [`StreamDeploymentLogsQueryRequest`].
-    pub fn build(self) -> Result<StreamDeploymentLogsQueryRequest, BuildError> {
-        Ok(StreamDeploymentLogsQueryRequest {
+    /// Consumes the builder and constructs a [`WorkflowsDeploymentsStreamLogsQueryRequest`].
+    pub fn build(self) -> Result<WorkflowsDeploymentsStreamLogsQueryRequest, BuildError> {
+        Ok(WorkflowsDeploymentsStreamLogsQueryRequest {
             worker_name: self.worker_name,
             workflow_name: self.workflow_name,
             after: self.after,

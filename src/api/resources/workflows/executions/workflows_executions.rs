@@ -304,9 +304,9 @@ impl ExecutionsClient {
     ///     client
     ///         .workflows
     ///         .executions
-    ///         .get_workflow_execution_logs(
+    ///         .get_logs(
     ///             &"execution_id".to_string(),
-    ///             &GetWorkflowExecutionLogsQueryRequest {
+    ///             &WorkflowsExecutionsGetLogsQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -314,10 +314,10 @@ impl ExecutionsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn get_workflow_execution_logs(
+    pub async fn get_logs(
         &self,
         execution_id: &str,
-        request: &GetWorkflowExecutionLogsQueryRequest,
+        request: &WorkflowsExecutionsGetLogsQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<ExecutionLogSearchResponse, ApiError> {
         self.http_client
@@ -371,9 +371,9 @@ impl ExecutionsClient {
     ///     client
     ///         .workflows
     ///         .executions
-    ///         .stream_workflow_execution_logs(
+    ///         .stream_logs(
     ///             &"execution_id".to_string(),
-    ///             &StreamWorkflowExecutionLogsQueryRequest {
+    ///             &WorkflowsExecutionsStreamLogsQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             Some(RequestOptions::new()),
@@ -381,12 +381,12 @@ impl ExecutionsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn stream_workflow_execution_logs(
+    pub async fn stream_logs(
         &self,
         execution_id: &str,
-        request: &StreamWorkflowExecutionLogsQueryRequest,
+        request: &WorkflowsExecutionsStreamLogsQueryRequest,
         options: Option<RequestOptions>,
-    ) -> Result<SseStream<StreamWorkflowExecutionLogsExecutionsResponse>, ApiError> {
+    ) -> Result<SseStream<StreamLogsExecutionsResponse>, ApiError> {
         self.http_client
             .execute_sse_request(
                 Method::GET,
@@ -592,7 +592,7 @@ impl ExecutionsClient {
     ///         .executions
     ///         .stream(
     ///             &"execution_id".to_string(),
-    ///             &StreamQueryRequest {
+    ///             &WorkflowsExecutionsStreamQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -603,7 +603,7 @@ impl ExecutionsClient {
     pub async fn stream(
         &self,
         execution_id: &str,
-        request: &StreamQueryRequest,
+        request: &WorkflowsExecutionsStreamQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<SseStream<StreamExecutionsResponse>, ApiError> {
         self.http_client
@@ -691,9 +691,9 @@ impl ExecutionsClient {
     ///     client
     ///         .workflows
     ///         .executions
-    ///         .get_workflow_execution_trace_events(
+    ///         .list_trace_events(
     ///             &"execution_id".to_string(),
-    ///             &GetWorkflowExecutionTraceEventsQueryRequest {
+    ///             &ListTraceEventsQueryRequest {
     ///                 ..Default::default()
     ///             },
     ///             None,
@@ -701,10 +701,10 @@ impl ExecutionsClient {
     ///         .await;
     /// }
     /// ```
-    pub async fn get_workflow_execution_trace_events(
+    pub async fn list_trace_events(
         &self,
         execution_id: &str,
-        request: &GetWorkflowExecutionTraceEventsQueryRequest,
+        request: &ListTraceEventsQueryRequest,
         options: Option<RequestOptions>,
     ) -> Result<WorkflowExecutionTraceEventsResponse, ApiError> {
         self.http_client
@@ -749,11 +749,11 @@ impl ExecutionsClient {
     ///     client
     ///         .workflows
     ///         .executions
-    ///         .get_workflow_execution_trace_info(&"execution_id".to_string(), None)
+    ///         .get_trace_info(&"execution_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn get_workflow_execution_trace_info(
+    pub async fn get_trace_info(
         &self,
         execution_id: &str,
         options: Option<RequestOptions>,
@@ -794,11 +794,11 @@ impl ExecutionsClient {
     ///     client
     ///         .workflows
     ///         .executions
-    ///         .get_workflow_execution_trace_otel(&"execution_id".to_string(), None)
+    ///         .get_trace_otel(&"execution_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn get_workflow_execution_trace_otel(
+    pub async fn get_trace_otel(
         &self,
         execution_id: &str,
         options: Option<RequestOptions>,
@@ -839,11 +839,11 @@ impl ExecutionsClient {
     ///     client
     ///         .workflows
     ///         .executions
-    ///         .get_workflow_execution_trace_summary(&"execution_id".to_string(), None)
+    ///         .get_trace_summary(&"execution_id".to_string(), None)
     ///         .await;
     /// }
     /// ```
-    pub async fn get_workflow_execution_trace_summary(
+    pub async fn get_trace_summary(
         &self,
         execution_id: &str,
         options: Option<RequestOptions>,

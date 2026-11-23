@@ -1,8 +1,8 @@
 pub use crate::prelude::*;
 
-/// Query parameters for get_workflow_events
+/// Query parameters for list
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
-pub struct GetWorkflowEventsQueryRequest {
+pub struct EventsListQueryRequest {
     /// Execution ID of the root workflow that initiated this execution chain.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub root_workflow_exec_id: Option<String>,
@@ -20,15 +20,15 @@ pub struct GetWorkflowEventsQueryRequest {
     pub cursor: Option<String>,
 }
 
-impl GetWorkflowEventsQueryRequest {
-    pub fn builder() -> GetWorkflowEventsQueryRequestBuilder {
-        <GetWorkflowEventsQueryRequestBuilder as Default>::default()
+impl EventsListQueryRequest {
+    pub fn builder() -> EventsListQueryRequestBuilder {
+        <EventsListQueryRequestBuilder as Default>::default()
     }
 }
 
 #[derive(Clone, PartialEq, Default, Debug)]
 #[non_exhaustive]
-pub struct GetWorkflowEventsQueryRequestBuilder {
+pub struct EventsListQueryRequestBuilder {
     root_workflow_exec_id: Option<String>,
     workflow_exec_id: Option<String>,
     workflow_run_id: Option<String>,
@@ -36,7 +36,7 @@ pub struct GetWorkflowEventsQueryRequestBuilder {
     cursor: Option<String>,
 }
 
-impl GetWorkflowEventsQueryRequestBuilder {
+impl EventsListQueryRequestBuilder {
     pub fn root_workflow_exec_id(mut self, value: impl Into<String>) -> Self {
         self.root_workflow_exec_id = Some(value.into());
         self
@@ -62,9 +62,9 @@ impl GetWorkflowEventsQueryRequestBuilder {
         self
     }
 
-    /// Consumes the builder and constructs a [`GetWorkflowEventsQueryRequest`].
-    pub fn build(self) -> Result<GetWorkflowEventsQueryRequest, BuildError> {
-        Ok(GetWorkflowEventsQueryRequest {
+    /// Consumes the builder and constructs a [`EventsListQueryRequest`].
+    pub fn build(self) -> Result<EventsListQueryRequest, BuildError> {
+        Ok(EventsListQueryRequest {
             root_workflow_exec_id: self.root_workflow_exec_id,
             workflow_exec_id: self.workflow_exec_id,
             workflow_run_id: self.workflow_run_id,

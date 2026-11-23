@@ -1,8 +1,8 @@
 pub use crate::prelude::*;
 
-/// Query parameters for get_workflow_registrations
+/// Query parameters for list_registrations
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
-pub struct GetWorkflowRegistrationsQueryRequest {
+pub struct ListRegistrationsQueryRequest {
     /// The workflow ID to filter by
     #[serde(skip_serializing_if = "Option::is_none")]
     pub workflow_id: Option<String>,
@@ -41,15 +41,15 @@ pub struct GetWorkflowRegistrationsQueryRequest {
     pub cursor: Option<String>,
 }
 
-impl GetWorkflowRegistrationsQueryRequest {
-    pub fn builder() -> GetWorkflowRegistrationsQueryRequestBuilder {
-        <GetWorkflowRegistrationsQueryRequestBuilder as Default>::default()
+impl ListRegistrationsQueryRequest {
+    pub fn builder() -> ListRegistrationsQueryRequestBuilder {
+        <ListRegistrationsQueryRequestBuilder as Default>::default()
     }
 }
 
 #[derive(Clone, PartialEq, Default, Debug)]
 #[non_exhaustive]
-pub struct GetWorkflowRegistrationsQueryRequestBuilder {
+pub struct ListRegistrationsQueryRequestBuilder {
     workflow_id: Option<String>,
     task_queue: Option<String>,
     active_only: Option<bool>,
@@ -64,7 +64,7 @@ pub struct GetWorkflowRegistrationsQueryRequestBuilder {
     cursor: Option<String>,
 }
 
-impl GetWorkflowRegistrationsQueryRequestBuilder {
+impl ListRegistrationsQueryRequestBuilder {
     pub fn workflow_id(mut self, value: impl Into<String>) -> Self {
         self.workflow_id = Some(value.into());
         self
@@ -125,9 +125,9 @@ impl GetWorkflowRegistrationsQueryRequestBuilder {
         self
     }
 
-    /// Consumes the builder and constructs a [`GetWorkflowRegistrationsQueryRequest`].
-    pub fn build(self) -> Result<GetWorkflowRegistrationsQueryRequest, BuildError> {
-        Ok(GetWorkflowRegistrationsQueryRequest {
+    /// Consumes the builder and constructs a [`ListRegistrationsQueryRequest`].
+    pub fn build(self) -> Result<ListRegistrationsQueryRequest, BuildError> {
+        Ok(ListRegistrationsQueryRequest {
             workflow_id: self.workflow_id,
             task_queue: self.task_queue,
             active_only: self.active_only,

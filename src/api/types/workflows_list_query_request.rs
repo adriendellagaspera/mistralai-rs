@@ -1,11 +1,11 @@
 pub use crate::prelude::*;
 
-/// Query parameters for get_workflows
+/// Query parameters for list
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
-pub struct GetWorkflowsQueryRequest {
+pub struct WorkflowsListQueryRequest {
     /// Filter by workflow status
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub status: Option<GetWorkflowsWorkflowsRequestStatus>,
+    pub status: Option<ListWorkflowsRequestStatus>,
     /// Whether to include shared workflows
     #[serde(skip_serializing_if = "Option::is_none")]
     pub include_shared: Option<bool>,
@@ -17,7 +17,7 @@ pub struct GetWorkflowsQueryRequest {
     pub deployment_name: Option<Vec<String>>,
     /// Filter by deployment activity. active=only active, inactive=only inactive, None=no filter
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub deployment_status: Option<GetWorkflowsWorkflowsRequestDeploymentStatus>,
+    pub deployment_status: Option<ListWorkflowsRequestDeploymentStatus>,
     /// Filter by archived state. False=exclude archived, True=only archived, None=include all
     #[serde(skip_serializing_if = "Option::is_none")]
     pub archived: Option<bool>,
@@ -29,10 +29,10 @@ pub struct GetWorkflowsQueryRequest {
     pub exclude_tags: Option<Vec<String>>,
     /// Field to sort by
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub sort_by: Option<GetWorkflowsWorkflowsRequestSortBy>,
+    pub sort_by: Option<ListWorkflowsRequestSortBy>,
     /// Sort direction
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub order: Option<GetWorkflowsWorkflowsRequestOrder>,
+    pub order: Option<ListWorkflowsRequestOrder>,
     /// The cursor for pagination
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<String>,
@@ -47,33 +47,33 @@ pub struct GetWorkflowsQueryRequest {
     pub search: Option<String>,
 }
 
-impl GetWorkflowsQueryRequest {
-    pub fn builder() -> GetWorkflowsQueryRequestBuilder {
-        <GetWorkflowsQueryRequestBuilder as Default>::default()
+impl WorkflowsListQueryRequest {
+    pub fn builder() -> WorkflowsListQueryRequestBuilder {
+        <WorkflowsListQueryRequestBuilder as Default>::default()
     }
 }
 
 #[derive(Clone, PartialEq, Default, Debug)]
 #[non_exhaustive]
-pub struct GetWorkflowsQueryRequestBuilder {
-    status: Option<GetWorkflowsWorkflowsRequestStatus>,
+pub struct WorkflowsListQueryRequestBuilder {
+    status: Option<ListWorkflowsRequestStatus>,
     include_shared: Option<bool>,
     available_in_chat_assistant: Option<bool>,
     deployment_name: Option<Vec<String>>,
-    deployment_status: Option<GetWorkflowsWorkflowsRequestDeploymentStatus>,
+    deployment_status: Option<ListWorkflowsRequestDeploymentStatus>,
     archived: Option<bool>,
     tags: Option<Vec<String>>,
     exclude_tags: Option<Vec<String>>,
-    sort_by: Option<GetWorkflowsWorkflowsRequestSortBy>,
-    order: Option<GetWorkflowsWorkflowsRequestOrder>,
+    sort_by: Option<ListWorkflowsRequestSortBy>,
+    order: Option<ListWorkflowsRequestOrder>,
     cursor: Option<String>,
     limit: Option<i64>,
     active_only: Option<bool>,
     search: Option<String>,
 }
 
-impl GetWorkflowsQueryRequestBuilder {
-    pub fn status(mut self, value: GetWorkflowsWorkflowsRequestStatus) -> Self {
+impl WorkflowsListQueryRequestBuilder {
+    pub fn status(mut self, value: ListWorkflowsRequestStatus) -> Self {
         self.status = Some(value);
         self
     }
@@ -93,10 +93,7 @@ impl GetWorkflowsQueryRequestBuilder {
         self
     }
 
-    pub fn deployment_status(
-        mut self,
-        value: GetWorkflowsWorkflowsRequestDeploymentStatus,
-    ) -> Self {
+    pub fn deployment_status(mut self, value: ListWorkflowsRequestDeploymentStatus) -> Self {
         self.deployment_status = Some(value);
         self
     }
@@ -116,12 +113,12 @@ impl GetWorkflowsQueryRequestBuilder {
         self
     }
 
-    pub fn sort_by(mut self, value: GetWorkflowsWorkflowsRequestSortBy) -> Self {
+    pub fn sort_by(mut self, value: ListWorkflowsRequestSortBy) -> Self {
         self.sort_by = Some(value);
         self
     }
 
-    pub fn order(mut self, value: GetWorkflowsWorkflowsRequestOrder) -> Self {
+    pub fn order(mut self, value: ListWorkflowsRequestOrder) -> Self {
         self.order = Some(value);
         self
     }
@@ -146,9 +143,9 @@ impl GetWorkflowsQueryRequestBuilder {
         self
     }
 
-    /// Consumes the builder and constructs a [`GetWorkflowsQueryRequest`].
-    pub fn build(self) -> Result<GetWorkflowsQueryRequest, BuildError> {
-        Ok(GetWorkflowsQueryRequest {
+    /// Consumes the builder and constructs a [`WorkflowsListQueryRequest`].
+    pub fn build(self) -> Result<WorkflowsListQueryRequest, BuildError> {
+        Ok(WorkflowsListQueryRequest {
             status: self.status,
             include_shared: self.include_shared,
             available_in_chat_assistant: self.available_in_chat_assistant,

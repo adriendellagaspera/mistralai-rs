@@ -1,17 +1,14 @@
 pub use crate::prelude::*;
 
-/// Query parameters for get_deployment_logs
+/// Query parameters for get_logs
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq, Eq, Hash)]
-pub struct GetDeploymentLogsQueryRequest {
-    /// Which stream to read. 'runtime' is the workers' own logs; 'build' reads the image build output and requires a managed deployment.
+pub struct WorkflowsExecutionsGetLogsQueryRequest {
+    /// Filter logs by workflow run ID
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub log_type: Option<DeploymentLogType>,
-    /// Filter logs by worker name
+    pub run_id: Option<String>,
+    /// Filter logs by activity ID
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub worker_name: Option<String>,
-    /// Filter logs by workflow name
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub workflow_name: Option<String>,
+    pub activity_id: Option<String>,
     /// Only return logs at or after this timestamp
     #[serde(skip_serializing_if = "Option::is_none")]
     pub after: Option<DateTime<FixedOffset>>,
@@ -20,7 +17,7 @@ pub struct GetDeploymentLogsQueryRequest {
     pub before: Option<DateTime<FixedOffset>>,
     /// First-page sort order: 'asc' (oldest first) or 'desc'. Ignored when `cursor` is set.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub order: Option<GetDeploymentLogsDeploymentsRequestOrder>,
+    pub order: Option<GetLogsExecutionsRequestOrder>,
     /// Pagination cursor from a previous response's `next_cursor`; carries the window and order
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<String>,
@@ -29,38 +26,32 @@ pub struct GetDeploymentLogsQueryRequest {
     pub limit: Option<i64>,
 }
 
-impl GetDeploymentLogsQueryRequest {
-    pub fn builder() -> GetDeploymentLogsQueryRequestBuilder {
-        <GetDeploymentLogsQueryRequestBuilder as Default>::default()
+impl WorkflowsExecutionsGetLogsQueryRequest {
+    pub fn builder() -> WorkflowsExecutionsGetLogsQueryRequestBuilder {
+        <WorkflowsExecutionsGetLogsQueryRequestBuilder as Default>::default()
     }
 }
 
 #[derive(Clone, PartialEq, Default, Debug)]
 #[non_exhaustive]
-pub struct GetDeploymentLogsQueryRequestBuilder {
-    log_type: Option<DeploymentLogType>,
-    worker_name: Option<String>,
-    workflow_name: Option<String>,
+pub struct WorkflowsExecutionsGetLogsQueryRequestBuilder {
+    run_id: Option<String>,
+    activity_id: Option<String>,
     after: Option<DateTime<FixedOffset>>,
     before: Option<DateTime<FixedOffset>>,
-    order: Option<GetDeploymentLogsDeploymentsRequestOrder>,
+    order: Option<GetLogsExecutionsRequestOrder>,
     cursor: Option<String>,
     limit: Option<i64>,
 }
 
-impl GetDeploymentLogsQueryRequestBuilder {
-    pub fn log_type(mut self, value: DeploymentLogType) -> Self {
-        self.log_type = Some(value);
+impl WorkflowsExecutionsGetLogsQueryRequestBuilder {
+    pub fn run_id(mut self, value: impl Into<String>) -> Self {
+        self.run_id = Some(value.into());
         self
     }
 
-    pub fn worker_name(mut self, value: impl Into<String>) -> Self {
-        self.worker_name = Some(value.into());
-        self
-    }
-
-    pub fn workflow_name(mut self, value: impl Into<String>) -> Self {
-        self.workflow_name = Some(value.into());
+    pub fn activity_id(mut self, value: impl Into<String>) -> Self {
+        self.activity_id = Some(value.into());
         self
     }
 
@@ -74,7 +65,7 @@ impl GetDeploymentLogsQueryRequestBuilder {
         self
     }
 
-    pub fn order(mut self, value: GetDeploymentLogsDeploymentsRequestOrder) -> Self {
+    pub fn order(mut self, value: GetLogsExecutionsRequestOrder) -> Self {
         self.order = Some(value);
         self
     }
@@ -89,12 +80,11 @@ impl GetDeploymentLogsQueryRequestBuilder {
         self
     }
 
-    /// Consumes the builder and constructs a [`GetDeploymentLogsQueryRequest`].
-    pub fn build(self) -> Result<GetDeploymentLogsQueryRequest, BuildError> {
-        Ok(GetDeploymentLogsQueryRequest {
-            log_type: self.log_type,
-            worker_name: self.worker_name,
-            workflow_name: self.workflow_name,
+    /// Consumes the builder and constructs a [`WorkflowsExecutionsGetLogsQueryRequest`].
+    pub fn build(self) -> Result<WorkflowsExecutionsGetLogsQueryRequest, BuildError> {
+        Ok(WorkflowsExecutionsGetLogsQueryRequest {
+            run_id: self.run_id,
+            activity_id: self.activity_id,
             after: self.after,
             before: self.before,
             order: self.order,

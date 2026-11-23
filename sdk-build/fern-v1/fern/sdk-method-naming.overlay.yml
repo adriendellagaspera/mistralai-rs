@@ -1,0 +1,53 @@
+overlay: 1.0.0
+info:
+  title: Fern Rust SDK public method naming
+  version: 1.0.0
+actions:
+  - target: "$.paths['/v1/libraries/{library_id}'].put"
+    update:
+      x-fern-sdk-method-name: update_legacy
+  - target: "$.paths['/v1/workflows'].get"
+    update:
+      x-fern-sdk-method-name: list
+  - target: "$.paths['/v1/workflows/registrations'].get"
+    update:
+      x-fern-sdk-method-name: list_registrations
+  - target: "$.paths['/v1/workflows/schedules'].get"
+    update:
+      x-fern-sdk-method-name: list
+  - target: "$.paths['/v1/workflows/events/list'].get"
+    update:
+      x-fern-sdk-method-name: list
+  - target: "$.paths['/v1/workflows/events/stream'].get"
+    update:
+      x-fern-sdk-method-name: stream
+  - target: "$.paths['/v1/observability/traces/fields'].get"
+    update:
+      x-fern-sdk-method-name: list_fields
+  - target: "$.paths['/v1/rag/deployments'].get"
+    update:
+      x-fern-sdk-method-name: list_deployment_summaries
+  - target: "$.paths['/v1/workflows/deployments/{name}/logs'].get"
+    update:
+      x-fern-sdk-method-name: get_logs
+  - target: "$.paths['/v1/workflows/deployments/{name}/logs/stream'].get"
+    update:
+      x-fern-sdk-method-name: stream_logs
+  - target: "$.paths['/v1/workflows/executions/{execution_id}/logs'].get"
+    update:
+      x-fern-sdk-method-name: get_logs
+  - target: "$.paths['/v1/workflows/executions/{execution_id}/logs/stream'].get"
+    update:
+      x-fern-sdk-method-name: stream_logs
+  - target: "$.paths['/v1/workflows/executions/{execution_id}/trace/events'].get"
+    update:
+      x-fern-sdk-method-name: list_trace_events
+  - target: "$.paths['/v1/workflows/executions/{execution_id}/trace/info'].get"
+    update:
+      x-fern-sdk-method-name: get_trace_info
+  - target: "$.paths['/v1/workflows/executions/{execution_id}/trace/otel'].get"
+    update:
+      x-fern-sdk-method-name: get_trace_otel
+  - target: "$.paths['/v1/workflows/executions/{execution_id}/trace/summary'].get"
+    update:
+      x-fern-sdk-method-name: get_trace_summary

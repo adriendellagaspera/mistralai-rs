@@ -2,31 +2,31 @@ pub use crate::prelude::*;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(untagged)]
-pub enum StreamWorkflowExecutionLogsExecutionsResponseData {
-    ExecutionLogRecord(ExecutionLogRecord),
+pub enum StreamLogsDeploymentsResponseData {
+    DeploymentLogRecord(DeploymentLogRecord),
 
     StreamError(StreamError),
 }
 
-impl StreamWorkflowExecutionLogsExecutionsResponseData {
-    pub fn is_execution_log_record(&self) -> bool {
-        matches!(self, Self::ExecutionLogRecord(_))
+impl StreamLogsDeploymentsResponseData {
+    pub fn is_deployment_log_record(&self) -> bool {
+        matches!(self, Self::DeploymentLogRecord(_))
     }
 
     pub fn is_stream_error(&self) -> bool {
         matches!(self, Self::StreamError(_))
     }
 
-    pub fn as_execution_log_record(&self) -> Option<&ExecutionLogRecord> {
+    pub fn as_deployment_log_record(&self) -> Option<&DeploymentLogRecord> {
         match self {
-            Self::ExecutionLogRecord(value) => Some(value),
+            Self::DeploymentLogRecord(value) => Some(value),
             _ => None,
         }
     }
 
-    pub fn into_execution_log_record(self) -> Option<ExecutionLogRecord> {
+    pub fn into_deployment_log_record(self) -> Option<DeploymentLogRecord> {
         match self {
-            Self::ExecutionLogRecord(value) => Some(value),
+            Self::DeploymentLogRecord(value) => Some(value),
             _ => None,
         }
     }
@@ -46,10 +46,10 @@ impl StreamWorkflowExecutionLogsExecutionsResponseData {
     }
 }
 
-impl fmt::Display for StreamWorkflowExecutionLogsExecutionsResponseData {
+impl fmt::Display for StreamLogsDeploymentsResponseData {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::ExecutionLogRecord(value) => write!(
+            Self::DeploymentLogRecord(value) => write!(
                 f,
                 "{}",
                 serde_json::to_string(value).unwrap_or_else(|_| format!("{:?}", value))

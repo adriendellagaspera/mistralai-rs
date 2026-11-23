@@ -1,10 +1,10 @@
 pub use crate::prelude::*;
 
-/// Query parameters for get_stream_events
+/// Query parameters for stream
 #[derive(Debug, Clone, Serialize, Deserialize, Default, PartialEq)]
-pub struct GetStreamEventsQueryRequest {
+pub struct EventsStreamQueryRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub scope: Option<GetStreamEventsEventsRequestScope>,
+    pub scope: Option<StreamEventsRequestScope>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub activity_name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -27,16 +27,16 @@ pub struct GetStreamEventsQueryRequest {
     pub workflow_event_types: Option<Vec<WorkflowEventType>>,
 }
 
-impl GetStreamEventsQueryRequest {
-    pub fn builder() -> GetStreamEventsQueryRequestBuilder {
-        <GetStreamEventsQueryRequestBuilder as Default>::default()
+impl EventsStreamQueryRequest {
+    pub fn builder() -> EventsStreamQueryRequestBuilder {
+        <EventsStreamQueryRequestBuilder as Default>::default()
     }
 }
 
 #[derive(Clone, PartialEq, Default, Debug)]
 #[non_exhaustive]
-pub struct GetStreamEventsQueryRequestBuilder {
-    scope: Option<GetStreamEventsEventsRequestScope>,
+pub struct EventsStreamQueryRequestBuilder {
+    scope: Option<StreamEventsRequestScope>,
     activity_name: Option<String>,
     activity_id: Option<String>,
     workflow_name: Option<String>,
@@ -49,8 +49,8 @@ pub struct GetStreamEventsQueryRequestBuilder {
     workflow_event_types: Option<Vec<WorkflowEventType>>,
 }
 
-impl GetStreamEventsQueryRequestBuilder {
-    pub fn scope(mut self, value: GetStreamEventsEventsRequestScope) -> Self {
+impl EventsStreamQueryRequestBuilder {
+    pub fn scope(mut self, value: StreamEventsRequestScope) -> Self {
         self.scope = Some(value);
         self
     }
@@ -105,9 +105,9 @@ impl GetStreamEventsQueryRequestBuilder {
         self
     }
 
-    /// Consumes the builder and constructs a [`GetStreamEventsQueryRequest`].
-    pub fn build(self) -> Result<GetStreamEventsQueryRequest, BuildError> {
-        Ok(GetStreamEventsQueryRequest {
+    /// Consumes the builder and constructs a [`EventsStreamQueryRequest`].
+    pub fn build(self) -> Result<EventsStreamQueryRequest, BuildError> {
+        Ok(EventsStreamQueryRequest {
             scope: self.scope,
             activity_name: self.activity_name,
             activity_id: self.activity_id,
