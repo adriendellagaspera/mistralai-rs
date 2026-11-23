@@ -45,11 +45,12 @@ jobs:
 
   generation:
     name: generation
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     permissions:
-      actions: write
-      contents: write
+      actions: write # Dispatch CI after committing generator-produced SDK sources.
+      contents: write # Commit Fern-generated sources on same-repository pull requests.
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -219,7 +220,15 @@ jobs:
           TEST: ${{ needs.test.result }}
           DOCS: ${{ needs.docs.result }}
           API: ${{ needs.api.result }}
+          EVENT_NAME: ${{ github.event_name }}
+          HEAD_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name || '' }}
+          REPOSITORY: ${{ github.repository }}
         run: |
+          # Fork pull requests skip the write-enabled generation job; all other jobs remain required.
+          if [ "$EVENT_NAME" = "pull_request" ] && [ "$HEAD_REPOSITORY" != "$REPOSITORY" ]; then
+            test "$GENERATION" = skipped
+            GENERATION=success
+          fi
           for result in "$POLICY" "$GENERATION" "$GENERATION_V1" "$FORMAT" "$LINT" "$DEPENDENCIES" "$TOOLING" "$TEST" "$DOCS" "$API"; do
             test "$result" = success
           done
