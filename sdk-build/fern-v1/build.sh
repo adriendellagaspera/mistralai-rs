@@ -107,9 +107,9 @@ root = Path(sys.argv[1])
 counts = Counter()
 for path in (root / "api" / "resources").rglob("*.rs"):
     source = path.read_text(errors="replace")
-    counts.update(re.findall(r"(?m)^\\s*pub\\s+async\\s+fn\\s+([A-Za-z0-9_]+)", source))
+    counts.update(re.findall(r"(?m)^\s*pub\s+async\s+fn\s+([A-Za-z0-9_]+)", source))
 output = Path(sys.argv[2])
-output.write_text("\\n".join(name for name in sorted(counts) for _ in range(counts[name])) + ("\\n" if counts else ""))
+output.write_text("\n".join(name for name in sorted(counts) for _ in range(counts[name])) + ("\n" if counts else ""))
 print(f"{output.name}: {sum(counts.values())} public async resource methods")
 PY
 }
