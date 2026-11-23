@@ -196,25 +196,25 @@ operations:
     method: "get_version"
   'operationId:list_agents_v1_audio_agents_get':
     resource: ["audio", "agents"]
-    method: "list"
+    method: "list_audio_agents"
   'operationId:create_agent_v1_audio_agents_post':
     resource: ["audio", "agents"]
-    method: "create"
+    method: "create_audio_agent"
   'operationId:delete_agent_v1_audio_agents__agent_id__delete':
     resource: ["audio", "agents"]
-    method: "delete"
+    method: "delete_audio_agent"
   'operationId:get_agent_v1_audio_agents__agent_id__get':
     resource: ["audio", "agents"]
-    method: "get"
+    method: "get_audio_agent"
   'operationId:update_agent_v1_audio_agents__agent_id__put':
     resource: ["audio", "agents"]
-    method: "update"
+    method: "update_audio_agent"
   'operationId:list_agent_sessions_v1_audio_agents__agent_id__sessions_get':
     resource: ["audio", "agents"]
     method: "list_sessions"
   'operationId:list_agent_versions_v1_audio_agents__agent_id__versions_get':
     resource: ["audio", "agents"]
-    method: "list_versions"
+    method: "list_audio_agent_versions"
   'operationId:create_session_v1_audio_sessions_post':
     resource: ["audio", "sessions"]
     method: "create"
@@ -297,7 +297,7 @@ operations:
     method: "classify"
   'operationId:create_client_session_v1_client_sessions_post':
     resource: ["realtime", "sessions"]
-    method: "create"
+    method: "create_realtime_session"
   'operationId:connector_list_v1':
     resource: ["beta", "connectors"]
     method: "list"
@@ -820,7 +820,7 @@ operations:
     method: "list_organizations"
   'operationId:users_api_list_workspaces':
     resource: ["beta", "users"]
-    method: "list_workspaces"
+    method: "list_current_user_workspaces"
   'operationId:list_webhooks_v1_webhooks_get':
     resource: ["beta", "webhooks"]
     method: "list"
