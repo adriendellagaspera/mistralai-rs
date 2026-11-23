@@ -80,3 +80,6 @@ cargo check --manifest-path "$FERN_ROOT/generated/Cargo.toml" --all-features
 cargo clippy --manifest-path "$FERN_ROOT/generated/Cargo.toml" --all-features -- \
   -D clippy::correctness \
   -D clippy::suspicious
+
+# Exercise tests emitted by the candidate generator, not only the checked-in SDK.
+cargo test --manifest-path "$FERN_ROOT/generated/Cargo.toml" --all-features --all-targets
