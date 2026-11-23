@@ -39,29 +39,21 @@ This is an audit of the reviewed SDK surface policy, not a dump of generated Rus
 | GET `/v1/workflows/executions/{execution_id}/trace/info` | `get_workflow_execution_trace_info` | `get_trace_info` | Remove repeated resource hierarchy. |
 | GET `/v1/workflows/executions/{execution_id}/trace/otel` | `get_workflow_execution_trace_otel` | `get_trace_otel` | Remove repeated resource hierarchy. |
 | GET `/v1/workflows/executions/{execution_id}/trace/summary` | `get_workflow_execution_trace_summary` | `get_trace_summary` | Remove repeated resource hierarchy. |
-| POST `/v1/audio/agents` | `create` | `create_audio_agent` | Disambiguate audio agents from beta agents in Fern's flattened Rust `agents` module. |
-| DELETE `/v1/audio/agents/{agent_id}` | `delete` | `delete_audio_agent` | Disambiguate audio agents from beta agents in the flattened module. |
-| GET `/v1/audio/agents/{agent_id}` | `get` | `get_audio_agent` | Disambiguate audio agents from beta agents in the flattened module. |
-| GET `/v1/audio/agents` | `list` | `list_audio_agents` | Disambiguate the audio-agent collection from the beta-agent collection. |
-| GET `/v1/audio/agents/{agent_id}/versions` | `list_versions` | `list_audio_agent_versions` | Disambiguate audio-agent versions from beta-agent versions. |
-| PUT `/v1/audio/agents/{agent_id}` | `update` | `update_audio_agent` | Disambiguate audio-agent updates from beta-agent updates. |
-| POST `/v1/client/sessions` | `create` | `create_realtime_session` | Disambiguate realtime sessions from audio sessions in the flattened Rust `sessions` module. |
-| GET `/v1/users/me/workspaces` | `list_workspaces` | `list_current_user_workspaces` | Disambiguate current-user workspaces from admin user workspaces in the flattened `users` module. |
 
-These 24 naming corrections are now applied to the reviewed SDK policy. The eight additional changes remove Fern-generated numeric method suffixes caused by flattened resource-group collisions. The legacy library PUT operation is named `update_legacy` because the current PATCH endpoint already owns `update`; Mistral documents PUT as deprecated and recommends PATCH. The collection operations retain `list` naming even when the response is paginated: the verb describes collection semantics, not whether the SDK transparently fetches every page. `get_budget`, `get_subscription`, `get_identity`, and `get_invite` remain `get` because they address singular resources or scalar state. Trace event retrieval is named `list_trace_events` to distinguish the collection from the singular trace metadata operations.
+These 16 naming corrections are now applied to the reviewed SDK policy and production Fern 0.48 sources. The legacy library PUT operation is named `update_legacy` because the current PATCH endpoint already owns `update`; Mistral documents PUT as deprecated and recommends PATCH. The collection operations retain `list` naming even when the response is paginated: the verb describes collection semantics, not whether the SDK transparently fetches every page. `get_budget`, `get_subscription`, `get_identity`, and `get_invite` remain `get` because they address singular resources or scalar state. Trace event retrieval is named `list_trace_events` to distinguish the collection from the singular trace metadata operations.
 
 ## Complete operation inventory
 
 | HTTP | Path | OpenAPI operationId | SDK method path(s) from current policy |
 |---|---|---|---|
 | POST | `/v1/agents/completions` | `agents_completion_v1_agents_completions_post` | `agents.complete` |
-| POST | `/v1/audio/agents` | `create_agent_v1_audio_agents_post` | `audio.agents.create_audio_agent` |
-| DELETE | `/v1/audio/agents/{agent_id}` | `delete_agent_v1_audio_agents__agent_id__delete` | `audio.agents.delete_audio_agent` |
-| GET | `/v1/audio/agents/{agent_id}` | `get_agent_v1_audio_agents__agent_id__get` | `audio.agents.get_audio_agent` |
-| GET | `/v1/audio/agents` | `list_agents_v1_audio_agents_get` | `audio.agents.list_audio_agents` |
+| POST | `/v1/audio/agents` | `create_agent_v1_audio_agents_post` | `audio.agents.create` |
+| DELETE | `/v1/audio/agents/{agent_id}` | `delete_agent_v1_audio_agents__agent_id__delete` | `audio.agents.delete` |
+| GET | `/v1/audio/agents/{agent_id}` | `get_agent_v1_audio_agents__agent_id__get` | `audio.agents.get` |
+| GET | `/v1/audio/agents` | `list_agents_v1_audio_agents_get` | `audio.agents.list` |
 | GET | `/v1/audio/agents/{agent_id}/sessions` | `list_agent_sessions_v1_audio_agents__agent_id__sessions_get` | `audio.agents.list_sessions` |
-| GET | `/v1/audio/agents/{agent_id}/versions` | `list_agent_versions_v1_audio_agents__agent_id__versions_get` | `audio.agents.list_audio_agent_versions` |
-| PUT | `/v1/audio/agents/{agent_id}` | `update_agent_v1_audio_agents__agent_id__put` | `audio.agents.update_audio_agent` |
+| GET | `/v1/audio/agents/{agent_id}/versions` | `list_agent_versions_v1_audio_agents__agent_id__versions_get` | `audio.agents.list_versions` |
+| PUT | `/v1/audio/agents/{agent_id}` | `update_agent_v1_audio_agents__agent_id__put` | `audio.agents.update` |
 | DELETE | `/v1/audio/sessions/{session_id}` | `delete_session_v1_audio_sessions__session_id__delete` | `audio.sessions.close` |
 | POST | `/v1/audio/sessions` | `create_session_v1_audio_sessions_post` | `audio.sessions.create` |
 | GET | `/v1/audio/sessions/{session_id}` | `get_session_v1_audio_sessions__session_id__get` | `audio.sessions.get` |
@@ -315,7 +307,7 @@ These 24 naming corrections are now applied to the reviewed SDK policy. The eigh
 | GET | `/v1/triggers/{trigger_id}/events` | `list_trigger_events_v1_triggers__trigger_id__events_get` | `beta.triggers.list_events` |
 | GET | `/v1/users/me` | `users_api_get_identity` | `beta.users.get_identity` |
 | GET | `/v1/users/me/organizations` | `users_api_list_organizations` | `beta.users.list_organizations` |
-| GET | `/v1/users/me/workspaces` | `users_api_list_workspaces` | `beta.users.list_current_user_workspaces` |
+| GET | `/v1/users/me/workspaces` | `users_api_list_workspaces` | `beta.users.list_workspaces` |
 | GET | `/v1/whoami` | `users_api_whoami` | `beta.users.whoami` |
 | POST | `/v1/webhooks` | `create_webhook_v1_webhooks_post` | `beta.webhooks.create` |
 | DELETE | `/v1/webhooks/{webhook_id}` | `delete_webhook_v1_webhooks__webhook_id__delete` | `beta.webhooks.delete` |
@@ -344,7 +336,7 @@ These 24 naming corrections are now applied to the reviewed SDK policy. The eigh
 | DELETE | `/v1/fine_tuning/models/{model_id}/archive` | `jobs_api_routes_fine_tuning_unarchive_fine_tuned_model` | `models.unarchive` |
 | PATCH | `/v1/fine_tuning/models/{model_id}` | `jobs_api_routes_fine_tuning_update_fine_tuned_model` | `models.update` |
 | POST | `/v1/ocr` | `ocr_v1_ocr_post` | `ocr.process` |
-| POST | `/v1/client/sessions` | `create_client_session_v1_client_sessions_post` | `realtime.sessions.create_realtime_session` |
+| POST | `/v1/client/sessions` | `create_client_session_v1_client_sessions_post` | `realtime.sessions.create` |
 | POST | `/v1/responses/input_tokens` | `count_input_tokens_v1_responses_input_tokens_post` | `responses.count_input_tokens` |
 | POST | `/v1/responses` | `create_response_v1_responses_post` | `responses.create` |
 | POST | `/v1/workflows/{workflow_identifier}/tags` | `add_workflow_tags_v1_workflows__workflow_identifier__tags_post` | `workflows.add_workflow_tags` |
@@ -404,17 +396,19 @@ These 24 naming corrections are now applied to the reviewed SDK policy. The eigh
 
 ## Approved naming decisions
 
-All 24 corrections are encoded in `policy.yaml` and `inventory.json`, and mirrored in `fern/sdk-method-naming.overlay.yml` using native OpenAPI Overlay actions and `x-fern-sdk-method-name`. The production Fern 0.48 pipeline and the Fern v1 diagnostic both consume the same reviewed naming policy. No operationId, path, HTTP verb, request schema, or response schema is changed.
+All 16 corrections are encoded in `policy.yaml` and `inventory.json`, and mirrored in `fern/sdk-method-naming.overlay.yml` using native OpenAPI Overlay actions and `x-fern-sdk-method-name`. The production Fern 0.48 pipeline and the Fern v1 diagnostic both consume the same reviewed naming policy. No operationId, path, HTTP verb, request schema, or response schema is changed.
 
 The naming review checked the public resource grouping and semantic role of each operation. Shortened names are scoped by the generated resource module; therefore `get_logs` and `stream_logs` can coexist in the separate deployment and execution modules. `list_trace_events` is intentionally distinct from `get_trace_info`, `get_trace_otel`, and `get_trace_summary`. Audio-agent and realtime-session names retain a domain qualifier because Fern's Rust generator flattens their nested groups into modules shared with beta agents and audio sessions.
+
+The Fern v1 Rust generator flattens nested resource groups and can therefore append numeric suffixes to otherwise identical leaf-resource methods (for example, `audio.agents` versus `beta.agents`). Production Fern 0.48 preserves the nested group modules (`audio/agents`, `beta/agents`, `realtime/sessions`, `beta/users`), so these are v1-specific naming collisions. We deliberately keep the concise production names rather than add redundant domain prefixes to work around a diagnostic generator's flattening behavior.
 
 ## Generation validation
 
 Run 45142402366 (commit `5011520`) completed successfully, including the `generation-v1` job and final gate. The artifact was checked against the previous no-overlay baseline:
 - Fern resolves 347 published operations into 349 public method paths; the generated Rust SDK contains 347 public async endpoint methods. The two additional paths are the streaming/non-streaming variants of chat and FIM completions.
-- All 24 approved method overrides appear in the generated resource modules; the eight additional names eliminate the remaining numeric method suffixes caused by flattened group collisions.
-- Fourteen query-bearing operations have their synthetic wrapper names updated consistently, including `AgentsGetQueryRequest2` → `GetAudioAgentQueryRequest`, `AgentsListQueryRequest2` → `ListAudioAgentsQueryRequest`, and `UsersListWorkspacesQueryRequest` → `ListCurrentUserWorkspacesQueryRequest`. The remaining ten overrides do not have synthetic query wrappers.
-- The corrected type inventory contains 93 public `*QueryRequest` types. The two numeric-suffix wrapper names are eliminated by the audio-agent method disambiguation; wrapped and inline styles retain the same type inventory.
+- All 16 approved method overrides appear in the generated resource modules. Fern v1's flattened resource modules still add `_2` suffixes to some cross-group collisions; production Fern 0.48 preserves the nested resource groups and does not require those prefixes.
+- Ten query-bearing operations have their synthetic wrapper names updated consistently (for example, `GetWorkflowEventsQueryRequest` → `EventsListQueryRequest` and `GetWorkflowExecutionTraceEventsQueryRequest` → `ListTraceEventsQueryRequest`). The remaining six overrides do not have synthetic query wrappers.
+- The corrected type inventory contains 93 public `*QueryRequest` types. Two v1-only wrapper names (`AgentsGetQueryRequest2` and `AgentsListQueryRequest2`) retain numeric suffixes because the v1 generator flattens the audio and beta agent groups; production Fern 0.48 keeps those groups separate.
 - The generated public function inventories contain 9,796 declarations in each parameter style. Exactly 165 signature lines change from the baseline and 165 are added, corresponding to the 16 endpoint renames and Fern's derived request/response naming changes. Wrapped-vs-inline function and query-type diffs are both empty.
 
 Both Fern generation modes succeed. Cargo checks remain diagnostic and currently report 52 pre-existing/unrelated crate errors in each mode, so this run does not establish that the v1 generated crate compiles. The generation gate validates Fern generation, the inventories, and parity between parameter styles.
