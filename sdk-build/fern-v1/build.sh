@@ -162,6 +162,33 @@ Path(sys.argv[2]).write_text(json.dumps(payload, indent=2) + "\n")
 print(f"{sys.argv[2]}: {len(entries)} files")
 PY
 
+  # Repeat the same parameter style to verify deterministic generation. This
+  # is a separate guest generation, not a comparison between inline/wrapped.
+  rm -rf "$FERN_DIR/generated"
+  (
+    cd "$WORKSPACE"
+    fern generate --target rust --guest --force --log-level info
+  ) 2>&1 | tee "$WORKSPACE/fern-generate-$style-repeat.log"
+  test -f "$FERN_DIR/generated/Cargo.toml"
+  python3 - "$FERN_DIR/generated" "$WORKSPACE/digest-$style-repeat.json" <<'PY'
+import hashlib
+import json
+import sys
+from pathlib import Path
+
+root = Path(sys.argv[1])
+entries = []
+for path in sorted(p for p in root.rglob("*") if p.is_file()):
+    entries.append({
+        "path": path.relative_to(root).as_posix(),
+        "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+    })
+Path(sys.argv[2]).write_text(json.dumps({"file_count": len(entries), "files": entries}, indent=2) + "\n")
+print(f"{sys.argv[2]}: {len(entries)} files")
+PY
+  cmp "$WORKSPACE/digest-$style.json" "$WORKSPACE/digest-$style-repeat.json"
+  rm -rf "$FERN_DIR/generated"
+
   # The generated crate is retained per parameter style so every diagnostic
   # operates on the exact same candidate tree.
   for diagnostic in fmt check clippy test; do
