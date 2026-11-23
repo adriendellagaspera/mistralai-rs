@@ -9,7 +9,7 @@ Audit source: `sdk-build/fern/inventory.json` and `sdk-build/fern/policy.yaml` a
 - 349 public method paths, because streaming operations can expose both a regular and a stream method.
 - 1770 public types.
 
-This is an audit of the reviewed SDK surface policy, not a dump of generated Rust identifiers. The policy is already explicit for every published operation; the work here is to improve its method names before translating the approved names into Fern's native OpenAPI overlay.
+This audit covers the complete reviewed SDK surface and the 16 high-confidence method-name corrections applied to the source policy, inventory, and production-generated Rust SDK. The Fern v1 overlay mirrors the same corrections for diagnostic validation.
 
 ## Naming convention proposed
 
@@ -398,7 +398,7 @@ These 16 naming corrections are now applied to the reviewed SDK policy and produ
 
 All 16 corrections are encoded in `policy.yaml` and `inventory.json`, and mirrored in `fern/sdk-method-naming.overlay.yml` using native OpenAPI Overlay actions and `x-fern-sdk-method-name`. The production Fern 0.48 pipeline and the Fern v1 diagnostic both consume the same reviewed naming policy. No operationId, path, HTTP verb, request schema, or response schema is changed.
 
-The naming review checked the public resource grouping and semantic role of each operation. Shortened names are scoped by the generated resource module; therefore `get_logs` and `stream_logs` can coexist in the separate deployment and execution modules. `list_trace_events` is intentionally distinct from `get_trace_info`, `get_trace_otel`, and `get_trace_summary`. Audio-agent and realtime-session names retain a domain qualifier because Fern's Rust generator flattens their nested groups into modules shared with beta agents and audio sessions.
+The naming review checked the public resource grouping and semantic role of each operation. Shortened names are scoped by the generated resource module; therefore `get_logs` and `stream_logs` can coexist in the separate deployment and execution modules. `list_trace_events` is intentionally distinct from `get_trace_info`, `get_trace_otel`, and `get_trace_summary`.
 
 The Fern v1 Rust generator flattens nested resource groups and can therefore append numeric suffixes to otherwise identical leaf-resource methods (for example, `audio.agents` versus `beta.agents`). Production Fern 0.48 preserves the nested group modules (`audio/agents`, `beta/agents`, `realtime/sessions`, `beta/users`), so these are v1-specific naming collisions. We deliberately keep the concise production names rather than add redundant domain prefixes to work around a diagnostic generator's flattening behavior.
 
