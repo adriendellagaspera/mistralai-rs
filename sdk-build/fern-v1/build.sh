@@ -137,7 +137,7 @@ for path in sorted(p for p in root.rglob("*") if p.is_file()):
         "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
     })
 payload = {"file_count": len(entries), "files": entries}
-Path(sys.argv[2]).write_text(json.dumps(payload, indent=2) + "\\n")
+Path(sys.argv[2]).write_text(json.dumps(payload, indent=2) + "\n")
 print(f"{sys.argv[2]}: {len(entries)} files")
 PY
 
@@ -190,15 +190,15 @@ query_types = set()
 functions = set()
 for path in root.rglob("*.rs"):
     source = path.read_text(errors="replace")
-    query_types.update(re.findall(r"pub\\s+(?:struct|enum|type)\\s+([A-Za-z0-9_]*QueryRequest[0-9]*)\\b", source))
-    pattern = re.compile(r"(?m)^\\s*pub\\s+(?:async\\s+)?fn\\s+[A-Za-z0-9_]+")
+    query_types.update(re.findall(r"pub\s+(?:struct|enum|type)\s+([A-Za-z0-9_]*QueryRequest[0-9]*)\b", source))
+    pattern = re.compile(r"(?m)^\s*pub\s+(?:async\s+)?fn\s+[A-Za-z0-9_]+")
     for match in pattern.finditer(source):
         body_start = source.find("{", match.end())
         if body_start >= 0:
             signature = " ".join(source[match.start():body_start].split())
             functions.add(f"{path.relative_to(root).as_posix()}: {signature}")
-Path(sys.argv[2]).write_text("\\n".join(sorted(query_types)) + ("\\n" if query_types else ""))
-Path(sys.argv[3]).write_text("\\n".join(sorted(functions)) + ("\\n" if functions else ""))
+Path(sys.argv[2]).write_text("\n".join(sorted(query_types)) + ("\n" if query_types else ""))
+Path(sys.argv[3]).write_text("\n".join(sorted(functions)) + ("\n" if functions else ""))
 print(f"production baseline: {len(query_types)} QueryRequest types, {len(functions)} public functions")
 PY
 diff -u "$WORKSPACE/query-types-production.txt" "$WORKSPACE/query-types-wrapped.txt" \
@@ -210,7 +210,7 @@ diff -u "$WORKSPACE/public-functions-production.txt" "$WORKSPACE/public-function
 diff -u "$WORKSPACE/public-functions-production.txt" "$WORKSPACE/public-functions-inline.txt" \
   | tee "$WORKSPACE/public-functions-v1-vs-production-inline.diff" || true
 
-echo "Fern Rust generator 1.0.0 audit completed (compile status: $COMPILE_STATUS; see cargo-check logs)."
+echo "Fern Rust generator 1.0.0 audit completed (compile status: $COMPILE_STATUS; see per-command Cargo logs)."
 # This job validates generation and the naming/signature inventories. Cargo
 # failures are retained as diagnostics, but are not a gate for this audit.
 exit 0
