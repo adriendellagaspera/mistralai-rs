@@ -92,7 +92,7 @@ jobs:
 
   generation-v1:
     name: generation-v1
-    if: github.event_name == 'workflow_dispatch' && inputs.run_fern_v1 == true
+    if: (github.event_name == 'workflow_dispatch' && inputs.run_fern_v1 == true) || (github.event_name == 'pull_request' && startsWith(github.head_ref, 'experiment/fern-v1-full-evaluation'))
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
@@ -100,7 +100,7 @@ jobs:
         with:
           persist-credentials: false
       - run: rustup show
-      - run: npm install --global fern-api@5.226.1 # zizmor: ignore[adhoc-packages]
+      - run: npm install --global fern-api@5.228.1 # zizmor: ignore[adhoc-packages]
       - run: python3 -m pip install --disable-pip-version-check PyYAML==6.0.3
       - name: Generate and compile both Fern v1 parameter styles
         run: bash sdk-build/fern-v1/build.sh
@@ -114,11 +114,12 @@ jobs:
           path: |
             sdk-build/fern-v1/public-method-paths.tsv
             sdk-build/fern-v1/query-types-*.txt
-            sdk-build/fern-v1/query-types.diff
+            sdk-build/fern-v1/query-types*.diff
             sdk-build/fern-v1/public-functions-*.txt
-            sdk-build/fern-v1/public-functions.diff
+            sdk-build/fern-v1/public-functions*.diff
+            sdk-build/fern-v1/digest-*.json
             sdk-build/fern-v1/fern-generate-*.log
-            sdk-build/fern-v1/cargo-check-*.log
+            sdk-build/fern-v1/cargo-*.log
             sdk-build/fern-v1/resolution.json
             sdk-build/fern-v1/fern/openapi.json
 
