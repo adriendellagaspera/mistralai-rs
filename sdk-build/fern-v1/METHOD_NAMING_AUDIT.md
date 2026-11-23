@@ -404,11 +404,20 @@ The Fern v1 Rust generator flattens nested resource groups and can therefore app
 
 ## Generation validation
 
-Run 45142402366 (commit `5011520`) completed successfully, including the `generation-v1` job and final gate. The artifact was checked against the previous no-overlay baseline:
+### Fern v1 diagnostic
+
+Run 45142402366 (commit `5011520`) completed successfully, including the `generation-v1` job and final gate. Its artifact demonstrated native OpenAPI Overlay renaming against the no-overlay baseline:
+
 - Fern resolves 347 published operations into 349 public method paths; the generated Rust SDK contains 347 public async endpoint methods. The two additional paths are the streaming/non-streaming variants of chat and FIM completions.
-- All 16 approved method overrides appear in the generated resource modules. Fern v1's flattened resource modules still add `_2` suffixes to some cross-group collisions; production Fern 0.48 preserves the nested resource groups and does not require those prefixes.
+- All 16 overlay overrides appear in the generated resource modules. Fern v1 flattens nested resource groups and therefore still adds numeric suffixes to some cross-group collisions; this is specific to the v1 Rust generator.
 - Ten query-bearing operations have their synthetic wrapper names updated consistently (for example, `GetWorkflowEventsQueryRequest` → `EventsListQueryRequest` and `GetWorkflowExecutionTraceEventsQueryRequest` → `ListTraceEventsQueryRequest`). The remaining six overrides do not have synthetic query wrappers.
 - The corrected type inventory contains 93 public `*QueryRequest` types. Two v1-only wrapper names (`AgentsGetQueryRequest2` and `AgentsListQueryRequest2`) retain numeric suffixes because the v1 generator flattens the audio and beta agent groups; production Fern 0.48 keeps those groups separate.
 - The generated public function inventories contain 9,796 declarations in each parameter style. Exactly 165 signature lines change from the baseline and 165 are added, corresponding to the 16 endpoint renames and Fern's derived request/response naming changes. Wrapped-vs-inline function and query-type diffs are both empty.
 
-Both Fern generation modes succeed. Cargo checks remain diagnostic and currently report 52 pre-existing/unrelated crate errors in each mode, so this run does not establish that the v1 generated crate compiles. The generation gate validates Fern generation, the inventories, and parity between parameter styles.
+Both Fern v1 generation modes succeed. Cargo checks are diagnostic and report 52 crate errors in each mode (missing generated types, unsupported `Display` implementations, and a missing `Default` implementation). This does not establish that the v1 generated crate compiles, so v1 is not the production generator.
+
+### Production Fern 0.48
+
+The production `generation` job in run 45155086336 passed. It ran `generate.sh` to materialize the SDK from the reviewed policy, then `check.sh` to regenerate and verify the committed source tree. The generated-source commit is `4cdbc250ef8cc90daf0ced898cb70b16a5e15a0a`; the final production output retains nested resource modules and the concise method names.
+
+No generated Rust was edited by hand. The v1 guest-mode diagnostic is now opt-in because Fern's guest service enforces a daily session quota; ordinary pull-request CI validates the production Fern 0.48 generator.
