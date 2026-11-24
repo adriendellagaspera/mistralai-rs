@@ -36,11 +36,13 @@ and integration tests against the new module/type names.
 A source-level comparison with the current production runtime found additional
 behavior that is not covered by the generated-crate compile gate:
 
-- The current SDK's `ClientConfig.token` is not honored by Fern v1's
-  generated auth path: the generated bearer helper reads `access_token`, while
-  the generated config builder writes `token`. The generated client also
-  fails to copy per-call `RequestOptions.api_key` into the overridden config.
-  These need explicit fixes and wire-level auth tests before cutover.
+- The initial Fern v1 output did not honor the current SDK's
+  `ClientConfig.token` and dropped per-call `RequestOptions.api_key` overrides.
+  The deterministic generated-source patch now normalizes client-level
+  `token` into `access_token` for both builder and direct-struct construction,
+  and restores per-call API-key overrides at all 349 generated request sites.
+  These patches have unit-level source assertions; wire-level auth tests are
+  still required before cutover.
 - The production runtime exposes `OAuthTokenProvider` with cached token
   acquisition/refresh and an API-specific token-exchange contract. The v1
   generated `config.rs` contains OAuth configuration fields but explicitly
