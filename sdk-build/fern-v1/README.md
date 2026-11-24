@@ -18,9 +18,9 @@ to generated client method signatures. A compilation failure therefore does
 not prevent the second mode from being generated or the inventories from being
 compared.
 
-The `fern-v1-sdk-migration-candidate` CI artifact (7-day retention) contains the generated SDK trees and inventories,
+The `fern-v1-sdk-migration-candidate` CI artifact (7-day retention) contains compressed generated SDK trees and inventories,
 their diffs, Fern generation logs, Cargo diagnostics, schema resolution, and
-the exact OpenAPI input. Generated crate trees are not uploaded.
+the exact OpenAPI input. The generated crate trees are included as compressed archives for inspection.
 
 Run from the repository root:
 
