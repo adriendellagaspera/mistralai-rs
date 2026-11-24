@@ -119,6 +119,9 @@ PY
   ) 2>&1 | tee "$WORKSPACE/fern-generate-$style.log"
   test -f "$FERN_DIR/generated/Cargo.toml"
 
+  # Apply strict, tested compatibility workarounds for known Fern v1 defects.
+  python3 "$WORKSPACE/patch_generated_sdk.py" "$FERN_DIR/generated/src"
+
   # Inventory before compilation: a broken generated crate must not hide the
   # request type names or public method signatures being compared.
   inventory_query_types "$style"
