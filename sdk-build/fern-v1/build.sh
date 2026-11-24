@@ -122,14 +122,31 @@ PY
   inventory_public_functions "$style"
   mv "$FERN_DIR/generated" "$FERN_DIR/generated-$style"
 
-  if cargo check --manifest-path "$FERN_DIR/generated-$style/Cargo.toml" --all-features \
-    2>&1 | tee "$WORKSPACE/cargo-check-$style.log"; then
-    echo "cargo check ($style): success"
-  else
-    local status=$?
-    echo "cargo check ($style): failed with exit code $status" >&2
-    COMPILE_STATUS=1
-  fi
+  for diagnostic in fmt check clippy test; do
+    local log="$WORKSPACE/cargo-$diagnostic-$style.log"
+    local status=0
+    case "$diagnostic" in
+      fmt)
+        cargo fmt --manifest-path "$FERN_DIR/generated-$style/Cargo.toml" -- --check
+        ;;
+      check)
+        cargo check --manifest-path "$FERN_DIR/generated-$style/Cargo.toml" --all-features
+        ;;
+      clippy)
+        cargo clippy --manifest-path "$FERN_DIR/generated-$style/Cargo.toml" --all-features -- \
+          -D clippy::correctness -D clippy::suspicious
+        ;;
+      test)
+        cargo test --manifest-path "$FERN_DIR/generated-$style/Cargo.toml" --all-features --all-targets
+        ;;
+    esac > >(tee "$log") 2>&1 || status=$?
+    if [ "$status" -eq 0 ]; then
+      echo "cargo $diagnostic ($style): success"
+    else
+      echo "cargo $diagnostic ($style): failed with exit code $status" >&2
+      COMPILE_STATUS=1
+    fi
+  done
 }
 
 run_generation wrapped
@@ -140,7 +157,6 @@ diff -u "$WORKSPACE/query-types-wrapped.txt" "$WORKSPACE/query-types-inline.txt"
 diff -u "$WORKSPACE/public-functions-wrapped.txt" "$WORKSPACE/public-functions-inline.txt" \
   | tee "$WORKSPACE/public-functions.diff" || true
 
-echo "Fern Rust generator 1.0.0 audit completed (compile status: $COMPILE_STATUS; see cargo-check logs)."
-# This job validates generation and the naming/signature inventories. Cargo
-# failures are retained as diagnostics, but are not a gate for this audit.
-exit 0
+echo "Fern Rust generator 1.0.0 migration validation completed (compile status: $COMPILE_STATUS; see per-command Cargo logs)."
+# A migration candidate is not green unless every generated variant passes.
+exit "$COMPILE_STATUS"
