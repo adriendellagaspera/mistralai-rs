@@ -1,4 +1,8 @@
+import sys
 import unittest
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent))
 
 from fix_local_schema_refs import rewrite_nested_defs, validate_local_refs
 
