@@ -7,6 +7,7 @@ WORKSPACE="$ROOT/sdk-build/fern-v1"
 FERN_DIR="$WORKSPACE/fern"
 SURFACE_TOOL="$ROOT/sdk-build/sdk_surface/sdk_surface.py"
 COMPILE_STATUS=0
+export CARGO_TARGET_DIR="$WORKSPACE/target"
 
 python3 "$LEGACY_ROOT/prepare_fern_source.py" \
   "$ROOT/sdk-build/openapi/published.yaml" \
@@ -122,7 +123,8 @@ PY
   inventory_public_functions "$style"
   mv "$FERN_DIR/generated" "$FERN_DIR/generated-$style"
 
-  for diagnostic in fmt check clippy test; do
+  local check_status=0
+  for diagnostic in fmt check; do
     local log="$WORKSPACE/cargo-$diagnostic-$style.log"
     local status=0
     case "$diagnostic" in
@@ -132,21 +134,43 @@ PY
       check)
         cargo check --manifest-path "$FERN_DIR/generated-$style/Cargo.toml" --all-features
         ;;
-      clippy)
-        cargo clippy --manifest-path "$FERN_DIR/generated-$style/Cargo.toml" --all-features -- \
-          -D clippy::correctness -D clippy::suspicious
-        ;;
-      test)
-        cargo test --manifest-path "$FERN_DIR/generated-$style/Cargo.toml" --all-features --all-targets
-        ;;
     esac > >(tee "$log") 2>&1 || status=$?
     if [ "$status" -eq 0 ]; then
       echo "cargo $diagnostic ($style): success"
     else
       echo "cargo $diagnostic ($style): failed with exit code $status" >&2
       COMPILE_STATUS=1
+      if [ "$diagnostic" = check ]; then
+        check_status=$status
+      fi
     fi
   done
+
+  if [ "$check_status" -eq 0 ]; then
+    for diagnostic in clippy test; do
+      local log="$WORKSPACE/cargo-$diagnostic-$style.log"
+      local status=0
+      case "$diagnostic" in
+        clippy)
+          cargo clippy --manifest-path "$FERN_DIR/generated-$style/Cargo.toml" --all-features -- \
+            -D clippy::correctness -D clippy::suspicious
+          ;;
+        test)
+          cargo test --manifest-path "$FERN_DIR/generated-$style/Cargo.toml" --all-features --all-targets
+          ;;
+      esac > >(tee "$log") 2>&1 || status=$?
+      if [ "$status" -eq 0 ]; then
+        echo "cargo $diagnostic ($style): success"
+      else
+        echo "cargo $diagnostic ($style): failed with exit code $status" >&2
+        COMPILE_STATUS=1
+      fi
+    done
+  else
+    for diagnostic in clippy test; do
+      printf 'skipped: cargo check (%s) failed\\n' "$style" > "$WORKSPACE/cargo-$diagnostic-$style.log"
+    done
+  fi
 }
 
 run_generation wrapped
