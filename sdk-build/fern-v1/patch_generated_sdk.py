@@ -144,8 +144,8 @@ def patch_generated_sdk(root: Path) -> dict[str, int]:
     client_path = root / "client.rs"
     client_source = replace_exact(
         client_path.read_text(),
-        "    pub fn new(config: ClientConfig) -> Result<Self, crate::error::ApiError> {\\n        let http_client = Arc::new(",
-        "    pub fn new(mut config: ClientConfig) -> Result<Self, crate::error::ApiError> {\\n        if config.access_token.is_none() {\\n            config.access_token = config.token.clone();\\n        }\\n        let http_client = Arc::new(",
+        "    pub fn new(config: ClientConfig) -> Result<Self, crate::error::ApiError> {\n        let http_client = Arc::new(",
+        "    pub fn new(mut config: ClientConfig) -> Result<Self, crate::error::ApiError> {\n        if config.access_token.is_none() {\n            config.access_token = config.token.clone();\n        }\n        let http_client = Arc::new(",
         1,
         "Mistral::new direct-config token normalization",
     )
@@ -155,13 +155,13 @@ def patch_generated_sdk(root: Path) -> dict[str, int]:
 
     resource_root = root / "api" / "resources"
     old_override = (
-        "                if let Some(token) = &opts.token {\\n"
-        "                    overridden.access_token = Some(token.clone());\\n"
+        "                if let Some(token) = &opts.token {\n"
+        "                    overridden.access_token = Some(token.clone());\n"
         "                }"
     )
     new_override = old_override + (
-        "\\n                if let Some(api_key) = &opts.api_key {\\n"
-        "                    overridden.api_key = Some(api_key.clone());\\n"
+        "\n                if let Some(api_key) = &opts.api_key {\n"
+        "                    overridden.api_key = Some(api_key.clone());\n"
         "                }"
     )
     override_count = 0
