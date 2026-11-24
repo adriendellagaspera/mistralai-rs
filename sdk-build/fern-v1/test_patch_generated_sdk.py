@@ -22,21 +22,21 @@ class GeneratedSdkCompatibilityPatchTests(unittest.TestCase):
         }.items():
             (types / f"{name.lower()}.rs").write_text((name + "\n") * count)
         multipart_body = (
-            "struct Fixture { file: () }\\n"
-            "impl Fixture { fn fixture(&self) { let mut form = (); let value = ();\\n"
-            + "\\n".join(
+            "struct Fixture { file: () }\n"
+            "impl Fixture { fn fixture(&self) { let mut form = (); let value = ();\n"
+            + "\n".join(
                 f'form = form.text("{field}", value.to_string());'
                 for field in ("context_bias", "speaker_references", "timestamp_granularities")
             )
-            + '\\nform = form.text("file", value.to_string());\\n} }\\n'
+            + '\nform = form.text("file", value.to_string());\n} }\n'
         )
         (types / "audio_transcription_request.rs").write_text(multipart_body)
         (types / "stream_request.rs").write_text(multipart_body)
         for filename in ("document_upload.rs", "multi_part_body_params.rs"):
             (types / filename).write_text(
-                "struct Fixture { file: () }\\n"
+                "struct Fixture { file: () }\n"
                 "impl Fixture { fn fixture(&self) { let mut form = (); "
-                'form = form.text("file", self.file.to_string()); } }\\n'
+                'form = form.text("file", self.file.to_string()); } }\n'
             )
         (types / "conversation_messages.rs").write_text(
             "    #[serde(default)]\n    pub messages: MessageEntries,\n"
