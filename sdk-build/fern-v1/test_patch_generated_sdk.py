@@ -44,39 +44,39 @@ class GeneratedSdkCompatibilityPatchTests(unittest.TestCase):
             "    pub messages: MessageEntries,\n"
             "}\n"
         )
-        (types / "file.rs").write_text("pub struct File(pub Vec<u8>);\\n")
+        (types / "file.rs").write_text("pub struct File(pub Vec<u8>);\n")
 
         (src / "config.rs").write_text(
-            "pub struct ClientConfig { pub access_token: Option<String>, pub token: Option<String> }\\n"
-            "pub struct Builder { access_token: Option<String>, token: Option<String> }\\n"
-            "impl Builder { fn build(self) -> ClientConfig { ClientConfig {\\n"
-            "    access_token: self.access_token,\\n"
-            "} } }\\n"
+            "pub struct ClientConfig { pub access_token: Option<String>, pub token: Option<String> }\n"
+            "pub struct Builder { access_token: Option<String>, token: Option<String> }\n"
+            "impl Builder { fn build(self) -> ClientConfig { ClientConfig {\n"
+            "    access_token: self.access_token,\n"
+            "} } }\n"
         )
         (src / "client.rs").write_text(
-            "use std::sync::Arc;\\n"
-            "use crate::config::ClientConfig;\\n"
-            "pub struct Mistral;\\n"
-            "impl Mistral {\\n"
-            "    pub fn new(config: ClientConfig) -> Result<Self, crate::Error> {\\n"
-            "        let http_client = Arc::new(1);\\n"
-            "        Ok(Self)\\n"
-            "    }\\n"
-            "}\\n"
+            "use std::sync::Arc;\n"
+            "use crate::config::ClientConfig;\n"
+            "pub struct Mistral;\n"
+            "impl Mistral {\n"
+            "    pub fn new(config: ClientConfig) -> Result<Self, crate::Error> {\n"
+            "        let http_client = Arc::new(1);\n"
+            "        Ok(Self)\n"
+            "    }\n"
+            "}\n"
         )
         resources = src / "api" / "resources" / "chat"
         resources.mkdir(parents=True)
         auth_block = (
-            "if let Some(token) = &opts.token {\\n"
-            "    overridden.access_token = Some(token.clone());\\n"
-            "}\\n"
+            "if let Some(token) = &opts.token {\n"
+            "    overridden.access_token = Some(token.clone());\n"
+            "}\n"
         )
         (resources / "mod.rs").write_text(
-            "struct Options { token: Option<String>, api_key: Option<String> }\\n"
-            "struct Config { access_token: Option<String>, api_key: Option<String> }\\n"
-            "fn fixture(opts: &Options, mut overridden: Config) {\\n"
+            "struct Options { token: Option<String>, api_key: Option<String> }\n"
+            "struct Config { access_token: Option<String>, api_key: Option<String> }\n"
+            "fn fixture(opts: &Options, mut overridden: Config) {\n"
             + auth_block * 349
-            + "}\\n"
+            + "}\n"
         )
         return src
 
