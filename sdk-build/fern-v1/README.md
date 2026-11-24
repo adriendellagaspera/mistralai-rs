@@ -5,7 +5,8 @@ production Fern 0.48 `generators.yml` pipeline. Production SDK sources are still
 generated only by that pinned production pipeline; the v1 workspace is the migration candidate and is validated as part of its dedicated pull request.
 
 The build regenerates the exact compatibility-filtered OpenAPI input used by
-production, then generates two Rust SDKs with Fern Rust generator 1.0.0 in Fern
+production, hoists response-local JSON Schema definitions into OpenAPI components,
+normalizes the disjoint NDJSON summary frames to `oneOf`, then generates two Rust SDKs with Fern Rust generator 1.0.0 in Fern
 guest mode (remote execution, no account token):
 
 - `client.requestParameterStyle: wrapped`
