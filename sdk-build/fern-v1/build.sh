@@ -183,6 +183,11 @@ diff -u "$WORKSPACE/query-types-wrapped.txt" "$WORKSPACE/query-types-inline.txt"
 diff -u "$WORKSPACE/public-functions-wrapped.txt" "$WORKSPACE/public-functions-inline.txt" \
   | tee "$WORKSPACE/public-functions.diff" || true
 
+for style in wrapped inline; do
+  tar -czf "$WORKSPACE/generated-$style.tar.gz" \
+    -C "$FERN_DIR" "generated-$style"
+done
+
 echo "Fern Rust generator 1.0.0 migration validation completed (compile status: $COMPILE_STATUS; see per-command Cargo logs)."
 # A migration candidate is not green unless every generated variant passes.
 exit "$COMPILE_STATUS"
