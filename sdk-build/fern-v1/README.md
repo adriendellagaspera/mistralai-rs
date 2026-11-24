@@ -40,3 +40,20 @@ nested groups, so the v1-specific suffixes are not copied into the production
 naming policy.
 
 The migration gate requires the generated crate to pass formatting, compilation, Clippy, and all tests. Generated files are retained as CI artifacts while the migration is under review; they are not considered production sources until the migration is complete.
+
+
+Fern v1.0.0 currently emits several Rust defects for this API surface. The
+build applies `patch_generated_sdk.py` to each freshly generated tree before
+inventories and Cargo checks. The patch is deliberately narrow and fails on
+unexpected generator output:
+
+- Adds public `String` aliases for five fixed-string schema types that Fern
+  references but does not emit.
+- Serializes multipart collection/map fields as JSON and uploads `File`
+  values as binary multipart parts rather than text.
+- Removes an erroneous `serde(default)` from the required
+  `ConversationMessages.messages` enum field.
+
+The patch has isolated unit tests and is part of the tooling test job. These
+workarounds are migration blockers to track upstream; they do not modify the
+OpenAPI contract or hand-edit generated files outside the reproducible build.
