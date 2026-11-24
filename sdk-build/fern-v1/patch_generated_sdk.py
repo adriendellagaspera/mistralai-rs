@@ -128,8 +128,11 @@ def patch_generated_sdk(root: Path) -> dict[str, int]:
 
     final_types = types_mod.read_text()
     for name, (variant, wire_value) in FIXED_STRING_TYPES.items():
-        expected = f'pub enum {name} {{\\n    #[serde(rename = "{wire_value}")]\\n    {variant},'
-        if expected not in final_types:
+        if (
+            f"pub enum {name}" not in final_types
+            or f'#[serde(rename = "{wire_value}")]' not in final_types
+            or f"    {variant}," not in final_types
+        ):
             raise ValueError(f"Missing fixed-string compatibility enum: {name}")
     return counts
 
