@@ -44,7 +44,40 @@ class GeneratedSdkCompatibilityPatchTests(unittest.TestCase):
             "    pub messages: MessageEntries,\n"
             "}\n"
         )
-        (types / "file.rs").write_text("pub struct File(pub Vec<u8>);\n")
+        (types / "file.rs").write_text("pub struct File(pub Vec<u8>);\\n")
+
+        (src / "config.rs").write_text(
+            "pub struct ClientConfig { pub access_token: Option<String>, pub token: Option<String> }\\n"
+            "pub struct Builder { access_token: Option<String>, token: Option<String> }\\n"
+            "impl Builder { fn build(self) -> ClientConfig { ClientConfig {\\n"
+            "    access_token: self.access_token,\\n"
+            "} } }\\n"
+        )
+        (src / "client.rs").write_text(
+            "use std::sync::Arc;\\n"
+            "use crate::config::ClientConfig;\\n"
+            "pub struct Mistral;\\n"
+            "impl Mistral {\\n"
+            "    pub fn new(config: ClientConfig) -> Result<Self, crate::Error> {\\n"
+            "        let http_client = Arc::new(1);\\n"
+            "        Ok(Self)\\n"
+            "    }\\n"
+            "}\\n"
+        )
+        resources = src / "api" / "resources" / "chat"
+        resources.mkdir(parents=True)
+        auth_block = (
+            "if let Some(token) = &opts.token {\\n"
+            "    overridden.access_token = Some(token.clone());\\n"
+            "}\\n"
+        )
+        (resources / "mod.rs").write_text(
+            "struct Options { token: Option<String>, api_key: Option<String> }\\n"
+            "struct Config { access_token: Option<String>, api_key: Option<String> }\\n"
+            "fn fixture(opts: &Options, mut overridden: Config) {\\n"
+            + auth_block * 349
+            + "}\\n"
+        )
         return src
 
     def test_applies_all_expected_patches(self):
@@ -64,6 +97,12 @@ class GeneratedSdkCompatibilityPatchTests(unittest.TestCase):
                 source = (src / "api" / "types" / filename).read_text()
                 self.assertIn("serde_json::to_string(&value)", source)
                 self.assertIn("reqwest::multipart::Part::bytes(value.0)", source)
+            config = (src / "config.rs").read_text()
+            self.assertIn("self.access_token.or_else(|| self.token.clone())", config)
+            client = (src / "client.rs").read_text()
+            self.assertIn("config.access_token = config.token.clone();", client)
+            resources = (src / "api" / "resources" / "chat" / "mod.rs").read_text()
+            self.assertEqual(resources.count("overridden.api_key = Some(api_key.clone());"), 349)
             for filename in ("document_upload.rs", "multi_part_body_params.rs"):
                 source = (src / "api" / "types" / filename).read_text()
                 self.assertIn("reqwest::multipart::Part::bytes(self.file.0)", source)
