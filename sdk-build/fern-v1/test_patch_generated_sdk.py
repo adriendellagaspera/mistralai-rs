@@ -71,11 +71,17 @@ class GeneratedSdkCompatibilityPatchTests(unittest.TestCase):
             "                    overridden.access_token = Some(token.clone());\n"
             "                }"
         )
+        api_key_block = (
+            "                if let Some(api_key) = &opts.api_key {\n"
+            "                    overridden.api_key = Some(api_key.clone());\n"
+            "                }"
+        )
         (resources / "mod.rs").write_text(
             "struct Options { token: Option<String>, api_key: Option<String> }\n"
             "struct Config { access_token: Option<String>, api_key: Option<String> }\n"
             "fn fixture(opts: &Options, mut overridden: Config) {\n"
-            + auth_block * 349
+            + auth_block * 343
+            + (auth_block + "\n" + api_key_block) * 6
             + "}\n"
         )
         return src
@@ -103,6 +109,7 @@ class GeneratedSdkCompatibilityPatchTests(unittest.TestCase):
             self.assertIn("config.access_token = config.token.clone();", client)
             resources = (src / "api" / "resources" / "chat" / "mod.rs").read_text()
             self.assertEqual(resources.count("overridden.api_key = Some(api_key.clone());"), 349)
+            self.assertEqual(counts["auth:per-call-api-key-overrides"], 343)
             for filename in ("document_upload.rs", "multi_part_body_params.rs"):
                 source = (src / "api" / "types" / filename).read_text()
                 self.assertIn("reqwest::multipart::Part::bytes(self.file.0)", source)
