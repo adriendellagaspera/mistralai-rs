@@ -21,20 +21,23 @@ class GeneratedSdkCompatibilityPatchTests(unittest.TestCase):
             "OcrCodeBlockType": 6,
         }.items():
             (types / f"{name.lower()}.rs").write_text((name + "\n") * count)
-        (types / "audio_transcription_request.rs").write_text(
-            "\n".join(
+        multipart_body = (
+            "struct Fixture { file: () }\\n"
+            "impl Fixture { fn fixture(&self) { let mut form = (); let value = ();\\n"
+            + "\\n".join(
                 f'form = form.text("{field}", value.to_string());'
                 for field in ("context_bias", "speaker_references", "timestamp_granularities")
-            ) + '\nform = form.text("file", value.to_string());\n'
+            )
+            + '\\nform = form.text("file", value.to_string());\\n} }\\n'
         )
-        (types / "stream_request.rs").write_text(
-            "\n".join(
-                f'form = form.text("{field}", value.to_string());'
-                for field in ("context_bias", "speaker_references", "timestamp_granularities")
-            ) + '\nform = form.text("file", value.to_string());\n'
-        )
+        (types / "audio_transcription_request.rs").write_text(multipart_body)
+        (types / "stream_request.rs").write_text(multipart_body)
         for filename in ("document_upload.rs", "multi_part_body_params.rs"):
-            (types / filename).write_text('form = form.text("file", self.file.to_string());\n')
+            (types / filename).write_text(
+                "struct Fixture { file: () }\\n"
+                "impl Fixture { fn fixture(&self) { let mut form = (); "
+                'form = form.text("file", self.file.to_string()); } }\\n'
+            )
         (types / "conversation_messages.rs").write_text(
             "    #[serde(default)]\n    pub messages: MessageEntries,\n"
         )
