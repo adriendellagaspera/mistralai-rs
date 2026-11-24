@@ -76,6 +76,13 @@ jobs:
       - run: python3 -m pip install --disable-pip-version-check PyYAML==6.0.3
       - name: Generate and compile both Fern v1 parameter styles
         run: bash sdk-build/fern-v1/build.sh
+      - name: Check repository tests against the Fern v1 generated source
+        run: |
+          python3 sdk-build/fern-v1/check_repository_integration.py \
+            "$GITHUB_WORKSPACE" \
+            sdk-build/fern-v1/fern/generated-wrapped \
+            sdk-build/fern-v1/integration
+          cargo test --manifest-path sdk-build/fern-v1/integration/Cargo.toml --all-features --all-targets
       - name: Preserve generated SDKs and audit outputs
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
