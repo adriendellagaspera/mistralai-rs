@@ -7,6 +7,7 @@ WORKSPACE="$ROOT/sdk-build/fern-v1"
 FERN_DIR="$WORKSPACE/fern"
 SURFACE_TOOL="$ROOT/sdk-build/sdk_surface/sdk_surface.py"
 COMPILE_STATUS=0
+export CARGO_TARGET_DIR="$WORKSPACE/target"
 
 python3 "$LEGACY_ROOT/prepare_fern_source.py" \
   "$ROOT/sdk-build/openapi/published.yaml" \
@@ -18,6 +19,8 @@ python3 "$SURFACE_TOOL" compile \
   --policy "$LEGACY_ROOT/policy.yaml" \
   --output "$FERN_DIR/openapi.json" \
   --resolution "$WORKSPACE/resolution.json"
+
+python3 "$WORKSPACE/fix_local_schema_refs.py" "$FERN_DIR/openapi.json"
 
 python3 - "$WORKSPACE/resolution.json" "$WORKSPACE/public-method-paths.tsv" <<'PY'
 import json
@@ -116,19 +119,66 @@ PY
   ) 2>&1 | tee "$WORKSPACE/fern-generate-$style.log"
   test -f "$FERN_DIR/generated/Cargo.toml"
 
+  # Apply strict, tested compatibility workarounds for known Fern v1 defects.
+  python3 "$WORKSPACE/patch_generated_sdk.py" "$FERN_DIR/generated/src"
+  python3 "$WORKSPACE/patch_generated_streaming.py" "$FERN_DIR/generated/src"
+  # The compatibility patch introduces longer expressions than rustfmt allows.
+  # Normalize the generated tree, then require the subsequent --check to pass.
+  cargo fmt --manifest-path "$FERN_DIR/generated/Cargo.toml"
+
   # Inventory before compilation: a broken generated crate must not hide the
   # request type names or public method signatures being compared.
   inventory_query_types "$style"
   inventory_public_functions "$style"
   mv "$FERN_DIR/generated" "$FERN_DIR/generated-$style"
 
-  if cargo check --manifest-path "$FERN_DIR/generated-$style/Cargo.toml" --all-features \
-    2>&1 | tee "$WORKSPACE/cargo-check-$style.log"; then
-    echo "cargo check ($style): success"
+  local check_status=0
+  for diagnostic in fmt check; do
+    local log="$WORKSPACE/cargo-$diagnostic-$style.log"
+    local status=0
+    case "$diagnostic" in
+      fmt)
+        cargo fmt --manifest-path "$FERN_DIR/generated-$style/Cargo.toml" -- --check
+        ;;
+      check)
+        cargo check --manifest-path "$FERN_DIR/generated-$style/Cargo.toml" --all-features
+        ;;
+    esac > >(tee "$log") 2>&1 || status=$?
+    if [ "$status" -eq 0 ]; then
+      echo "cargo $diagnostic ($style): success"
+    else
+      echo "cargo $diagnostic ($style): failed with exit code $status" >&2
+      COMPILE_STATUS=1
+      if [ "$diagnostic" = check ]; then
+        check_status=$status
+      fi
+    fi
+  done
+
+  if [ "$check_status" -eq 0 ]; then
+    for diagnostic in clippy test; do
+      local log="$WORKSPACE/cargo-$diagnostic-$style.log"
+      local status=0
+      case "$diagnostic" in
+        clippy)
+          cargo clippy --manifest-path "$FERN_DIR/generated-$style/Cargo.toml" --all-features -- \
+            -D clippy::correctness -D clippy::suspicious
+          ;;
+        test)
+          cargo test --manifest-path "$FERN_DIR/generated-$style/Cargo.toml" --all-features --all-targets
+          ;;
+      esac > >(tee "$log") 2>&1 || status=$?
+      if [ "$status" -eq 0 ]; then
+        echo "cargo $diagnostic ($style): success"
+      else
+        echo "cargo $diagnostic ($style): failed with exit code $status" >&2
+        COMPILE_STATUS=1
+      fi
+    done
   else
-    local status=$?
-    echo "cargo check ($style): failed with exit code $status" >&2
-    COMPILE_STATUS=1
+    for diagnostic in clippy test; do
+      printf 'skipped: cargo check (%s) failed\\n' "$style" > "$WORKSPACE/cargo-$diagnostic-$style.log"
+    done
   fi
 }
 
@@ -140,7 +190,11 @@ diff -u "$WORKSPACE/query-types-wrapped.txt" "$WORKSPACE/query-types-inline.txt"
 diff -u "$WORKSPACE/public-functions-wrapped.txt" "$WORKSPACE/public-functions-inline.txt" \
   | tee "$WORKSPACE/public-functions.diff" || true
 
-echo "Fern Rust generator 1.0.0 audit completed (compile status: $COMPILE_STATUS; see cargo-check logs)."
-# This job validates generation and the naming/signature inventories. Cargo
-# failures are retained as diagnostics, but are not a gate for this audit.
-exit 0
+for style in wrapped inline; do
+  tar -czf "$WORKSPACE/generated-$style.tar.gz" \
+    -C "$FERN_DIR" "generated-$style"
+done
+
+echo "Fern Rust generator 1.0.0 migration validation completed (compile status: $COMPILE_STATUS; see per-command Cargo logs)."
+# A migration candidate is not green unless every generated variant passes.
+exit "$COMPILE_STATUS"

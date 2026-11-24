@@ -64,7 +64,7 @@ jobs:
 
   generation-v1:
     name: generation-v1
-    if: github.event_name == 'workflow_dispatch' && inputs.run_fern_v1 == true
+    if: (github.event_name == 'workflow_dispatch' && inputs.run_fern_v1 == true) || (github.event_name == 'pull_request' && startsWith(github.head_ref, 'migration/fern-rust-v1'))
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
@@ -72,15 +72,22 @@ jobs:
         with:
           persist-credentials: false
       - run: rustup show
-      - run: npm install --global fern-api@5.226.1 # zizmor: ignore[adhoc-packages]
+      - run: npm install --global fern-api@5.228.1 # zizmor: ignore[adhoc-packages]
       - run: python3 -m pip install --disable-pip-version-check PyYAML==6.0.3
       - name: Generate and compile both Fern v1 parameter styles
         run: bash sdk-build/fern-v1/build.sh
+      - name: Check repository tests against the Fern v1 generated source
+        run: |
+          python3 sdk-build/fern-v1/check_repository_integration.py \
+            "$GITHUB_WORKSPACE" \
+            sdk-build/fern-v1/fern/generated-wrapped \
+            sdk-build/fern-v1/integration
+          cargo test --manifest-path sdk-build/fern-v1/integration/Cargo.toml --all-features --all-targets
       - name: Preserve generated SDKs and audit outputs
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: fern-v1-sdk-audit
+          name: fern-v1-sdk-migration-candidate
           if-no-files-found: warn
           retention-days: 7
           path: |
@@ -90,7 +97,8 @@ jobs:
             sdk-build/fern-v1/public-functions-*.txt
             sdk-build/fern-v1/public-functions.diff
             sdk-build/fern-v1/fern-generate-*.log
-            sdk-build/fern-v1/cargo-check-*.log
+            sdk-build/fern-v1/cargo-*.log
+            sdk-build/fern-v1/generated-*.tar.gz
             sdk-build/fern-v1/resolution.json
             sdk-build/fern-v1/fern/openapi.json
 
@@ -145,6 +153,7 @@ jobs:
       - run: python3 -m pip install --disable-pip-version-check PyYAML==6.0.3
       - run: python3 -m unittest discover -s sdk-build -p 'test_*.py'
       - run: python3 -m unittest discover -s .github/scripts -p 'test_*.py'
+      - run: python3 -m unittest discover -s sdk-build/fern-v1 -p 'test_*.py'
       - name: Verify pinned official SDK taxonomy and Tier-2/Tier-3 evidence
         run: python3 sdk-build/official-sdks/update.py check
 
@@ -202,9 +211,10 @@ jobs:
           DOCS: ${{ needs.docs.result }}
           API: ${{ needs.api.result }}
           RUN_FERN_V1: ${{ github.event.inputs.run_fern_v1 || 'false' }}
+          IS_FERN_V1_MIGRATION_PR: ${{ github.event_name == 'pull_request' && startsWith(github.head_ref, 'migration/fern-rust-v1') }}
         run: |
-          # Fern v1 is an opt-in diagnostic; skipped runs do not block production SDK checks.
-          if [ "$GENERATION_V1" = skipped ] && [ "$RUN_FERN_V1" != "true" ]; then
+          # The dedicated migration PR must pass Fern v1 generation and generated-crate checks.
+          if [ "$GENERATION_V1" = skipped ] && [ "$RUN_FERN_V1" != "true" ] && [ "$IS_FERN_V1_MIGRATION_PR" != "true" ]; then
             GENERATION_V1=success
           fi
           for result in "$POLICY" "$GENERATION" "$GENERATION_V1" "$FORMAT" "$LINT" "$DEPENDENCIES" "$TOOLING" "$TEST" "$DOCS" "$API"; do
