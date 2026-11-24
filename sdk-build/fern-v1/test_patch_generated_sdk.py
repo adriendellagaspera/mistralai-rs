@@ -50,7 +50,7 @@ class GeneratedSdkCompatibilityPatchTests(unittest.TestCase):
             "pub struct ClientConfig { pub access_token: Option<String>, pub token: Option<String> }\n"
             "pub struct Builder { access_token: Option<String>, token: Option<String> }\n"
             "impl Builder { fn build(self) -> ClientConfig { ClientConfig {\n"
-            "    access_token: self.access_token,\n"
+            "            access_token: self.access_token,\n"
             "} } }\n"
         )
         (src / "client.rs").write_text(
