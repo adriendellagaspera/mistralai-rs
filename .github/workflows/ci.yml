@@ -205,7 +205,7 @@ jobs:
           API: ${{ needs.api.result }}
           RUN_FERN_V1: ${{ github.event.inputs.run_fern_v1 || 'false' }}
         run: |
-          # Fern v1 is an opt-in diagnostic; skipped runs do not block production SDK checks.
+          # The dedicated migration PR must pass Fern v1 generation and generated-crate checks.
           if [ "$GENERATION_V1" = skipped ] && [ "$RUN_FERN_V1" != "true" ]; then
             GENERATION_V1=success
           fi
