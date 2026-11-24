@@ -121,6 +121,9 @@ PY
 
   # Apply strict, tested compatibility workarounds for known Fern v1 defects.
   python3 "$WORKSPACE/patch_generated_sdk.py" "$FERN_DIR/generated/src"
+  # The compatibility patch introduces longer expressions than rustfmt allows.
+  # Normalize the generated tree, then require the subsequent --check to pass.
+  cargo fmt --manifest-path "$FERN_DIR/generated/Cargo.toml"
 
   # Inventory before compilation: a broken generated crate must not hide the
   # request type names or public method signatures being compared.
