@@ -7,6 +7,7 @@ silently rewritten incorrectly.
 """
 from __future__ import annotations
 
+import subprocess
 import sys
 from pathlib import Path
 
@@ -85,6 +86,7 @@ def patch_generated_sdk(root: Path) -> dict[str, int]:
         )
         counts[f"multipart-file:{filename}"] = 1
         path.write_text(source)
+        subprocess.run(["rustfmt", "--edition", "2021", str(path)], check=True)
 
     for filename in ("document_upload.rs", "multi_part_body_params.rs"):
         path = root / "api" / "types" / filename
@@ -97,6 +99,7 @@ def patch_generated_sdk(root: Path) -> dict[str, int]:
             f"{filename}:file multipart part",
         )
         path.write_text(source)
+        subprocess.run(["rustfmt", "--edition", "2021", str(path)], check=True)
         counts[f"multipart-file:{filename}"] = 1
 
     # messages is required in the OpenAPI schema. Fern incorrectly emits
@@ -111,6 +114,7 @@ def patch_generated_sdk(root: Path) -> dict[str, int]:
         "ConversationMessages.messages serde(default)",
     )
     path.write_text(source)
+    subprocess.run(["rustfmt", "--edition", "2021", str(path)], check=True)
     counts["serde-default:ConversationMessages.messages"] = 1
 
     for name in MISSING_TYPE_NAMES:
