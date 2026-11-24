@@ -204,9 +204,10 @@ jobs:
           DOCS: ${{ needs.docs.result }}
           API: ${{ needs.api.result }}
           RUN_FERN_V1: ${{ github.event.inputs.run_fern_v1 || 'false' }}
+          IS_FERN_V1_MIGRATION_PR: ${{ github.event_name == 'pull_request' && startsWith(github.head_ref, 'migration/fern-rust-v1') }}
         run: |
           # The dedicated migration PR must pass Fern v1 generation and generated-crate checks.
-          if [ "$GENERATION_V1" = skipped ] && [ "$RUN_FERN_V1" != "true" ]; then
+          if [ "$GENERATION_V1" = skipped ] && [ "$RUN_FERN_V1" != "true" ] && [ "$IS_FERN_V1_MIGRATION_PR" != "true" ]; then
             GENERATION_V1=success
           fi
           for result in "$POLICY" "$GENERATION" "$GENERATION_V1" "$FORMAT" "$LINT" "$DEPENDENCIES" "$TOOLING" "$TEST" "$DOCS" "$API"; do
