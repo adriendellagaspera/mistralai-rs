@@ -29,3 +29,38 @@ The current CI candidate validates generation and compilation, not behavioral
 parity with the legacy transport implementation. Before cutover, add request
 serialization and SSE parsing contract tests, and review downstream examples
 and integration tests against the new module/type names.
+
+
+## Repository-level runtime compatibility gaps
+
+A source-level comparison with the current production runtime found additional
+behavior that is not covered by the generated-crate compile gate:
+
+- The production runtime exposes `OAuthTokenProvider` with cached token
+  acquisition/refresh and an API-specific token-exchange contract. The v1
+  generated `config.rs` contains OAuth configuration fields but explicitly
+  omits the provider, and no generated runtime code consumes those fields.
+  OAuth client-credentials authentication would therefore be silently
+  nonfunctional after a direct source replacement.
+- Production exposes `RequestExecutor` injection, custom `reqwest::Client`
+  injection, and `RawResponse<T>` (body, status, and headers). The generated
+  v1 runtime currently exposes none of these contracts.
+- Production's `HttpClient` accepts `ClientConfig` and exposes JSON, SSE,
+  multipart-SSE, and binary-stream execution methods. The v1 runtime instead
+  has a base-URL/timeout/retry constructor and lower-level reqwest builders.
+  Existing `tests/transport_contracts.rs` is consequently not a drop-in
+  compile target.
+- Production exposes pagination helpers, structured query parsing/building,
+  URL helpers, and the `SseStream` wrapper. These modules are absent from the
+  generated v1 runtime.
+- The public resource topology changes from grouped clients
+  (`Mistral.beta.*`, `Mistral.audio.*`, `Mistral.workflows.*`) to a flat
+  set of resource clients on `Mistral` (`Mistral.chat`, `Mistral.sessions`,
+  `Mistral.workflows`, etc.). Equal HTTP operation counts do not establish
+  source compatibility.
+
+These are migration blockers, not cosmetic differences. A production cutover
+needs either explicit, tested compatibility adapters/ported runtime
+capabilities or a deliberate major-version API break with corresponding
+release notes and integration tests. In particular, do not treat the presence
+of OAuth configuration fields as evidence that OAuth is implemented.
