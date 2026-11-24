@@ -20,6 +20,8 @@ python3 "$SURFACE_TOOL" compile \
   --output "$FERN_DIR/openapi.json" \
   --resolution "$WORKSPACE/resolution.json"
 
+python3 "$WORKSPACE/fix_local_schema_refs.py" "$FERN_DIR/openapi.json"
+
 python3 - "$WORKSPACE/resolution.json" "$WORKSPACE/public-method-paths.tsv" <<'PY'
 import json
 import sys
