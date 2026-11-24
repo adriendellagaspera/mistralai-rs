@@ -59,7 +59,7 @@ def patch_generated_sdk(root: Path) -> dict[str, int]:
     enums = marker
     for name, (variant, wire_value) in FIXED_STRING_TYPES.items():
         enums += (
-            "#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]\n"
+            "#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]\n"
             f"pub enum {name} {{\n"
             f'    #[serde(rename = "{wire_value}")]\n'
             f"    {variant},\n"
