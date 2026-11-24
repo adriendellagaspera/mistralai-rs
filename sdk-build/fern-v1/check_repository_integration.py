@@ -27,7 +27,7 @@ manifest = manifest.replace(
 )
 manifest = manifest.replace(
     'repository = "https://github.com/adriendellagaspera/mistralai-rs"',
-    'repository = "https://github.com/adriendellagaspera/mistralai-rs"\\nlicense = "MIT OR Apache-2.0"\\npublish = ["crates-io"]',
+    'repository = "https://github.com/adriendellagaspera/mistralai-rs"\nlicense = "MIT OR Apache-2.0"\npublish = ["crates-io"]',
 )
 manifest += """
 
