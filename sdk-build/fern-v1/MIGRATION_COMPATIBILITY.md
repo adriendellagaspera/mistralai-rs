@@ -40,7 +40,7 @@ behavior that is not covered by the generated-crate compile gate:
   `ClientConfig.token` and dropped per-call `RequestOptions.api_key` overrides.
   The deterministic generated-source patch now normalizes client-level
   `token` into `access_token` for both builder and direct-struct construction,
-  and restores per-call API-key overrides at all 349 generated request sites.
+  and restores the missing per-call API-key overrides at 343 generated request sites (six already had the override).
   These patches have unit-level source assertions; wire-level auth tests are
   still required before cutover.
 - The production runtime exposes `OAuthTokenProvider` with cached token
