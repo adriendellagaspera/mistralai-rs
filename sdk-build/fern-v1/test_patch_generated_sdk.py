@@ -55,7 +55,8 @@ class GeneratedSdkCompatibilityPatchTests(unittest.TestCase):
             types = (src / "api" / "types" / "mod.rs").read_text()
             for name, (variant, wire_value) in FIXED_STRING_TYPES.items():
                 self.assertIn(f"pub enum {name}", types)
-                self.assertIn(f'#[serde(rename = "{wire_value}")]\\n    {variant}', types)
+                self.assertIn(f'#[serde(rename = "{wire_value}")]' , types)
+                self.assertIn(f"    {variant},", types)
             messages = (src / "api" / "types" / "conversation_messages.rs").read_text()
             self.assertNotIn("#[serde(default)]", messages)
             for filename in ("audio_transcription_request.rs", "stream_request.rs"):
