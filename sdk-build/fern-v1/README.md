@@ -17,7 +17,7 @@ Clippy, and all generated-crate tests. A shared Cargo target directory avoids
 duplicated compilation work.
 
 Known Fern v1.0.0 gaps are handled deterministically:
-- `patch_generated_sdk.py` repairs five omitted fixed-string type declarations,
+- `patch_generated_sdk.py` repairs five omitted fixed-string enum declarations,
   multipart serialization for binary files and JSON collection fields, and an
   incorrect Serde default on a required enum.
 - `patch_generated_streaming.py` restores `chat.complete_stream` and
