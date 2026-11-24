@@ -91,8 +91,7 @@ jobs:
             sdk-build/fern-v1/public-functions.diff
             sdk-build/fern-v1/fern-generate-*.log
             sdk-build/fern-v1/cargo-*.log
-            sdk-build/fern-v1/fern/generated-wrapped/**
-            sdk-build/fern-v1/fern/generated-inline/**
+            sdk-build/fern-v1/generated-*.tar.gz
             sdk-build/fern-v1/resolution.json
             sdk-build/fern-v1/fern/openapi.json
 
