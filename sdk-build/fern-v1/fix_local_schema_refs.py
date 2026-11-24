@@ -75,7 +75,7 @@ def validate_local_refs(document: Any) -> None:
 
     visit(document, "#")
     if failures:
-        raise ValueError("Unresolved local OpenAPI references:\\n" + "\\n".join(failures))
+        raise ValueError("Unresolved local OpenAPI references:\n" + "\n".join(failures))
 
 
 def main() -> int:
@@ -85,7 +85,7 @@ def main() -> int:
     document = json.loads(path.read_text())
     rewritten = rewrite_nested_defs(document)
     validate_local_refs(document)
-    path.write_text(json.dumps(document, indent=2, ensure_ascii=False) + "\\n")
+    path.write_text(json.dumps(document, indent=2, ensure_ascii=False) + "\n")
     print(f"nested JSON Schema references rewritten: {rewritten}; all local references resolve")
     return 0
 
