@@ -11,13 +11,14 @@ import subprocess
 import sys
 from pathlib import Path
 
-MISSING_TYPE_NAMES = (
-    "GetDeploymentSummariesResponseVespaDeploymentType",
-    "AssistantMessageRole",
-    "OAuth2ClientCredentialsAuthMethodGrantType",
-    "FunctionToolType",
-    "OcrCodeBlockType",
-)
+FIXED_STRING_TYPES = {
+    "GetDeploymentSummariesResponseVespaDeploymentType": ("Vespa", "vespa"),
+    "AssistantMessageRole": ("Assistant", "assistant"),
+    "OAuth2ClientCredentialsAuthMethodGrantType": ("ClientCredentials", "client_credentials"),
+    "FunctionToolType": ("Function", "function"),
+    "OcrCodeBlockType": ("Code", "code"),
+}
+MISSING_TYPE_NAMES = tuple(FIXED_STRING_TYPES)
 
 
 def replace_exact(source: str, old: str, new: str, expected: int, label: str) -> str:
@@ -52,14 +53,22 @@ def patch_generated_sdk(root: Path) -> dict[str, int]:
         )
     types_mod = root / "api" / "types" / "mod.rs"
     types_source = types_mod.read_text()
-    marker = "// Fern v1 compatibility aliases for fixed-string schema types.\n"
+    marker = "// Fern v1 compatibility enums for fixed-string schema types.\n"
     if marker in types_source:
-        raise ValueError("Fern v1 compatibility aliases are already present")
-    aliases = marker + "".join(f"pub type {name} = String;\n" for name in MISSING_TYPE_NAMES)
-    types_mod.write_text(types_source.rstrip() + "\n\n" + aliases)
+        raise ValueError("Fern v1 compatibility enums are already present")
+    enums = marker
+    for name, (variant, wire_value) in FIXED_STRING_TYPES.items():
+        enums += (
+            "#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]\n"
+            f"pub enum {name} {{\n"
+            f'    #[serde(rename = "{wire_value}")]\n'
+            f"    {variant},\n"
+            "}\n\n"
+        )
+    types_mod.write_text(types_source.rstrip() + "\n\n" + enums.rstrip() + "\n")
 
     counts: dict[str, int] = {
-        f"type-alias:{name}": count for name, count in references.items()
+        f"fixed-enum:{name}": count for name, count in references.items()
     }
 
     # Multipart scalar collections/maps are JSON values, not Display strings.
@@ -117,9 +126,11 @@ def patch_generated_sdk(root: Path) -> dict[str, int]:
     subprocess.run(["rustfmt", "--edition", "2021", str(path)], check=True)
     counts["serde-default:ConversationMessages.messages"] = 1
 
-    for name in MISSING_TYPE_NAMES:
-        if f"pub type {name} = String;" not in types_mod.read_text():
-            raise ValueError(f"Missing generated compatibility alias: {name}")
+    final_types = types_mod.read_text()
+    for name, (variant, wire_value) in FIXED_STRING_TYPES.items():
+        expected = f'pub enum {name} {{\\n    #[serde(rename = "{wire_value}")]\\n    {variant},'
+        if expected not in final_types:
+            raise ValueError(f"Missing fixed-string compatibility enum: {name}")
     return counts
 
 
