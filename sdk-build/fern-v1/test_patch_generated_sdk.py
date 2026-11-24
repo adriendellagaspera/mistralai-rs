@@ -58,7 +58,7 @@ class GeneratedSdkCompatibilityPatchTests(unittest.TestCase):
             "use crate::config::ClientConfig;\n"
             "pub struct Mistral;\n"
             "impl Mistral {\n"
-            "    pub fn new(config: ClientConfig) -> Result<Self, crate::Error> {\n"
+            "    pub fn new(config: ClientConfig) -> Result<Self, crate::error::ApiError> {\n"
             "        let http_client = Arc::new(1);\n"
             "        Ok(Self)\n"
             "    }\n"
@@ -67,9 +67,9 @@ class GeneratedSdkCompatibilityPatchTests(unittest.TestCase):
         resources = src / "api" / "resources" / "chat"
         resources.mkdir(parents=True)
         auth_block = (
-            "if let Some(token) = &opts.token {\n"
-            "    overridden.access_token = Some(token.clone());\n"
-            "}\n"
+            "                if let Some(token) = &opts.token {\n"
+            "                    overridden.access_token = Some(token.clone());\n"
+            "                }"
         )
         (resources / "mod.rs").write_text(
             "struct Options { token: Option<String>, api_key: Option<String> }\n"
