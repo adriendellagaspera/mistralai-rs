@@ -7,6 +7,7 @@ silently rewritten incorrectly.
 """
 from __future__ import annotations
 
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -155,29 +156,43 @@ def patch_generated_sdk(root: Path) -> dict[str, int]:
 
     resource_root = root / "api" / "resources"
     old_override = (
-        "                if let Some(token) = &opts.token {\n"
-        "                    overridden.access_token = Some(token.clone());\n"
+        "                if let Some(token) = &opts.token {\\n"
+        "                    overridden.access_token = Some(token.clone());\\n"
         "                }"
     )
-    new_override = old_override + (
-        "\n                if let Some(api_key) = &opts.api_key {\n"
-        "                    overridden.api_key = Some(api_key.clone());\n"
+    api_key_override = (
+        "                if let Some(api_key) = &opts.api_key {\\n"
+        "                    overridden.api_key = Some(api_key.clone());\\n"
         "                }"
     )
-    override_count = 0
+    override_pattern = re.compile(
+        re.escape(old_override)
+        + r"(?!\\n"
+        + re.escape(api_key_override)
+        + r")"
+    )
+    token_sites = 0
+    existing_api_key_sites = 0
+    inserted_api_key_sites = 0
     for resource_path in sorted(resource_root.rglob("*.rs")):
         source = resource_path.read_text()
-        count = source.count(old_override)
-        if count:
-            override_count += count
-            source = source.replace(old_override, new_override)
-            resource_path.write_text(source)
-            subprocess.run(["rustfmt", "--edition", "2021", str(resource_path)], check=True)
-    if override_count != 349:
-        raise ValueError(
-            f"RequestOptions auth override: expected 349 generated sites, found {override_count}"
+        token_sites += source.count(old_override)
+        existing_api_key_sites += source.count(api_key_override)
+        patched, inserted = override_pattern.subn(
+            lambda match: match.group(0) + "\\n" + api_key_override,
+            source,
         )
-    counts["auth:per-call-api-key-overrides"] = override_count
+        if inserted:
+            inserted_api_key_sites += inserted
+            resource_path.write_text(patched)
+            subprocess.run(["rustfmt", "--edition", "2021", str(resource_path)], check=True)
+    if (token_sites, existing_api_key_sites, inserted_api_key_sites) != (349, 6, 343):
+        raise ValueError(
+            "RequestOptions auth override drift: expected 349 token sites, "
+            "6 existing API-key overrides, and 343 insertions; got "
+            f"{token_sites}, {existing_api_key_sites}, and {inserted_api_key_sites}"
+        )
+    counts["auth:per-call-api-key-overrides"] = inserted_api_key_sites
 
     final_types = types_mod.read_text()
     for name, (variant, wire_value) in FIXED_STRING_TYPES.items():
