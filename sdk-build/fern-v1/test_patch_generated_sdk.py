@@ -55,6 +55,7 @@ class GeneratedSdkCompatibilityPatchTests(unittest.TestCase):
             types = (src / "api" / "types" / "mod.rs").read_text()
             for name, (variant, wire_value) in FIXED_STRING_TYPES.items():
                 self.assertIn(f"pub enum {name}", types)
+                self.assertIn("#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash,", types)
                 self.assertIn(f'#[serde(rename = "{wire_value}")]' , types)
                 self.assertIn(f"    {variant},", types)
             messages = (src / "api" / "types" / "conversation_messages.rs").read_text()
