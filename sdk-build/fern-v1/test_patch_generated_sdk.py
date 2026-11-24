@@ -39,7 +39,10 @@ class GeneratedSdkCompatibilityPatchTests(unittest.TestCase):
                 'form = form.text("file", self.file.to_string()); } }\n'
             )
         (types / "conversation_messages.rs").write_text(
-            "    #[serde(default)]\n    pub messages: MessageEntries,\n"
+            "pub struct ConversationMessages {\n"
+            "    #[serde(default)]\n"
+            "    pub messages: MessageEntries,\n"
+            "}\n"
         )
         (types / "file.rs").write_text("pub struct File(pub Vec<u8>);\n")
         return src
