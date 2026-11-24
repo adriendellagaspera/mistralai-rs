@@ -156,18 +156,18 @@ def patch_generated_sdk(root: Path) -> dict[str, int]:
 
     resource_root = root / "api" / "resources"
     old_override = (
-        "                if let Some(token) = &opts.token {\\n"
-        "                    overridden.access_token = Some(token.clone());\\n"
+        "                if let Some(token) = &opts.token {\n"
+        "                    overridden.access_token = Some(token.clone());\n"
         "                }"
     )
     api_key_override = (
-        "                if let Some(api_key) = &opts.api_key {\\n"
-        "                    overridden.api_key = Some(api_key.clone());\\n"
+        "                if let Some(api_key) = &opts.api_key {\n"
+        "                    overridden.api_key = Some(api_key.clone());\n"
         "                }"
     )
     override_pattern = re.compile(
         re.escape(old_override)
-        + r"(?!\\n"
+        + r"(?!\n"
         + re.escape(api_key_override)
         + r")"
     )
@@ -179,7 +179,7 @@ def patch_generated_sdk(root: Path) -> dict[str, int]:
         token_sites += source.count(old_override)
         existing_api_key_sites += source.count(api_key_override)
         patched, inserted = override_pattern.subn(
-            lambda match: match.group(0) + "\\n" + api_key_override,
+            lambda match: match.group(0) + "\n" + api_key_override,
             source,
         )
         if inserted:
